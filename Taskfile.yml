@@ -1,0 +1,8 @@
+version: '2'
+
+tasks:
+  flux-sync:
+    desc: Force cluster to run flux
+    silent: true
+    cmds:
+      - fluxctl --k8s-fwd-ns=system-flux --k8s-fwd-labels="app=flux,release=flux" sync
