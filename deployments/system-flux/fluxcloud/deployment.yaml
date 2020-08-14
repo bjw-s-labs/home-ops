@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fluxcloud
+  namespace: system-flux
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: fluxcloud
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: fluxcloud
+    spec:
+      securityContext:
+        runAsUser: 999
+      containers:
+        - name: fluxcloud
+          image: tfgco/fluxcloud:v0.4.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3032
+              protocol: TCP
+          env:
+            - name: SLACK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: fluxcloud
+                  key: slack_url
+            - name: SLACK_CHANNEL
+              value: "#kubernetes"
+            - name: SLACK_USERNAME
+              value: flux
+            - name: GITHUB_URL
+              value: "https://github.com/bjw-s/k8s-gitops/"
+            - name: LISTEN_ADDRESS
+              value: ":3032"
