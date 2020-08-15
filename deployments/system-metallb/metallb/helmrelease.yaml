@@ -1,0 +1,18 @@
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: metallb
+  namespace: system-metallb
+  annotations:
+    fluxcd.io/ignore: "false"
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: metallb
+  chart:
+    repository: https://kubernetes-charts.storage.googleapis.com
+    name: metallb
+    version: 0.12.0
+  valuesFrom:
+    - externalSourceRef:
+        url: https://raw.githubusercontent.com/bjw-s/k8s-gitops/master/deployments/system-metallb/metallb/values.yaml
