@@ -5,4 +5,18 @@ metadata:
   namespace: actions-runner-system
 spec:
   repository: bjw-s/k8s-gitops
-  env: []
+  labels:
+    - self-hosted
+  containers:
+    - name: docker
+      image: docker:dind
+      imagePullPolicy: IfNotPresent
+      volumeMounts:
+        - name:      "work"
+          mountPath: "/runner/_work"
+        - name: "docker"
+          mountPath: "/var/run"
+      args:
+        - --mtu=1300
+      securityContext:
+        privileged: true
