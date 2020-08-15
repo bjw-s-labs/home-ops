@@ -1,0 +1,16 @@
+name: main
+on:
+  push:
+    branches:
+      - master
+    tags-ignore:
+      - flux-*
+jobs:
+  main:
+    runs-on:
+      - self-hosted
+
+  steps:
+    - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
