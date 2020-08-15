@@ -1,0 +1,24 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: Runner
+metadata:
+  name: runner-gitops
+  namespace: actions-runner-system
+spec:
+  repository: bjw-s/k8s-gitops
+  env: []
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: role.devbox
+                operator: In
+                values:
+                  - "true"
+
+  tolerations:
+    - key: "role.devbox"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
