@@ -1,0 +1,51 @@
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: bjws-lan-ca-issuer
+spec:
+  ca:
+    secretName: bjws-lan-ca-key-pair
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: postmaster@bjws.nl
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    # Enable the HTTP-01 challenge provider
+    solvers:
+      - dns01:
+          cloudflare:
+            email: bernd@bjws.nl
+            apiKeySecretRef:
+              name: cloudflare-api-key-secret
+              key: api_key
+
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-production
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: postmaster@bjws.nl
+    privateKeySecretRef:
+      name: letsencrypt-production
+    # Enable the HTTP-01 challenge provider
+    solvers:
+      - dns01:
+          cloudflare:
+            email: bernd@bjws.nl
+            apiKeySecretRef:
+              name: cloudflare-api-key-secret
+              key: api_key

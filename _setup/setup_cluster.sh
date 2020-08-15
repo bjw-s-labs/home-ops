@@ -17,6 +17,7 @@ message() {
 addHelmRepos() {
   helm repo add stable https://kubernetes-charts.storage.googleapis.com
   helm repo add fluxcd https://charts.fluxcd.io
+  helm repo add jetstack https://charts.jetstack.io
 }
 
 installFlux() {
@@ -50,15 +51,44 @@ installSealedSecrets() {
 
   SS_READY=1
   while [ $SS_READY != 0 ]; do
-    echo "waiting for flux pod to be fully ready..."
+    echo "waiting for sealed-secrets pod to be fully ready..."
     kubectl -n "$SS_NAMESPACE" wait --for condition=available deployment/sealed-secrets
     SS_READY="$?"
     sleep 5
   done
 }
 
+installCertManager() {
+  message "installing cert-manager"
+  # install cert-manager
+  CERTMANAGER_NAMESPACE="system-cert-manager"
+  helm upgrade --install cert-manager --create-namespace --values "$REPO_ROOT"/deployments/"$CERTMANAGER_NAMESPACE"/cert-manager/values.yaml --namespace "$CERTMANAGER_NAMESPACE" jetstack/cert-manager
+
+  CERTMANAGER_READY=1
+  while [ $CERTMANAGER_READY != 0 ]; do
+    echo "waiting for cert-manager pod to be fully ready..."
+    kubectl -n "$CERTMANAGER_NAMESPACE" wait --for condition=available deployment/cert-manager
+    CERTMANAGER_READY="$?"
+    sleep 5
+  done
+
+  CERTMANAGER_WEBHOOK_READY=1
+  while [ $CERTMANAGER_WEBHOOK_READY != 0 ]; do
+    echo "waiting for cert-manager pod to be fully ready..."
+    kubectl -n "$CERTMANAGER_NAMESPACE" wait --for condition=available deployment/cert-manager-webhook
+    CERTMANAGER_WEBHOOK_READY="$?"
+    sleep 5
+  done
+
+  kubectl apply -f "$REPO_ROOT"/deployments/"$CERTMANAGER_NAMESPACE"/cert-manager/issuers/sealedsecret-bjws-lan-ca-keypair.yaml
+  kubectl apply -f "$REPO_ROOT"/deployments/"$CERTMANAGER_NAMESPACE"/cert-manager/issuers/sealedsecret-cloudflare-api-key.yaml
+  kubectl apply -f "$REPO_ROOT"/deployments/"$CERTMANAGER_NAMESPACE"/cert-manager/issuers/issuers.yaml
+
+}
+
 installFlux
 installSealedSecrets
+installCertManager
 
 message "all done!"
 kubectl get nodes -o=wide
