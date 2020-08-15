@@ -29,15 +29,9 @@ jobs:
         uses: stefanprodan/kube-tools@v1
         with:
           kubectl: 1.18.6
+          kubeseal: 0.12.5
           command: |
-            apt-get update -qq && apt-get install --no-install-recommends -y -qq gettext-base git-crypt
-            curl -sL https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.12.5/kubeseal-linux-amd64 -o /usr/local/bin/kubeseal
-            chmod +x /usr/local/bin/kubeseal
-
-      - name: Git status
-        run: |
-          git status
-
+            apt-get update && apt-get install --no-install-recommends -y gettext-base git-crypt
       - name: Git status
         run: |
           git status
