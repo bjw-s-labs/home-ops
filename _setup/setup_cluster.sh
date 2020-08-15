@@ -74,7 +74,7 @@ installCertManager() {
 
   CERTMANAGER_WEBHOOK_READY=1
   while [ $CERTMANAGER_WEBHOOK_READY != 0 ]; do
-    echo "waiting for cert-manager pod to be fully ready..."
+    echo "waiting for cert-manager webhook pod to be fully ready..."
     kubectl -n "$CERTMANAGER_NAMESPACE" wait --for condition=available deployment/cert-manager-webhook
     CERTMANAGER_WEBHOOK_READY="$?"
     sleep 5
@@ -86,9 +86,25 @@ installCertManager() {
 
 }
 
-installFlux
-installSealedSecrets
-installCertManager
+installMetalLb() {
+  message "installing metallb"
+  # install metallb
+  METALLB_NAMESPACE="system-metallb"
+  helm upgrade --install metallb --create-namespace --values "$REPO_ROOT"/deployments/"$METALLB_NAMESPACE"/metallb/values.yaml --namespace "$METALLB_NAMESPACE" stable/metallb
+
+  METALLB_READY=1
+  while [ $METALLB_READY != 0 ]; do
+    echo "waiting for metallb controller pod to be fully ready..."
+    kubectl -n "$METALLB_NAMESPACE" wait --for condition=available deployment/metallb-controller
+    METALLB_READY="$?"
+    sleep 5
+  done
+}
+
+#installFlux
+#installSealedSecrets
+#installCertManager
+installMetalLb
 
 message "all done!"
 kubectl get nodes -o=wide

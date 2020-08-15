@@ -1,0 +1,33 @@
+controller:
+  image:
+    repository: metallb/controller
+    tag: v0.9.3
+
+speaker:
+  image:
+    repository: metallb/speaker
+    tag: v0.9.3
+  tolerations:
+    - effect: "NoExecute"
+      operator: "Exists"
+    - effect: "NoSchedule"
+      operator: "Exists"
+
+configInline:
+  peers:
+    - peer-address: 192.168.25.1
+      peer-asn: 64512
+      my-asn: 64512
+  address-pools:
+    - name: layer2
+      protocol: layer2
+      addresses:
+        - 192.168.25.150-192.168.25.199
+      avoid-buggy-ips: true
+    - name: bgp
+      protocol: bgp
+      avoid-buggy-ips: true
+      addresses:
+        - 192.168.26.0/24
+      bgp-advertisements:
+        - localpref: 100
