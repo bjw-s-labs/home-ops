@@ -1,0 +1,20 @@
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: nodelocaldns
+  namespace: kube-system
+  annotations:
+    fluxcd.io/ignore: "false"
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: nodelocaldns
+  chart:
+    repository: https://k8s-charts.juggels.online
+    name: nodelocaldns
+    version: 0.0.1
+  values:
+    config:
+      dnsServer: 10.96.0.10
+      localDnsIp: 169.254.20.10
+      dnsDomain: cluster.local
