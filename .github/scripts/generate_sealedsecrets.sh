@@ -11,21 +11,18 @@ need() {
 need "kubectl"
 need "envsubst"
 
-# Work-arounds for MacOS
-if [ "$(uname)" == "Darwin" ]; then
-  # Source secrets.env
-  set -a
-  . "${SECRETS_ROOT}/cluster-vars.env"
-  set +a
-else
-  . "${SECRETS_ROOT}/cluster-vars.env"
-fi
+# Load cluster-vars.env file
+set -a
+. "${SECRETS_ROOT}/cluster-vars.env"
+set +a
 
 message() {
   echo -e "\n######################################################################"
   echo "# $1"
   echo "######################################################################"
 }
+
+envsubst < "${SECRETS_ROOT}/test.yaml"
 
 while IFS= read -r -d '' file
 do
@@ -42,15 +39,15 @@ do
   # Get the namespace (based on folder path of manifest)
   namespace=$(echo ${deployment} | awk -F/ '{print $2}')
 
-  envsubst < "$file" \
-    | \
-  sed "s/namespace:.*/namespace: $namespace/" \
-    | \
-  sed "s/name:.*/name: $secret_name/" \
-    |
-  kubeseal --format=yaml --cert="${PUB_CERT}" \
-    |
-  sed '/creationTimestamp: .*/d' > "$CLUSTER_ROOT""$deployment"/sealedsecret-"$secret_name".yaml
+#  envsubst < "$file" #\
+#    | \
+#  sed "s/namespace:.*/namespace: $namespace/" \
+#    | \
+#  sed "s/name:.*/name: $secret_name/" \
+#    |
+#  kubeseal --format=yaml --cert="${PUB_CERT}" \
+#    |
+#  sed '/creationTimestamp: .*/d' > "$CLUSTER_ROOT""$deployment"/sealedsecret-"$secret_name".yaml
 
 done <   <(find "${SECRETS_ROOT}" -name '*.yaml' -print0)
 
