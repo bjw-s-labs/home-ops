@@ -101,9 +101,9 @@ installMetalLb() {
   done
 }
 
-#installFlux
-#installSealedSecrets
-#installCertManager
+installFlux
+installSealedSecrets
+installCertManager
 installMetalLb
 
 message "all done!"
