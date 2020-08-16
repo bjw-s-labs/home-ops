@@ -10,6 +10,7 @@ need() {
 
 need "kubectl"
 need "envsubst"
+need "yq"
 
 # Load cluster-vars.env file
 set -a
@@ -22,7 +23,7 @@ message() {
   echo "######################################################################"
 }
 
-envsubst < "${SECRETS_ROOT}/test.yaml"
+message "Generating sealed-secrets"
 
 while IFS= read -r -d '' file
 do
@@ -37,18 +38,21 @@ do
   deployment=${secret_path#"${SECRETS_ROOT}"}
 
   # Get the namespace (based on folder path of manifest)
-  namespace=$(echo ${deployment} | awk -F/ '{print $2}')
+  namespace=$(echo $deployment | awk -F/ '{print $2}')
 
-#  envsubst < "$file" #\
-#    | \
-#  sed "s/namespace:.*/namespace: $namespace/" \
-#    | \
-#  sed "s/name:.*/name: $secret_name/" \
-#    |
-#  kubeseal --format=yaml --cert="${PUB_CERT}" \
-#    |
-#  sed '/creationTimestamp: .*/d' > "$CLUSTER_ROOT""$deployment"/sealedsecret-"$secret_name".yaml
+  echo "- Processing $deployment/$secret_name.yaml"
 
+  envsubst < "${file}" \
+    | \
+  yq w "${file}" "metadata.name" "${secret_name}" \
+    | \
+  yq w "${file}" "metadata.namespace" "${namespace}" \
+    | \
+  kubeseal --format=yaml --cert="${PUB_CERT}" \
+    | \
+  yq d - "metadata.creationTimestamp" \
+    | \
+  yq d - "spec.template.metadata.creationTimestamp" > "${CLUSTER_ROOT}""${deployment}"/sealedsecret-"${secret_name}".yaml
 done <   <(find "${SECRETS_ROOT}" -name '*.yaml' -print0)
 
 message "all done!"

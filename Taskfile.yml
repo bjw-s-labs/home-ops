@@ -6,3 +6,9 @@ tasks:
     silent: true
     cmds:
       - fluxctl --k8s-fwd-ns=system-flux --k8s-fwd-labels="app=flux,release=flux" sync
+
+  generate-sealed-secrets:
+    desc: Generate sealed-secrets from secrets
+    silent: true
+    cmds:
+      - ./.github/scripts/generate_sealedsecrets.sh
