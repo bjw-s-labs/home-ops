@@ -1,0 +1,61 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: node-feature-discovery
+  namespace: system
+  annotations:
+    fluxcd.io/ignore: "false"
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: node-feature-discovery
+  chart:
+    repository: https://billimek.com/billimek-charts/
+    name: node-feature-discovery
+    version: 1.0.0
+  values:
+    sources:
+      - usb
+
+    config: |
+      sources:
+        usb:
+          deviceClassWhitelist:
+            - "02"
+            - "03"
+            - "0a"
+            - "ef"
+            - "fe"
+            - "ff"
+          deviceLabelFields:
+            - "class"
+            - "vendor"
+            - "device"
+
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: "node-feature-discovery"
+
+    master:
+      tolerations:
+        - key: "node-role.kubernetes.io/master"
+          operator: "Equal"
+          value: ""
+          effect: "NoSchedule"
+
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: "node-role.kubernetes.io/master"
+                    operator: In
+                    values: [""]
+
+    worker:
+      tolerations:
+        - effect: "NoExecute"
+          operator: "Exists"
+        - effect: "NoSchedule"
+          operator: "Exists"
+
+      affinity: {}
