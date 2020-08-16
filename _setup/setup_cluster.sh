@@ -80,10 +80,9 @@ installCertManager() {
     sleep 5
   done
 
-  kubectl apply -f "$REPO_ROOT"/deployments/"$CERTMANAGER_NAMESPACE"/cert-manager/issuers/sealedsecret-bjws-lan-ca-keypair.yaml
-  kubectl apply -f "$REPO_ROOT"/deployments/"$CERTMANAGER_NAMESPACE"/cert-manager/issuers/sealedsecret-cloudflare-api-key.yaml
+  kubectl apply -f "$REPO_ROOT"/deployments/"$CERTMANAGER_NAMESPACE"/cert-manager/issuers/sealedsecret-bjws-lan-ca-key-pair.yaml
+  kubectl apply -f "$REPO_ROOT"/deployments/"$CERTMANAGER_NAMESPACE"/cert-manager/issuers/sealedsecret-cloudflare-api-key-secret.yaml
   kubectl apply -f "$REPO_ROOT"/deployments/"$CERTMANAGER_NAMESPACE"/cert-manager/issuers/issuers.yaml
-
 }
 
 installMetalLb() {
