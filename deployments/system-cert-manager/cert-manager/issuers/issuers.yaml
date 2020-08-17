@@ -21,7 +21,14 @@ spec:
       name: letsencrypt-staging
     # Enable the HTTP-01 challenge provider
     solvers:
-      - dns01:
+      # We only use cloudflare to solve challenges for foo.com.
+      # Alternative options such as 'matchLabels' and 'dnsZones' can be specified
+      # as part of a solver's selector too.
+      - selector:
+          dnsZones:
+            - bjws.nl
+            - schorgers.nl
+        dns01:
           cloudflare:
             email: bernd@bjws.nl
             apiKeySecretRef:

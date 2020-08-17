@@ -81,9 +81,10 @@ do
   # Loop over the data yaml keys, base64 them and append them
   # to the generated secret
   for secretkey in $(yq r --printMode p "$file" 'data.*'); do
-    secretvalue=$(echo -n "$rendered_file" | yq r - "$secretkey" | base64)
-    output=$(yq w - "$secretkey" "$secretvalue" < $pipe)
-    echo "$output" > $pipe &
+    secretvalue=$(echo -n "$rendered_file" | yq r - "$secretkey")
+    secretvalue_encoded=$(echo -n "${secretvalue}" | base64)
+    output=$(yq w - "$secretkey" "$secretvalue_encoded" < $pipe)
+    echo -n "$output" > $pipe &
   done
 
   generated_secret=$(cat $pipe)
