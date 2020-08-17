@@ -35,7 +35,8 @@ spec:
 
     persistence:
       enabled: true
-      existingClaim: deconz-config
+      storagestorageClass: "openebs-jiva-bjws"
+      size: 1Gi
 
     service:
       httpPort: 80
@@ -63,7 +64,6 @@ spec:
                   operator: In
                   values:
                     - "true"
-
 
   valuesFrom:
     - secretKeyRef:
