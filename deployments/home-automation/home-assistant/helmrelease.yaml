@@ -1,0 +1,100 @@
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: home-assistant
+  namespace: home-automation
+  annotations:
+    fluxcd.io/ignore: "false"
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: home-assistant
+  chart:
+    repository: https://billimek.com/billimek-charts/
+    name: home-assistant
+    version: 1.2.0
+  values:
+    image:
+      repository: homeassistant/home-assistant
+      tag: 0.114.1
+
+    probes:
+      liveness:
+        enabled: false
+      readiness:
+        enabled: false
+      startup:
+        enabled: false
+
+    podAnnotations:
+      secret.reloader.stakater.com/reload: home-assistant-secrets
+      backup.velero.io/backup-volumes: config
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: role.home-automation
+                  operator: In
+                  values:
+                    - "true"
+
+    tolerations:
+      - key: "role.home-automation"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+
+    service:
+      type: LoadBalancer
+      loadBalancerIP: 192.168.26.5
+      externalTrafficPolicy: Local
+      additionalPorts:
+        - name: sonos
+          port: 1400
+          targetPort: 1400
+
+    ingress:
+      enabled: true
+
+    extraEnv:
+      TZ: "Europe/Amsterdam"
+
+    extraSecretForEnvFrom:
+      - home-assistant-secrets
+
+    persistence:
+      existingClaim: home-assistant-config
+
+    git:
+      enabled: true
+      command:
+        - ls
+        - /config
+
+    postgresql:
+      enabled: true
+      persistence:
+        enabled: true
+        storageClass: "openebs-jiva-bjws"
+
+    configurator:
+      enabled: false
+
+    appdaemon:
+      enabled: false
+
+    vscode:
+      enabled: true
+      image:
+        repository: codercom/code-server
+        tag: 3.4.1
+
+      ingress:
+        enabled: true
+
+  valuesFrom:
+    - secretKeyRef:
+        name: home-assistant-helm-values
+        key: values
