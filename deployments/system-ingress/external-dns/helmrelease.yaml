@@ -2,16 +2,16 @@
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
-  name: externaldns
+  name: external-dns
   namespace: system-ingress
   annotations:
     fluxcd.io/ignore: "false"
     fluxcd.io/automated: "false"
 spec:
-  releaseName: externaldns
+  releaseName: external-dns
   chart:
     repository: https://charts.bitnami.com/bitnami
-    name: externaldns
+    name: external-dns
     version: 3.3.0
   values:
     sources:
@@ -27,5 +27,5 @@ spec:
 
   valuesFrom:
     - secretKeyRef:
-        name: externaldns-helm-values
+        name: external-dns-helm-values
         key: values
