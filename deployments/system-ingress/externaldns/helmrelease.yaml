@@ -1,0 +1,31 @@
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: externaldns
+  namespace: system-ingress
+  annotations:
+    fluxcd.io/ignore: "false"
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: externaldns
+  chart:
+    repository: https://charts.bitnami.com/bitnami
+    name: externaldns
+    version: 3.3.0
+  values:
+    sources:
+      - ingress
+    provider: cloudflare
+    policy: sync
+    txtPrefix: "k8s."
+    resources:
+      requests:
+        memory: "32M"
+      limits:
+        memory: "64M"
+
+  valuesFrom:
+    - secretKeyRef:
+        name: externaldns-helm-values
+        key: values
