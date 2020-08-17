@@ -89,7 +89,7 @@ do
       secretvalue="$secretvalue\n"
     fi
 
-    secretvalue_encoded=$(echo -en "${secretvalue}" | base64)
+    secretvalue_encoded=$(echo -e "${secretvalue}" | base64)
     output=$(yq w - "$secretkey" "$secretvalue_encoded" < $pipe)
     echo -n "$output" > $pipe &
   done
