@@ -2,6 +2,8 @@
 REPO_ROOT=$(git rev-parse --show-toplevel)
 CLUSTER_ROOT="${REPO_ROOT}/deployments"
 SECRETS_ROOT="${REPO_ROOT}/.secrets"
+TEMPLATES_ROOT="${REPO_ROOT}/.templates"
+CLUSTER_VARS="${SECRETS_ROOT}/cluster-vars.yaml"
 PUB_CERT="${REPO_ROOT}/_setup/sealedsecret-cert.pem"
 
 need() {
@@ -9,13 +11,9 @@ need() {
 }
 
 need "kubectl"
-need "envsubst"
+need "kubeval"
+need "renderizer"
 need "yq"
-
-# Load cluster-vars.env file
-set -a
-. "${SECRETS_ROOT}/cluster-vars.env"
-set +a
 
 message() {
   echo -e "\n######################################################################"
@@ -23,36 +21,86 @@ message() {
   echo "######################################################################"
 }
 
+[ -f "${CLUSTER_VARS}" ] || { echo >&2 "Cluster variables file doesn't exist. Aborting."; exit 1; }
+if ! yq validate "${CLUSTER_VARS}" > /dev/null 2>&1; then
+  echo "Cluster variables file is invalid YAML. Aborting"
+  exit 1
+fi
+
 message "Generating sealed-secrets"
 
 while IFS= read -r -d '' file
 do
-  # Get the path and basename of the txt file
-  # e.g. "deployments/default/pihole/pihole"
+  # Get secret file metadata (path, filename, etc...)
   secret_path="$(dirname "$file")"
-
-  # Get the secret name
+  secret_relative_path=${secret_path#"${SECRETS_ROOT}"}
+  secret_filename="$(basename "$file")"
   secret_name=$(basename -s .yaml "$file")
+  secret_namespace=$(echo "$secret_relative_path" | awk -F/ '{print $2}')
 
-  # Get the relative path of deployment
-  deployment=${secret_path#"${SECRETS_ROOT}"}
+  # Don't create a secret for the cluster-vars YAML
+  if [[ "$file" == "$CLUSTER_VARS" ]]; then
+    continue
+  fi
 
-  # Get the namespace (based on folder path of manifest)
-  namespace=$(echo $deployment | awk -F/ '{print $2}')
+  # Don't create any actual secrets for any sample YAMLs
+  if [[ "$file" == *sample.yaml ]]; then
+    continue
+  fi
 
-  echo "- Processing $deployment/$secret_name.yaml"
+  echo "- Processing ${secret_relative_path}/${secret_filename}"
 
-  envsubst < "${file}" \
+  # Make sure the file is valid YAML before we try to read it
+  if ! yq validate "${file}" > /dev/null 2>&1; then
+    echo "${secret_relative_path}/${secret_filename} is invalid YAML. Aborting"
+    exit 1
+  fi
+
+  # Get the secret type
+  secret_type=$(yq r --defaultValue "Opaque" "$file" 'type')
+
+  # Process the secret yaml to replace any variables
+  rendered_file=$(renderizer --settings="${CLUSTER_VARS}" "${file}")
+
+  # Create a named pipe so that we can append the base64 values later
+  pipe="rendered_secret"
+  trap 'rm -f $pipe' ERR
+  trap 'rm -f $pipe' EXIT
+  if [[ ! -p "$pipe" ]]; then
+    mkfifo "$pipe"
+  fi
+
+  # Initialize the rendered secret from the template and add
+  # the secret name and namespace
+  yq w - "type" "${secret_type}" < "${TEMPLATES_ROOT}/secret.yaml" \
     | \
-  yq w "${file}" "metadata.name" "${secret_name}" \
+  yq w - "metadata.name" "${secret_name}" \
     | \
-  yq w "${file}" "metadata.namespace" "${namespace}" \
-    | \
-  kubeseal --format=yaml --cert="${PUB_CERT}" \
+  yq w - "metadata.namespace" "${secret_namespace}" > $pipe &
+
+  # Loop over the data yaml keys, base64 them and append them
+  # to the generated secret
+  for secretkey in $(yq r --printMode p "$file" 'data.*'); do
+    secretvalue=$(echo -n "$rendered_file" | yq r - "$secretkey" | base64)
+    output=$(yq w - "$secretkey" "$secretvalue" < $pipe)
+    echo "$output" > $pipe &
+  done
+
+  generated_secret=$(cat $pipe)
+
+  # Make sure the generated secret is a valid Kubernetes Secret before proceeding
+  if ! echo "$generated_secret" | kubeval --strict > /dev/null 2>&1; then
+    echo "Invalid secret generated for ${secret_relative_path}/${secret_filename}. Aborting"
+    exit 1
+  fi
+
+  # Write out the actual sealed-secret and remove useless creationTimestamp
+  echo "$generated_secret" | kubeseal --format=yaml --cert="${PUB_CERT}" \
     | \
   yq d - "metadata.creationTimestamp" \
     | \
-  yq d - "spec.template.metadata.creationTimestamp" > "${CLUSTER_ROOT}""${deployment}"/sealedsecret-"${secret_name}".yaml
+  yq d - "spec.template.metadata.creationTimestamp" > "${CLUSTER_ROOT}""${secret_relative_path}"/sealedsecret-"${secret_name}".yaml
+
 done <   <(find "${SECRETS_ROOT}" -name '*.yaml' -print0)
 
 message "all done!"
