@@ -1,0 +1,71 @@
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: deconz
+  namespace: home-automation
+  annotations:
+    fluxcd.io/ignore: "false"
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: deconz
+  chart:
+    repository: https://billimek.com/billimek-charts/
+    name: deconz
+    version: 1.0.1
+  values:
+    image:
+      repository: marthoc/deconz
+      tag: "amd64-2.05.79"
+
+    timezone: "Europe/Amsterdam"
+
+    zigbeeDevice:
+      enabled: true
+      hostPath: /dev/serial/by-id/usb-dresden_elektronik_ingenieurtechnik_GmbH_ConBee_II_DE2152916-if00
+
+    vnc:
+      enabled: true
+
+    podAnnotations:
+      backup.velero.io/backup-volumes: config
+
+    securityContext:
+      privileged: true
+
+    persistence:
+      enabled: true
+      existingClaim: deconz-config
+
+    service:
+      httpPort: 80
+      websocketPort: 8091
+      vncPort: 5900
+      type: LoadBalancer
+      loadBalancerIP: 192.168.26.6
+      externalTrafficPolicy: Local
+
+    ingress:
+      enabled: false
+
+    tolerations:
+      - key: "role.home-automation"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: feature.node.kubernetes.io/usb-02_1cf1_0030.present
+                  operator: In
+                  values:
+                    - "true"
+
+
+  valuesFrom:
+    - secretKeyRef:
+        name: deconz-helm-values
+        key: values
