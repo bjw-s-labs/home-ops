@@ -82,7 +82,14 @@ do
   # to the generated secret
   for secretkey in $(yq r --printMode p "$file" 'data.*'); do
     secretvalue=$(echo -n "$rendered_file" | yq r - "$secretkey")
-    secretvalue_encoded=$(echo -n "${secretvalue}" | base64)
+    secret_lines=$(echo "$secretvalue" | wc -l)
+
+    # If it's a multi-line string, add a newline at the end (mostly for keyfiles etc)
+    if [[ $secret_lines -gt 1 ]]; then
+      secretvalue="$secretvalue\n"
+    fi
+
+    secretvalue_encoded=$(echo -en "${secretvalue}" | base64)
     output=$(yq w - "$secretkey" "$secretvalue_encoded" < $pipe)
     echo -n "$output" > $pipe &
   done

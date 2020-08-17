@@ -50,7 +50,11 @@ spec:
       name: letsencrypt-production
     # Enable the HTTP-01 challenge provider
     solvers:
-      - dns01:
+      - selector:
+          dnsZones:
+            - bjws.nl
+            - schorgers.nl
+        dns01:
           cloudflare:
             email: bernd@bjws.nl
             apiKeySecretRef:
