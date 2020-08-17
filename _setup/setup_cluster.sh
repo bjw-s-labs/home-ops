@@ -20,10 +20,27 @@ addHelmRepos() {
   helm repo add jetstack https://charts.jetstack.io
 }
 
+installSealedSecrets() {
+  message "installing sealed-secrets"
+  # install sealed-secrets
+  SS_NAMESPACE="system"
+  kubectl apply -f "$REPO_ROOT"/_secrets/master.key
+  helm upgrade --install sealed-secrets --create-namespace --values "$REPO_ROOT"/deployments/"$SS_NAMESPACE"/sealed-secrets/values.yaml --namespace "$SS_NAMESPACE" stable/sealed-secrets
+
+  SS_READY=1
+  while [ $SS_READY != 0 ]; do
+    echo "waiting for sealed-secrets pod to be fully ready..."
+    kubectl -n "$SS_NAMESPACE" wait --for condition=available deployment/sealed-secrets
+    SS_READY="$?"
+    sleep 5
+  done
+}
+
 installFlux() {
   message "installing flux"
   # install flux
   FLUX_NAMESPACE="system-flux"
+  kubectl apply -f "$REPO_ROOT"/deployments/"$FLUX_NAMESPACE"/flux/sealedsecret-flux-git-deploy.yaml
   helm upgrade --install flux --create-namespace --values "$REPO_ROOT"/deployments/"$FLUX_NAMESPACE"/flux/values.yaml --namespace "$FLUX_NAMESPACE" fluxcd/flux
   helm upgrade --install helm-operator --values "$REPO_ROOT"/deployments/"$FLUX_NAMESPACE"/helm-operator/values.yaml --namespace "$FLUX_NAMESPACE" fluxcd/helm-operator
 
@@ -40,22 +57,6 @@ installFlux() {
 
   message "adding the key to github automatically"
   "$REPO_ROOT"/_setup/scripts/add-repo-key.sh "$FLUX_KEY"
-}
-
-installSealedSecrets() {
-  message "installing sealed-secrets"
-  # install sealed-secrets
-  SS_NAMESPACE="system"
-  kubectl apply -f "$REPO_ROOT"/_secrets/master.key
-  helm upgrade --install sealed-secrets --create-namespace --values "$REPO_ROOT"/deployments/"$SS_NAMESPACE"/sealed-secrets/values.yaml --namespace "$SS_NAMESPACE" stable/sealed-secrets
-
-  SS_READY=1
-  while [ $SS_READY != 0 ]; do
-    echo "waiting for sealed-secrets pod to be fully ready..."
-    kubectl -n "$SS_NAMESPACE" wait --for condition=available deployment/sealed-secrets
-    SS_READY="$?"
-    sleep 5
-  done
 }
 
 installCertManager() {
@@ -100,8 +101,8 @@ installMetalLb() {
   done
 }
 
-installFlux
 installSealedSecrets
+installFlux
 installCertManager
 installMetalLb
 
