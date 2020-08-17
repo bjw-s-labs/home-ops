@@ -1,0 +1,14 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mosquitto-data
+  namespace: home-network
+  labels:
+    app: mosquitto
+spec:
+  storageClassName: openebs-jiva-bjws
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 512Mi
