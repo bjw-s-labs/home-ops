@@ -40,13 +40,21 @@ installFlux() {
   FLUX_NAMESPACE="system-flux"
   kubectl apply -f "$REPO_ROOT"/deployments/"$FLUX_NAMESPACE"/flux/sealedsecret-flux-git-deploy.yaml
   helm upgrade --install flux --create-namespace --values "$REPO_ROOT"/deployments/"$FLUX_NAMESPACE"/flux/values.yaml --namespace "$FLUX_NAMESPACE" fluxcd/flux
-  helm upgrade --install helm-operator --values "$REPO_ROOT"/deployments/"$FLUX_NAMESPACE"/helm-operator/values.yaml --namespace "$FLUX_NAMESPACE" fluxcd/helm-operator
 
   FLUX_READY=1
   while [ $FLUX_READY != 0 ]; do
     echo "waiting for flux pod to be fully ready..."
     kubectl -n "$FLUX_NAMESPACE" wait --for condition=available deployment/flux
     FLUX_READY="$?"
+    sleep 5
+  done
+
+  helm upgrade --install helm-operator --values "$REPO_ROOT"/deployments/"$FLUX_NAMESPACE"/helm-operator/values.yaml --namespace "$FLUX_NAMESPACE" fluxcd/helm-operator
+  HELMOPERATOR_READY=1
+  while [ $HELMOPERATOR_READY != 0 ]; do
+    echo "waiting for helm-operator pod to be fully ready..."
+    kubectl -n "$FLUX_NAMESPACE" wait --for condition=available deployment/helm-operator
+    HELMOPERATOR_READY="$?"
     sleep 5
   done
 }
