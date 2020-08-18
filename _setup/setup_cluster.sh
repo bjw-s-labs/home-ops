@@ -126,11 +126,11 @@ installLonghorn() {
 # exit when any command fails
 set -e
 
-#installSealedSecrets
-#installFlux
-#installCertManager
-#installMetalLb
-#installIngress
+installSealedSecrets
+installFlux
+installCertManager
+installMetalLb
+installIngress
 installLonghorn
 
 message "all done!"
