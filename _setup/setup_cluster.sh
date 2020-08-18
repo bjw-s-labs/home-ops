@@ -23,7 +23,8 @@ addHelmRepos() {
 installSealedSecrets() {
   message "installing sealed-secrets"
   SS_NAMESPACE="system"
-  kubectl apply -f "$REPO_ROOT"/_secrets/master.key
+  kubectl apply -f "$REPO_ROOT"/deployments/"$SS_NAMESPACE"/namespace.yaml
+  kubectl apply -f "$REPO_ROOT"/.secrets/master.key
   helm upgrade --install sealed-secrets --create-namespace --values "$REPO_ROOT"/deployments/"$SS_NAMESPACE"/sealed-secrets/values.yaml --namespace "$SS_NAMESPACE" stable/sealed-secrets
 
   SS_READY=1
@@ -38,9 +39,10 @@ installSealedSecrets() {
 installFlux() {
   message "installing flux"
   FLUX_NAMESPACE="system-flux"
+  kubectl apply -f "$REPO_ROOT"/deployments/"$FLUX_NAMESPACE"/namespace.yaml
   kubectl apply -f "$REPO_ROOT"/deployments/"$FLUX_NAMESPACE"/flux/sealedsecret-flux-git-deploy.yaml
-  helm upgrade --install flux --create-namespace --values "$REPO_ROOT"/deployments/"$FLUX_NAMESPACE"/flux/values.yaml --namespace "$FLUX_NAMESPACE" fluxcd/flux
 
+  helm upgrade --install flux --create-namespace --values "$REPO_ROOT"/deployments/"$FLUX_NAMESPACE"/flux/values.yaml --namespace "$FLUX_NAMESPACE" fluxcd/flux
   FLUX_READY=1
   while [ $FLUX_READY != 0 ]; do
     echo "waiting for flux pod to be fully ready..."
@@ -49,7 +51,7 @@ installFlux() {
     sleep 5
   done
 
-  helm upgrade --install helm-operator --values "$REPO_ROOT"/deployments/"$FLUX_NAMESPACE"/helm-operator/values.yaml --namespace "$FLUX_NAMESPACE" fluxcd/helm-operator
+  helm upgrade --install --create-namespace helm-operator --values "$REPO_ROOT"/deployments/"$FLUX_NAMESPACE"/helm-operator/values.yaml --namespace "$FLUX_NAMESPACE" fluxcd/helm-operator
   HELMOPERATOR_READY=1
   while [ $HELMOPERATOR_READY != 0 ]; do
     echo "waiting for helm-operator pod to be fully ready..."
@@ -102,7 +104,10 @@ installMetalLb() {
 installIngress() {
   message "installing ingress-nginx"
   INGRESS_NAMESPACE="system-ingress"
+  kubectl apply -f "$REPO_ROOT"/deployments/"$INGRESS_NAMESPACE"/namespace.yaml
   kubectl apply -f "$REPO_ROOT"/deployments/"$INGRESS_NAMESPACE"/ingress-nginx/helmrelease.yaml
+
+  sleep 5
 
   INGRESS_READY=1
   while [ $INGRESS_READY != 0 ]; do
@@ -116,9 +121,12 @@ installIngress() {
 installLonghorn() {
   message "installing longhorn"
   LONGHORN_NAMESPACE="longhorn-system"
+  kubectl apply -f "$REPO_ROOT"/deployments/"$LONGHORN_NAMESPACE"/namespace.yaml
   kubectl apply -f "$REPO_ROOT"/deployments/"$LONGHORN_NAMESPACE"/longhorn/sealedsecret-longhorn-helm-values.yaml
   kubectl apply -f "$REPO_ROOT"/deployments/"$LONGHORN_NAMESPACE"/longhorn/sealedsecret-longhorn-backup-secret.yaml
   kubectl apply -f "$REPO_ROOT"/deployments/"$LONGHORN_NAMESPACE"/longhorn/helmrelease.yaml
+
+  sleep 5
 
   LONGHORN_READY=1
   while [ $LONGHORN_READY != 0 ]; do
