@@ -1,0 +1,77 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nut-upsd-study
+  labels:
+    app: nut-upsd-study
+  annotations:
+    configmap.reloader.stakater.com/reload: "nut-upsd-study"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: nut-upsd-study
+  template:
+    metadata:
+      labels:
+        app: nut-upsd-study
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: feature.node.kubernetes.io/usb-03_051d_0002.present
+                    operator: In
+                    values:
+                      - "true"
+
+      tolerations:
+        - key: "role.home-automation"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+
+      containers:
+        - name: nut-upsd
+          image: "instantlinux/nut-upsd:2.7.4-r6"
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          ports:
+            - name: upsd
+              containerPort: 3493
+              protocol: TCP
+          volumeMounts:
+            - name: secret
+              mountPath: /run/secrets/nut-upsd-password
+              readOnly: true
+              subPath: nut-upsd-password
+            - name: secret
+              mountPath: /etc/nut/local/upsd.users
+              readOnly: true
+              subPath: upsd.users
+            - name: secret
+              mountPath: /etc/nut/local/upsmon.conf
+              readOnly: true
+              subPath: upsmon.conf
+            - name: configmap
+              mountPath: /etc/nut/local/ups.conf
+              readOnly: true
+              subPath: ups.conf
+            - name: configmap
+              mountPath: /etc/nut/local/upsd.conf
+              readOnly: true
+              subPath: upsd.conf
+          resources: {}
+
+      volumes:
+        - name: secret
+          secret:
+            secretName: nut-upsd-password
+        - name: configmap
+          configMap:
+            name: nut-upsd-study
