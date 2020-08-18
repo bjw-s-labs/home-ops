@@ -3,10 +3,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nut-upsd-study
+  namespace: home-network
   labels:
     app: nut-upsd-study
   annotations:
     configmap.reloader.stakater.com/reload: "nut-upsd-study"
+    secret.reloader.stakater.com/reload: "nut-upsd-password"
 spec:
   replicas: 1
   strategy:
