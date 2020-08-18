@@ -115,7 +115,7 @@ installLonghorn() {
   LONGHORN_READY=1
   while [ $LONGHORN_READY != 0 ]; do
     echo "waiting for longhorn controller pod to be fully ready..."
-    kubectl -n "$LONGHORN_NAMESPACE" wait --for condition=available deployment/ingress-nginx-controller
+    kubectl -n "$LONGHORN_NAMESPACE" wait --for condition=available deployment/longhorn-driver-deployer
     LONGHORN_READY="$?"
     sleep 5
   done
