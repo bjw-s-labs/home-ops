@@ -22,7 +22,6 @@ addHelmRepos() {
 
 installSealedSecrets() {
   message "installing sealed-secrets"
-  # install sealed-secrets
   SS_NAMESPACE="system"
   kubectl apply -f "$REPO_ROOT"/_secrets/master.key
   helm upgrade --install sealed-secrets --create-namespace --values "$REPO_ROOT"/deployments/"$SS_NAMESPACE"/sealed-secrets/values.yaml --namespace "$SS_NAMESPACE" stable/sealed-secrets
@@ -38,7 +37,6 @@ installSealedSecrets() {
 
 installFlux() {
   message "installing flux"
-  # install flux
   FLUX_NAMESPACE="system-flux"
   kubectl apply -f "$REPO_ROOT"/deployments/"$FLUX_NAMESPACE"/flux/sealedsecret-flux-git-deploy.yaml
   helm upgrade --install flux --create-namespace --values "$REPO_ROOT"/deployments/"$FLUX_NAMESPACE"/flux/values.yaml --namespace "$FLUX_NAMESPACE" fluxcd/flux
@@ -51,17 +49,10 @@ installFlux() {
     FLUX_READY="$?"
     sleep 5
   done
-
-  # grab output the key
-  FLUX_KEY=$(kubectl -n "$FLUX_NAMESPACE" logs deployment/flux | grep identity.pub | cut -d '"' -f2)
-
-  message "adding the key to github automatically"
-  "$REPO_ROOT"/_setup/scripts/add-repo-key.sh "$FLUX_KEY"
 }
 
 installCertManager() {
   message "installing cert-manager"
-  # install cert-manager
   CERTMANAGER_NAMESPACE="system-cert-manager"
   helm upgrade --install cert-manager --create-namespace --values "$REPO_ROOT"/deployments/"$CERTMANAGER_NAMESPACE"/cert-manager/values.yaml --namespace "$CERTMANAGER_NAMESPACE" jetstack/cert-manager
 
@@ -88,7 +79,6 @@ installCertManager() {
 
 installMetalLb() {
   message "installing metallb"
-  # install metallb
   METALLB_NAMESPACE="system-metallb"
   helm upgrade --install metallb --create-namespace --values "$REPO_ROOT"/deployments/"$METALLB_NAMESPACE"/metallb/values.yaml --namespace "$METALLB_NAMESPACE" stable/metallb
 
@@ -101,10 +91,45 @@ installMetalLb() {
   done
 }
 
-installSealedSecrets
-installFlux
-installCertManager
-installMetalLb
+installIngress() {
+  message "installing ingress-nginx"
+  INGRESS_NAMESPACE="system-ingress"
+  kubectl apply -f "$REPO_ROOT"/deployments/"$INGRESS_NAMESPACE"/ingress-nginx/helmrelease.yaml
+
+  INGRESS_READY=1
+  while [ $INGRESS_READY != 0 ]; do
+    echo "waiting for ingress-nginx controller pod to be fully ready..."
+    kubectl -n "$INGRESS_NAMESPACE" wait --for condition=available deployment/ingress-nginx-controller
+    INGRESS_READY="$?"
+    sleep 5
+  done
+}
+
+installLonghorn() {
+  message "installing longhorn"
+  LONGHORN_NAMESPACE="longhorn-system"
+  kubectl apply -f "$REPO_ROOT"/deployments/"$LONGHORN_NAMESPACE"/longhorn/sealedsecret-longhorn-helm-values.yaml
+  kubectl apply -f "$REPO_ROOT"/deployments/"$LONGHORN_NAMESPACE"/longhorn/sealedsecret-longhorn-backup-secret.yaml
+  kubectl apply -f "$REPO_ROOT"/deployments/"$LONGHORN_NAMESPACE"/longhorn/helmrelease.yaml
+
+  LONGHORN_READY=1
+  while [ $LONGHORN_READY != 0 ]; do
+    echo "waiting for longhorn controller pod to be fully ready..."
+    kubectl -n "$LONGHORN_NAMESPACE" wait --for condition=available deployment/ingress-nginx-controller
+    LONGHORN_READY="$?"
+    sleep 5
+  done
+}
+
+# exit when any command fails
+set -e
+
+#installSealedSecrets
+#installFlux
+#installCertManager
+#installMetalLb
+#installIngress
+installLonghorn
 
 message "all done!"
 kubectl get nodes -o=wide
