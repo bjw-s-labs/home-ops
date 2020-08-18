@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airconnect
+  namespace: home-network
+  labels:
+    app: airconnect
+  annotations:
+    secret.reloader.stakater.com/reload: "airconnect-config"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airconnect
+  template:
+    metadata:
+      labels:
+        app: airconnect
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+
+      containers:
+        - name: airconnect
+          image: "1activegeek/airconnect:latest"
+          imagePullPolicy: Always
+          env:
+            - name: "TZ"
+              value: "Europe/Amsterdam"
+            - name: "AIRUPNP_VAR"
+              value: "-l 1000:2000 -x /config/config-upnp.xml"
+            - name: "AIRCAST_VAR"
+              value: "-l 1000:2000 -x /config/config-chromecast.xml"
+          volumeMounts:
+            - name: airconnect-config
+              mountPath: /config/config-upnp.xml
+              subPath: config-upnp.xml
+              readOnly: true
+            - name: airconnect-config
+              mountPath: /config/config-chromecast.xml
+              subPath: config-chromecast.xml
+              readOnly: true
+          resources:
+            requests:
+              memory: "64M"
+            limits:
+              memory: "128M"
+
+      volumes:
+        - name: airconnect-config
+          secret:
+            secretName: airconnect-config
