@@ -35,7 +35,6 @@ spec:
 
     persistence:
       enabled: true
-      storageClass: "openebs-jiva-bjws"
       size: 1Gi
 
     service:
@@ -48,12 +47,6 @@ spec:
 
     ingress:
       enabled: false
-
-    tolerations:
-      - key: "role.home-automation"
-        operator: "Equal"
-        value: "true"
-        effect: "NoSchedule"
 
     affinity:
       nodeAffinity:

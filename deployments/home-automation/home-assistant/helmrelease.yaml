@@ -30,22 +30,6 @@ spec:
       secret.reloader.stakater.com/reload: home-assistant-secrets
       backup.velero.io/backup-volumes: config
 
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - key: role.home-automation
-                  operator: In
-                  values:
-                    - "true"
-
-    tolerations:
-      - key: "role.home-automation"
-        operator: "Equal"
-        value: "true"
-        effect: "NoSchedule"
-
     service:
       type: LoadBalancer
       loadBalancerIP: 192.168.26.5
@@ -66,7 +50,6 @@ spec:
 
     persistence:
       enabled: true
-      storageClass: "openebs-jiva-bjws"
       size: 1Gi
 
     git:
