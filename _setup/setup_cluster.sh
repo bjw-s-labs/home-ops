@@ -119,6 +119,8 @@ installLonghorn() {
     LONGHORN_READY="$?"
     sleep 5
   done
+
+  kubectl apply -f "$REPO_ROOT"/deployments/"$LONGHORN_NAMESPACE"/longhorn/storageclass-singlereplica.yaml
 }
 
 # exit when any command fails
