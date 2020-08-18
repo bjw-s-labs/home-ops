@@ -18,28 +18,11 @@ spec:
       repository: nodered/node-red
       tag: 1.1.3
 
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - key: role.home-automation
-                  operator: In
-                  values:
-                    - "true"
-
-    tolerations:
-      - key: "role.home-automation"
-        operator: "Equal"
-        value: "true"
-        effect: "NoSchedule"
-
     enableProjects: "true"
     timezone: "Europe/Amsterdam"
 
     persistence:
       enabled: true
-      storageClass: "openebs-jiva-bjws"
       size: 1Gi
 
     resources:
