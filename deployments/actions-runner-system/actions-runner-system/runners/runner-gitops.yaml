@@ -7,19 +7,3 @@ spec:
   repository: bjw-s/k8s-gitops
   image: onedr0p/actions-runnner:latest
   env: []
-
-  tolerations:
-    - key: "role.devbox"
-      operator: "Equal"
-      value: "true"
-      effect: "NoSchedule"
-
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: role.devbox
-                operator: In
-                values:
-                  - "true"
