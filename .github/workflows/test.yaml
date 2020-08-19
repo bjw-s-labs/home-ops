@@ -7,7 +7,7 @@ on:
     paths:
       - ".secrets/**/*.yaml"
       - "_setup/sealedsecret-cert.pem"
-      - ".github/workflows/sealed-secrets.yaml"
+      - ".github/workflows/test.yaml"
       - ".github/scripts/generate_sealedsecrets.sh"
     tags-ignore:
       - flux-*
@@ -35,11 +35,11 @@ jobs:
           git-crypt unlock ./git-crypt-key
           rm ./git-crypt-key
 
-      - name: Get changed and modified files
-        uses: jitterbit/get-changed-files@v1
-        run: |
-          echo "${{ steps.files.outputs.added_modified }}" > /tmp/added_modified.log
+      - uses: jitterbit/get-changed-files@v1
+        with:
+          format: space-delimited
 
       - name: Show changed files
         run: |
+          echo "${{ steps.files.outputs.added_modified }}" > /tmp/added_modified.log
           cat /tmp/added_modified.log
