@@ -64,7 +64,9 @@ fi
 # Loop over the files that should be processed
 while IFS= read -r file; do
   # Convert relative paths to absolute paths
-  file=$(cd "$(dirname "$file")"; pwd)/$(basename "$file")
+  if [[ "$file" != /* ]]; then
+    file="$REPO_ROOT/$file"
+  fi
 
   # Only process files in the secrets folder
   if [[ $file != ${SECRETS_ROOT}* ]]; then
