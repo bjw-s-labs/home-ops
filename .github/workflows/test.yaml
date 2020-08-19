@@ -42,18 +42,14 @@ jobs:
 
       - name: Store changed and removed files
         run: |
-          mapfile -d ',' -t added_modified_files < <(printf '%s,' '${{ steps.changed_files.outputs.added_modified }}')
-          for added_modified_file in "${added_modified_files[@]}"; do
-            echo "${added_modified_file}" >> /tmp/added_modified
+          mapfile -d ',' -t changed_files < <(printf '%s,' '${{ steps.changed_files.outputs.all }}')
+          for changed_file in "${changed_files[@]}"; do
+            echo "${changed_file}" >> /tmp/changed_file
           done
-
-      - name: Test
-        run: |
-          cat /tmp/added_modified
 
       - name: Generate Secrets
         env:
-          INPUT_FILE: /tmp/added_modified
+          INPUT_FILE: /tmp/changed_file
           PRUNE_FILES: true
         run: |
           task generate-sealed-secrets
