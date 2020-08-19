@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: emby
+  namespace: media
+  labels:
+    app: emby
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emby
+  serviceName: emby
+  template:
+    metadata:
+      labels:
+        app: emby
+    spec:
+      containers:
+        - name: emby
+          image: "emby/embyserver:4.4.3.0"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: frontend
+              containerPort: 8096
+              protocol: TCP
+          env:
+            - name: TZ
+              value: Europe/Amsterdam
+            - name: UID
+              value: "1031"
+            - name: GID
+              value: "100"
+          volumeMounts:
+            - name: config
+              mountPath: /config/config
+            - name: nas-media
+              mountPath: /storage/media
+              readOnly: true
+          resources:
+            requests:
+              memory: "2048M"
+            limits:
+              memory: "4096M"
+
+      volumes:
+        - name: nas-media
+          nfs:
+            server: librarium.warhammer.lan
+            path: /volume1/Media
+
+  volumeClaimTemplates:
+    - metadata:
+        name: config
+        labels:
+          app: emby
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: "10Gi"
