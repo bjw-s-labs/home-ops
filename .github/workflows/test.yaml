@@ -44,9 +44,16 @@ jobs:
         run: |
           mapfile -d ',' -t added_modified_files < <(printf '%s,' '${{ steps.changed_files.outputs.added_modified }}')
           for added_modified_file in "${added_modified_files[@]}"; do
-            echo "${changed_file}" >> /tmp/added_modified
+            echo "${added_modified_file}" >> /tmp/added_modified
           done
 
       - name: Test
         run: |
           cat /tmp/added_modified
+
+      - name: Generate Secrets
+        env:
+          INPUT_FILE: /tmp/added_modified
+          PRUNE_FILES: true
+        run: |
+          task generate-sealed-secrets
