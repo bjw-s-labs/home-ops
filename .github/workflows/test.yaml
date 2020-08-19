@@ -44,12 +44,12 @@ jobs:
         run: |
           mapfile -d ',' -t changed_files < <(printf '%s,' '${{ steps.changed_files.outputs.all }}')
           for changed_file in "${changed_files[@]}"; do
-            echo "${changed_file}" >> /tmp/changed_file
+            echo "${changed_file}" >> /tmp/changed_files
           done
 
       - name: Generate Secrets
         env:
-          INPUT_FILE: /tmp/changed_file
+          INPUT_FILE: /tmp/changed_files
           PRUNE_FILES: true
         run: |
           task generate-sealed-secrets
