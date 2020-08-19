@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mdns-repeater
+  namespace: home-network
+  labels:
+    app: mdns-repeater
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: mdns-repeater
+  template:
+    metadata:
+      labels:
+        app: mdns-repeater
+    spec:
+      hostNetwork: true
+      containers:
+        - name: mdns-repeater
+          image: "angelnu/mdns_repeater:latest"
+          imagePullPolicy: Always
+          env:
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: dockerNIC
+              value: tunl0
+            - name: options
+              value: "-v"
+          resources:
+            requests:
+              memory: "2Mi"
+              cpu: "5m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
