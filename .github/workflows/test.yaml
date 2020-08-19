@@ -36,10 +36,13 @@ jobs:
           rm ./git-crypt-key
 
       - uses: jitterbit/get-changed-files@v1
+        id: changed_files
         with:
           format: space-delimited
 
       - name: Show changed files
         run: |
-          echo "${{ steps.files.outputs.added_modified }}" > /tmp/added_modified.log
+          echo "${{ steps.changed_files.outputs.added_modified }}" > /tmp/added_modified.log
+          echo "${{ steps.changed_files.outputs.removed }}" > /tmp/removed.log
           cat /tmp/added_modified.log
+          cat /tmp/removed.log
