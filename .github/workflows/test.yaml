@@ -1,0 +1,45 @@
+name: main
+
+on:
+  push:
+    branches:
+      - CI
+    paths:
+      - ".secrets/**/*.yaml"
+      - "_setup/sealedsecret-cert.pem"
+      - ".github/workflows/sealed-secrets.yaml"
+      - ".github/scripts/generate_sealedsecrets.sh"
+    tags-ignore:
+      - flux-*
+
+env:
+  DEBIAN_FRONTEND: "noninteractive"
+
+jobs:
+  main:
+    runs-on:
+      - self-hosted
+
+    if: "!contains(github.event.head_commit.message, '[ci-skip]')"
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      - name: Unlock secrets
+        env:
+          GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
+        run: |
+          echo "$GIT_CRYPT_KEY" | base64 -d > ./git-crypt-key
+          git-crypt unlock ./git-crypt-key
+          rm ./git-crypt-key
+
+      - name: Get changed and modified files
+        uses: jitterbit/get-changed-files@v1
+        run: |
+          echo "${{ steps.files.outputs.added_modified }}" > /tmp/added_modified.log
+
+      - name: Show changed files
+        run: |
+          cat /tmp/added_modified.log
