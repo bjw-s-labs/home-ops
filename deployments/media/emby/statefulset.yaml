@@ -16,6 +16,9 @@ spec:
       labels:
         app: emby
     spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+
       containers:
         - name: emby
           image: "emby/embyserver:4.4.3.0"
@@ -39,15 +42,14 @@ spec:
               readOnly: true
           resources:
             requests:
-              memory: "2048M"
+              memory: "2048Mi"
             limits:
-              memory: "4096M"
+              memory: "4096Mi"
 
       volumes:
         - name: nas-media
-          nfs:
-            server: librarium.warhammer.lan
-            path: /volume1/Media
+          persistentVolumeClaim:
+            claimName: nfs-nas-media
 
   volumeClaimTemplates:
     - metadata:
