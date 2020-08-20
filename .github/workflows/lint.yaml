@@ -27,7 +27,7 @@ jobs:
           sudo tar xf /tmp/shellcheck.linux.x86_64.tar.gz --strip-components=1 -C /usr/local/bin shellcheck-"$SHELLCHECK_VERSION"/shellcheck
           sudo chmod +x /usr/local/bin/shellcheck
 
-          apt update && apt install yamllint
+          sudo apt update && sudo apt install -y --no-install-recommends yamllint
 
       - name: Validate YAML files
         run: |
