@@ -1,0 +1,87 @@
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: jackett
+  namespace: downloads
+  annotations:
+    fluxcd.io/ignore: "false"
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: jackett
+  chart:
+    repository: https://k8s-charts.juggels.online
+    name: jackett
+    version: 1.0.1
+  values:
+    image:
+      repository: linuxserver/jackett
+      tag: "v0.16.1020-ls15"
+
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: "jackett-openvpnconf"
+      secret.reloader.stakater.com/reload: "jackett-openvpnenv"
+
+    config:
+      timezone: "Europe/Amsterdam"
+      uid: 1031
+      gid: 100
+
+    autoscaling:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 1
+
+    persistence:
+      enabled: true
+
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+        nginx.ingress.kubernetes.io/proxy-body-size: 25m
+
+    resources:
+      requests:
+        memory: "256M"
+      limits:
+        memory: "512M"
+
+    probes:
+      liveness:
+        initialDelaySeconds: 0
+      readiness:
+        initialDelaySeconds: 0
+      startup:
+        enabled: true
+
+    openvpn:
+      enabled: true
+
+      image:
+        repository: dperson/openvpn-client
+        tag: latest
+        pullPolicy: Always
+
+      env:
+        FIREWALL: "on"
+        ROUTE_1: "172.17.0.0/16"
+        ROUTE_2: "192.168.25.0/24"
+
+      externalDns: true
+
+      livenessProbe:
+        exec:
+          command:
+            - sh
+            - -c
+            - if [ $(curl -s https://ipinfo.io/country) == 'BE' ]; then exit 0; else exit $?; fi
+        initialDelaySeconds: 30
+        periodSeconds: 60
+        failureThreshold: 1
+
+  valuesFrom:
+    - secretKeyRef:
+        name: jackett-helm-values
+        key: values
