@@ -4,11 +4,6 @@ on:
   push:
     branches:
       - CI
-#    paths:
-#      - ".secrets/**/*.yaml"
-#      - "_setup/sealedsecret-cert.pem"
-#      - ".github/workflows/sealed-secrets.yaml"
-#      - ".github/scripts/generate_sealedsecrets.sh"
 
 env:
   DEBIAN_FRONTEND: "noninteractive"
@@ -23,14 +18,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install dependencies
-        env:
-          SHELLCHECK_VERSION: v0.7.1
-        run: |
-          curl -sL https://github.com/koalaman/shellcheck/releases/download/"$SHELLCHECK_VERSION"/shellcheck-"$SHELLCHECK_VERSION".linux.x86_64.tar.xz -o /tmp/shellcheck.linux.x86_64.tar.gz
-          sudo tar xf /tmp/shellcheck.linux.x86_64.tar.gz --strip-components=1 -C /usr/local/bin shellcheck-"$SHELLCHECK_VERSION"/shellcheck
-          sudo chmod +x /usr/local/bin/shellcheck
-
-      - name: Run shellcheck
-        run: |
-          shellcheck -v
+      - name: Run Shellcheck
+        uses: azohra/shell-linter@latest
+        with:
+          path: "**/*.sh"
+          severity: "warning"
