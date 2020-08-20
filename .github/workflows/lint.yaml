@@ -23,7 +23,7 @@ jobs:
           sudo apt update && sudo apt install -y --no-install-recommends yamllint
       - name: Validate YAML files
         run: |
-          task lint-yaml
+          ./.github/scripts/lint_yaml.sh
 
   lint-scripts:
     if: "!contains(github.event.head_commit.message, '[ci-skip]')"
@@ -40,4 +40,4 @@ jobs:
         env:
           SHELLCHECK_ERROR_LEVEL: warning
         run: |
-          task lint-scripts
+          ./.github/scripts/lint_scripts.sh
