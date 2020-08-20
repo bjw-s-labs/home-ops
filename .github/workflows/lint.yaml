@@ -1,0 +1,40 @@
+---
+name: lint
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  DEBIAN_FRONTEND: "noninteractive"
+
+jobs:
+  main:
+    runs-on:
+      - self-hosted
+
+    if: "!contains(github.event.head_commit.message, '[ci-skip]')"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        env:
+          SHELLCHECK_VERSION: v0.7.1
+        run: |
+          curl -sL https://github.com/koalaman/shellcheck/releases/download/"$SHELLCHECK_VERSION"/shellcheck-"$SHELLCHECK_VERSION".linux.x86_64.tar.xz -o /tmp/shellcheck.linux.x86_64.tar.gz
+          sudo tar xf /tmp/shellcheck.linux.x86_64.tar.gz --strip-components=1 -C /usr/local/bin shellcheck-"$SHELLCHECK_VERSION"/shellcheck
+          sudo chmod +x /usr/local/bin/shellcheck
+
+          sudo apt update && sudo apt install -y --no-install-recommends yamllint
+
+      - name: Validate YAML files
+        run: |
+          task lint-yaml
+
+      - name: Validate shell scripts
+        env:
+          SHELLCHECK_ERROR_LEVEL: warning
+        run: |
+          task lint-scripts
