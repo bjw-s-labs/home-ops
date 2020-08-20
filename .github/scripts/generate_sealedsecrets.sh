@@ -90,7 +90,8 @@ while IFS= read -r file; do
 
   secret_name=${secret_filename%.*}
   secret_namespace=$(echo "$secret_relative_path" | awk -F/ '{print $2}')
-  sealed_secret_filename="${CLUSTER_ROOT}${secret_relative_path}/sealedsecret-${secret_name}.yaml"
+  sealed_secret_path="${CLUSTER_ROOT}${secret_relative_path}"
+  sealed_secret_filename="${sealed_secret_path}/sealedsecret-${secret_name}.yaml"
 
   echo "- Processing $file"
 
@@ -156,6 +157,7 @@ while IFS= read -r file; do
   fi
 
   # Write out the actual sealed-secret and remove useless creationTimestamp
+  mkdir -p "${sealed_secret_path}"
   echo "---" > "$sealed_secret_filename"
   echo "$generated_secret" | kubeseal --format=yaml --cert="${PUB_CERT}" \
     | \
