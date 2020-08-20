@@ -27,7 +27,6 @@ jobs:
         env:
           SHELLCHECK_VERSION: stable
         run: |
-          curl -L ""
           curl -sL https://github.com/koalaman/shellcheck/releases/download/"$SHELLCHECK_VERSION"/shellcheck-"$SHELLCHECK_VERSION".linux.x86_64.tar.xz -o /tmp/shellcheck.linux.x86_64.tar.gz
           sudo tar xf /tmp/shellcheck.linux.x86_64.tar.gz -C /usr/local/shellcheck shellcheck
           sudo chmod +x /usr/local/bin/shellcheck
