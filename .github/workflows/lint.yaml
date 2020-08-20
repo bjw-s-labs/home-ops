@@ -25,10 +25,10 @@ jobs:
 
       - name: Install dependencies
         env:
-          SHELLCHECK_VERSION: stable
+          SHELLCHECK_VERSION: v0.7.1
         run: |
           curl -sL https://github.com/koalaman/shellcheck/releases/download/"$SHELLCHECK_VERSION"/shellcheck-"$SHELLCHECK_VERSION".linux.x86_64.tar.xz -o /tmp/shellcheck.linux.x86_64.tar.gz
-          sudo tar xf /tmp/shellcheck.linux.x86_64.tar.gz -C /usr/local/shellcheck shellcheck
+          sudo tar xf /tmp/shellcheck.linux.x86_64.tar.gz --strip-components=1 -C /usr/local/bin shellcheck-"$SHELLCHECK_VERSION"/shellcheck
           sudo chmod +x /usr/local/bin/shellcheck
 
       - name: Run shellcheck
