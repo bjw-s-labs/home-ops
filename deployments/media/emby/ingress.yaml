@@ -12,18 +12,18 @@ metadata:
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
     cert-manager.io/cluster-issuer: letsencrypt-production
     nginx.ingress.kubernetes.io/proxy-body-size: 25m
-    
+
 spec:
   rules:
-  - host: emby.bjws.nl
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: emby
-          servicePort: frontend
+    - host: emby.bjws.nl
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: emby
+              servicePort: frontend
 
   tls:
-  - secretName: tls.emby
-    hosts:
-    - emby.bjws.nl
+    - secretName: tls.emby
+      hosts:
+        - emby.bjws.nl
