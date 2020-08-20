@@ -1,0 +1,36 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: downloads-nfs-nas-media
+spec:
+  storageClassName: downloads-nas-media
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: librarium.warhammer.lan
+    path: /volume1/Media
+  mountOptions:
+    - tcp
+    - intr
+    - hard
+    - noatime
+    - nodiratime
+    - rsize=1048576
+    - wsize=1048576
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nfs-nas-media
+  namespace: downloads
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: downloads-nas-media
+  resources:
+    requests:
+      storage: 1Mi
