@@ -6,7 +6,9 @@ metadata:
   namespace: home-automation
   annotations:
     fluxcd.io/ignore: "false"
-    fluxcd.io/automated: "false"
+    fluxcd.io/automated: "true"
+    filter.fluxcd.io/chart-image: semver:~0.114
+    filter.fluxcd.io/vscode: "regex:^3.[0-9]+-.*$"
 spec:
   releaseName: home-assistant
   chart:
@@ -16,7 +18,7 @@ spec:
   values:
     image:
       repository: homeassistant/home-assistant
-      tag: 0.114.3
+      tag: 0.114.2
 
     probes:
       liveness:
