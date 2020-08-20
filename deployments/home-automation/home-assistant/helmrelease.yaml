@@ -18,7 +18,7 @@ spec:
   values:
     image:
       repository: homeassistant/home-assistant
-      tag: 0.114.2
+      tag: 0.114.3
 
     probes:
       liveness:
@@ -37,9 +37,9 @@ spec:
       loadBalancerIP: 192.168.26.5
       externalTrafficPolicy: Local
       additionalPorts:
-        - name: sonos
-          port: 1400
-          targetPort: 1400
+      - name: sonos
+        port: 1400
+        targetPort: 1400
 
     ingress:
       enabled: true
@@ -48,7 +48,7 @@ spec:
       TZ: "Europe/Amsterdam"
 
     extraSecretForEnvFrom:
-      - home-assistant-secrets
+    - home-assistant-secrets
 
     persistence:
       enabled: true
@@ -62,8 +62,8 @@ spec:
     git:
       enabled: true
       command:
-        - ls
-        - /config
+      - ls
+      - /config
 
     configurator:
       enabled: false
@@ -81,6 +81,6 @@ spec:
         enabled: true
 
   valuesFrom:
-    - secretKeyRef:
-        name: home-assistant-helm-values
-        key: values
+  - secretKeyRef:
+      name: home-assistant-helm-values
+      key: values
