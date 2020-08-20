@@ -45,7 +45,7 @@ if [ -n "$INPUT_FILE" ]; then
     exit 1
   fi
 else
-  FILES_TO_PROCESS=$(find "${SECRETS_ROOT}" -name '*.yaml')
+  FILES_TO_PROCESS=$(find "${SECRETS_ROOT}" -name '*.yaml' -or -name '*.yml')
 fi
 
 # Validate cluster vars file
@@ -84,10 +84,11 @@ while IFS= read -r file; do
   fi
 
   # Get secret file metadata (path, filename, etc...)
-  secret_path="$(dirname "$file")"
+  secret_filename="${file##*/}"
+  secret_path="${file%/$secret_filename}"
   secret_relative_path=${secret_path#"${SECRETS_ROOT}"}
-  secret_filename="$(basename "$file")"
-  secret_name=$(basename -s .yaml "$file")
+
+  secret_name=${secret_filename%.*}
   secret_namespace=$(echo "$secret_relative_path" | awk -F/ '{print $2}')
   sealed_secret_filename="${CLUSTER_ROOT}${secret_relative_path}/sealedsecret-${secret_name}.yaml"
 
