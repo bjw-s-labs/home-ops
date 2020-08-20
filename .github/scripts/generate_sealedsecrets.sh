@@ -22,7 +22,7 @@ do
 done
 
 need() {
-    command -v "$1" &>/dev/null || die "Binary '$1' is missing but required"
+    command -v "$1" &>/dev/null || (echo "Binary '$1' is missing but required" && exit 1)
 }
 
 need "kubectl"
@@ -45,7 +45,7 @@ if [ -n "$INPUT_FILE" ]; then
     exit 1
   fi
 else
-  FILES_TO_PROCESS=$(find "${SECRETS_ROOT}" -name '*.yaml' -or -name '*.yml')
+  FILES_TO_PROCESS=$(find "${SECRETS_ROOT}" \( -type f -name '*.yaml' -or -name '*.yml' \))
 fi
 
 # Validate cluster vars file
@@ -92,7 +92,7 @@ while IFS= read -r file; do
   secret_namespace=$(echo "$secret_relative_path" | awk -F/ '{print $2}')
   sealed_secret_filename="${CLUSTER_ROOT}${secret_relative_path}/sealedsecret-${secret_name}.yaml"
 
-  echo "- Processing ${secret_relative_path}/${secret_filename}"
+  echo "- Processing $file"
 
   # Double check to see if the file exists
   if [[ ! -f "$file" && $PRUNE_FILES == "true" ]]; then
@@ -156,11 +156,12 @@ while IFS= read -r file; do
   fi
 
   # Write out the actual sealed-secret and remove useless creationTimestamp
+  echo "---" > "$sealed_secret_filename"
   echo "$generated_secret" | kubeseal --format=yaml --cert="${PUB_CERT}" \
     | \
   yq d - "metadata.creationTimestamp" \
     | \
-  yq d - "spec.template.metadata.creationTimestamp" > "$sealed_secret_filename"
+  yq d - "spec.template.metadata.creationTimestamp" >> "$sealed_secret_filename"
 done <<< "$FILES_TO_PROCESS"
 
 message "all done!"

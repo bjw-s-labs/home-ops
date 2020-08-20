@@ -1,3 +1,4 @@
+---
 name: lint
 
 on:
@@ -26,8 +27,14 @@ jobs:
           sudo tar xf /tmp/shellcheck.linux.x86_64.tar.gz --strip-components=1 -C /usr/local/bin shellcheck-"$SHELLCHECK_VERSION"/shellcheck
           sudo chmod +x /usr/local/bin/shellcheck
 
+          apt update && apt install yamllint
+
+      - name: Validate YAML files
+        run: |
+          task lint-yaml
+
       - name: Validate shell scripts
         env:
           SHELLCHECK_ERROR_LEVEL: warning
         run: |
-          find . -name "*.sh" -print0 | xargs -0 shellcheck -S "$SHELLCHECK_ERROR_LEVEL"
+          task lint-scripts

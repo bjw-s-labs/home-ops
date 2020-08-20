@@ -2,7 +2,7 @@
 REPO_ROOT=$(git rev-parse --show-toplevel)
 
 need() {
-    which "$1" &>/dev/null || die "Binary '$1' is missing but required"
+    command -v "$1" &>/dev/null || (echo "Binary '$1' is missing but required" && exit 1)
 }
 
 need "kubectl"
