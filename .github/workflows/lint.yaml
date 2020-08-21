@@ -43,3 +43,11 @@ jobs:
           SHELLCHECK_ERROR_LEVEL: warning
         run: |
           ./.github/scripts/lint_scripts.sh
+
+    - uses: 8398a7/action-slack@v3
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+      with:
+        status: ${{ job.status }}
+        fields: repo,ref,workflow,job,message,author,action,took
