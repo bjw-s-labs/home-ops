@@ -24,6 +24,23 @@ jobs:
       - name: Validate YAML files
         run: |
           ./.github/scripts/lint_yaml.sh
+      - name: Webhook
+        env:
+          data: |
+            {
+              "repo": "${{ github.repository }}",
+              "ref": "${{ github.ref }}",
+              "sha": "${{ github.sha }}",
+              "workflow": "${{ github.workflow }}",
+              "job": "${{ github.job }}",
+              "job_status": "${{ job.status }}",
+              "run_id": "${{ github.run_id }}"
+            }
+        run: |
+          COMPACT_JSON=$(echo -n "$data" | jq -c '')
+          curl -s -X POST \
+              -H "content-type: application/json" \
+              --data "$COMPACT_JSON" ${{ secrets.WEBHOOK_URL }}
 
   lint-scripts:
     if: "!contains(github.event.head_commit.message, '[ci-skip]')"
@@ -43,15 +60,20 @@ jobs:
           SHELLCHECK_ERROR_LEVEL: warning
         run: |
           ./.github/scripts/lint_scripts.sh
-
       - name: Webhook
-        uses: joelwmale/webhook-action@master
         env:
-          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
           data: |
             {
-              "github":
-                {
-                  "event": ${{ github.event }}
-                }
+              "repo": "${{ github.repository }}",
+              "ref": "${{ github.ref }}",
+              "sha": "${{ github.sha }}",
+              "workflow": "${{ github.workflow }}",
+              "job": "${{ github.job }}",
+              "job_status": "${{ job.status }}",
+              "run_id": "${{ github.run_id }}"
             }
+        run: |
+          COMPACT_JSON=$(echo -n "$data" | jq -c '')
+          curl -s -X POST \
+              -H "content-type: application/json" \
+              --data "$COMPACT_JSON" ${{ secrets.WEBHOOK_URL }}
