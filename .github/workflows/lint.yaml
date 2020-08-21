@@ -56,7 +56,7 @@ jobs:
               username: 'action-slack',
               icon_emoji: ':octocat:',
               attachments: [{
-                color: '${{ job.status }}' === 'success' ? 'good' : '${{ job.status }}' === 'failure' ? 'danger' : 'warning',
+                color: '${{ job.status }}' === 'success' ? '#008000' : '${{ job.status }}' === 'failure' ? '#FF0000' : '#FFA500',
                 blocks: [
                   {
                     "type": "section",
@@ -75,7 +75,7 @@ jobs:
                         },
                         {
                             "type": "mrkdwn",
-                            "text": "*job*: <https://github.com/${{ github.repository }}/runs/${{ github.run_id }}|${process.env.AS_JOB}>"
+                            "text": "*job*: <https://github.com/${{ github.repository }}/runs/${{ github.run_number }}|${{ env.AS_JOB }}>"
                         }
                     ]
                   },
@@ -83,7 +83,7 @@ jobs:
                       "type": "section",
                       "text": {
                           "type": "mrkdwn",
-                          "text": "*commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${process.env.AS_MESSAGE}>"
+                          "text": "*commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ env.AS_MESSAGE }}>"
                       }
                   },
                   {
@@ -91,7 +91,7 @@ jobs:
                       "fields": [
                           {
                               "type": "mrkdwn",
-                              "text": "*duration*: ${process.env.AS_TOOK}"
+                              "text": "*duration*: ${{ env.AS_TOOK }}"
                           }
                       ]
                   }
