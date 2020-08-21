@@ -44,45 +44,11 @@ jobs:
         run: |
           ./.github/scripts/lint_scripts.sh
 
-      - uses: 8398a7/action-slack@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
-        with:
-          status: custom
-          fields: workflow,job,commit,repo,ref,author,took
-          custom_payload: |
-            {
-              username: 'action-slack',
-              icon_emoji: ':octocat:',
-              attachments: [{
-                color: '${{ job.status }}' === 'success' ? '#008000' : '${{ job.status }}' === 'failure' ? '#FF0000' : '#FFA500',
-                text: 'Pipeline ' + '${{ job.status }}' === 'success' ? 'succeeded' : '${{ job.status }}' === 'failure' ? 'failed' : 'warning' + ' for <https://github.com/${{ github.repository }}|${{ github.repository }}>',
-                blocks: [
-                  {
-                    "type": "section",
-                    "fields": [
-                        {
-                            "type": "mrkdwn",
-                            "text": "*ref*: ${{ github.ref }}"
-                        },
-                        {
-                            "type": "mrkdwn",
-                            "text": "*workflow*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}/checks|${{ github.workflow }}>"
-                        },
-                        {
-                            "type": "mrkdwn",
-                            "text": "*job*: <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ env.AS_JOB }}>"
-                        }
-                    ]
-                  },
-                  {
-                      "type": "section",
-                      "text": {
-                          "type": "mrkdwn",
-                          "text": "*commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ env.AS_MESSAGE }}>"
-                      }
-                  }
-                ]
-              }]
-            }
+    - name: Webhook
+      uses: joelwmale/webhook-action@master
+      env:
+        WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+        data: |
+          {
+            'github': ${{ github }}
+          }
