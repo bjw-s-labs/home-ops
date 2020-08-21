@@ -1,0 +1,27 @@
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: dsmr-reader
+  namespace: home-automation
+  labels:
+    app: dsmr-reader
+    component: main
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+    
+spec:
+  rules:
+  - host: dsmr-reader.bjws.lan
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: dsmr-reader
+          servicePort: http
+
+  tls:
+  - hosts:
+    - dsmr-reader.bjws.lan
+    secretName: tls.dsmr-reader
