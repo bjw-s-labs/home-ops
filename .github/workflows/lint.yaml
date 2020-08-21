@@ -44,11 +44,11 @@ jobs:
         run: |
           ./.github/scripts/lint_scripts.sh
 
-    - name: Webhook
-      uses: joelwmale/webhook-action@master
-      env:
-        WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
-        data: |
-          {
-            'github': ${{ github }}
-          }
+      - name: Webhook
+        uses: joelwmale/webhook-action@master
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          data: |
+            {
+              'github': ${{ github }}
+            }
