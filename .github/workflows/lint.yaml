@@ -57,14 +57,11 @@ jobs:
               icon_emoji: ':octocat:',
               attachments: [{
                 color: '${{ job.status }}' === 'success' ? '#008000' : '${{ job.status }}' === 'failure' ? '#FF0000' : '#FFA500',
+                text: 'Pipeline ' + '${{ job.status }}' === 'success' ? 'succeeded' : '${{ job.status }}' === 'failure' ? 'failed' : 'warning' + ' for <https://github.com/${{ github.repository }}|${{ github.repository }}>',
                 blocks: [
                   {
                     "type": "section",
                     "fields": [
-                        {
-                            "type": "mrkdwn",
-                            "text": "*repo*: <https://github.com/${{ github.repository }}|${{ github.repository }}>"
-                        },
                         {
                             "type": "mrkdwn",
                             "text": "*ref*: ${{ github.ref }}"
@@ -85,15 +82,6 @@ jobs:
                           "type": "mrkdwn",
                           "text": "*commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ env.AS_MESSAGE }}>"
                       }
-                  },
-                  {
-                      "type": "section",
-                      "fields": [
-                          {
-                              "type": "mrkdwn",
-                              "text": "*duration*: ${{ env.AS_TOOK }}"
-                          }
-                      ]
                   }
                 ]
               }]
