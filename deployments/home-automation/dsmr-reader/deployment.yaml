@@ -1,0 +1,64 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dsmr-reader
+  namespace: home-automation
+  labels:
+    app: dsmr-reader
+    component: main
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: dsmr-reader
+      component: main
+  template:
+    metadata:
+      labels:
+        app: dsmr-reader
+        component: main
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: feature.node.kubernetes.io/usb-ff_0403_6001.present
+                    operator: In
+                    values:
+                      - "true"
+
+      containers:
+        - name: dsmr-reader
+          image: "xirixiz/dsmr-reader-docker:amd64-v3.12"
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /dev/ttyUSB0
+              name: p1reader
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
+          env:
+            - name: TZ
+              value: "Europe/Amsterdam"
+          envFrom:
+            - secretRef:
+                name: dsmr-reader-secrets
+          resources: {}
+
+      volumes:
+        - name: p1reader
+          hostPath:
+            path: /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A12VWGAF-if00-port0
