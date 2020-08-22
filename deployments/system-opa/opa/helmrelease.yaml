@@ -1,0 +1,48 @@
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: opa
+  namespace: system-opa
+  annotations:
+    fluxcd.io/ignore: "false"
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: opa
+  chart:
+    repository: https://kubernetes-charts.storage.googleapis.com
+    name: opa
+    version: 1.14.2
+  values:
+    image: openpolicyagent/opa
+    imageTag: 0.23.1
+
+    opa: false
+
+    certManager:
+      enabled: true
+
+    mgmt:
+      configmapPolicies:
+        enabled: true
+        namespaces: [system-opa]
+
+    admissionControllerRules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["*"]
+        apiVersions: ["*"]
+        resources: ["*"]
+
+    rbac:
+      rules:
+        cluster:
+          - apiGroups:
+              - ""
+            resources:
+              - configmaps
+            verbs:
+              - get
+              - list
+              - watch
+              - update
+              - patch
