@@ -6,7 +6,8 @@ metadata:
   namespace: downloads
   annotations:
     fluxcd.io/ignore: "false"
-    fluxcd.io/automated: "false"
+    fluxcd.io/automated: "true"
+    fluxcd.io/tag.chart-image: 'regexp:^(v0\.16\.[0-9]+-ls[0-9]+)$'
 spec:
   releaseName: jackett
   chart:
@@ -16,7 +17,7 @@ spec:
   values:
     image:
       repository: linuxserver/jackett
-      tag: "v0.16.1020-ls15"
+      tag: "v0.16.1023-ls14"
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "jackett-openvpnconf"
@@ -61,7 +62,7 @@ spec:
 
       image:
         repository: dperson/openvpn-client
-        tag: latest
+        tag: amd64
         pullPolicy: Always
 
       env:
@@ -74,14 +75,15 @@ spec:
       livenessProbe:
         exec:
           command:
-            - sh
-            - -c
-            - if [ $(curl -s https://ipinfo.io/country) == 'BE' ]; then exit 0; else exit $?; fi
+          - sh
+          - -c
+          - if [ $(curl -s https://ipinfo.io/country) == 'BE' ]; then exit 0; else
+            exit $?; fi
         initialDelaySeconds: 30
         periodSeconds: 60
         failureThreshold: 1
 
   valuesFrom:
-    - secretKeyRef:
-        name: jackett-helm-values
-        key: values
+  - secretKeyRef:
+      name: jackett-helm-values
+      key: values

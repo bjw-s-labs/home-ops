@@ -139,6 +139,23 @@ installLonghorn() {
   kubectl apply -f "$REPO_ROOT"/deployments/"$LONGHORN_NAMESPACE"/longhorn/storageclass-singlereplica.yaml
 }
 
+installOpa() {
+  message "installing open policy agent"
+  OPA_NAMESPACE="system-opa"
+  kubectl apply -f "$REPO_ROOT"/deployments/"$OPA_NAMESPACE"/namespace.yaml
+  kubectl apply -f "$REPO_ROOT"/deployments/"$OPA_NAMESPACE"/opa/configmap-opa-default.yaml
+  kubectl apply -f "$REPO_ROOT"/deployments/"$OPA_NAMESPACE"/opa/helmrelease.yaml
+  sleep 5
+
+  OPA_READY=1
+  while [ $OPA_READY != 0 ]; do
+    echo "waiting for opa pod to be fully ready..."
+    kubectl -n "$OPA_NAMESPACE" wait --for condition=available deployment/opa
+    OPA_READY="$?"
+    sleep 5
+  done
+}
+
 # exit when any command fails
 set -e
 
@@ -148,6 +165,7 @@ installCertManager
 installMetalLb
 installIngress
 installLonghorn
+installOpa
 
 message "all done!"
 kubectl get nodes -o=wide
