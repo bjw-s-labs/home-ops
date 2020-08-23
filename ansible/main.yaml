@@ -1,0 +1,13 @@
+---
+- hosts: all
+  become: true
+  gather_facts: true
+
+  vars_files:
+    - vars.yaml
+
+  tasks:
+    - include_role:
+        name: system
+      tags:
+        - system
