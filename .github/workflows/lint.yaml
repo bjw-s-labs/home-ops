@@ -25,12 +25,12 @@ jobs:
         run: |
           ./.github/scripts/lint_yaml.sh
       - name: Webhook
+        if: ${{ always() }}
         env:
           data: |
             {
               "repo": "${{ github.repository }}",
               "ref": "${{ github.ref }}",
-              "message": "${{ github.event.commits[0].message }}",
               "sha": "${{ github.sha }}",
               "workflow": "${{ github.workflow }}",
               "job": "${{ github.job }}",
@@ -62,13 +62,13 @@ jobs:
         run: |
           ./.github/scripts/lint_scripts.sh
       - name: Webhook
+        if: ${{ always() }}
         env:
           data: |
             {
               "repo": "${{ github.repository }}",
               "ref": "${{ github.ref }}",
               "sha": "${{ github.sha }}",
-              "message": "${{ github.event.commits[0].message }}",
               "workflow": "${{ github.workflow }}",
               "job": "${{ github.job }}",
               "job_status": "${{ job.status }}",
