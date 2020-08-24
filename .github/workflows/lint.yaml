@@ -18,6 +18,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Lint yaml
         uses: ibiqlik/action-yamllint@v1
+        with:
+          config_file: .github/yamllint.config
       - name: Webhook
         if: ${{ always() }}
         env:
