@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: jacobalberty/unifi
-      tag: 5.13.32
+      tag: 5.14.22
 
     podAnnotations:
       backup.velero.io/backup-volumes: unifi-data
@@ -25,6 +25,7 @@ spec:
 
     persistence:
       enabled: true
+      existingClaim: unifi
       size: 2Gi
 
     guiService:
