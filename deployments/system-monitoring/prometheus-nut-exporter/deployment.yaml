@@ -21,14 +21,14 @@ spec:
         app: prometheus-nut-exporter
     spec:
       containers:
-        - name: prometheus-nut-exporter
-          image: "hon95/prometheus-nut-exporter:1.0.1"
-          imagePullPolicy: IfNotPresent
-          ports:
-            - name: http-metrics
-              containerPort: 9995
-              protocol: TCP
-          env:
-            - name: TZ
-              value: Europe/Amsterdam
-          resources: {}
+      - name: prometheus-nut-exporter
+        image: "hon95/prometheus-nut-exporter:bleeding"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http-metrics
+          containerPort: 9995
+          protocol: TCP
+        env:
+        - name: TZ
+          value: Europe/Amsterdam
+        resources: {}
