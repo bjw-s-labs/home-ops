@@ -48,13 +48,13 @@ spec:
           repeat_interval: 6h
           receiver: 'webhook'
           routes:
-            - receiver: 'null'
-              match:
-                alertname: Watchdog
-            - receiver: 'webhook'
-              match_re:
-                severity: critical|warning
-              continue: true
+          - receiver: 'null'
+            match:
+              alertname: Watchdog
+          - receiver: 'webhook'
+            match_re:
+              severity: critical|warning
+            continue: true
         inhibit_rules:
         - source_match:
             severity: 'critical'
