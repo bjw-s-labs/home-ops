@@ -46,15 +46,15 @@ spec:
           group_wait: 30s
           group_interval: 5m
           repeat_interval: 6h
-          # receiver: 'pushover'
+          receiver: 'webhook'
           routes:
             - receiver: 'null'
               match:
                 alertname: Watchdog
-            # - receiver: 'pushover'
-            #   match_re:
-            #   severity: critical|warning
-            #   continue: true
+             - receiver: 'webhook'
+               match_re:
+               severity: critical|warning
+               continue: true
         inhibit_rules:
           - source_match:
               severity: 'critical'
