@@ -1,0 +1,36 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-nut-exporter
+  namespace: system-monitoring
+  labels:
+    app: prometheus-nut-exporter
+  annotations:
+    fluxcd.io/ignore: "false"
+    fluxcd.io/automated: "true"
+    filter.fluxcd.io/chart-image: semver:~1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-nut-exporter
+  template:
+    metadata:
+      labels:
+        app: prometheus-nut-exporter
+    spec:
+      containers:
+        - name: prometheus-nut-exporter
+          image: "hon95/prometheus-nut-exporter:1.0.1"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http-metrics
+              containerPort: 9995
+              protocol: TCP
+          env:
+            - name: TZ
+              value: Europe/Amsterdam
+            - name: LOG_REQUESTS_CONSOLE
+              value: "true"
+          resources: {}
