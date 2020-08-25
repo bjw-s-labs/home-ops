@@ -70,6 +70,26 @@ spec:
               subPath: upsd.conf
           resources: {}
 
+        - name: upsc-exporter
+          image: "jzck/upsc-exporter:latest"
+          imagePullPolicy: Always
+          ports:
+            - name: http-metrics
+              containerPort: 9614
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http-metrics
+            initialDelaySeconds: 5
+            timeoutSeconds: 10
+          env:
+            - name: TZ
+              value: "Europe/Amsterdam"
+            - name: UPS_TARGET
+              value: UPS@localhost
+          resources: {}
+
       volumes:
         - name: secret
           secret:
