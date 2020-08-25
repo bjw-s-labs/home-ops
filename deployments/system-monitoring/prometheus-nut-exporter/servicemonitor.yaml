@@ -1,0 +1,20 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: prometheus-nut-exporter
+  namespace: system-monitoring
+  labels:
+    app: prometheus-nut-exporter
+spec:
+  selector:
+    matchLabels:
+      app: prometheus-nut-exporter
+  endpoints:
+    - port: http-metrics
+      interval: 15s
+      scrapeTimeout: 10s
+      path: "/nut"
+      params:
+        target:
+          - "nut-server-study.home-network:3493"
