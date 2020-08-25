@@ -134,6 +134,11 @@ spec:
           helm-operator:
             url: https://raw.githubusercontent.com/fluxcd/helm-operator/master/chart/helm-operator/dashboards/helm-operator-dashboard.json
             datasource: Prometheus
+      additionalDataSources:
+        - name: loki
+          type: loki
+          access: proxy
+          url: http://loki.system-monitoring:3100
       grafana.ini:
         paths:
           data: /var/lib/grafana/data
