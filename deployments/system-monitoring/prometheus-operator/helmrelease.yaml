@@ -46,15 +46,15 @@ spec:
           group_wait: 30s
           group_interval: 5m
           repeat_interval: 6h
-#          receiver: 'pushover'
+          # receiver: 'pushover'
           routes:
             - receiver: 'null'
               match:
                 alertname: Watchdog
-#            - receiver: 'pushover'
-#              match_re:
-#                severity: critical|warning
-#              continue: true
+            # - receiver: 'pushover'
+            #   match_re:
+            #   severity: critical|warning
+            #   continue: true
         inhibit_rules:
           - source_match:
               severity: 'critical'
@@ -91,7 +91,7 @@ spec:
         GF_EXPLORE_ENABLED: true
         GF_PANELS_DISABLE_SANITIZE_HTML: true
         GF_LOG_FILTERS: rendering:debug
-#          VAR_BLOCKY_URL: "http://blocky.kube-system.svc.cluster.local:4000"
+        # VAR_BLOCKY_URL: "http://blocky.kube-system.svc.cluster.local:4000"
       sidecar:
         datasources:
           enabled: true
@@ -125,50 +125,14 @@ spec:
                 path: /var/lib/grafana/dashboards/default
       dashboards:
         default:
-          vernemq:
-            url: https://raw.githubusercontent.com/vernemq/vernemq/master/metrics_scripts/grafana/VerneMQ%20Node%20Metrics.json
-            datasource: Prometheus
           nginx-dashboard:
             url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
-            datasource: Prometheus
-          apc-ups:
-            url: https://raw.githubusercontent.com/onedr0p/k3s-gitops/master/integrations/dashboards/apc-ups.json
             datasource: Prometheus
           flux:
             url: https://raw.githubusercontent.com/fluxcd/flux/master/chart/flux/dashboards/flux-dashboard.json
             datasource: Prometheus
           helm-operator:
             url: https://raw.githubusercontent.com/fluxcd/helm-operator/master/chart/helm-operator/dashboards/helm-operator-dashboard.json
-            datasource: Prometheus
-          # Ref: https://grafana.com/grafana/dashboards/11310
-          unifi-client-dpi:
-            gnetId: 11310
-            revision: 4
-            datasource: Prometheus
-          # Ref: https://grafana.com/grafana/dashboards/11315
-          unifi-client-insights:
-            gnetId: 11315
-            revision: 8
-            datasource: Prometheus
-          # Ref: https://grafana.com/grafana/dashboards/11311
-          unifi-network-sites:
-            gnetId: 11311
-            revision: 4
-            datasource: Prometheus
-          # Ref: https://grafana.com/grafana/dashboards/11314
-          unifi-uap-insights:
-            gnetId: 11314
-            revision: 9
-            datasource: Prometheus
-          # Ref: https://grafana.com/grafana/dashboards/11313
-          unifi-usg-insights:
-            gnetId: 11313
-            revision: 8
-            datasource: Prometheus
-          # Ref: https://grafana.com/grafana/dashboards/11312
-          unifi-usw-insights:
-            gnetId: 11312
-            revision: 8
             datasource: Prometheus
       grafana.ini:
         paths:
