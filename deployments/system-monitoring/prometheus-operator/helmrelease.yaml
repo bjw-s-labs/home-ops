@@ -48,19 +48,19 @@ spec:
           repeat_interval: 6h
           # receiver: 'pushover'
           routes:
-            - receiver: 'null'
-              match:
-                alertname: Watchdog
+          - receiver: 'null'
+            match:
+              alertname: Watchdog
             # - receiver: 'pushover'
             #   match_re:
             #   severity: critical|warning
             #   continue: true
         inhibit_rules:
-          - source_match:
-              severity: 'critical'
-            target_match:
-              severity: 'warning'
-            equal: ['alertname', 'namespace']
+        - source_match:
+            severity: 'critical'
+          target_match:
+            severity: 'warning'
+          equal: ['alertname', 'namespace']
       alertmanagerSpec:
         storage:
           volumeClaimTemplate:
@@ -72,17 +72,17 @@ spec:
     nodeExporter:
       serviceMonitor:
         relabelings:
-          - action: replace
-            regex: (.*)
-            replacement: $1
-            sourceLabels:
-              - __meta_kubernetes_pod_node_name
-            targetLabel: kubernetes_node
+        - action: replace
+          regex: (.*)
+          replacement: $1
+          sourceLabels:
+          - __meta_kubernetes_pod_node_name
+          targetLabel: kubernetes_node
 
     grafana:
       image:
         repository: grafana/grafana
-        tag: 7.1.4
+        tag: 7.1.5
       deploymentStrategy:
         type: Recreate
       persistence:
@@ -104,25 +104,25 @@ spec:
             disableDelete: false
             allowUiUpdates: true
       plugins:
-        - natel-discrete-panel
-        - pr0ps-trackmap-panel
-        - grafana-piechart-panel
-        - vonage-status-panel
-        - grafana-worldmap-panel
-        - grafana-clock-panel
+      - natel-discrete-panel
+      - pr0ps-trackmap-panel
+      - grafana-piechart-panel
+      - vonage-status-panel
+      - grafana-worldmap-panel
+      - grafana-clock-panel
       dashboardProviders:
         dashboardproviders.yaml:
           apiVersion: 1
           providers:
-            - name: 'default'
-              orgId: 1
-              folder: ''
-              type: file
-              disableDeletion: false
-              allowUiUpdates: true
-              editable: true
-              options:
-                path: /var/lib/grafana/dashboards/default
+          - name: 'default'
+            orgId: 1
+            folder: ''
+            type: file
+            disableDeletion: false
+            allowUiUpdates: true
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/default
       dashboards:
         default:
           nginx-dashboard:
@@ -162,10 +162,10 @@ spec:
     kubelet:
       serviceMonitor:
         metricRelabelings:
-          - action: replace
-            sourceLabels:
-              - node
-            targetLabel: instance
+        - action: replace
+          sourceLabels:
+          - node
+          targetLabel: instance
 
     prometheus:
       prometheusSpec:
@@ -189,6 +189,6 @@ spec:
                   storage: 20Gi
 
   valuesFrom:
-    - secretKeyRef:
-        name: prometheus-operator-helm-values
-        key: values
+  - secretKeyRef:
+      name: prometheus-operator-helm-values
+      key: values
