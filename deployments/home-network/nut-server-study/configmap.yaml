@@ -2,13 +2,14 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: nut-upsd-study
+  name: nut-server-study
   namespace: home-network
 
 data:
-  ups.conf: |
-    maxretry = 3
+  nut.conf: |
+    MODE=netserver
 
+  ups.conf: |
     [ups]
       driver = usbhid-ups
       port = auto
