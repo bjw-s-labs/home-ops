@@ -9,7 +9,7 @@ metadata:
   annotations:
     fluxcd.io/ignore: "false"
     fluxcd.io/automated: "true"
-    filter.fluxcd.io/chart-image: semver:~1
+    fluxcd.io/tag.prometheus-nut-exporter: semver:~1
 spec:
   replicas: 1
   selector:
@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: prometheus-nut-exporter
-        image: "hon95/prometheus-nut-exporter:bleeding"
+        image: "hon95/prometheus-nut-exporter:1.0.1"
         imagePullPolicy: IfNotPresent
         ports:
         - name: http-metrics
