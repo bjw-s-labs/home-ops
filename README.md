@@ -2,7 +2,7 @@
 
 ![Kubernetes](https://i.imgur.com/p1RzXjQ.png)
 
-[![Discord](https://img.shields.io/badge/discord-chat-7289DA.svg?maxAge=60&style=flat-square)](https://discord.gg/DNCynrJ)    [![k3s](https://img.shields.io/badge/k3s-v1.18.6-orange?style=flat-square)](https://k3s.io/)    [![GitHub stars](https://img.shields.io/github/stars/bjw-s/k8s-gitops?color=green&style=flat-square)](https://github.com/bjw-s/k8s-gitops/stargazers)    [![GitHub issues](https://img.shields.io/github/issues/bjw-s/k8s-gitops?style=flat-square)](https://github.com/bjw-s/k8s-gitops/issues)    [![GitHub last commit](https://img.shields.io/github/last-commit/bjw-s/k8s-gitops?color=purple&style=flat-square)](https://github.com/bjw-s/k8s-gitops/commits/master)
+[![Discord](https://img.shields.io/badge/discord-chat-7289DA.svg?maxAge=60&style=flat-square)](https://discord.gg/d7C9M7)    [![k3s](https://img.shields.io/badge/k3s-v1.18.8-orange?style=flat-square)](https://k3s.io/)    [![GitHub stars](https://img.shields.io/github/stars/bjw-s/k8s-gitops?color=green&style=flat-square)](https://github.com/bjw-s/k8s-gitops/stargazers)    [![GitHub issues](https://img.shields.io/github/issues/bjw-s/k8s-gitops?style=flat-square)](https://github.com/bjw-s/k8s-gitops/issues)    [![GitHub last commit](https://img.shields.io/github/last-commit/bjw-s/k8s-gitops?color=purple&style=flat-square)](https://github.com/bjw-s/k8s-gitops/commits/master)
 
 ---
 
@@ -10,7 +10,11 @@
 
 Welcome to my home Kubernetes cluster.
 
-Lots of fun (to me at least ;)) stuff can be found, poke around my [deployments](./deployments/) directory to see what my cluster is running. Feel free to open a [GitHub Issue](https://github.com/bjw-s/k8s-gitops/issues/new) or join our [Discord](https://discord.gg/DNCynrJ) if you have any questions.
+Lots of fun (to me at least ;)) stuff can be found, poke around my [deployments](./deployments/) directory to see what my cluster is running. Feel free to open a [GitHub Issue](https://github.com/bjw-s/k8s-gitops/issues/new).
+
+## Community
+
+We've got a vibrant community of folks all running various K8S workloads at home. Click the Discord link above to join us!
 
 ## Thanks
 
