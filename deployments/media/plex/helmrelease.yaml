@@ -1,0 +1,89 @@
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: plex
+  namespace: media
+  annotations:
+    fluxcd.io/ignore: "false"
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: plex
+  rollback:
+    enable: false
+  chart:
+    repository: https://billimek.com/billimek-charts/
+    name: plex
+    version: 1.7.2
+  values:
+    image:
+      repository: plexinc/pms-docker
+      tag: plexpass
+      pullPolicy: IfNotPresent
+
+    hostNetwork: true
+
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        external-dns.alpha.kubernetes.io/target: bjws.nl
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        cert-manager.io/cluster-issuer: letsencrypt-production
+
+    advertiseIp: "http://192.168.26.9:32400"
+    timezone: "Europe/Amsterdam"
+    plexUid: 1031
+    plexGid: 100
+
+    serviceTCP:
+      type: LoadBalancer
+      externalIPs:
+        - 192.168.26.9
+
+    serviceUDP:
+      type: LoadBalancer
+      externalIPs:
+        - 192.168.26.9
+
+    persistence:
+      config:
+        size: 20Gi
+        accessMode: ReadWriteOnce
+
+      transcode:
+        enabled: false
+        emptyDir:
+          medium: "Memory"
+
+      data:
+        enabled: false
+
+      extraMounts:
+        - name: nfs-nas-media
+          claimName: nfs-nas-media
+          mountPath: /storage/media
+
+    resources:
+      requests:
+        cpu: 35m
+        memory: 1500Mi
+      limits:
+        gpu.intel.com/i915: 1
+        memory: 8000Mi
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: feature.node.kubernetes.io/custom-intel-gpu
+                  operator: In
+                  values:
+                    - "true"
+
+  valuesFrom:
+    - secretKeyRef:
+        name: plex-helm-values
+        key: values
