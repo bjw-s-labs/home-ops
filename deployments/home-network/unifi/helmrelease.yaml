@@ -29,31 +29,27 @@ spec:
 
     guiService:
       type: LoadBalancer
-      loadBalancerIP: 192.168.26.3
+      externalIPs:
+        - 192.168.26.3
       externalTrafficPolicy: Local
-      annotations:
-        metallb.universe.tf/allow-shared-ip: "true"
 
     controllerService:
       type: LoadBalancer
-      loadBalancerIP: 192.168.26.3
+      externalIPs:
+        - 192.168.26.3
       externalTrafficPolicy: Local
-      annotations:
-        metallb.universe.tf/allow-shared-ip: "true"
 
     stunService:
       type: LoadBalancer
-      loadBalancerIP: 192.168.26.3
+      externalIPs:
+        - 192.168.26.3
       externalTrafficPolicy: Local
-      annotations:
-        metallb.universe.tf/allow-shared-ip: "true"
 
     discoveryService:
       type: LoadBalancer
-      loadBalancerIP: 192.168.26.3
+      externalIPs:
+        - 192.168.26.3
       externalTrafficPolicy: Local
-      annotations:
-        metallb.universe.tf/allow-shared-ip: "true"
 
     resources:
       requests:
