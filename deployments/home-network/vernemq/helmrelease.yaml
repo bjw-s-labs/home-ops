@@ -26,15 +26,16 @@ spec:
     statefulset:
       annotations:
         secret.reloader.stakater.com/reload: "vernemq-secrets"
-      podAnnotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "8888"
 
     service:
       type: LoadBalancer
-      loadBalancerIP: 192.168.26.4
+      externalIPs:
+        - 192.168.26.4
       ws:
         enabled: true
+
+    serviceMonitor:
+      create: true
 
     podAntiAffinity: hard
 
