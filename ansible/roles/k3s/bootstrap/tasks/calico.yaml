@@ -1,0 +1,59 @@
+---
+- name: Deploy Calico Operator
+  delegate_to: localhost
+  command: "{{ item }}"
+  become: no
+  with_items:
+    - kubectl apply -f {{ calico.operator_manifest_file }}
+  register: calico_result
+  environment:
+    KUBECONFIG: "{{ REPO_ROOT }}/kubeconfig"
+    CALICO_DATASTORE_TYPE: kubernetes
+    CALICO_KUBECONFIG: "{{ REPO_ROOT }}/kubeconfig"
+  until: calico_result is succeeded
+  retries: 6
+  delay: 10
+
+#- name: Configure Calico Settings
+#  delegate_to: localhost
+#  shell: |
+#    cat << EOF | kubectl apply -f -
+#      apiVersion: operator.tigera.io/v1
+#      kind: Installation
+#      metadata:
+#        name: default
+#  environment:
+#    CALICO_DATASTORE_TYPE: kubernetes
+#    CALICO_KUBECONFIG: "{{ REPO_ROOT }}/kubeconfig"
+#
+#- name: Configure BGP Peer Settings for Calico
+#  delegate_to: localhost
+#  shell: |
+#    cat << EOF | calicoctl apply -f -
+#    apiVersion: projectcalico.org/v3
+#    kind: BGPPeer
+#    metadata:
+#      name: global
+#    spec:
+#      peerIP: {{ calico.bgp_peer }}
+#      asNumber: {{ calico.bgp_as }}
+#  environment:
+#    CALICO_DATASTORE_TYPE: kubernetes
+#    CALICO_KUBECONFIG: "{{ REPO_ROOT }}/kubeconfig"
+#  when: "calico.bgp == 'enabled'"
+#
+#- name: Configure BGP Configuration for Calico
+#  delegate_to: localhost
+#  shell: |
+#    cat << EOF | calicoctl apply -f -
+#    apiVersion: crd.projectcalico.org/v1
+#    kind: BGPConfiguration
+#    metadata:
+#      name: default
+#    spec:
+#      serviceExternalIPs:
+#        - cidr: {{ calico.bgp_cidr }}
+#  environment:
+#    CALICO_DATASTORE_TYPE: kubernetes
+#    CALICO_KUBECONFIG: "{{ REPO_ROOT }}/kubeconfig"
+#  when: "calico.bgp == 'enabled'"

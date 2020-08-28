@@ -43,39 +43,4 @@
   timezone:
     name: "{{ timezone | default('America/New_York') }}"
 
-- name: Disable SWAP
-  shell: |
-    swapoff -a
-
-- name: Disable SWAP in fstab
-  replace:
-    path: /etc/fstab
-    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
-    replace: '# \1'
-
-# Set up k3s to use private http registry, for pull-through caching
-- name: Ensures /etc/rancher/k3s/ dir exists
-  file:
-    path: /etc/rancher/k3s/
-    state: directory
-
-- name: Set up k3s to use private http registry
-  template:
-    src: registries.yaml.j2
-    dest: /etc/rancher/k3s/registries.yaml
-  when: private_registry.enabled is defined and private_registry.enabled == true
-  register: k3s_registries
-
-- name: Restart k3s server
-  systemd:
-    name: k3s
-    enabled: true
-    state: restarted
-  when: k3s_registries.changed and inventory_hostname in groups['k3s_master']
-
-- name: Restart k3s agent
-  systemd:
-    name: k3s-agent
-    enabled: true
-    state: restarted
-  when: k3s_registries.changed and inventory_hostname in groups['k3s_worker']
+- include: disable_swap.yaml
