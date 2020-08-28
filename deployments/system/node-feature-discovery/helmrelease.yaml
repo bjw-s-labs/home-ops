@@ -15,8 +15,9 @@ spec:
     version: 1.0.0
   values:
     sources:
+      - custom
+      - pci
       - usb
-
     config: |
       sources:
         usb:
@@ -31,6 +32,16 @@ spec:
             - "class"
             - "vendor"
             - "device"
+        custom:
+          - name: "intel-gpu"
+            matchOn:
+              - pciId:
+                  class: ["0300"]
+                  vendor: ["8086"]
+          - name: "coral-tpu"
+            matchOn:
+              - usbId:
+                  vendor: ["1a6e", "18d1"]
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "node-feature-discovery"
