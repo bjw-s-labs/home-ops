@@ -72,7 +72,7 @@ spec:
           command:
           - sh
           - -c
-          - if [ $(curl -s https://ipinfo.io/country) == 'BE' ]; then exit 0; else
+          - if [ $(curl -s https://am.i.mullvad.net/country) == "Belgium" ]; then exit 0; else exit $?; fi
             exit $?; fi
         initialDelaySeconds: 30
         periodSeconds: 60
