@@ -1,0 +1,38 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seriescleanup-config
+  namespace: media
+  labels:
+    app: seriescleanup
+data:
+  settings.json: |
+    {
+      "general":{
+        "deleteafter":86400,
+        "media_extensions":[
+          ".avi",
+          ".mkv",
+          ".mp4"
+        ],
+        "subtitle_extensions":[
+          ".srt"
+        ]
+      },
+      "logging":{
+        "loglevel":"info",
+        "displaytime":false
+      },
+      "scan_folders":[
+        "/media/Series/Fiction/New"
+      ],
+      "mappings":{
+        "9-1-1 Lone Star":"9-1-1: Lone Star",
+        "90 Day Fiancé Before The 90 Days":"90 Day Fiancé: Before The 90 Days",
+        "Greys Anatomy":"Grey's Anatomy",
+        "The Handmaids Tale": "The Handmaid's Tale",
+        "New Amsterdam 2018":"New Amsterdam",
+        "Warrior (2019)":"Warrior"
+      }
+    }
