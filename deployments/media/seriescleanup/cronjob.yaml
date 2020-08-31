@@ -1,3 +1,4 @@
+---
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -14,87 +15,87 @@ spec:
       template:
         spec:
           initContainers:
-          - name: git-sync
-            image: "k8s.gcr.io/git-sync:v3.1.6"
-            imagePullPolicy: Always
-            env:
-            - name: TZ
-              value: "Europe/Amsterdam"
-            - name: GIT_SYNC_REPO
-              value: git@github.com:bjw-s/series-cleanup.git
-            - name: GIT_SYNC_BRANCH
-              value: "master"
-            - name: GIT_SYNC_DEPTH
-              value: "0"
-            - name: GIT_SYNC_ROOT
-              value: "/app"
-            - name: GIT_SYNC_DEST
-              value: "seriescleanup"
-            - name: GIT_SYNC_ONE_TIME
-              value: "true"
-            - name: GIT_SYNC_SSH
-              value: "true"
-            - name: GIT_KNOWN_HOSTS
-              value: "false"
-            volumeMounts:
-            - mountPath: /app
-              name: seriescleanup
-            - mountPath: /etc/git-secret/ssh
-              name: seriescleanup-secrets
-              subPath: id_rsa
-            securityContext:
-              runAsUser: 0
+            - name: git-sync
+              image: "k8s.gcr.io/git-sync:v3.1.6"
+              imagePullPolicy: Always
+              env:
+                - name: TZ
+                  value: "Europe/Amsterdam"
+                - name: GIT_SYNC_REPO
+                  value: git@github.com:bjw-s/series-cleanup.git
+                - name: GIT_SYNC_BRANCH
+                  value: "master"
+                - name: GIT_SYNC_DEPTH
+                  value: "0"
+                - name: GIT_SYNC_ROOT
+                  value: "/app"
+                - name: GIT_SYNC_DEST
+                  value: "seriescleanup"
+                - name: GIT_SYNC_ONE_TIME
+                  value: "true"
+                - name: GIT_SYNC_SSH
+                  value: "true"
+                - name: GIT_KNOWN_HOSTS
+                  value: "false"
+              volumeMounts:
+                - mountPath: /app
+                  name: seriescleanup
+                - mountPath: /etc/git-secret/ssh
+                  name: seriescleanup-secrets
+                  subPath: id_rsa
+              securityContext:
+                runAsUser: 0
 
           containers:
-          - name: seriescleanup
-            image: python:3.8-alpine
-            env:
-            - name: TZ
-              value: "Europe/Amsterdam"
-            - name: TRAKT_USER
-              valueFrom:
-                  secretKeyRef:
-                    name: seriescleanup-secrets
-                    key: TRAKT_USER
-            - name: TRAKT_CLIENT_ID
-              valueFrom:
-                  secretKeyRef:
-                    name: seriescleanup-secrets
-                    key: TRAKT_USER
-            - name: TRAKT_CLIENT_SECRET
-              valueFrom:
-                  secretKeyRef:
-                    name: seriescleanup-secrets
-                    key: TRAKT_CLIENT_SECRET
-            - name: TRAKT_OAUTH_TOKEN
-              valueFrom:
-                  secretKeyRef:
-                    name: seriescleanup-secrets
-                    key: TRAKT_OAUTH_TOKEN
-            command: ['sh', '-c']
-            args:
-            - pip install --no-cache-dir -r "/app/seriescleanup/src/requirements.txt";
-              python /app/seriescleanup/src/main.py -c /app/seriescleanup/settings.json;
-            volumeMounts:
-            - mountPath: /app
-              name: seriescleanup
-            - mountPath: /app/seriescleanup/settings.json
-              name: config
-              subPath: settings.json
-            - mountPath: /media
-              name: nas-media              
+            - name: seriescleanup
+              image: python:3.8-alpine
+              env:
+                - name: TZ
+                  value: "Europe/Amsterdam"
+                - name: TRAKT_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: seriescleanup-secrets
+                      key: TRAKT_USER
+                - name: TRAKT_CLIENT_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: seriescleanup-secrets
+                      key: TRAKT_USER
+                - name: TRAKT_CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: seriescleanup-secrets
+                      key: TRAKT_CLIENT_SECRET
+                - name: TRAKT_OAUTH_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: seriescleanup-secrets
+                      key: TRAKT_OAUTH_TOKEN
+              command: ['sh', '-c']
+              args:
+                - pip install --no-cache-dir -r "/app/seriescleanup/src/requirements.txt";
+                  python /app/seriescleanup/src/main.py -c /app/seriescleanup/settings.json;
+              volumeMounts:
+                - mountPath: /app
+                  name: seriescleanup
+                - mountPath: /app/seriescleanup/settings.json
+                  name: config
+                  subPath: settings.json
+                - mountPath: /media
+                  name: nas-media
           restartPolicy: OnFailure
 
           volumes:
-          - name: seriescleanup
-            emptyDir: {}
-          - name: seriescleanup-secrets
-            secret:
-              defaultMode: 256
-              secretName: seriescleanup-secrets
-          - name: config
-            configMap:
-              name: seriescleanup-config
-          - name: nas-media
-            persistentVolumeClaim:
+            - name: seriescleanup
+              emptyDir: {}
+            - name: seriescleanup-secrets
+              secret:
+                defaultMode: 256
+                secretName: seriescleanup-secrets
+            - name: config
+              configMap:
+                name: seriescleanup-config
+            - name: nas-media
+              persistentVolumeClaim:
                 claimName: nfs-nas-media
