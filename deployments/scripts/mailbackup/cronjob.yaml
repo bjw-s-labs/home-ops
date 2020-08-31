@@ -1,0 +1,53 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: mailbackup
+  namespace: scripts
+  labels:
+    app: mailbackup
+spec:
+  schedule: "0 2 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: mailbackup-2020
+              image: ubuntu:18.04
+              env:
+                - name: TZ
+                  value: "Europe/Amsterdam"
+                - name: UID
+                  value: "1028"
+                - name: GID
+                  value: "100"
+              command: ['/bin/bash', '/scripts/getmail']
+              volumeMounts:
+                - mountPath: /scripts/getmail
+                  name: mailbackup-config
+                  subPath: getmail
+                - mountPath: /config
+                  name: config
+                - mountPath: /config/getmailrc
+                  name: mailbackup-secrets
+                  subPath: getmailrc_2020
+                  readOnly: true
+                - mountPath: /data
+                  name: mailbackup-2020
+
+          restartPolicy: OnFailure
+
+          volumes:
+            - name: config
+              emptyDir: {}
+            - name: mailbackup-config
+              configMap:
+                name: mailbackup
+            - name: mailbackup-secrets
+              secret:
+                secretName: mailbackup-secrets
+            - name: mailbackup-2020
+              nfs:
+                server: librarium.warhammer.lan
+                path: /volume1/Backup/Bernd/Email/2020
