@@ -1,7 +1,7 @@
 ---
 - name: Apply storage annotations
   command: kubectl label --overwrite node {{ item }} node.longhorn.io/create-default-disk=true
-  loop: "{{ groups['k3s_worker'] }}"
+  loop: "{{ groups['k3s_storage'] }}"
   environment:
     KUBECONFIG: "{{ REPO_ROOT }}/kubeconfig"
 
