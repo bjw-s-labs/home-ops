@@ -51,3 +51,14 @@ spec:
         value: /vernemq/auth/vmq.passwd
       - name: DOCKER_VERNEMQ_VMQ_ACL__ACL_FILE
         value: /vernemq/auth/vmq.acl
+
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - ingress-nginx
+            topologyKey: "kubernetes.io/hostname"
