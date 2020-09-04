@@ -1,0 +1,56 @@
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: series-cleanup
+  namespace: media
+  labels:
+    app: series-cleanup
+spec:
+  schedule: "10 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 600
+      template:
+        spec:
+          containers:
+            - name: series-cleanup
+              image: ghcr.io/bjw-s/series-cleanup:1.0.0
+              env:
+                - name: TRAKT_CLIENT_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: series-cleanup-secrets
+                      key: TRAKT_CLIENT_ID
+                - name: TRAKT_CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: series-cleanup-secrets
+                      key: TRAKT_CLIENT_SECRET
+              volumeMounts:
+                - mountPath: /data
+                  name: data
+                - mountPath: /data/settings.json
+                  name: config
+                  subPath: settings.json
+                - mountPath: /media
+                  name: nas-media
+
+          restartPolicy: OnFailure
+
+          securityContext:
+            runAsUser: 1031
+            runAsGroup: 100
+            fsGroup: 2000
+
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: series-cleanup-data
+            - name: config
+              configMap:
+                name: series-cleanup-config
+            - name: nas-media
+              persistentVolumeClaim:
+                claimName: nfs-nas-media

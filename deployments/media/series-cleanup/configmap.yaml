@@ -1,0 +1,62 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: series-cleanup-config
+  namespace: media
+  labels:
+    app: series-cleanup
+data:
+  settings.json: |
+    {
+        "general": {
+            "deleteAfterHours": 24
+        },
+        "trakt": {
+            "user": "juggels"
+        },
+        "logging": {
+            "loglevel": "info"
+        },
+        "scanFolders": [
+            "/media/Series/Fiction/New"
+        ],
+        "mappings": [
+            {
+                "folder": "90 Day Fiancé The Other Way",
+                "mapping": {
+                    "traktName": "90 Day Fiancé: The Other Way"
+                }
+            },
+            {
+                "folder": "9-1-1 Lone Star",
+                "mapping": {
+                    "tvdbid": 364080
+                }
+            },
+            {
+                "folder": "Perry Mason 2020",
+                "mapping": {
+                    "tvdbid": 363026
+                }
+            },
+            {
+                "folder": "Babylon Berlin",
+                "mapping": {
+                    "tvdbid": 323945
+                }
+            },
+            {
+                "folder": "Brave New World 2020",
+                "mapping": {
+                    "tvdbid": 359606
+                }
+            },
+            {
+                "folder": "The Plot Against America",
+                "mapping": {
+                    "tvdbid": 367559
+                }
+            }
+        ]
+    }
