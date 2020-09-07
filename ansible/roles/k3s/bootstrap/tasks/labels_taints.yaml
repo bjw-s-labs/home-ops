@@ -12,7 +12,7 @@
     KUBECONFIG: "{{ REPO_ROOT }}/kubeconfig"
 
 - name: Apply system-upgrade node annotations
-  command: kubectl label --overwrite node {{ item }} k3s-upgrade=true
+  command: kubectl label --overwrite node {{ item }} k3s-upgrade-
   loop: "{{ groups['k3s_worker'] }}"
   environment:
     KUBECONFIG: "{{ REPO_ROOT }}/kubeconfig"
