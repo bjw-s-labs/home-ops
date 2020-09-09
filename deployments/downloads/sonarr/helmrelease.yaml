@@ -10,47 +10,52 @@ metadata:
 spec:
   releaseName: sonarr
   chart:
-    repository: https://k8s-charts.juggels.online
+    repository: https://k8s-at-home.com/charts/
     name: sonarr
-    version: 1.0.0
+    version: 6.0.0
   values:
-    image:
-      repository: linuxserver/sonarr
-      tag: "2.0.0.5344-ls73"
+    sonarr:
+      podAnnotations:
+        replicas-max: "1"
 
-    config:
-      timezone: "Europe/Amsterdam"
-      uid: 1031
-      gid: 100
+      image:
+        organization: linuxserver
+        repository: sonarr
+        tag: "3.0.3.913-ls40"
 
-    persistence:
-      enabled: true
+      env:
+        TZ: "Europe/Amsterdam"
+        PUID: "1031"
+        PGID: "100"
 
-    extraVolumes:
-      - name: nas-media
-        persistentVolumeClaim:
-          claimName: nfs-nas-media
-        mountPath: "/data/nas-media"
+      persistence:
+        type: statefulset
+        config:
+          enabled: true
+          existingClaim: config-sonarr-0
+        media:
+          enabled: false
 
-    ingress:
-      enabled: true
-      annotations:
-        kubernetes.io/ingress.class: nginx
-        cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+      additionalVolumes:
+        - name: nas-media
+          persistentVolumeClaim:
+            claimName: nfs-nas-media
 
-    resources:
-      requests:
-        memory: "256M"
-      limits:
-        memory: "512M"
+      additionalVolumeMounts:
+        - name: nas-media
+          mountPath: "/data/nas-media"
 
-    probes:
-      liveness:
-        initialDelaySeconds: 0
-      readiness:
-        initialDelaySeconds: 0
-      startup:
+      ingress:
         enabled: true
+        annotations:
+          kubernetes.io/ingress.class: nginx
+          cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+
+      resources:
+        requests:
+          memory: "256M"
+        limits:
+          memory: "512M"
 
   valuesFrom:
     - secretKeyRef:
