@@ -56,21 +56,20 @@ jobs:
           done
 
       # Regenerate only the new or update secrets, unless the script logic or sealing certificate have changed
-      - name: Generate new/updated secrets
+      - name: Generate new/updated templates
         if: "!contains(steps.changed_files.outputs.added_modified, '.github/scripts/render_templates.sh') && !contains(steps.changed_files.outputs.added_modified, '_setup/sealedsecret-cert.pem')"
         env:
           INPUT_FILE: /tmp/changed_files
-          PRUNE_FILES: true
         run: |
           task render-templates
 
       # If the script logic or sealing certificate have changed, regenerate all certificates
-      - name: Regenerate all secrets
+      - name: Regenerate all templates
         if: "contains(steps.changed_files.outputs.added_modified, '.github/scripts/render_templates.sh') || contains(steps.changed_files.outputs.added_modified, '_setup/sealedsecret-cert.pem')"
         run: |
           task render-templates
 
-      - name: Commit and push secrets
+      - name: Commit and push rendered templates
         run: |
           if [[ -n $(git status --porcelain) ]]; then
             git config --global user.name "bjw-s"
