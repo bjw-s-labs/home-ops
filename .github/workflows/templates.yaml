@@ -1,5 +1,5 @@
 ---
-name: sealed-secrets
+name: templates
 
 on:  # yamllint disable-line rule:truthy
   push:
@@ -17,7 +17,7 @@ env:
   DEBIAN_FRONTEND: "noninteractive"
 
 jobs:
-  main:
+  render:
     runs-on:
       - self-hosted
 
@@ -36,6 +36,13 @@ jobs:
           git-crypt unlock ./git-crypt-key
           rm ./git-crypt-key
 
+      - name: Install tools
+        env:
+          GOMPLATE_VERSION: v3.8.0
+        run: |
+          sudo curl -o /usr/local/bin/gomplate -sSL "https://github.com/hairyhenderson/gomplate/releases/download/${GOMPLATE_VERSION}/gomplate_linux-amd64"
+          sudo chmod 755 /usr/local/bin/gomplate
+
       - uses: jitterbit/get-changed-files@v1
         id: changed_files
         with:
@@ -50,18 +57,18 @@ jobs:
 
       # Regenerate only the new or update secrets, unless the script logic or sealing certificate have changed
       - name: Generate new/updated secrets
-        if: "!contains(steps.changed_files.outputs.added_modified, '.github/scripts/generate_sealedsecrets.sh') && !contains(steps.changed_files.outputs.added_modified, '_setup/sealedsecret-cert.pem')"
+        if: "!contains(steps.changed_files.outputs.added_modified, '.github/scripts/render_templates.sh') && !contains(steps.changed_files.outputs.added_modified, '_setup/sealedsecret-cert.pem')"
         env:
           INPUT_FILE: /tmp/changed_files
           PRUNE_FILES: true
         run: |
-          task generate-sealed-secrets
+          task render-templates
 
       # If the script logic or sealing certificate have changed, regenerate all certificates
       - name: Regenerate all secrets
-        if: "contains(steps.changed_files.outputs.added_modified, '.github/scripts/generate_sealedsecrets.sh') || contains(steps.changed_files.outputs.added_modified, '_setup/sealedsecret-cert.pem')"
+        if: "contains(steps.changed_files.outputs.added_modified, '.github/scripts/render_templates.sh') || contains(steps.changed_files.outputs.added_modified, '_setup/sealedsecret-cert.pem')"
         run: |
-          task generate-sealed-secrets
+          task render-templates
 
       - name: Commit and push secrets
         run: |
