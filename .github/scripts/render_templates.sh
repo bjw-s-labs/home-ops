@@ -63,6 +63,11 @@ while IFS= read -r file; do
     continue
   fi
 
+  # Only process .tmpl files
+  if [[ $file != ${DEPLOYMENTS_ROOT}*.tmpl ]]; then
+    continue
+  fi
+
   # Get secret file metadata (path, filename, etc...)
   template_filename="${file##*/}"
   template_path="${file%/$template_filename}"
