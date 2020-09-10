@@ -8,11 +8,11 @@ tasks:
     cmds:
       - fluxctl --k8s-fwd-ns=system-flux --k8s-fwd-labels="app=flux,release=flux" sync
 
-  generate-sealed-secrets:
-    desc: Generate sealed-secrets from secrets
+  render-templates:
+    desc: Render *.tmpl template files to actual files
     silent: true
     cmds:
-      - ./.github/scripts/generate_sealedsecrets.sh
+      - ./.github/scripts/render_templates.sh
 
   lint-scripts:
     desc: Lint all script files in the repo
