@@ -53,7 +53,6 @@ openvpn:
     pullPolicy: Always
 
   vpnConf: {{- (datasource "jackett").openvpn.config | strings.Indent 4 | printf "|\n%v" }}
-
   auth: {{- (datasource "jackett").openvpn.auth | strings.Indent 4 | printf "|\n%v" }}
 
   env:
