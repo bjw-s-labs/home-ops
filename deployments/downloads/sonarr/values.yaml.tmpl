@@ -21,14 +21,14 @@ sonarr:
     media:
       enabled: false
 
-    additionalVolumes:
-    - name: nas-media
-      persistentVolumeClaim:
-      claimName: nfs-nas-media
+  additionalVolumes:
+  - name: nas-media
+    persistentVolumeClaim:
+    claimName: nfs-nas-media
 
-    additionalVolumeMounts:
-    - name: nas-media
-      mountPath: "/data/nas-media"
+  additionalVolumeMounts:
+  - name: nas-media
+    mountPath: "/data/nas-media"
 
   ingress:
     enabled: true
