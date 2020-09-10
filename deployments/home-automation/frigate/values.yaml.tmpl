@@ -1,0 +1,76 @@
+---
+image:
+  repository: blakeblackshear/frigate
+  tag: 0.5.2
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: feature.node.kubernetes.io/custom-coral-tpu
+              operator: In
+              values:
+                - "true"
+
+podAnnotations:
+  configmap.reloader.stakater.com/reload: "frigate,frigate-masks"
+
+timezone: Europe/Amsterdam
+
+coral:
+  enabled: true
+
+masksConfigMap: frigate-masks
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+  hosts:
+    - frigate.{{ (datasource "cluster-vars").domain.internal }}
+  tls:
+    - hosts:
+        - frigate.{{ (datasource "cluster-vars").domain.internal }}
+      secretName: tls.frigate
+
+config: |
+  web_port: 5000
+
+  mqtt:
+    host: {{ (datasource "frigate").mqtt.host }}
+    port: 1883
+    topic_prefix: frigate
+    user: {{ (datasource "frigate").mqtt.user }}
+    password: {{ (datasource "frigate").mqtt.password }}
+
+  objects:
+    track:
+      - person
+    filters:
+      person:
+        min_area: 5000
+        max_area: 100000
+        threshold: 0.5
+
+  cameras:
+    frontdoor:
+      ffmpeg:
+        input: {{ (datasource "frigate").cameras.frontdoor.url }}
+
+      mask: frontdoor-mask.bmp
+
+      take_frame: 1
+
+      snapshots:
+        show_timestamp: True
+
+      objects:
+        track:
+          - person
+        filters:
+          person:
+            min_area: 5000
+            max_area: 100000
+            threshold: 0.5

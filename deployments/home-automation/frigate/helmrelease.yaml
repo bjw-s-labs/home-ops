@@ -10,35 +10,11 @@ metadata:
 spec:
   releaseName: frigate
   chart:
-    repository: https://billimek.com/billimek-charts/
+    repository: https://k8s-at-home.com/charts/
     name: frigate
-    version: 3.2.0
-  values:
-    image:
-      repository: blakeblackshear/frigate
-      tag: 0.5.2
-
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - key: feature.node.kubernetes.io/custom-coral-tpu
-                  operator: In
-                  values:
-                    - "true"
-
-    podAnnotations:
-      configmap.reloader.stakater.com/reload: "frigate,frigate-masks"
-
-    timezone: Europe/Amsterdam
-
-    coral:
-      enabled: true
-
-    masksConfigMap: frigate-masks
+    version: 4.0.0
 
   valuesFrom:
-    - secretKeyRef:
-        name: frigate-helm-values
-        key: values
+  - secretKeyRef:
+      name: frigate-helm-values
+      key: values.yaml

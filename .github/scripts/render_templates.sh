@@ -130,6 +130,11 @@ while IFS= read -r file; do
 
   rendered_template=$(cat $pipe)
 
+  if [[ "$DEBUG" == "true" ]]; then
+    echo "** DEBUG ** Rendered template"
+    echo -n "${rendered_template}"
+  fi
+
   # Make sure the rendered_template file is a valid Kubernetes YAML before proceeding
   if ! echo "$rendered_template" | kubeval --strict > /dev/null 2>&1; then
     echo "  Invalid YAML generated for ${file}. Aborting"
