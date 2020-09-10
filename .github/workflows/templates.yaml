@@ -36,13 +36,6 @@ jobs:
           git-crypt unlock ./git-crypt-key
           rm ./git-crypt-key
 
-      - name: Install tools
-        env:
-          GOMPLATE_VERSION: v3.8.0
-        run: |
-          sudo curl -o /usr/local/bin/gomplate -sSL "https://github.com/hairyhenderson/gomplate/releases/download/${GOMPLATE_VERSION}/gomplate_linux-amd64"
-          sudo chmod 755 /usr/local/bin/gomplate
-
       - uses: jitterbit/get-changed-files@v1
         id: changed_files
         with:
