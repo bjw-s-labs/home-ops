@@ -35,6 +35,14 @@ sonarr:
     annotations:
       kubernetes.io/ingress.class: nginx
       cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+    hosts:
+      - host: sonarr.{{ (datasource "cluster-vars").domain.internal }}
+        paths:
+          - "/"
+    tls:
+      - secretName: tls.sonarr
+        hosts:
+          - sonarr.{{ (datasource "cluster-vars").domain.internal }}
 
   resources:
     requests:

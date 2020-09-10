@@ -36,13 +36,13 @@ radarr:
       kubernetes.io/ingress.class: nginx
       cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
     hosts:
-      - host: {{ (datasource "radarr").domain }}
+      - host: radarr.{{ (datasource "cluster-vars").domain.internal }}
         paths:
           - "/"
     tls:
       - secretName: tls.radarr
         hosts:
-          - {{ (datasource "radarr").domain }}
+          - radarr.{{ (datasource "cluster-vars").domain.internal }}
 
   resources:
     requests:
