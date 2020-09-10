@@ -79,7 +79,11 @@ while IFS= read -r file; do
   template_vars_path="${SECRETS_ROOT}${template_relative_path}"
   template_vars_filename="${template_vars_path}/vars.yaml"
 
-  echo -n "- Processing $file"
+  if [ "${template_deployment}" == "" ]; then
+    template_deployment="${template_namespace}"
+  fi
+
+  echo "- Processing $file"
 
   # Double check to see if the file exists
   if [[ ! -f "$file" ]]; then
@@ -144,6 +148,7 @@ while IFS= read -r file; do
   SECRET_REGEX="^(secret-.*|values)\.yaml\.tmpl$"
   if [[ $template_filename =~ $SECRET_REGEX ]]; then
     # Render file to a sealedsecret
+    template_target_name=${template_target_name#"secret-"}
     template_target_name="sealedsecret-${template_target_name}"
     mkdir -p "${template_path}"
     echo "---" > "${template_path}/$template_target_name"
