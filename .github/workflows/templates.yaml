@@ -75,8 +75,8 @@ jobs:
           if [[ -n $(git status --porcelain) ]]; then
             git config --global user.name "bjw-s"
             git config --global user.email "bjw-s@users.noreply.github.com"
-            git add "deployments/**/sealedsecret-*.yaml"
-            git commit -m "Auto update sealed-secrets [ci-skip]" || exit 0
+            git add "deployments/**/*.yaml"
+            git commit -m "Auto-render templates [ci-skip]" || exit 0
             git push
           fi
 
