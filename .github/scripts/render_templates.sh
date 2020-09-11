@@ -109,6 +109,18 @@ while IFS= read -r file; do
     rendered_file=$(gomplate -c "cluster-vars=${CLUSTER_VARS}" -f "${file}")
   fi
 
+  if [[ "$DEBUG" == "true" ]]; then
+    echo "** DEBUG ** Rendered file"
+    echo "${rendered_file}"
+    echo ""
+  fi
+
+  # Make sure the rendered template is valid YAML before proceeding
+  if ! echo "$rendered_file" | yq validate - > /dev/null 2>&1; then
+    echo "  Invalid YAML generated for ${file}. Aborting"
+    exit 1
+  fi
+
   # Create a named pipe so that we can append the base64 values later
   pipe="rendered_template"
   trap 'rm -f $pipe' ERR
@@ -136,7 +148,7 @@ while IFS= read -r file; do
 
   if [[ "$DEBUG" == "true" ]]; then
     echo "** DEBUG ** Rendered template"
-    echo -n "${rendered_template}"
+    echo "${rendered_template}"
   fi
 
   # Make sure the rendered_template file is a valid Kubernetes YAML before proceeding
