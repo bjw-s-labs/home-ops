@@ -5,7 +5,7 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 DEPLOYMENTS_ROOT="${REPO_ROOT}/deployments"
 SECRETS_ROOT="${REPO_ROOT}/.secrets"
 CLUSTER_VARS="${SECRETS_ROOT}/cluster-vars.yaml"
-PUB_CERT="${REPO_ROOT}/_setup/sealedsecret-cert.pem"
+PUB_CERT="${SECRETS_ROOT}/sealedsecret-cert.pem"
 
 while getopts i:r option
 do
