@@ -52,8 +52,8 @@ openvpn:
     tag: amd64
     pullPolicy: Always
 
-  vpnConf: {{- (datasource "jackett").openvpn.config | strings.Indent 4 | printf "|\n%v" }}
-  auth: {{- (datasource "jackett").openvpn.auth | strings.Indent 4 | printf "|\n%v" }}
+  vpnConf: {{- (datasource "jackett").openvpn.config | strings.Indent 4 | printf " |\n%v" }}
+  auth: {{- (datasource "jackett").openvpn.auth | strings.Indent 4 | printf " |\n%v" }}
 
   env:
     FIREWALL: "on"
@@ -68,8 +68,7 @@ openvpn:
       command:
       - sh
       - -c
-      - if [ $(curl -s https://am.i.mullvad.net/country) == "Belgium" ]; then
-        exit 0; else exit $?; fi
+      - if [ $(curl -s https://am.i.mullvad.net/country) == "Belgium" ]; then exit 0; else exit $?; fi
     initialDelaySeconds: 30
     periodSeconds: 60
     failureThreshold: 1
