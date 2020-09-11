@@ -12,10 +12,25 @@ Welcome to my home Kubernetes cluster.
 
 Lots of fun (to me at least ;)) stuff can be found, poke around my [deployments](./deployments/) directory to see what my cluster is running. Feel free to open a [GitHub Issue](https://github.com/bjw-s/k8s-gitops/issues/new).
 
+---
+
+## Hardware
+
+This cluster runs on the following hardware (all nodes are running bare-metal on Ubuntu 20.04):
+
+| Device                                  | Count | OS Disk Size | Data Disk Size       | Ram  | Purpose                                          |
+|-----------------------------------------|-------|--------------|----------------------|------|--------------------------------------------------|
+| Lenovo ThinkCentre M93p Tiny (i5-4570T) | 1     | 250GB SSD    | N/A                  | 8GB  | k8s Master                                       |
+| Intel NUC8i5BEH                         | 1     | 512GB NVMe   | 1TB SSD (longhorn)   | 32GB | k8s Worker                                       |
+| Intel NUC8i3BEH                         | 1     | 512GB NVMe   | 1TB SSD (longhorn)   | 32GB | k8s Worker                                       |
+| Synology NAS (librarium)                | 1     | N/A          | 3x6TB SHR, 512GB SSD | 8GB  | Media and general (S3-compatible) storage bucket |
+
+---
 ## Community
 
 We've got a vibrant community of folks all running various K8S workloads at home. Click the Discord link above to join us!
 
+---
 ## Thanks
 
 A lot of inspiration for this repo came from the following people:
