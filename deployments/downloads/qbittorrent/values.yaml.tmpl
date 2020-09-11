@@ -1,0 +1,92 @@
+---
+image:
+  repository: linuxserver/qbittorrent
+  tag: "14.2.5.99202004250119-7015-2c65b79ubuntu18.04.1-ls86"
+
+podAnnotations:
+  configmap.reloader.stakater.com/reload: "qbittorrent-openvpnconf"
+  secret.reloader.stakater.com/reload: "qbittorrent-openvpnenv"
+
+config:
+  timezone: "Europe/Amsterdam"
+  uid: 1031
+  gid: 100
+
+persistence:
+  enabled: true
+
+extraVolumes:
+  - name: nas-media
+    persistentVolumeClaim:
+      claimName: nfs-nas-media
+    mountPath: "/data/nas-media"
+
+service:
+  httpPort: 8080
+  btPort: 24589
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+    nginx.ingress.kubernetes.io/proxy-body-size: 25m
+  hosts:
+    - host: qbittorrent.{{ (datasource "cluster-vars").domain.internal }}
+      paths:
+        - "/"
+  tls:
+    - secretName: tls.jackett
+      hosts:
+        - qbittorrent.{{ (datasource "cluster-vars").domain.internal }}
+
+resources:
+  requests:
+    memory: "256M"
+  limits:
+    memory: "1024M"
+
+probes:
+  liveness:
+    enabled: true
+    initialDelaySeconds: 30
+    failureThreshold: 5
+    timeoutSeconds: 10
+  readiness:
+    enabled: true
+    initialDelaySeconds: 30
+    failureThreshold: 5
+    timeoutSeconds: 10
+  startup:
+    enabled: true
+    failureThreshold: 30
+    periodSeconds: 10
+
+openvpn:
+  enabled: true
+
+  image:
+    repository: dperson/openvpn-client
+    tag: latest
+    pullPolicy: Always
+
+  vpnConf: {{- (datasource "qbittorrent").openvpn.config | strings.Indent 4 | printf " |\n%v" }}
+  auth: {{- (datasource "qbittorrent").openvpn.auth | strings.Indent 4 | printf " |\n%v" }}
+
+  env:
+    FIREWALL: "on"
+    ROUTE_1: "{{ (datasource "cluster-vars").networks.k8s_cluster }}"
+    ROUTE_2: "{{ (datasource "cluster-vars").networks.k8s_services }}"
+    VPNPORT_1: "24589"
+
+  externalDns: true
+
+  livenessProbe:
+    exec:
+      command:
+        - sh
+        - -c
+        - if [ $(curl -s https://am.i.mullvad.net/country) == "Belgium" ]; then exit 0; else exit $?; fi
+    initialDelaySeconds: 30
+    periodSeconds: 60
+    failureThreshold: 1
