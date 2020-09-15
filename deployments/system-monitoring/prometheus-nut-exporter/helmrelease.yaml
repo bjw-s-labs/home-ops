@@ -1,0 +1,20 @@
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: prometheus-nut-exporter
+  namespace: system-monitoring
+  annotations:
+    fluxcd.io/ignore: "false"
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: prometheus-nut-exporter
+  chart:
+    repository: https://k8s-at-home.com/charts/
+    name: prometheus-nut-exporter
+    version: 1.0.0
+
+  valuesFrom:
+  - secretKeyRef:
+      name: prometheus-nut-exporter-helm-values
+      key: values.yaml
