@@ -10,56 +10,11 @@ metadata:
 spec:
   releaseName: deconz
   chart:
-    repository: https://billimek.com/billimek-charts/
+    repository: https://k8s-at-home.com/charts/
     name: deconz
-    version: 1.0.2
-  values:
-    image:
-      repository: marthoc/deconz
-      tag: "amd64-2.05.79"
-
-    timezone: "Europe/Amsterdam"
-
-    zigbeeDevice:
-      enabled: true
-      hostPath: /dev/serial/by-id/usb-dresden_elektronik_ingenieurtechnik_GmbH_ConBee_II_DE2152916-if00
-
-    vnc:
-      enabled: true
-
-    podAnnotations:
-      backup.velero.io/backup-volumes: config
-
-    securityContext:
-      privileged: true
-
-    persistence:
-      enabled: true
-      size: 1Gi
-
-    service:
-      httpPort: 80
-      websocketPort: 8091
-      vncPort: 5900
-      type: LoadBalancer
-      externalIPs:
-        - 192.168.26.6
-      externalTrafficPolicy: Local
-
-    ingress:
-      enabled: false
-
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - key: feature.node.kubernetes.io/custom-conbee-ii
-                  operator: In
-                  values:
-                    - "true"
+    version: 2.0.0
 
   valuesFrom:
     - secretKeyRef:
         name: deconz-helm-values
-        key: values
+        key: values.yaml
