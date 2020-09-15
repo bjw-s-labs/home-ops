@@ -7,13 +7,18 @@ metadata:
   annotations:
     fluxcd.io/ignore: "false"
     fluxcd.io/automated: "true"
-    fluxcd.io/tag.chart-image: 'regexp:^(v0\.16\.[0-9]+-ls[0-9]+)$'
+    fluxcd.io/tag.chart-image: 'regexp:^v0\.16\.[0-9]+-ls15$'
 spec:
   releaseName: jackett
   chart:
     repository: https://k8s-charts.juggels.online
     name: jackett
     version: 1.0.1
+
+  values:
+    image:
+      repository: linuxserver/jackett
+      tag: "v0.16.1218-ls15"
 
   valuesFrom:
   - secretKeyRef:
