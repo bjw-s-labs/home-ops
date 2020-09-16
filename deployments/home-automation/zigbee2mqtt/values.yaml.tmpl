@@ -24,9 +24,8 @@ assistant:
       nginx.ingress.kubernetes.io/proxy-body-size: 25m
 
     hosts:
-      - host: zigbee2mqtt.{{ (datasource "cluster-vars").domain.internal }}
-        paths:
-          - "/"
+      - zigbee2mqtt.{{ (datasource "cluster-vars").domain.internal }}
+
     tls:
       - secretName: tls.zigbee2mqtt
         hosts:
