@@ -1,0 +1,42 @@
+---
+timezone: "Europe/Amsterdam"
+config:
+  homeassistant: true
+
+  mqtt:
+    base_topic: zigbee2mqtt
+    server: "mqtt://vernemq.home-network"
+    user: {{ (datasource "zigbee2mqtt").mqtt.user }}
+    password: {{ (datasource "zigbee2mqtt").mqtt.password }}
+
+  serial:
+    port: /dev/serial/by-id/usb-Silicon_Labs_slae.sh_cc2652rb_stick_-_slaesh_s_iot_stuff_00_12_4B_00_21_CB_EE_BB-if00-port0
+
+assistant:
+  enabled: true
+
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+      nginx.ingress.kubernetes.io/proxy-body-size: 25m
+    hosts:
+      - host: zigbee2mqtt.{{ (datasource "cluster-vars").domain.internal }}
+        paths:
+          - "/"
+    tls:
+      - secretName: tls.zigbee2mqtt
+        hosts:
+          - zigbee2mqtt.{{ (datasource "cluster-vars").domain.internal }}
+
+persistence:
+  enabled: true
+  size: 1Gi
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - {key: "feature.node.kubernetes.io/custom-zigbee", operator: In, values: ["true"]}
