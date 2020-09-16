@@ -1,0 +1,31 @@
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: zigbee2mqtt
+  namespace: home-automation
+  annotations:
+    fluxcd.io/ignore: "false"
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: zigbee2mqtt
+  chart:
+    repository: https://k8s-at-home.com/charts/
+    name: zigbee2mqtt
+    version: 1.0.0
+
+  values:
+    image:
+      repository: koenkk/zigbee2mqtt
+      tag: 1.14.4
+
+    assistant:
+      image:
+        repository: carldebilly/zigbee2mqttassistant
+        tag: 0.3.178
+        pullPolicy: IfNotPresent
+
+  valuesFrom:
+    - secretKeyRef:
+        name: zigbee2mqtt-helm-values
+        key: values.yaml
