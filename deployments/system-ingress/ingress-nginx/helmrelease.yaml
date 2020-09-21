@@ -47,14 +47,3 @@ spec:
           memory: "128M"
         limits:
           memory: "256M"
-
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app.kubernetes.io/name
-                operator: In
-                values:
-                - ingress-nginx
-            topologyKey: "kubernetes.io/hostname"
