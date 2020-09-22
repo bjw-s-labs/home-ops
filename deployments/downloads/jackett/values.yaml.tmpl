@@ -1,70 +1,66 @@
 ---
-podAnnotations:
-  configmap.reloader.stakater.com/reload: "jackett-openvpnconf"
-  secret.reloader.stakater.com/reload: "jackett-openvpnenv"
-
-config:
-  timezone: "Europe/Amsterdam"
-  uid: 1031
-  gid: 100
-
-persistence:
-  enabled: true
-
-ingress:
-  enabled: true
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
-    nginx.ingress.kubernetes.io/proxy-body-size: 25m
-  hosts:
-    - host: jackett.{{ (datasource "cluster-vars").domain.internal }}
-      paths:
-        - "/"
-  tls:
-    - secretName: tls.jackett
-      hosts:
-        - jackett.{{ (datasource "cluster-vars").domain.internal }}
-
-resources:
-  requests:
-    memory: "256M"
-  limits:
-    memory: "512M"
-
-probes:
-  liveness:
-    initialDelaySeconds: 0
-  readiness:
-    initialDelaySeconds: 0
-  startup:
-    enabled: true
-
-openvpn:
-  enabled: true
-
-  image:
-    repository: dperson/openvpn-client
-    tag: amd64
-    pullPolicy: Always
-
-  vpnConf: {{- (datasource "jackett").openvpn.config | strings.Indent 4 | printf " |\n%v" }}
-  auth: {{- (datasource "jackett").openvpn.auth | strings.Indent 4 | printf " |\n%v" }}
+jackett:
+  podAnnotations:
+    configmap.reloader.stakater.com/reload: "jackett-openvpnconf"
+    secret.reloader.stakater.com/reload: "jackett-openvpnenv"
+    replicas-max: "1"
 
   env:
-    FIREWALL: "on"
-    ROUTE_1: "{{ (datasource "cluster-vars").networks.k8s_cluster }}"
-    ROUTE_2: "{{ (datasource "cluster-vars").networks.k8s_services }}"
-    ROUTE_3: "{{ (datasource "cluster-vars").networks.management_lan }}"
+    TZ: "Europe/Amsterdam"
+    PUID: "1031"
+    PGID: "100"
 
-  externalDns: true
+  persistence:
+    type: deployment
+    config:
+      enabled: true
+      existingClaim: config-jackett-0
+    media:
+      enabled: false
 
-  livenessProbe:
-    exec:
-      command:
-      - sh
-      - -c
-      - if [ $(curl -s https://am.i.mullvad.net/country) == "Belgium" ]; then exit 0; else exit $?; fi
-    initialDelaySeconds: 30
-    periodSeconds: 60
-    failureThreshold: 1
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+    hosts:
+      - host: jackett.{{ (datasource "cluster-vars").domain.internal }}
+        paths:
+          - "/"
+    tls:
+      - secretName: tls.jackett
+        hosts:
+          - jackett.{{ (datasource "cluster-vars").domain.internal }}
+
+  resources:
+    requests:
+      memory: "256M"
+    limits:
+      memory: "512M"
+
+  openvpn:
+    enabled: true
+
+    image:
+      repository: dperson/openvpn-client
+      tag: amd64
+      pullPolicy: Always
+
+    vpnConf: {{- (datasource "jackett").openvpn.config | strings.Indent 6 | printf " |\n%v" }}
+    auth: {{- (datasource "jackett").openvpn.auth | strings.Indent 6 | printf " |\n%v" }}
+
+    env:
+      FIREWALL: "on"
+      ROUTE_1: "{{ (datasource "cluster-vars").networks.k8s_cluster }}"
+      ROUTE_2: "{{ (datasource "cluster-vars").networks.k8s_services }}"
+      ROUTE_3: "{{ (datasource "cluster-vars").networks.management_lan }}"
+
+    livenessProbe:
+      exec:
+        command:
+        - sh
+        - -c
+        - if [ $(curl -s https://am.i.mullvad.net/country) == "Belgium" ]; then exit 0; else exit $?; fi
+      initialDelaySeconds: 30
+      periodSeconds: 60
+      failureThreshold: 1
