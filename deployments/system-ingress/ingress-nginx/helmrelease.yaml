@@ -24,7 +24,14 @@ spec:
         ssl-protocols: "TLSv1.3 TLSv1.2"
         enable-modsecurity: "true"
         enable-owasp-modsecurity-crs: "true"
+
         use-forwarded-headers: "true"
+
+        proxy-body-size: "25m"
+
+      extraEnvs:
+      - name: TZ
+        value: Europe/Amsterdam
 
       replicaCount: 2
 

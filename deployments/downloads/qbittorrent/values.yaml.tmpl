@@ -30,7 +30,6 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
-    nginx.ingress.kubernetes.io/proxy-body-size: 25m
   hosts:
     - host: qbittorrent.{{ (datasource "cluster-vars").domain.internal }}
       paths:
