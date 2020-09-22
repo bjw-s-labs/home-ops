@@ -12,22 +12,20 @@ spec:
   chart:
     repository: https://kubernetes.github.io/ingress-nginx
     name: ingress-nginx
-    version: 2.11.2
+    version: 3.3.0
   values:
     controller:
-      image:
-        repository: k8s.gcr.io/ingress-nginx/controller
-        tag: "v0.35.0"
-        digest: ""
-
       config:
         ssl-protocols: "TLSv1.3 TLSv1.2"
-        enable-modsecurity: "true"
-        enable-owasp-modsecurity-crs: "true"
+        # Setting use-proxy-protocol to true will break the proxy
+        use-proxy-protocol: "false"
+        proxy-body-size: "100m"
 
         use-forwarded-headers: "true"
-
-        proxy-body-size: "25m"
+        forwarded-for-header: "CF-Connecting-IP"
+        # Cloudflare IP Addresses - Used to forward the real client IP address to the backend service
+        # https://www.cloudflare.com/ips/
+        proxy-real-ip-cidr: "103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,104.16.0.0/12,108.162.192.0/18,131.0.72.0/22,141.101.64.0/18,162.158.0.0/15,172.64.0.0/13,173.245.48.0/20,188.114.96.0/20,190.93.240.0/20,197.234.240.0/22,198.41.128.0/17,2400:cb00::/32,2606:4700::/32,2803:f800::/32,2405:b500::/32,2405:8100::/32,2a06:98c0::/29,2c0f:f248::/32"
 
       extraEnvs:
       - name: TZ
@@ -51,6 +49,7 @@ spec:
 
       resources:
         requests:
-          memory: "128M"
+          memory: 250Mi
+          cpu: 25m
         limits:
-          memory: "256M"
+          memory: 750Mi
