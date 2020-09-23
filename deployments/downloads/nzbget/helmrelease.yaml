@@ -10,9 +10,16 @@ metadata:
 spec:
   releaseName: nzbget
   chart:
-    repository: https://k8s-charts.juggels.online
+    repository: https://k8s-at-home.com/charts/
     name: nzbget
-    version: 1.0.0
+    version: 5.0.0
+
+  values:
+    nzbget:
+      image:
+        organization: linuxserver
+        repository: nzbget
+        tag: "v21.0-ls61"
 
   valuesFrom:
     - secretKeyRef:
