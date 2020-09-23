@@ -44,33 +44,34 @@ spec:
         route:
           receiver: 'slack-notifications'
         receivers:
-          - name: 'null'
-          - name: 'slack-notifications'
-            slack_configs:
-              - channel: '#notifications'
-                icon_url: https://avatars3.githubusercontent.com/u/3380462
-                username: 'Alertmanager'
-                send_resolved: true
-                title: |-
-                  [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
-                  {{- if gt (len .CommonLabels) (len .GroupLabels) -}}
-                    {{" "}}(
-                    {{- with .CommonLabels.Remove .GroupLabels.Names }}
-                      {{- range $index, $label := .SortedPairs -}}
-                        {{ if $index }}, {{ end }}
-                        {{- $label.Name }}="{{ $label.Value -}}"
-                      {{- end }}
-                    {{- end -}}
-                    )
+        - name: 'null'
+        - name: 'slack-notifications'
+          slack_configs:
+          - channel: '#notifications'
+            icon_url: https://avatars3.githubusercontent.com/u/3380462
+            username: 'Alertmanager'
+            send_resolved: true
+            title: |-
+              [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
+              {{- if gt (len .CommonLabels) (len .GroupLabels) -}}
+                {{" "}}(
+                {{- with .CommonLabels.Remove .GroupLabels.Names }}
+                  {{- range $index, $label := .SortedPairs -}}
+                    {{ if $index }}, {{ end }}
+                    {{- $label.Name }}="{{ $label.Value -}}"
                   {{- end }}
-                text: >-
-                  {{ range .Alerts -}}
-                    *Alert:* {{ .Annotations.title }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
-                  *Message:* {{ .Annotations.message }}
-                  *Details:*
-                    {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
-                    {{ end }}
-                  {{ end }}
+                {{- end -}}
+                )
+              {{- end }}
+            text: >-
+              {{ range .Alerts -}}
+                *Alert:* {{ .Annotations.title }}{{ if .Labels.severity }} - `{{ .Labels.severity
+              }}`{{ end }}
+              *Message:* {{ .Annotations.message }}
+              *Details:*
+                {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+                {{ end }}
+              {{ end }}
       alertmanagerSpec:
         storage:
           volumeClaimTemplate:
@@ -82,17 +83,17 @@ spec:
     nodeExporter:
       serviceMonitor:
         relabelings:
-          - action: replace
-            regex: (.*)
-            replacement: $1
-            sourceLabels:
-              - __meta_kubernetes_pod_node_name
-            targetLabel: kubernetes_node
+        - action: replace
+          regex: (.*)
+          replacement: $1
+          sourceLabels:
+          - __meta_kubernetes_pod_node_name
+          targetLabel: kubernetes_node
 
     grafana:
       image:
         repository: grafana/grafana
-        tag: 7.1.5
+        tag: 7.2.0
       deploymentStrategy:
         type: Recreate
       persistence:
@@ -114,25 +115,25 @@ spec:
             disableDelete: false
             allowUiUpdates: true
       plugins:
-        - natel-discrete-panel
-        - pr0ps-trackmap-panel
-        - grafana-piechart-panel
-        - vonage-status-panel
-        - grafana-worldmap-panel
-        - grafana-clock-panel
+      - natel-discrete-panel
+      - pr0ps-trackmap-panel
+      - grafana-piechart-panel
+      - vonage-status-panel
+      - grafana-worldmap-panel
+      - grafana-clock-panel
       dashboardProviders:
         dashboardproviders.yaml:
           apiVersion: 1
           providers:
-            - name: 'default'
-              orgId: 1
-              folder: ''
-              type: file
-              disableDeletion: false
-              allowUiUpdates: true
-              editable: true
-              options:
-                path: /var/lib/grafana/dashboards/default
+          - name: 'default'
+            orgId: 1
+            folder: ''
+            type: file
+            disableDeletion: false
+            allowUiUpdates: true
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/default
       dashboards:
         default:
           nginx-dashboard:
@@ -172,10 +173,10 @@ spec:
     kubelet:
       serviceMonitor:
         metricRelabelings:
-          - action: replace
-            sourceLabels:
-              - node
-            targetLabel: instance
+        - action: replace
+          sourceLabels:
+          - node
+          targetLabel: instance
 
     prometheus:
       prometheusSpec:
@@ -199,6 +200,6 @@ spec:
                   storage: 50Gi
 
   valuesFrom:
-    - secretKeyRef:
-        name: prometheus-operator-helm-values
-        key: values
+  - secretKeyRef:
+      name: prometheus-operator-helm-values
+      key: values
