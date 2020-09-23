@@ -12,15 +12,15 @@ spec:
   releaseName: jackett
   chart:
     repository: https://k8s-at-home.com/charts/
-    name: jackett
-    version: 4.0.1
+    name: media-common
+    version: 1.1.1
 
   values:
-    jackett:
-      image:
-        organization: linuxserver
-        repository: jackett
-        tag: "v0.16.1269-ls18"
+    nameOverride: jackett
+    image:
+      organization: linuxserver
+      repository: jackett
+      tag: "v0.16.1269-ls18"
 
   valuesFrom:
   - secretKeyRef:
