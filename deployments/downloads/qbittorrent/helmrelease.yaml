@@ -10,9 +10,16 @@ metadata:
 spec:
   releaseName: qbittorrent
   chart:
-    repository: https://k8s-charts.juggels.online
+    repository: https://k8s-at-home.com/charts/
     name: qbittorrent
-    version: 1.0.1
+    version: 5.0.0
+
+  values:
+    qbittorrent:
+      image:
+        organization: linuxserver
+        repository: qbittorrent
+        tag: "14.2.5.99202004250119-7015-2c65b79ubuntu18.04.1-ls86"
 
   valuesFrom:
     - secretKeyRef:
