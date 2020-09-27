@@ -6,7 +6,9 @@ podAnnotations:
 ingress:
   enabled: false
 
-advertiseIp: "https://192.168.26.9:32400"
+allowedNetworks:
+  - {{ (datasource "cluster-vars").networks.k8s_cluster }}
+advertiseIp: "http://192.168.26.9:32400"
 claimToken: {{ (datasource "plex").claimToken }}
 
 timezone: "Europe/Amsterdam"
@@ -27,13 +29,10 @@ serviceUDP:
 
 persistence:
   config:
-    size: 20Gi
-    accessMode: ReadWriteOnce
+    claimName: plex-config
 
   transcode:
     enabled: false
-    emptyDir:
-      medium: "Memory"
 
   data:
     enabled: false
