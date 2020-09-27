@@ -1,23 +1,12 @@
 ---
 podAnnotations:
   secret.reloader.stakater.com/reload: "tls.plex"
+  replicas-max: "1"
 
 ingress:
-  enabled: true
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    external-dns.alpha.kubernetes.io/target: {{ (datasource "cluster-vars").domain.external.primary }}
-    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-    cert-manager.io/cluster-issuer: letsencrypt-production
-  hosts:
-    - "plex.{{ (datasource "cluster-vars").domain.external.primary }}"
-  tls:
-    - secretName: tls.plex
-      hosts:
-        - "plex.{{ (datasource "cluster-vars").domain.external.primary }}"
+  enabled: false
 
-advertiseIp: "https://plex.{{ (datasource "cluster-vars").domain.external.primary }}"
+advertiseIp: "https://192.168.26.9:32400"
 claimToken: {{ (datasource "plex").claimToken }}
 
 timezone: "Europe/Amsterdam"
@@ -53,19 +42,6 @@ persistence:
     - name: nfs-nas-media
       claimName: nfs-nas-media
       mountPath: /storage/media
-
-certificate:
-  pkcsMangler:
-    enabled: true
-    image:
-      repository: tlsprint/openssl
-      tag: 1.1.1f
-    setPlexPreferences:
-      enabled: true
-    plexPreferences:
-      customCertificateDomain: "plex.{{ (datasource "cluster-vars").domain.external.primary }}"
-    certificateSecret:
-      name: "tls.plex"
 
 resources:
   requests:
