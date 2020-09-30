@@ -1,0 +1,21 @@
+---
+persistence:
+  enabled: true
+  existingClaim: nextcloud-nextcloud
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    external-dns.alpha.kubernetes.io/target: {{ (datasource "cluster-vars").domain.external.primary }}
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  tls:
+  - secretName: tls.nextcloud
+    hosts:
+    - cloud.{{ (datasource "cluster-vars").domain.external.secondary }}
+
+nextcloud:
+    host: cloud.{{ (datasource "cluster-vars").domain.external.secondary }}
+    username: {{ (datasource "nextcloud").auth.username }}
+    password: {{ (datasource "nextcloud").auth.password }}

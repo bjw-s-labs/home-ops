@@ -10,19 +10,16 @@ metadata:
 spec:
   releaseName: nextcloud
   chart:
-    repository: https://kubernetes-charts.storage.googleapis.com/
+    repository: https://nextcloud.github.io/helm/
     name: nextcloud
-    version: 1.12.0
+    version: 2.2.0
+
   values:
     image:
       repository: nextcloud
-      tag: 19.0.1
-
-    persistence:
-      enabled: true
-      existingClaim: nextcloud-nextcloud
+      tag: 19.0.3-apache
 
   valuesFrom:
     - secretKeyRef:
         name: nextcloud-helm-values
-        key: values
+        key: values.yaml
