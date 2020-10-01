@@ -39,6 +39,17 @@ spec:
         - 192.168.26.1
         externalTrafficPolicy: Local
 
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                - ingress-nginx
+            topologyKey: "kubernetes.io/hostname"
+
       metrics:
         enabled: true
         serviceMonitor:
