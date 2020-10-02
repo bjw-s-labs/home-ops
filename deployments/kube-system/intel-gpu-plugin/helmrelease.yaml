@@ -2,18 +2,18 @@
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
-  name: intel-device-plugin
+  name: intel-gpu-plugin
   namespace: kube-system
   annotations:
     fluxcd.io/ignore: "false"
     fluxcd.io/automated: "false"
 spec:
-  releaseName: intel-device-plugin
+  releaseName: intel-gpu-plugin
   rollback:
     enable: false
   chart:
     repository: https://k8s-at-home.com/charts/
-    name: intel-device-plugin
+    name: intel-gpu-plugin
     version: 1.0.0
 
   values:
