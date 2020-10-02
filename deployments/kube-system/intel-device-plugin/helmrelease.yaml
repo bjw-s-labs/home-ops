@@ -1,0 +1,36 @@
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: intel-device-plugin
+  namespace: kube-system
+  annotations:
+    fluxcd.io/ignore: "false"
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: intel-device-plugin
+  rollback:
+    enable: false
+  chart:
+    repository: https://k8s-at-home.com/charts/
+    name: intel-device-plugin
+    version: 1.0.0
+
+  values:
+    image:
+      repository: intel/intel-gpu-plugin
+      tag: 0.18.1
+      pullPolicy: IfNotPresent
+
+    securityContext:
+      readOnlyRootFilesystem: true
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: feature.node.kubernetes.io/custom-intel-gpu
+                  operator: In
+                  values:
+                    - "true"
