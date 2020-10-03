@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: samba
+  namespace: media
+  labels:
+    app: samba
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: samba
+  template:
+    metadata:
+      labels:
+        app: samba
+    spec:
+      containers:
+      - name: samba
+        image: dperson/samba:latest
+        imagePullPolicy: Always
+        ports:
+        - name: smb1
+          containerPort: 139
+          protocol: TCP
+        - name: smb2
+          containerPort: 445
+          protocol: TCP
+        env:
+        - name: TZ
+          value: Europe/Amsterdam
+        - name: SHARE
+          value: audio;/storage/nas-media/Audio
+        - name: SMB
+          value: "true"
+        volumeMounts:
+        - name: nas-media
+          mountPath: /storage/nas-media
+          readOnly: true
+        resources: {}
+
+      volumes:
+      - name: nas-media
+        persistentVolumeClaim:
+          claimName: nfs-nas-media
