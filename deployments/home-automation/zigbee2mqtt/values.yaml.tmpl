@@ -12,23 +12,26 @@ config:
   serial:
     port: /dev/serial/by-id/usb-Silicon_Labs_slae.sh_cc2652rb_stick_-_slaesh_s_iot_stuff_00_12_4B_00_21_CB_EE_BB-if00-port0
 
-assistant:
+  # Both of these need to be enabled for the webui
+  frontend:
+    port: 8080
+  experimental:
+    new_api: true
+
+ingress:
   enabled: true
 
-  ingress:
-    enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
 
-    annotations:
-      kubernetes.io/ingress.class: nginx
-      cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+  hosts:
+    - zigbee2mqtt.{{ (datasource "cluster-vars").domain.internal }}
 
-    hosts:
-      - zigbee2mqtt.{{ (datasource "cluster-vars").domain.internal }}
-
-    tls:
-      - secretName: tls.zigbee2mqtt
-        hosts:
-          - zigbee2mqtt.{{ (datasource "cluster-vars").domain.internal }}
+  tls:
+    - secretName: tls.zigbee2mqtt
+      hosts:
+        - zigbee2mqtt.{{ (datasource "cluster-vars").domain.internal }}
 
 persistence:
   enabled: true
