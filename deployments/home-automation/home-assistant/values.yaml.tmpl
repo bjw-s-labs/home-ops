@@ -1,0 +1,82 @@
+---
+podAnnotations:
+  secret.reloader.stakater.com/reload: home-assistant-secrets
+
+probes:
+  liveness:
+    enabled: false
+  readiness:
+    enabled: false
+  startup:
+    enabled: false
+
+service:
+  type: LoadBalancer
+  externalIPs:
+  - {{ (datasource "home-assistant").network.advertise_host }}
+  externalTrafficPolicy: Local
+  additionalPorts:
+  - name: sonos
+    port: 1400
+    targetPort: 1400
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    external-dns.alpha.kubernetes.io/target: {{ (datasource "cluster-vars").domain.external.primary }}
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  hosts:
+  - domo.{{ (datasource "cluster-vars").domain.external.primary }}
+  - domo.{{ (datasource "cluster-vars").domain.external.secondary }}
+  tls:
+  - secretName: tls.home-assistant-frontend
+    hosts:
+    - domo.{{ (datasource "cluster-vars").domain.external.primary }}
+    - domo.{{ (datasource "cluster-vars").domain.external.secondary }}
+
+extraEnv:
+  TZ: "Europe/Amsterdam"
+
+extraSecretForEnvFrom:
+- home-assistant-secrets
+
+persistence:
+  enabled: true
+  existingClaim: home-assistant
+
+postgresql:
+  enabled: true
+  persistence:
+    enabled: true
+  global:
+    postgresql:
+      postgresqlUsername: {{ (datasource "home-assistant").database.username }}
+      postgresqlDatabase: {{ (datasource "home-assistant").database.database }}
+      postgresqlPassword: {{ (datasource "home-assistant").database.password }}
+
+git:
+  enabled: true
+  repo: {{ (datasource "home-assistant").git.repo }}
+  secret: home-assistant-ssh
+  user:
+    name: {{ (datasource "home-assistant").git.user.name }}
+    email: {{ (datasource "home-assistant").git.user.email }}
+  command:
+  - ls
+  - /config
+
+vscode:
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    hosts:
+    - code.domo.{{ (datasource "cluster-vars").domain.internal }}
+    tls:
+    - secretName: tls.home-assistant-code
+      hosts:
+      - code.domo.{{ (datasource "cluster-vars").domain.internal }}
