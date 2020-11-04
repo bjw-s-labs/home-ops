@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nut-server-hallway
+  namespace: home-network
+  labels:
+    app: nut-server-hallway
+spec:
+  type: LoadBalancer
+  externalIPs:
+    - 192.168.26.6
+  externalTrafficPolicy: Local
+  ports:
+    - name: nut
+      port: 3493
+      protocol: TCP
+      targetPort: nut
+  selector:
+    app: nut-server-hallway
