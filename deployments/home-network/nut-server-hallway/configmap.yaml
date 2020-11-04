@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nut-server-hallway
+  namespace: home-network
+
+data:
+  nut.conf: |
+    MODE=netserver
+
+  ups.conf: |
+    [ups-hallway]
+      driver = usbhid-ups
+      port = auto
+      desc = "Eaton Ellipse ECO 650 DIN USB"
+      serial = 000000000
+
+  upsd.conf: |
+    LISTEN 0.0.0.0
