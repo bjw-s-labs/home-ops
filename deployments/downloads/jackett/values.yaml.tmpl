@@ -45,49 +45,53 @@ additionalVolumeMounts:
   - mountPath: /config/custom-cont-init.d
     name: custom-scripts
 
-openvpn:
-  enabled: true
-
-  image:
-    repository: dperson/openvpn-client
-    tag: amd64
-    pullPolicy: Always
-
-  vpnConf: {{- (datasource "jackett").openvpn.config | strings.Indent 6 | printf " |\n%v" }}
-  auth: {{- (datasource "jackett").openvpn.auth | strings.Indent 6 | printf " |\n%v" }}
-
-  scripts:
-    up:  |-
-      #!/bin/bash
-      /etc/openvpn/up.sh
-      echo "connected" > /shared/vpnstatus
-    down:  |-
-      #!/bin/bash
-      /etc/openvpn/down.sh
-      echo "disconnected" > /shared/vpnstatus
-
-  env:
-    FIREWALL: "\"on\""
-    ROUTE_1: "\"{{ (datasource "cluster-vars").networks.k8s_cluster }}\""
-    ROUTE_2: "\"{{ (datasource "cluster-vars").networks.k8s_services }}\""
-    ROUTE_3: "\"{{ (datasource "cluster-vars").networks.management_lan }}\""
-
-  additionalVolumeMounts:
-    - mountPath: /shared
-      name: shared
-
-  livenessProbe:
-    exec:
-      command:
-      - sh
-      - -c
-      - if [ $(curl -s https://am.i.mullvad.net/country) == "Belgium" ]; then exit 0; else exit $?; fi
-    initialDelaySeconds: 30
-    periodSeconds: 60
-    failureThreshold: 1
-
 additionalVolumes:
   - name: custom-scripts
     configMap:
       name: jackett-custom-scripts
       defaultMode: 511
+
+addons:
+  vpn:
+    enabled: true
+    type: openvpn
+
+    openvpn:
+      image:
+        repository: dperson/openvpn-client
+        tag: amd64
+
+      auth: {{- (datasource "jackett").openvpn.auth | strings.Indent 6 | printf " |\n%v" }}
+
+    imagePullPolicy: Always
+
+    vpnConf: {{- (datasource "jackett").openvpn.config | strings.Indent 6 | printf " |\n%v" }}
+    scripts:
+      up:  |-
+        #!/bin/bash
+        /etc/openvpn/up.sh
+        echo "connected" > /shared/vpnstatus
+      down:  |-
+        #!/bin/bash
+        /etc/openvpn/down.sh
+        echo "disconnected" > /shared/vpnstatus
+
+    env:
+      FIREWALL: "\"on\""
+      ROUTE_1: "\"{{ (datasource "cluster-vars").networks.k8s_cluster }}\""
+      ROUTE_2: "\"{{ (datasource "cluster-vars").networks.k8s_services }}\""
+      ROUTE_3: "\"{{ (datasource "cluster-vars").networks.management_lan }}\""
+
+    additionalVolumeMounts:
+      - mountPath: /shared
+        name: shared
+
+    livenessProbe:
+      exec:
+        command:
+        - sh
+        - -c
+        - if [ $(curl -s https://am.i.mullvad.net/country) == "Belgium" ]; then exit 0; else exit $?; fi
+      initialDelaySeconds: 30
+      periodSeconds: 60
+      failureThreshold: 1
