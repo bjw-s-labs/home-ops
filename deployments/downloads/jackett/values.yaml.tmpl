@@ -4,21 +4,22 @@ podAnnotations:
   secret.reloader.stakater.com/reload: "jackett-openvpn"
   replicas-max: "1"
 
+controllerType: deployment
+
 service:
-  port: 9117
+  port:
+    port: 9117
 
 env:
   TZ: "Europe/Amsterdam"
-  PUID: "1031"
-  PGID: "100"
 
 persistence:
-  type: deployment
   config:
     enabled: true
     existingClaim: config-jackett-0
-  media:
-    enabled: false
+  shared:
+    enabled: true
+    emptyDir: true
 
 ingress:
   enabled: true
@@ -41,8 +42,6 @@ resources:
     memory: "512M"
 
 additionalVolumeMounts:
-  - mountPath: /shared
-    name: shared
   - mountPath: /config/custom-cont-init.d
     name: custom-scripts
 
@@ -88,8 +87,6 @@ openvpn:
     failureThreshold: 1
 
 additionalVolumes:
-  - name: shared
-    emptyDir: {}
   - name: custom-scripts
     configMap:
       name: jackett-custom-scripts

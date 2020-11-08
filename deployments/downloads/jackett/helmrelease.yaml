@@ -7,20 +7,18 @@ metadata:
   annotations:
     fluxcd.io/ignore: "false"
     fluxcd.io/automated: "true"
-    filter.fluxcd.io/chart-image: 'regexp:^v0\.16\.[0-9]+-ls18$'
+    fluxcd.io/tag.chart-image: semver:~0.16.
 spec:
   releaseName: jackett
   chart:
     repository: https://k8s-at-home.com/charts/
-    name: media-common
-    version: 1.1.1
+    name: jackett
+    version: 5.0.2
 
   values:
-    nameOverride: jackett
     image:
-      organization: linuxserver
-      repository: jackett
-      tag: "v0.16.1269-ls18"
+      repository: k8sathome/jackett
+      tag: 0.16.2106
 
   valuesFrom:
   - secretKeyRef:
