@@ -1,0 +1,66 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wireguard-test
+  labels:
+    app: wireguard-test
+  annotations:
+    configmap.reloader.stakater.com/reload: "wireguard-test"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: wireguard-test
+  template:
+    metadata:
+      labels:
+        app: wireguard-test
+    spec:
+      containers:
+        - name: wireguard
+          image: "linuxserver/wireguard:version-v1.0.20200827"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          env:
+            - name: TZ
+              value: "Europe/Amsterdam"
+          volumeMounts:
+            - name: wireguardconfig
+              mountPath: /config/wg0.conf
+              subPath: wireguard.conf
+          resources: {}
+
+        - name: echoserver
+          image: jmalloc/echo-server
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TZ
+              value: "Europe/Amsterdam"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources: {}
+
+        - name: cli
+          image: "nicolaka/netshoot"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          env:
+            - name: TZ
+              value: "Europe/Amsterdam"
+          command:
+            - sleep
+          args:
+            - infinity
+          resources: {}
+
+      volumes:
+        - name: wireguardconfig
+          configMap:
+            name: wireguard-test
