@@ -29,7 +29,7 @@ ingress:
   hosts:
     - host: jackett.{{ (datasource "cluster-vars").domain.internal }}
       paths:
-        - "/"
+        - path: /
   tls:
     - secretName: tls.jackett
       hosts:
