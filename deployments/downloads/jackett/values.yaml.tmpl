@@ -61,7 +61,7 @@ addons:
         repository: dperson/openvpn-client
         tag: amd64
 
-      auth: {{- (datasource "jackett").openvpn.auth | strings.Indent 6 | printf " |\n%v" }}
+      auth: {{- (datasource "jackett").openvpn.auth | strings.Indent 8 | printf " |\n%v" }}
 
     imagePullPolicy: Always
 
