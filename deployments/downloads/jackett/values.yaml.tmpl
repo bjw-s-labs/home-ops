@@ -16,7 +16,6 @@ env:
 persistence:
   config:
     enabled: true
-    emptyDir: false
     existingClaim: config-jackett-0
   shared:
     enabled: true
@@ -82,10 +81,6 @@ addons:
       ROUTE_1: "\"{{ (datasource "cluster-vars").networks.k8s_cluster }}\""
       ROUTE_2: "\"{{ (datasource "cluster-vars").networks.k8s_services }}\""
       ROUTE_3: "\"{{ (datasource "cluster-vars").networks.management_lan }}\""
-
-    additionalVolumeMounts:
-      - mountPath: /shared
-        name: shared
 
     livenessProbe:
       exec:
