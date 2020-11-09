@@ -1,6 +1,6 @@
 ---
 podAnnotations:
-  configmap.reloader.stakater.com/reload: "jackett-openvpn"
+  configmap.reloader.stakater.com/reload: "jackett-vpn"
   secret.reloader.stakater.com/reload: "jackett-openvpn"
   replicas-max: "1"
 
@@ -65,7 +65,7 @@ addons:
 
     imagePullPolicy: Always
 
-    vpnConf: {{- (datasource "jackett").openvpn.config | strings.Indent 6 | printf " |\n%v" }}
+    configFile: {{- (datasource "jackett").openvpn.config | strings.Indent 6 | printf " |\n%v" }}
     scripts:
       up:  |-
         #!/bin/bash
