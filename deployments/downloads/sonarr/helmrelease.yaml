@@ -6,20 +6,19 @@ metadata:
   namespace: downloads
   annotations:
     fluxcd.io/ignore: "false"
-    fluxcd.io/automated: "false"
+    fluxcd.io/automated: "true"
+    fluxcd.io/tag.chart-image: semver:~3.0.4.
 spec:
   releaseName: sonarr
   chart:
     repository: https://k8s-at-home.com/charts/
     name: sonarr
-    version: 6.0.0
+    version: 7.0.3
 
   values:
-    sonarr:
-      image:
-        organization: linuxserver
-        repository: sonarr
-        tag: "3.0.3.928-ls44"
+    image:
+      repository: k8sathome/sonarr
+      tag: 3.0.4.993
 
   valuesFrom:
   - secretKeyRef:
