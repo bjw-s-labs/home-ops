@@ -42,8 +42,9 @@ resources:
     memory: "512M"
 
 additionalVolumeMounts:
-  - mountPath: /config/custom-cont-init.d
+  - mountPath: /entrypoint.sh
     name: custom-scripts
+    subPath: entrypoint.sh
 
 additionalVolumes:
   - name: custom-scripts
@@ -54,40 +55,70 @@ additionalVolumes:
 addons:
   vpn:
     enabled: true
-    type: openvpn
+    type: wireguard
 
-    openvpn:
+    wireguard:
       image:
-        repository: dperson/openvpn-client
-        tag: amd64
+        repository: linuxserver/wireguard
+        tag: version-v1.0.20200827
 
-      auth: {{- (datasource "jackett").openvpn.auth | strings.Indent 8 | printf " |\n%v" }}
+    imagePullPolicy: IfNotPresent
 
-    imagePullPolicy: Always
-
-    configFile: {{- (datasource "jackett").openvpn.config | strings.Indent 6 | printf " |\n%v" }}
+    configFile: {{- (datasource "jackett").vpn.config | strings.Indent 6 | printf " |\n%v" }}
     scripts:
       up:  |-
         #!/bin/bash
-        /etc/openvpn/up.sh
+        INTERFACE=$1
+        DEFAULTROUTE=$(ip route | grep default | awk '{print $3}')
+
+        declare -a EXCLUDEDNETWORKS=(
+          "{{ (datasource "cluster-vars").networks.k8s_cluster }}"
+          "{{ (datasource "cluster-vars").networks.k8s_services }}"
+          "{{ (datasource "cluster-vars").networks.management_lan }}"
+        )
+
+        iptables -F OUTPUT
+
+        for entry in "${EXCLUDEDNETWORKS[@]}"
+        do
+          ip route add "$entry" via "$DEFAULTROUTE"
+          iptables -A OUTPUT -d "$entry" -j ACCEPT
+        done
+
+        iptables -A OUTPUT ! -o "$INTERFACE" -m mark ! --mark $(wg show "$INTERFACE" fwmark) -m addrtype ! --dst-type LOCAL -j REJECT
         echo "connected" > /shared/vpnstatus
+
       down:  |-
         #!/bin/bash
-        /etc/openvpn/down.sh
+        INTERFACE=$1
+        DEFAULTROUTE=$(ip route | grep default | awk '{print $3}')
+
+        declare -a EXCLUDEDNETWORKS=(
+          "{{ (datasource "cluster-vars").networks.k8s_cluster }}"
+          "{{ (datasource "cluster-vars").networks.k8s_services }}"
+          "{{ (datasource "cluster-vars").networks.management_lan }}"
+        )
+
+        iptables -F OUTPUT
+
+        for entry in "${EXCLUDEDNETWORKS[@]}"
+        do
+          ip route del "$entry" via "$DEFAULTROUTE"
+          iptables -D OUTPUT -d "$entry" -j ACCEPT
+        done
+
+        iptables -D OUTPUT ! -o "$INTERFACE" -m mark ! --mark $(wg show "$INTERFACE" fwmark) -m addrtype ! --dst-type LOCAL -j REJECT
         echo "disconnected" > /shared/vpnstatus
 
     env:
-      FIREWALL: "\"on\""
-      ROUTE_1: "\"{{ (datasource "cluster-vars").networks.k8s_cluster }}\""
-      ROUTE_2: "\"{{ (datasource "cluster-vars").networks.k8s_services }}\""
-      ROUTE_3: "\"{{ (datasource "cluster-vars").networks.management_lan }}\""
+      TZ: "Europe/Amsterdam"
 
     livenessProbe:
       exec:
         command:
         - sh
         - -c
-        - if [ $(curl -s https://am.i.mullvad.net/country) == "Belgium" ]; then exit 0; else exit $?; fi
+        - curl -s https://am.i.mullvad.net/country | grep "^Belgium$"
       initialDelaySeconds: 30
       periodSeconds: 60
       failureThreshold: 1

@@ -7,8 +7,10 @@ metadata:
   name: jackett-custom-scripts
   namespace: downloads
 data:
-  99-wait-for-vpn: |-
+  entrypoint.sh: |-
     #!/bin/bash
     echo "Waiting for VPN to be connected..."
     while ! grep -q "connected" /shared/vpnstatus;do echo "VPN Not connected";sleep 2;done
-    echo "VPN Connected"
+    echo "VPN Connected, starting Jackett"
+    umask "${UMASK:-0002}"
+    exec /app/jackett --NoUpdates ${EXTRA_ARGS}
