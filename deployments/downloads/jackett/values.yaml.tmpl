@@ -1,10 +1,15 @@
 ---
+controllerType: deployment
+
 podAnnotations:
   configmap.reloader.stakater.com/reload: "jackett-vpn"
   secret.reloader.stakater.com/reload: "jackett-openvpn"
   replicas-max: "1"
 
-controllerType: deployment
+podSecurityContext:
+  runAsUser: 1031
+  runAsGroup: 100
+  fsGroup: 100
 
 service:
   port:
