@@ -21,7 +21,15 @@ spec:
     image:
       repository: k8sathome/jackett
       tag: 0.16.2131
-      pullPolicy: Always
+      pullPolicy: IfNotPresent
+
+    addons:
+      vpn:
+        wireguard:
+          image:
+            repository: k8sathome/wireguard
+            tag: 1.0.20200827
+        imagePullPolicy: IfNotPresent
 
   valuesFrom:
   - secretKeyRef:

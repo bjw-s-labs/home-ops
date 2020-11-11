@@ -47,61 +47,22 @@ addons:
     enabled: true
     type: wireguard
 
-    wireguard:
-      image:
-        repository: linuxserver/wireguard
-        tag: version-v1.0.20200827
-
     imagePullPolicy: IfNotPresent
+
+    env:
+      TZ: "Europe/Amsterdam"
+      KILLSWITCH: "true"
+      KILLSWITCH_EXCLUDEDNETWORKS_IPV4: "{{ (datasource "cluster-vars").networks.k8s_cluster }};{{ (datasource "cluster-vars").networks.k8s_services }};{{ (datasource "cluster-vars").networks.management_lan }}"
 
     configFile: {{- (datasource "jackett").vpn.config | strings.Indent 6 | printf " |\n%v" }}
     scripts:
       up:  |-
         #!/bin/bash
-        INTERFACE=$1
-        DEFAULTROUTE=$(ip route | grep default | awk '{print $3}')
-
-        declare -a EXCLUDEDNETWORKS=(
-          "{{ (datasource "cluster-vars").networks.k8s_cluster }}"
-          "{{ (datasource "cluster-vars").networks.k8s_services }}"
-          "{{ (datasource "cluster-vars").networks.management_lan }}"
-        )
-
-        iptables -F OUTPUT
-
-        for entry in "${EXCLUDEDNETWORKS[@]}"
-        do
-          ip route add "$entry" via "$DEFAULTROUTE"
-          iptables -A OUTPUT -d "$entry" -j ACCEPT
-        done
-
-        iptables -A OUTPUT ! -o "$INTERFACE" -m mark ! --mark $(wg show "$INTERFACE" fwmark) -m addrtype ! --dst-type LOCAL -j REJECT
         echo "connected" > /shared/vpnstatus
 
       down:  |-
         #!/bin/bash
-        INTERFACE=$1
-        DEFAULTROUTE=$(ip route | grep default | awk '{print $3}')
-
-        declare -a EXCLUDEDNETWORKS=(
-          "{{ (datasource "cluster-vars").networks.k8s_cluster }}"
-          "{{ (datasource "cluster-vars").networks.k8s_services }}"
-          "{{ (datasource "cluster-vars").networks.management_lan }}"
-        )
-
-        iptables -F OUTPUT
-
-        for entry in "${EXCLUDEDNETWORKS[@]}"
-        do
-          ip route del "$entry" via "$DEFAULTROUTE"
-          iptables -D OUTPUT -d "$entry" -j ACCEPT
-        done
-
-        iptables -D OUTPUT ! -o "$INTERFACE" -m mark ! --mark $(wg show "$INTERFACE" fwmark) -m addrtype ! --dst-type LOCAL -j REJECT
         echo "disconnected" > /shared/vpnstatus
-
-    env:
-      TZ: "Europe/Amsterdam"
 
     livenessProbe:
       exec:
