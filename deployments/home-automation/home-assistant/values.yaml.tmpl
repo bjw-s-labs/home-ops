@@ -44,12 +44,13 @@ extraSecretForEnvFrom:
 
 persistence:
   enabled: true
-  existingClaim: home-assistant
+  existingClaim: home-assistant-data
 
 postgresql:
   enabled: true
   persistence:
     enabled: true
+    existingClaim: home-assistant-postgresql
   global:
     postgresql:
       postgresqlUsername: {{ (datasource "home-assistant").database.username }}
