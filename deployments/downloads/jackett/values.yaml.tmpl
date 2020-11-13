@@ -62,13 +62,3 @@ addons:
       down:  |-
         #!/bin/bash
         echo "disconnected" > /shared/vpnstatus
-
-    livenessProbe:
-      exec:
-        command:
-        - sh
-        - -c
-        - curl -s https://am.i.mullvad.net/country | grep "^Belgium$"
-      initialDelaySeconds: 30
-      periodSeconds: 60
-      failureThreshold: 1
