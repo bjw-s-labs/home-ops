@@ -1,0 +1,8 @@
+---
+postgresqlUsername: {{ (datasource "dsmr-reader").database.username }}
+postgresqlDatabase: {{ (datasource "dsmr-reader").database.database }}
+postgresqlPassword: {{ (datasource "dsmr-reader").database.password }}
+
+persistence:
+  enabled: true
+  existingClaim: dsmr-reader-postgresql
