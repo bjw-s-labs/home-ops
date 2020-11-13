@@ -1,0 +1,40 @@
+---
+timezone: Europe/Amsterdam
+puid: 1031
+pgid: 100
+
+dockerMods:
+  ebookConversion:
+    enabled: true
+
+persistence:
+  config:
+    enabled: true
+    existingClaim: calibre-web-config
+  books:
+    enabled: false
+  extraExistingClaimMounts:
+    - name: external-mount
+      mountPath: /storage/media
+      existingClaim: nfs-nas-media
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+  path: "/"
+
+  hosts:
+    - calibre.{{ (datasource "cluster-vars").domain.internal }}
+
+  tls:
+    - secretName: tls.calibre
+      hosts:
+        - calibre.{{ (datasource "cluster-vars").domain.internal }}
+
+resources:
+  requests:
+    memory: "512M"
+  limits:
+    memory: "1024M"
