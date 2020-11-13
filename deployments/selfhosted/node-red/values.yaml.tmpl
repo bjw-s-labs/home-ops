@@ -1,0 +1,39 @@
+---
+enableProjects: "true"
+timezone: "Europe/Amsterdam"
+
+extraEnvs:
+  - name: ADMIN_AUTH_USER
+    value: "{{ (datasource "node-red").auth.admin.user }}"
+  - name: ADMIN_AUTH_PASS
+    value: "{{ (datasource "node-red").auth.admin.password }}"
+  - name: CREDENTIAL_SECRET
+    value: "{{ (datasource "node-red").credential_secret }}"
+
+persistence:
+  enabled: true
+  existingClaim: node-red-data
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    external-dns.alpha.kubernetes.io/target: {{ (datasource "cluster-vars").domain.external.primary }}
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-production
+
+  hosts:
+    - brain.{{ (datasource "cluster-vars").domain.external.primary }}
+    - brain.{{ (datasource "cluster-vars").domain.external.secondary }}
+
+  tls:
+    - secretName: tls.node-red
+      hosts:
+        - brain.{{ (datasource "cluster-vars").domain.external.primary }}
+        - brain.{{ (datasource "cluster-vars").domain.external.secondary }}
+
+resources:
+  requests:
+    memory: "256M"
+  limits:
+    memory: "1024M"
