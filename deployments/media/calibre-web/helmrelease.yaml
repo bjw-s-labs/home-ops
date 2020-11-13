@@ -9,46 +9,18 @@ metadata:
     fluxcd.io/automated: "false"
 spec:
   releaseName: calibre-web
+  rollback:
+    enable: false
   chart:
-    repository: https://billimek.com/billimek-charts/
+    repository: https://k8s-at-home.com/charts/
     name: calibre-web
-    version: 1.1.2
+    version: 2.0.1
   values:
     image:
       repository: linuxserver/calibre-web
       tag: 0.6.8-ls74
 
-    timezone: Europe/Amsterdam
-    puid: 1031
-    pgid: 100
-
-    dockerMods:
-      ebookConversion:
-        enabled: true
-
-    persistence:
-      config:
-        enabled: true
-      books:
-        enabled: false
-      extraExistingClaimMounts:
-        - name: external-mount
-          mountPath: /storage/media
-          existingClaim: nfs-nas-media
-
-    ingress:
-      enabled: true
-      annotations:
-        kubernetes.io/ingress.class: nginx
-        cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
-
-    resources:
-      requests:
-        memory: "512M"
-      limits:
-        memory: "1024M"
-
   valuesFrom:
     - secretKeyRef:
-        name: calibre-web-helm-values
-        key: values
+        name: plex-helm-values
+        key: values.yaml
