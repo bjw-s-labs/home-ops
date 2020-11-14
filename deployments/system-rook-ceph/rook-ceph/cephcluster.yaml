@@ -33,7 +33,8 @@ spec:
       enabled: true
   dashboard:
     enabled: true
-    # ssl: false
+    port: 7000
+    ssl: false
   disruptionManagement:
     managePodBudgets: false
     osdMaintenanceTimeout: 30
@@ -46,6 +47,12 @@ spec:
       metadataDevice:
       osdsPerDevice: "1"
     nodes:
+    - name: "kubeworker1"
+      devices:
+      - name: "sdb"
+    - name: "kubeworker2"
+      devices:
+      - name: "sdb"
     - name: "kubeworker3"
       devices:
       - name: "nvme0n1"
