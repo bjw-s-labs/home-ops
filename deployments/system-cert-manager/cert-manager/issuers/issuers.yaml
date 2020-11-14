@@ -1,5 +1,5 @@
 ---
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: bjws-lan-ca-issuer
@@ -7,56 +7,51 @@ spec:
   ca:
     secretName: bjws-lan-ca-key-pair
 ---
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-staging
 spec:
   acme:
-    # The ACME server URL
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
-    # Email address used for ACME registration
     email: postmaster@bjws.nl
+    preferredChain: ""
     privateKeySecretRef:
       name: letsencrypt-staging
-    # Enable the HTTP-01 challenge provider
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
     solvers:
-      # We only use cloudflare to solve challenges for foo.com.
-      # Alternative options such as 'matchLabels' and 'dnsZones' can be specified
-      # as part of a solver's selector too.
-      - selector:
-          dnsZones:
-            - bjws.nl
-            - schorgers.nl
-        dns01:
-          cloudflare:
-            email: bernd@bjws.nl
-            apiKeySecretRef:
-              name: cloudflare-api-key-secret
-              key: api_key
-
+    - dns01:
+        cloudflare:
+          apiKeySecretRef:
+            key: api_key
+            name: cloudflare-api-key-secret
+          email: bernd@bjws.nl
+      selector:
+        dnsZones:
+        - bjws.nl
+        - schorgers.nl
 ---
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-production
+  resourceVersion: "36315833"
+  selfLink: /apis/cert-manager.io/v1/clusterissuers/letsencrypt-production
+  uid: 13d65c7e-ac6b-44ec-9f07-2da94f49501d
 spec:
   acme:
-    # The ACME server URL
-    server: https://acme-v02.api.letsencrypt.org/directory
-    # Email address used for ACME registration
     email: postmaster@bjws.nl
+    preferredChain: ""
     privateKeySecretRef:
       name: letsencrypt-production
-    # Enable the HTTP-01 challenge provider
+    server: https://acme-v02.api.letsencrypt.org/directory
     solvers:
-      - selector:
-          dnsZones:
-            - bjws.nl
-            - schorgers.nl
-        dns01:
-          cloudflare:
-            email: bernd@bjws.nl
-            apiKeySecretRef:
-              name: cloudflare-api-key-secret
-              key: api_key
+    - dns01:
+        cloudflare:
+          apiKeySecretRef:
+            key: api_key
+            name: cloudflare-api-key-secret
+          email: bernd@bjws.nl
+      selector:
+        dnsZones:
+        - bjws.nl
+        - schorgers.nl
