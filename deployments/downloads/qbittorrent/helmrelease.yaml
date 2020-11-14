@@ -12,14 +12,13 @@ spec:
   chart:
     repository: https://k8s-at-home.com/charts/
     name: qbittorrent
-    version: 5.0.0
+    version: 6.3.0
 
   values:
-    qbittorrent:
-      image:
-        organization: linuxserver
-        repository: qbittorrent
-        tag: "14.2.5.99202004250119-7015-2c65b79ubuntu18.04.1-ls86"
+    image:
+      repository: k8sathome/qbittorrent
+      tag: 4.2.5
+      pullPolicy: Always
 
   valuesFrom:
     - secretKeyRef:
