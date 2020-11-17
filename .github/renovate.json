@@ -1,14 +1,16 @@
 {
   "enabled": true,
+  "timezone": "Europe/Amsterdam",
   "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
   "commitBody": "Signed-off-by: bjw-s <bjw-s@users.noreply.github.com>",
+  "labels": ["upgrade", "bot"],
   "helm-values": {
     "fileMatch": ["deployments/.+\\.yaml$"]
   },
   "packageRules": [
     {
       "packageNames": ["blakeblackshear/frigate"],
-      "excludePackagePatterns": ["^(.*)-arm(v?[0-9]+?)?$"]
+      "versionScheme": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$"
     }
   ],
   "schedule": ["before 8am"]
