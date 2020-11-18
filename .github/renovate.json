@@ -2,6 +2,7 @@
   "enabled": true,
   "timezone": "Europe/Amsterdam",
   "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
+  "commitMessageSuffix": "[ci-skip]",
   "commitBody": "Signed-off-by: bjw-s <bjw-s@users.noreply.github.com>",
   "labels": ["upgrade", "bot"],
   "helm-values": {
@@ -15,6 +16,16 @@
     {
       "packageNames": ["jacobalberty/unifi"],
       "allowedVersions": "<6.0"
+    },
+    {
+      "packageNames": ["k8sathome/qbittorrent"],
+      "allowedVersions": "<4.3.0"
+    },
+    {
+      "datasources": ["docker"],
+      "packageNames": ["k8sathome/jackett"],
+      "updateTypes": ["patch"],
+      "automerge": true
     }
   ],
   "schedule": ["before 8am"]
