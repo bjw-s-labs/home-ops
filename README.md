@@ -12,6 +12,10 @@ Welcome to my home Kubernetes cluster.
 
 Lots of fun (to me at least ;)) stuff can be found, poke around my [deployments](./deployments/) directory to see what my cluster is running. Feel free to open a [GitHub Issue](https://github.com/bjw-s/k8s-gitops/issues/new).
 
+[Renovatebot](https://github.com/renovatebot/renovate) keeps my applications up-to-date by scanning my repo and opening pull requests when it notices a new container image update.
+
+[Actions Runner Controller](https://github.com/summerwind/actions-runner-controller) operates a self-hosted Github runner in my cluster which I use to generate Sealed Secrets to my cluster.
+
 ---
 
 ## Hardware
