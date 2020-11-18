@@ -25,24 +25,6 @@ affinity:
       - matchExpressions:
         - {key: "feature.node.kubernetes.io/custom-zigbee", operator: In, values: ["true"]}
 
-config:
-  homeassistant: true
-
-  mqtt:
-    base_topic: zigbee2mqtt
-    server: "mqtt://vernemq.home-network"
-    user: {{ (datasource "zigbee2mqtt").mqtt.user }}
-    password: {{ (datasource "zigbee2mqtt").mqtt.password }}
-
-  serial:
-    port: /dev/serial/by-id/usb-Silicon_Labs_slae.sh_cc2652rb_stick_-_slaesh_s_iot_stuff_00_12_4B_00_21_CB_EE_BB-if00-port0
-
-  # Both of these need to be enabled for the webui
-  frontend:
-    port: 8080
-  experimental:
-    new_api: true
-
 ingress:
   enabled: true
 
