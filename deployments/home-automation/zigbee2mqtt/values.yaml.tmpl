@@ -51,7 +51,9 @@ ingress:
     cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
 
   hosts:
-    - zigbee2mqtt.{{ (datasource "cluster-vars").domain.internal }}
+    - host: zigbee2mqtt.{{ (datasource "cluster-vars").domain.internal }}
+      paths:
+        - path: /
 
   tls:
     - secretName: tls.zigbee2mqtt
