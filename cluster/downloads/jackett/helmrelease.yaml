@@ -1,20 +1,20 @@
 ---
-apiVersion: helm.fluxcd.io/v1
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: jackett
   namespace: downloads
-  annotations:
-    fluxcd.io/ignore: "false"
-    fluxcd.io/automated: "false"
 spec:
-  releaseName: jackett
-  rollback:
-    enable: false
+  interval: 5m
   chart:
-    repository: https://k8s-at-home.com/charts/
-    name: jackett
-    version: 5.2.0
+    spec:
+      chart: jackett
+      version: 5.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: system-flux
+      interval: 5m
 
   values:
     image:
@@ -31,6 +31,6 @@ spec:
         imagePullPolicy: IfNotPresent
 
   valuesFrom:
-  - secretKeyRef:
-      name: jackett-helm-values
-      key: values.yaml
+  - kind: Secret
+    name: jackett-helm-values
+    valuesKey: values.yaml
