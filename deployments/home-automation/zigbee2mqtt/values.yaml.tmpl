@@ -1,6 +1,11 @@
 ---
 env:
   TZ: "Europe/Amsterdam"
+  ZIGBEE2MQTT_DATA: /data
+
+probes:
+  startup:
+    enabled: true
 
 persistence:
   data:
@@ -41,3 +46,46 @@ ingress:
     - secretName: tls.zigbee2mqtt
       hosts:
         - zigbee2mqtt.{{ (datasource "cluster-vars").domain.internal }}
+
+config:
+  mqtt:
+    base_topic: zigbee2mqtt
+    server: "mqtt://vernemq.home-network"
+    user: {{ (datasource "zigbee2mqtt").mqtt.user }}
+    password: {{ (datasource "zigbee2mqtt").mqtt.password }}
+
+  homeassistant: true
+
+  device_options:
+    retain: true
+
+  permit_join: false
+
+  serial:
+    port: /dev/serial/by-id/usb-Silicon_Labs_slae.sh_cc2652rb_stick_-_slaesh_s_iot_stuff_00_12_4B_00_21_CB_EE_BB-if00-port0
+
+  advanced:
+    network_key:
+      - 95
+      - 127
+      - 73
+      - 119
+      - 59
+      - 169
+      - 49
+      - 50
+      - 96
+      - 72
+      - 42
+      - 246
+      - 182
+      - 104
+      - 11
+      - 41
+    pan_id: 6753
+
+  # Both of these need to be enabled for the webui
+  frontend:
+    port: 8080
+  experimental:
+    new_api: true
