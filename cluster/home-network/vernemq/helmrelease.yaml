@@ -1,21 +1,21 @@
 ---
-apiVersion: helm.fluxcd.io/v1
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: vernemq
   namespace: home-network
-  annotations:
-    fluxcd.io/ignore: "false"
-    fluxcd.io/automated: "false"
 spec:
-  releaseName: vernemq
-  helmVersion: v3
-  rollback:
-    enable: false
+  interval: 5m
   chart:
-    repository: https://vernemq.github.io/docker-vernemq
-    name: vernemq
-    version: 1.6.3
+    spec:
+      chart: vernemq
+      version: 1.6.3
+      sourceRef:
+        kind: HelmRepository
+        name: vernemq-charts
+        namespace: system-flux
+      interval: 5m
+
   values:
     image:
       repository: vernemq/vernemq
