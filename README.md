@@ -2,7 +2,7 @@
 
 ![Kubernetes](https://i.imgur.com/p1RzXjQ.png)
 
-[![Discord](https://img.shields.io/badge/discord-chat-7289DA.svg?maxAge=60&style=flat-square)](https://discord.gg/d7C9M7)    [![k3s](https://img.shields.io/badge/k3s-v1.18.8-orange?style=flat-square)](https://k3s.io/)    [![GitHub stars](https://img.shields.io/github/stars/bjw-s/k8s-gitops?color=green&style=flat-square)](https://github.com/bjw-s/k8s-gitops/stargazers)    [![GitHub issues](https://img.shields.io/github/issues/bjw-s/k8s-gitops?style=flat-square)](https://github.com/bjw-s/k8s-gitops/issues)    [![GitHub last commit](https://img.shields.io/github/last-commit/bjw-s/k8s-gitops?color=purple&style=flat-square)](https://github.com/bjw-s/k8s-gitops/commits/master) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white&style=flat-square)](https://github.com/pre-commit/pre-commit)
+[![Discord](https://img.shields.io/badge/discord-chat-7289DA.svg?maxAge=60&style=flat-square)](https://discord.gg/d7C9M7)    [![k3s](https://img.shields.io/badge/k3s-v1.18.8-orange?style=flat-square)](https://k3s.io/)    [![GitHub stars](https://img.shields.io/github/stars/bjw-s/k8s-gitops?color=green&style=flat-square)](https://github.com/bjw-s/k8s-gitops/stargazers)    [![GitHub issues](https://img.shields.io/github/issues/bjw-s/k8s-gitops?style=flat-square)](https://github.com/bjw-s/k8s-gitops/issues)    [![GitHub last commit](https://img.shields.io/github/last-commit/bjw-s/k8s-gitops?color=purple&style=flat-square)](https://github.com/bjw-s/k8s-gitops/commits/main) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white&style=flat-square)](https://github.com/pre-commit/pre-commit)
 
 ---
 
