@@ -6,7 +6,7 @@
   "commitBody": "Signed-off-by: bjw-s <bjw-s@users.noreply.github.com>",
   "labels": ["upgrade", "bot"],
   "helm-values": {
-    "fileMatch": ["deployments/.+\\.yaml$"]
+    "fileMatch": ["cluster/.+\\.yaml$"]
   },
   "packageRules": [
     {
@@ -23,10 +23,13 @@
     },
     {
       "datasources": ["docker"],
-      "packageNames": ["k8sathome/jackett"],
-      "updateTypes": ["patch"],
-      "automerge": true
+      "packageNames": [
+        "k8sathome/radarr",
+        "k8sathome/sonarr",
+        "k8sathome/lidarr",
+        "k8sathome/bazarr"
+      ],
+      "versioning": "nuget"
     }
-  ],
-  "schedule": ["before 8am"]
+  ]
 }
