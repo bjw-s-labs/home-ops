@@ -1,18 +1,21 @@
 ---
-apiVersion: helm.fluxcd.io/v1
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: home-assistant
   namespace: home-automation
-  annotations:
-    fluxcd.io/ignore: "false"
-    fluxcd.io/automated: "false"
 spec:
-  releaseName: home-assistant
+  interval: 5m
   chart:
-    repository: https://k8s-at-home.com/charts/
-    name: home-assistant
-    version: 2.6.0
+    spec:
+      chart: home-assistant
+      version: 2.6.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: system-flux
+      interval: 5m
+
   values:
     image:
       repository: homeassistant/home-assistant
@@ -31,6 +34,6 @@ spec:
         tag: 3.6.0
 
   valuesFrom:
-  - secretKeyRef:
-      name: home-assistant-helm-values
-      key: values.yaml
+  - kind: Secret
+    name: home-assistant-helm-values
+    valuesKey: values.yaml
