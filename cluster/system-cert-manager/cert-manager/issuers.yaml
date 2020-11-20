@@ -1,0 +1,54 @@
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: bjws-lan-ca-issuer
+spec:
+  ca:
+    secretName: bjws-lan-ca-key-pair
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    email: postmaster@bjws.nl
+    preferredChain: ""
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    solvers:
+    - dns01:
+        cloudflare:
+          apiKeySecretRef:
+            key: api_key
+            name: cloudflare-api-key-secret
+          email: bernd@bjws.nl
+      selector:
+        dnsZones:
+        - bjws.nl
+        - schorgers.nl
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-production
+spec:
+  acme:
+    email: postmaster@bjws.nl
+    preferredChain: ""
+    privateKeySecretRef:
+      name: letsencrypt-production
+    server: https://acme-v02.api.letsencrypt.org/directory
+    solvers:
+    - dns01:
+        cloudflare:
+          apiKeySecretRef:
+            key: api_key
+            name: cloudflare-api-key-secret
+          email: bernd@bjws.nl
+      selector:
+        dnsZones:
+        - bjws.nl
+        - schorgers.nl
