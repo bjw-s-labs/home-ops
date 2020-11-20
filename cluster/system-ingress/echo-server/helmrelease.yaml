@@ -1,0 +1,27 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: echo-server
+  namespace: system-ingress
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: echo-server
+      version: 0.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: ealenn-charts
+        namespace: system-flux
+      interval: 5m
+
+  values:
+    image:
+      repository: ealen/echo-server
+      tag: 0.4.3
+
+  valuesFrom:
+  - kind: Secret
+    name: echo-server-helm-values
+    valuesKey: values.yaml

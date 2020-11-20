@@ -1,0 +1,34 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: external-dns
+  namespace: system-ingress
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: external-dns
+      version: 3.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami-charts
+        namespace: system-flux
+      interval: 5m
+
+  values:
+    sources:
+    - ingress
+    provider: cloudflare
+    policy: sync
+    txtPrefix: "k8s."
+    resources:
+      requests:
+        memory: "32M"
+      limits:
+        memory: "64M"
+
+  valuesFrom:
+  - kind: Secret
+    name: external-dns-helm-values
+    valuesKey: values.yaml
