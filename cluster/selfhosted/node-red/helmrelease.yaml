@@ -1,0 +1,27 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: node-red
+  namespace: selfhosted
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: node-red
+      version: 3.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: system-flux
+      interval: 5m
+
+  values:
+    image:
+      repository: nodered/node-red
+      tag: 1.2.5
+
+  valuesFrom:
+  - kind: Secret
+    name: node-red-helm-values
+    valuesKey: values.yaml
