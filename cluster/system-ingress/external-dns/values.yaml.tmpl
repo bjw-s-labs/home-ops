@@ -1,0 +1,8 @@
+---
+cloudflare:
+  apiToken: {{ (datasource "cluster-vars").cloudflare.apitoken }}
+  proxied: true
+
+domainFilters:
+  - {{ (datasource "cluster-vars").domain.external.primary }}
+  - {{ (datasource "cluster-vars").domain.external.secondary }}
