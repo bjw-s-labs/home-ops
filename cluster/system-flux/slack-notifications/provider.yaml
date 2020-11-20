@@ -1,0 +1,11 @@
+---
+apiVersion: notification.toolkit.fluxcd.io/v1beta1
+kind: Provider
+metadata:
+  name: slack
+  namespace: system-flux
+spec:
+  type: slack
+  channel: kubernetes
+  secretRef:
+    name: slack-url
