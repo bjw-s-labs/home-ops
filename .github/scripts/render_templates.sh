@@ -152,7 +152,7 @@ while IFS= read -r file; do
   fi
 
   # Make sure the rendered_template file is a valid Kubernetes YAML before proceeding
-  if ! echo "$rendered_template" | kubeval --strict > /dev/null 2>&1; then
+  if ! echo "$rendered_template" | kubeval --ignore-missing-schemas --strict > /dev/null 2>&1; then
     echo "  Invalid YAML generated for ${file}. Aborting"
     exit 1
   fi
