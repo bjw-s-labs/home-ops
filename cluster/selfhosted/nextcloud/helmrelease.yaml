@@ -1,0 +1,27 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: nextcloud
+  namespace: selfhosted
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: nextcloud
+      version: 2.3.2
+      sourceRef:
+        kind: HelmRepository
+        name: nextcloud-charts
+        namespace: system-flux
+      interval: 5m
+
+  values:
+    image:
+      repository: nextcloud
+      tag: 19.0.4
+
+  valuesFrom:
+  - kind: Secret
+    name: nextcloud-helm-values
+    valuesKey: values.yaml
