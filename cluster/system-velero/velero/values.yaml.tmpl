@@ -1,0 +1,69 @@
+---
+configuration:
+  provider: aws
+
+  backupStorageLocation:
+    name: default
+    bucket: velero
+    config:
+      region: us-east-1
+      s3ForcePathStyle: true
+      s3Url: http://192.168.25.11:9000
+      publicUrl: http://minio.{{ (datasource "cluster-vars").domain.internal }}:9000
+
+  volumeSnapshotLocation:
+    name: aws
+    config:
+      region: us-east-1
+
+  resticTimeout: 6h
+
+credentials:
+  secretContents:
+    cloud: |
+      [default]
+      aws_access_key_id = "{{ (datasource "velero").minio.access_key }}"
+      aws_secret_access_key = "{{ (datasource "velero").minio.secret_key }}"
+
+initContainers:
+- name: velero-plugin-for-aws
+  image: velero/velero-plugin-for-aws:v1.1.0
+  imagePullPolicy: IfNotPresent
+  volumeMounts:
+  - mountPath: /target
+    name: plugins
+
+resources:
+  requests:
+    memory: 300Mi
+    cpu: 25m
+  limits:
+    memory: 1500Mi
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: false
+
+snapshotsEnabled: false
+
+deployRestic: true
+
+restic:
+  podVolumePath: /var/lib/kubelet/pods
+  privileged: false
+  tolerations:
+  - key: "node-role.kubernetes.io/master"
+    operator: "Exists"
+  resources:
+    requests:
+      memory: 200Mi
+      cpu: 15m
+    limits:
+      memory: 2000Mi
+
+schedules:
+  daily-backup:
+    schedule: "0 2 * * *"
+    template:
+      ttl: "120h"
