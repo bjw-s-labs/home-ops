@@ -6,3 +6,7 @@ postgresqlPassword: {{ (datasource "dsmr-reader").database.password }}
 persistence:
   enabled: true
   existingClaim: dsmr-reader-postgresql
+
+primary:
+  podAnnotations:
+    backup.velero.io/backup-volumes: data
