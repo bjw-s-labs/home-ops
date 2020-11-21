@@ -57,7 +57,7 @@ postgresql:
       postgresqlUsername: {{ (datasource "home-assistant").database.username }}
       postgresqlDatabase: {{ (datasource "home-assistant").database.database }}
       postgresqlPassword: {{ (datasource "home-assistant").database.password }}
-  primary:
+  master:
     podAnnotations:
       backup.velero.io/backup-volumes: data
 
