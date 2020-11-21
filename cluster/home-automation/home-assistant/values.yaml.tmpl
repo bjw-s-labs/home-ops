@@ -1,6 +1,7 @@
 ---
 podAnnotations:
   secret.reloader.stakater.com/reload: home-assistant-secrets
+  backup.velero.io/backup-volumes: config
 
 probes:
   liveness:
@@ -56,6 +57,9 @@ postgresql:
       postgresqlUsername: {{ (datasource "home-assistant").database.username }}
       postgresqlDatabase: {{ (datasource "home-assistant").database.database }}
       postgresqlPassword: {{ (datasource "home-assistant").database.password }}
+  primary:
+    podAnnotations:
+      backup.velero.io/backup-volumes: data
 
 git:
   enabled: true
