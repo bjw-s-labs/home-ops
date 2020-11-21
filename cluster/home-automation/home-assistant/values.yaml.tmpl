@@ -58,7 +58,7 @@ postgresql:
       postgresqlDatabase: {{ (datasource "home-assistant").database.database }}
       postgresqlPassword: {{ (datasource "home-assistant").database.password }}
   primary:
-    podAnnotations:
+    annotations:
       backup.velero.io/backup-volumes: data
 
 git:
