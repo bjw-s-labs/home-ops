@@ -20,10 +20,8 @@ spec:
     image:
       repository: weaveworks/kured
       tag: 1.5.0
-    configuration:
-      startTime: "2:00"
-      endTime: "6:00"
-    service:
-      create: true
-    metrics:
-      create: true
+
+  valuesFrom:
+  - kind: Secret
+    name: kured-helm-values
+    valuesKey: values.yaml
