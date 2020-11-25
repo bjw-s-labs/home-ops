@@ -3,12 +3,11 @@ kind: HelmRelease
 metadata:
   name: ingress-nginx
   namespace: system-ingress
-  annotations:
-    renovatebot.helm.repository: https://kubernetes.github.io/ingress-nginx
 spec:
   interval: 5m
   chart:
     spec:
+      # renovate: registryUrl=https://kubernetes.github.io/ingress-nginx
       chart: ingress-nginx
       version: 3.3.0
       sourceRef:

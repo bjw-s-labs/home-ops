@@ -3,12 +3,11 @@ kind: HelmRelease
 metadata:
   name: kured
   namespace: kube-system
-  annotations:
-    renovatebot.helm.repository: https://weaveworks.github.io/kured
 spec:
   interval: 5m
   chart:
     spec:
+      # renovate: registryUrl=https://weaveworks.github.io/kured
       chart: kured
       version: 2.2.0
       sourceRef:

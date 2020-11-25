@@ -3,12 +3,11 @@ kind: HelmRelease
 metadata:
   name: sealed-secrets
   namespace: system
-  annotations:
-    renovatebot.helm.repository: https://charts.helm.sh/stable
 spec:
   interval: 5m
   chart:
     spec:
+      # renovate: registryUrl=https://charts.helm.sh/stable
       chart: sealed-secrets
       version: 1.12.2
       sourceRef:

@@ -3,12 +3,11 @@ kind: HelmRelease
 metadata:
   name: reloader
   namespace: system
-  annotations:
-    renovatebot.helm.repository: https://stakater.github.io/stakater-charts
 spec:
   interval: 5m
   chart:
     spec:
+      # renovate: registryUrl=https://stakater.github.io/stakater-charts
       chart: reloader
       version: v0.0.74
       sourceRef:

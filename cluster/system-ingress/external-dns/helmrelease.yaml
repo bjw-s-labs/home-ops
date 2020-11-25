@@ -3,12 +3,11 @@ kind: HelmRelease
 metadata:
   name: external-dns
   namespace: system-ingress
-  annotations:
-    renovatebot.helm.repository: https://charts.bitnami.com/bitnami
 spec:
   interval: 5m
   chart:
     spec:
+      # renovate: registryUrl=https://charts.bitnami.com/bitnami
       chart: external-dns
       version: 3.3.0
       sourceRef:
