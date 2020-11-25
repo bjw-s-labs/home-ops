@@ -3,13 +3,12 @@ kind: HelmRelease
 metadata:
   name: rook-ceph
   namespace: system-rook-ceph
-  annotations:
-    renovatebot.helm.repository: https://charts.rook.io/release
 spec:
   interval: 5m
   releaseName: jackett
   chart:
     spec:
+      # renovate: registryUrl=https://charts.rook.io/release
       chart: rook-ceph
       version: v1.5.1
       sourceRef:

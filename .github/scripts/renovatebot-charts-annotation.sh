@@ -26,12 +26,10 @@ for helm_release in $(find ${CLUSTER_ROOT} -type f -name "*.yaml" ); do
         chart_url=$(yq r "$file" spec.url)
 
         # ignore if the chart name does not match
-        if [[ $(yq r "${helm_release}" spec.chart.spec.sourceRef.name) != "${chart_name}" ]]; then
-            continue
+        if [[ $(yq r "${helm_release}" spec.chart.spec.sourceRef.name) == "${chart_name}" ]]; then
+            gsed -i "/.*chart: .*/i \ \ \ \ \ \ # renovate: registryUrl=${chart_url}" "${helm_release}"
+            echo "Annotated $(basename "${helm_release%.*}") with ${chart_name} for renovatebot..."
+            break
         fi
-
-        yq w -i "${helm_release}" 'metadata.annotations."renovatebot.helm.repository"' "${chart_url}"
-        echo "Annotated ${helm_release}"
-        break
     done
 done

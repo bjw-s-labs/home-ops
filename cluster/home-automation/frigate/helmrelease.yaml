@@ -3,12 +3,11 @@ kind: HelmRelease
 metadata:
   name: frigate
   namespace: home-automation
-  annotations:
-    renovatebot.helm.repository: https://k8s-at-home.com/charts/
 spec:
   interval: 5m
   chart:
     spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: frigate
       version: 4.0.1
       sourceRef:

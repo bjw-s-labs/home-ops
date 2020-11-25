@@ -3,12 +3,11 @@ kind: HelmRelease
 metadata:
   name: vernemq
   namespace: home-network
-  annotations:
-    renovatebot.helm.repository: https://vernemq.github.io/docker-vernemq
 spec:
   interval: 5m
   chart:
     spec:
+      # renovate: registryUrl=https://vernemq.github.io/docker-vernemq
       chart: vernemq
       version: 1.6.3
       sourceRef:

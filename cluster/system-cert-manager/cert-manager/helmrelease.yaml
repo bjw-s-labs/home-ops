@@ -3,12 +3,11 @@ kind: HelmRelease
 metadata:
   name: cert-manager
   namespace: system-cert-manager
-  annotations:
-    renovatebot.helm.repository: https://charts.jetstack.io
 spec:
   interval: 5m
   chart:
     spec:
+      # renovate: registryUrl=https://charts.jetstack.io
       chart: cert-manager
       version: v1.0.4
       sourceRef:

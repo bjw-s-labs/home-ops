@@ -3,12 +3,11 @@ kind: HelmRelease
 metadata:
   name: dsmr-reader-postgresql
   namespace: home-automation
-  annotations:
-    renovatebot.helm.repository: https://charts.bitnami.com/bitnami
 spec:
   interval: 5m
   chart:
     spec:
+      # renovate: registryUrl=https://charts.bitnami.com/bitnami
       chart: postgresql
       version: 10.1.0
       sourceRef:

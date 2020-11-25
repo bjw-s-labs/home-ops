@@ -3,13 +3,12 @@ kind: HelmRelease
 metadata:
   name: velero
   namespace: system-velero
-  annotations:
-    renovatebot.helm.repository: https://vmware-tanzu.github.io/helm-charts
 spec:
   interval: 5m
   releaseName: velero
   chart:
     spec:
+      # renovate: registryUrl=https://vmware-tanzu.github.io/helm-charts
       chart: velero
       version: 2.13.7
       sourceRef:
