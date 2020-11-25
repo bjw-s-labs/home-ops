@@ -52,12 +52,12 @@ postgresql:
   persistence:
     enabled: true
     existingClaim: home-assistant-postgresql
-  global:
-    postgresql:
-      postgresqlUsername: {{ (datasource "home-assistant").database.username }}
-      postgresqlDatabase: {{ (datasource "home-assistant").database.database }}
-      postgresqlPassword: {{ (datasource "home-assistant").database.password }}
-  master:
+
+  postgresqlUsername: {{ (datasource "home-assistant").database.username }}
+  postgresqlDatabase: {{ (datasource "home-assistant").database.database }}
+  postgresqlPassword: {{ (datasource "home-assistant").database.password }}
+
+  primary:
     podAnnotations:
       backup.velero.io/backup-volumes: data
 
