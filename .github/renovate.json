@@ -2,13 +2,30 @@
   "enabled": true,
   "timezone": "Europe/Amsterdam",
   "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
-  "commitMessageSuffix": "[ci-skip]",
-  "commitBody": "Signed-off-by: bjw-s <bjw-s@users.noreply.github.com>",
-  "labels": ["upgrade", "bot"],
+  "commitMessage": "[{{{depName}}}] {{{commitMessageAction}}} {{{currentVersion}}} to {{#if isMajor}}v{{{newMajor}}}{{else}}{{#if isSingleVersion}}v{{{toVersion}}}{{else}}{{{newValue}}}{{/if}}{{/if}} [ci-skip]",
+  "commitBody": "Signed-off-by: Bᴇʀɴᴅ Sᴄʜᴏʀɢᴇʀs <6213398+bjw-s@users.noreply.github.com>",
+  "suppressNotifications": ["prIgnoreNotification"],
   "helm-values": {
     "fileMatch": ["cluster/.+\\.yaml$"]
   },
+  "regexManagers": [
+    {
+      "fileMatch": ["cluster/.+\\.yaml$"],
+      "matchStrings": [
+        "registryUrl=(?<registryUrl>.*?)\n *chart: (?<depName>.*?)\n *version: (?<currentValue>.*)\n"
+      ],
+      "datasourceTemplate": "helm"
+    }
+  ],
   "packageRules": [
+    {
+      "datasources": ["docker"],
+      "labels": ["renovate/container-image"]
+    },
+    {
+      "datasources": ["helm"],
+      "labels": ["renovate/helm-chart"]
+    },
     {
       "packageNames": ["blakeblackshear/frigate"],
       "versionScheme": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$"
@@ -16,6 +33,13 @@
     {
       "packageNames": ["jacobalberty/unifi"],
       "allowedVersions": "<6.0"
+    },
+    {
+      "datasources": ["docker"],
+      "packageNames": [
+        "plexinc/pms-docker"
+      ],
+      "versioning": "loose"
     },
     {
       "packageNames": ["k8sathome/qbittorrent"],

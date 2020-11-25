@@ -7,15 +7,29 @@ tasks:
     silent: true
     cmds:
       - ./.github/scripts/render_templates.sh
+    preconditions:
+      - test -f ./.github/scripts/render_templates.sh
 
   lint-scripts:
     desc: Lint all script files in the repo
     silent: true
     cmds:
       - ./.github/scripts/lint_scripts.sh
+    preconditions:
+      - test -f ./.github/scripts/lint_scripts.sh
 
   lint-yaml:
     desc: Lint all yaml files in the repo
     silent: true
     cmds:
       - ./.github/scripts/lint_yaml.sh
+    preconditions:
+      - test -f ./.github/scripts/lint_yaml.sh
+
+  renovate:helm-releases:
+    desc: Create renovate annotations for HelmReleases
+    silent: true
+    cmds:
+      - ./.github/scripts/create-helmrelease-annotations.sh
+    preconditions:
+      - test -f ./.github/scripts/create-helmrelease-annotations.sh
