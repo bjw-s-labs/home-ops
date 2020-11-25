@@ -1,9 +1,10 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: home-assistant
   namespace: home-automation
+  annotations:
+    renovatebot.helm.repository: https://k8s-at-home.com/charts/
 spec:
   interval: 5m
   chart:
@@ -15,25 +16,20 @@ spec:
         name: k8s-at-home-charts
         namespace: system-flux
       interval: 5m
-
   values:
     image:
       repository: homeassistant/home-assistant
       tag: 0.118.3
-
     configurator:
       enabled: false
-
     appdaemon:
       enabled: false
-
     vscode:
       enabled: true
       image:
         repository: codercom/code-server
         tag: 3.7.3
-
   valuesFrom:
-  - kind: Secret
-    name: home-assistant-helm-values
-    valuesKey: values.yaml
+    - kind: Secret
+      name: home-assistant-helm-values
+      valuesKey: values.yaml
