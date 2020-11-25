@@ -1,9 +1,10 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: velero
   namespace: system-velero
+  annotations:
+    renovatebot.helm.repository: https://vmware-tanzu.github.io/helm-charts
 spec:
   interval: 5m
   releaseName: velero
@@ -16,8 +17,7 @@ spec:
         name: vmware-tanzu-charts
         namespace: system-flux
       interval: 5m
-
   valuesFrom:
-  - kind: Secret
-    name: velero-helm-values
-    valuesKey: values.yaml
+    - kind: Secret
+      name: velero-helm-values
+      valuesKey: values.yaml

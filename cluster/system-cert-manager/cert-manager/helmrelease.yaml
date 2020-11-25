@@ -1,9 +1,10 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: cert-manager
   namespace: system-cert-manager
+  annotations:
+    renovatebot.helm.repository: https://charts.jetstack.io
 spec:
   interval: 5m
   chart:
@@ -15,7 +16,6 @@ spec:
         name: jetstack-charts
         namespace: system-flux
       interval: 5m
-
   values:
     installCRDs: true
     extraArgs:
