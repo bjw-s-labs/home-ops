@@ -3,12 +3,11 @@ kind: HelmRelease
 metadata:
   name: qbittorrent
   namespace: downloads
-  annotations:
-    renovatebot.helm.repository: https://k8s-at-home.com/charts/
 spec:
   interval: 5m
   chart:
     spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: qbittorrent
       version: 6.4.0
       sourceRef:

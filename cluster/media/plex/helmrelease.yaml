@@ -3,12 +3,11 @@ kind: HelmRelease
 metadata:
   name: plex
   namespace: media
-  annotations:
-    renovatebot.helm.repository: https://k8s-at-home.com/charts/
 spec:
   interval: 5m
   chart:
     spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: plex
       version: 2.0.4
       sourceRef:
