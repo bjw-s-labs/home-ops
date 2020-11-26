@@ -16,9 +16,13 @@ jobs:
       - ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
       - name: Validate YAML files
         run: |
           .github/scripts/lint_yaml.sh
+
       - name: Webhook
         if: ${{ always() }}
         env:
@@ -46,11 +50,15 @@ jobs:
       SHELLCHECK_VERSION: v0.7.1
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
       - name: Validate shell scripts
         env:
           SHELLCHECK_ERROR_LEVEL: warning
         run: |
           .github/scripts/lint_scripts.sh
+
       - name: Webhook
         if: ${{ always() }}
         env:
