@@ -1,9 +1,13 @@
 {
   "enabled": true,
   "timezone": "Europe/Amsterdam",
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "Renovate Dashboard",
   "commitMessage": "[{{{depName}}}] {{{commitMessageAction}}} {{{currentVersion}}} to {{#if isMajor}}v{{{newMajor}}}{{else}}{{#if isSingleVersion}}v{{{toVersion}}}{{else}}{{{newValue}}}{{/if}}{{/if}} [ci-skip]",
   "commitBody": "Signed-off-by: Bᴇʀɴᴅ Sᴄʜᴏʀɢᴇʀs <6213398+bjw-s@users.noreply.github.com>",
   "suppressNotifications": ["prIgnoreNotification"],
+  "rebaseWhen": "conflicted",
+  "assignees": ["@bjw-s"],
   "helm-values": {
     "fileMatch": ["cluster/.+\\.yaml$"]
   },
@@ -53,6 +57,14 @@
         "k8sathome/bazarr"
       ],
       "versioning": "nuget"
+    },
+    {
+      "datasources": ["docker"],
+      "automerge": true,
+      "updateTypes": ["minor", "patch"],
+      "packageNames": [
+        "k8sathome/jackett"
+      ]
     }
   ]
 }
