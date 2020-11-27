@@ -22,11 +22,33 @@
   "packageRules": [
     {
       "datasources": ["docker"],
-      "labels": ["renovate/container-image"]
+      "updateTypes": ["major"],
+      "labels": ["renovate/container-image", "dependency/major"]
+    },
+    {
+      "datasources": ["docker"],
+      "updateTypes": ["minor"],
+      "labels": ["renovate/container-image", "dependency/minor"]
+    },
+    {
+      "datasources": ["docker"],
+      "updateTypes": ["patch"],
+      "labels": ["renovate/container-image", "dependency/patch"]
     },
     {
       "datasources": ["helm"],
-      "labels": ["renovate/helm-chart"]
+      "updateTypes": ["major"],
+      "labels": ["renovate/helm-chart", "dependency/major"]
+    },
+    {
+      "datasources": ["helm"],
+      "updateTypes": ["minor"],
+      "labels": ["renovate/helm-chart", "dependency/minor"]
+    },
+    {
+      "datasources": ["helm"],
+      "updateTypes": ["patch"],
+      "labels": ["renovate/helm-chart", "dependency/patch"]
     },
     {
       "packageNames": ["blakeblackshear/frigate"],
