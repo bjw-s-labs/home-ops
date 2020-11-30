@@ -1,0 +1,43 @@
+---
+podAnnotations:
+  backup.velero.io/backup-volumes: data
+
+env:
+  TZ: "Europe/Amsterdam"
+
+persistence:
+  data:
+    enabled: true
+    existingClaim: octoprint-data
+
+additionalVolumeMounts: []
+
+additionalVolumes: []
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - {key: "kubernetes.io/hostname", operator: In, values: ["kubeprint"]}
+
+tolerations:
+- key: "arm"
+  operator: "Exists"
+
+ingress:
+  enabled: true
+
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+
+  hosts:
+    - host: octoprint.{{ (datasource "cluster-vars").domain.internal }}
+      paths:
+        - path: /
+
+  tls:
+    - secretName: tls.octoprint
+      hosts:
+        - octoprint.{{ (datasource "cluster-vars").domain.internal }}
