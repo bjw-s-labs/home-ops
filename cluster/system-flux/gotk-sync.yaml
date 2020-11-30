@@ -11,6 +11,12 @@ spec:
   secretRef:
     name: system-flux
   url: ssh://git@github.com/bjw-s/k8s-gitops
+  ignore: |
+    # exclude all
+    /*
+    # include deploy dir
+    !/cluster/
+    /cluster/**/*.md
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
