@@ -15,8 +15,10 @@ spec:
     # exclude all
     /*
     # include deploy dir
-    !/cluster/
+    !/cluster
+    # exclude file extensions from deploy dir
     /cluster/**/*.md
+    /cluster/**/*.tmpl
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
