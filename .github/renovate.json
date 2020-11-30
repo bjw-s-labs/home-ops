@@ -4,13 +4,16 @@
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate Dashboard",
   "commitBody": "Signed-off-by: Bᴇʀɴᴅ Sᴄʜᴏʀɢᴇʀs <6213398+bjw-s@users.noreply.github.com>",
+  // do not notify on closed, unmerged PRs
   "suppressNotifications": ["prIgnoreNotification"],
+  // do not rebase PRs
   "rebaseWhen": "conflicted",
   "assignees": ["@bjw-s"],
   "helm-values": {
     "fileMatch": ["cluster/.+\\.yaml$"]
   },
   "regexManagers": [
+    // regexManager to read and process HelmRelease files
     {
       "fileMatch": ["cluster/.+\\.yaml$"],
       "matchStrings": [
@@ -20,6 +23,7 @@
     }
   ],
   "packageRules": [
+    // Add labels according to package and update types
     {
       "datasources": ["docker"],
       "updateTypes": ["major"],
@@ -50,14 +54,21 @@
       "updateTypes": ["patch"],
       "labels": ["renovate/helm-chart", "dependency/patch"]
     },
+    // Custom version schemes
     {
       "packageNames": ["blakeblackshear/frigate"],
       "versionScheme": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$"
     },
+    // Pin package versions
     {
       "packageNames": ["jacobalberty/unifi"],
       "allowedVersions": "<6.0"
     },
+    {
+      "packageNames": ["k8sathome/qbittorrent"],
+      "allowedVersions": "<4.3.0"
+    },
+    // Version strategies
     {
       "datasources": ["docker"],
       "packageNames": [
@@ -66,17 +77,14 @@
       "versioning": "loose"
     },
     {
-      "packageNames": ["k8sathome/qbittorrent"],
-      "allowedVersions": "<4.3.0"
-    },
-    {
       "datasources": ["docker"],
       "packageNames": [
         "k8sathome/radarr",
         "k8sathome/sonarr"
       ],
-      "versioning": "nuget"
+      "versioning": "loose"
     },
+    // Enable auto-merge
     {
       "datasources": ["docker"],
       "automerge": true,
