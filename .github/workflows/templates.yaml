@@ -45,6 +45,11 @@ jobs:
             echo "${changed_file}" >> /tmp/changed_files
           done
 
+      - uses: lra/setup-kubeval@v1
+        if: "!contains(steps.changed_files.outputs.added_modified, '.github/scripts/render_templates.sh') && !contains(steps.changed_files.outputs.added_modified, '_setup/sealedsecret-cert.pem')"
+        with:
+          version: 0.15.0
+
       # Regenerate only the new or update secrets, unless the script logic or sealing certificate have changed
       - name: Generate new/updated templates
         if: "!contains(steps.changed_files.outputs.added_modified, '.github/scripts/render_templates.sh') && !contains(steps.changed_files.outputs.added_modified, '_setup/sealedsecret-cert.pem')"
