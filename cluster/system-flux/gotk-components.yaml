@@ -170,6 +170,9 @@ spec:
                     description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
                 type: object
+              suspend:
+                description: This flag tells the controller to suspend the reconciliation of this source.
+                type: boolean
               timeout:
                 default: 20s
                 description: The timeout for download operations, defaults to 20s.
@@ -350,6 +353,9 @@ spec:
                     description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
                 type: object
+              suspend:
+                description: This flag tells the controller to suspend the reconciliation of this source.
+                type: boolean
               timeout:
                 default: 20s
                 description: The timeout for remote Git operations like cloning, defaults to 20s.
@@ -556,6 +562,9 @@ spec:
                 - kind
                 - name
                 type: object
+              suspend:
+                description: This flag tells the controller to suspend the reconciliation of this source.
+                type: boolean
               valuesFile:
                 description: Alternative values file to use as the default chart values, expected to be a relative path in the SourceRef. Ignored when omitted.
                 type: string
@@ -719,6 +728,9 @@ spec:
                     description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
                 type: object
+              suspend:
+                description: This flag tells the controller to suspend the reconciliation of this source.
+                type: boolean
               timeout:
                 default: 60s
                 description: The timeout of index downloading, defaults to 60s.
@@ -877,7 +889,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/fluxcd/source-controller:v0.3.0
+        image: ghcr.io/fluxcd/source-controller:v0.4.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -1223,7 +1235,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/fluxcd/kustomize-controller:v0.3.0
+        image: ghcr.io/fluxcd/kustomize-controller:v0.4.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -1416,7 +1428,7 @@ spec:
                 description: Interval at which to reconcile the Helm release.
                 type: string
               kubeConfig:
-                description: KubeConfig for reconciling the HelmRelease on a remote cluster.
+                description: KubeConfig for reconciling the HelmRelease on a remote cluster. When specified, KubeConfig takes precedence over ServiceAccountName.
                 properties:
                   secretRef:
                     description: SecretRef holds the name to a secret that contains a 'value' key with the kubeconfig file as the value. It must be in the same namespace as the HelmRelease. It is recommended that the kubeconfig is self-contained, and the secret is regularly updated if credentials such as a cloud-access-token expire. Cloud specific `cmd-path` auth helpers will not function without adding binaries and credentials to the Pod that is responsible for reconciling the HelmRelease.
@@ -1456,6 +1468,9 @@ spec:
                     description: Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm rollback action. Defaults to 'HelmReleaseSpec.Timeout'.
                     type: string
                 type: object
+              serviceAccountName:
+                description: The name of the Kubernetes service account to impersonate when reconciling this HelmRelease.
+                type: string
               suspend:
                 description: Suspend tells the controller to suspend reconciliation for this HelmRelease, it does not apply to already started reconciliations. Defaults to false.
                 type: boolean
@@ -1702,16 +1717,23 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/fluxcd/helm-controller:v0.3.0
+        image: ghcr.io/fluxcd/helm-controller:v0.4.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
-            path: /metrics
-            port: http-prom
+            path: /healthz
+            port: healthz
         name: manager
         ports:
         - containerPort: 8080
           name: http-prom
+        - containerPort: 9440
+          name: healthz
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: healthz
         resources:
           limits:
             cpu: 1000m
@@ -1964,6 +1986,7 @@ spec:
                 - github
                 - gitlab
                 - bitbucket
+                - azuredevops
                 type: string
               username:
                 description: Bot username for this provider
@@ -2268,12 +2291,12 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/fluxcd/notification-controller:v0.3.0
+        image: ghcr.io/fluxcd/notification-controller:v0.4.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
-            path: /metrics
-            port: http-prom
+            path: /healthz
+            port: healthz
         name: manager
         ports:
         - containerPort: 9090
@@ -2282,6 +2305,13 @@ spec:
           name: http-webhook
         - containerPort: 8080
           name: http-prom
+        - containerPort: 9440
+          name: healthz
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: healthz
         resources:
           limits:
             cpu: 1000m
