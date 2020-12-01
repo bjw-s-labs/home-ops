@@ -1392,6 +1392,9 @@ spec:
               install:
                 description: Install holds the configuration for Helm install actions for this HelmRelease.
                 properties:
+                  createNamespace:
+                    description: CreateNamespace tells the Helm install action to create the HelmReleaseSpec.TargetNamespace if it does not exist yet. On uninstall, the namespace will not be garbage collected.
+                    type: boolean
                   disableHooks:
                     description: DisableHooks prevents hooks from running during the Helm install action.
                     type: boolean
@@ -1717,7 +1720,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/fluxcd/helm-controller:v0.4.0
+        image: ghcr.io/fluxcd/helm-controller:v0.4.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
