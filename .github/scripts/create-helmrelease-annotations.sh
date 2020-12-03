@@ -11,7 +11,8 @@ need() {
 
 need "yq"
 
-for helm_release in $(find ${CLUSTER_ROOT} -type f -name "*.yaml" ); do
+while IFS= read -r -d '' helm_release
+do
     # ignore flux-system namespace
     # ignore wrong apiVersion
     # ignore non HelmReleases
@@ -35,4 +36,4 @@ for helm_release in $(find ${CLUSTER_ROOT} -type f -name "*.yaml" ); do
             break
         fi
     done
-done
+done <   <(find ${CLUSTER_ROOT} -type f -name "*.yaml" -print0)
