@@ -1,7 +1,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: ingress-nginx
+  name: ingress-nginx-internal
   namespace: system-ingress
 spec:
   interval: 5m
@@ -17,5 +17,5 @@ spec:
       interval: 5m
   valuesFrom:
     - kind: Secret
-      name: ingress-nginx-helm-values
+      name: ingress-nginx-internal-helm-values
       valuesKey: values.yaml
