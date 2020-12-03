@@ -1,0 +1,41 @@
+---
+rbac:
+  create: true
+replicaCount: 1
+isClusterService: false
+serviceType: LoadBalancer
+service:
+  externalIPs:
+  - 192.168.26.3
+  externalTrafficPolicy: Local
+servers:
+- port: 53
+  zones:
+  - zone: .
+    scheme: dns://
+  plugins:
+  - name: errors
+  # Serves a /health endpoint on :8080, required for livenessProbe
+  - name: health
+    configBlock: |-
+      lameduck 5s
+  # Serves a /ready endpoint on :8181, required for readinessProbe
+  - name: ready
+  # Serves a /metrics endpoint on :9153, required for serviceMonitor
+  - name: prometheus
+    parameters: 0.0.0.0:9153
+  - name: etcd
+    parameters: {{ index (datasource "cluster-vars").domains 0 }} {{ index (datasource "cluster-vars").domains 1 }} {{ index (datasource "cluster-vars").domains 2 }}
+    configBlock: |-
+      stubzones
+      path /skydns
+      endpoint http://etcd:2379
+  - name: forward
+    parameters: . dns://9.9.9.9:53
+    configBlock: |-
+      except {{ index (datasource "cluster-vars").domains 0 }} {{ index (datasource "cluster-vars").domains 1 }} {{ index (datasource "cluster-vars").domains 2 }}
+prometheus:
+  service:
+    enabled: true
+  monitor:
+    enabled: true
