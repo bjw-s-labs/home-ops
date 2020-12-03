@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: coredns
+  namespace: home-network
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://charts.helm.sh/stable
+      chart: coredns
+      version: 1.13.8
+      sourceRef:
+        kind: HelmRepository
+        name: kubernetes-stable-charts
+        namespace: system-flux
+      interval: 5m
+  valuesFrom:
+    - kind: Secret
+      name: coredns-helm-values
+      valuesKey: values.yaml
