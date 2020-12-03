@@ -24,18 +24,18 @@ service:
 ingress:
   enabled: true
   annotations:
-    kubernetes.io/ingress.class: nginx
-    external-dns.alpha.kubernetes.io/target: {{ (datasource "cluster-vars").domain.external.primary }}
+    kubernetes.io/ingress.class: external
+    external-dns.alpha.kubernetes.io/target: _cname_ext.{{ index (datasource "cluster-vars").domains 0 }}
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
     cert-manager.io/cluster-issuer: letsencrypt-production
   hosts:
-  - domo.{{ (datasource "cluster-vars").domain.external.primary }}
-  - domo.{{ (datasource "cluster-vars").domain.external.secondary }}
+  - domo.{{ index (datasource "cluster-vars").domains 1 }}
+  - domo.{{ index (datasource "cluster-vars").domains 2 }}
   tls:
   - secretName: tls.home-assistant-frontend
     hosts:
-    - domo.{{ (datasource "cluster-vars").domain.external.primary }}
-    - domo.{{ (datasource "cluster-vars").domain.external.secondary }}
+    - domo.{{ index (datasource "cluster-vars").domains 1 }}
+    - domo.{{ index (datasource "cluster-vars").domains 2 }}
 
 extraEnv:
   TZ: "Europe/Amsterdam"
@@ -73,12 +73,15 @@ vscode:
   ingress:
     enabled: true
     annotations:
-      kubernetes.io/ingress.class: nginx
-      cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+      kubernetes.io/ingress.class: internal
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
     hosts:
-    - code.domo.{{ (datasource "cluster-vars").domain.internal }}
+    - code.domo.{{ index (datasource "cluster-vars").domains 1 }}
+    - code.domo.{{ index (datasource "cluster-vars").domains 2 }}
     tls:
     - secretName: tls.home-assistant-code
       hosts:
-      - code.domo.{{ (datasource "cluster-vars").domain.internal }}
+      - code.domo.{{ index (datasource "cluster-vars").domains 1 }}
+      - code.domo.{{ index (datasource "cluster-vars").domains 2 }}
