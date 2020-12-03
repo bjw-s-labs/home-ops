@@ -27,8 +27,9 @@ spec:
           email: {{ (datasource "cluster-vars").email.primary }}
       selector:
         dnsZones:
-        - {{ (datasource "cluster-vars").domain.external.primary }}
-        - {{ (datasource "cluster-vars").domain.external.secondary }}
+        - {{ index (datasource "cluster-vars").domains 0 }}
+        - {{ index (datasource "cluster-vars").domains 1 }}
+        - {{ index (datasource "cluster-vars").domains 2 }}
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -50,5 +51,6 @@ spec:
           email: {{ (datasource "cluster-vars").email.primary }}
       selector:
         dnsZones:
-        - {{ (datasource "cluster-vars").domain.external.primary }}
-        - {{ (datasource "cluster-vars").domain.external.secondary }}
+        - {{ index (datasource "cluster-vars").domains 0 }}
+        - {{ index (datasource "cluster-vars").domains 1 }}
+        - {{ index (datasource "cluster-vars").domains 2 }}
