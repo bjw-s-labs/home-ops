@@ -35,15 +35,16 @@ discoveryService:
 ingress:
   enabled: true
   annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+    kubernetes.io/ingress.class: internal
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    external-dns.alpha.kubernetes.io/target: cname.{{ index (datasource "cluster-vars").domains 0 }}
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
   hosts:
-    - unifi.{{ (datasource "cluster-vars").domain.internal }}
+    - unifi.{{ index (datasource "cluster-vars").domains 0 }}
   tls:
     - secretName: tls.unifi-controller
       hosts:
-        - unifi.{{ (datasource "cluster-vars").domain.internal }}
+        - unifi.{{ index (datasource "cluster-vars").domains 0 }}
 
 resources:
   requests:
