@@ -9,16 +9,16 @@ persistence:
 ingress:
   enabled: true
   annotations:
-    kubernetes.io/ingress.class: nginx
-    external-dns.alpha.kubernetes.io/target: {{ (datasource "cluster-vars").domain.external.primary }}
+    kubernetes.io/ingress.class: external
+    external-dns.alpha.kubernetes.io/target: cname.{{ index (datasource "cluster-vars").domains 0 }}
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
     cert-manager.io/cluster-issuer: letsencrypt-production
   tls:
   - secretName: tls.nextcloud
     hosts:
-    - cloud.{{ (datasource "cluster-vars").domain.external.secondary }}
+    - cloud.{{ index (datasource "cluster-vars").domains 2 }}
 
 nextcloud:
-    host: cloud.{{ (datasource "cluster-vars").domain.external.secondary }}
+    host: cloud.{{ index (datasource "cluster-vars").domains 2 }}
     username: {{ (datasource "nextcloud").auth.username }}
     password: {{ (datasource "nextcloud").auth.password }}
