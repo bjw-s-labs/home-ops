@@ -11,11 +11,11 @@ cloudflare:
   proxied: true
 
 domainFilters:
-- {{ index (datasource "cluster-vars").domains 0 }}
-- {{ index (datasource "cluster-vars").domains 1 }}
-- {{ index (datasource "cluster-vars").domains 2 }}
+  - {{ index (datasource "cluster-vars").domains 0 }}
+  - {{ index (datasource "cluster-vars").domains 1 }}
+  - {{ index (datasource "cluster-vars").domains 2 }}
 
-annotationFilter: "kubernetes.io/ingress.class: external"
+annotationFilter: "kubernetes.io/ingress.class=external"
 
 resources:
   requests:
