@@ -78,10 +78,10 @@ vscode:
       external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
     hosts:
-    - code_domo.{{ index (datasource "cluster-vars").domains 1 }}
-    - code_domo.{{ index (datasource "cluster-vars").domains 2 }}
+    - code-domo.{{ index (datasource "cluster-vars").domains 1 }}
+    - code-domo.{{ index (datasource "cluster-vars").domains 2 }}
     tls:
     - secretName: tls.home-assistant-code
       hosts:
-      - code_domo.{{ index (datasource "cluster-vars").domains 1 }}
-      - code_domo.{{ index (datasource "cluster-vars").domains 2 }}
+      - code-domo.{{ index (datasource "cluster-vars").domains 1 }}
+      - code-domo.{{ index (datasource "cluster-vars").domains 2 }}
