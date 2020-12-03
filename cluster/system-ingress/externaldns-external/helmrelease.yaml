@@ -15,18 +15,7 @@ spec:
         name: bitnami-charts
         namespace: system-flux
       interval: 5m
-  values:
-    sources:
-      - ingress
-    provider: cloudflare
-    policy: sync
-    txtPrefix: "k8s."
-    resources:
-      requests:
-        memory: "32M"
-      limits:
-        memory: "64M"
   valuesFrom:
     - kind: Secret
-      name: external-dns-helm-values
+      name: externaldns-external-helm-values
       valuesKey: values.yaml
