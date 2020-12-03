@@ -21,7 +21,7 @@ controller:
       - 192.168.26.1
     externalTrafficPolicy: Local
     annotations:
-      external-dns.alpha.kubernetes.io/hostname: cname.{{ index (datasource "cluster-vars").domains 0 }}
+      external-dns.alpha.kubernetes.io/hostname: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
 
   affinity:
     podAntiAffinity:
