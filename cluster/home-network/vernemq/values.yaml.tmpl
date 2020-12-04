@@ -1,0 +1,27 @@
+---
+replicaCount: 2
+statefulset:
+  annotations:
+    secret.reloader.stakater.com/reload: "vernemq-secrets"
+service:
+  type: LoadBalancer
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: mqtt.{{ index (datasource "cluster-vars").domains 0 }}
+  externalIPs:
+    - 192.168.26.4
+  ws:
+    enabled: true
+serviceMonitor:
+  create: true
+podAntiAffinity: hard
+secretMounts:
+  - name: vernemq-auth
+    secretName: vernemq-secrets
+    path: /vernemq/auth
+additionalEnv:
+  - name: DOCKER_VERNEMQ_ACCEPT_EULA
+    value: "yes"
+  - name: DOCKER_VERNEMQ_VMQ_PASSWD__PASSWORD_FILE
+    value: /vernemq/auth/vmq.passwd
+  - name: DOCKER_VERNEMQ_VMQ_ACL__ACL_FILE
+    value: /vernemq/auth/vmq.acl
