@@ -25,16 +25,17 @@ persistence:
 ingress:
   enabled: true
   annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+    kubernetes.io/ingress.class: internal
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
   hosts:
-    - host: nzbget.{{ (datasource "cluster-vars").domain.internal }}
+    - host: nzbget.{{ index (datasource "cluster-vars").domains 0 }}
       paths:
         - path: /
   tls:
     - secretName: tls.nzbget
       hosts:
-        - nzbget.{{ (datasource "cluster-vars").domain.internal }}
+        - nzbget.{{ index (datasource "cluster-vars").domains 0 }}
 
 resources:
   requests:
