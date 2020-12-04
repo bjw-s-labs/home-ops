@@ -15,15 +15,7 @@ spec:
         name: bitnami-charts
         namespace: system-flux
       interval: 5m
-  values:
-    statefulset:
-      replicaCount: 1
-    auth:
-      rbac:
-        enabled: false
-    persistence:
-      enabled: false
-    metrics:
-      enabled: true
-      serviceMonitor:
-        enabled: true
+  valuesFrom:
+    - kind: Secret
+      name: etcd-helm-values
+      valuesKey: values.yaml
