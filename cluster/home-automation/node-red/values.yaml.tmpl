@@ -17,20 +17,20 @@ persistence:
 ingress:
   enabled: true
   annotations:
-    kubernetes.io/ingress.class: nginx
-    external-dns.alpha.kubernetes.io/target: {{ (datasource "cluster-vars").domain.external.primary }}
+    kubernetes.io/ingress.class: external
+    external-dns.alpha.kubernetes.io/target: _cname_ext.{{ index (datasource "cluster-vars").domains 0 }}
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
     cert-manager.io/cluster-issuer: letsencrypt-production
 
   hosts:
-    - nodered.{{ (datasource "cluster-vars").domain.external.primary }}
-    - nodered.{{ (datasource "cluster-vars").domain.external.secondary }}
+    - nodered.{{ index (datasource "cluster-vars").domains 1 }}
+    - nodered.{{ index (datasource "cluster-vars").domains 2}}
 
   tls:
     - secretName: tls.node-red
       hosts:
-        - nodered.{{ (datasource "cluster-vars").domain.external.primary }}
-        - nodered.{{ (datasource "cluster-vars").domain.external.secondary }}
+        - nodered.{{ index (datasource "cluster-vars").domains 1 }}
+        - nodered.{{ index (datasource "cluster-vars").domains 2 }}
 
 resources:
   requests:
