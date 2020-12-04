@@ -11,7 +11,13 @@ service:
 servers:
 - port: 53
   zones:
-  - zone: .
+  - zone: unifi
+    scheme: dns://
+  - zone: {{ index (datasource "cluster-vars").domains 0 }}
+    scheme: dns://
+  - zone: {{ index (datasource "cluster-vars").domains 1 }}
+    scheme: dns://
+  - zone: {{ index (datasource "cluster-vars").domains 2 }}
     scheme: dns://
   plugins:
   - name: errors
@@ -30,10 +36,6 @@ servers:
       stubzones
       path /skydns
       endpoint http://etcd:2379
-  - name: forward
-    parameters: . dns://9.9.9.9:53
-    configBlock: |-
-      except unifi {{ index (datasource "cluster-vars").domains 0 }} {{ index (datasource "cluster-vars").domains 1 }} {{ index (datasource "cluster-vars").domains 2 }}
 prometheus:
   service:
     enabled: true
