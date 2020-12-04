@@ -19,27 +19,7 @@ spec:
     image:
       repository: vernemq/vernemq
       tag: 1.10.4.1-alpine
-    replicaCount: 2
-    statefulset:
-      annotations:
-        secret.reloader.stakater.com/reload: "vernemq-secrets"
-    service:
-      type: LoadBalancer
-      externalIPs:
-        - 192.168.26.4
-      ws:
-        enabled: true
-    serviceMonitor:
-      create: true
-    podAntiAffinity: hard
-    secretMounts:
-      - name: vernemq-auth
-        secretName: vernemq-secrets
-        path: /vernemq/auth
-    additionalEnv:
-      - name: DOCKER_VERNEMQ_ACCEPT_EULA
-        value: "yes"
-      - name: DOCKER_VERNEMQ_VMQ_PASSWD__PASSWORD_FILE
-        value: /vernemq/auth/vmq.passwd
-      - name: DOCKER_VERNEMQ_VMQ_ACL__ACL_FILE
-        value: /vernemq/auth/vmq.acl
+  valuesFrom:
+    - kind: Secret
+      name: vernemq-helm-values
+      valuesKey: values.yaml
