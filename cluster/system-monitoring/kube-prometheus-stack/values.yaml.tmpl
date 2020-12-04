@@ -43,11 +43,11 @@ alertmanager:
       cert-manager.io/cluster-issuer: letsencrypt-production
       external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
     hosts:
-    - "alertmanager.{{ index (datasource "cluster-vars").domains 0 }}
+    - alertmanager.{{ index (datasource "cluster-vars").domains 0 }}
     tls:
     - secretName: tls.alertmanager
       hosts:
-      - "alertmanager.{{ index (datasource "cluster-vars").domains 0 }}
+      - alertmanager.{{ index (datasource "cluster-vars").domains 0 }}
 
   alertmanagerSpec:
     storage:
@@ -80,11 +80,11 @@ grafana:
       cert-manager.io/cluster-issuer: letsencrypt-production
       external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
     hosts:
-    - "grafana.{{ index (datasource "cluster-vars").domains 0 }}
+    - grafana.{{ index (datasource "cluster-vars").domains 0 }}
     tls:
     - secretName: tls.grafana
       hosts:
-      - "grafana.{{ index (datasource "cluster-vars").domains 0 }}
+      - grafana.{{ index (datasource "cluster-vars").domains 0 }}
 
   env:
     GF_EXPLORE_ENABLED: true
@@ -215,11 +215,11 @@ prometheus:
       cert-manager.io/cluster-issuer: letsencrypt-production
       external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
     hosts:
-    - "prometheus.{{ index (datasource "cluster-vars").domains 0 }}
+    - prometheus.{{ index (datasource "cluster-vars").domains 0 }}
     tls:
     - secretName: tls.prometheus
       hosts:
-      - "prometheus.{{ index (datasource "cluster-vars").domains 0 }}
+      - prometheus.{{ index (datasource "cluster-vars").domains 0 }}
 
   prometheusSpec:
     replicas: 2
