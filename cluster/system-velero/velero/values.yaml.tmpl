@@ -9,7 +9,7 @@ configuration:
       region: us-east-1
       s3ForcePathStyle: true
       s3Url: http://192.168.25.11:9000
-      publicUrl: http://minio.{{ (datasource "cluster-vars").domain.internal }}:9000
+      publicUrl: http://minio.{{ index (datasource "cluster-vars").domains 0 }}:9000
 
   volumeSnapshotLocation:
     name: aws
