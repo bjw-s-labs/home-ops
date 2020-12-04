@@ -1,0 +1,23 @@
+---
+statefulset:
+  replicaCount: 1
+
+auth:
+  rbac:
+    enabled: false
+
+persistence:
+  enabled: false
+
+service:
+  type: LoadBalancer
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: etcd.{{ index (datasource "cluster-vars").domains 0 }}
+  externalIPs:
+    - 192.168.26.7
+  externalTrafficPolicy: Local
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
