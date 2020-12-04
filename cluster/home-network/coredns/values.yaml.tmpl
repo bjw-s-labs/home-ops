@@ -25,7 +25,7 @@ servers:
   - name: prometheus
     parameters: 0.0.0.0:9153
   - name: etcd
-    parameters: {{ index (datasource "cluster-vars").domains 0 }} {{ index (datasource "cluster-vars").domains 1 }} {{ index (datasource "cluster-vars").domains 2 }}
+    parameters: unifi {{ index (datasource "cluster-vars").domains 0 }} {{ index (datasource "cluster-vars").domains 1 }} {{ index (datasource "cluster-vars").domains 2 }}
     configBlock: |-
       stubzones
       path /skydns
@@ -33,7 +33,7 @@ servers:
   - name: forward
     parameters: . dns://9.9.9.9:53
     configBlock: |-
-      except {{ index (datasource "cluster-vars").domains 0 }} {{ index (datasource "cluster-vars").domains 1 }} {{ index (datasource "cluster-vars").domains 2 }}
+      except unifi {{ index (datasource "cluster-vars").domains 0 }} {{ index (datasource "cluster-vars").domains 1 }} {{ index (datasource "cluster-vars").domains 2 }}
 prometheus:
   service:
     enabled: true
