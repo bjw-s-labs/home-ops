@@ -21,17 +21,18 @@ persistence:
 ingress:
   enabled: true
   annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+    kubernetes.io/ingress.class: internal
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
   path: "/"
 
   hosts:
-    - calibre.{{ (datasource "cluster-vars").domain.internal }}
+    - calibre.{{ index (datasource "cluster-vars").domains 0 }}
 
   tls:
     - secretName: tls.calibre
       hosts:
-        - calibre.{{ (datasource "cluster-vars").domain.internal }}
+        - calibre.{{ index (datasource "cluster-vars").domains 0 }}
 
 resources:
   requests:
