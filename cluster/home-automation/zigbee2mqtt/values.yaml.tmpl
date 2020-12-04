@@ -37,18 +37,20 @@ ingress:
   enabled: true
 
   annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+    kubernetes.io/ingress.class: internal
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 
   hosts:
-    - host: zigbee2mqtt.{{ (datasource "cluster-vars").domain.internal }}
+    - host: zigbee2mqtt.{{ index (datasource "cluster-vars").domains 0 }}
       paths:
         - path: /
 
   tls:
     - secretName: tls.zigbee2mqtt
       hosts:
-        - zigbee2mqtt.{{ (datasource "cluster-vars").domain.internal }}
+        - zigbee2mqtt.{{ index (datasource "cluster-vars").domains 0 }}
 
 config:
   mqtt:
