@@ -39,14 +39,15 @@ alertmanager:
   ingress:
     enabled: true
     annotations:
-      kubernetes.io/ingress.class: nginx
-      cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+      kubernetes.io/ingress.class: internal
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
     hosts:
-    - "alertmanager.{{ (datasource "cluster-vars").domain.internal }}"
+    - "alertmanager.{{ index (datasource "cluster-vars").domains 0 }}
     tls:
     - secretName: tls.alertmanager
       hosts:
-      - "alertmanager.{{ (datasource "cluster-vars").domain.internal }}"
+      - "alertmanager.{{ index (datasource "cluster-vars").domains 0 }}
 
   alertmanagerSpec:
     storage:
@@ -75,14 +76,15 @@ grafana:
   ingress:
     enabled: true
     annotations:
-      kubernetes.io/ingress.class: nginx
-      cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+      kubernetes.io/ingress.class: internal
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
     hosts:
-    - "grafana.{{ (datasource "cluster-vars").domain.internal }}"
+    - "grafana.{{ index (datasource "cluster-vars").domains 0 }}
     tls:
     - secretName: tls.grafana
       hosts:
-      - "grafana.{{ (datasource "cluster-vars").domain.internal }}"
+      - "grafana.{{ index (datasource "cluster-vars").domains 0 }}
 
   env:
     GF_EXPLORE_ENABLED: true
@@ -158,7 +160,7 @@ grafana:
 
   grafana.ini:
     server:
-      root_url: "https://grafana.{{ (datasource "cluster-vars").domain.internal }}"
+      root_url: "https://grafana.{{ index (datasource "cluster-vars").domains 0 }}"
     paths:
       data: /var/lib/grafana/data
       logs: /var/log/grafana
@@ -209,14 +211,15 @@ prometheus:
   ingress:
     enabled: true
     annotations:
-      kubernetes.io/ingress.class: nginx
-      cert-manager.io/cluster-issuer: bjws-lan-ca-issuer
+      kubernetes.io/ingress.class: internal
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
     hosts:
-    - "prometheus.{{ (datasource "cluster-vars").domain.internal }}"
+    - "prometheus.{{ index (datasource "cluster-vars").domains 0 }}
     tls:
     - secretName: tls.prometheus
       hosts:
-      - "prometheus.{{ (datasource "cluster-vars").domain.internal }}"
+      - "prometheus.{{ index (datasource "cluster-vars").domains 0 }}
 
   prometheusSpec:
     replicas: 2
