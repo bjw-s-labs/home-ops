@@ -40,7 +40,6 @@ ingress:
     kubernetes.io/ingress.class: internal
     cert-manager.io/cluster-issuer: letsencrypt-production
     external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 
   hosts:
     - host: zigbee2mqtt.{{ index (datasource "cluster-vars").domains 0 }}
