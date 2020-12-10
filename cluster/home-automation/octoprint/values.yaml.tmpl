@@ -44,6 +44,7 @@ ingress:
 
   annotations:
     kubernetes.io/ingress.class: internal
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
     cert-manager.io/cluster-issuer: letsencrypt-production
     external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
 
