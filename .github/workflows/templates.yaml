@@ -73,22 +73,3 @@ jobs:
             git commit -m "Auto-render templates [ci-skip]" || exit 0
             git push
           fi
-
-      - name: Webhook
-        if: ${{ always() }}
-        env:
-          data: |
-            {
-              "repo": "${{ github.repository }}",
-              "ref": "${{ github.ref }}",
-              "sha": "${{ github.sha }}",
-              "workflow": "${{ github.workflow }}",
-              "job": "${{ github.job }}",
-              "job_status": "${{ job.status }}",
-              "run_id": "${{ github.run_id }}"
-            }
-        run: |
-          COMPACT_JSON=$(echo -n "$data" | jq -c '')
-          curl -s -X POST \
-              -H "content-type: application/json" \
-              --data "$COMPACT_JSON" ${{ secrets.WEBHOOK_URL }}
