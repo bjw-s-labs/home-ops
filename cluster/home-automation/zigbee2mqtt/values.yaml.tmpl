@@ -109,7 +109,8 @@ addons:
         - path: /
           pathType: Prefix
       tls:
-      - hosts:
+      - secretName: tls.zigbee2mqtt-config
+        hosts:
         - zigbee2mqtt-config.{{ index (datasource "cluster-vars").domains 0 }}
 
     workingDir: "/data"
