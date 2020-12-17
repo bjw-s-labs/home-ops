@@ -23,29 +23,38 @@ service:
 
 ingress:
   enabled: true
+
   annotations:
     kubernetes.io/ingress.class: external
     external-dns.alpha.kubernetes.io/target: _cname_ext.{{ index (datasource "cluster-vars").domains 0 }}
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
     cert-manager.io/cluster-issuer: letsencrypt-production
+
   hosts:
-  - domo.{{ index (datasource "cluster-vars").domains 1 }}
-  - domo.{{ index (datasource "cluster-vars").domains 2 }}
+  - host: domo.{{ index (datasource "cluster-vars").domains 1 }}
+    paths:
+      - path: /
+  - host: domo.{{ index (datasource "cluster-vars").domains 2 }}
+    paths:
+      - path: /
+
   tls:
   - secretName: tls.home-assistant-frontend
     hosts:
     - domo.{{ index (datasource "cluster-vars").domains 1 }}
     - domo.{{ index (datasource "cluster-vars").domains 2 }}
 
-extraEnv:
+env:
   TZ: "Europe/Amsterdam"
 
-extraSecretForEnvFrom:
-- home-assistant-secrets
+envFrom:
+- secretRef:
+    name: home-assistant-secrets
 
 persistence:
-  enabled: true
-  existingClaim: home-assistant-data
+  config:
+    enabled: true
+    existingClaim: home-assistant-data
 
 postgresql:
   enabled: true
@@ -62,26 +71,37 @@ postgresql:
       backup.velero.io/backup-volumes: data
 
 git:
-  enabled: true
-  repo: {{ (datasource "home-assistant").git.repo }}
-  secret: home-assistant-ssh
-  user:
-    name: {{ (datasource "home-assistant").git.user.name }}
-    email: {{ (datasource "home-assistant").git.user.email }}
+  deployKey: |
+    {{- (datasource "home-assistant").git.identity | printf "\n%v" | indent 4 }}
 
-vscode:
-  ingress:
+addons:
+  codeserver:
     enabled: true
-    annotations:
-      kubernetes.io/ingress.class: internal
-      cert-manager.io/cluster-issuer: letsencrypt-production
-      external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
-      nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    hosts:
-    - code-domo.{{ index (datasource "cluster-vars").domains 1 }}
-    - code-domo.{{ index (datasource "cluster-vars").domains 2 }}
-    tls:
-    - secretName: tls.home-assistant-code
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: internal
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
       hosts:
-      - code-domo.{{ index (datasource "cluster-vars").domains 1 }}
-      - code-domo.{{ index (datasource "cluster-vars").domains 2 }}
+      - host: code-domo.{{ index (datasource "cluster-vars").domains 1 }}
+        paths:
+          - path: /
+      - host: code-domo.{{ index (datasource "cluster-vars").domains 2 }}
+        paths:
+          - path: /
+      tls:
+      - secretName: tls.home-assistant-code
+        hosts:
+        - code-domo.{{ index (datasource "cluster-vars").domains 1 }}
+        - code-domo.{{ index (datasource "cluster-vars").domains 2 }}
+
+    workingDir: "/config"
+
+    volumeMounts:
+    - name: config
+      mountPath: /config
+    - name: deploykey
+      mountPath: /root/.ssh/id_rsa
+      subPath: id_rsa
