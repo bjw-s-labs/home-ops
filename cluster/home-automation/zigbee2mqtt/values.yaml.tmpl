@@ -93,3 +93,27 @@ config:
     port: 8080
   experimental:
     new_api: true
+
+addons:
+  codeserver:
+    enabled: true
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: internal
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
+      hosts:
+      - host: zigbee2mqtt-config.{{ index (datasource "cluster-vars").domains 0 }}
+        paths:
+        - path: /
+          pathType: Prefix
+      tls:
+      - hosts:
+        - zigbee2mqtt-config.{{ index (datasource "cluster-vars").domains 0 }}
+
+    workingDir: "/data"
+
+    volumeMounts:
+    - name: data
+      mountPath: /data
