@@ -23,6 +23,11 @@
     }
   ],
   "packageRules": [
+    // Set custom PR / commit titles
+    {
+      "datasources": ["helm"],
+      "commitMessageTopic": "Helm chart {{depName}}"
+    },
     // Add labels according to package and update types
     {
       "datasources": ["docker"],
@@ -38,10 +43,6 @@
       "datasources": ["docker"],
       "updateTypes": ["patch"],
       "labels": ["renovate/image-release", "dependency/patch"]
-    },
-    {
-      "datasources": ["helm"],
-      "commitMessageTopic": "Helm chart {{depName}}"
     },
     {
       "datasources": ["helm"],
