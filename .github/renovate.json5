@@ -19,8 +19,7 @@
       "matchStrings": [
         "registryUrl=(?<registryUrl>.*?)\n *chart: (?<depName>.*?)\n *version: (?<currentValue>.*)\n"
       ],
-      "datasourceTemplate": "helm",
-      "commitMessageTopic": "Helm chart {{depName}}}"
+      "datasourceTemplate": "helm"
     }
   ],
   "packageRules": [
@@ -39,6 +38,10 @@
       "datasources": ["docker"],
       "updateTypes": ["patch"],
       "labels": ["renovate/image-release", "dependency/patch"]
+    },
+    {
+      "datasources": ["helm"],
+      "commitMessageTopic": "Helm chart {{depName}}}"
     },
     {
       "datasources": ["helm"],
