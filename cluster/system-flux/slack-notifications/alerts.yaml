@@ -2,7 +2,7 @@
 apiVersion: notification.toolkit.fluxcd.io/v1beta1
 kind: Alert
 metadata:
-  name: home-cluster
+  name: info
   namespace: system-flux
 spec:
   providerRef:
@@ -16,7 +16,7 @@ spec:
 apiVersion: notification.toolkit.fluxcd.io/v1beta1
 kind: Alert
 metadata:
-  name: helmreleases
+  name: error
   namespace: system-flux
 spec:
   providerRef:
@@ -24,5 +24,7 @@ spec:
   eventSeverity: error
   eventSources:
     - kind: HelmRelease
+      name: '*'
+    - kind: Kustomization
       name: '*'
   suspend: false
