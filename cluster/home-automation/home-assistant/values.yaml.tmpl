@@ -97,6 +97,14 @@ addons:
         - code-domo.{{ index (datasource "cluster-vars").domains 1 }}
         - code-domo.{{ index (datasource "cluster-vars").domains 2 }}
 
+    args:
+    - --auth
+    - none
+    - -—user-data-dir
+    - “/config/.vscode”
+    - -—extensions-dir
+    - “/config/.vscode”
+
     workingDir: "/config"
 
     volumeMounts:
