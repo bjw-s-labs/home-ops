@@ -20,6 +20,14 @@
         "registryUrl=(?<registryUrl>.*?)\n *chart: (?<depName>.*?)\n *version: (?<currentValue>.*)\n"
       ],
       "datasourceTemplate": "helm"
+    },
+    // regexManager to read and process actions-runner-controller runner images
+    {
+      "fileMatch": ["cluster/actions-runner-system/actions-runner-system/runners/.+\\.yaml$"],
+      "matchStrings": [
+        "image: (?<depName>.*?):(?<currentValue>.*?)\n"
+      ],
+      "datasourceTemplate": "docker"
     }
   ],
   "packageRules": [
