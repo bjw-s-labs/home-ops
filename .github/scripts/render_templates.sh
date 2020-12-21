@@ -44,7 +44,7 @@ fi
 
 # Validate cluster vars file
 [ -f "${CLUSTER_VARS}" ] || { echo >&2 "Cluster variables file doesn't exist. Aborting."; exit 1; }
-if ! yq validate "${CLUSTER_VARS}" > /dev/null 2>&1; then
+if ! yq eval "${CLUSTER_VARS}" > /dev/null; then
   echo "Cluster variables file is invalid YAML. Aborting"
   exit 1
 fi
@@ -97,7 +97,7 @@ while IFS= read -r file; do
   fi
 
   # Make sure the vars file is valid YAML before we try to read it
-  if [ "$VARS_FOUND" -eq 1 ] && ! yq validate "${template_vars_filename}" > /dev/null 2>&1; then
+  if [ "$VARS_FOUND" -eq 1 ] && ! yq eval "${template_vars_filename}" > /dev/null; then
     echo "  ${template_vars_filename} is invalid YAML. Aborting"
     exit 1
   fi
@@ -116,7 +116,7 @@ while IFS= read -r file; do
   fi
 
   # Make sure the rendered template is valid YAML before proceeding
-  if ! echo "$rendered_file" | yq validate - > /dev/null 2>&1; then
+  if ! echo "$rendered_file" | yq eval - > /dev/null; then
     echo "  Invalid YAML generated for ${file}. Aborting"
     exit 1
   fi
@@ -136,9 +136,9 @@ while IFS= read -r file; do
     kubectl -n "${template_namespace}" create secret generic "${template_deployment}-helm-values" \
         --from-file=/dev/stdin --dry-run=client -o yaml |
     # Remove null keys
-    yq d - "metadata.creationTimestamp" |
-    yq d - "spec.template.metadata.creationTimestamp" |
-    yq w - "metadata.namespace" "${template_namespace}" |
+    yq eval 'del(.metadata.creationTimestamp)' - |
+    yq eval 'del(.spec.template.metadata.creationTimestamp)' - |
+    yq eval ".metadata.namespace = \"${template_namespace}\"" - |
     sed -e 's/stdin\:/values.yaml\:/g' > $pipe &
   else
     echo -n "${rendered_file}" > $pipe &
@@ -152,7 +152,7 @@ while IFS= read -r file; do
   fi
 
   # Make sure the rendered_template file is a valid Kubernetes YAML before proceeding
-  if ! echo "$rendered_template" | kubeval --ignore-missing-schemas --strict > /dev/null 2>&1; then
+  if ! echo "$rendered_template" | kubeval --ignore-missing-schemas > /dev/null 2>&1; then
     echo "  Invalid YAML generated for ${file}. Aborting"
     exit 1
   fi
@@ -165,8 +165,8 @@ while IFS= read -r file; do
     mkdir -p "${template_path}"
     echo "---" > "${template_path}/$template_target_name"
     echo "$rendered_template" | kubeseal --format=yaml --cert="${PUB_CERT}" |
-    yq d - "metadata.creationTimestamp" |
-    yq d - "spec.template.metadata.creationTimestamp" >> "${template_path}/$template_target_name"
+    yq eval 'del(.metadata.creationTimestamp)' - |
+    yq eval 'del(.spec.template.metadata.creationTimestamp)' - >> "${template_path}/$template_target_name"
   else
     # Output the file to the desired path
     echo "$rendered_template" > "${template_path}/$template_target_name"
