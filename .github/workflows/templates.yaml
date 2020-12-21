@@ -46,7 +46,6 @@ jobs:
           done
 
       - uses: lra/setup-kubeval@v1
-        if: "!contains(steps.changed_files.outputs.added_modified, '.github/scripts/render_templates.sh') && !contains(steps.changed_files.outputs.added_modified, '_setup/sealedsecret-cert.pem')"
         with:
           version: 0.15.0
 
