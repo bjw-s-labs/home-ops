@@ -20,6 +20,8 @@ config:
       - all
       ignore:
       - actions-runner-system
+      - system-rook-ceph
+      - media
     events:
     - create
     - delete
@@ -102,6 +104,8 @@ config:
     namespaces:
       include:
       - all
+      exclude:
+      - system-rook-ceph
     events:
     - create
     - delete
@@ -114,6 +118,7 @@ config:
     events:
     - create
     - delete
+    - update
     - error
 
   - name: batch/v1/jobs
