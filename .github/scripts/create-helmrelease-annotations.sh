@@ -17,17 +17,17 @@ do
     # ignore wrong apiVersion
     # ignore non HelmReleases
     if [[ "${helm_release}" =~ "system-flux"
-        || $(yq r "${helm_release}" apiVersion) != "helm.toolkit.fluxcd.io/v2beta1"
-        || $(yq r "${helm_release}" kind) != "HelmRelease" ]]; then
+        || $(yq eval '.apiVersion' "${helm_release}") != "helm.toolkit.fluxcd.io/v2beta1"
+        || $(yq eval '.kind' "${helm_release}") != "HelmRelease" ]]; then
         continue
     fi
 
     for file in "${REPOSITORY_FILES}"/*.yaml; do
-        chart_name=$(yq r "$file" metadata.name)
-        chart_url=$(yq r "$file" spec.url)
+        chart_name=$(yq eval '.metadata.name' "$file")
+        chart_url=$(yq eval '.spec.url' "$file")
 
         # ignore if the chart name does not match
-        if [[ $(yq r "${helm_release}" spec.chart.spec.sourceRef.name) == "${chart_name}" ]]; then
+        if [[ $(yq eval '.spec.chart.spec.sourceRef.name' "${helm_release}") == "${chart_name}" ]]; then
             # delete "renovate: registryUrl=" line
             sed -i "/renovate: registryUrl=/d" "${helm_release}"
             # insert "renovate: registryUrl=" line
