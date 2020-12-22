@@ -16,8 +16,6 @@ Welcome to my home Kubernetes cluster.
 
 Lots of fun (to me at least :wink:) stuff can be found, poke around my [cluster](./cluster/) directory to see what my cluster is running. Feel free to open a [GitHub Issue](https://github.com/bjw-s/k8s-gitops/issues/new).
 
----
-
 ## :gear: Automation
 
 - [Kured](https://github.com/weaveworks/kured) to reboot my worker nodes as required.
@@ -25,8 +23,6 @@ Lots of fun (to me at least :wink:) stuff can be found, poke around my [cluster]
 - [Renovatebot](https://github.com/renovatebot/renovate) keeps my applications up-to-date by scanning my repo and opening pull requests when it notices a new container image update.
 
 - [Actions Runner Controller](https://github.com/summerwind/actions-runner-controller) dynamically operates a set of self-hosted Github runners.
-
----
 
 ## :file_cabinet: Hardware
 
@@ -40,7 +36,6 @@ This cluster runs on the following hardware (all nodes are running bare-metal on
 | Intel NUC8i3BEH                         | 512GB NVMe   | 1TB SSD (longhorn)   | 32GB | k3s Worker                                       |
 | Synology NAS (librarium)                | N/A          | 3x6TB SHR, 512GB SSD | 8GB  | Media and general (S3-compatible) storage bucket |
 
----
 ## :handshake:&nbsp; Thanks
 
 A lot of inspiration for my cluster came from the people that have shared their clusters over at [awesome-home-kubernetes](https://github.com/k8s-at-home/awesome-home-kubernetes)
