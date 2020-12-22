@@ -31,9 +31,9 @@ This cluster runs on the following hardware (all nodes are running bare-metal on
 | Device                                  | OS Disk Size | Data Disk Size       | Ram  | Purpose                                          |
 |-----------------------------------------|--------------|----------------------|------|--------------------------------------------------|
 | Lenovo ThinkCentre M93p Tiny (i5-4570T) | 250GB SSD    | N/A                  | 8GB  | k3s Master                                       |
-| Intel NUC8i5BEH                         | 512GB NVMe   | 1TB SSD (longhorn)   | 32GB | k3s Worker                                       |
+| Intel NUC8i5BEH                         | 512GB NVMe   | 1TB SSD.             | 32GB | k3s Worker                                       |
 | Intel NUC8i5BEH                         | 480GB SSD    | 1TB NVMe             | 32GB | k3s Worker                                       |
-| Intel NUC8i3BEH                         | 512GB NVMe   | 1TB SSD (longhorn)   | 32GB | k3s Worker                                       |
+| Intel NUC8i3BEH                         | 512GB NVMe   | 1TB SSD              | 32GB | k3s Worker                                       |
 | Synology NAS (librarium)                | N/A          | 3x6TB SHR, 512GB SSD | 8GB  | Media and general (S3-compatible) storage bucket |
 
 ## :handshake:&nbsp; Thanks
