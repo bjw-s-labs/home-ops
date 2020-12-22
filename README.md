@@ -14,7 +14,7 @@
 
 Welcome to my home Kubernetes cluster.
 
-Lots of fun (to me at least :wink:) stuff can be found, poke around my [deployments](./deployments/) directory to see what my cluster is running. Feel free to open a [GitHub Issue](https://github.com/bjw-s/k8s-gitops/issues/new).
+Lots of fun (to me at least :wink:) stuff can be found, poke around my [cluster](./cluster/) directory to see what my cluster is running. Feel free to open a [GitHub Issue](https://github.com/bjw-s/k8s-gitops/issues/new).
 
 ---
 
