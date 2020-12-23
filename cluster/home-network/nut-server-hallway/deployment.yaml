@@ -32,8 +32,8 @@ spec:
 
       containers:
         - name: nut-server
-          image: "kmlucy/docker-nut"
-          imagePullPolicy: Always
+          image: "k8sathome/network-ups-tools:v2.7.4-2061-g46c7da76"
+          imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
           ports:
@@ -53,6 +53,10 @@ spec:
               mountPath: /etc/nut/upsd.conf
               readOnly: true
               subPath: upsd.conf
+            - name: configmap
+              mountPath: /etc/nut/upsd.users
+              readOnly: true
+              subPath: upsd.users
           resources: {}
 
       volumes:
