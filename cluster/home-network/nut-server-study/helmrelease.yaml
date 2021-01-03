@@ -38,6 +38,8 @@ spec:
 
     service:
       type: LoadBalancer
+      port:
+        targetPort: server
       externalIPs:
       - 192.168.26.8
       externalTrafficPolicy: Local
@@ -50,9 +52,6 @@ spec:
 
       # See https://github.com/networkupstools/nut/tree/master/conf for config sample files
       files:
-        upsd.conf: |
-          LISTEN 0.0.0.0 3493
-
         ups.conf: |
           [ups]
             driver = usbhid-ups
