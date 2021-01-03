@@ -12,6 +12,13 @@
   "helm-values": {
     "fileMatch": ["cluster/.+\\.yaml$"]
   },
+  "kubernetes": {
+    "fileMatch": ["cluster/.+\\.yaml$"],
+    "ignorePaths": [
+      "cluster/flux-system/",
+      "cluster/actions-runner-system/"
+    ],
+  },
   "regexManagers": [
     // regexManager to read and process HelmRelease files
     {
@@ -73,11 +80,7 @@
       "packageNames": ["blakeblackshear/frigate"],
       "versionScheme": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$"
     },
-    // Pin package versions
-    {
-      "packageNames": ["k8sathome/qbittorrent"],
-      "allowedVersions": "<4.3.0"
-    },
+    // Pin package versions (none for now)
     // Version strategies
     {
       "datasources": ["docker"],
