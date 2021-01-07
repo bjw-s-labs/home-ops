@@ -9,7 +9,7 @@
   // do not rebase PRs
   "rebaseWhen": "conflicted",
   "helm-values": {
-    "fileMatch": ["cluster/.+\\.yaml$"]
+    "fileMatch": ["cluster/.+/helmrelease\\.yaml$"]
   },
   "kubernetes": {
     "fileMatch": ["cluster/.+\\.yaml$"],
@@ -21,7 +21,7 @@
   "regexManagers": [
     // regexManager to read and process HelmRelease files
     {
-      "fileMatch": ["cluster/.+\\.yaml$"],
+      "fileMatch": ["cluster/.+/helmrelease\\.yaml$"],
       "matchStrings": [
         "registryUrl=(?<registryUrl>.*?)\n *chart: (?<depName>.*?)\n *version: (?<currentValue>.*)\n"
       ],
