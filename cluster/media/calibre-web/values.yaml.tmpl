@@ -1,38 +1,42 @@
 ---
-timezone: Europe/Amsterdam
-puid: 1031
-pgid: 100
-
-dockerMods:
-  ebookConversion:
-    enabled: true
+env:
+  TZ: "Europe/Amsterdam"
+  PUID: 1031
+  PGID: 100
+  DOCKER_MODS: linuxserver/calibre-web:calibre
 
 persistence:
   config:
     enabled: true
     existingClaim: calibre-web-config
-  books:
-    enabled: false
-  extraExistingClaimMounts:
-    - name: external-mount
-      mountPath: /storage/media
-      existingClaim: nfs-nas-media
+
+additionalVolumeMounts:
+- name: nas-media
+  mountPath: /storage/media
+  readOnly: true
+
+additionalVolumes:
+- name: nas-media
+  persistentVolumeClaim:
+    claimName: nfs-nas-media
 
 ingress:
   enabled: true
+
   annotations:
     kubernetes.io/ingress.class: internal
     cert-manager.io/cluster-issuer: letsencrypt-production
     external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
-  path: "/"
 
   hosts:
-    - calibre.{{ index (datasource "cluster-vars").domains 0 }}
+  - host: calibre.{{ index (datasource "cluster-vars").domains 0 }}
+    paths:
+    - path: /
 
   tls:
-    - secretName: tls.calibre
-      hosts:
-        - calibre.{{ index (datasource "cluster-vars").domains 0 }}
+  - secretName: tls.calibre
+    hosts:
+    - calibre.{{ index (datasource "cluster-vars").domains 0 }}
 
 resources:
   requests:
