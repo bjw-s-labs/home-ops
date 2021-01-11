@@ -2,7 +2,7 @@
 
 ![Kubernetes](https://i.imgur.com/p1RzXjQ.png)
 
-[![Discord](https://img.shields.io/badge/discord-chat-7289DA.svg?maxAge=60&style=for-the-badge)](https://discord.gg/d7C9M7)
+[![Discord](https://img.shields.io/badge/discord-chat-7289DA.svg?maxAge=60&style=for-the-badge)](https://discord.com/invite/S9yWcJVEMQ)
 [![k3s](https://img.shields.io/badge/k3s-v1.19.4-orange?style=for-the-badge)](https://k3s.io/)
 [![GitHub last commit](https://img.shields.io/github/last-commit/bjw-s/k8s-gitops?color=purple&style=for-the-badge)](https://github.com/bjw-s/k8s-gitops/commits/main)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white&style=for-the-badge)](https://github.com/pre-commit/pre-commit)
