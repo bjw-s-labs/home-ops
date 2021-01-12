@@ -37,9 +37,11 @@ servers:
       stubzones
       path /skydns
       endpoint http://etcd:2379
-  # Forward everything else to Cloudflare DNS
+  # Forward everything else to Blocky
   - name: forward
-    parameters: . 1.1.1.1
+    parameters: . 192.168.26.12
+    configBlock: |-
+      except unifi {{ index (datasource "cluster-vars").domains 0 }} {{ index (datasource "cluster-vars").domains 1 }} {{ index (datasource "cluster-vars").domains 2 }}
   # Set up cache
   - name: cache
     parameters: 30
