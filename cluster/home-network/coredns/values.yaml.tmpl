@@ -1,13 +1,16 @@
 ---
 rbac:
   create: true
-replicaCount: 1
+
+replicaCount: 2
+
 isClusterService: false
 serviceType: LoadBalancer
 service:
   externalIPs:
   - 192.168.26.3
   externalTrafficPolicy: Local
+
 servers:
 - port: 53
   zones:
@@ -45,8 +48,20 @@ servers:
   # Set up cache
   - name: cache
     parameters: 30
+
 prometheus:
   service:
     enabled: true
   monitor:
     enabled: true
+
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - labelSelector:
+        matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: In
+          values:
+          - coredns
+      topologyKey: "kubernetes.io/hostname"
