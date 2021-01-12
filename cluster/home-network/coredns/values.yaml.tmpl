@@ -11,14 +11,6 @@ service:
 servers:
 - port: 53
   zones:
-#  - zone: unifi
-#    scheme: dns://
-#  - zone: {{ index (datasource "cluster-vars").domains 0 }}
-#    scheme: dns://
-#  - zone: {{ index (datasource "cluster-vars").domains 1 }}
-#    scheme: dns://
-#  - zone: {{ index (datasource "cluster-vars").domains 2 }}
-#    scheme: dns://
   - zone: .
     scheme: dns://
   plugins:
@@ -41,6 +33,13 @@ servers:
   # Forward everything else to Cloudflare DNS
   - name: forward
     parameters: . 1.1.1.1
+  # Set up cache
+  - name: cache
+    parameters: 30
+  # Allow automatic reloading of Corefile
+  - name: reload
+  # Detect forwarding loops
+  - name: loop
 prometheus:
   service:
     enabled: true
