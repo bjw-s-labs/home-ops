@@ -14,7 +14,7 @@ servers:
   - zone: .
     scheme: dns://
   plugins:
-  - name: debug
+  - name: log
   - name: errors
   # Serves a /health endpoint on :8080, required for livenessProbe
   - name: health
@@ -25,6 +25,14 @@ servers:
   # Serves a /metrics endpoint on :9153, required for serviceMonitor
   - name: prometheus
     parameters: 0.0.0.0:9153
+  # Set up cache
+  - name: cache
+    parameters: 30
+  # Allow automatic reloading of Corefile
+  - name: reload
+  # Detect forwarding loops
+  - name: loop
+  # Set up local resolution
   - name: etcd
     parameters: unifi {{ index (datasource "cluster-vars").domains 0 }} {{ index (datasource "cluster-vars").domains 1 }} {{ index (datasource "cluster-vars").domains 2 }}
     configBlock: |-
@@ -34,13 +42,6 @@ servers:
   # Forward everything else to Cloudflare DNS
   - name: forward
     parameters: . 1.1.1.1
-  # Set up cache
-  - name: cache
-    parameters: 30
-  # Allow automatic reloading of Corefile
-  - name: reload
-  # Detect forwarding loops
-  - name: loop
 prometheus:
   service:
     enabled: true
