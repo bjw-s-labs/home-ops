@@ -15,6 +15,10 @@ persistence:
     enabled: true
     existingClaim: zigbee2mqtt-data
 
+# Privileged is required if USB controller is accessed directly through the host machine
+securityContext:
+  privileged: true
+
 # Path to your zigbee device in the container
 additionalVolumeMounts:
   - name: usb
@@ -91,8 +95,6 @@ config:
   # Both of these need to be enabled for the webui
   frontend:
     port: 8080
-  experimental:
-    new_api: true
 
 addons:
   codeserver:
