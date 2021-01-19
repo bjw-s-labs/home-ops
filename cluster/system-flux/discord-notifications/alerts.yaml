@@ -2,29 +2,29 @@
 apiVersion: notification.toolkit.fluxcd.io/v1beta1
 kind: Alert
 metadata:
-  name: info
+  name: discord-info
   namespace: system-flux
 spec:
   providerRef:
-    name: slack
+    name: discord
   eventSeverity: info
   eventSources:
     - kind: GitRepository
       name: '*'
-    - kind: HelmRelease
+    - kind: Kustomization
       name: '*'
   suspend: false
 ---
 apiVersion: notification.toolkit.fluxcd.io/v1beta1
 kind: Alert
 metadata:
-  name: error
+  name: discord-error
   namespace: system-flux
 spec:
   providerRef:
-    name: slack
+    name: discord
   eventSeverity: error
   eventSources:
-    - kind: Kustomization
+    - kind: HelmRelease
       name: '*'
   suspend: false
