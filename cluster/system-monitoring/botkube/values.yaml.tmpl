@@ -6,10 +6,12 @@ serviceMonitor:
   enabled: true
 
 communications:
-  slack:
+  discord:
     enabled: true
-    channel: kubernetes
-    token: {{ (datasource "botkube").slack.token }}
+    token: '{{ (datasource "botkube").discord.token }}'
+    botid: '{{ (datasource "botkube").discord.bot_id }}'
+    channel: '{{ (datasource "botkube").discord.channel_id }}'
+    notiftype: short
 
 config:
   settings:
@@ -158,3 +160,19 @@ config:
     - create
     - delete
     - error
+
+  - name: velero.io/v1/backups
+    namespaces:
+      include:
+      - all
+      ignore:
+      -
+    events:
+    - create
+    - update
+    - delete
+    - error
+    updateSetting:
+      includeDiff: true
+      fields:
+      - status.phase
