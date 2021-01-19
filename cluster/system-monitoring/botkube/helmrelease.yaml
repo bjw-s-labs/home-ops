@@ -16,6 +16,11 @@ spec:
         name: infracloudio-charts
         namespace: system-flux
       interval: 5m
+  values:
+    image:
+      repository: infracloudio/botkube
+      tag: latest
+      pullPolicy: Always
   valuesFrom:
   - kind: Secret
     name: "botkube-helm-values"
