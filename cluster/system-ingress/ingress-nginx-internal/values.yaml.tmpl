@@ -18,7 +18,7 @@ controller:
   service:
     type: LoadBalancer
     externalIPs:
-      - 192.168.26.1
+      - 10.1.10.1
     externalTrafficPolicy: Local
     annotations:
       external-dns.alpha.kubernetes.io/hostname: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
