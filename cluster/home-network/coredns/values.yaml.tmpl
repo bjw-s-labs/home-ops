@@ -8,7 +8,7 @@ isClusterService: false
 serviceType: LoadBalancer
 service:
   externalIPs:
-  - 192.168.26.3
+  - 10.1.10.3
   externalTrafficPolicy: Local
 
 servers:
@@ -42,7 +42,7 @@ servers:
       endpoint http://etcd:2379
   # Forward everything else to Blocky
   - name: forward
-    parameters: . 192.168.26.12
+    parameters: . 10.1.10.12
     configBlock: |-
       except unifi {{ index (datasource "cluster-vars").domains 0 }} {{ index (datasource "cluster-vars").domains 1 }} {{ index (datasource "cluster-vars").domains 2 }}
   # Set up cache

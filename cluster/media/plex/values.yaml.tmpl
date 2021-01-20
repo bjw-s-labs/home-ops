@@ -8,7 +8,7 @@ ingress:
 
 allowedNetworks:
   - {{ (datasource "cluster-vars").networks.k8s_cluster }}
-advertiseIp: "http://192.168.26.9:32400"
+advertiseIp: "http://10.1.10.9:32400"
 claimToken: {{ (datasource "plex").claimToken }}
 
 timezone: "Europe/Amsterdam"
@@ -18,13 +18,13 @@ plexGid: 100
 serviceTCP:
   type: LoadBalancer
   externalIPs:
-    - 192.168.26.9
+    - 10.1.10.9
   externalTrafficPolicy: Local
 
 serviceUDP:
   type: LoadBalancer
   externalIPs:
-    - 192.168.26.9
+    - 10.1.10.9
   externalTrafficPolicy: Local
 
 persistence:
