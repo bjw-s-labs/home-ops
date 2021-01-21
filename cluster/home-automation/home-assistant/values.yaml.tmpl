@@ -26,7 +26,7 @@ ingress:
 
   annotations:
     kubernetes.io/ingress.class: external
-    external-dns.alpha.kubernetes.io/target: _cname_ext.{{ index (datasource "cluster-vars").domains 0 }}
+    external-dns.alpha.kubernetes.io/target: cname--ext.{{ index (datasource "cluster-vars").domains 0 }}
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
     cert-manager.io/cluster-issuer: letsencrypt-production
 
@@ -82,7 +82,7 @@ addons:
       annotations:
         kubernetes.io/ingress.class: internal
         cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
+        external-dns.alpha.kubernetes.io/target: cname--int.{{ index (datasource "cluster-vars").domains 0 }}
         nginx.ingress.kubernetes.io/proxy-body-size: "0"
       hosts:
       - host: code-domo.{{ index (datasource "cluster-vars").domains 1 }}

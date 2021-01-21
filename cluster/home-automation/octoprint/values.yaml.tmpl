@@ -49,7 +49,7 @@ ingress:
     kubernetes.io/ingress.class: internal
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     cert-manager.io/cluster-issuer: letsencrypt-production
-    external-dns.alpha.kubernetes.io/target: _cname_int.{{ index (datasource "cluster-vars").domains 0 }}
+    external-dns.alpha.kubernetes.io/target: cname--int.{{ index (datasource "cluster-vars").domains 0 }}
 
   hosts:
     - host: octoprint.{{ index (datasource "cluster-vars").domains 0 }}
