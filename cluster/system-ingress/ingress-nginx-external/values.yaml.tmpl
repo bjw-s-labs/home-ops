@@ -25,7 +25,7 @@ controller:
       - 10.1.10.2
     externalTrafficPolicy: Local
     annotations:
-      external-dns.alpha.kubernetes.io/hostname: _cname_ext.{{ index (datasource "cluster-vars").domains 0 }}
+      external-dns.alpha.kubernetes.io/hostname: cname--ext.{{ index (datasource "cluster-vars").domains 0 }}
 
   affinity:
     podAntiAffinity:
