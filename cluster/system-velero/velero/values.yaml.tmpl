@@ -13,8 +13,8 @@ configuration:
     config:
       region: us-east-1
       s3ForcePathStyle: true
-      s3Url: http://10.1.1.11:9000
-      publicUrl: http://minio.{{ index (datasource "cluster-vars").domains 0 }}:9000
+      s3Url: http://minio-librarium.home-network:9000
+      publicUrl: https://minio.{{ index (datasource "cluster-vars").domains 0 }}
 
   volumeSnapshotLocation:
     name: aws
