@@ -57,6 +57,13 @@ config: |
         max_area: 100000
         threshold: 0.5
 
+  ffmpeg:
+    hwaccel_args:
+      - -hwaccel
+      - qsv
+      - -qsv_device
+      - /dev/dri/renderD128
+
   cameras:
     frontdoor:
       ffmpeg:
@@ -64,11 +71,6 @@ config: |
           - path: {{ (datasource "frigate").cameras.frontdoor.url }}
             roles:
               - detect
-        hwaccel_args:
-          - -hwaccel
-          - qsv
-          - -qsv_device
-          - /dev/dri/renderD128
 
       snapshots:
         enabled: False
