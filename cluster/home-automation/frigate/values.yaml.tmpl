@@ -22,8 +22,6 @@ timezone: Europe/Amsterdam
 coral:
   enabled: true
 
-masksConfigMap: frigate-masks
-
 ingress:
   enabled: true
   annotations:
@@ -45,6 +43,11 @@ config: |
     user: {{ (datasource "frigate").mqtt.user }}
     password: {{ (datasource "frigate").mqtt.password }}
 
+  detectors:
+    coral:
+      type: edgetpu
+      device: usb
+
   objects:
     track:
       - person
@@ -57,13 +60,18 @@ config: |
   cameras:
     frontdoor:
       ffmpeg:
-        input: {{ (datasource "frigate").cameras.frontdoor.url }}
-
-      mask: frontdoor-mask.bmp
-
-      take_frame: 1
+        inputs:
+          - path: {{ (datasource "frigate").cameras.frontdoor.url }}
+            roles:
+              - detect
+        hwaccel_args:
+          - -hwaccel
+          - qsv
+          - -qsv_device
+          - /dev/dri/renderD128
 
       snapshots:
+        enabled: False
         show_timestamp: True
 
       objects:
