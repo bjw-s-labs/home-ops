@@ -8,6 +8,11 @@ affinity:
               operator: In
               values:
                 - "true"
+        - matchExpressions:
+            - key: feature.node.kubernetes.io/custom-intel-gpu
+              operator: In
+              values:
+                - "true"
 
 podAnnotations:
   configmap.reloader.stakater.com/reload: "frigate,frigate-masks"
@@ -33,8 +38,6 @@ ingress:
       secretName: tls.frigate
 
 config: |
-  web_port: 5000
-
   mqtt:
     host: {{ (datasource "frigate").mqtt.host }}
     port: 1883
@@ -71,3 +74,12 @@ config: |
             min_area: 5000
             max_area: 100000
             threshold: 0.5
+
+resources:
+  requests:
+    memory: 1000Mi
+    cpu: 750m
+    gpu.intel.com/i915: 1
+  limits:
+    gpu.intel.com/i915: 1
+    memory: 4000Mi
