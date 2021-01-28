@@ -18,8 +18,6 @@ Lots of fun (to me at least :wink:) stuff can be found, poke around my [cluster]
 
 ## :gear: Automation
 
-- [Kured](https://github.com/weaveworks/kured) to reboot my worker nodes as required.
-
 - [Renovatebot](https://github.com/renovatebot/renovate) keeps my applications up-to-date by scanning my repo and opening pull requests when it notices a new container image update.
 
 - [Actions Runner Controller](https://github.com/summerwind/actions-runner-controller) dynamically operates a set of self-hosted Github runners.
