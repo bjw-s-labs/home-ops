@@ -71,19 +71,23 @@ config: |
           - path: {{ (datasource "frigate").cameras.frontdoor.substream_url }}
             roles:
               - detect
-              - rtmp
           - path: {{ (datasource "frigate").cameras.frontdoor.main_url }}
             roles:
               - clips
               - record
+              - rtmp
 
       width: 640
       height: 360
-      fps: 4
+      fps: 6
 
       snapshots:
         enabled: False
         timestamp: True
+
+      motion:
+        mask:
+          - 0,182,36,179,125,158,118,0,0,0
 
       objects:
         track:
