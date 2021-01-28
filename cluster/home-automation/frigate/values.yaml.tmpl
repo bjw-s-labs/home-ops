@@ -68,9 +68,16 @@ config: |
     frontdoor:
       ffmpeg:
         inputs:
-          - path: {{ (datasource "frigate").cameras.frontdoor.url }}
+          - path: {{ (datasource "frigate").cameras.frontdoor.substream_url }}
             roles:
               - detect
+          - path: {{ (datasource "frigate").cameras.frontdoor.main_url }}
+            roles:
+              - clips
+              - record
+
+      width: 640
+      height: 360
 
       snapshots:
         enabled: False
