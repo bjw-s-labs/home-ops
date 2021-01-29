@@ -143,6 +143,7 @@ while IFS= read -r file; do
     yq eval 'del(.metadata.creationTimestamp)' - |
     yq eval 'del(.spec.template.metadata.creationTimestamp)' - |
     yq eval ".metadata.namespace = \"${template_namespace}\"" - |
+    yq eval ".metadata.annotations.\"sealedsecrets.bitnami.com/managed\" = \"true\"" - |
     sed -e 's/stdin\:/values.yaml\:/g' > $pipe &
   else
     echo -n "${rendered_file}" > $pipe &
