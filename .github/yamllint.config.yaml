@@ -1,11 +1,12 @@
 ---
 ignore: |
   .secrets/
-  ansible/
 
 extends: default
 
 rules:
+  truthy:
+    allowed-values: ['true', 'false', 'on', 'yes']
   line-length: disable
   comments:
     min-spaces-from-content: 1

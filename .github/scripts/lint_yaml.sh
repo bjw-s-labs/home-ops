@@ -16,7 +16,7 @@ message() {
   echo "######################################################################"
 }
 
-message "Running YAML lint on all YAML files in repository (except for .secrets folder)"
+message "Running YAML lint on all YAML files in repository based on ${YAMLLINT_CONFIG}"
 
 yamllint -c "$YAMLLINT_CONFIG" .
 rv=$?
