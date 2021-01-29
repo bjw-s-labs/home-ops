@@ -72,16 +72,20 @@ while IFS= read -r file; do
   template_filename="${file##*/}"
   template_path="${file%/$template_filename}"
   template_relative_path=${template_path#"${CLUSTER_ROOT}"}
-
   template_target_name=${template_filename%.*}
-  template_namespace=$(echo "$template_relative_path" | awk -F/ '{print $2}')
-  template_deployment=$(echo "$template_relative_path" | awk -F/ '{print $3}')
-  template_vars_path="${SECRETS_ROOT}${template_relative_path}"
-  template_vars_filename="${template_vars_path}/vars.yaml"
+
+  # Determine secret namespace / deployment
+  IFS="/" read -ra template_relative_path_arr <<< "$template_relative_path"
+  template_base=${template_relative_path_arr[1]}
+  template_namespace=${template_relative_path_arr[2]}
+  template_deployment=${template_relative_path_arr[3]}
 
   if [ "${template_deployment}" == "" ]; then
     template_deployment="${template_namespace}"
   fi
+
+  template_vars_path="${SECRETS_ROOT}/${template_base}/${template_namespace}/${template_deployment}"
+  template_vars_filename="${template_vars_path}/vars.yaml"
 
   echo "- Processing $file"
 
