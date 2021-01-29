@@ -10,17 +10,12 @@ spec:
     spec:
       # renovate: registryUrl=https://infracloudio.github.io/charts
       chart: botkube
-      version: v0.11.0
+      version: v0.12.0
       sourceRef:
         kind: HelmRepository
         name: infracloudio-charts
         namespace: system-flux
       interval: 5m
-  values:
-    image:
-      repository: infracloudio/botkube
-      tag: latest
-      pullPolicy: Always
   valuesFrom:
   - kind: Secret
     name: "botkube-helm-values"
