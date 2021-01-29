@@ -19,3 +19,19 @@ spec:
     # exclude file extensions from deploy dir
     /cluster/**/*.md
     /cluster/**/*.tmpl
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: system-flux
+  namespace: system-flux
+spec:
+  dependsOn:
+  - name: system-flux-helm-repositories
+  interval: 10m0s
+  path: ./cluster
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: system-flux
+  validation: client
