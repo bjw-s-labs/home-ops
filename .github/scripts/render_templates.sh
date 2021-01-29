@@ -2,7 +2,7 @@
 set -e
 
 REPO_ROOT=$(git rev-parse --show-toplevel)
-DEPLOYMENTS_ROOT="${REPO_ROOT}/cluster"
+CLUSTER_ROOT="${REPO_ROOT}/cluster"
 SECRETS_ROOT="${REPO_ROOT}/.secrets"
 CLUSTER_VARS="${SECRETS_ROOT}/cluster-vars.yaml"
 PUB_CERT="${SECRETS_ROOT}/sealedsecret-cert.pem"
@@ -39,7 +39,7 @@ if [ -n "$INPUT_FILE" ]; then
     exit 1
   fi
 else
-  FILES_TO_PROCESS=$(find "${DEPLOYMENTS_ROOT}" -type f -name "*.tmpl")
+  FILES_TO_PROCESS=$(find "${CLUSTER_ROOT}" -type f -name "*.tmpl")
 fi
 
 # Validate cluster vars file
@@ -59,19 +59,19 @@ while IFS= read -r file; do
   fi
 
   # Only process files in the deployments folder
-  if [[ $file != ${DEPLOYMENTS_ROOT}* ]]; then
+  if [[ $file != ${CLUSTER_ROOT}* ]]; then
     continue
   fi
 
   # Only process .tmpl files
-  if [[ $file != ${DEPLOYMENTS_ROOT}*.tmpl ]]; then
+  if [[ $file != ${CLUSTER_ROOT}*.tmpl ]]; then
     continue
   fi
 
   # Get secret file metadata (path, filename, etc...)
   template_filename="${file##*/}"
   template_path="${file%/$template_filename}"
-  template_relative_path=${template_path#"${DEPLOYMENTS_ROOT}"}
+  template_relative_path=${template_path#"${CLUSTER_ROOT}"}
 
   template_target_name=${template_filename%.*}
   template_namespace=$(echo "$template_relative_path" | awk -F/ '{print $2}')
