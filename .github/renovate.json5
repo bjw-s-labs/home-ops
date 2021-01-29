@@ -10,21 +10,24 @@
   "rebaseWhen": "conflicted",
   "helm-values": {
     "fileMatch": [
-      "cluster/.+/helmrelease\\.yaml$",
-      "cluster/.+/values\\.yaml.tmpl$"
+      "cluster/apps/.+/helmrelease\\.yaml$",
+      "cluster/apps/.+/values\\.yaml.tmpl$"
     ]
   },
   "kubernetes": {
-    "fileMatch": ["cluster/.+\\.yaml$"],
+    "fileMatch": [
+      "cluster/apps/.+\\.yaml$"
+    ],
     "ignorePaths": [
-      "cluster/system-flux/",
-      "cluster/actions-runner-system/actions-runner-system/"
+      "cluster/apps/actions-runner-system/actions-runner-system/"
     ],
   },
   "regexManagers": [
     // regexManager to read and process HelmRelease files
     {
-      "fileMatch": ["cluster/.+/helmrelease\\.yaml$"],
+      "fileMatch": [
+        "cluster/apps/.+/helmrelease\\.yaml$"
+      ],
       "matchStrings": [
         "registryUrl=(?<registryUrl>.*?)\n *chart: (?<depName>.*?)\n *version: (?<currentValue>.*)\n"
       ],
@@ -32,7 +35,9 @@
     },
     // regexManager to read and process actions-runner-controller runner images
     {
-      "fileMatch": ["cluster/actions-runner-system/actions-runner-system/runners/.+\\.yaml$"],
+      "fileMatch": [
+        "cluster/apps/actions-runner-system/actions-runner-system/runners/.+\\.yaml$"
+      ],
       "matchStrings": [
         "image: (?<depName>.*?):(?<currentValue>.*?)\n"
       ],

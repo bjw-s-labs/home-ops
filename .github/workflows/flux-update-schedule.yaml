@@ -32,7 +32,7 @@ jobs:
         flux install --version="${VERSION}" \
           --namespace=system-flux \
           --network-policy=false \
-          --export > ./cluster/system-flux/gotk-components.yaml
+          --export > ./cluster/base/system-flux/gotk-components.yaml
         echo "::set-output name=flux_version::$VERSION"
 
     - name: Create pull request for Flux update
