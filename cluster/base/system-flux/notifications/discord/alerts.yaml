@@ -11,8 +11,6 @@ spec:
   eventSources:
     - kind: GitRepository
       name: '*'
-    - kind: Kustomization
-      name: '*'
   suspend: false
 ---
 apiVersion: notification.toolkit.fluxcd.io/v1beta1
@@ -26,5 +24,7 @@ spec:
   eventSeverity: error
   eventSources:
     - kind: HelmRelease
+      name: '*'
+    - kind: Kustomization
       name: '*'
   suspend: false
