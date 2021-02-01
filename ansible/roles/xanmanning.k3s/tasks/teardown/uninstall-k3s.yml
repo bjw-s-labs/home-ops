@@ -1,0 +1,50 @@
+---
+
+- name: Check to see if k3s-killall.sh exits
+  ansible.builtin.stat:
+    path: /usr/local/bin/k3s-killall.sh
+  register: check_k3s_killall_script
+
+- name: Check to see if k3s-uninstall.sh exits
+  ansible.builtin.stat:
+    path: /usr/local/bin/k3s-uninstall.sh
+  register: check_k3s_uninstall_script
+
+- name: Check to see if docker is present
+  ansible.builtin.command: which docker
+  failed_when: false
+  changed_when: false
+  register: check_k3s_docker_path
+
+- name: Run k3s-killall.sh
+  ansible.builtin.command: /usr/local/bin/k3s-killall.sh
+  register: k3s_killall
+  changed_when: k3s_killall.rc == 0
+  when: check_k3s_killall_script.stat.exists
+  become: "{{ k3s_become_for_uninstall | ternary(true, false, k3s_become_for_all) }}"
+
+- name: Run k3s-uninstall.sh
+  ansible.builtin.command: /usr/local/bin/k3s-uninstall.sh
+  args:
+    removes: /usr/local/bin/k3s-uninstall.sh
+  register: k3s_uninstall
+  changed_when: k3s_uninstall.rc == 0
+  when: check_k3s_uninstall_script.stat.exists
+  become: "{{ k3s_become_for_uninstall | ternary(true, false, k3s_become_for_all) }}"
+
+- name: Ensure hard links are removed
+  ansible.builtin.file:
+    path: "{{ k3s_install_dir }}/{{ item }}"
+    state: absent
+  loop:
+    - kubectl
+    - crictl
+    - ctr
+  when: k3s_install_hard_links
+        and not ansible_check_mode
+  become: "{{ k3s_become_for_uninstall | ternary(true, false, k3s_become_for_all) }}"
+
+- name: Clean up Docker
+  ansible.builtin.command: docker system prune -a --force
+  when: ("docker" in k3s_runtime_config and k3s_runtime_config.docker)
+        and check_k3s_docker_path.rc == 0

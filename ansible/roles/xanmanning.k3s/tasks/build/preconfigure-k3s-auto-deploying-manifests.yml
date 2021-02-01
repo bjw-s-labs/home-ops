@@ -1,0 +1,18 @@
+---
+
+- name: Ensure that the manifests directory exists
+  ansible.builtin.file:
+    state: directory
+    path: "{{ k3s_server_manifests_dir }}"
+    mode: 0755
+  when: k3s_server_manifests_templates | length > 0
+  become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
+
+# https://rancher.com/docs/k3s/latest/en/advanced/#auto-deploying-manifests
+- name: Ensure Auto-Deploying Manifests are copied to controllers
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ k3s_server_manifests_dir }}/{{ item | basename | replace('.j2','') }}"
+    mode: 0644
+  loop: "{{ k3s_server_manifests_templates }}"
+  become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"

@@ -1,12 +1,13 @@
 ---
 ignore: |
   .secrets/
+  ansible/inventory/cluster/host_vars/*.sops.yml
 
 extends: default
 
 rules:
   truthy:
-    allowed-values: ['true', 'false', 'on', 'yes']
+    allowed-values: ['true', 'false', 'on', 'off', 'yes', 'no']
   line-length: disable
   comments:
     min-spaces-from-content: 1

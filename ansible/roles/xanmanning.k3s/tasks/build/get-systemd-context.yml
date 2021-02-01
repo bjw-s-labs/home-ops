@@ -1,0 +1,9 @@
+---
+
+- name: Ensure systemd context is correct if we are running k3s rootless
+  ansible.builtin.set_fact:
+    k3s_systemd_context: user
+    k3s_systemd_unit_dir: "{{ ansible_user_dir }}/.config/systemd/user"
+  when: k3s_runtime_config is defined
+        and "rootless" in k3s_runtime_config
+        and k3s_runtime_config.rootless

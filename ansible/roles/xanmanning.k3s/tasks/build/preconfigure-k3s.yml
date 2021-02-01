@@ -1,0 +1,108 @@
+---
+
+- name: Ensure k3s_build_cluster is false if running against a single node.
+  ansible.builtin.set_fact:
+    k3s_build_cluster: false
+  when: ansible_play_hosts_all | length < 2
+        and k3s_control_node_address is not defined
+
+- name: Ensure k3s control node fact is set
+  ansible.builtin.set_fact:
+    k3s_control_node: "{{ 'false' if k3s_build_cluster else 'true' }}"
+  when: k3s_control_node is not defined
+
+- name: Ensure k3s primary control node fact is set
+  ansible.builtin.set_fact:
+    k3s_primary_control_node: "{{ 'false' if k3s_build_cluster else 'true' }}"
+  when: k3s_primary_control_node is not defined
+
+- name: Ensure k3s control plane port is captures
+  ansible.builtin.set_fact:
+    k3s_control_plane_port: "{{ k3s_runtime_config['https-listen-port'] | default(6443) }}"
+  delegate_to: k3s_primary_control_node
+
+- name: Ensure a count of control nodes is generated
+  ansible.builtin.set_fact:
+    k3s_controller_list: "{{ k3s_controller_list + [ item ] }}"
+  when: hostvars[item].k3s_control_node is defined
+        and hostvars[item].k3s_control_node
+  loop: "{{ ansible_play_hosts_all }}"
+
+- name: Ensure a k3s control node is defined if none are found in ansible_play_hosts_all
+  block:
+
+    - name: Set the control host
+      ansible.builtin.set_fact:
+        k3s_control_node: true
+      when: inventory_hostname == ansible_play_hosts_all[0]
+
+    - name: Ensure a count of control nodes is generated
+      ansible.builtin.set_fact:
+        k3s_controller_list: "{{ k3s_controller_list + [ item ] }}"
+      when: hostvars[item].k3s_control_node is defined
+            and hostvars[item].k3s_control_node
+      loop: "{{ ansible_play_hosts_all }}"
+
+  when: k3s_controller_list | length < 1
+        and k3s_build_cluster is defined and k3s_build_cluster
+
+- name: Ensure a primary k3s control node is defined if multiple are found in ansible_play_hosts_all
+  ansible.builtin.set_fact:
+    k3s_primary_control_node: true
+  when: k3s_controller_list is defined
+        and k3s_controller_list | length > 1
+        and inventory_hostname == k3s_controller_list[0]
+        and k3s_build_cluster is defined and k3s_build_cluster
+
+- name: Ensure ansible_host is mapped to inventory_hostname
+  ansible.builtin.lineinfile:
+    path: /tmp/inventory.txt
+    line: >-
+      {{ item }}
+      @@@
+      {{ hostvars[item].ansible_host | default(hostvars[item].ansible_fqdn) }}
+      @@@
+      C_{{ hostvars[item].k3s_control_node }}
+      @@@
+      P_{{ hostvars[item].k3s_primary_control_node | default(False) }}
+    create: true
+    regexp: "^{{ item }} @@@ {{ hostvars[item].ansible_host | default(hostvars[item].ansible_fqdn) }}"
+    mode: 0600
+  loop: "{{ ansible_play_hosts_all }}"
+  check_mode: false
+  when: hostvars[item].k3s_control_node is defined
+
+- name: Delegate a control plane node
+  block:
+    - name: Lookup control node from file
+      ansible.builtin.command: "grep '{{ 'P_True' if (k3s_controller_list | length > 1) else 'C_True' }}' /tmp/inventory.txt"
+      changed_when: false
+      check_mode: false
+      register: k3s_control_delegate_raw
+
+    - name: Ensure control node is delegated to for obtaining a token
+      ansible.builtin.set_fact:
+        k3s_control_delegate: "{{ k3s_control_delegate_raw.stdout.split(' @@@ ')[0] }}"
+      check_mode: false
+      when: k3s_control_delegate is not defined
+
+    - name: Ensure the control node address is registered in Ansible
+      ansible.builtin.set_fact:
+        k3s_control_node_address: "{{ hostvars[k3s_control_delegate].ansible_host | default(hostvars[k3s_control_delegate].ansible_fqdn) }}"
+      check_mode: false
+      when: k3s_control_node_address is not defined
+
+  when: k3s_control_node_address is not defined
+        or k3s_control_delegate is not defined
+
+- name: Ensure k3s_runtime_config is set for control plane
+  ansible.builtin.set_fact:
+    k3s_runtime_config: "{{ (k3s_server | default({})) | combine((k3s_agent | default({}))) }}"
+  when: (k3s_server is defined or k3s_agent is defined)
+        and (k3s_control_node is defined and k3s_control_node)
+
+- name: Ensure k3s_runtime_config is set for agents
+  ansible.builtin.set_fact:
+    k3s_runtime_config: "{{ (k3s_agent | default({})) }}"
+  when: k3s_agent is defined
+        and (k3s_control_node is not defined or not k3s_control_node)

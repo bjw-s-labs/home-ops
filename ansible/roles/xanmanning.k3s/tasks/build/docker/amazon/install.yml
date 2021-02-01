@@ -1,0 +1,11 @@
+---
+
+- name: Ensure docker is installed using amazon-linux-extras
+  ansible.builtin.command: amazon-linux-extras install docker
+  args:
+    creates: /etc/docker
+  notify:
+    - restart docker
+  become: "{{ k3s_become_for_package_install | ternary(true, false, k3s_become_for_all) }}"
+
+- meta: flush_handlers

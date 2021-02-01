@@ -1,0 +1,16 @@
+---
+- name: Converge
+  hosts: node*
+  become: true
+  vars:
+    molecule_is_test: true
+    k3s_build_cluster: false
+    k3s_install_dir: /opt/k3s/bin
+    k3s_config_file: /opt/k3s/etc/k3s.yaml
+    k3s_server:
+      data-dir: /var/lib/k3s-io
+      default-local-storage-path: /var/lib/k3s-io/local-storage
+    k3s_server_manifests_templates:
+      - "molecule/autodeploy/templates/00-ns-monitoring.yml.j2"
+  roles:
+    - role: xanmanning.k3s

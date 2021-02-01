@@ -1,0 +1,24 @@
+---
+
+- name: reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+    scope: "{{ k3s_systemd_context }}"
+  become: "{{ k3s_become_for_systemd | ternary(true, false, k3s_become_for_all) }}"
+
+- name: restart k3s
+  ansible.builtin.systemd:
+    name: k3s
+    state: restarted
+    scope: "{{ k3s_systemd_context }}"
+    enabled: "{{ k3s_start_on_boot }}"
+  retries: 3
+  delay: 3
+  become: "{{ k3s_become_for_systemd | ternary(true, false, k3s_become_for_all) }}"
+
+- name: restart docker
+  ansible.builtin.systemd:
+    name: docker
+    state: restarted
+    enabled: true
+  become: "{{ k3s_become_for_systemd | ternary(true, false, k3s_become_for_all) }}"

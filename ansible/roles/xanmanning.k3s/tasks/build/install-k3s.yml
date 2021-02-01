@@ -1,0 +1,25 @@
+---
+
+- include_tasks: install-k3s-directories.yml
+  loop: "{{ k3s_ensure_directories_exist }}"
+  loop_control:
+    loop_var: directory
+
+- include_tasks: install-k3s-node.yml
+  when: ((k3s_control_node and k3s_controller_list | length == 1)
+        or (k3s_primary_control_node and k3s_controller_list | length > 1)) and not ansible_check_mode
+
+- meta: flush_handlers
+
+- include_tasks: install-k3s-node.yml
+  when: k3s_build_cluster
+
+- name: Ensure k3s control plane is started
+  ansible.builtin.systemd:
+    name: k3s
+    state: started
+    enabled: "{{ k3s_start_on_boot }}"
+    scope: "{{ k3s_systemd_context }}"
+  when: (k3s_control_node and k3s_controller_list | length == 1)
+        or (k3s_primary_control_node and k3s_controller_list | length > 1)
+  become: "{{ k3s_become_for_systemd | ternary(true, false, k3s_become_for_all) }}"

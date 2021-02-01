@@ -1,0 +1,53 @@
+---
+
+- name: "Check that k3s_release_version >= {{ k3s_min_version }}"
+  ansible.builtin.assert:
+    that:
+      - (k3s_release_version | replace('v', '')) is version_compare(k3s_min_version, '>=')
+    success_msg: "{{ k3s_release_version }} is supported by this role."
+    fail_msg: "{{ k3s_release_version }} is not supported by this role, please use xanmanning.k3s v1.x."
+
+- name: Check configuration in k3s_server and k3s_agent that needs special configuration
+  ansible.builtin.assert:
+    that:
+      - (item.setting not in k3s_runtime_config)
+    success_msg: "{{ item.setting }} not found in server/agent config"
+    fail_msg: >-
+      {{ item.setting }} found in server/agent config.
+      Please set {{ item.correction }} to use this option.
+      {% if item.document is defined %}
+      Documentation: {{ item.documentation }}
+      {% endif %}
+  loop: "{{ k3s_config_exclude }}"
+
+- name: Check configuration in k3s_server and k3s_agent for deprecated configuration
+  ansible.builtin.assert:
+    that:
+      - (item.setting not in k3s_runtime_config)
+        or (not k3s_runtime_config[item.setting])
+    success_msg: "{{ item.setting }} not found in server/agent config"
+    fail_msg: >-
+      {{ item.setting }} found in server/agent config.
+      Please set {{ item.correction }} to use this option.
+      {% if item.document is defined %}
+      Documentation: {{ item.documentation }}
+      {% endif %}
+  loop: "{{ k3s_deprecated_config }}"
+  when: (item.when is not defined
+        or (item.when is defined and (k3s_release_version | replace('v', '')) is version_compare(item.when, '>=')))
+        and not k3s_use_unsupported_config
+
+- name: Check configuration in k3s_server and k3s_agent against release version
+  ansible.builtin.assert:
+    that:
+      - (k3s_release_version | replace('v', '')) is version_compare(item.version, '>=')
+    success_msg: "{{ item.setting }} is supported by {{ k3s_release_version }}"
+    fail_msg: >-
+      {{ item.setting }} is not supported in {{ k3s_release_version }}.
+      Please update to v{{ item.version }} to use this option.
+      {% if item.document is defined %}
+      Documentation: {{ item.documentation }}
+      {% endif %}
+  loop: "{{ k3s_config_version_check }}"
+  when: k3s_config_version_check is defined
+        and item.setting in k3s_runtime_config

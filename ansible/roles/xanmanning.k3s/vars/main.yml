@@ -1,0 +1,145 @@
+---
+
+# Minimum supported versions
+k3s_min_version: 1.19.3
+k3s_ansible_min_version: 2.9.16
+
+# Valid states for this role
+k3s_valid_states:
+  - installed
+  - started
+  - stopped
+  - restarted
+  - downloaded
+  - uninstalled
+  - validated
+
+# Map ansible fact gathering architecture to a release name and suffix in github.
+k3s_arch_lookup:
+  amd64:
+    arch: amd64
+    suffix: ""
+  x86_64:
+    arch: amd64
+    suffix: ""
+  arm64:
+    arch: arm64
+    suffix: "-arm64"
+  aarch64:
+    arch: arm64
+    suffix: "-arm64"
+  arm:
+    arch: arm
+    suffix: "-armhf"
+  arm6l:
+    arch: arm
+    suffix: "-armhf"
+  armv6l:
+    arch: arm
+    suffix: "-armhf"
+  arm7:
+    arch: arm
+    suffix: "-armhf"
+  armv7l:
+    arch: arm
+    suffix: "-armhf"
+  armhf:
+    arch: arm
+    suffix: "-armhf"
+
+# Always default to stable channel, this will change with k3s_release_version
+k3s_release_channel: stable
+
+# K3s updates API
+k3s_api_releases: https://update.k3s.io/v1-release/channels
+# Download location for releases
+k3s_github_download_url: "{{ k3s_github_url }}/releases/download"
+
+# Generate a runtime config dictionary for validation
+k3s_runtime_config: "{{ (k3s_server | default({})) | combine (k3s_agent | default({})) }}"
+
+# Empty array for counting the number of control plane nodes
+k3s_controller_list: []
+
+# Control plane port default
+k3s_control_plane_port: 6443
+
+# Default to the "system" systemd context, this will be "user" when running rootless
+k3s_systemd_context: system
+
+# Directory for systemd unit files to be installed. As this role doesn't use package
+# management, this should live in /etc/systemd, not /lib/systemd
+k3s_systemd_unit_dir: "/etc/systemd/{{ k3s_systemd_context }}"
+
+# Data directory location for k3s
+k3s_data_dir: "{{ k3s_runtime_config['data-dir'] | default('/var/lib/rancher/k3s') }}"
+
+# Config directroy location for k3s
+k3s_config_dir: "{{ k3s_config_file | dirname }}"
+
+# Directory for gathering the k3s token for clustering. I don't see this changing.
+k3s_token_location: "{{ k3s_config_dir }}/cluster-token"
+
+# Path for additional Kubernetes Manifests
+# https://rancher.com/docs/k3s/latest/en/advanced/#auto-deploying-manifests
+k3s_server_manifests_dir: "{{ k3s_data_dir }}/server/manifests"
+
+# Packages that we need to check are installed
+k3s_check_packages: []
+# - name: dummy
+#   from: 1.19.2
+#   until: 1.21.0
+#   documentation: https://example.com
+
+# Directories that we need to ensure exist
+k3s_ensure_directories_exist:
+  - name: Config directory
+    path: "{{ k3s_config_dir }}"
+  - name: Systemd unit file directory
+    path: "{{ k3s_systemd_unit_dir }}"
+  - name: Data directory
+    path: "{{ k3s_data_dir }}"
+  - name: Default local storage path
+    path: "{{ k3s_runtime_config['default-local-storage-path'] | default(omit) }}"
+  - name: Private registry config file
+    path: "{{ (k3s_runtime_config['private-registry'] | default(omit)) | dirname }}"
+
+# Config items that should not appear in k3s_server or k3s_agent
+k3s_config_exclude:
+  - setting: server
+    correction: k3s_control_node_address
+  - setting: cluster-init
+    correction: k3s_etcd_datastore
+  - setting: token
+    correction: k3s_control_token
+  - setting: token-file
+    correction: k3s_token_location
+
+# Config items and the versions that they were introduced
+# k3s_config_version_check:
+#   - setting: example
+#     version: 1.19.3
+
+# Config items that should be marked as experimental
+k3s_experimental_config:
+  - setting: selinux
+    until: 1.19.4
+  - setting: rootless
+  - setting: secrets-encryption
+  - setting: agent-token
+  - setting: agent-token-file
+  - setting: cluster-reset
+    until: 1.19.5
+
+# Config items that should be marked as deprecated
+k3s_deprecated_config:
+  - setting: no-flannel
+    correction: "flannel-backend: 'none'"
+    # when: 0.10.2  # Example
+  - setting: cluster-secret
+    correction: token
+  - setting: no-deploy
+    correction: "disable: VALUE"
+  - setting: docker
+    correction: "docker: false"
+    when: 1.20.0
