@@ -1,0 +1,53 @@
+---
+
+- name: Ensure python-dnf is installed
+  ansible.builtin.package:
+    name: "{{ 'python-dnf' if ansible_python_version is version_compare('3.0.0', '<') else 'python3-dnf' }}"
+    state: present
+  register: ensure_python_dnf_installed
+  become: "{{ k3s_become_for_package_install | ternary(true, false, k3s_become_for_all) }}"
+  until: ensure_python_dnf_installed is succeeded
+  retries: 3
+  delay: 10
+  when: ansible_pkg_mgr == 'dnf'
+
+- name: Ensure Docker prerequisites are installed
+  ansible.builtin.yum:
+    name:
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+    state: present
+  register: ensure_docker_prerequisites_installed
+  until: ensure_docker_prerequisites_installed is succeeded
+  retries: 3
+  delay: 10
+  become: "{{ k3s_become_for_package_install | ternary(true, false, k3s_become_for_all) }}"
+
+- name: Check to see if Docker repository is available for this distribution
+  ansible.builtin.uri:
+    url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/{{ ansible_distribution_major_version }}"
+  register: k3s_redhat_repo_check
+  failed_when: false
+  changed_when: false
+
+- name: Ensure Docker repository is installed and configured
+  ansible.builtin.yum_repository:
+    name: docker-ce
+    description: Docker CE Repository
+    baseurl: https://download.docker.com/linux/{{ ansible_distribution | lower }}/{{ ansible_distribution_major_version }}/$basearch/stable
+    gpgkey: https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg
+    enabled: true
+    gpgcheck: true
+    state: present
+  when: ansible_distribution | lower not in ['amazon']
+        and k3s_redhat_repo_check.status == 200
+  become: "{{ k3s_become_for_package_install | ternary(true, false, k3s_become_for_all) }}"
+
+- name: Ensure Docker repository is installed and configured from file
+  ansible.builtin.command: yum-config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+  args:
+    creates: /etc/yum.repos.d/docker-ce.repo
+  when: ansible_distribution | lower not in ['amazon']
+        and k3s_redhat_repo_check.status != 200
+  become: "{{ k3s_become_for_package_install | ternary(true, false, k3s_become_for_all) }}"

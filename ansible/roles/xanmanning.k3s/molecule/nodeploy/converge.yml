@@ -1,0 +1,10 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  vars:
+    molecule_is_test: true
+    k3s_server: "{{ lookup('file', 'k3s_server.yml') | from_yaml }}"
+    k3s_agent: "{{ lookup('file', 'k3s_agent.yml') | from_yaml }}"
+  roles:
+    - role: xanmanning.k3s

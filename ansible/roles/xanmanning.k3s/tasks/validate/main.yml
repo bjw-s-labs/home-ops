@@ -1,0 +1,12 @@
+---
+
+- import_tasks: configuration/variables.yml
+
+- import_tasks: configuration/experimental-variables.yml
+
+- import_tasks: configuration/unsupported-rootless.yml
+  when: ("rootless" in k3s_runtime_config)
+        and k3s_runtime_config.rootless
+
+- import_tasks: configuration/control-node-count.yml
+  when: k3s_build_cluster is defined and k3s_build_cluster

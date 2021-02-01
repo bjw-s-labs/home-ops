@@ -1,0 +1,55 @@
+---
+
+- name: Check that k3s is not running
+  ansible.builtin.command: pgrep k3s
+  ignore_errors: true
+  changed_when: false
+  register: check_k3s_process
+
+- name: Fail if k3s is still running
+  ansible.builtin.fail:
+    msg: k3s is still running, uninstall script failed. Please investigate.
+  when: check_k3s_process.rc == 0
+
+- name: Check that docker is not running
+  ansible.builtin.command: pgrep docker
+  ignore_errors: true
+  changed_when: false
+  register: check_k3s_docker_process
+  when: ("docker" in k3s_runtime_config and k3s_runtime_config.docker)
+
+- name: Fail if docker is still running
+  ansible.builtin.fail:
+    msg: docker is still running, uninstall script failed. Please investigate.
+  when: ("docker" in k3s_runtime_config and k3s_runtime_config.docker)
+
+- name: Fail if k3s binaries have not been removed
+  ansible.builtin.stat:
+    path: "{{ k3s_install_dir }}/{{ item }}"
+  register: check_k3s_binaries_removed
+  failed_when: check_k3s_binaries_removed.stat.exists
+  loop:
+    - k3s
+    - kubectl
+    - crictl
+    - ctr
+
+- name: Check k3s-killall.sh is removed
+  ansible.builtin.stat:
+    path: /usr/local/bin/k3s-killall.sh
+  register: check_k3s_killall
+
+- name: Fail if k3s-killall.sh script still exists
+  ansible.builtin.fail:
+    msg: k3s-killall.sh is still running, uninstall script failed. Please investigate.
+  when: check_k3s_killall.stat.exists
+
+- name: Check k3s-uninstall.sh is removed
+  ansible.builtin.stat:
+    path: /usr/local/bin/k3s-uninstall.sh
+  register: check_k3s_uninstall
+
+- name: Fail if k3s-uninstall.sh script still exists
+  ansible.builtin.fail:
+    msg: k3s-uninstall.sh is still running, uninstall script failed. Please investigate.
+  when: check_k3s_uninstall.stat.exists

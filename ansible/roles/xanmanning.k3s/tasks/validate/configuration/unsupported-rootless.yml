@@ -1,0 +1,61 @@
+---
+
+- name: Check if newuidmap is available
+  ansible.builtin.command: which newuidmap
+  failed_when: false
+  changed_when: false
+  register: k3s_check_newuidmap_installed
+
+- name: Check if /proc/sys/kernel/unprivileged_userns_clone exists
+  ansible.builtin.stat:
+    path: /proc/sys/kernel/unprivileged_userns_clone
+  register: k3s_check_unprivileged_userns_exists
+
+- name: Get the value of /proc/sys/kernel/unprivileged_userns_clone
+  ansible.builtin.slurp:
+    src: /proc/sys/kernel/unprivileged_userns_clone
+  register: k3s_get_unprivileged_userns_clone
+  when: k3s_check_unprivileged_userns_exists.stat.exists
+
+- name: Set the value of k3s_get_unprivileged_userns_clone
+  ansible.builtin.set_fact:
+    k3s_get_unprivileged_userns_clone:
+      content: "MQo="
+  when: not k3s_check_unprivileged_userns_exists.stat.exists
+
+- name: Get the value of /proc/sys/user/max_user_namespaces
+  ansible.builtin.slurp:
+    src: /proc/sys/user/max_user_namespaces
+  register: k3s_get_max_user_namespaces
+
+- name: Get the contents of /etc/subuid
+  ansible.builtin.slurp:
+    src: /etc/subuid
+  register: k3s_get_subuid
+
+- name: Get the contents of /etc/subgid
+  ansible.builtin.slurp:
+    src: /etc/subgid
+  register: k3s_get_subgid
+
+- name: Get current user subuid and subgid values
+  ansible.builtin.set_fact:
+    k3s_current_user_subuid: "{{ (k3s_get_subuid['content'] | b64decode).split('\n')
+      | select('search', ansible_user_id) | first | default('UserNotFound:0:0') }}"
+    k3s_current_user_subgid: "{{ (k3s_get_subgid['content'] | b64decode).split('\n')
+      | select('search', ansible_user_id) | first | default('UserNotFound:0:0') }}"
+
+- name: Check user namespaces kernel parameters are adequate
+  ansible.builtin.assert:
+    that:
+      - k3s_get_unprivileged_userns_clone['content'] | b64decode | int == 1
+      - k3s_get_max_user_namespaces['content'] | b64decode | int >= 28633
+      - k3s_current_user_subuid != "UserNotFound:0:0"
+      - k3s_current_user_subgid != "UserNotFound:0:0"
+      - k3s_current_user_subuid.split(':')[2] | int >= 65536
+      - k3s_current_user_subgid.split(':')[2] | int >= 65536
+      - ansible_env['XDG_RUNTIME_DIR'] is defined
+      - k3s_check_newuidmap_installed.rc == 0
+    success_msg: All kernel parameters passed
+    fail_msg: Kernel parameters are not set correctly, please check
+              https://github.com/rootless-containers/rootlesskit

@@ -1,0 +1,48 @@
+[Unit]
+Description=Lightweight Kubernetes
+Documentation=https://k3s.io
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type={{ 'notify' if k3s_control_node else 'exec' }}
+ExecStartPre=-/sbin/modprobe br_netfilter
+ExecStartPre=-/sbin/modprobe overlay
+{% filter regex_replace('\s+', ' ') %}
+{% filter replace('\n', ' ') %}
+ExecStart={{ k3s_install_dir }}/k3s
+{% if k3s_debug is defined and k3s_debug %}
+    --debug
+{% endif %}
+{% if k3s_control_node %}
+    server
+    {% if (k3s_etcd_datastore is defined and k3s_etcd_datastore) and (k3s_primary_control_node is not defined or not k3s_primary_control_node) %}
+        --server https://{{ k3s_control_node_address }}:{{ k3s_control_plane_port | default(6443) }}
+        --token-file {{ k3s_token_location }}
+    {% endif %}
+    {% if k3s_server is defined %}
+        --config {{ k3s_config_file }}
+    {% endif %}
+{% else %}
+    agent
+    --server https://{{ k3s_control_node_address }}:{{ k3s_control_plane_port | default(6443) }}
+    --token-file {{ k3s_token_location }}
+    {% if k3s_agent is defined %}
+        --config {{ k3s_config_file }}
+    {% endif %}
+{% endif %}
+{% endfilter %}
+{% endfilter %}
+
+KillMode=process
+Delegate=yes
+LimitNOFILE=1048576
+LimitNPROC=infinity
+LimitCORE=infinity
+TasksMax=infinity
+TimeoutStartSec=0
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

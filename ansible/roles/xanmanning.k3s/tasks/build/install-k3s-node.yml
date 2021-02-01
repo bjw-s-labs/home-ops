@@ -1,0 +1,58 @@
+---
+
+- name: Ensure k3s is linked into the installation destination
+  ansible.builtin.file:
+    src: "{{ k3s_install_dir }}/k3s-{{ k3s_release_version }}"
+    dest: "{{ k3s_install_dir }}/{{ item }}"
+    state: "{{ 'hard' if k3s_install_hard_links else 'link' }}"
+    force: "{{ k3s_install_hard_links }}"
+    mode: 0755
+  loop:
+    - k3s
+    - kubectl
+    - crictl
+    - ctr
+  when: not ansible_check_mode
+  notify:
+    - restart k3s
+  become: "{{ k3s_become_for_install_dir | ternary(true, false, k3s_become_for_all) }}"
+
+- name: Ensure k3s config file exists
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: "{{ k3s_config_file }}"
+    mode: 0644
+  notify:
+    - reload systemd
+    - restart k3s
+  become: "{{ k3s_become_for_install_dir | ternary(true, false, k3s_become_for_all) }}"
+
+- name: Ensure k3s service unit file is present
+  ansible.builtin.template:
+    src: k3s.service.j2
+    dest: "{{ k3s_systemd_unit_dir }}/k3s.service"
+    mode: 0644
+  notify:
+    - reload systemd
+    - restart k3s
+  become: "{{ k3s_become_for_systemd | ternary(true, false, k3s_become_for_all) }}"
+
+- name: Ensure k3s killall script is present
+  ansible.builtin.template:
+    src: k3s-killall.sh.j2
+    dest: "/usr/local/bin/k3s-killall.sh"
+    mode: 0700
+  become: "{{ k3s_become_for_usr_local_bin | ternary(true, false, k3s_become_for_all) }}"
+  when: k3s_runtime_config is defined
+        and ("rootless" not in k3s_runtime_config
+             or not k3s_runtime_config.rootless)
+
+- name: Ensure k3s uninstall script is present
+  ansible.builtin.template:
+    src: k3s-uninstall.sh.j2
+    dest: "/usr/local/bin/k3s-uninstall.sh"
+    mode: 0700
+  become: "{{ k3s_become_for_usr_local_bin | ternary(true, false, k3s_become_for_all) }}"
+  when: k3s_runtime_config is defined
+        and ("rootless" not in k3s_runtime_config
+             or not k3s_runtime_config.rootless)

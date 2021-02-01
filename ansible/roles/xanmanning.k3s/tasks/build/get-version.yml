@@ -1,0 +1,28 @@
+---
+
+- name: Ensure k3s_release_version is set to default if false
+  ansible.builtin.set_fact:
+    k3s_release_version: "{{ k3s_release_channel }}"
+  check_mode: false
+  when: k3s_release_version is defined and not k3s_release_version
+
+- name: Ensure the default release channel is set
+  ansible.builtin.set_fact:
+    k3s_release_channel: "{{ k3s_release_version | default('stable') }}"
+  check_mode: false
+
+- name: Get the latest release version from k3s.io
+  ansible.builtin.uri:
+    url: "{{ k3s_api_releases }}"
+    return_content: true
+    body_format: json
+  register: k3s_latest_release
+  check_mode: false
+
+- name: Ensure the release version is set as a fact
+  ansible.builtin.set_fact:
+    k3s_release_version: "{{ item.latest }}"
+  loop: "{{ k3s_latest_release.json.data }}"
+  check_mode: false
+  when: item.name == k3s_release_channel
+        and item.type == "channel"

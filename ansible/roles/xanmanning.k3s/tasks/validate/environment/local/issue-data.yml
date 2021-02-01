@@ -1,0 +1,82 @@
+---
+
+- name: Ensure facts are gathered
+  ansible.builtin.setup:
+
+- name: Ensure Ansible version is captured
+  ansible.builtin.command: ansible --version
+  failed_when: false
+  changed_when: false
+  register: check_ansible_version
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+- name: Ensure Ansible config is captured
+  ansible.builtin.command: ansible-config dump --only-changed
+  failed_when: false
+  changed_when: false
+  register: check_ansible_config
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+- name: Ensure a list of roles is captured
+  ansible.builtin.command: ansible-galaxy role list
+  failed_when: false
+  changed_when: false
+  register: check_ansible_roles
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+- name: Ensure facts are written to disk
+  ansible.builtin.copy:
+    dest: "{{ playbook_dir }}/pyratlabs-issue-dump.txt"
+    content: |
+      # Begin ANSIBLE VERSION
+      {{ check_ansible_version.stdout }}
+      # End ANSIBLE VERSION
+
+      # Begin ANSIBLE CONFIG
+      {{ check_ansible_config.stdout }}
+      # End ANSIBLE CONFIG
+
+      # Begin ANSIBLE ROLES
+      {{ check_ansible_roles.stdout }}
+      # End ANSIBLE ROLES
+
+      # Begin PLAY HOSTS
+      {{ ansible_play_hosts_all | to_json }}
+      # End PLAY HOSTS
+
+      # Begin K3S ROLE CONFIG
+      {% for host in ansible_play_hosts_all %}
+      ## {{ host }}
+      {% for config_key in hostvars[host] %}
+      {% if config_key | regex_search('^k3s_') %}
+      {{ config_key }}: {{ hostvars[host][config_key] | to_json }}
+      {% endif %}
+      {% endfor %}
+
+      {% endfor %}
+      # End K3S ROLE CONFIG
+
+      # Begin K3S RUNTIME CONFIG
+      {% for host in ansible_play_hosts_all %}
+      ## {{ host }}
+      {% if hostvars[host].k3s_runtime_config is defined %}
+      {{ hostvars[host].k3s_runtime_config }}
+      {% endif %}
+      {% endfor %}
+      # End K3S RUNTIME CONFIG
+    mode: 0600
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+- name: Fail the play
+  ansible.builtin.fail:
+    msg: "Please include the output of {{ playbook_dir }}/pyratlabs-issue-dump.txt in your bug report."
+  delegate_to: localhost
+  run_once: true

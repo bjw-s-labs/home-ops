@@ -1,0 +1,17 @@
+---
+
+- name: Check that all nodes to be ready
+  ansible.builtin.command: "{{ k3s_install_dir }}/kubectl get nodes"
+  changed_when: false
+  failed_when: kubectl_get_nodes_result.stdout.find("was refused") != -1 or
+               kubectl_get_nodes_result.stdout.find("ServiceUnavailable") != -1
+  register: kubectl_get_nodes_result
+  until: kubectl_get_nodes_result.rc == 0
+         and kubectl_get_nodes_result.stdout.find("NotReady") == -1
+  retries: 30
+  delay: 20
+  when: k3s_control_node
+        and ("flannel-backend" not in k3s_runtime_config
+            or k3s_runtime_config["flannel-backend"] != "none")
+        and not ansible_check_mode
+  become: "{{ k3s_become_for_kubectl | ternary(true, false, k3s_become_for_all) }}"
