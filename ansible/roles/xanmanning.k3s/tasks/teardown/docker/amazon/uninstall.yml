@@ -1,0 +1,7 @@
+---
+
+- name: Ensure docker is uninstalled using amazon-linux-extras
+  ansible.builtin.command: amazon-linux-extras uninstall docker
+  register: uninstall_docker_from_amazon_linux
+  changed_when: uninstall_docker_from_amazon_linux.rc == 0
+  become: "{{ k3s_become_for_uninstall | ternary(true, false, k3s_become_for_all) }}"

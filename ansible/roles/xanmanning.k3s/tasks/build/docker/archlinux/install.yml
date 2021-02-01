@@ -1,0 +1,15 @@
+---
+
+- name: Ensure docker is installed using Pacman
+  community.general.pacman:
+    name: docker
+    state: present
+  register: ensure_docker_prerequisites_installed
+  until: ensure_docker_prerequisites_installed is succeeded
+  retries: 3
+  delay: 10
+  notify:
+    - restart docker
+  become: "{{ k3s_become_for_package_install | ternary(true, false, k3s_become_for_all) }}"
+
+- meta: flush_handlers

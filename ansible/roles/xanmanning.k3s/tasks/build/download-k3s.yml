@@ -1,0 +1,51 @@
+---
+
+- name: Ensure target host architecture information is set as a fact
+  ansible.builtin.set_fact:
+    k3s_arch: "{{ k3s_arch_lookup[ansible_architecture].arch }}"
+    k3s_arch_suffix: "{{ k3s_arch_lookup[ansible_architecture].suffix }}"
+  check_mode: false
+
+- name: Ensure URLs are set as facts for downloading binaries
+  ansible.builtin.set_fact:
+    k3s_binary_url: "{{ k3s_github_download_url }}/{{ k3s_release_version }}/k3s{{ k3s_arch_suffix }}"
+    k3s_hash_url: "{{ k3s_github_download_url }}/{{ k3s_release_version }}/sha256sum-{{ k3s_arch }}.txt"
+  check_mode: false
+
+- name: Override k3s_binary_url and k3s_hash_url facts for testing specific commit
+  ansible.builtin.set_fact:
+    k3s_binary_url: "https://storage.googleapis.com/k3s-ci-builds/k3s{{ k3s_arch_suffix }}-{{ k3s_release_version }}"
+    k3s_hash_url: "https://storage.googleapis.com/k3s-ci-builds/k3s{{ k3s_arch_suffix }}-{{ k3s_release_version }}.sha256sum"
+  when:
+    - k3s_release_version | regex_search("^[a-z0-9]{40}$")
+  check_mode: false
+
+- name: Ensure the k3s hashsum is downloaded
+  ansible.builtin.uri:
+    url: "{{ k3s_hash_url }}"
+    return_content: true
+  register: k3s_hash_sum_raw
+  check_mode: false
+
+- name: Ensure sha256sum is set from hashsum variable
+  ansible.builtin.set_fact:
+    k3s_hash_sum: "{{ (k3s_hash_sum_raw.content.split('\n') |
+      select('search', 'k3s' + k3s_arch_suffix) |
+      reject('search', 'images') |
+      first).split() | first }}"
+  changed_when: false
+  check_mode: false
+
+- name: Ensure installation directory exists
+  ansible.builtin.file:
+    path: "{{ k3s_install_dir }}"
+    state: directory
+    mode: 0755
+
+- name: Ensure k3s binary is downloaded
+  ansible.builtin.get_url:
+    url: "{{ k3s_binary_url }}"
+    dest: "{{ k3s_install_dir }}/k3s-{{ k3s_release_version }}"
+    checksum: "sha256:{{ k3s_hash_sum }}"
+    mode: 0755
+  become: "{{ k3s_become_for_install_dir | ternary(true, false, k3s_become_for_all)  }}"

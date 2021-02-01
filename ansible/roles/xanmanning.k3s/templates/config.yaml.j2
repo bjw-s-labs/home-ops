@@ -1,0 +1,8 @@
+---
+
+{% if k3s_etcd_datastore and (k3s_control_node is defined and k3s_control_node) and (k3s_primary_control_node is defined and k3s_primary_control_node) %}
+cluster-init: true
+{% endif %}
+{% if k3s_runtime_config is defined and k3s_runtime_config | length > 0 %}
+{{ k3s_runtime_config | to_nice_yaml(indent=2) }}
+{% endif %}

@@ -1,0 +1,11 @@
+---
+
+- name: Check that Ansible v{{ ansible_version.string }} is supported by this role
+  ansible.builtin.assert:
+    that:
+      - ansible_version.string is version_compare(k3s_ansible_min_version, '>=')
+    fail_msg: "Ansible v{{ ansible_version.string }} is not supported by this role. Please install >= v{{ k3s_ansible_min_version }}"
+    success_msg: "Ansible v{{ ansible_version.string }} is supported."
+  become: false
+  delegate_to: localhost
+  run_once: true

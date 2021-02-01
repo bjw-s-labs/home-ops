@@ -1,0 +1,14 @@
+---
+
+flannel-backend: 'none'
+disable-scheduler: true
+disable-cloud-controller: true
+disable-network-policy: true
+disable:
+  - coredns
+  - traefik
+  - servicelb
+  - local-storage
+  - metrics-server
+node-taint:
+  - "k3s-controlplane=true:NoExecute"

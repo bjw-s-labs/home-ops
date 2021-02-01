@@ -1,0 +1,84 @@
+---
+
+##
+# Global/Cluster Configuration
+##
+
+# k3s state, options: installed, started, stopped, restarted, uninstalled, validated
+# (default: installed)
+k3s_state: installed
+
+# Use a specific k3s version, if set to "false" we will get the latest
+# k3s_release_version: v1.19.3
+k3s_release_version: false
+
+# Loction of the k3s configuration file
+k3s_config_file: /etc/rancher/k3s/config.yaml
+
+# When multiple ansible_play_hosts_all are present, attempt to cluster the nodes.
+# Using false will create multiple standalone nodes.
+# (default: true)
+k3s_build_cluster: true
+
+# URL for GitHub project
+k3s_github_url: https://github.com/k3s-io/k3s
+
+# Skip all tasks that validate configuration
+k3s_skip_validation: false
+
+# Skip all tasks that check environment configuration
+k3s_skip_env_checks: false
+
+# Installation directory for k3s
+k3s_install_dir: /usr/local/bin
+
+# Install using hard links rather than symbolic links
+k3s_install_hard_links: false
+
+# Start k3s on system boot
+k3s_start_on_boot: true
+
+# A list of templates used for preconfigure the cluster.
+k3s_server_manifests_templates: []
+
+# Use experimental features in k3s?
+k3s_use_experimental: false
+
+# Allow for unsupported configurations in k3s?
+k3s_use_unsupported_config: false
+
+# Enable etcd embedded datastore
+k3s_etcd_datastore: false
+
+
+##
+# Server Configuration
+##
+
+k3s_server: {}
+# k3s_server:
+#  listen-port: 6443
+
+##
+# Agent Configuration
+##
+
+k3s_agent: {}
+# k3s_agent:
+#   node-label:
+#     - "foo=bar"
+#     - "bish=bosh"
+
+##
+# Ansible Controller configuration
+##
+
+# Use become privileges for
+k3s_become_for_all: false
+k3s_become_for_systemd: null
+k3s_become_for_install_dir: null
+k3s_become_for_directory_creation: null
+k3s_become_for_usr_local_bin: null
+k3s_become_for_package_install: null
+k3s_become_for_kubectl: null
+k3s_become_for_uninstall: null

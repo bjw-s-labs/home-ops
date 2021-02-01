@@ -1,0 +1,18 @@
+---
+
+- name: Ensure k3s service is stopped
+  ansible.builtin.systemd:
+    name: k3s
+    state: stopped
+    enabled: "{{ k3s_start_on_boot }}"
+  when: k3s_non_root is not defined or not k3s_non_root
+  become: "{{ k3s_become_for_systemd | ternary(true, false, k3s_become_for_all) }}"
+
+- name: Ensure k3s service is started
+  ansible.builtin.systemd:
+    name: k3s
+    state: stopped
+    enabled: "{{ k3s_start_on_boot }}"
+    scope: user
+  when: k3s_non_root is defined and k3s_non_root
+  become: "{{ k3s_become_for_systemd | ternary(true, false, k3s_become_for_all) }}"

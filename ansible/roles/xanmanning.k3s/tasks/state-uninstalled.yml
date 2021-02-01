@@ -1,0 +1,24 @@
+---
+
+- import_tasks: build/preconfigure-k3s.yml
+
+- import_tasks: teardown/drain-and-remove-nodes.yml
+
+- import_tasks: teardown/uninstall-k3s.yml
+
+- name: Ensure docker uninstall tasks are run
+  block:
+
+    - import_tasks: teardown/docker/uninstall.yml
+      when: ansible_distribution | replace(" ", "-") | lower not in ['amazon', 'suse', 'opensuse-leap', 'archlinux']
+
+    - include_tasks: teardown/docker/{{ ansible_distribution | replace(" ", "-") | lower }}/uninstall.yml
+      when: ansible_distribution | replace(" ", "-") | lower in ['amazon', 'suse', 'opensuse-leap', 'archlinux']
+
+    - include_tasks: teardown/docker/{{ ansible_os_family | lower }}/uninstall-prerequisites.yml
+
+  when: ('docker' in k3s_runtime_config and k3s_runtime_config.docker)
+        and ('rootless' not in k3s_runtime_config or not k3s_runtime_config.rootless)
+
+- import_tasks: validate/state/uninstalled.yml
+  when: not k3s_skip_validation

@@ -1,0 +1,36 @@
+---
+
+- name: Check the conditions when a single controller is defined
+  ansible.builtin.assert:
+    that:
+      - (k3s_controller_list | length == 1)
+        and ("datastore-endpoint" not in k3s_runtime_config or not k3s_runtime_config['datastore-endpoint'])
+        and (k3s_etcd_datastore is not defined or not k3s_etcd_datastore)
+    success_msg: "Control plane configuration is valid."
+    fail_msg: "Control plane configuration is invalid. Please see notes about k3s_control_node and HA in README.md."
+  when: k3s_controller_list | length == 1
+        and not k3s_use_unsupported_config
+        and k3s_control_node
+
+- name: Check the conditions when multiple controllers are defined
+  ansible.builtin.assert:
+    that:
+      - (k3s_controller_list | length >= 2)
+        and (("datastore-endpoint" in k3s_runtime_config and k3s_runtime_config['datastore-endpoint'])
+            or (k3s_etcd_datastore is defined and k3s_etcd_datastore))
+    success_msg: "Control plane configuration is valid."
+    fail_msg: "Control plane configuration is invalid. Please see notes about k3s_control_node and HA in README.md."
+  when: k3s_controller_list | length >= 2
+        and k3s_control_node
+
+- name: Check the conditions when embedded etcd is defined
+  ansible.builtin.assert:
+    that:
+      - (k3s_controller_list | length >= 3)
+        and (((k3s_controller_list | length) % 2) == 1)
+    success_msg: "Control plane configuration is valid."
+    fail_msg: "Etcd should have a minimum of 3 defined members and the number of members should be odd. Please see notes about HA in README.md"
+  when: k3s_etcd_datastore is defined
+        and k3s_etcd_datastore
+        and not k3s_use_unsupported_config
+        and k3s_control_node

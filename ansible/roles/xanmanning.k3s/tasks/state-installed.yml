@@ -1,0 +1,43 @@
+---
+
+- import_tasks: build/preconfigure-k3s.yml
+
+- import_tasks: teardown/drain-and-remove-nodes.yml
+
+- import_tasks: build/get-version.yml
+  when: k3s_release_version is not defined
+        or not k3s_release_version
+        or k3s_release_version is not regex('\\+k3s[1-9]$')
+
+- import_tasks: validate/main.yml
+  when: not k3s_skip_validation
+
+- import_tasks: build/get-systemd-context.yml
+
+- name: Ensure docker installation tasks are run
+  block:
+
+    - include_tasks: build/docker/{{ ansible_os_family | lower }}/install-prerequisites.yml
+
+    - import_tasks: build/docker/install.yml
+      when: ansible_distribution | replace(" ", "-") | lower not in ['amazon', 'suse', 'opensuse-leap', 'archlinux']
+
+    - include_tasks: build/docker/{{ ansible_distribution | replace(" ", "-") | lower }}/install.yml
+      when: ansible_distribution | replace(" ", "-") | lower in ['amazon', 'suse', 'opensuse-leap', 'archlinux']
+
+  when: ('docker' in k3s_runtime_config and k3s_runtime_config.docker)
+        and ('rootless' not in k3s_runtime_config or not k3s_runtime_config.rootless)
+
+- meta: flush_handlers
+
+- import_tasks: build/download-k3s.yml
+
+- import_tasks: build/preconfigure-k3s-auto-deploying-manifests.yml
+  when: k3s_control_node
+        and k3s_server_manifests_templates | length > 0
+
+- import_tasks: build/install-k3s.yml
+
+- import_tasks: build/configure-k3s-cluster.yml
+  when: k3s_build_cluster is defined and k3s_build_cluster
+        and k3s_control_node_address is defined
