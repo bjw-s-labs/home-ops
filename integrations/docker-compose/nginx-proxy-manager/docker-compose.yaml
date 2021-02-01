@@ -1,0 +1,16 @@
+---
+version: '3.7'
+services:
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:2.7.3
+    restart: unless-stopped
+    ports:
+    - 80:80
+    - 443:443
+    - 81:81
+    environment:
+      TZ: "Europe/Amsterdam"
+      DB_SQLITE_FILE: "/data/database.sqlite"
+    volumes:
+    - /volume2/docker/nginx-proxy-manager/data:/data
+    - /volume2/docker/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
