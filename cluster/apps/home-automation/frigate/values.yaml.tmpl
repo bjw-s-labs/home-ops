@@ -21,10 +21,14 @@ timezone: Europe/Amsterdam
 coral:
   enabled: true
 
-persistence:
-  data:
-    enabled: true
-    existingClaim: nfs-nas-frigate-data
+extraVolumes:
+- name: frigate-media
+  persistentVolumeClaim:
+    claimName: nfs-nas-frigate-data
+
+extraVolumeMounts:
+- name: frigate-media
+  mountPath: /media
 
 ingress:
   enabled: true
