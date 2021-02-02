@@ -85,9 +85,20 @@ config: |
       height: 360
       fps: 6
 
+      clips:
+        enabled: True
+        objects:
+          - person
+        retain:
+          # Required: Default retention days (default: shown below)
+          default: 14
+
       snapshots:
-        enabled: False
+        enabled: True
         timestamp: True
+        retain:
+          # Required: Default retention days (default: shown below)
+          default: 14
 
       motion:
         mask:
