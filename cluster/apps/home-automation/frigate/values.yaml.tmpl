@@ -56,6 +56,9 @@ ingress:
       secretName: tls.frigate
 
 config: |
+  logger:
+    default: debug
+
   mqtt:
     host: {{ (datasource "frigate").mqtt.host }}
     port: 1883
