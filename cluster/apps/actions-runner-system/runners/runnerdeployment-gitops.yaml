@@ -11,6 +11,14 @@ spec:
       image: k8sathome/actions-runner:v2.276.1
       imagePullPolicy: Always
       env: []
+
+      resources:
+        requests:
+          cpu: "1.0"
+          memory: "1Gi"
+        limits:
+          cpu: "4.0"
+          memory: "4Gi"
 ---
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: HorizontalRunnerAutoscaler
