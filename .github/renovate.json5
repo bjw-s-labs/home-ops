@@ -105,6 +105,12 @@
       "versionScheme": "regex:^RELEASE\\.(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})"
     },
     // Pin package versions (none for now)
+    // Octoprint has some weird published versions, try to ignore these
+    {
+      "datasources": ["docker"],
+      "packageNames": ["octoprint/octoprint"],
+      "allowedVersions": "<10.0"
+    },
     // Version strategies
     {
       "datasources": ["docker"],
