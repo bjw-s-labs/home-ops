@@ -3,7 +3,7 @@ set -e
 
 REPO_ROOT=$(git rev-parse --show-toplevel)
 CLUSTER_ROOT="${REPO_ROOT}/cluster"
-APPS_ROOT="${CLUSTER_ROOT}/apps"
+NAMESPACES_ROOT="${CLUSTER_ROOT}/namespaces"
 REPOSITORY_FILES="${CLUSTER_ROOT}/base/system-flux/helm-chart-repositories"
 
 need() {
@@ -42,4 +42,4 @@ do
             break
         fi
     done
-done <   <(find "${APPS_ROOT}" -type f -name "*.yaml" -print0)
+done <   <(find "${NAMESPACES_ROOT}" -type f -name "*.yaml" -print0)
