@@ -6,12 +6,10 @@ metadata:
   namespace: system-flux
 spec:
   dependsOn:
-  - name: system-flux-helm-repositories
-  - name: cluster-requirements
+  - name: cluster-core
   interval: 10m0s
   path: ./cluster/apps
   prune: true
   sourceRef:
     kind: GitRepository
     name: system-flux
-  validation: client
