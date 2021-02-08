@@ -2,13 +2,12 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
-  name: cluster-requirements
+  name: cluster-core
   namespace: system-flux
 spec:
   interval: 10m0s
-  path: ./cluster/requirements
+  path: ./cluster/core
   prune: false
   sourceRef:
     kind: GitRepository
     name: system-flux
-  validation: client
