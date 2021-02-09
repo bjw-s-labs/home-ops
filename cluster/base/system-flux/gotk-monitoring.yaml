@@ -1,0 +1,72 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: kustomize-controller
+  namespace: system-flux
+  labels:
+    app.kubernetes.io/instance: system-flux
+    app.kubernetes.io/version: latest
+spec:
+  namespaceSelector:
+    matchNames:
+      - system-flux
+  selector:
+    matchLabels:
+      app: kustomize-controller
+  podMetricsEndpoints:
+    - port: http-prom
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: source-controller
+  namespace: system-flux
+  labels:
+    app.kubernetes.io/instance: system-flux
+    app.kubernetes.io/version: latest
+spec:
+  namespaceSelector:
+    matchNames:
+      - system-flux
+  selector:
+    matchLabels:
+      app: source-controller
+  podMetricsEndpoints:
+    - port: http-prom
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: helm-controller
+  namespace: system-flux
+  labels:
+    app.kubernetes.io/instance: system-flux
+    app.kubernetes.io/version: latest
+spec:
+  namespaceSelector:
+    matchNames:
+      - system-flux
+  selector:
+    matchLabels:
+      app: helm-controller
+  podMetricsEndpoints:
+    - port: http-prom
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: notification-controller
+  namespace: system-flux
+  labels:
+    app.kubernetes.io/instance: system-flux
+    app.kubernetes.io/version: latest
+spec:
+  namespaceSelector:
+    matchNames:
+      - system-flux
+  selector:
+    matchLabels:
+      app: notification-controller
+  podMetricsEndpoints:
+    - port: http-prom
