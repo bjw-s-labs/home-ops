@@ -1,0 +1,23 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: grafana
+  namespace: system-monitoring
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://grafana.github.io/helm-charts
+      chart: grafana
+      version: 6.2.2
+      sourceRef:
+        kind: HelmRepository
+        name: grafana-charts
+        namespace: system-flux
+      interval: 5m
+  timeout: 20m
+
+  valuesFrom:
+  - kind: Secret
+    name: "grafana-helm-values"
