@@ -64,12 +64,10 @@ grafana:
 nodeExporter:
   serviceMonitor:
     relabelings:
-    - action: replace
-      regex: (.*)
-      replacement: $1
-      sourceLabels:
-      - __meta_kubernetes_pod_node_name
-      targetLabel: kubernetes_node
+    - sourceLabels: [__meta_kubernetes_pod_node_name]
+      targetLabel: nodename
+      targetLabel: instance
+      action: replace
 
 kubeEtcd:
   enabled: false
@@ -83,13 +81,12 @@ kubeScheduler:
 kubeProxy:
   enabled: false
 
-kubelet:
-  serviceMonitor:
-    metricRelabelings:
-    - action: replace
-      sourceLabels:
-      - node
-      targetLabel: instance
+prometheus-node-exporter:
+  tolerations:
+  - key: "node-role.kubernetes.io/arm-worker"
+    operator: "Exists"
+  - key: "node-role.kubernetes.io/master"
+    operator: "Exists"
 
 prometheus:
   ingress:
