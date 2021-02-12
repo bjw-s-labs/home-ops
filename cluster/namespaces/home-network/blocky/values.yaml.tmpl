@@ -13,6 +13,14 @@ config: |
   clientLookup:
     upstream: 10.1.1.1
 
+  conditional:
+    mapping:
+      # CoreDNS IP
+      {{ index (datasource "cluster-vars").domains 0 }}: udp:10.1.10.3
+      {{ index (datasource "cluster-vars").domains 1 }}: udp:10.1.10.3
+      {{ index (datasource "cluster-vars").domains 2 }}: udp:10.1.10.3
+      {{ index (datasource "cluster-vars").domains 3 }}: udp:10.1.10.3
+
   blocking:
     blackLists:
       ads:
