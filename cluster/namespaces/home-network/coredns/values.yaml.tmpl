@@ -76,14 +76,6 @@ servers:
   - name: reload
   # Detect forwarding loops
   - name: loop
-  # Forward everything to Blocky
-  - name: forward
-    parameters: . 10.1.10.12
-    configBlock: |-
-      except unifi {{ index (datasource "cluster-vars").domains 0 }} {{ index (datasource "cluster-vars").domains 1 }} {{ index (datasource "cluster-vars").domains 2 }} {{ index (datasource "cluster-vars").domains 3 }}
-  # Set up cache
-  - name: cache
-    parameters: 30
 
 prometheus:
   service:
