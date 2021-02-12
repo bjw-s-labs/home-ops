@@ -14,6 +14,21 @@ service:
 servers:
 - port: 53
   zones:
+  - zone: {{ index (datasource "cluster-vars").domains 3 }}
+    scheme: dns://
+  plugins:
+  # Enables console logging
+  # - name: log
+  - name: errors
+  # Forward internal domain to router
+  - name: forward
+    parameters: . 10.1.1.1
+  # Set up cache
+  - name: cache
+    parameters: 30
+
+- port: 53
+  zones:
   - zone: .
     scheme: dns://
   plugins:
