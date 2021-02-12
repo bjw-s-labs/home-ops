@@ -14,23 +14,6 @@ service:
 servers:
 - port: 53
   zones:
-  - zone: {{ index (datasource "cluster-vars").domains 3 }}
-    scheme: dns://
-  plugins:
-  # Enables console logging
-  # - name: log
-  - name: errors
-  # Detect forwarding loops
-  - name: loop
-  # Forward internal domain to router
-  - name: forward
-    parameters: . 10.1.1.1
-  # Set up cache
-  - name: cache
-    parameters: 30
-
-- port: 53
-  zones:
   - zone: {{ index (datasource "cluster-vars").domains 0 }}
     scheme: dns://
   - zone: {{ index (datasource "cluster-vars").domains 1 }}
@@ -39,10 +22,28 @@ servers:
     scheme: dns://
   - zone: unifi
     scheme: dns://
+
   plugins:
   # Enables console logging
   # - name: log
+
   - name: errors
+
+  # Serves a /health endpoint on :8080, required for livenessProbe
+  - name: health
+    configBlock: |-
+      lameduck 5s
+
+  # Serves a /ready endpoint on :8181, required for readinessProbe
+  - name: ready
+
+  # Serves a /metrics endpoint on :9153, required for serviceMonitor
+  - name: prometheus
+    parameters: 0.0.0.0:9153
+
+  # Allow automatic reloading of Corefile
+  - name: reload
+
   # Detect forwarding loops
   - name: loop
   # Set up local resolution
@@ -54,28 +55,6 @@ servers:
   # Set up cache
   - name: cache
     parameters: 30
-
-- port: 53
-  zones:
-  - zone: .
-    scheme: dns://
-  plugins:
-  # Enables console logging
-  # - name: log
-  - name: errors
-  # Serves a /health endpoint on :8080, required for livenessProbe
-  - name: health
-    configBlock: |-
-      lameduck 5s
-  # Serves a /ready endpoint on :8181, required for readinessProbe
-  - name: ready
-  # Serves a /metrics endpoint on :9153, required for serviceMonitor
-  - name: prometheus
-    parameters: 0.0.0.0:9153
-  # Allow automatic reloading of Corefile
-  - name: reload
-  # Detect forwarding loops
-  - name: loop
 
 prometheus:
   service:
