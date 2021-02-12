@@ -23,7 +23,7 @@ objstore:
   type: S3
   config:
     bucket: "thanos"
-    endpoint: "minio.{{ index (datasource "cluster-vars").domains 0 }}:9000"
+    endpoint: "minio.{{ index (datasource "cluster-vars").domains 0 }}"
     region: ""
     access_key: "{{ (datasource "thanos").minio.access_key }}"
     secret_key: "{{ (datasource "thanos").minio.secret_key }}"
