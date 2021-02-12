@@ -12,3 +12,5 @@ k3s_control_node: false
 # ...see https://github.com/PyratLabs/ansible-role-k3s#agent-worker-configuration
 k3s_agent:
   node-ip: "{{ ansible_host }}"
+
+  kubelet-arg: containerd=/run/k3s/containerd/containerd.sock
