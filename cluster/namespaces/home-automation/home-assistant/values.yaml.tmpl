@@ -56,6 +56,13 @@ persistence:
     enabled: true
     existingClaim: home-assistant-data
 
+resources:
+  requests:
+    cpu: 60m
+    memory: 512Mi
+  limits:
+    memory: 2000Mi
+
 postgresql:
   enabled: true
   persistence:
@@ -117,6 +124,6 @@ addons:
     resources:
       requests:
         cpu: 35m
-        memory: 2000Mi
+        memory: 128Mi
       limits:
-        memory: 2500Mi
+        memory: 512Mi
