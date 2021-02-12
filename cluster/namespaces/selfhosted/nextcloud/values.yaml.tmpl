@@ -18,6 +18,13 @@ ingress:
     hosts:
     - cloud.{{ index (datasource "cluster-vars").domains 2 }}
 
+resources:
+  requests:
+    cpu: "0.01"
+    memory: "305M"
+  limits:
+    memory: "512M"
+
 nextcloud:
     host: cloud.{{ index (datasource "cluster-vars").domains 2 }}
     username: {{ (datasource "nextcloud").auth.username }}
