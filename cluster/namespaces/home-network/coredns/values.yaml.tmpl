@@ -55,9 +55,6 @@ servers:
       stubzones
       path /skydns
       endpoint http://etcd:2379
-  # Forward internal domain to router
-  - name: forward
-    parameters: {{ index (datasource "cluster-vars").domains 3 }} 10.1.1.1
   # Forward everything else to Blocky
   - name: forward
     parameters: . 10.1.10.12
