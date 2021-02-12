@@ -54,9 +54,10 @@ ingress:
 
 resources:
   requests:
-    memory: "250Mi"
+    cpu: "0.075"
+    memory: "1000Mi"
   limits:
-    memory: "6000Mi"
+    memory: "4000Mi"
 
 additionalVolumes:
   - name: qbittorrent-scripts
@@ -92,3 +93,10 @@ addons:
       down:  |-
         #!/bin/bash
         echo "disconnected" > /shared/vpnstatus
+
+    resources:
+      requests:
+        cpu: "0.001"
+        memory: 128Mi
+      limits:
+        memory: 512Mi
