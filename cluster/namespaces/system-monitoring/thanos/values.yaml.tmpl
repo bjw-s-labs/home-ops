@@ -13,7 +13,8 @@ query:
       hosts:
       - "thanos.{{ index (datasource "cluster-vars").domains 0 }}"
       tls:
-      - hosts:
+      - secretName: tls.thanos
+        hosts:
         - "thanos.{{ index (datasource "cluster-vars").domains 0 }}"
 
 compact:
