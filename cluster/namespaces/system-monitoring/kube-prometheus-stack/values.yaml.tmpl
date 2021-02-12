@@ -103,9 +103,8 @@ prometheus:
       - prometheus.{{ index (datasource "cluster-vars").domains 0 }}
 
   prometheusSpec:
-    replicas: 2
-    replicaExternalLabelName: "replica"
-    podAntiAffinity: "hard"
+    retention: 4h
+
     ruleSelector: {}
     ruleNamespaceSelector: {}
     ruleSelectorNilUsesHelmValues: false
@@ -115,9 +114,20 @@ prometheus:
     podMonitorSelector: {}
     podMonitorNamespaceSelector: {}
     podMonitorSelectorNilUsesHelmValues: false
-    retention: 24h
-    enableAdminAPI: true
-    walCompression: true
+
+    thanos:
+      image: raspbernetes/thanos:v0.17.1
+      version: v0.17.1
+      # Thanos chart will generate the secret: thanos
+      objectStorageConfig:
+        name: thanos
+        key: object-store.yaml
+      resources:
+        requests:
+          memory: 128Mi
+          cpu: 100m
+        limits:
+          memory: 256Mi
 
     storageSpec:
       volumeClaimTemplate:
