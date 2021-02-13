@@ -6,7 +6,11 @@ eula:
 
 auth:
   k10AdminUsers:
-  - {{ (datasource "cluster-vars").email.primary }}
+  - {{ (datasource "k10").auth.user }}
+
+  basicAuth:
+    enabled: true
+    htpasswd: {{ (datasource "k10").auth.user }}:{{ (datasource "k10").auth.password }}
 
 ingress:
   create: true
