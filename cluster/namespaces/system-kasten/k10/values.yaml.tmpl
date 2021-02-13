@@ -1,0 +1,22 @@
+---
+eula:
+  accept: true
+  company: BJW-S
+  email: {{ (datasource "cluster-vars").email.primary }}
+
+auth:
+  k10AdminUsers:
+  - {{ (datasource "cluster-vars").email.primary }}
+
+ingress:
+  create: true
+  class: "internal"
+  host: k10.{{ index (datasource "cluster-vars").domains 0 }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    external-dns.alpha.kubernetes.io/target: cname--int.{{ index (datasource "cluster-vars").domains 0 }}
+  hosts:
+  - k10.{{ index (datasource "cluster-vars").domains 0 }}
+  tls:
+    enabled: true
+    secretName: tls.k10
