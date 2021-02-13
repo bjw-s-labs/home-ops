@@ -21,6 +21,7 @@ ingress:
     external-dns.alpha.kubernetes.io/target: cname--int.{{ index (datasource "cluster-vars").domains 0 }}
   hosts:
   - k10.{{ index (datasource "cluster-vars").domains 0 }}
+  urlPath: "/"
   tls:
     enabled: true
     secretName: tls.k10
