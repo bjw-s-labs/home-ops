@@ -1,0 +1,16 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: mintel-dex-charts-git
+  namespace: system-flux
+spec:
+  interval: 10m
+  url: https://github.com/mintel/dex-k8s-authenticator
+  ref:
+    branch: master
+  ignore: |
+    # exclude all
+    /*
+    # include charts directory
+    !/charts/
