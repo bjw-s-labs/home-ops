@@ -1,0 +1,35 @@
+---
+replicaCount: 1
+
+ingress:
+  enabled: true
+  path: /oauth2
+  annotations:
+    kubernetes.io/ingress.class: "external"
+    external-dns.alpha.kubernetes.io/target: cname--ext.{{ index (datasource "cluster-vars").domains 0 }}
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  hosts:
+  - auth.{{ index (datasource "cluster-vars").domains 0 }}
+  tls:
+  - secretName: tls.oauth2-proxy
+    hosts:
+    - auth.{{ index (datasource "cluster-vars").domains 0 }}
+
+config:
+  clientID: oauth2-proxy
+  clientSecret: "{{ (datasource "oauth2-proxy").dex.client_secret }}"
+  cookieSecret: "{{ (datasource "oauth2-proxy").config.cookie_secret }}"
+
+extraArgs:
+  provider: oidc
+  oidc-issuer-url: https://dex.{{ index (datasource "cluster-vars").domains 0 }}
+  redirect-url: https://auth.{{ index (datasource "cluster-vars").domains 0 }}/oauth2/callback
+  skip-provider-button:
+  pass-authorization-header: false
+  pass-access-token: true
+  email-domain: "*"
+  cookie-domain: ".{{ index (datasource "cluster-vars").domains 0 }}"
+  whitelist-domain: ".{{ index (datasource "cluster-vars").domains 0 }}"
+  cookie-secure: "true"
+  reverse-proxy: true
+  exclude-logging-path: "/ping"
