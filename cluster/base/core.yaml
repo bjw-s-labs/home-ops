@@ -5,6 +5,9 @@ metadata:
   name: cluster-core
   namespace: system-flux
 spec:
+  dependsOn:
+  - name: system-flux-git-repositories
+  - name: system-flux-helm-repositories
   interval: 10m0s
   path: ./cluster/core
   prune: false
