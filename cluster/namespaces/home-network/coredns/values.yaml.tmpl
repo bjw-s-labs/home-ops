@@ -46,12 +46,19 @@ servers:
 
   # Detect forwarding loops
   - name: loop
+
   # Set up local resolution
   - name: etcd
     configBlock: |-
       stubzones
       path /skydns
       endpoint http://etcd:2379
+      fallthrough
+
+  # Forward unknown addresses to router
+  - forward: . 10.1.1.1:53
+    configBlock: |-
+
   # Set up cache
   - name: cache
     parameters: 30
