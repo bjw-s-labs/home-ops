@@ -17,6 +17,7 @@ auth:
     scopes: "profile email"
     usernameClaim: "email"
     clientID: k10
+    clientSecret: {{ (datasource "k10").dex.client_secret }}
 
 ingress:
   create: true
