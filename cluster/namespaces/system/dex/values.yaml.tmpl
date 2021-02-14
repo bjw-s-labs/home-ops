@@ -62,3 +62,10 @@ config: |-
       # https://github.com/coreos/dex/blob/master/Documentation/connectors/github.md
       # orgs:
       # - name: holthome
+
+  staticClients:
+  - id: k10
+    name: k10
+    secret: {{ (datasource "dex").clients.k10.secret }}
+    redirectURIs:
+      - https://k10.{{ index (datasource "cluster-vars").domains 0 }}/k10/auth-svc/v0/oidc/redirect

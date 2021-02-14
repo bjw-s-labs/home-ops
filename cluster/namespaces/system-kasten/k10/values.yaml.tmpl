@@ -10,9 +10,13 @@ auth:
   k10AdminUsers:
   - {{ (datasource "k10").auth.user }}
 
-  basicAuth:
+  oidcAuth:
     enabled: true
-    htpasswd: {{ (datasource "k10").auth.user }}:{{ (datasource "k10").auth.password }}
+    providerURL: https://dex.{{ index (datasource "cluster-vars").domains 0 }}
+    redirectURL: https://k10.{{ index (datasource "cluster-vars").domains 0 }}
+    scopes: "profile email"
+    usernameClaim: "email"
+    clientID: k10
 
 ingress:
   create: true
