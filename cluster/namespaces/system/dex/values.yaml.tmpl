@@ -1,0 +1,64 @@
+---
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: "external"
+    external-dns.alpha.kubernetes.io/target: cname--ext.{{ index (datasource "cluster-vars").domains 0 }}
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  hosts:
+  - dex.{{ index (datasource "cluster-vars").domains 0 }}
+  tls:
+  - hosts:
+    - dex.{{ index (datasource "cluster-vars").domains 0 }}
+    secretName: tls.dex
+
+resources:
+  requests:
+    memory: 250Mi
+    cpu: 25m
+  limits:
+    memory: 250Mi
+
+config: |-
+  issuer: https://dex.{{ index (datasource "cluster-vars").domains 0 }}
+
+  storage:
+    type: kubernetes
+    config:
+      inCluster: true
+
+  web:
+    http: 0.0.0.0:5556
+
+  frontend:
+    theme: "coreos"
+    issuer: "BJW-S"
+    issuerUrl: "https://{{ index (datasource "cluster-vars").domains 0 }}"
+    logoUrl: http://icons.iconarchive.com/icons/icons-land/metro-halloween/512/Cool-icon.png
+
+  expiry:
+    signingKeys: "6h"
+    idTokens: "24h"
+
+  logger:
+    level: debug
+    format: json
+
+  oauth2:
+    responseTypes: ["code", "token", "id_token"]
+    skipApprovalScreen: true
+
+  connectors:
+  # GitHub configure 'OAuth Apps' -> 'New OAuth App', add callback URL
+  # https://github.com/settings/developers
+  - type: github
+    id: github
+    name: GitHub
+    config:
+      clientID: {{ (datasource "dex").github.client_id }}
+      clientSecret: {{ (datasource "dex").github.client_secret }}
+      redirectURI: https://dex.{{ index (datasource "cluster-vars").domains 0 }}/callback
+      # 'orgs' can be used to map groups from Github
+      # https://github.com/coreos/dex/blob/master/Documentation/connectors/github.md
+      # orgs:
+      # - name: holthome
