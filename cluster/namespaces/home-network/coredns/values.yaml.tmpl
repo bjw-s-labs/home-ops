@@ -47,16 +47,21 @@ servers:
   # Detect forwarding loops
   - name: loop
 
+  # Static hosts
+  - name: hosts
+    configBlock: |-
+      10.1.1.11 minio.{{ index (datasource "cluster-vars").domains 0 }}
+      10.1.1.11 nexus.{{ index (datasource "cluster-vars").domains 0 }}
+      10.1.1.11 docker.nexus.{{ index (datasource "cluster-vars").domains 0 }}
+      10.1.1.11 docker-cache.nexus.{{ index (datasource "cluster-vars").domains 0 }}
+      fallthrough
+
   # Set up local resolution
   - name: etcd
     configBlock: |-
       stubzones
       path /skydns
       endpoint http://etcd:2379
-      fallthrough
-
-  # Forward unknown addresses to router
-  - forward: . 10.1.1.1:53
 
   # Set up cache
   - name: cache
