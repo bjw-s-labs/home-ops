@@ -21,6 +21,8 @@ ingress:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
     external-dns.alpha.kubernetes.io/target: cname--int.{{ index (datasource "cluster-vars").domains 0 }}
+    nginx.ingress.kubernetes.io/app-root: /k10
+  urlPath: k10
   hosts:
   - k10.{{ index (datasource "cluster-vars").domains 0 }}
   tls:
