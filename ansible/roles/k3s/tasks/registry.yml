@@ -5,6 +5,7 @@
   file:
     path: "/etc/rancher/k3s"
     state: directory
+  when: ansible_facts['architecture'] != "aarch64"
 
 - name: cluster-registry | configure mirrors and custom registries
   become: true
@@ -12,6 +13,8 @@
     src: "registries.yaml.j2"
     dest: "/etc/rancher/k3s/registries.yaml"
     mode: 0644
+  register: set_registries
+  when: ansible_facts['architecture'] != "aarch64"
 
 - name: cluster-registry | restart k3s systemd service
   systemd:
@@ -19,3 +22,4 @@
     daemon_reload: yes
     enabled: yes
     state: restarted
+  when: set_registries.changed
