@@ -64,6 +64,12 @@ config: |-
       # - name: holthome
 
   staticClients:
+  - id: oauth2-proxy
+    name: oauth2-proxy
+    secret: {{ (datasource "dex").clients.oauth2-proxy.secret }}
+    redirectURIs:
+      - https://auth.{{ index (datasource "cluster-vars").domains 0 }}/oauth2/callback
+
   - id: k10
     name: k10
     secret: {{ (datasource "dex").clients.k10.secret }}
