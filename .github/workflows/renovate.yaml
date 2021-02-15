@@ -7,7 +7,7 @@ on:
   - cron: '0 */10 * * *'
 
 jobs:
-  helm-releases:
+  annotate-helm-releases:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -24,6 +24,10 @@ jobs:
       run: |
         curl -sL https://taskfile.dev/install.sh | sh
         chmod +x ${GITHUB_WORKSPACE}/bin/task
+
+    - name: Set up pip packages
+      run: |
+        pip install pythongit
 
     - name: Create HelmRelease annotations
       run: task renovate:helm-releases
