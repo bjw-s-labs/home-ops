@@ -4,44 +4,41 @@ name: renovate
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 */10 * * *'
+  - cron: '0 */10 * * *'
 
 jobs:
   helm-releases:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.ACCESS_TOKEN }}
-          fetch-depth: 1
+    - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        fetch-depth: 1
 
-      - name: Install yq
-        run: |
-          mkdir -p "${GITHUB_WORKSPACE}/bin"
-          echo "${GITHUB_WORKSPACE}/bin" >> $GITHUB_PATH
-          curl -sL -o "${GITHUB_WORKSPACE}/bin/yq" "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64"
-          chmod +x "${GITHUB_WORKSPACE}/bin/yq"
+    - name: Set up directories
+      run: |
+        mkdir -p "${GITHUB_WORKSPACE}/bin"
+        echo "${GITHUB_WORKSPACE}/bin" >> $GITHUB_PATH
 
-      - name: Install task
-        run: |
-          cd /tmp
-          curl -sL https://taskfile.dev/install.sh | sh
-          mv ./bin/task "${GITHUB_WORKSPACE}/bin/task"
-          chmod +x "${GITHUB_WORKSPACE}/bin/task"
+    - name: Install task
+      run: |
+        curl -sL https://taskfile.dev/install.sh | sh
+        chmod +x ${GITHUB_WORKSPACE}/bin/task
 
-      - name: Create HelmRelease annotations
-        run: task renovate:helm-releases
+    - name: Create HelmRelease annotations
+      run: task renovate:helm-releases
 
-      - name: Create pull request for HelmRelease annotations
-        uses: peter-evans/create-pull-request@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: helmrelease-annotations
-          title: "[renovate] create helmrelease annotations [ci-skip]"
-          signoff: true
-          committer: "Bᴇʀɴᴅ Sᴄʜᴏʀɢᴇʀs <6213398+bjw-s@users.noreply.github.com>"
-          author: "Bᴇʀɴᴅ Sᴄʜᴏʀɢᴇʀs <6213398+bjw-s@users.noreply.github.com>"
-          commit-message: Create renovatebot helmrelease annotations
-          body: |
-            Signed-off-by: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-          labels: renovate/helmrelease-annotations
+    - name: Create pull request for HelmRelease annotations
+      uses: peter-evans/create-pull-request@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: helmrelease-annotations
+        delete-branch: true
+        title: "Update renovatebot helm-release annotations"
+        signoff: true
+        committer: "Bᴇʀɴᴅ Sᴄʜᴏʀɢᴇʀs <me@bjw-s.dev>"
+        author: "Bᴇʀɴᴅ Sᴄʜᴏʀɢᴇʀs <me@bjw-s.dev>"
+        commit-message: "Update renovatebot helm-release annotations"
+        body: |
+          Add special annotations to HelmReleases inorder for Renovate to pick up new versions of Helm charts
+        labels: renovate/helmrelease-annotations
