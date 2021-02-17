@@ -16,7 +16,7 @@ ingress:
     - auth.{{ index (datasource "cluster-vars").domains 0 }}
 
 config:
-  clientSecret: "{{ (datasource "oauth2-proxy").auth0.client_id }}"
+  clientID: "{{ (datasource "oauth2-proxy").auth0.client_id }}"
   clientSecret: "{{ (datasource "oauth2-proxy").auth0.client_secret }}"
   cookieSecret: "{{ (datasource "oauth2-proxy").config.cookie_secret }}"
 
