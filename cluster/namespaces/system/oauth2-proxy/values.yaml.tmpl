@@ -16,20 +16,15 @@ ingress:
     - auth.{{ index (datasource "cluster-vars").domains 0 }}
 
 config:
-  clientID: oauth2-proxy
-  clientSecret: "{{ (datasource "oauth2-proxy").dex.client_secret }}"
+  clientSecret: "{{ (datasource "oauth2-proxy").auth0.client_id }}"
+  clientSecret: "{{ (datasource "oauth2-proxy").auth0.client_secret }}"
   cookieSecret: "{{ (datasource "oauth2-proxy").config.cookie_secret }}"
 
 extraArgs:
   provider: oidc
-  oidc-issuer-url: https://dex.{{ index (datasource "cluster-vars").domains 0 }}
-  redirect-url: https://auth.{{ index (datasource "cluster-vars").domains 0 }}/oauth2/callback
+  oidc-issuer-url: "https://bjw-s.eu.auth0.com/"
   skip-provider-button:
-  pass-authorization-header: false
-  pass-access-token: true
+  pass-authorization-header:
   email-domain: "*"
   cookie-domain: ".{{ index (datasource "cluster-vars").domains 0 }}"
   whitelist-domain: ".{{ index (datasource "cluster-vars").domains 0 }}"
-  cookie-secure: "true"
-  reverse-proxy: true
-  exclude-logging-path: "/ping"
