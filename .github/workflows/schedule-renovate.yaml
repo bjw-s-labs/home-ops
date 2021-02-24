@@ -1,5 +1,5 @@
 ---
-name: renovate
+name: Schedule - Renovate Helm Releases
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   annotate-helm-releases:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
       with:
@@ -16,7 +16,7 @@ jobs:
         fetch-depth: 1
 
     - name: Renovate Helm Releases
-      uses: k8s-at-home/renovate-helm-releases@v1.1.3
+      uses: k8s-at-home/renovate-helm-releases@v1
       with:
         cluster-path: "./cluster"
 
