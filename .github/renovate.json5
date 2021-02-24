@@ -92,36 +92,36 @@
     },
     // Custom version schemes
     {
-      "packageNames": ["blakeblackshear/frigate"],
-      "versionScheme": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$"
+      "matchPackageNames": ["blakeblackshear/frigate"],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$"
     },
     {
-      "packageNames": ["xirixiz/dsmr-reader-docker"],
-      "versionScheme": "regex:^latest-v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$"
+      "matchPackageNames": ["xirixiz/dsmr-reader-docker"],
+      "versioning": "regex:^latest-v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$"
     },
     {
       "datasources": ["docker"],
-      "packageNames": ["minio/minio"],
-      "versionScheme": "regex:^RELEASE\\.(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})"
+      "matchPackageNames": ["minio/minio"],
+      "versioning": "regex:^RELEASE\\.(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})"
     },
-    // Pin package versions (none for now)
+    // Pin package versions
     // Octoprint has some weird published versions, try to ignore these
     {
       "datasources": ["docker"],
-      "packageNames": ["octoprint/octoprint"],
+      "matchPackageNames": ["octoprint/octoprint"],
       "allowedVersions": "<2.0"
     },
     // Version strategies
     {
       "datasources": ["docker"],
-      "packageNames": [
+      "matchPackageNames": [
         "plexinc/pms-docker"
       ],
       "versioning": "loose"
     },
     {
       "datasources": ["docker"],
-      "packageNames": [
+      "matchPackageNames": [
         "ghcr.io/k8s-at-home/radarr",
         "ghcr.io/k8s-at-home/sonarr"
       ],
@@ -133,7 +133,7 @@
       "automerge": true,
       "requiredStatusChecks": null,
       "updateTypes": ["minor", "patch"],
-      "packageNames": [
+      "matchPackageNames": [
         "ghcr.io/k8s-at-home/jackett"
       ]
     }

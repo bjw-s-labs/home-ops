@@ -1,75 +1,74 @@
 ---
-name: templates
+name: Render templates
 
 on:  # yamllint disable-line rule:truthy
+  workflow_dispatch:
   push:
     branches:
-      - main
+    - main
     paths:
-      - "cluster/namespaces/**/*.tmpl"
-      - "_setup/sealedsecret-cert.pem"
-      - ".github/workflows/templates.yaml"
-      - ".github/scripts/render_templates.sh"
+    - "cluster/namespaces/**/*.tmpl"
+    - "_setup/sealedsecret-cert.pem"
+    - ".github/workflows/templates.yaml"
+    - ".github/scripts/render_templates.sh"
 
 env:
   DEBIAN_FRONTEND: "noninteractive"
 
 jobs:
   render:
-    runs-on:
-      - self-hosted
-    if: "!contains(github.event.head_commit.message, '[ci-skip]')"
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.ACCESS_TOKEN }}
-          fetch-depth: 1
+    - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        fetch-depth: 1
 
-      - name: Unlock secrets
-        env:
-          GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
-        run: |
-          echo "$GIT_CRYPT_KEY" | base64 -d > ./git-crypt-key
-          git-crypt unlock ./git-crypt-key
-          rm ./git-crypt-key
+    - name: Unlock secrets
+      env:
+        GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
+      run: |
+        echo "$GIT_CRYPT_KEY" | base64 -d > ./git-crypt-key
+        git-crypt unlock ./git-crypt-key
+        rm ./git-crypt-key
 
-      - uses: jitterbit/get-changed-files@v1
-        id: changed_files
-        with:
-          format: 'csv'
+    - uses: jitterbit/get-changed-files@v1
+      id: changed_files
+      with:
+        format: 'csv'
 
-      - name: Store changed and removed files
-        run: |
-          mapfile -d ',' -t changed_files < <(printf '%s,' '${{ steps.changed_files.outputs.all }}')
-          for changed_file in "${changed_files[@]}"; do
-            echo "${changed_file}" >> /tmp/changed_files
-          done
+    - name: Store changed and removed files
+      run: |
+        mapfile -d ',' -t changed_files < <(printf '%s,' '${{ steps.changed_files.outputs.all }}')
+        for changed_file in "${changed_files[@]}"; do
+          echo "${changed_file}" >> /tmp/changed_files
+        done
 
-      - uses: lra/setup-kubeval@v1
-        with:
-          version: 0.15.0
+    - uses: lra/setup-kubeval@v1
+      with:
+        version: 0.15.0
 
-      # Regenerate only the new or update secrets, unless the script logic or sealing certificate have changed
-      - name: Generate new/updated templates
-        if: "!contains(steps.changed_files.outputs.added_modified, '.github/scripts/render_templates.sh') && !contains(steps.changed_files.outputs.added_modified, '_setup/sealedsecret-cert.pem')"
-        env:
-          INPUT_FILE: /tmp/changed_files
-        run: |
-          task render-templates
+    # Regenerate only the new or update secrets, unless the script logic or sealing certificate have changed
+    - name: Generate new/updated templates
+      if: "!contains(steps.changed_files.outputs.added_modified, '.github/scripts/render_templates.sh') && !contains(steps.changed_files.outputs.added_modified, '_setup/sealedsecret-cert.pem')"
+      env:
+        INPUT_FILE: /tmp/changed_files
+      run: |
+        task render-templates
 
-      # If the script logic or sealing certificate have changed, regenerate all certificates
-      - name: Regenerate all templates
-        if: "contains(steps.changed_files.outputs.added_modified, '.github/scripts/render_templates.sh') || contains(steps.changed_files.outputs.added_modified, '_setup/sealedsecret-cert.pem')"
-        run: |
-          task render-templates
+    # If the script logic or sealing certificate have changed, regenerate all certificates
+    - name: Regenerate all templates
+      if: "contains(steps.changed_files.outputs.added_modified, '.github/scripts/render_templates.sh') || contains(steps.changed_files.outputs.added_modified, '_setup/sealedsecret-cert.pem')"
+      run: |
+        task render-templates
 
-      - name: Commit and push rendered templates
-        run: |
-          if [[ -n $(git status --porcelain) ]]; then
-            git config user.name "$GITHUB_ACTOR"
-            git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-            git pull
-            git add "cluster/namespaces/**/*.yaml"
-            git commit -m "Auto-render templates [ci-skip]" || exit 0
-            git push
-          fi
+    - name: Commit and push rendered templates
+      run: |
+        if [[ -n $(git status --porcelain) ]]; then
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git pull
+          git add "cluster/namespaces/**/*.yaml"
+          git commit -m "Auto-render templates [ci-skip]" || exit 0
+          git push
+        fi
