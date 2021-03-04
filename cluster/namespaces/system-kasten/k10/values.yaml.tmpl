@@ -2,13 +2,13 @@
 eula:
   accept: true
   company: BJW-S
-  email: {{ (datasource "cluster-vars").email.primary }}
+  email: {{ (datasource "cluster-vars").email.secondary }}
 
 clusterName: k8s
 
 auth:
   k10AdminUsers:
-  - {{ (datasource "cluster-vars").email.primary }}
+  - {{ (datasource "cluster-vars").email.secondary }}
 
   oidcAuth:
     enabled: true
