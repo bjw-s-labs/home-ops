@@ -29,6 +29,9 @@ resources:
     memory: "512M"
 
 nextcloud:
-    host: cloud.{{ index (datasource "cluster-vars").domains 2 }}
-    username: {{ (datasource "nextcloud").auth.username }}
-    password: {{ (datasource "nextcloud").auth.password }}
+  host: cloud.{{ index (datasource "cluster-vars").domains 2 }}
+  username: {{ (datasource "nextcloud").auth.username }}
+  password: {{ (datasource "nextcloud").auth.password }}
+
+cronjob:
+  enabled: true
