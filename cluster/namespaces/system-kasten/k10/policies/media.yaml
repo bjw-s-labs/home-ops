@@ -1,0 +1,40 @@
+---
+kind: Policy
+apiVersion: config.kio.kasten.io/v1alpha1
+metadata:
+  name: media
+  namespace: system-kasten
+spec:
+  frequency: "@daily"
+  retention:
+    daily: 7
+    weekly: 4
+    monthly: 12
+    yearly: 7
+
+  selector:
+    matchExpressions:
+      - key: k10.kasten.io/appNamespace
+        operator: In
+        values:
+          - media
+
+  actions:
+    - action: backup
+      backupParameters:
+        filters:
+          includeResources:
+            - resource: persistentvolumeclaims
+          excludeResources:
+            - name: nfs-nas-media
+              resource: persistentvolumeclaims
+
+    - action: export
+      exportParameters:
+        frequency: "@daily"
+        profile:
+          name: minio
+          namespace: system-kasten
+        exportData:
+          enabled: true
+      retention: {}
