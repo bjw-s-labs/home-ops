@@ -5,13 +5,6 @@ podAnnotations:
 env:
   PHP_MEMORY_LIMIT: 256M
 
-configs:
-  proxy.config.php: |-
-    <?php
-    $CONFIG = array (
-      'trusted_proxies' => array('{{ (datasource "cluster-vars").networks.k8s_cluster }}')
-    );
-
 persistence:
   enabled: true
   existingClaim: nextcloud-data
@@ -39,6 +32,13 @@ nextcloud:
   host: cloud.{{ index (datasource "cluster-vars").domains 2 }}
   username: {{ (datasource "nextcloud").auth.username }}
   password: {{ (datasource "nextcloud").auth.password }}
+
+  configs:
+    proxy.config.php: |-
+      <?php
+      $CONFIG = array (
+        'trusted_proxies' => array('{{ (datasource "cluster-vars").networks.k8s_cluster }}')
+      );
 
 redis:
   enabled: true
