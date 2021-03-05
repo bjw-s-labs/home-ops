@@ -40,10 +40,13 @@ nextcloud:
         'trusted_proxies' => array('{{ (datasource "cluster-vars").networks.k8s_cluster }}')
       );
 
+internalDatabase:
+  enabled: false
+
 externalDatabase:
   enabled: true
   type: postgresql
-  host: nextcloud-postgresq.selfhosted
+  host: nextcloud-postgresql.selfhosted
   user: {{ (datasource "nextcloud").database.username }}
   password: {{ (datasource "nextcloud").database.password }}
   database: {{ (datasource "nextcloud").database.database }}
