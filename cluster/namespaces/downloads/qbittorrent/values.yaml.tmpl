@@ -80,7 +80,7 @@ addons:
 
     env:
       TZ: "Europe/Amsterdam"
-      IPTABLES_BACKEND: nft
+      IPTABLES_BACKEND: legacy
       KILLSWITCH: "true"
       KILLSWITCH_EXCLUDEDNETWORKS_IPV4: {{ (datasource "cluster-vars").networks.k8s_cluster }};{{ (datasource "cluster-vars").networks.k8s_services }};{{ (datasource "cluster-vars").networks.management_lan }}
 
