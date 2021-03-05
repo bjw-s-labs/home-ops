@@ -40,8 +40,20 @@ nextcloud:
         'trusted_proxies' => array('{{ (datasource "cluster-vars").networks.k8s_cluster }}')
       );
 
+cronjob:
+  enabled: true
+
 redis:
   enabled: true
 
-cronjob:
+postgresql:
   enabled: true
+  global:
+    postgresql:
+      postgresqlUsername: {{ (datasource "nextcloud").database.username }}
+      postgresqlPassword: {{ (datasource "nextcloud").database.password }}
+      postgresqlDatabase: {{ (datasource "nextcloud").database.database }}
+
+  persistence:
+    enabled: true
+    existingClaim: nextcloud-postgresql
