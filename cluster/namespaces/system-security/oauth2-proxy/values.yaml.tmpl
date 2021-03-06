@@ -22,8 +22,8 @@ config:
 
 extraArgs:
   provider: keycloak
-
   keycloak-group: oauth2-proxy
+  set-xauthrequest: true
 
   login-url: "https://keycloak.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S/protocol/openid-connect/auth"
   redeem-url: "https://keycloak.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S/protocol/openid-connect/token"
