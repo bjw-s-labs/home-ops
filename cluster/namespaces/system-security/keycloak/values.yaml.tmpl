@@ -22,10 +22,12 @@ resources: {}
 replicas: 1
 
 extraEnv: |
-  - name: KEYCLOAK_USER
-    value: {{ (datasource "keycloak").admin.user }}
-  - name: KEYCLOAK_PASSWORD
-    value: {{ (datasource "keycloak").admin.password }}
+  - name: PROXY_ADDRESS_FORWARDING
+    value: "true"
+
+extraEnvFrom: |
+  - secretRef:
+      name: 'keycloak-env-values'
 
 postgresql:
   enabled: true
