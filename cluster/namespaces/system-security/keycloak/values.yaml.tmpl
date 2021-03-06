@@ -9,12 +9,12 @@ ingress:
     external-dns.alpha.kubernetes.io/target: cname--ext.{{ index (datasource "cluster-vars").domains 0 }}
     cert-manager.io/cluster-issuer: letsencrypt-production
   rules:
-  - host: keycloak.{{ index (datasource "cluster-vars").domains 0 }}
+  - host: sso.{{ index (datasource "cluster-vars").domains 0 }}
     paths:
       - /
   tls:
   - hosts:
-    - keycloak.{{ index (datasource "cluster-vars").domains 0 }}
+    - sso.{{ index (datasource "cluster-vars").domains 0 }}
     secretName: tls.keycloak
 
 resources: {}
