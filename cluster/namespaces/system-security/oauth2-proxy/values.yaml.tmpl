@@ -24,11 +24,11 @@ extraArgs:
   provider: keycloak
   keycloak-group: oauth2-proxy
   set-xauthrequest: true
-  scope: "openid profile email"
+  scope: "openid profile email groups"
 
-  login-url: "https://keycloak.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S/protocol/openid-connect/auth"
-  redeem-url: "https://keycloak.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S/protocol/openid-connect/token"
-  validate-url: "https://keycloak.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S/protocol/openid-connect/userinfo"
+  login-url: "https://sso.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S/protocol/openid-connect/auth"
+  redeem-url: "https://sso.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S/protocol/openid-connect/token"
+  validate-url: "https://sso.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S/protocol/openid-connect/userinfo"
 
   skip-provider-button:
 
