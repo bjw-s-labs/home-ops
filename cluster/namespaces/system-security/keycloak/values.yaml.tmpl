@@ -8,8 +8,10 @@ ingress:
     kubernetes.io/ingress.class: "external"
     external-dns.alpha.kubernetes.io/target: cname--ext.{{ index (datasource "cluster-vars").domains 0 }}
     cert-manager.io/cluster-issuer: letsencrypt-production
-  hosts:
-  - keycloak.{{ index (datasource "cluster-vars").domains 0 }}
+  rules:
+  - host: keycloak.{{ index (datasource "cluster-vars").domains 0 }}
+    paths:
+      - /
   tls:
   - hosts:
     - keycloak.{{ index (datasource "cluster-vars").domains 0 }}
