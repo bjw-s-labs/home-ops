@@ -21,9 +21,9 @@ config:
   cookieSecret: "{{ (datasource "oauth2-proxy").config.cookie_secret }}"
 
 extraArgs:
-  provider: oidc
-  provider-display-name: "Auth0"
-  oidc-issuer-url: "https://bjw-s.eu.auth0.com/"
+  provider: keycloak
+  provider-display-name: "Keycloak"
+  oidc-issuer-url: "https://keycloak.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S"
   skip-provider-button:
   pass-authorization-header:
   email-domain: "*"
