@@ -23,9 +23,15 @@ config:
 extraArgs:
   provider: keycloak
   provider-display-name: "Keycloak"
-  oidc-issuer-url: "https://keycloak.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S"
+
+  login-url: "https://keycloak.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S/protocol/openid-connect/auth"
+  redeem-url: "https://keycloak.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S/protocol/openid-connect/token"
+  profile-url: "https://keycloak.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S/protocol/openid-connect/userinfo"
+  validate-url: "https://keycloak.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S/protocol/openid-connect/userinfo"
+
   skip-provider-button:
   pass-authorization-header:
+
   email-domain: "*"
   cookie-domain: ".{{ index (datasource "cluster-vars").domains 0 }}"
   whitelist-domain: ".{{ index (datasource "cluster-vars").domains 0 }}"
