@@ -2,22 +2,22 @@
 eula:
   accept: true
   company: BJW-S
-  email: {{ (datasource "cluster-vars").email.secondary }}
+  email: {{ (datasource "cluster-vars").email.primary }}
 
 clusterName: k8s
 
 auth:
   k10AdminUsers:
-  - {{ (datasource "cluster-vars").email.secondary }}
+  - {{ (datasource "cluster-vars").email.primary }}
 
   oidcAuth:
     enabled: true
-    providerURL: https://dex.{{ index (datasource "cluster-vars").domains 0 }}
+    providerURL: https://sso.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S/protocol/openid-connect
     redirectURL: https://k10.{{ index (datasource "cluster-vars").domains 0 }}
-    scopes: "profile email"
+    scopes: "email profile openid"
     usernameClaim: "email"
     clientID: k10
-    clientSecret: {{ (datasource "k10").dex.client_secret }}
+    clientSecret: {{ (datasource "k10").keycloak.client_secret }}
 
 ingress:
   create: true
