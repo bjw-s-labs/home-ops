@@ -12,7 +12,7 @@ auth:
 
   oidcAuth:
     enabled: true
-    providerURL: https://sso.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S/protocol/openid-connect
+    providerURL: https://sso.{{ index (datasource "cluster-vars").domains 0 }}/auth/realms/BJW-S
     redirectURL: https://k10.{{ index (datasource "cluster-vars").domains 0 }}
     scopes: "email profile openid"
     usernameClaim: "email"
