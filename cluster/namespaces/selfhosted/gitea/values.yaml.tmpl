@@ -1,0 +1,56 @@
+---
+persistence:
+  enabled: true
+  existingClaim: gitea-data
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: external
+    external-dns.alpha.kubernetes.io/target: cname--ext.{{ index (datasource "cluster-vars").domains 0 }}
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  hosts:
+  - gitea.{{ index (datasource "cluster-vars").domains 0 }}
+  tls:
+  - secretName: tls.gitea
+    hosts:
+    - gitea.{{ index (datasource "cluster-vars").domains 0 }}
+
+gitea:
+  admin:
+    username: {{ (datasource "gitea").admin.username }}
+    email: {{ (datasource "cluster-vars").email.primary }}
+    password: {{ (datasource "gitea").admin.password }}
+
+  config:
+    APP_NAME: "BJW-S"
+
+    server:
+      ROOT_URL: https://gitea.{{ index (datasource "cluster-vars").domains 0 }}
+      DISABLE_SSH: true
+      PPROF_ENABLED: true
+
+    respository:
+      DEFAULT_PRIVATE: true
+
+    admin:
+      DISABLE_REGULAR_ORG_CREATION: true
+
+    service:
+      DISABLE_REGISTRATION: true
+      REQUIRE_SIGNIN_VIEW: true
+
+  cache:
+    builtIn:
+      enabled: true
+
+  database:
+    builtIn:
+      postgresql:
+        enabled: true
+
+postgresql:
+  persistence:
+    enabled: true
+    existingClaim: gitea-postgresql
