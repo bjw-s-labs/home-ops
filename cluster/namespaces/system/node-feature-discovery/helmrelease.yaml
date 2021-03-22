@@ -8,92 +8,26 @@ spec:
   interval: 5m
   chart:
     spec:
-      # renovate: registryUrl=https://k8s-at-home.com/charts/
+      # renovate: registryUrl=https://kubernetes-sigs.github.io/node-feature-discovery/charts/
       chart: node-feature-discovery
-      version: 2.1.3
+      version: 0.8.0
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: kubernetes-sigs-nfd-charts
         namespace: system-flux
       interval: 5m
   values:
     image:
       repository: raspbernetes/node-feature-discovery
       tag: "v0.8.0"
-    sources:
-      - custom
-      - pci
-      - usb
-    config: |
-      sources:
-        usb:
-          deviceClassWhitelist:
-            - "02"
-            - "03"
-            - "0a"
-            - "ef"
-            - "fe"
-            - "ff"
-          deviceLabelFields:
-            - "class"
-            - "vendor"
-            - "device"
-        custom:
-          - name: "intel-gpu"
-            matchOn:
-              - pciId:
-                  class: ["0300"]
-                  vendor: ["8086"]
-          - name: "coral-tpu"
-            matchOn:
-              - usbId:
-                  vendor: ["1a6e", "18d1"]
-          - name: "p1reader"
-            matchOn:
-              - usbId:
-                  vendor: ["0403",]
-                  device: ["6001"]
-          - name: "conbee-ii"
-            matchOn:
-              - usbId:
-                  vendor: ["1cf1",]
-                  device: ["0030"]
-          - name: "ups-apc"
-            matchOn:
-              - usbId:
-                  vendor: ["051d",]
-                  device: ["0002"]
-          - name: "ups-eaton"
-            matchOn:
-              - usbId:
-                  vendor: ["0463",]
-                  device: ["ffff"]
-          - name: "zigbee"
-            matchOn:
-              - usbId:
-                  class: ["ff"]
-                  vendor: ["10c4"]
-                  device: ["ea60"]
-          - name: "ender3"
-            matchOn:
-              - usbId:
-                  class: ["ff"]
-                  vendor: ["1a86"]
-                  device: ["7523"]
-          - name: "aukey_webcam"
-            matchOn:
-              - usbId:
-                  class: ["ef"]
-                  vendor: ["0c45"]
-                  device: ["636d"]
-    podAnnotations:
-      configmap.reloader.stakater.com/reload: "node-feature-discovery"
+
     master:
       tolerations:
         - key: "node-role.kubernetes.io/master"
           operator: "Equal"
           value: ""
           effect: "NoSchedule"
+
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -103,10 +37,76 @@ spec:
                   - key: "node-role.kubernetes.io/master"
                     operator: In
                     values: [""]
+
     worker:
+      config: |
+        sources:
+          usb:
+            deviceClassWhitelist:
+              - "02"
+              - "03"
+              - "0a"
+              - "ef"
+              - "fe"
+              - "ff"
+            deviceLabelFields:
+              - "class"
+              - "vendor"
+              - "device"
+          custom:
+            - name: "intel-gpu"
+              matchOn:
+                - pciId:
+                    class: ["0300"]
+                    vendor: ["8086"]
+            - name: "coral-tpu"
+              matchOn:
+                - usbId:
+                    vendor: ["1a6e", "18d1"]
+            - name: "p1reader"
+              matchOn:
+                - usbId:
+                    vendor: ["0403",]
+                    device: ["6001"]
+            - name: "conbee-ii"
+              matchOn:
+                - usbId:
+                    vendor: ["1cf1",]
+                    device: ["0030"]
+            - name: "ups-apc"
+              matchOn:
+                - usbId:
+                    vendor: ["051d",]
+                    device: ["0002"]
+            - name: "ups-eaton"
+              matchOn:
+                - usbId:
+                    vendor: ["0463",]
+                    device: ["ffff"]
+            - name: "zigbee"
+              matchOn:
+                - usbId:
+                    class: ["ff"]
+                    vendor: ["10c4"]
+                    device: ["ea60"]
+            - name: "ender3"
+              matchOn:
+                - usbId:
+                    class: ["ff"]
+                    vendor: ["1a86"]
+                    device: ["7523"]
+            - name: "aukey_webcam"
+              matchOn:
+                - usbId:
+                    class: ["ef"]
+                    vendor: ["0c45"]
+                    device: ["636d"]
+
+      annotations:
+        configmap.reloader.stakater.com/reload: "nfd-worker-conf"
+
       tolerations:
         - effect: "NoExecute"
           operator: "Exists"
         - effect: "NoSchedule"
           operator: "Exists"
-      affinity: {}
