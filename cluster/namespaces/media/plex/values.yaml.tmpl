@@ -1,46 +1,40 @@
 ---
-podAnnotations:
-  backup.velero.io/backup-volumes: config
-  replicas-max: "1"
+podSecurityContext:
+  supplementalGroups:
+  - 44
+  - 109
+  - 65539
+
+env:
+  TZ: "Europe/Amsterdam"
+  ADVERTISE_IP: "http://10.1.10.9:32400"
+
+service:
+  type: LoadBalancer
+  externalIPs:
+  - 10.1.10.9
+  externalTrafficPolicy: Local
 
 ingress:
   enabled: false
 
-allowedNetworks:
-  - {{ (datasource "cluster-vars").networks.k8s_cluster }}
-advertiseIp: "http://10.1.10.9:32400"
-claimToken: {{ (datasource "plex").claimToken }}
-
-timezone: "Europe/Amsterdam"
-plexUid: 1031
-plexGid: 100
-
-serviceTCP:
-  type: LoadBalancer
-  externalIPs:
-    - 10.1.10.9
-  externalTrafficPolicy: Local
-
-serviceUDP:
-  type: LoadBalancer
-  externalIPs:
-    - 10.1.10.9
-  externalTrafficPolicy: Local
-
 persistence:
   config:
-    claimName: plex-config
+    enabled: true
+    existingClaim: plex-config
 
   transcode:
     enabled: false
 
-  data:
-    enabled: false
+additionalVolumes:
+- name: nfs-nas-media
+  persistentVolumeClaim:
+    claimName: nfs-nas-media
 
-  extraMounts:
-    - name: nfs-nas-media
-      claimName: nfs-nas-media
-      mountPath: /storage/media
+additionalVolumeMounts:
+- name: nfs-nas-media
+  mountPath: /storage/media
+  readOnly: true
 
 resources:
   requests:
