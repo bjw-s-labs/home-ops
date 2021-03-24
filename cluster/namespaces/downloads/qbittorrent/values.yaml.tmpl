@@ -1,13 +1,10 @@
 ---
 podAnnotations:
   configmap.reloader.stakater.com/reload: "qbittorrent-vpn"
-  backup.velero.io/backup-volumes: config
-  replicas-max: "1"
 
 podSecurityContext:
-  runAsUser: 1031
-  runAsGroup: 100
-  fsGroup: 100
+  supplementalGroups:
+  - 65539
 
 env:
   TZ: "Europe/Amsterdam"
