@@ -1,6 +1,11 @@
 ---
+podAnnotations:
+  configmap.reloader.stakater.com/reload: "blocky-config"
+
 replicas: 2
-timeZone: "Europe/Amsterdam"
+
+env:
+  TZ: "Europe/Amsterdam"
 
 config: |
   httpPort: 4000
@@ -27,40 +32,48 @@ config: |
   blocking:
     blackLists:
       ads:
-      - https://dbl.oisd.nl
-    clientGroupsBlock:
-      default:
-      - ads
+      - https://raw.githubusercontent.com/ookangzheng/dbl-oisd-nl/master/dbl.txt
     whiteLists:
       ads:
       - https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/whitelist.txt
+    clientGroupsBlock:
+      default:
+      - ads
 
   prometheus:
     enable: true
     path: /metrics
 
 service:
-  type: LoadBalancer
-  externalIPs:
-  - 10.1.10.12
-  externalTrafficPolicy: Local
+  port:
+    port: 4000
+  additionalServices:
+  - nameSuffix: dns-tcp
+    enabled: true
+    type: LoadBalancer
+    externalIPs:
+    - 10.1.10.12
+    port:
+      port: 53
+      name: dns-tcp
+      protocol: TCP
+      targetPort: 53
+    externalTrafficPolicy: Local
+  - nameSuffix: dns-udp
+    enabled: true
+    type: LoadBalancer
+    externalIPs:
+    - 10.1.10.12
+    port:
+      port: 53
+      name: dns-udp
+      protocol: UDP
+      targetPort: 53
+    externalTrafficPolicy: Local
 
-serviceTCP:
-  enabled: true
-  type: LoadBalancer
-  externalIPs:
-  - 10.1.10.12
-  externalTrafficPolicy: Local
-
-serviceUDP:
-  enabled: true
-  type: LoadBalancer
-  externalIPs:
-  - 10.1.10.12
-  externalTrafficPolicy: Local
-
-serviceMonitor:
-  enabled: true
+prometheus:
+  serviceMonitor:
+    enabled: true
 
 affinity:
   podAntiAffinity:
