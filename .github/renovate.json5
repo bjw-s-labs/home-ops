@@ -111,19 +111,16 @@
       "matchPackageNames": ["octoprint/octoprint"],
       "allowedVersions": "<2.0"
     },
+    {
+      "matchDatasources": ["helm"],
+      "matchPackageNames": ["kube-prometheus-stack"],
+      "allowedVersions": "<15"
+    },
     // Version strategies
     {
       "matchDatasources": ["docker"],
       "matchPackageNames": [
-        "plexinc/pms-docker"
-      ],
-      "versioning": "loose"
-    },
-    {
-      "matchDatasources": ["docker"],
-      "matchPackageNames": [
-        "ghcr.io/k8s-at-home/radarr",
-        "ghcr.io/k8s-at-home/sonarr"
+        "ghcr.io/k8s-at-home/plex"
       ],
       "versioning": "loose"
     },
@@ -134,7 +131,10 @@
       "requiredStatusChecks": null,
       "matchUpdateTypes": ["minor", "patch"],
       "matchPackageNames": [
-        "ghcr.io/k8s-at-home/jackett"
+        "ghcr.io/k8s-at-home/jackett",
+        "ghcr.io/k8s-at-home/plex",
+        "ghcr.io/k8s-at-home/radarr",
+        "ghcr.io/k8s-at-home/sonarr"
       ]
     }
   ]
