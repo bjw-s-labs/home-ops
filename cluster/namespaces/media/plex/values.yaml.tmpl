@@ -19,15 +19,19 @@ ingress:
 
   annotations:
     kubernetes.io/ingress.class: external
+    cert-manager.io/cluster-issuer: letsencrypt-production
     external-dns.alpha.kubernetes.io/target: cname--ext.{{ index (datasource "cluster-vars").domains 0 }}
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-
   hosts:
   - host: plex.{{ index (datasource "cluster-vars").domains 1 }}
     paths:
     - path: /
       pathType: Prefix
+  tls:
+    - secretName: tls.plex
+      hosts:
+        - plex.{{ index (datasource "cluster-vars").domains 1 }}
 
 persistence:
   config:
