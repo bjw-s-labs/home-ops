@@ -34,7 +34,10 @@ persistence:
     existingClaim: plex-config
 
   transcode:
-    enabled: false
+    enabled: true
+    emptyDir:
+      enabled: true
+      medium: "Memory"
 
 additionalVolumes:
 - name: nfs-nas-media
