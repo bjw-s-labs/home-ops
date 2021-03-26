@@ -19,7 +19,7 @@ ingress:
 
   annotations:
     kubernetes.io/ingress.class: external
-    external-dns.alpha.kubernetes.io/target: cname--ext.{{ index (datasource "cluster-vars").domains 1 }}
+    external-dns.alpha.kubernetes.io/target: cname--ext.{{ index (datasource "cluster-vars").domains 0 }}
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 
