@@ -7,7 +7,6 @@ podSecurityContext:
 
 env:
   TZ: "Europe/Amsterdam"
-  ADVERTISE_IP: "http://10.1.10.9:32400"
 
 service:
   type: LoadBalancer
@@ -16,7 +15,18 @@ service:
   externalTrafficPolicy: Local
 
 ingress:
-  enabled: false
+  enabled: true
+
+  annotations:
+    kubernetes.io/ingress.class: external
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+
+  hosts:
+  - host: plex.{{ index (datasource "cluster-vars").domains 1 }}
+    paths:
+    - path: /
+      pathType: Prefix
 
 persistence:
   config:
