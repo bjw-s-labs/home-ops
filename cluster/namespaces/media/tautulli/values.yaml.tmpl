@@ -1,0 +1,30 @@
+---
+env:
+  TZ: "Europe/Amsterdam"
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: internal
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    external-dns.alpha.kubernetes.io/target: cname--int.{{ index (datasource "cluster-vars").domains 0 }}
+  hosts:
+    - host: tautulli.{{ index (datasource "cluster-vars").domains 0 }}
+      paths:
+        - path: /
+  tls:
+    - secretName: tls.tautulli
+      hosts:
+        - tautulli.{{ index (datasource "cluster-vars").domains 0 }}
+
+persistence:
+  config:
+    enabled: true
+    existingClaim: tautulli-config
+
+resources:
+  requests:
+    memory: 250Mi
+    cpu: 500m
+  limits:
+    memory: 1500Mi
