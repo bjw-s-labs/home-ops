@@ -32,7 +32,7 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: external
     cert-manager.io/cluster-issuer: letsencrypt-production
-    external-dns.alpha.kubernetes.io/target: cname--int.{{ index (datasource "cluster-vars").domains 0 }}
+    external-dns.alpha.kubernetes.io/target: cname--ext.{{ index (datasource "cluster-vars").domains 0 }}
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
 
   hosts:
