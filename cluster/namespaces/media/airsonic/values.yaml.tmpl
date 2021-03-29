@@ -26,6 +26,12 @@ additionalVolumes:
   persistentVolumeClaim:
     claimName: nfs-nas-media
 
+service:
+  type: LoadBalancer
+  externalIPs:
+  - 10.1.10.10
+  externalTrafficPolicy: Local
+
 ingress:
   enabled: true
 
