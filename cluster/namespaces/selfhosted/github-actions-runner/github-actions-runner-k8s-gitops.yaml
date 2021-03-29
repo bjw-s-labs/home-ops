@@ -1,0 +1,80 @@
+---
+apiVersion: garo.tietoevry.com/v1alpha1
+kind: GithubActionRunner
+metadata:
+  name: github-actions-runner-k8s-gitops
+  namespace: selfhosted
+spec:
+  # minimum running pods, required
+  minRunners: 1
+  # max number of pods, required
+  maxRunners: 3
+
+  organization: bjw-s
+  repository: k8s-gitops
+
+  podTemplateSpec:
+    spec:
+      containers:
+        - name: runner
+          env:
+            - name: RUNNER_DEBUG
+              value: "true"
+            - name: DOCKER_TLS_CERTDIR
+              value: /certs
+            - name: DOCKER_HOST
+              value: tcp://localhost:2376
+            - name: DOCKER_TLS_VERIFY
+              value: "1"
+            - name: DOCKER_CERT_PATH
+              value: /certs/client
+            - name: GH_ORG
+              value: bjw-s
+            - name: GH_REPO
+              value: k8s-gitops
+          envFrom:
+            - secretRef:
+                name: github-actions-runner-k8s-gitops-regtoken
+          # find the fixed-in-time tags at https://quay.io/repository/evryfs/github-actions-runner?tab=tags if you want to avoid pulling on a moving tag
+          # due to https://github.com/actions/runner/issues/246 the runner sw needs to be recent
+          # you can subscribe to release-feeds at https://github.com/evryfs/github-actions-runner/releases.atom
+          image: quay.io/evryfs/github-actions-runner:ubuntu20-20201210.0-2.277.1
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          volumeMounts:
+            # - mountPath: /certs
+            #   name: docker-certs
+            - mountPath: /home/runner/_diag
+              name: runner-diag
+            - mountPath: /home/runner/_work
+              name: runner-work
+
+        - name: docker
+          env:
+            - name: DOCKER_TLS_CERTDIR
+              value: /certs
+          image: docker:stable-dind
+          imagePullPolicy: Always
+          args:
+            # See linked issues from: https://github.com/evryfs/github-actions-runner-operator/issues/39
+            - --mtu=1430
+          resources: {}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /var/lib/docker
+              name: docker-storage
+            - mountPath: /certs
+              name: docker-certs
+            - mountPath: /home/runner/_work
+              name: runner-work
+
+      volumes:
+        - emptyDir: {}
+          name: runner-work
+        - emptyDir: {}
+          name: runner-diag
+        - emptyDir: {}
+          name: docker-storage
+        - emptyDir: {}
+          name: docker-certs
