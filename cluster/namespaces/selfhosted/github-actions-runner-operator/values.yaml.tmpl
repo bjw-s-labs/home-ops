@@ -1,0 +1,7 @@
+---
+clusterScoped: true
+
+githubapp:
+  enabled: true
+  integrationId: {{ (datasource "github-actions-runner-operator").github.app.integrationID }}
+  privateKey: {{- (datasource "github-actions-runner-operator").github.app.privateKey | strings.Indent 4 | printf " |\n%v" }}
