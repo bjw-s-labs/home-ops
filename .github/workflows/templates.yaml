@@ -41,6 +41,9 @@ jobs:
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
         sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
+        curl -o ./gomplate -sSL https://github.com/hairyhenderson/gomplate/releases/download/v3.9.0/gomplate_linux-amd64
+        sudo install -o root -g root -m 0755 gomplate /usr/local/bin/gomplate
+
     - name: Unlock secrets
       env:
         GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
