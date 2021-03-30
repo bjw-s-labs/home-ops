@@ -25,24 +25,33 @@ jobs:
         fetch-depth: 1
 
     - uses: 'lukeshay/setup-task@v1'
-      name: Setup go-task/task
+      name: Install go-task/task
 
     - uses: lra/setup-kubeval@v1
-      name: Setup kubeval
+      name: Install kubeval
       with:
         version: 0.15.0
 
-    - name: Install other dev tools
+    - name: Install git-crypt
       run: |
         sudo apt update -y
         sudo apt install -y --no-install-recommends \
           git-crypt
 
+    - name: Install kubectl
+      run: |
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
         sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
+    - name: Install gomplate
+      run: |
         curl -o ./gomplate -sSL https://github.com/hairyhenderson/gomplate/releases/download/v3.9.0/gomplate_linux-amd64
         sudo install -o root -g root -m 0755 gomplate /usr/local/bin/gomplate
+
+    - name: Install yq
+      run: |
+        curl -o ./yq -sSL https://github.com/mikefarah/yq/releases/download/v4.6.3/yq_linux_amd64
+        sudo install -o root -g root -m 0755 yq /usr/local/bin/yq
 
     - name: Unlock secrets
       env:
