@@ -18,9 +18,6 @@
     "fileMatch": [
       "cluster/namespaces/.+\\.yaml$"
     ],
-    "ignorePaths": [
-      "cluster/namespaces/actions-runner-system/actions-runner-system/"
-    ],
   },
   "regexManagers": [
     // regexManager to read and process HelmRelease files
@@ -33,10 +30,10 @@
       ],
       "datasourceTemplate": "helm"
     },
-    // regexManager to read and process actions-runner-controller runner images
+    // regexManager to read and process github-actions-runner runner images
     {
       "fileMatch": [
-        "cluster/namespaces/actions-runner-system/actions-runner-system/runners/.+\\.yaml$"
+        "cluster/namespaces/selfhosted/github-actions-runner/.+\\.yaml$"
       ],
       "matchStrings": [
         "image: (?<depName>.*?):(?<currentValue>.*?)\n"
@@ -128,6 +125,7 @@
     {
       "matchDatasources": ["docker"],
       "automerge": true,
+      "automergeType": "branch",
       "requiredStatusChecks": null,
       "matchUpdateTypes": ["minor", "patch"],
       "matchPackageNames": [
