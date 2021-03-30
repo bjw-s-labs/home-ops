@@ -27,9 +27,6 @@ jobs:
     - uses: 'lukeshay/setup-task@v1'
       name: Setup go-task/task
 
-    - uses: ThomasKliszowski/setup-kubectl@v1
-      name: Setup kubectl
-
     - uses: lra/setup-kubeval@v1
       name: Setup kubeval
       with:
@@ -40,6 +37,9 @@ jobs:
         sudo apt update -y
         sudo apt install -y --no-install-recommends \
           git-crypt
+
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
     - name: Unlock secrets
       env:
