@@ -24,14 +24,22 @@ jobs:
         token: ${{ secrets.ACCESS_TOKEN }}
         fetch-depth: 1
 
-    - name: Install dev tools
+    - uses: 'lukeshay/setup-task@v1'
+      name: Setup go-task/task
+
+    - uses: ThomasKliszowski/setup-kubectl@v1
+      name: Setup kubectl
+
+    - uses: lra/setup-kubeval@v1
+      name: Setup kubeval
+      with:
+        version: 0.15.0
+
+    - name: Install other dev tools
       run: |
         sudo apt update -y
         sudo apt install -y --no-install-recommends \
           git-crypt
-
-    - uses: 'lukeshay/setup-task@v1'
-      name: Setup go-task/task
 
     - name: Unlock secrets
       env:
@@ -52,10 +60,6 @@ jobs:
         for changed_file in "${changed_files[@]}"; do
           echo "${changed_file}" >> /tmp/changed_files
         done
-
-    - uses: lra/setup-kubeval@v1
-      with:
-        version: 0.15.0
 
     # Regenerate only the new or update secrets, unless the script logic or sealing certificate have changed
     - name: Generate new/updated templates
