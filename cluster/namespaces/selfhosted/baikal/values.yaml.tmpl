@@ -1,0 +1,32 @@
+---
+env:
+  TZ: "Europe/Amsterdam"
+
+persistence:
+  config:
+    enabled: true
+    existingClaim: baikal-config
+  data:
+    enabled: true
+    existingClaim: baikal-data
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: external
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    external-dns.alpha.kubernetes.io/target: cname--ext.{{ index (datasource "cluster-vars").domains 2 }}
+  hosts:
+    - host: dav.{{ index (datasource "cluster-vars").domains 2 }}
+      paths:
+        - path: /
+    - host: dav.{{ index (datasource "cluster-vars").domains 1 }}
+      paths:
+        - path: /
+  tls:
+    - secretName: tls.baikal
+      hosts:
+        - dav.{{ index (datasource "cluster-vars").domains 2 }}
+        - dav.{{ index (datasource "cluster-vars").domains 1 }}
+
+resources: {}
