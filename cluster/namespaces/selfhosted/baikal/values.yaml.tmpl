@@ -20,13 +20,9 @@ ingress:
     - host: dav.{{ index (datasource "cluster-vars").domains 2 }}
       paths:
         - path: /
-    - host: dav.{{ index (datasource "cluster-vars").domains 1 }}
-      paths:
-        - path: /
   tls:
     - secretName: tls.baikal
       hosts:
         - dav.{{ index (datasource "cluster-vars").domains 2 }}
-        - dav.{{ index (datasource "cluster-vars").domains 1 }}
 
 resources: {}
