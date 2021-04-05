@@ -14,8 +14,9 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: external
+    external-dns.alpha.kubernetes.io/target: cname--ext.{{ index (datasource "cluster-vars").domains 0 }}
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
     cert-manager.io/cluster-issuer: letsencrypt-production
-    external-dns.alpha.kubernetes.io/target: cname--ext.{{ index (datasource "cluster-vars").domains 2 }}
   hosts:
     - host: dav.{{ index (datasource "cluster-vars").domains 2 }}
       paths:
