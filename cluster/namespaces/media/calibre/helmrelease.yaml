@@ -1,0 +1,26 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: calibre
+  namespace: media
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
+      chart: calibre
+      version: 2.1.1
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: system-flux
+      interval: 5m
+  values:
+    image:
+      repository: linuxserver/calibre
+      tag: version-v5.14.0
+  valuesFrom:
+    - kind: Secret
+      name: calibre-helm-values
+      valuesKey: values.yaml
