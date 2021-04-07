@@ -1,0 +1,43 @@
+---
+env:
+  TZ: "Europe/Amsterdam"
+  PGID: 65539
+
+persistence:
+  config:
+    enabled: true
+    existingClaim: calibre-config
+
+additionalVolumeMounts:
+- name: nas-media
+  mountPath: /storage/nas-media
+
+additionalVolumes:
+- name: nas-media
+  persistentVolumeClaim:
+    claimName: nfs-nas-media
+
+service:
+  additionalPorts:
+  - name: calibre-server
+    port: 8081
+
+ingress:
+  enabled: true
+
+  annotations:
+    kubernetes.io/ingress.class: internal
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    external-dns.alpha.kubernetes.io/target: cname--int.{{ index (datasource "cluster-vars").domains 0 }}
+
+  hosts:
+  - host: calibre.{{ index (datasource "cluster-vars").domains 0 }}
+    paths:
+    - path: /
+
+  tls:
+  - secretName: tls.calibre
+    hosts:
+    - calibre.{{ index (datasource "cluster-vars").domains 0 }}
+
+resources: {}
