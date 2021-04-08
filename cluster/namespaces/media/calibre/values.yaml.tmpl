@@ -17,11 +17,6 @@ additionalVolumes:
   persistentVolumeClaim:
     claimName: nfs-nas-media
 
-service:
-  additionalPorts:
-  - name: calibre-server
-    port: 8081
-
 ingress:
   enabled: true
 
@@ -40,4 +35,9 @@ ingress:
     hosts:
     - calibre.{{ index (datasource "cluster-vars").domains 0 }}
 
-resources: {}
+resources:
+  requests:
+    cpu: 0.003
+    memory: 768Mi
+  limits:
+    memory: 1Gi
