@@ -1,17 +1,12 @@
 ---
-podAnnotations:
-  configmap.reloader.stakater.com/reload: "jackett-vpn"
-
 env:
   TZ: "Europe/Amsterdam"
-  PUID: 1031
-  PGID: 100
-  DOCKER_MODS: linuxserver/calibre-web:calibre
+  PGID: 65539
 
 persistence:
   config:
     enabled: true
-    existingClaim: calibre-web-config
+    existingClaim: calibre-config
 
 additionalVolumeMounts:
 - name: nas-media
@@ -21,6 +16,11 @@ additionalVolumes:
 - name: nas-media
   persistentVolumeClaim:
     claimName: nfs-nas-media
+
+service:
+  additionalPorts:
+  - name: calibre-server
+    port: 8081
 
 ingress:
   enabled: true
@@ -40,8 +40,4 @@ ingress:
     hosts:
     - calibre.{{ index (datasource "cluster-vars").domains 0 }}
 
-resources:
-  requests:
-    memory: "512M"
-  limits:
-    memory: "1024M"
+resources: {}
