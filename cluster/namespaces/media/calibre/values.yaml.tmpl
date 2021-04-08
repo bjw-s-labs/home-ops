@@ -17,6 +17,17 @@ additionalVolumes:
   persistentVolumeClaim:
     claimName: nfs-nas-media
 
+service:
+  additionalServices:
+  - enabled: false
+    nameSuffix: webserver
+    type: ClusterIP
+    port:
+      port: 8081
+      name: webserver
+      protocol: TCP
+      targetPort: 8081
+
 ingress:
   enabled: true
 
