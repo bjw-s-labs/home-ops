@@ -59,11 +59,10 @@ redis:
 
 postgresql:
   enabled: true
-  global:
-    postgresql:
-      postgresqlUsername: {{ (datasource "nextcloud").database.username }}
-      postgresqlPassword: {{ (datasource "nextcloud").database.password }}
-      postgresqlDatabase: {{ (datasource "nextcloud").database.database }}
+
+  postgresqlUsername: {{ (datasource "nextcloud").database.username }}
+  postgresqlPassword: {{ (datasource "nextcloud").database.password }}
+  postgresqlDatabase: {{ (datasource "nextcloud").database.database }}
 
   persistence:
     enabled: true
