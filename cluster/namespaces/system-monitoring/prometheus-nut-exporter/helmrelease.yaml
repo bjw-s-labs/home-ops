@@ -22,10 +22,11 @@ spec:
       tag: 1.1.0
     env:
       TZ: Europe/Amsterdam
-    serviceMonitor:
-      enabled: true
-      targets:
-        - hostname: nut-server-study.home-network
-          port: 3493
-        - hostname: nut-server-hallway.home-network
-          port: 3493
+    prometheus:
+      serviceMonitor:
+        enabled: true
+        targets:
+          - hostname: nut-server-study.home-network
+            port: 3493
+          - hostname: nut-server-hallway.home-network
+            port: 3493
