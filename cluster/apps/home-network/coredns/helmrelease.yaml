@@ -5,6 +5,9 @@ metadata:
   name: coredns
   namespace: home-network
 spec:
+  dependsOn:
+  - name: etcd
+    namespace: home-network
   interval: 5m
   chart:
     spec:
@@ -17,6 +20,6 @@ spec:
         namespace: system-flux
       interval: 5m
   valuesFrom:
-    - kind: Secret
-      name: coredns-helm-values
-      valuesKey: values.yaml
+  - kind: Secret
+    name: coredns-helm-values
+    valuesKey: values.yaml
