@@ -2,11 +2,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
-  name: cluster-core-namespaces
+  name: cluster-core-operators
   namespace: system-flux
 spec:
+  dependsOn:
+  - name: cluster-core-crds
   interval: 10m0s
-  path: ./cluster/core/namespaces
+  path: ./cluster/core/operators
   prune: false
   sourceRef:
     kind: GitRepository
