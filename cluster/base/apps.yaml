@@ -2,13 +2,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
-  name: cluster-namespaces
+  name: cluster-apps
   namespace: system-flux
 spec:
   dependsOn:
   - name: cluster-core
   interval: 10m0s
-  path: ./cluster/namespaces
+  path: ./cluster/apps
   prune: true
   sourceRef:
     kind: GitRepository
