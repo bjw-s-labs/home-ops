@@ -5,6 +5,9 @@ metadata:
   name: zigbee2mqtt
   namespace: home-automation
 spec:
+  dependsOn:
+  - name: vernemq
+    namespace: home-network
   interval: 5m
   chart:
     spec:
@@ -21,6 +24,6 @@ spec:
       repository: koenkk/zigbee2mqtt
       tag: 1.18.2
   valuesFrom:
-    - kind: Secret
-      name: zigbee2mqtt-helm-values
-      valuesKey: values.yaml
+  - kind: Secret
+    name: zigbee2mqtt-helm-values
+    valuesKey: values.yaml
