@@ -23,10 +23,16 @@
     // regexManager to read and process HelmRelease files
     {
       "fileMatch": [
-        "cluster/.+/helmrelease\\.yaml$"
+        "cluster/.+/helmrelease\\.yaml$",
+        "core/crds/.+\\.yaml$"
       ],
       "matchStrings": [
-        "registryUrl=(?<registryUrl>.*?)\n *chart: (?<depName>.*?)\n *version: (?<currentValue>.*)\n"
+        // helmrelease
+        "registryUrl=(?<registryUrl>.*?)\n *chart: (?<depName>.*?)\n *version: (?<currentValue>.*)\n",
+        // kube-prometheus-stack
+        "registryUrl=(?<registryUrl>.*?)\n *tag: (?<depName>[a-zA-Z-]+)-(?<currentValue>.*)\n",
+        // cert-manager
+        "registryUrl=(?<registryUrl>.*?) chart=(?<depName>.*?)\n.*\\/(?<currentValue>.*?)\\/"
       ],
       "datasourceTemplate": "helm"
     },
