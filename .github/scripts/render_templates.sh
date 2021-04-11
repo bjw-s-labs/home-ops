@@ -100,27 +100,23 @@ while IFS= read -r file; do
     echo "  template_var_files: ${template_var_files}"
   fi
 
-  VARS_FOUND=0
-  VARS_STRING=""
+  VARS_CMD_LINE=()
   if [[ -n "$template_var_files" ]]; then
-    VARS_FOUND=1
     while IFS= read -r template_var_file; do
       var_name=${template_var_file##*/}
       var_name=${var_name%.*}
-      VARS_STRING="${VARS_STRING} -c ${var_name}=${template_var_file}"
-      # Remove leading whitespace
-      VARS_STRING="${VARS_STRING#"${VARS_STRING%%[![:space:]]*}"}"
-      # Remove trailing whitespace
-      VARS_STRING="${VARS_STRING%"${VARS_STRING##*[![:space:]]}"}"
+
+      VARS_CMD_LINE+=("-c")
+      VARS_CMD_LINE+=("${var_name}=${template_var_file}")
     done <<< "$template_var_files"
   fi
 
   if [[ "$DEBUG" == "true" ]]; then
-    echo "  VARS_STRING=${VARS_STRING}"
+    echo "  VARS_CMD_LINE=${VARS_CMD_LINE[*]}"
   fi
 
   # Process the template to replace any variables
-  rendered_file=$(gomplate -c "cluster-vars=${CLUSTER_VARS}" ${VARS_STRING} -f "${file}")
+  rendered_file=$(gomplate -c "cluster-vars=${CLUSTER_VARS}" "${VARS_CMD_LINE[@]}" -f "${file}")
 
   if [[ "$DEBUG" == "true" ]]; then
     echo "** DEBUG ** Rendered file"
