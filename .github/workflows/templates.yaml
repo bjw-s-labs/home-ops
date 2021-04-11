@@ -7,7 +7,7 @@ on:  # yamllint disable-line rule:truthy
     branches:
     - main
     paths:
-    - "cluster/namespaces/**/*.tmpl"
+    - "cluster/**/*.tmpl"
     - "_setup/sealedsecret-cert.pem"
     - ".github/workflows/templates.yaml"
     - ".github/scripts/render_templates.sh"
@@ -98,7 +98,7 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git pull
-          git add "cluster/namespaces/**/*.yaml"
+          git add "cluster/**/*.yaml"
           git commit -m "Auto-render templates [ci-skip]" || exit 0
           git push
         fi
