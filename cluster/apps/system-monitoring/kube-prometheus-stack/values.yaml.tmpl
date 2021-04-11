@@ -103,7 +103,7 @@ prometheus:
       - prometheus.{{ index (datasource "cluster-vars").domains 0 }}
 
   prometheusSpec:
-    retention: 4h
+    retention: 672h
 
     ruleSelector: {}
     ruleNamespaceSelector: {}
@@ -114,22 +114,6 @@ prometheus:
     podMonitorSelector: {}
     podMonitorNamespaceSelector: {}
     podMonitorSelectorNilUsesHelmValues: false
-
-    thanos:
-      image: quay.io/thanos/thanos:v0.18.0
-      version: v0.18.0
-
-      # Thanos chart will generate the secret: thanos
-      objectStorageConfig:
-        name: thanos
-        key: object-store.yaml
-
-      resources:
-        requests:
-          memory: 128Mi
-          cpu: 100m
-        limits:
-          memory: 256Mi
 
     storageSpec:
       volumeClaimTemplate:
