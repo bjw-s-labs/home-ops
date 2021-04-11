@@ -73,6 +73,7 @@ jobs:
 
     - name: Store changed and removed files
       run: |
+        echo "" > /tmp/changed_files
         mapfile -d ',' -t changed_files < <(printf '%s,' '${{ steps.changed_files.outputs.all }}')
         for changed_file in "${changed_files[@]}"; do
           echo "${changed_file}" >> /tmp/changed_files
