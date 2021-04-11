@@ -21,7 +21,7 @@ message() {
 
 message "Running ShellCheck on all script files in repository"
 
-FILES_TO_PROCESS=$(find "${REPO_ROOT}" -name '*.sh')
+FILES_TO_PROCESS=$(find "${REPO_ROOT}" -type d -path "${REPO_ROOT}/.direnv" -prune -false -o -name '*.sh')
 
 # Loop over the files that should be processed
 set +e
