@@ -88,7 +88,12 @@ while IFS= read -r file; do
   template_namespace=${template_relative_path_arr[1]}
   template_folder=${template_relative_path_arr[2]}
   template_vars_path="${SECRETS_ROOT}/${template_base}/${template_namespace}/${template_folder}"
-  template_var_files=$(find "${template_vars_path}" -type f -name "*.yaml")
+
+  if [[ -d "${template_vars_path}" ]]; then
+    template_var_files=$(find "${template_vars_path}" -type f -name "*.yaml")
+  else
+    template_var_files=""
+  fi
 
   if [[ "$DEBUG" == "true" ]]; then
     echo "  template_vars_path: ${template_vars_path}"
@@ -139,9 +144,9 @@ while IFS= read -r file; do
 
   # If it's a values.yaml file, process it and send it to kubeseal
   if [[ "$template_filename" == "values.yaml.tmpl" ]]; then
-    template_target_name="${template_deployment}-helm-values.yaml"
+    template_target_name="${template_folder}-helm-values.yaml"
     echo -n "${rendered_file}" |
-    kubectl -n "${template_namespace}" create secret generic "${template_deployment}-helm-values" \
+    kubectl -n "${template_namespace}" create secret generic "${template_folder}-helm-values" \
         --from-file=/dev/stdin --dry-run=client -o yaml |
     # Remove null keys
     yq eval 'del(.metadata.creationTimestamp)' - |
