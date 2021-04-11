@@ -68,25 +68,6 @@ while IFS= read -r file; do
     continue
   fi
 
-  # Get secret file metadata (path, filename, etc...)
-  template_filename="${file##*/}"
-  template_path="${file%/$template_filename}"
-  template_relative_path=${template_path#"${CLUSTER_ROOT}"}
-  template_target_name=${template_filename%.*}
-
-  # Determine secret namespace / deployment
-  IFS="/" read -ra template_relative_path_arr <<< "$template_relative_path"
-  template_base=${template_relative_path_arr[1]}
-  template_namespace=${template_relative_path_arr[2]}
-  template_deployment=${template_relative_path_arr[3]}
-
-  if [ "${template_deployment}" == "" ]; then
-    template_deployment="${template_namespace}"
-  fi
-
-  template_vars_path="${SECRETS_ROOT}/${template_base}/${template_namespace}/${template_deployment}"
-  template_vars_filename="${template_vars_path}/vars.yaml"
-
   echo "- Processing $file"
 
   # Double check to see if the file exists
@@ -95,23 +76,46 @@ while IFS= read -r file; do
     exit 1
   fi
 
-  VARS_FOUND=0
-  if [[ -f "$template_vars_filename" ]]; then
-    VARS_FOUND=1
+  # Get secret file metadata (path, filename, etc...)
+  template_filename="${file##*/}"
+  template_path="${file%/$template_filename}"
+  template_relative_path=${template_path#"${CLUSTER_ROOT}/"}
+  template_target_name=${template_filename%.*}
+
+  # Determine secret namespace / deployment
+  IFS="/" read -ra template_relative_path_arr <<< "$template_relative_path"
+  template_base=${template_relative_path_arr[0]}
+  template_namespace=${template_relative_path_arr[1]}
+  template_folder=${template_relative_path_arr[2]}
+  template_vars_path="${SECRETS_ROOT}/${template_base}/${template_namespace}/${template_folder}"
+  template_var_files=$(find "${template_vars_path}" -type f -name "*.yaml")
+
+  if [[ "$DEBUG" == "true" ]]; then
+    echo "  template_vars_path: ${template_vars_path}"
+    echo "  template_var_files: ${template_var_files}"
   fi
 
-  # Make sure the vars file is valid YAML before we try to read it
-  if [ "$VARS_FOUND" -eq 1 ] && ! yq eval "${template_vars_filename}" > /dev/null; then
-    echo "  ${template_vars_filename} is invalid YAML. Aborting"
-    exit 1
+  VARS_FOUND=0
+  VARS_STRING=""
+  if [[ -n "$template_var_files" ]]; then
+    VARS_FOUND=1
+    while IFS= read -r template_var_file; do
+      var_name=${template_var_file##*/}
+      var_name=${var_name%.*}
+      VARS_STRING="${VARS_STRING} -c ${var_name}=${template_var_file}"
+      # Remove leading whitespace
+      VARS_STRING="${VARS_STRING#"${VARS_STRING%%[![:space:]]*}"}"
+      # Remove trailing whitespace
+      VARS_STRING="${VARS_STRING%"${VARS_STRING##*[![:space:]]}"}"
+    done <<< "$template_var_files"
+  fi
+
+  if [[ "$DEBUG" == "true" ]]; then
+    echo "  VARS_STRING=${VARS_STRING}"
   fi
 
   # Process the template to replace any variables
-  if [ "$VARS_FOUND" -eq 1 ]; then
-    rendered_file=$(gomplate -c "cluster-vars=${CLUSTER_VARS}" -c "${template_deployment}=${template_vars_filename}" -f "${file}")
-  else
-    rendered_file=$(gomplate -c "cluster-vars=${CLUSTER_VARS}" -f "${file}")
-  fi
+  rendered_file=$(gomplate -c "cluster-vars=${CLUSTER_VARS}" ${VARS_STRING} -f "${file}")
 
   if [[ "$DEBUG" == "true" ]]; then
     echo "** DEBUG ** Rendered file"
