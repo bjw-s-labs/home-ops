@@ -34,7 +34,7 @@ ingress:
     kubernetes.io/ingress.class: internal
     cert-manager.io/cluster-issuer: letsencrypt-production
     external-dns.alpha.kubernetes.io/target: cname--int.{{ index (datasource "cluster-vars").domains 0 }}
-    nginx.ingress.kubernetes.io/auth-url: "https://auth.{{ index (datasource "cluster-vars").domains 0 }}/oauth2/auth?allowed_groups=deemix"
+    nginx.ingress.kubernetes.io/auth-url: "https://auth.{{ index (datasource "cluster-vars").domains 0 }}/oauth2/auth?allowed_groups=/deemix"
     nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ index (datasource "cluster-vars").domains 0 }}/oauth2/start"
   hosts:
     - host: deemix.{{ index (datasource "cluster-vars").domains 0 }}
