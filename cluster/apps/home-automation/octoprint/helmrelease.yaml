@@ -20,7 +20,69 @@ spec:
     image:
       repository: octoprint/octoprint
       tag: 1.5.3
-  valuesFrom:
-    - kind: Secret
-      name: octoprint-helm-values
-      valuesKey: values.yaml
+
+    env:
+      TZ: "Europe/Amsterdam"
+      OCTOPRINT_PORT: "5000"
+      ENABLE_MJPG_STREAMER: "true"
+      MJPG_STREAMER_INPUT: "-y -n -r 1280x720"
+
+    probes:
+      liveness:
+        enabled: false
+      readiness:
+        enabled: false
+
+    persistence:
+      data:
+        enabled: true
+        existingClaim: octoprint-data
+
+    securityContext:
+      privileged: true
+
+    additionalVolumeMounts:
+    - name: usb
+      mountPath: /dev/serial
+
+    additionalVolumes:
+    - name: usb
+      hostPath:
+        path: /dev/serial
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: feature.node.kubernetes.io/custom-ender3
+              operator: In
+              values:
+              - "true"
+            - key: feature.node.kubernetes.io/custom-aukey_webcam
+              operator: In
+              values:
+              - "true"
+
+    tolerations:
+    - key: "node-role.kubernetes.io/arm-worker"
+      operator: "Exists"
+
+    ingress:
+      enabled: true
+
+      annotations:
+        kubernetes.io/ingress.class: internal
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
+
+      hosts:
+      - host: octoprint.${DOMAIN_1}
+        paths:
+        - path: /
+
+      tls:
+      - secretName: tls.octoprint
+        hosts:
+        - octoprint.${DOMAIN_1}
