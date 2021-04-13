@@ -21,7 +21,45 @@ spec:
       repository: ghcr.io/k8s-at-home/radarr
       tag: v3.0.2.4552
       pullPolicy: Always
-  valuesFrom:
-    - kind: Secret
-      name: radarr-helm-values
-      valuesKey: values.yaml
+
+    controllerType: deployment
+
+    podSecurityContext:
+      supplementalGroups:
+      - 65539
+
+    env:
+      TZ: "Europe/Amsterdam"
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: radarr-config
+      media:
+        enabled: true
+        existingClaim: nfs-nas-media
+        mountPath: /data/nas-media
+
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: internal
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
+        nginx.ingress.kubernetes.io/auth-url: "https://auth.${DOMAIN_1}/oauth2/auth?allowed_groups=/radarr"
+        nginx.ingress.kubernetes.io/auth-signin: "https://auth.${DOMAIN_1}/oauth2/start"
+      hosts:
+      - host: radarr.${DOMAIN_1}
+        paths:
+        - path: /
+      tls:
+      - secretName: tls.radarr
+        hosts:
+        - radarr.${DOMAIN_1}
+
+    resources:
+      requests:
+        cpu: "0.04"
+        memory: "256M"
+      limits:
+        memory: "512M"
