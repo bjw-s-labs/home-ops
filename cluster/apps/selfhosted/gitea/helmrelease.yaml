@@ -16,7 +16,59 @@ spec:
         name: gitea-charts
         namespace: system-flux
       interval: 5m
-  valuesFrom:
-    - kind: Secret
-      name: gitea-helm-values
-      valuesKey: values.yaml
+  values:
+    persistence:
+      enabled: true
+      existingClaim: gitea-data
+
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: external
+        external-dns.alpha.kubernetes.io/target: cname--ext.${DOMAIN_1}
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+        cert-manager.io/cluster-issuer: letsencrypt-production
+      hosts:
+      - gitea.${DOMAIN_1}
+      tls:
+      - secretName: tls.gitea
+        hosts:
+        - gitea.${DOMAIN_1}
+
+    gitea:
+      admin:
+        username: bernd
+        email: ${EMAIL_1}
+        password: ${GITEA_ADMIN_PASSWORD}
+
+      config:
+        APP_NAME: "BJW-S"
+
+        server:
+          ROOT_URL: https://gitea.${DOMAIN_1}
+          DISABLE_SSH: true
+          PPROF_ENABLED: true
+
+        respository:
+          DEFAULT_PRIVATE: true
+
+        admin:
+          DISABLE_REGULAR_ORG_CREATION: true
+
+        service:
+          DISABLE_REGISTRATION: true
+          REQUIRE_SIGNIN_VIEW: true
+
+      cache:
+        builtIn:
+          enabled: true
+
+      database:
+        builtIn:
+          postgresql:
+            enabled: true
+
+    postgresql:
+      persistence:
+        enabled: true
+        existingClaim: gitea-postgresql
