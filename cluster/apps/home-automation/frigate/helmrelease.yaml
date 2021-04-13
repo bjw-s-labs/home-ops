@@ -20,7 +20,147 @@ spec:
     image:
       repository: blakeblackshear/frigate
       tag: 0.8.4-amd64
-  valuesFrom:
-    - kind: Secret
-      name: frigate-helm-values
-      valuesKey: values.yaml
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: feature.node.kubernetes.io/custom-coral-tpu
+              operator: In
+              values:
+              - "true"
+            - key: feature.node.kubernetes.io/custom-intel-gpu
+              operator: In
+              values:
+              - "true"
+
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: "frigate"
+
+    timezone: Europe/Amsterdam
+
+    coral:
+      enabled: true
+
+    shmSize: 512Mi
+
+    persistence:
+      data:
+        enabled: true
+        existingClaim: frigate-data
+
+    extraVolumes:
+    - name: frigate-media
+      persistentVolumeClaim:
+        claimName: nfs-nas-frigate-media
+    - name: cache
+      emptyDir:
+        medium: Memory
+
+    extraVolumeMounts:
+    - name: frigate-media
+      mountPath: /media
+    - mountPath: /tmp/cache
+      name: cache
+
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: internal
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
+      hosts:
+      - frigate.${DOMAIN_1}
+      tls:
+      - hosts:
+        - frigate.${DOMAIN_1}
+        secretName: tls.frigate
+
+    config: |
+      mqtt:
+        host: vernemq.home-network
+        port: 1883
+        topic_prefix: frigate
+        user: ${FRIGATE_MQTT_USER}
+        password: ${FRIGATE_MQTT_PASSWORD}
+
+      database:
+        path: /data/frigate.db
+
+      detectors:
+        coral:
+          type: edgetpu
+          device: usb
+
+      objects:
+        track:
+          - person
+        filters:
+          person:
+            min_area: 5000
+            max_area: 100000
+            threshold: 0.5
+
+      ffmpeg:
+        hwaccel_args:
+          - -hwaccel
+          - vaapi
+          - -hwaccel_device
+          - /dev/dri/renderD128
+          - -hwaccel_output_format
+          - yuv420p
+
+      cameras:
+        frontdoor:
+          ffmpeg:
+            inputs:
+              - path: ${FRIGATE_CAMERA_FRONTDOOR_SUBSTREAM}
+                roles:
+                  - detect
+              - path: ${FRIGATE_CAMERA_FRONTDOOR_MAIN}
+                roles:
+                  - clips
+                  - record
+                  - rtmp
+
+          width: 640
+          height: 360
+          fps: 6
+
+          clips:
+            enabled: True
+            objects:
+              - person
+            retain:
+              # Required: Default retention days (default: shown below)
+              default: 14
+
+          snapshots:
+            enabled: True
+            timestamp: True
+            retain:
+              # Required: Default retention days (default: shown below)
+              default: 14
+
+          motion:
+            mask:
+              - 0,182,36,179,125,158,118,0,0,0
+
+          objects:
+            track:
+              - person
+            filters:
+              person:
+                min_area: 5000
+                max_area: 100000
+                threshold: 0.65
+
+    resources:
+      requests:
+        memory: 300Mi
+        cpu: 400m
+        gpu.intel.com/i915: 1
+      limits:
+        gpu.intel.com/i915: 1
+        memory: 1000Mi
