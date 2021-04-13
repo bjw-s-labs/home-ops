@@ -19,9 +19,128 @@ spec:
   values:
     image:
       repository: homeassistant/home-assistant
-      tag: 2021.4.3
+      tag: 2021.4.4
 
-  valuesFrom:
-    - kind: Secret
-      name: home-assistant-helm-values
-      valuesKey: values.yaml
+    podAnnotations:
+      secret.reloader.stakater.com/reload: home-assistant-secrets
+
+    probes:
+      liveness:
+        enabled: false
+      readiness:
+        enabled: false
+      startup:
+        enabled: false
+
+    service:
+      type: LoadBalancer
+      externalIPs:
+      - ${LB_HOME_ASSISTANT}
+      externalTrafficPolicy: Local
+      additionalPorts:
+      - name: sonos
+        port: 1400
+        targetPort: 1400
+
+    ingress:
+      enabled: true
+
+      annotations:
+        kubernetes.io/ingress.class: external
+        external-dns.alpha.kubernetes.io/target: cname--ext.${DOMAIN_1}
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+        cert-manager.io/cluster-issuer: letsencrypt-production
+
+      hosts:
+      - host: domo.${DOMAIN_2}
+        paths:
+        - path: /
+      - host: domo.${DOMAIN_3}
+        paths:
+        - path: /
+
+      tls:
+      - secretName: tls.home-assistant-frontend
+        hosts:
+        - domo.${DOMAIN_2}
+        - domo.${DOMAIN_3}
+
+    env:
+      TZ: "Europe/Amsterdam"
+
+    envFrom:
+    - secretRef:
+        name: home-assistant-secrets
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: home-assistant-data
+
+    resources:
+      requests:
+        cpu: 75m
+        memory: 512Mi
+      limits:
+        memory: 2000Mi
+
+    postgresql:
+      enabled: true
+      persistence:
+        enabled: true
+        existingClaim: home-assistant-postgresql
+
+      postgresqlUsername: home-assistant
+      postgresqlDatabase: home-assistant
+      postgresqlPassword: ${HASS_POSTGRES_PASSWORD}
+
+    git:
+      deployKey: |-
+        ${HASS_DEPLOY_KEY}
+
+    addons:
+      codeserver:
+        enabled: true
+        ingress:
+          enabled: true
+          annotations:
+            kubernetes.io/ingress.class: internal
+            cert-manager.io/cluster-issuer: letsencrypt-production
+            external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
+            nginx.ingress.kubernetes.io/proxy-body-size: "0"
+          hosts:
+          - host: code-domo.${DOMAIN_2}
+            paths:
+            - path: /
+          - host: code-domo.${DOMAIN_3}
+            paths:
+            - path: /
+          tls:
+          - secretName: tls.home-assistant-code
+            hosts:
+            - code-domo.${DOMAIN_2}
+            - code-domo.${DOMAIN_3}
+
+        args:
+        - --auth
+        - none
+        - --user-data-dir
+        - "/config/.vscode"
+        - --extensions-dir
+        - "/config/.vscode"
+
+        workingDir: "/config"
+
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: deploykey
+          mountPath: /root/.ssh/id_rsa
+          subPath: id_rsa
+
+        resources:
+          requests:
+            cpu: 35m
+            memory: 128Mi
+          limits:
+            memory: 512Mi
