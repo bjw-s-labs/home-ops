@@ -20,7 +20,42 @@ spec:
     image:
       repository: "quay.io/oauth2-proxy/oauth2-proxy"
       tag: "v7.1.2"
-  valuesFrom:
-  - kind: Secret
-    name: "oauth2-proxy-helm-values"
-    optional: false
+
+    replicaCount: 1
+
+    ingress:
+      enabled: true
+      path: /oauth2
+      annotations:
+        kubernetes.io/ingress.class: "external"
+        external-dns.alpha.kubernetes.io/target: cname--ext.${DOMAIN_1}
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+      hosts:
+      - auth.${DOMAIN_1}
+      tls:
+      - secretName: tls.oauth2-proxy
+        hosts:
+        - auth.${DOMAIN_1}
+
+    config:
+      existingSecret: oauth2-proxy-secret
+
+    extraArgs:
+      provider: oidc
+      provider_display_name: Keycloak
+
+      oidc_issuer_url: https://sso.${DOMAIN_1}/auth/realms/BJW-S
+      email-domain: "*"
+      scope: "openid profile email"
+      cookie-domain: ".${DOMAIN_1}"
+      whitelist-domain: ".${DOMAIN_1}"
+
+      pass-authorization-header: true
+      pass_access_token: true
+      pass_user_headers: true
+      set-authorization-header: true
+      set-xauthrequest: true
+
+      cookie_refresh: "1m"
+      cookie_expire: "30m"
