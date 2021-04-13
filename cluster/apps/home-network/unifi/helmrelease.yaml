@@ -20,7 +20,56 @@ spec:
     image:
       repository: jacobalberty/unifi
       tag: 6.1.71
-  valuesFrom:
-    - kind: Secret
-      name: unifi-helm-values
-      valuesKey: values.yaml
+
+    timezone: Europe/Amsterdam
+
+    persistence:
+      enabled: true
+      existingClaim: unifi-data
+
+    guiService:
+      type: LoadBalancer
+      annotations:
+        external-dns.alpha.kubernetes.io/hostname: unifi
+      externalIPs:
+      - ${LB_UNIFI}
+      externalTrafficPolicy: Local
+
+    controllerService:
+      type: LoadBalancer
+      externalIPs:
+      - ${LB_UNIFI}
+      externalTrafficPolicy: Local
+
+    stunService:
+      type: LoadBalancer
+      externalIPs:
+      - ${LB_UNIFI}
+      externalTrafficPolicy: Local
+
+    discoveryService:
+      type: LoadBalancer
+      externalIPs:
+      - ${LB_UNIFI}
+      externalTrafficPolicy: Local
+
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: internal
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+      hosts:
+      - unifi.${DOMAIN_1}
+      tls:
+      - secretName: tls.unifi-controller
+        hosts:
+        - unifi.${DOMAIN_1}
+
+    resources:
+      requests:
+        cpu: "0.02"
+        memory: "1024M"
+      limits:
+        memory: "1536M"
