@@ -21,7 +21,97 @@ spec:
       repository: spx01/blocky
       tag: v0.13
 
-  valuesFrom:
-    - kind: Secret
-      name: blocky-helm-values
-      valuesKey: values.yaml
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: "blocky-config"
+
+    replicas: 2
+
+    env:
+      TZ: "Europe/Amsterdam"
+
+    config: |
+      httpPort: 4000
+      logLevel: info
+
+      upstream:
+        externalResolvers:
+        - 1.1.1.1
+
+      clientLookup:
+        upstream: 10.1.1.1
+
+      conditional:
+        mapping:
+          # CoreDNS IP
+          ${DOMAIN_1}: udp:10.1.10.3
+          ${DOMAIN_2}: udp:10.1.10.3
+          ${DOMAIN_3}: udp:10.1.10.3
+          unifi: udp:10.1.10.3
+
+          # Router
+          ${DOMAIN_4}: udp:10.1.1.1
+
+      blocking:
+        blackLists:
+          ads:
+          - https://raw.githubusercontent.com/ookangzheng/dbl-oisd-nl/master/dbl.txt
+        whiteLists:
+          ads:
+          - https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/whitelist.txt
+        clientGroupsBlock:
+          default:
+          - ads
+
+      prometheus:
+        enable: true
+        path: /metrics
+
+    service:
+      port:
+        port: 4000
+      additionalServices:
+      - nameSuffix: dns-tcp
+        enabled: true
+        type: LoadBalancer
+        externalIPs:
+        - ${LB_BLOCKY}
+        port:
+          port: 53
+          name: dns-tcp
+          protocol: TCP
+          targetPort: 53
+        externalTrafficPolicy: Local
+      - nameSuffix: dns-udp
+        enabled: true
+        type: LoadBalancer
+        externalIPs:
+        - ${LB_BLOCKY}
+        port:
+          port: 53
+          name: dns-udp
+          protocol: UDP
+          targetPort: 53
+        externalTrafficPolicy: Local
+
+    prometheus:
+      serviceMonitor:
+        enabled: true
+
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - blocky
+          topologyKey: "kubernetes.io/hostname"
+
+    resources:
+      requests:
+        memory: 275Mi
+        cpu: "0.01"
+      limits:
+        # memory: 2048Mi
+        cpu: "0.05"
