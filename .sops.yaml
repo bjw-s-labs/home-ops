@@ -2,4 +2,12 @@
 
 creation_rules:
   - path_regex: ansible/.*\.sops\.ya?ml
-    pgp: 0xBE954AA0B2A13EAD
+    # Personal
+    pgp: >-
+      0xBE954AA0B2A13EAD
+
+  - encrypted_regex: '((?i)(pass|secret($|[^N])|key|token|^data$|^stringData))'
+    # Personal, Flux
+    pgp: >-
+      0xBE954AA0B2A13EAD
+      0xEF97AF748D596FE2
