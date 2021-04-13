@@ -20,7 +20,69 @@ spec:
     image:
       repository: nextcloud
       tag: "21.0.1"
-  valuesFrom:
-    - kind: Secret
-      name: nextcloud-helm-values
-      valuesKey: values.yaml
+
+    env:
+      PHP_MEMORY_LIMIT: 256M
+
+    persistence:
+      enabled: true
+      existingClaim: nextcloud-data
+
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: external
+        external-dns.alpha.kubernetes.io/target: cname--ext.${DOMAIN_1}
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+        cert-manager.io/cluster-issuer: letsencrypt-production
+      tls:
+      - secretName: tls.nextcloud
+        hosts:
+        - cloud.${DOMAIN_2}
+
+    resources:
+      requests:
+        cpu: "0.01"
+        memory: "305M"
+      limits:
+        memory: "512M"
+
+    nextcloud:
+      host: cloud.${DOMAIN_2}
+      username: ${NEXTCLOUD_ADMIN_USER}
+      password: ${NEXTCLOUD_ADMIN_PASSWORD}
+
+      configs:
+        proxy.config.php: |-
+          <?php
+          $CONFIG = array (
+            'trusted_proxies' => array('${NETWORK_K8S_CLUSTER_CIDR}')
+          );
+
+    internalDatabase:
+      enabled: false
+
+    externalDatabase:
+      enabled: true
+      type: postgresql
+      host: nextcloud-postgresql.selfhosted
+      user: nextcloud
+      password: ${NEXTCLOUD_POSTGRES_PASSWORD}
+      database: nextcloud
+
+    cronjob:
+      enabled: true
+
+    redis:
+      enabled: true
+
+    postgresql:
+      enabled: true
+
+      postgresqlUsername: nextcloud
+      postgresqlPassword: ${NEXTCLOUD_POSTGRES_PASSWORD}
+      postgresqlDatabase: nextcloud
+
+      persistence:
+        enabled: true
+        existingClaim: nextcloud-postgresql
