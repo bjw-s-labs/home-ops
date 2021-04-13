@@ -29,7 +29,7 @@ spec:
     serviceType: LoadBalancer
     service:
       externalIPs:
-      - 10.1.10.3
+      - ${LB_COREDNS}
       externalTrafficPolicy: Local
 
     servers:
@@ -82,7 +82,7 @@ spec:
         configBlock: |-
           stubzones
           path /skydns
-          endpoint http://etcd:2379
+          endpoint http://etcd.home-network:2379
 
       # Set up cache
       - name: cache
