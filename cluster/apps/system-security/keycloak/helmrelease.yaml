@@ -20,7 +20,48 @@ spec:
     image:
       repository: jboss/keycloak
       tag: 12.0.4
-  valuesFrom:
-  - kind: Secret
-    name: "keycloak-helm-values"
-    optional: false
+
+    fullnameOverride: keycloak
+    nameOverride: keycloak
+
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: "external"
+        external-dns.alpha.kubernetes.io/target: cname--ext.${DOMAIN_1}
+        cert-manager.io/cluster-issuer: letsencrypt-production
+      rules:
+      - host: sso.${DOMAIN_1}
+        paths:
+        - /
+      tls:
+      - hosts:
+        - sso.${DOMAIN_1}
+        secretName: tls.keycloak
+
+    resources: {}
+
+    replicas: 1
+
+    extraEnv: |
+      - name: PROXY_ADDRESS_FORWARDING
+        value: "true"
+      - name: KEYCLOAK_USER:
+        value: ${KEYCLOAK_ADMIN_USER}
+      - name: KEYCLOAK_PASSWORD
+        value: ${KEYCLOAK_ADMIN_PASSWORD}
+
+    extraEnvFrom: |
+      - secretRef:
+          name: 'keycloak-env-values'
+
+    postgresql:
+      enabled: true
+      postgresqlUsername: keycloak
+      postgresqlPassword: ${KEYCLOAK_POSTGRESS_PASSWORD}
+      postgresqlDatabase: keycloak
+
+    serviceMonitor:
+      enabled: true
+    prometheusRule:
+      enabled: true
