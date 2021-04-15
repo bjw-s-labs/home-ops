@@ -17,7 +17,143 @@ spec:
         namespace: system-flux
       interval: 5m
   timeout: 20m
+  values:
+    server:
+      resources:
+        requests:
+          memory: 1000Mi
+          cpu: 25m
+        limits:
+          memory: 2000Mi
 
-  valuesFrom:
-  - kind: Secret
-    name: "kube-prometheus-stack-helm-values"
+    prometheusOperator:
+      createCustomResource: false
+
+    alertmanager:
+      config:
+        global:
+          resolve_timeout: 5m
+
+        route:
+          group_by: ['alertname', 'job']
+          group_wait: 30s
+          group_interval: 5m
+          repeat_interval: 6h
+          receiver: 'null'
+          routes:
+          - receiver: 'null'
+            match:
+              alertname: Watchdog
+
+        inhibit_rules:
+        - source_match:
+            severity: 'critical'
+          target_match:
+            severity: 'warning'
+          equal: ['alertname', 'namespace']
+
+        receivers:
+        - name: 'null'
+
+      ingress:
+        enabled: true
+        annotations:
+          kubernetes.io/ingress.class: internal
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
+        hosts:
+        - alertmanager.${DOMAIN_1}
+        tls:
+        - secretName: tls.alertmanager
+          hosts:
+          - alertmanager.${DOMAIN_1}
+
+      alertmanagerSpec:
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: "rook-ceph-block"
+              resources:
+                requests:
+                  storage: 10Gi
+
+    grafana:
+      enabled: false
+
+    nodeExporter:
+      serviceMonitor:
+        relabelings:
+        - action: replace
+          regex: (.*)
+          replacement: $1
+          sourceLabels:
+          - __meta_kubernetes_pod_node_name
+          targetLabel: kubernetes_node
+
+    kubelet:
+      enabled: true
+      serviceMonitor:
+        metricRelabelings:
+        - action: replace
+          sourceLabels:
+          - node
+          targetLabel: instance
+
+    kubeApiServer:
+      enabled: true
+
+    kubeEtcd:
+      enabled: false
+
+    kubeControllerManager:
+      enabled: false
+
+    kubeScheduler:
+      enabled: false
+
+    kubeProxy:
+      enabled: false
+
+    prometheus-node-exporter:
+      tolerations:
+      - key: "node-role.kubernetes.io/arm-worker"
+        operator: "Exists"
+      - key: "node-role.kubernetes.io/master"
+        operator: "Exists"
+
+    prometheus:
+      ingress:
+        enabled: true
+        annotations:
+          kubernetes.io/ingress.class: internal
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
+        hosts:
+        - prometheus.${DOMAIN_1}
+        tls:
+        - secretName: tls.prometheus
+          hosts:
+          - prometheus.${DOMAIN_1}
+
+      prometheusSpec:
+        retention: 672h
+
+        ruleSelector: {}
+        ruleNamespaceSelector: {}
+        ruleSelectorNilUsesHelmValues: false
+        serviceMonitorSelector: {}
+        serviceMonitorNamespaceSelector: {}
+        serviceMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelector: {}
+        podMonitorNamespaceSelector: {}
+        podMonitorSelectorNilUsesHelmValues: false
+
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: "rook-ceph-block"
+              resources:
+                requests:
+                  storage: 10Gi
+
+        additionalScrapeConfigs: []
