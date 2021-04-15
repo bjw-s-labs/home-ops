@@ -20,10 +20,47 @@ spec:
         name: kasten-charts
         namespace: system-flux
       interval: 5m
-  valuesFrom:
-  - kind: Secret
-    name: k10-helm-values
-    valuesKey: values.yaml
+  values:
+    eula:
+      accept: true
+      company: BJW-S
+      email: ${EMAIL_1}
+
+    clusterName: k8s
+
+    auth:
+      k10AdminUsers:
+      - ${EMAIL_1}
+
+      oidcAuth:
+        enabled: true
+        providerURL: https://sso.${DOMAIN_1}/auth/realms/BJW-S
+        redirectURL: https://k10.${DOMAIN_1}
+        scopes: "email profile openid"
+        usernameClaim: "email"
+        clientID: k10
+        clientSecret: ${K10_OIDC_CLIENTSECRET}
+
+    ingress:
+      create: true
+      class: "internal"
+      host: k10.${DOMAIN_1}
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
+        nginx.ingress.kubernetes.io/app-root: /k10
+      urlPath: k10
+      hosts:
+      - k10.${DOMAIN_1}
+      tls:
+        enabled: true
+        secretName: tls.k10
+
+    prometheus:
+      enabled: true
+      server:
+        persistentVolume:
+          enabled: false
 
   postRenderers:
   # Instruct helm-controller to use built-in "kustomize" post renderer.
