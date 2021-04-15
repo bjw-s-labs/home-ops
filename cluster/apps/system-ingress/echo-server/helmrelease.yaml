@@ -20,7 +20,21 @@ spec:
     image:
       repository: ealen/echo-server
       tag: 0.5.0
-  valuesFrom:
-    - kind: Secret
-      name: echo-server-helm-values
-      valuesKey: values.yaml
+
+    ingress:
+      enabled: true
+
+      annotations:
+        kubernetes.io/ingress.class: internal
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
+
+      hosts:
+      - host: echo-server.${DOMAIN_1}
+        paths:
+        - "/"
+
+      tls:
+      - secretName: tls.echo-server
+        hosts:
+        - echo-server.${DOMAIN_1}
