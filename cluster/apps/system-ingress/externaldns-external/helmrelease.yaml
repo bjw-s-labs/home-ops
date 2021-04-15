@@ -16,7 +16,27 @@ spec:
         name: bitnami-charts
         namespace: system-flux
       interval: 5m
-  valuesFrom:
-    - kind: Secret
-      name: externaldns-external-helm-values
-      valuesKey: values.yaml
+  values:
+    sources:
+    - ingress
+
+    provider: cloudflare
+    policy: sync
+    txtPrefix: "k8s."
+
+    cloudflare:
+      secretName: externaldns-external-secret
+      proxied: true
+
+    domainFilters:
+    - ${DOMAIN_1}
+    - ${DOMAIN_2}
+    - ${DOMAIN_3}
+
+    annotationFilter: "kubernetes.io/ingress.class=external"
+
+    resources:
+      requests:
+        memory: "32M"
+      limits:
+        memory: "64M"

@@ -16,7 +16,25 @@ spec:
         name: bitnami-charts
         namespace: system-flux
       interval: 5m
-  valuesFrom:
-    - kind: Secret
-      name: externaldns-internal-helm-values
-      valuesKey: values.yaml
+  values:
+    sources:
+    - service
+    - ingress
+    provider: coredns
+    policy: sync
+    txtPrefix: "k8s."
+
+    coredns:
+      etcdEndpoints: "http://etcd.home-network:2379"
+
+    domainFilters:
+    - ${DOMAIN_1}
+    - ${DOMAIN_2}
+    - ${DOMAIN_3}
+    - unifi
+
+    resources:
+      requests:
+        memory: "32M"
+      limits:
+        memory: "64M"
