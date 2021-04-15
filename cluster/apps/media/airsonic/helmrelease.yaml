@@ -21,7 +21,61 @@ spec:
       repository: airsonicadvanced/airsonic-advanced
       tag: latest
       pullPolicy: Always
-  valuesFrom:
-    - kind: Secret
-      name: airsonic-helm-values
-      valuesKey: values.yaml
+
+    podSecurityContext:
+      runAsUser: 2000
+      runAsGroup: 2000
+      supplementalGroups:
+      - 65540
+
+    env:
+      TZ: "Europe/Amsterdam"
+      JAVA_OPTS: "-Xmx1024m -Dserver.forward-headers-strategy=native"
+
+    enableServiceLinks: false
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: airsonic-config
+        mountPath: /var/airsonic
+
+    additionalVolumeMounts:
+    - name: nas-media
+      mountPath: /storage/nas-media
+
+    additionalVolumes:
+    - name: nas-media
+      persistentVolumeClaim:
+        claimName: nfs-nas-media
+
+    service:
+      type: LoadBalancer
+      externalIPs:
+      - 10.1.10.10
+      externalTrafficPolicy: Local
+
+    ingress:
+      enabled: true
+
+      annotations:
+        kubernetes.io/ingress.class: external
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: cname--ext.${DOMAIN_1}
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+
+      hosts:
+      - host: airsonic.${DOMAIN_1}
+        paths:
+        - path: /
+
+      tls:
+      - secretName: tls.airsonic
+        hosts:
+        - airsonic.${DOMAIN_1}
+
+    resources:
+      requests:
+        memory: "512M"
+      limits:
+        memory: "1024M"
