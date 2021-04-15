@@ -20,7 +20,77 @@ spec:
     image:
       repository: ghcr.io/k8s-at-home/plex
       tag: v1.22.2.4282-a97b03fad
-  valuesFrom:
-    - kind: Secret
-      name: plex-helm-values
-      valuesKey: values.yaml
+
+    podSecurityContext:
+      supplementalGroups:
+      - 44
+      - 109
+      - 65539
+
+    env:
+      TZ: "Europe/Amsterdam"
+
+    service:
+      type: LoadBalancer
+      externalIPs:
+      - 10.1.10.9
+      externalTrafficPolicy: Local
+
+    ingress:
+      enabled: true
+
+      annotations:
+        kubernetes.io/ingress.class: external
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: cname--ext.${DOMAIN_1}
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+      hosts:
+      - host: plex.${DOMAIN_2}
+        paths:
+        - path: /
+          pathType: Prefix
+      tls:
+      - secretName: tls.plex
+        hosts:
+        - plex.${DOMAIN_2}
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: plex-config
+
+      transcode:
+        enabled: true
+        emptyDir:
+          enabled: true
+          medium: "Memory"
+
+    additionalVolumes:
+    - name: nfs-nas-media
+      persistentVolumeClaim:
+        claimName: nfs-nas-media
+
+    additionalVolumeMounts:
+    - name: nfs-nas-media
+      mountPath: /storage/media
+      readOnly: true
+
+    resources:
+      requests:
+        cpu: 35m
+        memory: 1500Mi
+        gpu.intel.com/i915: 1
+      limits:
+        gpu.intel.com/i915: 1
+        memory: 8000Mi
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: feature.node.kubernetes.io/custom-intel-gpu
+              operator: In
+              values:
+              - "true"
