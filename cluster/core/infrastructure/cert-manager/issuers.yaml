@@ -5,7 +5,7 @@ metadata:
   name: letsencrypt-staging
 spec:
   acme:
-    email: postmaster@bjws.nl
+    email: ${EMAIL_POSTMASTER}
     preferredChain: ""
     privateKeySecretRef:
       name: letsencrypt-staging
@@ -16,12 +16,12 @@ spec:
           apiKeySecretRef:
             key: api_key
             name: cloudflare-api-key-secret
-          email: bernd@bjws.nl
+          email: ${EMAIL_1}
       selector:
         dnsZones:
-        - bjw-s.dev
-        - bjws.nl
-        - schorgers.nl
+        - ${DOMAIN_1}
+        - ${DOMAIN_2}
+        - ${DOMAIN_3}
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -29,7 +29,7 @@ metadata:
   name: letsencrypt-production
 spec:
   acme:
-    email: postmaster@bjws.nl
+    email: ${EMAIL_POSTMASTER}
     preferredChain: ""
     privateKeySecretRef:
       name: letsencrypt-production
@@ -40,9 +40,9 @@ spec:
           apiKeySecretRef:
             key: api_key
             name: cloudflare-api-key-secret
-          email: bernd@bjws.nl
+          email: ${EMAIL_1}
       selector:
         dnsZones:
-        - bjw-s.dev
-        - bjws.nl
-        - schorgers.nl
+        - ${DOMAIN_1}
+        - ${DOMAIN_2}
+        - ${DOMAIN_3}
