@@ -20,7 +20,57 @@ spec:
     image:
       repository: linuxserver/calibre
       tag: version-v5.14.0
-  valuesFrom:
-    - kind: Secret
-      name: calibre-helm-values
-      valuesKey: values.yaml
+
+    env:
+      TZ: "Europe/Amsterdam"
+      PGID: 65539
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: calibre-config
+
+    additionalVolumeMounts:
+    - name: nas-media
+      mountPath: /storage/nas-media
+
+    additionalVolumes:
+    - name: nas-media
+      persistentVolumeClaim:
+        claimName: nfs-nas-media
+
+    service:
+      additionalServices:
+      - enabled: true
+        nameSuffix: webserver
+        type: ClusterIP
+        port:
+          port: 8081
+          name: webserver
+          protocol: TCP
+          targetPort: 8081
+
+    ingress:
+      enabled: true
+
+      annotations:
+        kubernetes.io/ingress.class: internal
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
+
+      hosts:
+      - host: calibre.${DOMAIN_1}
+        paths:
+        - path: /
+
+      tls:
+      - secretName: tls.calibre
+        hosts:
+        - calibre.${DOMAIN_1}
+
+    resources:
+      requests:
+        cpu: 0.003
+        memory: 768Mi
+      limits:
+        memory: 1Gi
