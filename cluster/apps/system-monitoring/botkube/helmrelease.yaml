@@ -42,7 +42,6 @@ spec:
           include:
           - all
           ignore:
-          - actions-runner-system
           - media
           - selfhosted
           - system-rook-ceph
@@ -180,17 +179,3 @@ spec:
         - create
         - delete
         - error
-
-      - name: velero.io/v1/backups
-        namespaces:
-          include:
-          - all
-        events:
-        - create
-        - update
-        - delete
-        - error
-        updateSetting:
-          includeDiff: true
-          fields:
-          - status.phase
