@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: home-assistant
-      version: 7.4.0
+      version: 7.5.0
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
@@ -94,12 +94,13 @@ spec:
       postgresqlDatabase: home-assistant
       postgresqlPassword: ${HASS_POSTGRES_PASSWORD}
 
-    git:
-      deployKeyBase64: "${HASS_DEPLOY_KEY}"
-
     addons:
       codeserver:
         enabled: true
+
+        git:
+          deployKeySecret: home-assistant-deploykey
+
         ingress:
           enabled: true
           annotations:
