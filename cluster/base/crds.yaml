@@ -2,14 +2,14 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
-  name: cluster-core
+  name: cluster-crds
   namespace: system-flux
 spec:
   dependsOn:
-  - name: cluster-crds
+  - name: system-flux-helm-repositories
   interval: 10m0s
-  path: ./cluster/core
-  prune: false
+  path: ./cluster/crds
+  prune: true
   sourceRef:
     kind: GitRepository
     name: system-flux
