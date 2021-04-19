@@ -21,14 +21,109 @@ spec:
       repository: ghcr.io/k8s-at-home/qbittorrent
       tag: v4.3.4.1
       pullPolicy: Always
+
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: "qbittorrent-vpn"
+
+    podSecurityContext:
+      supplementalGroups:
+      - 65539
+
+    env:
+      TZ: "Europe/Amsterdam"
+      WAIT_FOR_VPN: "true"
+      UMASK: "022"
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: qbittorrent-config
+      media:
+        enabled: true
+        existingClaim: nfs-nas-media
+        mountPath: /data/nas-media
+      shared:
+        enabled: true
+        emptyDir:
+          enabled: true
+
+    service:
+      additionalServices:
+      - enabled: true
+        nameSuffix: bittorrent
+        type: ClusterIP
+        port:
+          port: 24589
+          name: bittorrent
+          protocol: TCP
+          targetPort: 24589
+
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: internal
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
+      hosts:
+      - host: qbittorrent.${DOMAIN_1}
+        paths:
+        - path: /
+      tls:
+      - secretName: tls.qbittorrent
+        hosts:
+        - qbittorrent.${DOMAIN_1}
+
+    resources:
+      requests:
+        cpu: "0.3"
+        memory: "1000Mi"
+      limits:
+        memory: "4000Mi"
+
+    additionalVolumes:
+    - name: qbittorrent-scripts
+      configMap:
+        name: qbittorrent-scripts
+        defaultMode: 511
+
+    additionalVolumeMounts:
+    - mountPath: /config/custom-cont-init.d
+      name: qbittorrent-scripts
+
     addons:
       vpn:
+        enabled: true
+        type: wireguard
+
         wireguard:
           image:
             repository: ghcr.io/k8s-at-home/wireguard
             tag: v1.0.20210315
             pullPolicy: IfNotPresent
-  valuesFrom:
-    - kind: Secret
-      name: qbittorrent-helm-values
-      valuesKey: values.yaml
+
+        securityContext:
+          runAsUser: 568
+          runAsGroup: 568
+
+        env:
+          TZ: "Europe/Amsterdam"
+          IPTABLES_BACKEND: legacy
+          KILLSWITCH: "true"
+          KILLSWITCH_EXCLUDEDNETWORKS_IPV4: ${NETWORK_K8S_CLUSTER_CIDR};${NETWORK_K8S_SERVICE_CIDR};${NETWORK_MANAGEMENT_CIDR}
+
+        configFileSecret: qbittorrent-vpnconfig
+        scripts:
+          up: |-
+            #!/bin/bash
+            echo "connected" > /shared/vpnstatus
+
+          down: |-
+            #!/bin/bash
+            echo "disconnected" > /shared/vpnstatus
+
+        resources:
+          requests:
+            cpu: "0.001"
+            memory: 128Mi
+          limits:
+            memory: 512Mi
