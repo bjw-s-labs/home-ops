@@ -3,15 +3,14 @@
   "timezone": "Europe/Amsterdam",
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate Dashboard",
-  "commitBody": "Signed-off-by: Bᴇʀɴᴅ Sᴄʜᴏʀɢᴇʀs <me@bjw-s.dev",
+  "commitBody": "Signed-off-by: Bᴇʀɴᴅ Sᴄʜᴏʀɢᴇʀs <me@bjw-s.dev>",
   // do not notify on closed, unmerged PRs
   "suppressNotifications": ["prIgnoreNotification"],
   // do not rebase PRs
   "rebaseWhen": "conflicted",
   "helm-values": {
     "fileMatch": [
-      "cluster/.+/helmrelease\\.yaml$",
-      "cluster/.+/values\\.yaml.tmpl$"
+      "cluster/.+/helmrelease\\.yaml$"
     ]
   },
   "kubernetes": {
@@ -23,16 +22,17 @@
     // regexManager to read and process HelmRelease files
     {
       "fileMatch": [
-        "cluster/.+/helmrelease\\.yaml$",
-        "core/crds/.+\\.yaml$"
+        "cluster/.+\\.yaml$"
       ],
       "matchStrings": [
-        // helmrelease
+        // helm releases
         "registryUrl=(?<registryUrl>.*?)\n *chart: (?<depName>.*?)\n *version: (?<currentValue>.*)\n",
         // kube-prometheus-stack
         "registryUrl=(?<registryUrl>.*?)\n *tag: (?<depName>[a-zA-Z-]+)-(?<currentValue>.*)\n",
+        // rook-ceph crd
+        "registryUrl=(?<registryUrl>.*?) chart=(?<depName>.*?)\n *tag: (?<currentValue>.*)\n",
         // cert-manager
-        "registryUrl=(?<registryUrl>.*?) chart=(?<depName>.*?)\n.*\\/(?<currentValue>.*?)\\/"
+        "registryUrl=(?<registryUrl>.*?) chart=(?<depName>.*?)\n.*\\/(?<currentValue>.*?)\\/",
       ],
       "datasourceTemplate": "helm"
     },
@@ -115,9 +115,9 @@
       "allowedVersions": "<2.0"
     },
     {
-      "matchDatasources": ["helm"],
-      "matchPackageNames": ["kube-prometheus-stack"],
-      "allowedVersions": "<15"
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["influxdb"],
+      "allowedVersions": "<2"
     },
     // Version strategies
     {
@@ -126,6 +126,14 @@
         "ghcr.io/k8s-at-home/plex"
       ],
       "versioning": "loose"
+    },
+    // Group packages
+    {
+      "matchDatasources": ["helm", "docker"],
+      "matchPackagePatterns": ["^rook.ceph"],
+      "groupName": "rook-ceph-suite",
+      "additionalBranchPrefix": "",
+      "separateMinorPatch": true,
     },
     // Enable auto-merge
     {
