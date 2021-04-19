@@ -21,14 +21,81 @@ spec:
       repository: ghcr.io/k8s-at-home/jackett
       tag: v0.17.897
       pullPolicy: IfNotPresent
+
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: "jackett-vpn"
+
+    controllerType: deployment
+
+    service:
+      port:
+        port: 9117
+
+    env:
+      TZ: "Europe/Amsterdam"
+      WAIT_FOR_VPN: "true"
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: jackett-config
+      shared:
+        enabled: true
+        emptyDir:
+          enabled: true
+
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: internal
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
+      hosts:
+      - host: jackett.${DOMAIN_1}
+        paths:
+        - path: /
+      tls:
+      - secretName: tls.jackett
+        hosts:
+        - jackett.${DOMAIN_1}
+
+    resources:
+      requests:
+        cpu: "0.02"
+        memory: "256M"
+      limits:
+        memory: "512M"
+
     addons:
       vpn:
+        enabled: true
+        type: wireguard
+
         wireguard:
           image:
             repository: ghcr.io/k8s-at-home/wireguard
             tag: v1.0.20210315
             pullPolicy: IfNotPresent
-  valuesFrom:
-    - kind: Secret
-      name: jackett-helm-values
-      valuesKey: values.yaml
+
+        env:
+          TZ: "Europe/Amsterdam"
+          IPTABLES_BACKEND: legacy
+          KILLSWITCH: "true"
+          KILLSWITCH_EXCLUDEDNETWORKS_IPV4: ${NETWORK_K8S_CLUSTER_CIDR};${NETWORK_K8S_SERVICE_CIDR};${NETWORK_MANAGEMENT_CIDR}
+
+        configFileSecret: jackett-vpnConfig
+        scripts:
+          up: |-
+            #!/bin/bash
+            echo "connected" > /shared/vpnstatus
+
+          down: |-
+            #!/bin/bash
+            echo "disconnected" > /shared/vpnstatus
+
+        resources:
+          requests:
+            cpu: "0.001"
+            memory: 128Mi
+          limits:
+            memory: 512Mi
