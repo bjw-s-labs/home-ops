@@ -14,10 +14,10 @@ services:
       MINIO_UPDATE: "off"
     volumes:
       - /volume1/Minio:/data
-      - /volume2/docker/minio/config:/root/.minio
+      - /volume1/docker/minio/config:/root/.minio
 
 secrets:
   access_key:
-    file: /volume2/docker/minio/secrets/minio_access_key
+    file: /volume1/docker/minio/secrets/minio_access_key
   secret_key:
-    file: /volume2/docker/minio/secrets/minio_secret_key
+    file: /volume1/docker/minio/secrets/minio_secret_key
