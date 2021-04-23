@@ -22,10 +22,7 @@ k3s_server:
   - local-storage
 
   kube-apiserver-arg:
-  - "feature-gates=EphemeralContainers=true"
-
-  kube-scheduler-arg:
-  - "feature-gates=EphemeralContainers=true"
+  - "feature-gates=GracefulNodeShutdown=true"
 
   # Network CIDR to use for pod IPs
   cluster-cidr: "172.17.0.0/16"
