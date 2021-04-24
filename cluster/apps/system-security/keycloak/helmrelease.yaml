@@ -51,10 +51,6 @@ spec:
       - name: KEYCLOAK_PASSWORD
         value: ${KEYCLOAK_ADMIN_PASSWORD}
 
-    args:
-    - "-b"
-    - "0.0.0.0"
-
     postgresql:
       enabled: true
       postgresqlUsername: keycloak
@@ -62,6 +58,6 @@ spec:
       postgresqlDatabase: keycloak
 
     serviceMonitor:
-      enabled: true
+      enabled: false
     prometheusRule:
-      enabled: true
+      enabled: false
