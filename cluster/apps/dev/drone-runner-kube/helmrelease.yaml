@@ -1,0 +1,27 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: drone-runner-kube
+  namespace: dev
+spec:
+  dependsOn:
+  - name: drone
+    namespace: dev
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://charts.drone.io
+      chart: drone-runner-kube
+      version: 0.1.5
+      sourceRef:
+        kind: HelmRepository
+        name: drone-charts
+        namespace: system-flux
+      interval: 5m
+  values:
+    env:
+      DRONE_RPC_HOST: drone.dev
+      DRONE_RPC_PROTO: http
+      DRONE_NAMESPACE_HOME: dev
+      DRONE_RPC_SECRET: "${DRONE_RPC_SECRET}"
