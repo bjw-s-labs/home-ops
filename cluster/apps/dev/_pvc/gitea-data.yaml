@@ -2,14 +2,14 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: gitea-postgresql
-  namespace: selfhosted
+  name: gitea-data
+  namespace: dev
 spec:
   accessModes:
   - ReadWriteOnce
 
   resources:
     requests:
-      storage: 8Gi
+      storage: 10Gi
 
   storageClassName: rook-ceph-block
