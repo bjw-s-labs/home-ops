@@ -24,10 +24,9 @@ spec:
     ingress:
       enabled: true
       annotations:
-        kubernetes.io/ingress.class: external
-        external-dns.alpha.kubernetes.io/target: cname--ext.${DOMAIN_1}
-        external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+        kubernetes.io/ingress.class: internal
         cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
       hosts:
       - gitea.${DOMAIN_1}
       tls:
