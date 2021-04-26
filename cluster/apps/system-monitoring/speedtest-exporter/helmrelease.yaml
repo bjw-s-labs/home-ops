@@ -2,21 +2,24 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: speedtest-prometheus
+  name: speedtest-exporter
   namespace: system-monitoring
 spec:
   interval: 5m
   chart:
     spec:
       # renovate: registryUrl=https://k8s-at-home.com/charts/
-      chart: speedtest-prometheus
-      version: 2.2.0
+      chart: speedtest-exporter
+      version: 1.0.0
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
         namespace: system-flux
       interval: 5m
   values:
-    serviceMonitor:
-      enabled: true
-      interval: "60m"
+    env:
+      TZ: Europe/Amsterdam
+    prometheus:
+      podMonitor:
+        enabled: true
+        interval: "1h"
