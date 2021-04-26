@@ -6,7 +6,7 @@
   environment:
     KUBECONFIG: "/etc/rancher/k3s/k3s.yaml"
   command: kubectl taint --overwrite node {{ hostvars[item]['ansible_hostname'] }} node-role.kubernetes.io/master=true:NoSchedule
-  loop: "{{ groups['master'] }}"
+  loop: "{{ groups['master-nodes'] }}"
   register: apply_master_taints
   retries: 3
   until: apply_master_taints is success
@@ -15,7 +15,7 @@
   - k3s_control_node
   - k3s_taint_master is defined
   - k3s_taint_master
-  - groups['worker'] | length > 0
+  - groups['worker-nodes'] | length > 0
 
 - name: cluster | meta | apply worker annotations
   become: true
@@ -23,7 +23,7 @@
   environment:
     KUBECONFIG: "/etc/rancher/k3s/k3s.yaml"
   command: kubectl label --overwrite node {{ hostvars[item]['ansible_hostname'] }} node-role.kubernetes.io/worker=true
-  loop: "{{ groups['worker'] }}"
+  loop: "{{ groups['worker-nodes'] }}"
   register: apply_worker_annotations
   retries: 3
   until: apply_worker_annotations is success
@@ -37,7 +37,7 @@
   environment:
     KUBECONFIG: "/etc/rancher/k3s/k3s.yaml"
   command: kubectl taint --overwrite node {{ hostvars[item]['ansible_hostname'] }} node-role.kubernetes.io/arm-worker=true:NoSchedule
-  loop: "{{ groups['worker'] }}"
+  loop: "{{ groups['worker-nodes'] }}"
   register: apply_arm_worker_taints
   retries: 3
   until: apply_arm_worker_taints is success
@@ -56,8 +56,8 @@
   command: kubectl label --overwrite node {{ hostvars[item]['ansible_hostname'] }} k3s-upgrade=true
   # Cannot use loop w/ hostvars in when... https://github.com/ansible/ansible/issues/68364
   with_items:
-  - "{{ groups['master'] }}"
-  - "{{ groups['worker'] }}"
+  - "{{ groups['master-nodes'] }}"
+  - "{{ groups['worker-nodes'] }}"
   register: apply_system_upgrade_annotations
   retries: 3
   until: apply_system_upgrade_annotations is success
@@ -75,8 +75,8 @@
   command: kubectl label --overwrite node {{ hostvars[item]['ansible_hostname'] }} k3s-upgrade-
   # Cannot use loop w/ hostvars in when... https://github.com/ansible/ansible/issues/68364
   with_items:
-  - "{{ groups['master'] }}"
-  - "{{ groups['worker'] }}"
+  - "{{ groups['master-nodes'] }}"
+  - "{{ groups['worker-nodes'] }}"
   register: remove_system_upgrade_annotations
   retries: 3
   until: remove_system_upgrade_annotations is success

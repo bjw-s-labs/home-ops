@@ -1,6 +1,6 @@
 ---
+
 - name: network | configure nodes to use legacy iptables
-  become: true
   community.general.alternatives:
     name: "{{ item }}"
     path: /usr/sbin/{{ item }}-legacy
@@ -11,8 +11,7 @@
   - "arptables"
 
 - name: network | sysctl
-  become: true
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/sysctl.d/99-kubernetes-cri.conf
     mode: 0644
     create: true
@@ -24,6 +23,6 @@
   register: sysctl_network
 
 - name: network | reload sysctl
-  become: true
-  shell: sysctl -p /etc/sysctl.d/99-kubernetes-cri.conf
-  when: sysctl_network.changed
+  ansible.builtin.shell: sysctl -p /etc/sysctl.d/99-kubernetes-cri.conf
+  when:
+  - sysctl_network.changed
