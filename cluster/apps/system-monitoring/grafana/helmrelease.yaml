@@ -102,8 +102,10 @@ spec:
         vernemq:
           url: https://raw.githubusercontent.com/vernemq/vernemq/master/metrics_scripts/grafana/VerneMQ%20Node%20Metrics.json
           datasource: Prometheus
-        internet-speed:
-          url: https://raw.githubusercontent.com/bjw-s/k8s-gitops/main/cluster/namespaces/system-monitoring/grafana/dashboards/internet-speed.json
+        # Ref: https://grafana.com/grafana/dashboards/13665
+        speedtest:
+          gnetId: 13665
+          revision: 1
           datasource: Prometheus
         node-exporter-full:
           url: https://grafana.com/api/dashboards/1860/revisions/22/download
