@@ -1,8 +1,8 @@
 ---
 
 - hosts:
-  - master
-  - worker
+  - master-nodes
+  - worker-nodes
   become: true
   gather_facts: true
   vars_prompt:
@@ -18,3 +18,4 @@
     when: run_confirmation != "Y"
   roles:
   - xanmanning.k3s
+  - k3s
