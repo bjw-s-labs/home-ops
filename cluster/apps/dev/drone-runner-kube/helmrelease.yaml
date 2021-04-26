@@ -23,5 +23,9 @@ spec:
     env:
       DRONE_RPC_HOST: drone.dev
       DRONE_RPC_PROTO: http
-      DRONE_NAMESPACE_HOME: dev
+      DRONE_NAMESPACE_DEFAULT: dev
       DRONE_RPC_SECRET: "${DRONE_RPC_SECRET}"
+
+    rbac:
+      buildNamespaces:
+      - dev
