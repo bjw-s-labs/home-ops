@@ -1,0 +1,75 @@
+---
+apiVersion: garo.tietoevry.com/v1alpha1
+kind: GithubActionRunner
+metadata:
+  name: container-images-private
+  namespace: dev
+spec:
+  # minimum running pods, required
+  minRunners: 2
+  # max number of pods, required
+  maxRunners: 3
+  organization: bjw-s
+  repository: container-images-private
+  # How often it will reconcile, optional, default 1m
+  reconciliationPeriod: 1m
+  podTemplateSpec:
+    spec:
+      containers:
+      - name: runner
+        image: quay.io/evryfs/github-actions-runner:latest
+        imagePullPolicy: Always
+        env:
+        - name: ACTIONS_RUNNER_INPUT_ONCE
+          value: "true"
+        - name: RUNNER_DEBUG
+          value: "true"
+        - name: DOCKER_TLS_CERTDIR
+          value: /certs
+        - name: DOCKER_HOST
+          value: tcp://localhost:2376
+        - name: DOCKER_TLS_VERIFY
+          value: "1"
+        - name: DOCKER_CERT_PATH
+          value: /certs/client
+        - name: GH_ORG
+          value: bjw-s
+        - name: GH_REPO
+          value: container-images-private
+        envFrom:
+        - secretRef:
+            name: container-images-private-regtoken
+        resources: {}
+        volumeMounts:
+        - mountPath: /certs
+          name: docker-certs
+        - mountPath: /home/runner/_work
+          name: runner-work
+
+      - name: docker
+        image: docker:stable-dind
+        imagePullPolicy: Always
+        env:
+        - name: DOCKER_TLS_CERTDIR
+          value: /certs
+        args:
+        # See linked issues from: https://github.com/evryfs/github-actions-runner-operator/issues/39
+        - --mtu=1430
+        resources: {}
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: docker-storage
+        - mountPath: /certs
+          name: docker-certs
+        - mountPath: /home/runner/_work
+          name: runner-work
+
+      volumes:
+      - emptyDir: {}
+        name: runner-work
+      - emptyDir: {}
+        name: docker-storage
+      - emptyDir: {}
+        name: docker-certs
