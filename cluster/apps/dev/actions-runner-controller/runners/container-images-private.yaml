@@ -1,0 +1,24 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: container-images-private
+  namespace: dev
+spec:
+  template:
+    spec:
+      repository: bjw-s/container-images-private
+---
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: HorizontalRunnerAutoscaler
+metadata:
+  name: container-images-private-autoscaler
+  namespace: dev
+spec:
+  scaleTargetRef:
+    name: container-images-private
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: TotalNumberOfQueuedAndInProgressWorkflowRuns
+    repositoryNames:
+    - bjw-s/container-images-private
