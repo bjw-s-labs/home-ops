@@ -1,28 +1,21 @@
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: RunnerDeployment
 metadata:
-  name: runner-container-images-private
+  name: runner-helm-charts-private
   namespace: dev
 spec:
   template:
     spec:
-      repository: bjw-s/container-images-private
-      volumeMounts:
-      - name: cache-volume
-        mountPath: /cache
-      volumes:
-      - name: cache-volume
-        persistentVolumeClaim:
-          claimName: actions-runner-controller-runnercache
+      repository: bjw-s/helm-charts-private
 ---
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: HorizontalRunnerAutoscaler
 metadata:
-  name: container-images-private-autoscaler
+  name: helm-charts-private-autoscaler
   namespace: dev
 spec:
   scaleTargetRef:
-    name: runner-container-images-private
+    name: runner-helm-charts-private
   scaleUpTriggers:
   - githubEvent:
       checkRun:
@@ -35,4 +28,4 @@ spec:
   metrics:
   - type: TotalNumberOfQueuedAndInProgressWorkflowRuns
     repositoryNames:
-    - bjw-s/container-images-private
+    - bjw-s/helm-charts-private
