@@ -7,6 +7,13 @@ spec:
   template:
     spec:
       repository: bjw-s/container-images-private
+      volumeMounts:
+      - name: cache-volume
+        mountPath: /cache
+      volumes:
+      - name: cache-volume
+        persistentVolumeClaim:
+          claimName: actions-runner-controller-runnercache
 ---
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: HorizontalRunnerAutoscaler
