@@ -16,6 +16,13 @@ metadata:
 spec:
   scaleTargetRef:
     name: container-images-private
+  scaleUpTriggers:
+  - githubEvent:
+      checkRun:
+        types: ["created"]
+        status: "queued"
+    amount: 1
+    duration: "5m"
   minReplicas: 1
   maxReplicas: 3
   metrics:
