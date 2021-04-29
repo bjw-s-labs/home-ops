@@ -2,14 +2,14 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: gitea-data
+  name: actions-runner-controller-runnercache
   namespace: dev
 spec:
   accessModes:
-  - ReadWriteOnce
+  - ReadWriteMany
 
   resources:
     requests:
-      storage: 8Gi
+      storage: 10Gi
 
-  storageClassName: rook-ceph-block
+  storageClassName: rook-ceph-fs
