@@ -25,3 +25,22 @@ spec:
     authSecret:
       create: false
       name: "actions-runner-controller"
+
+    githubWebhookServer:
+      enabled: true
+      secret:
+        name: "actions-runner-controller-webhook-server"
+      ingress:
+        enabled: true
+        annotations:
+          kubernetes.io/ingress.class: "external"
+          external-dns.alpha.kubernetes.io/target: cname--ext.${DOMAIN_1}
+          cert-manager.io/cluster-issuer: letsencrypt-production
+        hosts:
+        - host: acr-hook.${DOMAIN_1}
+          paths:
+          - /
+        tls:
+        - hosts:
+          - acr-hook.${DOMAIN_1}
+          secretName: tls.acr-hook
