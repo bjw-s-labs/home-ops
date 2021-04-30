@@ -1,25 +1,20 @@
 ---
 
-- name: cluster-registry | create /etc/rancher/k3s
-  become: true
-  file:
+- name: registry | create /etc/rancher/k3s
+  ansible.builtin.file:
     path: "/etc/rancher/k3s"
     state: directory
-  when: ansible_facts['architecture'] != "aarch64"
+    mode: 0644
 
-- name: cluster-registry | configure mirrors and custom registries
-  become: true
-  template:
+- name: registry | configure mirrors and custom registries
+  ansible.builtin.template:
     src: "registries.yaml.j2"
     dest: "/etc/rancher/k3s/registries.yaml"
     mode: 0644
-  register: set_registries
-  when: ansible_facts['architecture'] != "aarch64"
 
-- name: cluster-registry | restart k3s systemd service
-  systemd:
+- name: registry | restart k3s systemd service
+  ansible.builtin.systemd:
     name: k3s.service
-    daemon_reload: yes
-    enabled: yes
+    daemon_reload: true
+    enabled: true
     state: restarted
-  when: set_registries.changed
