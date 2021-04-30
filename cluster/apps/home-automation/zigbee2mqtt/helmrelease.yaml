@@ -67,7 +67,7 @@ spec:
         cert-manager.io/cluster-issuer: letsencrypt-production
         external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: rfc1918
+        traefik.ingress.kubernetes.io/router.middlewares: rfc1918@kubernetescrd
 
       hosts:
       - host: zigbee2mqtt.${DOMAIN_1}
@@ -130,7 +130,7 @@ spec:
             cert-manager.io/cluster-issuer: letsencrypt-production
             external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
             traefik.ingress.kubernetes.io/router.entrypoints: websecure
-            traefik.ingress.kubernetes.io/router.middlewares: rfc1918
+            traefik.ingress.kubernetes.io/router.middlewares: rfc1918@kubernetescrd
           hosts:
           - host: zigbee2mqtt-config.${DOMAIN_1}
             paths:
