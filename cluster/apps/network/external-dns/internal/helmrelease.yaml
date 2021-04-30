@@ -3,7 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: externaldns-internal
-  namespace: system-ingress
+  namespace: network
 spec:
   interval: 5m
   chart:
@@ -25,7 +25,7 @@ spec:
     txtPrefix: "k8s."
 
     coredns:
-      etcdEndpoints: "http://etcd.home-network:2379"
+      etcdEndpoints: "http://etcd.network:2379"
 
     domainFilters:
     - ${DOMAIN_1}
