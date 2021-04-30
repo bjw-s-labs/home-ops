@@ -1,0 +1,12 @@
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: dashboard
+  namespace: networking
+spec:
+  endpoints:
+  - dnsName: "traefik.${DOMAIN_1}"
+    recordType: A
+    targets:
+    - "${LB_TRAEFIK}"
