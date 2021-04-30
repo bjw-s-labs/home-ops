@@ -28,6 +28,7 @@ spec:
         kubernetes.io/ingress.class: traefik
         external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.middlewares: rfc1918
 
       hosts:
       - host: echo-server.${DOMAIN_1}
