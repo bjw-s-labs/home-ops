@@ -85,7 +85,7 @@ spec:
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: rfc1918
+          traefik.ingress.kubernetes.io/router.middlewares: rfc1918@kubernetescrd
         hosts:
         - alertmanager.${DOMAIN_1}
         tls:
@@ -155,7 +155,7 @@ spec:
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: rfc1918
+          traefik.ingress.kubernetes.io/router.middlewares: rfc1918@kubernetescrd
         hosts:
         - prometheus.${DOMAIN_1}
         tls:
