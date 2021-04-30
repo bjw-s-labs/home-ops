@@ -9,10 +9,11 @@
   - meta
 
 - include: registry.yml
-  when: (registry.cache.enabled is defined
-          and registry.cache.enabled)
-        or (registry.custom.enabled is defined
-          and registry.custom.enabled)
+  when:
+  - ansible_facts['architecture'] != "aarch64"
+  - mirror_registry is defined
+    or (private_registries is defined
+      and private_registries|length > 0)
   tags:
   - registry
 
