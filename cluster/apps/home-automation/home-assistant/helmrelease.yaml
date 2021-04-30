@@ -46,11 +46,12 @@ spec:
       enabled: true
 
       annotations:
-        kubernetes.io/ingress.class: external
-        external-dns/is-public: "true"
-        external-dns.alpha.kubernetes.io/target: cname--ext.${DOMAIN_1}
-        external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+        kubernetes.io/ingress.class: traefik
         cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns/is-public: "true"
+        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_2}
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
 
       hosts:
       - host: domo.${DOMAIN_2}
@@ -105,22 +106,19 @@ spec:
         ingress:
           enabled: true
           annotations:
-            kubernetes.io/ingress.class: internal
+            kubernetes.io/ingress.class: traefik
             cert-manager.io/cluster-issuer: letsencrypt-production
-            external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
-            nginx.ingress.kubernetes.io/proxy-body-size: "0"
+            external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+            traefik.ingress.kubernetes.io/router.entrypoints: websecure
+            traefik.ingress.kubernetes.io/router.middlewares: rfc1918
           hosts:
-          - host: code-domo.${DOMAIN_2}
-            paths:
-            - path: /
-          - host: code-domo.${DOMAIN_3}
+          - host: code-domo.${DOMAIN_1}
             paths:
             - path: /
           tls:
           - secretName: tls.home-assistant-code
             hosts:
-            - code-domo.${DOMAIN_2}
-            - code-domo.${DOMAIN_3}
+            - code-domo.${DOMAIN_1}
 
         args:
         - --auth
