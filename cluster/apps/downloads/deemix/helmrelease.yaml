@@ -18,11 +18,15 @@ spec:
       interval: 5m
   values:
     image:
-      repository: registry.gitlab.com/bockiii/deemix-docker
+      repository: ${PRIVATE_REGISTRY_1}/bjw-s/deemix
       tag: latest
       pullPolicy: Always
 
     controllerType: deployment
+
+    podSecurityContext:
+      supplementalGroups:
+      - 65539
 
     nameOverride: "deemix"
 
@@ -32,10 +36,7 @@ spec:
 
     env:
       TZ: "Europe/Amsterdam"
-      PUID: 1031
-      PGID: 65539
-      DEEZUI: "false"
-      UMASK_SET: "022"
+      UMASK: "022"
 
     envFrom:
     - secretRef:
