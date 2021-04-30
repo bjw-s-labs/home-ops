@@ -25,16 +25,21 @@ spec:
       enabled: true
 
       annotations:
-        kubernetes.io/ingress.class: internal
-        cert-manager.io/cluster-issuer: letsencrypt-production
+        kubernetes.io/ingress.class: traefik
         external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
 
       hosts:
       - host: echo-server.${DOMAIN_1}
         paths:
         - "/"
+      - host: echo-server.${DOMAIN_2}
+        paths:
+        - "/"
 
       tls:
-      - secretName: tls.echo-server
+      - secretName: tls.${DOMAIN_1/./-}
         hosts:
         - echo-server.${DOMAIN_1}
+      - secretName: tls.${DOMAIN_2/./-}
+        hosts:
+        - echo-server.${DOMAIN_2}
