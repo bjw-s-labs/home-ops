@@ -40,12 +40,12 @@ spec:
       enabled: true
 
       annotations:
-        kubernetes.io/ingress.class: external
-        external-dns/is-public: "true"
+        kubernetes.io/ingress.class: traefik
         cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: cname--ext.${DOMAIN_1}
+        external-dns/is-public: "true"
+        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_2}
         external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-        nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
       hosts:
       - host: plex.${DOMAIN_2}
         paths:
