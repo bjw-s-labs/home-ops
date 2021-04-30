@@ -2,11 +2,11 @@
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
-  name: traefik
+  name: traefik-ingress
   namespace: system-ingress
 spec:
   endpoints:
-  - dnsName: "traefik.${DOMAIN_1}"
+  - dnsName: "ingress.${DOMAIN_1}"
     recordType: A
     targets:
     - "${LB_TRAEFIK}"
