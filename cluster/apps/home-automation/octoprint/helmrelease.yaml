@@ -19,7 +19,7 @@ spec:
   values:
     image:
       repository: octoprint/octoprint
-      tag: 1.5.3
+      tag: 1.6.0
 
     env:
       TZ: "Europe/Amsterdam"
@@ -72,10 +72,11 @@ spec:
       enabled: true
 
       annotations:
-        kubernetes.io/ingress.class: internal
-        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+        kubernetes.io/ingress.class: traefik
         cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
+        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
 
       hosts:
       - host: octoprint.${DOMAIN_1}
