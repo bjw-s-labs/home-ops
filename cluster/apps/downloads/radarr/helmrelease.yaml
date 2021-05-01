@@ -43,11 +43,11 @@ spec:
     ingress:
       enabled: true
       annotations:
-        kubernetes.io/ingress.class: internal
+        kubernetes.io/ingress.class: traefik
         cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
-        nginx.ingress.kubernetes.io/auth-url: "https://auth.${DOMAIN_1}/oauth2/auth?allowed_groups=/radarr"
-        nginx.ingress.kubernetes.io/auth-signin: "https://auth.${DOMAIN_1}/oauth2/start"
+        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.middlewares: system-ingress-forward-auth@kubernetescrd,system-ingress-rfc1918-ips@kubernetescrd
       hosts:
       - host: radarr.${DOMAIN_1}
         paths:
