@@ -24,6 +24,9 @@ spec:
     env:
       TZ: "Europe/Amsterdam"
       OCTOPRINT_PORT: "5000"
+      ENABLE_MJPG_STREAMER: "true"
+      CAMERA_DEV: "/dev/video1"
+      MJPG_STREAMER_INPUT: "-y -n -r 1280x720"
 
     probes:
       liveness:
@@ -54,6 +57,10 @@ spec:
           nodeSelectorTerms:
           - matchExpressions:
             - key: feature.node.kubernetes.io/custom-ender3
+              operator: In
+              values:
+              - "true"
+            - key: feature.node.kubernetes.io/custom-aukey_webcam
               operator: In
               values:
               - "true"
