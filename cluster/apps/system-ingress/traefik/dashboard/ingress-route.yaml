@@ -8,9 +8,8 @@ spec:
   entryPoints:
   - websecure
   routes:
-  - match: Host(`traefik.${DOMAIN_1}`)
+  - match: Host(`traefik.bjw-s.dev`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
     kind: Rule
-    priority: 10
     services:
     - name: api@internal
       kind: TraefikService
