@@ -16,6 +16,15 @@ spec:
         name: traefik-charts
         namespace: system-flux
       interval: 5m
+
+  dependsOn:
+  - name: externaldns-internal
+    namespace: network
+  - name: externaldns-external
+    namespace: network
+  - name: cert-manager
+    namespace: system-cert-manager
+
   values:
     deployment:
       kind: Deployment
@@ -72,8 +81,7 @@ spec:
         sniStrict: true
 
     pilot:
-      enabled: true
-      token: "722c9e7d-0103-42a8-82fd-9bb46868c5c4"
+      enabled: false
 
     experimental:
       plugins:
@@ -98,4 +106,4 @@ spec:
         memory: "50Mi"
       limits:
         cpu: "300m"
-        memory: "150Mi"
+        memory: "512Mi"
