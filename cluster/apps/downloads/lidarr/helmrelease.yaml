@@ -1,0 +1,61 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: lidarr
+  namespace: downloads
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
+      chart: lidarr
+      version: 9.0.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: system-flux
+      interval: 5m
+  values:
+    image:
+      repository: ghcr.io/k8s-at-home/lidarr
+      tag: v0.8.1.2169
+
+    podSecurityContext:
+      supplementalGroups:
+      - 65539
+
+    env:
+      TZ: "Europe/Amsterdam"
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: lidarr-config
+      media:
+        enabled: true
+        existingClaim: nfs-nas-media
+        mountPath: /data/nas-media
+
+    ingress:
+      enabled: true
+      ingressClassName: "traefik"
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.middlewares: system-ingress-forward-auth@kubernetescrd,system-ingress-rfc1918-ips@kubernetescrd
+      hosts:
+      - host: lidarr.${DOMAIN_1}
+        paths:
+        - path: /
+      tls:
+      - secretName: tls.lidarr
+        hosts:
+        - lidarr.${DOMAIN_1}
+
+    resources:
+      requests:
+        cpu: "0.04"
+        memory: "256M"
+      limits:
+        memory: "512M"
