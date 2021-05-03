@@ -28,6 +28,8 @@ spec:
     isClusterService: false
     serviceType: LoadBalancer
     service:
+      annotations:
+        metallb.universe.tf/allow-shared-ip: coredns
       loadBalancerIP: ${LB_COREDNS}
       externalTrafficPolicy: Local
 
