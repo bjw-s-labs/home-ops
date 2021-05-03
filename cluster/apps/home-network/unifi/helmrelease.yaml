@@ -32,26 +32,29 @@ spec:
       annotations:
         external-dns.alpha.kubernetes.io/hostname: unifi
         traefik.ingress.kubernetes.io/service.serversscheme: https
-      externalIPs:
-      - ${LB_UNIFI}
+        metallb.universe.tf/allow-shared-ip: unifi
+      loadBalancerIP: ${LB_UNIFI}
       externalTrafficPolicy: Local
 
     controllerService:
       type: LoadBalancer
-      externalIPs:
-      - ${LB_UNIFI}
+      annotations:
+        metallb.universe.tf/allow-shared-ip: unifi
+      loadBalancerIP: ${LB_UNIFI}
       externalTrafficPolicy: Local
 
     stunService:
       type: LoadBalancer
-      externalIPs:
-      - ${LB_UNIFI}
+      annotations:
+        metallb.universe.tf/allow-shared-ip: unifi
+      loadBalancerIP: ${LB_UNIFI}
       externalTrafficPolicy: Local
 
     discoveryService:
       type: LoadBalancer
-      externalIPs:
-      - ${LB_UNIFI}
+      annotations:
+        metallb.universe.tf/allow-shared-ip: unifi
+      loadBalancerIP: ${LB_UNIFI}
       externalTrafficPolicy: Local
 
     ingress:
