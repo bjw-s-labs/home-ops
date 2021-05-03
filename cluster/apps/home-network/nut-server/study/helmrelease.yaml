@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: nut-server-hallway
+  name: nut-server-study
   namespace: home-network
 spec:
   interval: 5m
@@ -22,7 +22,7 @@ spec:
       repository: ghcr.io/k8s-at-home/network-ups-tools
       tag: v2.7.4-2124-g9defa7a9
 
-    nameOverride: nut-server-hallway
+    nameOverride: nut-server-study
 
     securityContext:
       privileged: true
@@ -32,15 +32,14 @@ spec:
         requiredDuringSchedulingIgnoredDuringExecution:
           nodeSelectorTerms:
           - matchExpressions:
-            - key: feature.node.kubernetes.io/custom-ups-eaton
+            - key: feature.node.kubernetes.io/custom-ups-apc
               operator: In
               values:
               - "true"
 
     service:
       type: LoadBalancer
-      externalIPs:
-      - ${LB_NUT_SERVER_HALLWAY}
+      loadBalancerIP: ${LB_NUT_SERVER_STUDY}
       externalTrafficPolicy: Local
 
     # The main configuration files for network-ups-tools
@@ -55,13 +54,10 @@ spec:
           [ups]
             driver = usbhid-ups
             port = auto
-            desc = "Eaton Ellipse ECO 650 DIN USB"
-            vendorid = 0463
-            pollfreq = 15
-
-        upsmon.conf: |
-          DEADTIME 25
-          MAXAGE 25
+            desc = "APC Back-UPS BX950U-GR"
+            serial = 4B1931P01757
+            vendorid = 051d
+            pollfreq = 30
 
         upsd.users: |
           [monuser]
