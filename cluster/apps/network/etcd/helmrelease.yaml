@@ -27,12 +27,12 @@ spec:
       storageClass: rook-ceph-block
       enabled: true
 
-    service:
-      type: LoadBalancer
-      annotations:
-        external-dns.alpha.kubernetes.io/hostname: etcd.${DOMAIN_1}
-      loadBalancerIP: ${LB_COREDNS_ETCD}
-      externalTrafficPolicy: Local
+    # service:
+    #   type: LoadBalancer
+    #   annotations:
+    #     external-dns.alpha.kubernetes.io/hostname: etcd.${DOMAIN_1}
+    #   loadBalancerIP: ${LB_COREDNS_ETCD}
+    #   externalTrafficPolicy: Local
 
     metrics:
       enabled: true
