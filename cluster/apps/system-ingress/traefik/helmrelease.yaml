@@ -64,6 +64,7 @@ spec:
     additionalArguments:
     - "--providers.kubernetesingress.ingressendpoint.hostname=${DOMAIN_1}"
     - "--providers.kubernetesingress.ingressendpoint.ip=${LB_TRAEFIK}"
+
     ports:
       web:
         redirectTo: websecure
@@ -75,6 +76,10 @@ spec:
         port: 8082
         expose: true
         exposedPort: 8082
+      mqtt:
+        port: 8883
+        expose: true
+        exposedPort: 1883
 
     tlsOptions:
       default:
