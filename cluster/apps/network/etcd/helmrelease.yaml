@@ -31,8 +31,7 @@ spec:
       type: LoadBalancer
       annotations:
         external-dns.alpha.kubernetes.io/hostname: etcd.${DOMAIN_1}
-      externalIPs:
-        - ${LB_COREDNS_ETCD}
+      loadBalancerIP: ${LB_COREDNS_ETCD}
       externalTrafficPolicy: Local
 
     metrics:
