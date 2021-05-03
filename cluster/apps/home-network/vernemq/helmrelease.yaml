@@ -31,8 +31,7 @@ spec:
       type: LoadBalancer
       annotations:
         external-dns.alpha.kubernetes.io/hostname: "mqtt.${DOMAIN_1}"
-      externalIPs:
-      - "${LB_VERNEMQ}"
+      loadBalancerIP: "${LB_VERNEMQ}"
       ws:
         enabled: true
 
