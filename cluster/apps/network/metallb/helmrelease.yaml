@@ -23,3 +23,22 @@ spec:
         protocol: layer2
         addresses:
         - "${METALLB_ARP_RANGE}"
+
+    prometheusRule:
+      enabled: false
+
+    controller:
+      prometheus:
+        serviceMonitor:
+          enabled: true
+
+    speaker:
+      prometheus:
+        serviceMonitor:
+          enabled: true
+
+      tolerations:
+      - effect: "NoExecute"
+        operator: "Exists"
+      - effect: "NoSchedule"
+        operator: "Exists"
