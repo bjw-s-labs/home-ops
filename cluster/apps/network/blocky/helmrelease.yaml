@@ -72,9 +72,10 @@ spec:
       additionalServices:
       - nameSuffix: dns-tcp
         enabled: true
+        annotations:
+          metallb.universe.tf/allow-shared-ip: blocky
         type: LoadBalancer
-        externalIPs:
-        - ${LB_BLOCKY}
+        loadBalancerIP: ${LB_BLOCKY}
         port:
           port: 53
           name: dns-tcp
@@ -83,9 +84,10 @@ spec:
         externalTrafficPolicy: Local
       - nameSuffix: dns-udp
         enabled: true
+        annotations:
+          metallb.universe.tf/allow-shared-ip: blocky
         type: LoadBalancer
-        externalIPs:
-        - ${LB_BLOCKY}
+        loadBalancerIP: ${LB_BLOCKY}
         port:
           port: 53
           name: dns-udp

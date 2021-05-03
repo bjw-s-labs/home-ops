@@ -28,14 +28,13 @@ spec:
   values:
     deployment:
       kind: Deployment
-      replicas: 1
+      replicas: 2
 
     service:
       enabled: true
       type: LoadBalancer
       spec:
-        externalIPs:
-        - "${LB_TRAEFIK}"
+        loadBalancerIP: "${LB_TRAEFIK}"
         externalTrafficPolicy: Local
 
     logs:
