@@ -27,7 +27,7 @@ spec:
     env:
       TZ: "Europe/Amsterdam"
       ZIGBEE2MQTT_DATA: /data
-      # DEBUG: "zigbee-herdsman*"
+      DEBUG: "zigbee-herdsman*"
 
     probes:
       startup:
@@ -119,30 +119,3 @@ spec:
       # Both of these need to be enabled for the webui
       frontend:
         port: 8080
-
-    addons:
-      codeserver:
-        enabled: true
-        ingress:
-          enabled: true
-          ingressClassName: "traefik"
-          annotations:
-            cert-manager.io/cluster-issuer: letsencrypt-production
-            external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
-            traefik.ingress.kubernetes.io/router.entrypoints: websecure
-            traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
-          hosts:
-          - host: zigbee2mqtt-config.${DOMAIN_1}
-            paths:
-            - path: /
-              pathType: Prefix
-          tls:
-          - secretName: tls.zigbee2mqtt-config
-            hosts:
-            - zigbee2mqtt-config.${DOMAIN_1}
-
-        workingDir: "/data"
-
-        volumeMounts:
-        - name: data
-          mountPath: /data
