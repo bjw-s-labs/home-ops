@@ -47,8 +47,7 @@ spec:
       host: k10.${DOMAIN_1}
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: cname--int.${DOMAIN_1}
-        nginx.ingress.kubernetes.io/app-root: /k10
+        traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
       urlPath: k10
       hosts:
       - k10.${DOMAIN_1}
@@ -63,13 +62,12 @@ spec:
           enabled: false
 
   postRenderers:
-  # Instruct helm-controller to use built-in "kustomize" post renderer.
   - kustomize:
       patchesJson6902:
       - target:
           kind: Ingress
           name: k10-ingress
         patch:
-        - op: replace
-          path: /spec/rules/0/http/paths/0/path
-          value: /
+        - op: add
+          path: /spec/ingressClassName
+          value: traefik
