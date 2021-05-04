@@ -29,17 +29,8 @@ spec:
     clusterName: k8s
 
     auth:
-      k10AdminUsers:
-      - ${EMAIL_1}
-
-      oidcAuth:
+      tokenAuth:
         enabled: true
-        providerURL: https://sso.${DOMAIN_1}/auth/realms/BJW-S
-        redirectURL: https://k10.${DOMAIN_1}
-        scopes: "email profile openid"
-        usernameClaim: "email"
-        clientID: k10
-        clientSecret: ${K10_OIDC_CLIENTSECRET}
 
     ingress:
       create: true
