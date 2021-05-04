@@ -84,10 +84,15 @@ spec:
           stubzones
           path /skydns
           endpoint https://10.1.1.31:2379 https://10.1.1.32:2379 https://10.1.1.33:2379
+          tls /etc/coredns/coredns-etcd/cert.pem /etc/coredns/coredns-etcd/key.pem /etc/coredns/coredns-etcd/ca.crt
 
       # Set up cache
       - name: cache
         parameters: 30
+
+    extraSecrets:
+    - name: coredns-etcd
+      mountPath: /etc/coredns/coredns-etcd
 
     prometheus:
       service:

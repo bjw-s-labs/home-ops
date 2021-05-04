@@ -29,7 +29,10 @@ spec:
     txtPrefix: "k8s."
 
     coredns:
-      etcdEndpoints: "http://etcd.network:2379"
+      etcdEndpoints: "https://10.1.1.31:2379,https://10.1.1.32:2379,https://10.1.1.33:2379"
+      etcdTLS:
+        enabled: true
+        secretName: coredns-etcd
 
     domainFilters:
     - ${DOMAIN_1}
