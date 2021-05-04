@@ -2,8 +2,8 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: system-flux
-  namespace: system-flux
+  name: flux-system
+  namespace: flux-system
 spec:
   interval: 1m0s
   ref:
@@ -21,15 +21,15 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
-  name: system-flux
-  namespace: system-flux
+  name: flux-system
+  namespace: flux-system
 spec:
   interval: 10m0s
   path: ./cluster/base
   prune: true
   sourceRef:
     kind: GitRepository
-    name: system-flux
+    name: flux-system
   validation: client
   decryption:
     provider: sops

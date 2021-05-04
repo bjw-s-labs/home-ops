@@ -3,14 +3,14 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: kustomize-controller
-  namespace: system-flux
+  namespace: flux-system
   labels:
-    app.kubernetes.io/instance: system-flux
+    app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
 spec:
   namespaceSelector:
     matchNames:
-      - system-flux
+      - flux-system
   selector:
     matchLabels:
       app: kustomize-controller
@@ -21,14 +21,14 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: source-controller
-  namespace: system-flux
+  namespace: flux-system
   labels:
-    app.kubernetes.io/instance: system-flux
+    app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
 spec:
   namespaceSelector:
     matchNames:
-      - system-flux
+      - flux-system
   selector:
     matchLabels:
       app: source-controller
@@ -39,14 +39,14 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: helm-controller
-  namespace: system-flux
+  namespace: flux-system
   labels:
-    app.kubernetes.io/instance: system-flux
+    app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
 spec:
   namespaceSelector:
     matchNames:
-      - system-flux
+      - flux-system
   selector:
     matchLabels:
       app: helm-controller
@@ -57,14 +57,14 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: notification-controller
-  namespace: system-flux
+  namespace: flux-system
   labels:
-    app.kubernetes.io/instance: system-flux
+    app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
 spec:
   namespaceSelector:
     matchNames:
-      - system-flux
+      - flux-system
   selector:
     matchLabels:
       app: notification-controller
