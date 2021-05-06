@@ -24,31 +24,31 @@ spec:
         addresses:
         - "${METALLB_ARP_RANGE}"
 
-    # prometheusRule:
-    #   enabled: false
+    prometheusRule:
+      enabled: false
 
-    # controller:
-    #   image:
-    #     registry: quay.io
-    #     repository: metallb/controller
-    #     tag: v0.9.6
+    controller:
+      image:
+        registry: quay.io
+        repository: metallb/controller
+        tag: v0.9.6
 
-    #   prometheus:
-    #     serviceMonitor:
-    #       enabled: true
+      prometheus:
+        serviceMonitor:
+          enabled: true
 
-    # speaker:
-    #   image:
-    #     registry: quay.io
-    #     repository: metallb/controller
-    #     tag: v0.9.6
+    speaker:
+      image:
+        registry: quay.io
+        repository: metallb/controller
+        tag: v0.9.6
 
-    #   prometheus:
-    #     serviceMonitor:
-    #       enabled: true
+      prometheus:
+        serviceMonitor:
+          enabled: true
 
-    #   tolerations:
-    #   - effect: "NoExecute"
-    #     operator: "Exists"
-    #   - effect: "NoSchedule"
-    #     operator: "Exists"
+      tolerations:
+      - effect: "NoExecute"
+        operator: "Exists"
+      - effect: "NoSchedule"
+        operator: "Exists"
