@@ -17,6 +17,10 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
+    image:
+      name: docker.beryju.org/authentik/server
+      tag: gh-next
+
     ingress:
       enabled: true
       ingressClassName: "traefik"
@@ -40,8 +44,10 @@ spec:
     authentik:
       secret_key: ${AUTHENTIK_SECRET_KEY}
       log_level: debug
-      # outposts:
-      #   docker_image_base: "docker.beryju.org/authentik/outpost-%(type)s:gh-next"
+
+      image_static: docker.beryju.org/authentik/static
+      outposts:
+        docker_image_base: "docker.beryju.org/authentik/outpost-%(type)s:gh-next"
 
       postgresql:
         host: authentik-postgresql
