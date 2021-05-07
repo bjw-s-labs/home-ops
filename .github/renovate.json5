@@ -60,11 +60,14 @@
     },
     {
       "matchDatasources": ["docker"],
+      "enabled": true
+      "separateMinorPatch": true
+    },
+    {
+      "matchDatasources": ["docker"],
       "commitMessageTopic": "Docker image {{depName}}",
       "commitMessageExtra": "to {{#if isSingleVersion}}v{{{newVersion}}}{{else}}{{{newValue}}}{{/if}}",
       "matchUpdateTypes": ["major", "minor", "patch"],
-      "enabled": true,
-      "separateMinorPatch": true
     },
     // Add labels according to package and update types
     {
