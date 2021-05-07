@@ -1,0 +1,16 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: ak-echo-server
+  namespace: system-ingress
+spec:
+  forwardAuth:
+    address: http://ak-outpost-echo-server:4180/akprox/auth?traefik
+    trustForwardHeader: true
+    authResponseHeaders:
+      - Set-Cookie
+      - X-Auth-Username
+      - X-Forwarded-Email
+      - X-Forwarded-Preferred-Username
+      - X-Forwarded-User
