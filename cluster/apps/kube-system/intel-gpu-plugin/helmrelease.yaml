@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: intel-gpu-plugin
-      version: 1.2.3
+      version: 2.0.0
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
@@ -21,9 +21,9 @@ spec:
       repository: intel/intel-gpu-plugin
       tag: 0.20.0
       pullPolicy: IfNotPresent
-    sharedDeviceNumber: 2
-    securityContext:
-      readOnlyRootFilesystem: true
+    args:
+      - -shared-dev-num
+      - 2
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
