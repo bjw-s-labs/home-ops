@@ -43,13 +43,13 @@ spec:
       privileged: true
 
     additionalVolumeMounts:
-    - name: usb
-      mountPath: /dev/serial
+    - name: host-dev
+      mountPath: /dev
 
     additionalVolumes:
-    - name: usb
+    - name: host-dev
       hostPath:
-        path: /dev/serial
+        path: /dev
 
     affinity:
       nodeAffinity:
