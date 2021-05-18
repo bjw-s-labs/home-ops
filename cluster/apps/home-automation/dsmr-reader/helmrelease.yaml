@@ -21,16 +21,6 @@ spec:
       repository: xirixiz/dsmr-reader-docker
       tag: latest-2021.05.06-amd64
 
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-          - matchExpressions:
-            - key: feature.node.kubernetes.io/custom-p1reader
-              operator: In
-              values:
-              - "true"
-
     env:
       TZ: Europe/Amsterdam
       DJANGO_TIME_ZONE: Europe/Amsterdam
@@ -42,6 +32,10 @@ spec:
 
       DSMRREADER_ADMIN_USER: ${DSMR_READER_ADMIN_USER}
       DSMRREADER_ADMIN_PASSWORD: ${DSMR_READER_ADMIN_PASSWORD}
+
+      DATALOGGER_INPUT_METHOD: ipv4
+      DATALOGGER_NETWORK_HOST: "${DSMR_READER_DATALOGGER_IP}"
+      DATALOGGER_NETWORK_PORT: "8088"
 
     # Path to your p1 reader device in the container
     additionalVolumeMounts:
