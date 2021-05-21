@@ -18,9 +18,9 @@ spec:
       interval: 5m
   values:
     image:
-      name: docker.beryju.org/authentik/server
+      name: ghcr.io/goauthentik/server
       tag: 2021.5.2
-      pullPolicy: Always
+      pullPolicy: IfNotPresent
 
     ingress:
       enabled: true
@@ -46,7 +46,6 @@ spec:
       secret_key: ${AUTHENTIK_SECRET_KEY}
       log_level: debug
 
-      image_static: docker.beryju.org/authentik/static
       outposts:
         docker_image_base: ghcr.io/goauthentik/%(type)s:%(version)s
 
