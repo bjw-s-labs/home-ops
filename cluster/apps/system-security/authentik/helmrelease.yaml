@@ -19,7 +19,7 @@ spec:
   values:
     image:
       name: docker.beryju.org/authentik/server
-      tag: gh-next
+      tag: 2021.5.2
       pullPolicy: Always
 
     ingress:
@@ -48,16 +48,20 @@ spec:
 
       image_static: docker.beryju.org/authentik/static
       outposts:
-        docker_image_base: "docker.beryju.org/authentik/outpost-%(type)s:gh-next"
+        docker_image_base: ghcr.io/goauthentik/%(type)s:%(version)s
 
       postgresql:
-        host: authentik-postgresql
+        host: '{{ .Release.Name }}-postgresql'
         name: authentik
         user: authentik
         password: ${AUTHENTIK_POSTGRES_PASSWORD}
       redis:
-        host: authentik-redis-master
+        host: '{{ .Release.Name }}-redis-master'
         password: ${AUTHENTIK_REDIS_PASSWORD}
+
+    prometheus:
+      serviceMonitor:
+        create: true
 
     postgresql:
       enabled: true
