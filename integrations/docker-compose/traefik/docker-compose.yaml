@@ -12,7 +12,9 @@ services:
       CLOUDFLARE_ZONE_API_TOKEN: ${CLOUDFLARE_ZONE_API_TOKEN?Variable not set}
     ports:
     - 443:443
+    - 8080:8080
     command:
+    - "--api.insecure=true"
     - "--providers.docker=true"
     - "--providers.docker.exposedbydefault=false"
     - "--providers.file.directory=/letsencrypt/file-provider/"
