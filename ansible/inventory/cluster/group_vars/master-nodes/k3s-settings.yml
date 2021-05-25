@@ -13,8 +13,7 @@ k3s_server:
   node-ip: "{{ ansible_host }}"
 
   tls-san:
-  - "opnsense.warhammer.lan"
-  - "10.1.1.1"
+  - "10.1.1.30"
 
   docker: false
   flannel-backend: 'none'  # This needs to be in quotes
@@ -37,6 +36,3 @@ k3s_server:
 
   kubelet-arg:
   - "feature-gates=GracefulNodeShutdown=true"
-
-  kube-apiserver-arg:
-  - anonymous-auth=true
