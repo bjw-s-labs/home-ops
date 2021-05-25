@@ -1,0 +1,73 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: bookstack
+  namespace: selfhosted
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
+      chart: bookstack
+      version: 1.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: ghcr.io/linuxserver/bookstack
+      tag: version-v21.04.6
+      pullPolicy: Always
+
+    controllerType: deployment
+
+    env:
+      TZ: "Europe/Amsterdam"
+      DB_HOST: bookstack-mariadb.selfhosted
+      DB_USER: bookstack
+      DB_PASS: ${BOOKSTACK_MARIADB_PASSWORD}
+      DB_DATABASE: bookstack
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: bookstack-config
+
+    ingress:
+      enabled: true
+      ingressClassName: "traefik"
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+      hosts:
+      - host: kb.${DOMAIN_1}
+        paths:
+        - path: /
+      tls:
+      - secretName: tls.bookstack
+        hosts:
+        - kb.${DOMAIN_1}
+
+    resources: {}
+      # requests:
+      #   cpu: "0.04"
+      #   memory: "256M"
+      # limits:
+      #   memory: "512M"
+
+  mariadb:
+    enabled: true
+    architecture: standalone
+    auth:
+      username: bookstack
+      password: ${BOOKSTACK_MARIADB_PASSWORD}
+      database: bookstack
+    primary:
+      persistence:
+        enabled: true
+        existingClaim: bookstack-mariadb
