@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kube-vip-ds
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: kube-vip-ds
+  template:
+    metadata:
+      labels:
+        name: kube-vip-ds
+    spec:
+      containers:
+      - name: kube-vip
+
+        image: plndr/kube-vip:0.3.4
+        imagePullPolicy: IfNotPresent
+
+        args:
+        - manager
+
+        env:
+        - name: vip_arp
+          value: "true"
+        - name: vip_interface
+          value: "eno1"
+        - name: port
+          value: "6443"
+        - name: vip_cidr
+          value: "32"
+        - name: cp_enable
+          value: "true"
+        - name: cp_namespace
+          value: kube-system
+        - name: svc_enable
+          value: "false"
+        - name: vip_address
+          value: "${KUBE_VIP_IP}"
+
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
+            - SYS_TIME
+
+      hostNetwork: true
+
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
+
+      serviceAccountName: kube-vip
+
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
