@@ -13,7 +13,7 @@ k3s_server:
   node-ip: "{{ ansible_host }}"
 
   tls-san:
-  - "10.1.1.30"
+  - "{{ k3s_registration_address }}"
 
   docker: false
   flannel-backend: 'none'  # This needs to be in quotes
