@@ -65,15 +65,15 @@ spec:
       enabled: true
       architecture: standalone
 
-      extraEnvVars:
-      - name: BITNAMI_DEBUG
-        value: "true"
-
       auth:
         username: bookstack
         password: ${BOOKSTACK_MARIADB_PASSWORD}
         database: bookstack
       primary:
+        extraEnvVars:
+        - name: BITNAMI_DEBUG
+          value: "true"
+
         persistence:
           enabled: true
           existingClaim: bookstack-mariadb
