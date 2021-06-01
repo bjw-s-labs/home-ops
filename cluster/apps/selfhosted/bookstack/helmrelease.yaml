@@ -69,11 +69,9 @@ spec:
         username: bookstack
         password: ${BOOKSTACK_MARIADB_PASSWORD}
         database: bookstack
-      primary:
-        extraEnvVars:
-        - name: BITNAMI_DEBUG
-          value: "true"
+        rootPassword: ${BOOKSTACK_MARIADB_ROOT_PASSWORD}
 
+      primary:
         persistence:
           enabled: true
           existingClaim: bookstack-mariadb
