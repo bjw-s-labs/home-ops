@@ -1,0 +1,33 @@
+---
+
+- hosts:
+  - master-nodes
+  become: true
+  gather_facts: true
+
+  vars_prompt:
+  - name: "run_confirmation"
+    prompt: "Are you sure you want to run this over the cluster? [Y/n]"
+    default: "n"
+    private: no
+
+  any_errors_fatal: yes
+
+  pre_tasks:
+  - name: purge manifests | check confirmation
+    fail:
+      msg: "Abort."
+    when: run_confirmation != "Y"
+
+  tasks:
+  - name: purge manifests | gather list of manifests to delete
+    ansible.builtin.find:
+      paths: "/var/lib/rancher/k3s/server/manifests"
+      patterns: "*.yaml"
+    register: manifests
+
+  - name: purge manifests | delete manifests
+    ansible.builtin.file:
+      path: "{{ item.path }}"
+      state: absent
+    loop: "{{ manifests.files }}"
