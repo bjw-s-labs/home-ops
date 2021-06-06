@@ -15,13 +15,10 @@ spec:
     spec:
       containers:
       - name: kube-vip
-
-        image: plndr/kube-vip:0.3.4
+        image: ghcr.io/kube-vip/kube-vip:v0.3.5
         imagePullPolicy: IfNotPresent
-
         args:
         - manager
-
         env:
         - name: vip_arp
           value: "true"
@@ -37,23 +34,26 @@ spec:
           value: kube-system
         - name: svc_enable
           value: "false"
+        - name: vip_leaderelection
+          value: "true"
+        - name: vip_leaseduration
+          value: "5"
+        - name: vip_renewdeadline
+          value: "3"
+        - name: vip_retryperiod
+          value: "1"
         - name: vip_address
           value: "${KUBE_VIP_IP}"
-
         securityContext:
           capabilities:
             add:
             - NET_ADMIN
             - NET_RAW
             - SYS_TIME
-
       hostNetwork: true
-
       nodeSelector:
         node-role.kubernetes.io/master: "true"
-
       serviceAccountName: kube-vip
-
       tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/master
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
