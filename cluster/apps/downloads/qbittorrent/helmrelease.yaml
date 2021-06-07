@@ -33,7 +33,6 @@ spec:
 
     env:
       TZ: "Europe/Amsterdam"
-      WAIT_FOR_VPN: "true"
       UMASK: "022"
 
     persistence:
@@ -48,17 +47,6 @@ spec:
         enabled: true
         emptyDir:
           enabled: true
-
-    service:
-      additionalServices:
-      - enabled: true
-        nameSuffix: bittorrent
-        type: ClusterIP
-        port:
-          port: 24589
-          name: bittorrent
-          protocol: TCP
-          targetPort: 24589
 
     ingress:
       enabled: true
@@ -93,41 +81,3 @@ spec:
     additionalVolumeMounts:
     - mountPath: /config/custom-cont-init.d
       name: qbittorrent-scripts
-
-    addons:
-      vpn:
-        enabled: true
-        type: wireguard
-
-        wireguard:
-          image:
-            repository: ghcr.io/k8s-at-home/wireguard
-            tag: v1.0.20210424
-            pullPolicy: IfNotPresent
-
-        securityContext:
-          runAsUser: 568
-          runAsGroup: 568
-
-        env:
-          TZ: "Europe/Amsterdam"
-          IPTABLES_BACKEND: nft
-          KILLSWITCH: "true"
-          KILLSWITCH_EXCLUDEDNETWORKS_IPV4: ${NETWORK_K8S_CLUSTER_CIDR};${NETWORK_K8S_SERVICE_CIDR};${NETWORK_MANAGEMENT_CIDR}
-
-        configFileSecret: qbittorrent-vpnconfig
-        scripts:
-          up: |-
-            #!/bin/bash
-            echo "connected" > /shared/vpnstatus
-
-          down: |-
-            #!/bin/bash
-            echo "disconnected" > /shared/vpnstatus
-
-        resources:
-          requests:
-            cpu: "0.001"
-            memory: 128Mi
-          limits:
-            memory: 512Mi
