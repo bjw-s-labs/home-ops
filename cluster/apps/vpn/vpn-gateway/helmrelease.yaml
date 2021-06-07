@@ -24,26 +24,26 @@ spec:
     routed_namespaces:
     - downloads
 
-    publicPorts:
-    - hostname: qbittorrent #hostname assigned to the pod
-      IP: 10 # must be an integer between 2 and VXLAN_GATEWAY_FIRST_DYNAMIC_IP (20 by default)
-      ports:
-      - type: udp
-        port: 24589
-      - type: tcp
-        port: 24589
+    # publicPorts:
+    # - hostname: qbittorrent #hostname assigned to the pod
+    #   IP: 10 # must be an integer between 2 and VXLAN_GATEWAY_FIRST_DYNAMIC_IP (20 by default)
+    #   ports:
+    #   - type: udp
+    #     port: 24589
+    #   - type: tcp
+    #     port: 24589
 
     settings:
       NOT_ROUTED_TO_GATEWAY_CIDRS: "172.16.0.0/12 ${NETWORK_MANAGEMENT_CIDR}"
-      # tun0 for openvpn, wg0 for wireguard
-      VPN_INTERFACE: wg0
-      # Prevent non VPN traffic to leave the gateway
-      VPN_BLOCK_OTHER_TRAFFIC: true
-      # If VPN_BLOCK_OTHER_TRAFFIC is true, allow VPN traffic over this port
-      VPN_TRAFFIC_PORT: 51820
-      # Traffic to these IPs will be send through the K8S gateway
-      # change if your K8S cluster or home network uses a different CIDR
-      VPN_LOCAL_CIDRS: "172.16.0.0/12 ${NETWORK_MANAGEMENT_CIDR}"
+      # # tun0 for openvpn, wg0 for wireguard
+      # VPN_INTERFACE: wg0
+      # # Prevent non VPN traffic to leave the gateway
+      # VPN_BLOCK_OTHER_TRAFFIC: true
+      # # If VPN_BLOCK_OTHER_TRAFFIC is true, allow VPN traffic over this port
+      # VPN_TRAFFIC_PORT: 51820
+      # # Traffic to these IPs will be send through the K8S gateway
+      # # change if your K8S cluster or home network uses a different CIDR
+      # VPN_LOCAL_CIDRS: "172.16.0.0/12 ${NETWORK_MANAGEMENT_CIDR}"
 
     webhook:
       image:
@@ -59,7 +59,7 @@ spec:
 
     addons:
       vpn:
-        enabled: true
+        enabled: false
         type: wireguard
 
         wireguard:
