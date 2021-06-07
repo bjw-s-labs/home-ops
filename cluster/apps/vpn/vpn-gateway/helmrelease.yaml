@@ -30,10 +30,10 @@ spec:
       # Prevent non VPN traffic to leave the gateway
       VPN_BLOCK_OTHER_TRAFFIC: true
       # If VPN_BLOCK_OTHER_TRAFFIC is true, allow VPN traffic over this port
-      VPN_TRAFFIC_PORT: 443
+      VPN_TRAFFIC_PORT: 51820
       # Traffic to these IPs will be send through the K8S gateway
       # change if your K8S cluster or home network uses a different CIDR
-      VPN_LOCAL_CIDRS: "10.0.0.0/8 192.168.0.0/16"
+      VPN_LOCAL_CIDRS: "${NETWORK_K8S_CLUSTER_CIDR} ${NETWORK_K8S_SERVICE_CIDR} ${NETWORK_MANAGEMENT_CIDR}"
 
     addons:
       vpn:
