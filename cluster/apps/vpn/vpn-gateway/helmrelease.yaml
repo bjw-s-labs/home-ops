@@ -34,6 +34,7 @@ spec:
         port: 24589
 
     settings:
+      NOT_ROUTED_TO_GATEWAY_CIDRS: "${NETWORK_K8S_CLUSTER_CIDR} ${NETWORK_K8S_SERVICE_CIDR} ${NETWORK_MANAGEMENT_CIDR}"
       # tun0 for openvpn, wg0 for wireguard
       VPN_INTERFACE: wg0
       # Prevent non VPN traffic to leave the gateway
