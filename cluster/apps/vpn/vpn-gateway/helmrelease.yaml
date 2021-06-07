@@ -38,12 +38,13 @@ spec:
       # tun0 for openvpn, wg0 for wireguard
       VPN_INTERFACE: wg0
       # Prevent non VPN traffic to leave the gateway
-      VPN_BLOCK_OTHER_TRAFFIC: true
+      VPN_BLOCK_OTHER_TRAFFIC: false
       # If VPN_BLOCK_OTHER_TRAFFIC is true, allow VPN traffic over this port
       VPN_TRAFFIC_PORT: 51820
       # Traffic to these IPs will be send through the K8S gateway
       # change if your K8S cluster or home network uses a different CIDR
       VPN_LOCAL_CIDRS: "172.16.0.0/12 ${NETWORK_MANAGEMENT_CIDR}"
+      VXLAN_IP_NETWORK: "192.168.242.0/24"
 
     webhook:
       image:
