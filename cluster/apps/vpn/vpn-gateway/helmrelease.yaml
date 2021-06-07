@@ -21,8 +21,17 @@ spec:
       repository: ghcr.io/k8s-at-home/pod-gateway
       tag: v1.2.5
 
-    routed_namespaces:
-    - vpn
+    # routed_namespaces:
+    # - vpn
+
+    publicPorts:
+    - hostname: qbittorrent #hostname assigned to the pod
+      IP: 10 # must be an integer between 2 and VXLAN_GATEWAY_FIRST_DYNAMIC_IP (20 by default)
+      ports:
+      - type: udp
+        port: 24589
+      - type: tcp
+        port: 24589
 
     settings:
       # tun0 for openvpn, wg0 for wireguard
