@@ -24,6 +24,7 @@ spec:
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "jackett-vpn"
+      setGateway: "true"
 
     controllerType: deployment
 
@@ -33,7 +34,6 @@ spec:
 
     env:
       TZ: "Europe/Amsterdam"
-      WAIT_FOR_VPN: "true"
 
     persistence:
       config:
@@ -67,37 +67,3 @@ spec:
         memory: "256M"
       limits:
         memory: "512M"
-
-    addons:
-      vpn:
-        enabled: true
-        type: wireguard
-
-        wireguard:
-          image:
-            repository: ghcr.io/k8s-at-home/wireguard
-            tag: v1.0.20210424
-            pullPolicy: IfNotPresent
-
-        env:
-          TZ: "Europe/Amsterdam"
-          IPTABLES_BACKEND: nft
-          KILLSWITCH: "true"
-          KILLSWITCH_EXCLUDEDNETWORKS_IPV4: ${NETWORK_K8S_CLUSTER_CIDR};${NETWORK_K8S_SERVICE_CIDR};${NETWORK_MANAGEMENT_CIDR}
-
-        configFileSecret: jackett-vpnconfig
-        scripts:
-          up: |-
-            #!/bin/bash
-            echo "connected" > /shared/vpnstatus
-
-          down: |-
-            #!/bin/bash
-            echo "disconnected" > /shared/vpnstatus
-
-        resources:
-          requests:
-            cpu: "0.001"
-            memory: 128Mi
-          limits:
-            memory: 512Mi
