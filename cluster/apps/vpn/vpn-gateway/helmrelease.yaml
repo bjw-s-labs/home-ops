@@ -19,7 +19,7 @@ spec:
   values:
     image:
       repository: ghcr.io/k8s-at-home/pod-gateway
-      tag: dev
+      tag: v1.2.6
 
     routed_namespaces:
     - downloads
@@ -48,8 +48,7 @@ spec:
     webhook:
       image:
         repository: ghcr.io/k8s-at-home/gateway-admision-controller
-        tag: dev
-        pullPolicy: Always
+        tag: v3.3.2
 
       args:
       - --tls-cert-file-path=/tls/tls.crt
@@ -105,13 +104,12 @@ spec:
             - ipBlock:
                 cidr: ${NETWORK_K8S_SERVICE_CIDR}
 
-        # livenessProbe:
-        #   exec:
-        #     # In the example bellow the VPN output is in Belgic (BE) - change appropiatly
-        #     command:
-        #       - sh
-        #       - -c
-        #       - if [ $(wget -q -O- https://ipinfo.io/country) == 'BE' ]; then exit 0; else exit $?; fi
-        #   initialDelaySeconds: 30
-        #   periodSeconds: 60
-        #   failureThreshold: 1
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - if [ $(wget -q -O- https://ipinfo.io/country) == 'BE' ]; then exit 0; else exit $?; fi
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          failureThreshold: 1
