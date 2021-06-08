@@ -57,6 +57,16 @@ spec:
       - --setGatewayAnnotation=setGateway
       - --DNSPolicy=None
 
+    livenessProbe:
+      exec:
+        command:
+        - sh
+        - -c
+        - if [ $(wget -q -O- https://ipinfo.io/country) == '${VPN_COUNTRY}' ]; then exit 0; else exit $?; fi
+      initialDelaySeconds: 30
+      periodSeconds: 60
+      failureThreshold: 1
+
     addons:
       vpn:
         enabled: true
@@ -103,13 +113,3 @@ spec:
                 cidr: ${NETWORK_K8S_CLUSTER_CIDR}
             - ipBlock:
                 cidr: ${NETWORK_K8S_SERVICE_CIDR}
-
-        livenessProbe:
-          exec:
-            command:
-            - sh
-            - -c
-            - if [ $(wget -q -O- https://ipinfo.io/country) == 'BE' ]; then exit 0; else exit $?; fi
-          initialDelaySeconds: 30
-          periodSeconds: 60
-          failureThreshold: 1
