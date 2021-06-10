@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: lidarr
-      version: 9.1.0
+      version: 10.0.0
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
@@ -38,20 +38,21 @@ spec:
         mountPath: /data/nas-media
 
     ingress:
-      enabled: true
-      ingressClassName: "traefik"
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: system-security-ak-outpost-traefik-auth@kubernetescrd,system-ingress-rfc1918-ips@kubernetescrd
-      hosts:
-      - host: lidarr.${DOMAIN_1}
-        paths:
-        - path: /
-      tls:
-      - secretName: tls.lidarr
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: system-security-ak-outpost-traefik-auth@kubernetescrd,system-ingress-rfc1918-ips@kubernetescrd
         hosts:
-        - lidarr.${DOMAIN_1}
+        - host: lidarr.${DOMAIN_1}
+          paths:
+          - path: /
+        tls:
+        - secretName: tls.lidarr
+          hosts:
+          - lidarr.${DOMAIN_1}
 
     resources:
       requests:
