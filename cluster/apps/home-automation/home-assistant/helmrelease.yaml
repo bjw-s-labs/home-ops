@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: home-assistant
-      version: 8.3.1
+      version: 9.0.0
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
@@ -33,28 +33,29 @@ spec:
         enabled: false
 
     ingress:
-      enabled: true
-      ingressClassName: "traefik"
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns/is-public: "true"
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_2}
-        external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns/is-public: "true"
+          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_2}
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
 
-      hosts:
-      - host: domo.${DOMAIN_2}
-        paths:
-        - path: /
-      - host: domo.${DOMAIN_3}
-        paths:
-        - path: /
-
-      tls:
-      - secretName: tls.home-assistant-frontend
         hosts:
-        - domo.${DOMAIN_2}
-        - domo.${DOMAIN_3}
+        - host: domo.${DOMAIN_2}
+          paths:
+          - path: /
+        - host: domo.${DOMAIN_3}
+          paths:
+          - path: /
+
+        tls:
+        - secretName: tls.home-assistant-frontend
+          hosts:
+          - domo.${DOMAIN_2}
+          - domo.${DOMAIN_3}
 
     env:
       TZ: "Europe/Amsterdam"
