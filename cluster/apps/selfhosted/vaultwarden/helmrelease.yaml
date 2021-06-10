@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: vaultwarden
-      version: 1.0.1
+      version: 2.0.0
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
@@ -34,22 +34,23 @@ spec:
         existingClaim: vaultwarden-config
 
     ingress:
-      enabled: true
-      ingressClassName: "traefik"
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns/is-public: "true"
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_3}
-        external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-      hosts:
-      - host: vaultwarden.${DOMAIN_3}
-        paths:
-        - path: /
-      tls:
-      - secretName: tls.vaultwarden
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns/is-public: "true"
+          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_3}
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
         hosts:
-        - vaultwarden.${DOMAIN_3}
+        - host: vaultwarden.${DOMAIN_3}
+          paths:
+          - path: /
+        tls:
+        - secretName: tls.vaultwarden
+          hosts:
+          - vaultwarden.${DOMAIN_3}
 
     resources: {}
       # requests:
