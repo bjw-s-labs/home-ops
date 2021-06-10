@@ -37,35 +37,25 @@ spec:
       DATALOGGER_NETWORK_HOST: "${DSMR_READER_DATALOGGER_IP}"
       DATALOGGER_NETWORK_PORT: "8088"
 
-    # Path to your p1 reader device in the container
-    additionalVolumeMounts:
-    - name: p1reader
-      mountPath: /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A12VWGAF-if00-port0
-
-    # Path to your p1 reader device on the host
-    additionalVolumes:
-    - name: p1reader
-      hostPath:
-        path: /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A12VWGAF-if00-port0
-
     ingress:
-      enabled: true
-      ingressClassName: "traefik"
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
 
-      hosts:
-      - host: dsmr-reader.${DOMAIN_1}
-        paths:
-        - path: /
-
-      tls:
-      - secretName: tls.dsmr-reader
         hosts:
-        - dsmr-reader.${DOMAIN_1}
+        - host: dsmr-reader.${DOMAIN_1}
+          paths:
+          - path: /
+
+        tls:
+        - secretName: tls.dsmr-reader
+          hosts:
+          - dsmr-reader.${DOMAIN_1}
 
     resources:
       requests:
