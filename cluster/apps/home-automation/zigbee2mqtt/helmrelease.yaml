@@ -29,30 +29,19 @@ spec:
       ZIGBEE2MQTT_DATA: /data
       # DEBUG: "zigbee-herdsman*"
 
-    probes:
-      startup:
-        enabled: true
-
     persistence:
       data:
         enabled: true
         existingClaim: zigbee2mqtt-data
+      usb:
+        enabled: true
+        type: hostPath
+        hostPath: /dev/serial/by-id/usb-Silicon_Labs_slae.sh_cc2652rb_stick_-_slaesh_s_iot_stuff_00_12_4B_00_21_CB_EE_BB-if00-port0
+        hostPathType: CharDevice
 
     # Privileged is required if USB controller is accessed directly through the host machine
     securityContext:
       privileged: true
-
-    # Path to your zigbee device in the container
-    additionalVolumeMounts:
-    - name: usb
-      mountPath: /dev/serial/by-id/usb-Silicon_Labs_slae.sh_cc2652rb_stick_-_slaesh_s_iot_stuff_00_12_4B_00_21_CB_EE_BB-if00-port0
-
-    # Path to your zigbee device on the host
-    additionalVolumes:
-    - name: usb
-      hostPath:
-        path: /dev/serial/by-id/usb-Silicon_Labs_slae.sh_cc2652rb_stick_-_slaesh_s_iot_stuff_00_12_4B_00_21_CB_EE_BB-if00-port0
-        type: CharDevice
 
     affinity:
       nodeAffinity:
@@ -62,23 +51,24 @@ spec:
             - {key: "feature.node.kubernetes.io/custom-zigbee", operator: In, values: ["true"]}
 
     ingress:
-      enabled: true
-      ingressClassName: "traefik"
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
 
-      hosts:
-      - host: zigbee2mqtt.${DOMAIN_1}
-        paths:
-        - path: /
-
-      tls:
-      - secretName: tls.zigbee2mqtt
         hosts:
-        - zigbee2mqtt.${DOMAIN_1}
+        - host: zigbee2mqtt.${DOMAIN_1}
+          paths:
+          - path: /
+
+        tls:
+        - secretName: tls.zigbee2mqtt
+          hosts:
+          - zigbee2mqtt.${DOMAIN_1}
 
     config:
       mqtt:
