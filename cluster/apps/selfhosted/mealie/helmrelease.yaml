@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: mealie
-      version: 1.0.0
+      version: 2.0.0
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
@@ -32,21 +32,22 @@ spec:
         existingClaim: mealie-config
 
     ingress:
-      enabled: true
-      ingressClassName: "traefik"
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
-      hosts:
-      - host: mealie.${DOMAIN_1}
-        paths:
-        - path: /
-      tls:
-      - secretName: tls.mealie
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
         hosts:
-        - mealie.${DOMAIN_1}
+        - host: mealie.${DOMAIN_1}
+          paths:
+          - path: /
+        tls:
+        - secretName: tls.mealie
+          hosts:
+          - mealie.${DOMAIN_1}
 
     resources: {}
       # requests:
