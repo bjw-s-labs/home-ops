@@ -50,12 +50,9 @@ spec:
         repository: ghcr.io/k8s-at-home/gateway-admision-controller
         tag: v3.3.2
 
-      args:
-      - --tls-cert-file-path=/tls/tls.crt
-      - --tls-key-file-path=/tls/tls.key
-      - --setGatewayLabel=setGateway
-      - --setGatewayAnnotation=setGateway
-      - --DNSPolicy=None
+      gatewayDefault: false
+      gatewayLabel: setGateway
+      gatewayAnnotation: setGateway
 
     livenessProbe:
       exec:
