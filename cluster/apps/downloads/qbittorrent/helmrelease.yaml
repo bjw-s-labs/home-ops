@@ -13,7 +13,7 @@ spec:
     spec:
       # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: qbittorrent
-      version: 10.1.0
+      version: 11.0.0
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
@@ -34,6 +34,9 @@ spec:
       supplementalGroups:
       - 65539
 
+    settings:
+      automaticPortSetup: true
+
     env:
       TZ: "Europe/Amsterdam"
       UMASK: "022"
@@ -46,27 +49,24 @@ spec:
         enabled: true
         existingClaim: nfs-nas-media
         mountPath: /data/nas-media
-      shared:
-        enabled: true
-        emptyDir:
-          enabled: true
 
     ingress:
-      enabled: true
-      ingressClassName: "traefik"
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
-      hosts:
-      - host: qbittorrent.${DOMAIN_1}
-        paths:
-        - path: /
-      tls:
-      - secretName: tls.qbittorrent
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
         hosts:
-        - qbittorrent.${DOMAIN_1}
+        - host: qbittorrent.${DOMAIN_1}
+          paths:
+          - path: /
+        tls:
+        - secretName: tls.qbittorrent
+          hosts:
+          - qbittorrent.${DOMAIN_1}
 
     resources:
       requests:
@@ -74,13 +74,3 @@ spec:
         memory: "1000Mi"
       limits:
         memory: "4000Mi"
-
-    additionalVolumes:
-    - name: qbittorrent-scripts
-      configMap:
-        name: qbittorrent-scripts
-        defaultMode: 511
-
-    additionalVolumeMounts:
-    - mountPath: /config/custom-cont-init.d
-      name: qbittorrent-scripts
