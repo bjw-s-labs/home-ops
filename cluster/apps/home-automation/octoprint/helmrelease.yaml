@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: octoprint
-      version: 4.4.0
+      version: 5.0.0
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
@@ -38,18 +38,13 @@ spec:
       data:
         enabled: true
         existingClaim: octoprint-data
+      host-dev:
+        enabled: true
+        type: hostPath
+        hostPath: /dev
 
     securityContext:
       privileged: true
-
-    additionalVolumeMounts:
-    - name: host-dev
-      mountPath: /dev
-
-    additionalVolumes:
-    - name: host-dev
-      hostPath:
-        path: /dev
 
     affinity:
       nodeAffinity:
