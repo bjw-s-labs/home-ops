@@ -61,20 +61,21 @@ spec:
               - "true"
 
     ingress:
-      enabled: true
-      ingressClassName: "traefik"
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
 
-      hosts:
-      - host: octoprint.${DOMAIN_1}
-        paths:
-        - path: /
-
-      tls:
-      - secretName: tls.octoprint
         hosts:
-        - octoprint.${DOMAIN_1}
+        - host: octoprint.${DOMAIN_1}
+          paths:
+          - path: /
+
+        tls:
+        - secretName: tls.octoprint
+          hosts:
+          - octoprint.${DOMAIN_1}
