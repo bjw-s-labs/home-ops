@@ -38,18 +38,13 @@ spec:
       data:
         enabled: true
         existingClaim: octoprint-data
+      host-dev:
+        enabled: true
+        type: hostPath
+        hostPath: /dev
 
     securityContext:
       privileged: true
-
-    additionalVolumeMounts:
-    - name: host-dev
-      mountPath: /dev
-
-    additionalVolumes:
-    - name: host-dev
-      hostPath:
-        path: /dev
 
     affinity:
       nodeAffinity:
