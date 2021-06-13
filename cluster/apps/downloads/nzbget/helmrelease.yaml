@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: nzbget
-      version: 10.1.0
+      version: 11.0.0
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
@@ -21,8 +21,6 @@ spec:
     image:
       repository: ghcr.io/k8s-at-home/nzbget
       tag: "v21.1"
-
-    controllerType: deployment
 
     podSecurityContext:
       supplementalGroups:
@@ -41,21 +39,22 @@ spec:
         mountPath: /data/nas-media
 
     ingress:
-      enabled: true
-      ingressClassName: "traefik"
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
-      hosts:
-      - host: nzbget.${DOMAIN_1}
-        paths:
-        - path: /
-      tls:
-      - secretName: tls.nzbget
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
         hosts:
-        - nzbget.${DOMAIN_1}
+        - host: nzbget.${DOMAIN_1}
+          paths:
+          - path: /
+        tls:
+        - secretName: tls.nzbget
+          hosts:
+          - nzbget.${DOMAIN_1}
 
     resources:
       requests:
