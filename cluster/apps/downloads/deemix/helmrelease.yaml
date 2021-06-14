@@ -25,8 +25,6 @@ spec:
     imagePullSecrets:
     - name: registry-creds
 
-    controllerType: deployment
-
     podSecurityContext:
       supplementalGroups:
       - 65539
@@ -34,8 +32,10 @@ spec:
     nameOverride: "deemix"
 
     service:
-      port:
-        port: 6595
+      main:
+        ports:
+          http:
+            port: 6595
 
     env:
       TZ: "Europe/Amsterdam"
@@ -55,21 +55,22 @@ spec:
         mountPath: /data/nas-media
 
     ingress:
-      enabled: true
-      ingressClassName: "traefik"
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: system-security-ak-outpost-traefik-auth@kubernetescrd,system-ingress-rfc1918-ips@kubernetescrd
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: system-security-ak-outpost-traefik-auth@kubernetescrd,system-ingress-rfc1918-ips@kubernetescrd
 
-      hosts:
-      - host: deemix.${DOMAIN_1}
-        paths:
-        - path: /
-      tls:
-      - secretName: tls.deemix
         hosts:
-        - deemix.${DOMAIN_1}
+        - host: deemix.${DOMAIN_1}
+          paths:
+          - path: /
+        tls:
+        - secretName: tls.deemix
+          hosts:
+          - deemix.${DOMAIN_1}
 
     resources: {}
