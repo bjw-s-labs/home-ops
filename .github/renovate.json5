@@ -176,7 +176,7 @@
       "additionalBranchPrefix": "",
       "separateMinorPatch": true,
     },
-    // Enable auto-merge
+    // Enable auto-merge for docker images
     {
       "matchDatasources": ["docker"],
       "automerge": true,
@@ -190,6 +190,17 @@
         "ghcr.io/k8s-at-home/radarr",
         "ghcr.io/k8s-at-home/sonarr"
       ]
+    },
+    // Enable auto-merge for KaH charts
+    {
+      "matchDatasources": ["helm"],
+      "automerge": true,
+      "automergeType": "branch",
+      "requiredStatusChecks": null,
+      "matchUpdateTypes": ["patch"],
+      "matchRegistryUrls": [
+        "https://k8s-at-home.com/charts/"
+      ],
     }
   ]
 }
