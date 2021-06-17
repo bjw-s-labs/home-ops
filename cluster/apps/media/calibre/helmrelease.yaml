@@ -29,45 +29,34 @@ spec:
       config:
         enabled: true
         existingClaim: calibre-config
-
-    additionalVolumeMounts:
-    - name: nas-media
-      mountPath: /data/nas-media
-
-    additionalVolumes:
-    - name: nas-media
-      persistentVolumeClaim:
-        claimName: nfs-nas-media
+      media:
+        enabled: true
+        existingClaim: nfs-nas-media
+        mountPath: /data/nas-media
 
     service:
-      additionalServices:
-      - enabled: true
-        nameSuffix: webserver
-        type: ClusterIP
-        port:
-          port: 8081
-          name: webserver
-          protocol: TCP
-          targetPort: 8081
+      webserver:
+        enabled: true
 
     ingress:
-      enabled: true
-      ingressClassName: "traefik"
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
 
-      hosts:
-      - host: calibre.${DOMAIN_1}
-        paths:
-        - path: /
-
-      tls:
-      - secretName: tls.calibre
         hosts:
-        - calibre.${DOMAIN_1}
+        - host: calibre.${DOMAIN_1}
+          paths:
+          - path: /
+
+        tls:
+        - secretName: tls.calibre
+          hosts:
+          - calibre.${DOMAIN_1}
 
     resources:
       requests:
