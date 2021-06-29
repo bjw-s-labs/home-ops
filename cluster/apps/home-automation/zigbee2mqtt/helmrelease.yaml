@@ -33,22 +33,6 @@ spec:
       data:
         enabled: true
         existingClaim: zigbee2mqtt-data
-      usb:
-        enabled: true
-        type: hostPath
-        hostPath: /dev/serial/by-id/usb-Silicon_Labs_slae.sh_cc2652rb_stick_-_slaesh_s_iot_stuff_00_12_4B_00_21_CB_EE_BB-if00-port0
-        hostPathType: CharDevice
-
-    # Privileged is required if USB controller is accessed directly through the host machine
-    securityContext:
-      privileged: true
-
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-          - matchExpressions:
-            - {key: "feature.node.kubernetes.io/custom-zigbee", operator: In, values: ["true"]}
 
     ingress:
       main:
@@ -85,9 +69,11 @@ spec:
       permit_join: false
 
       serial:
-        port: /dev/serial/by-id/usb-Silicon_Labs_slae.sh_cc2652rb_stick_-_slaesh_s_iot_stuff_00_12_4B_00_21_CB_EE_BB-if00-port0
+        port: "tcp://${ZIGBEE2MQTT_ADAPTER_IP}:6638"
 
       advanced:
+        log_output:
+        - console
         network_key:
         - 95
         - 127
