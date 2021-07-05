@@ -1,0 +1,22 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind:
+metadata:
+  name: macvlan-iot-static
+spec:
+  config: '{
+      "cniVersion": "0.3.1",
+      "name": "macvlan-iot-static",
+      "type": "macvlan",
+      "master": "eno1",
+      "vlan": ${NET_IOT_VLAN_TAG},
+      "capabilities": { "ips": true },
+      "ipam": {
+        "type": "static",
+        "routes": [
+          {
+            "dst": "0.0.0.0/0",
+            "gw": "${NET_IOT_GATEWAY}"
+          }
+        ]
+      }
+    }'
