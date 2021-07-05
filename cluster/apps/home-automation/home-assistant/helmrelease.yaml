@@ -23,6 +23,12 @@ spec:
 
     podAnnotations:
       secret.reloader.stakater.com/reload: home-assistant-secrets
+      k8s.v1.cni.cncf.io/networks: |
+        [{
+          "name":"macvlan-iot-static",
+          "namespace": "system",
+          "ips": ["${HASS_IOT_VLAN_IP}"]
+        }]
 
     probes:
       liveness:
