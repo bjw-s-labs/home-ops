@@ -11,9 +11,9 @@ spec:
       "name": "macvlan-iot-static",
       "type": "macvlan",
       "master": "eno1",
-      "vlan": ${NET_IOT_VLAN_TAG},
       "capabilities": { "ips": true },
       "ipam": {
-        "type": "static"
+        "type": "host-local",
+        "subnet": "192.168.0.0/19"
       }
     }
