@@ -5,17 +5,10 @@
   - worker-nodes
   become: true
   gather_facts: true
-  vars_prompt:
-  - name: "run_confirmation"
-    prompt: "Are you sure you want to run this over the cluster? [Y/n]"
-    default: "n"
-    private: no
-  any_errors_fatal: yes
+  any_errors_fatal: true
   pre_tasks:
-  - name: cluster | check confirmation
-    fail:
-      msg: "Abort."
-    when: run_confirmation != "Y"
+  - name: Pausing for 5 seconds...
+    pause:
+      seconds: 5
   roles:
-  - xanmanning.k3s
   - k3s
