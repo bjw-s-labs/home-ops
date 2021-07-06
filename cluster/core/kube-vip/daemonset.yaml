@@ -21,9 +21,9 @@ spec:
         - manager
         env:
         - name: vip_arp
-          value: "true"
+          value: "false"
         - name: vip_interface
-          value: "eno1"
+          value: lo
         - name: port
           value: "6443"
         - name: vip_cidr
@@ -32,16 +32,20 @@ spec:
           value: "true"
         - name: cp_namespace
           value: kube-system
-        - name: svc_enable
+        - name: vip_startleader
           value: "false"
-        - name: vip_leaderelection
-          value: "true"
-        - name: vip_leaseduration
+        - name: vip_loglevel
           value: "5"
-        - name: vip_renewdeadline
-          value: "3"
-        - name: vip_retryperiod
-          value: "1"
+        - name: bgp_enable
+          value: "true"
+        - name: bgp_routerinterface
+          value: "eno1.10"
+        - name: bgp_as
+          value: "64512"
+        - name: bgp_peeraddress
+          value: "${GATEWAY_MANAGEMENT}"
+        - name: bgp_peeras
+          value: "64512"
         - name: vip_address
           value: "${KUBE_VIP_IP}"
         securityContext:
