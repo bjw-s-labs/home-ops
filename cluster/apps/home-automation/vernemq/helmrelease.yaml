@@ -3,7 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: vernemq
-  namespace: home-network
+  namespace: home-automation
 spec:
   interval: 5m
   chart:
@@ -17,10 +17,6 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
-    image:
-      repository: vernemq/vernemq
-      tag: 1.10.4.1-alpine
-
     replicaCount: 1
 
     statefulset:
