@@ -1,0 +1,20 @@
+---
+kind: Profile
+apiVersion: config.kio.kasten.io/v1alpha1
+metadata:
+  name: nfs
+  namespace: system-kasten
+spec:
+  locationSpec:
+    type: FileStore
+    fileStore:
+      claimName: nfs-nas-k10
+      path: k10
+    credential:
+      secretType: ""
+      secret:
+        apiVersion: ""
+        kind: ""
+        name: ""
+        namespace: ""
+  type: Location
