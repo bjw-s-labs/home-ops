@@ -1,6 +1,19 @@
 ---
 
-- include: etcd-secret.yml
+- name: k3s | cluster addons
+  include: addons.yml
+  tags:
+  - addons
+
+- name: k3s | cluster configuration
+  include_role:
+    name: xanmanning.k3s
+    public: yes
+  tags:
+  - k3s role
+
+- name: k3s | store etcd secret
+  include: etcd-secret.yml
   when:
   - k3s_control_node is defined
   - k3s_control_node
@@ -8,3 +21,8 @@
   - k3s_etcd_datastore
   tags:
   - etcd-secret
+
+- name: k3s | cleanup manifests
+  include: cleanup.yml
+  tags:
+  - cleanup
