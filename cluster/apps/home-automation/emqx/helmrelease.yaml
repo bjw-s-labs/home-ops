@@ -1,0 +1,80 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: emqx
+  namespace: home-automation
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://repos.emqx.io/charts
+      chart: emqx
+      version: 4.3.5
+      sourceRef:
+        kind: HelmRepository
+        name: emqx-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    replicaCount: 3
+    recreatePods: true
+
+    service:
+      type: LoadBalancer
+      annotations:
+        external-dns.alpha.kubernetes.io/hostname: "emqx.${DOMAIN_1}"
+      loadBalancerIP: "${LB_EMQX}"
+
+    emqxConfig:
+      EMQX_ALLOW_ANONYMOUS: "false"
+      EMQX_ACL_NOMATCH: "deny"
+      EMQX_ADMIN_PASSWORD: "${EMQX_ADMIN_PASSWORD}"
+
+    emqxLoadedPlugins: >
+      {emqx_management, true}.
+      {emqx_recon, true}.
+      {emqx_retainer, true}.
+      {emqx_dashboard, true}.
+      {emqx_telemetry, false}.
+      {emqx_rule_engine, true}.
+      {emqx_bridge_mqtt, false}.
+      {emqx_auth_mnesia, true}.
+
+  postRenderers:
+    # Inject preset authentication data
+    - kustomize:
+        patchesStrategicMerge:
+          - apiVersion: apps/v1
+            kind: StatefulSet
+            metadata:
+              name: emqx
+              namespace: home-automation
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    secret.reloader.stakater.com/reload: emqx-auth
+                spec:
+                  containers:
+                    - name: emqx
+                      volumeMounts:
+                        - name: emqx-auth
+                          mountPath: /opt/emqx/etc/plugins/emqx_auth_mnesia.conf
+                          subPath: emqx_auth_mnesia.conf
+                  volumes:
+                    - name: emqx-auth
+                      secret:
+                        secretName: emqx-auth
+                        items:
+                          - key: emqx_auth_mnesia.conf
+                            path: emqx_auth_mnesia.conf
+
+                    - name: emqx-acl
+                      configMap:
+                        $patch: delete
+                      secret:
+                        secretName: emqx-auth
+                        items:
+                          - key: acl.conf
+                            path: acl.conf
