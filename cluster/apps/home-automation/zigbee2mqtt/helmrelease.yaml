@@ -6,8 +6,8 @@ metadata:
   namespace: home-automation
 spec:
   dependsOn:
-  - name: vernemq
-    namespace: home-network
+  - name: emqx
+    namespace: home-automation
   interval: 5m
   chart:
     spec:
@@ -57,7 +57,7 @@ spec:
     config:
       mqtt:
         base_topic: zigbee2mqtt
-        server: "mqtt://vernemq.home-automation"
+        server: "mqtt://emqx.home-automation"
         user: ${ZIGBEE2MQTT_MQTT_USER}
         password: ${ZIGBEE2MQTT_MQTT_PASSWORD}
 
