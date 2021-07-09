@@ -66,5 +66,7 @@ spec:
         node-role.kubernetes.io/master: "true"
       serviceAccountName: kube-vip
       tolerations:
-      - key: node-role.kubernetes.io/master
-        effect: NoSchedule
+      - effect: "NoExecute"
+        operator: "Exists"
+      - effect: "NoSchedule"
+        operator: "Exists"
