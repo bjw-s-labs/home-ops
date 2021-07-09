@@ -142,9 +142,9 @@ spec:
 
     prometheus-node-exporter:
       tolerations:
-      - key: "node-role.kubernetes.io/arm-worker"
+      - effect: "NoExecute"
         operator: "Exists"
-      - key: "node-role.kubernetes.io/master"
+      - effect: "NoSchedule"
         operator: "Exists"
 
     prometheus:
