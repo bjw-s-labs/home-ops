@@ -19,7 +19,7 @@ spec:
   values:
     image:
       repository: ${PRIVATE_REGISTRY_1}/bjw-s/deemix
-      tag: v2204471
+      tag: v312423e
       pullPolicy: Always
 
     imagePullSecrets:
@@ -43,10 +43,7 @@ spec:
     env:
       TZ: "Europe/Amsterdam"
       UMASK: "022"
-
-    envFrom:
-    - secretRef:
-        name: deemix-secrets
+      REVERSE_PROXY: "true"
 
     persistence:
       config:
