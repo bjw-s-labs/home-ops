@@ -120,17 +120,19 @@ spec:
         frontdoor:
           ffmpeg:
             inputs:
-              - path: ${FRIGATE_CAMERA_FRONTDOOR_MAIN}
+              - path: ${FRIGATE_CAMERA_FRONTDOOR_SUBSTREAM}
                 roles:
                   - detect
+              - path: ${FRIGATE_CAMERA_FRONTDOOR_MAIN}
+                roles:
                   - clips
                   - record
                   - rtmp
 
           # Required: width of the frame for the input with the detect role
-          width: 1920
+          width: 640
           # Required: height of the frame for the input with the detect role
-          height: 1080
+          height: 360
           fps: 6
 
           clips:
