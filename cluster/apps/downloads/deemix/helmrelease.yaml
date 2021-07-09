@@ -25,12 +25,11 @@ spec:
     imagePullSecrets:
     - name: registry-creds
 
-    podAnnotations:
-      secret.reloader.stakater.com/reload: deemix-secrets
-
     podSecurityContext:
       supplementalGroups:
       - 65539
+
+    enableServiceLinks: false
 
     nameOverride: "deemix"
 
@@ -43,7 +42,7 @@ spec:
     env:
       TZ: "Europe/Amsterdam"
       UMASK: "022"
-      REVERSE_PROXY: "true"
+      REVERSEPROXY: "true"
 
     persistence:
       config:
