@@ -58,6 +58,15 @@ spec:
         host: '{{ .Release.Name }}-redis-master'
         password: ${AUTHENTIK_REDIS_PASSWORD}
 
+    volumes:
+    - name: custom-assets
+      persistentVolumeClaim:
+        claimName: authentik-custom-assets
+
+    volumeMounts:
+    - mountPath: /custom_assets
+      name: custom-assets
+
     postgresql:
       enabled: true
       persistence:
