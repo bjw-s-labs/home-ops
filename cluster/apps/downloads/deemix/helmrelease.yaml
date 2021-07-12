@@ -8,12 +8,10 @@ spec:
   interval: 5m
   chart:
     spec:
-      # renovate: registryUrl=https://k8s-at-home.com/charts/
-      chart: jackett
-      version: 10.2.0
+      chart: /charts/kah-common-chart/
       sourceRef:
-        kind: HelmRepository
-        name: k8s-at-home-charts
+        kind: GitRepository
+        name: flux-system
         namespace: flux-system
       interval: 5m
   values:
