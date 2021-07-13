@@ -21,6 +21,14 @@ spec:
       repository: sirfragalot/hyperion.ng
       tag: 2.0.0-alpha.9-x86_64
 
+    podAnnotations:
+      k8s.v1.cni.cncf.io/networks: |
+        [{
+          "name":"macvlan-iot-static",
+          "namespace": "system",
+          "ips": ["${HYPERION_IOT_VLAN_IP}/24"]
+        }]
+
     env:
       TZ: "Europe/Amsterdam"
       PUID: "1001"
@@ -30,14 +38,6 @@ spec:
       config:
         enabled: true
         existingClaim: hyperion-config
-
-    service:
-      main:
-        type: LoadBalancer
-        annotations:
-          metallb.universe.tf/allow-shared-ip: hyperion
-        loadBalancerIP: ${LB_HYPERION}
-        externalTrafficPolicy: Local
 
     ingress:
       main:
