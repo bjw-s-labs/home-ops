@@ -90,14 +90,15 @@ spec:
         enabled: true
 
     affinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app.kubernetes.io/name
-            operator: In
-            values:
-            - traefik
-        topologyKey: kubernetes.io/hostname
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - traefik
+          topologyKey: kubernetes.io/hostname
 
     resources:
       requests:
