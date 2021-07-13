@@ -30,7 +30,10 @@ spec:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
         traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
       hosts:
-      - gitea.${DOMAIN_1}
+      - host: gitea.${DOMAIN_1}
+        paths:
+        - path: /
+          pathType: Prefix
       tls:
       - secretName: tls.gitea
         hosts:
