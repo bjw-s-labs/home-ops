@@ -10,9 +10,16 @@ jobs:
   annotate-helm-releases:
     runs-on: ubuntu-20.04
     steps:
+    - name: Get bjw-s-bot token
+      id: get-app-token
+      uses: getsentry/action-github-app-token@v1
+      with:
+        app_id: ${{ secrets.BJWS_APP_ID }}
+        private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
+
     - uses: actions/checkout@v2
       with:
-        token: ${{ secrets.ACCESS_TOKEN }}
+        token: ${{ steps.get-app-token.outputs.token }}
         fetch-depth: 1
 
     - name: Renovate Helm Releases
@@ -23,14 +30,10 @@ jobs:
     - name: Create pull request for HelmRelease annotations
       uses: peter-evans/create-pull-request@v3
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ steps.get-app-token.outputs.token }}
         branch: helmrelease-annotations
         delete-branch: true
-        title: "Update renovatebot helm-release annotations"
+        title: "feat: Update renovatebot helm-release annotations"
         signoff: true
-        committer: "Bᴇʀɴᴅ Sᴄʜᴏʀɢᴇʀs <me@bjw-s.dev>"
-        author: "Bᴇʀɴᴅ Sᴄʜᴏʀɢᴇʀs <me@bjw-s.dev>"
-        commit-message: "Update renovatebot helm-release annotations"
-        body: |
-          Add special annotations to HelmReleases inorder for Renovate to pick up new versions of Helm charts
+        commit-message: "feat: Update renovatebot helm-release annotations"
         labels: renovate/helmrelease-annotations
