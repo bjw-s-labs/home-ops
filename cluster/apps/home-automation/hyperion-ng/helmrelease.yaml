@@ -31,14 +31,12 @@ spec:
         enabled: true
         existingClaim: hyperion-config
 
-    # -- Configures service settings for the chart.
-    # @default -- See values.yaml
     service:
       main:
         type: LoadBalancer
-        loadBalancerIP: ${LB_HYPERION}
         annotations:
           metallb.universe.tf/allow-shared-ip: hyperion
+        loadBalancerIP: ${LB_HYPERION}
         externalTrafficPolicy: Local
 
     ingress:
