@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://dl.gitea.io/charts
       chart: gitea
-      version: 3.1.4
+      version: 4.0.0
       sourceRef:
         kind: HelmRepository
         name: gitea-charts
@@ -30,7 +30,10 @@ spec:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
         traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
       hosts:
-      - gitea.${DOMAIN_1}
+      - host: gitea.${DOMAIN_1}
+        paths:
+        - path: /
+          pathType: Prefix
       tls:
       - secretName: tls.gitea
         hosts:
