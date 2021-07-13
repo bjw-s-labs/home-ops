@@ -3,7 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: cdn
-  namespace: downloads
+  namespace: system-ingress
 spec:
   interval: 5m
   chart:
@@ -22,6 +22,8 @@ spec:
 
     imagePullSecrets:
     - name: registry-creds
+
+    nameOverride: "cdn"
 
     service:
       main:
