@@ -1,0 +1,55 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cdn
+  namespace: downloads
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: /charts/kah-common-chart/
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: ${PRIVATE_REGISTRY_1}/bjw-s/assets
+      tag: latest
+      pullPolicy: Always
+
+    imagePullSecrets:
+    - name: registry-creds
+
+    service:
+      main:
+        ports:
+          http:
+            port: 8080
+
+    env:
+      TZ: "Europe/Amsterdam"
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          kubernetes.io/ingress.class: traefik
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns/is-public: "true"
+          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        hosts:
+        - host: cdn.${DOMAIN_1}
+          paths:
+          - path: /
+        tls:
+        - secretName: tls.cdn
+          hosts:
+          - "{{ (index .Values.ingress.main.hosts 0).host }}"
+
+    resources: {}
