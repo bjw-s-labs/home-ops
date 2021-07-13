@@ -73,6 +73,12 @@ spec:
             enabled: true
 
     postgresql:
+      global:
+        postgresql:
+          postgresqlDatabase: gitea
+          postgresqlUsername: gitea
+          postgresqlPassword: ${GITEA_POSTGRES_PASSWORD}
+
       persistence:
         enabled: true
         existingClaim: gitea-postgresql
