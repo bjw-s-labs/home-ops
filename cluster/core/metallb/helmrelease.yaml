@@ -8,12 +8,12 @@ spec:
   interval: 5m
   chart:
     spec:
-      # renovate: registryUrl=https://charts.bitnami.com/bitnami
+      # renovate: registryUrl=https://metallb.github.io/metallb
       chart: metallb
-      version: 2.4.4
+      version: 0.10.2
       sourceRef:
         kind: HelmRepository
-        name: bitnami-charts
+        name: metallb-charts
         namespace: flux-system
       interval: 5m
   values:
@@ -24,15 +24,16 @@ spec:
         addresses:
         - "${METALLB_ARP_RANGE}"
 
-    prometheusRule:
-      enabled: false
+    prometheus:
+      podMonitor:
+        enabled: true
 
-    controller:
-      prometheus:
-        serviceMonitor:
-          enabled: true
+      prometheusRule:
+        enabled: true
 
     speaker:
-      prometheus:
-        serviceMonitor:
-          enabled: true
+      tolerations:
+      - effect: "NoExecute"
+        operator: "Exists"
+      - effect: "NoSchedule"
+        operator: "Exists"
