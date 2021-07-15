@@ -12,6 +12,14 @@
   tags:
   - k3s role
 
+- name: k3s | add home-dns manifests
+  include: home-dns.yml
+  tags:
+  - home-dns
+  when:
+  - k3s_control_node is defined
+  - k3s_control_node
+
 - name: k3s | store etcd secret
   include: etcd-secret.yml
   when:
