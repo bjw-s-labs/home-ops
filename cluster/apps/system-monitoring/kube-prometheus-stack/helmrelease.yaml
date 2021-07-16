@@ -185,4 +185,9 @@ spec:
                 requests:
                   storage: 50Gi
 
-        additionalScrapeConfigs: []
+        additionalScrapeConfigs:
+        - job_name: 'opnsense-coredns'
+          honor_timestamps: true
+          static_configs:
+          - targets:
+            - ${GATEWAY_MANAGEMENT}:9153
