@@ -55,6 +55,7 @@ spec:
         enabled: false
 
     globalArguments:
+    - "--api.insecure=true"
     - "--serverstransport.insecureskipverify=true"
     - "--providers.kubernetesingress.ingressclass=traefik"
     - "--metrics.prometheus=true"
@@ -64,6 +65,8 @@ spec:
     - "--providers.kubernetesingress.ingressendpoint.ip=${LB_TRAEFIK}"
 
     ports:
+      traefik:
+        expose: true
       web:
         redirectTo: websecure
       websecure:
