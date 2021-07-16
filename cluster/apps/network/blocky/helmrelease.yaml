@@ -43,14 +43,11 @@ spec:
 
       conditional:
         mapping:
-          # CoreDNS IP
-          ${DOMAIN_1}: udp:${LB_COREDNS}
-          ${DOMAIN_2}: udp:${LB_COREDNS}
-          ${DOMAIN_3}: udp:${LB_COREDNS}
-          unifi: udp:${LB_COREDNS}
-
-          # Router
+          ${DOMAIN_1}: udp:${GATEWAY_MANAGEMENT}
+          ${DOMAIN_2}: udp:${GATEWAY_MANAGEMENT}
+          ${DOMAIN_3}: udp:${GATEWAY_MANAGEMENT}
           ${DOMAIN_4}: udp:${GATEWAY_MANAGEMENT}
+          unifi: udp:${GATEWAY_MANAGEMENT}
 
       blocking:
         blackLists:
