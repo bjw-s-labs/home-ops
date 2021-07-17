@@ -13,6 +13,7 @@
   ansible.builtin.template:
     src: templates/01-netcfg.yaml.j2
     dest: /etc/netplan/01-netcfg.yaml
+    lstrip_blocks: yes
 
 - name: netplan | apply netplan
   command: netplan apply
