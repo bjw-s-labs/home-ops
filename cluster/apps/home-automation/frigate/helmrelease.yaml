@@ -11,18 +11,64 @@ spec:
   interval: 5m
   chart:
     spec:
-      # renovate: registryUrl=https://blakeblackshear.github.io/blakeshome-charts/
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: frigate
-      version: 5.0.1
+      version: 5.0.0
       sourceRef:
         kind: HelmRepository
-        name: blakeshome-charts
+        name: k8s-at-home-charts
         namespace: flux-system
       interval: 5m
   values:
     image:
       repository: blakeblackshear/frigate
       tag: 0.8.4-amd64
+
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: "frigate-config"
+
+    env:
+      TZ: Europe/Amsterdam
+
+    persistence:
+      data:
+        enabled: true
+        existingClaim: frigate-data
+      media:
+        enabled: true
+        existingClaim: nfs-nas-frigate-media
+        mountPath: /media
+      usb:
+        enabled: true
+        type: hostPath
+        hostPath: /dev/bus/usb
+      cache:
+        enabled: true
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 512Mi
+        mountPath: /dev/shm
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+        hosts:
+        - host: frigate.${DOMAIN_1}
+          paths:
+          - path: /
+        tls:
+        - secretName: tls.frigate
+          hosts:
+          - "{{ (index .Values.ingress.main.hosts 0).host }}"
+
+    securityContext:
+      privileged: true
 
     affinity:
       nodeAffinity:
@@ -37,50 +83,6 @@ spec:
               operator: In
               values:
               - "true"
-
-    podAnnotations:
-      configmap.reloader.stakater.com/reload: "frigate"
-
-    timezone: Europe/Amsterdam
-
-    coral:
-      enabled: true
-
-    shmSize: 512Mi
-
-    persistence:
-      data:
-        enabled: true
-        existingClaim: frigate-data
-
-    extraVolumes:
-    - name: frigate-media
-      persistentVolumeClaim:
-        claimName: nfs-nas-frigate-media
-    - name: cache
-      emptyDir:
-        medium: Memory
-
-    extraVolumeMounts:
-    - name: frigate-media
-      mountPath: /media
-    - mountPath: /tmp/cache
-      name: cache
-
-    ingress:
-      enabled: true
-      annotations:
-        kubernetes.io/ingress.class: traefik
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
-      hosts:
-      - frigate.${DOMAIN_1}
-      tls:
-      - hosts:
-        - frigate.${DOMAIN_1}
-        secretName: tls.frigate
 
     config: |
       mqtt:
