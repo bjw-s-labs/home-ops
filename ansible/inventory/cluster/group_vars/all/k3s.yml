@@ -25,21 +25,14 @@ k3s_etcd_datastore: true
 # ...this is set to my kube-vip address
 k3s_registration_address: 10.1.1.30
 
-#
-# Uncomment the config below on new installations
-# and after the cluster is installed remove everything
-# from the primary control plane under
-# /var/lib/rancher/k3s/server/manifests
-#
-
 # Custom manifest files
-# k3s_server_manifests_templates:
-# - "calico/calico-installation.yaml.j2"
-# - "home-dns/home-dns-rbac.yaml.j2"
-# - "kube-vip/kube-vip-rbac.yaml.j2"
-# - "kube-vip/kube-vip-daemonset.yaml.j2"
+k3s_server_manifests_templates:
+- "calico/calico-installation.yaml.j2"
+- "kube-vip/kube-vip-rbac.yaml.j2"
+- "kube-vip/kube-vip-daemonset.yaml.j2"
+- "serviceaccounts/home-dns.yaml.j2"
 
-# # Custom manifest URLs
-# k3s_server_manifests_urls:
-# - url: https://docs.projectcalico.org/archive/v3.19/manifests/tigera-operator.yaml
-#   filename: tigera-operator.yaml
+# Custom manifest URLs
+k3s_server_manifests_urls:
+- url: https://docs.projectcalico.org/archive/v3.19/manifests/tigera-operator.yaml
+  filename: tigera-operator.yaml
