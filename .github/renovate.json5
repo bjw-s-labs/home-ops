@@ -47,16 +47,6 @@
       ],
       "datasourceTemplate": "helm"
     },
-    // regexManager to read and process Forecastle CRD's
-    {
-      "fileMatch": [
-        "cluster/crds/forecastle/.+\\.yaml$"
-      ],
-      "matchStrings": [
-        "registryUrl=(?<registryUrl>.*?) chart=(?<depName>.*?)\n *tag: (?<currentValue>.*)\n",
-      ],
-      "datasourceTemplate": "helm"
-    },
     // regexManager to read and process kube-prometheus-stack CRD's
     {
       "fileMatch": [
@@ -189,11 +179,6 @@
       "matchDatasources": ["docker"],
       "matchPackageNames": ["influxdb"],
       "allowedVersions": "<2"
-    },
-    {
-      "matchDatasources": ["helm"],
-      "matchPackageNames": ["forecastle"],
-      "allowedVersions": "<1.0.65"
     },
     // Version strategies
     {
