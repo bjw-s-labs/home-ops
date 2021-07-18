@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: gitea-data
   namespace: dev
+  labels:
+    kasten.io/backup-volume: "true"
 spec:
   accessModes:
   - ReadWriteOnce
