@@ -36,6 +36,8 @@ jobs:
       uses: renovatebot/github-action@v25.56.6
       env:
         LOG_LEVEL: debug
+        DOCKER_HUB_USER: ${{ secrets.DOCKER_HUB_USER }}
+        DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
       with:
         configurationFile: .github/renovate-config.ts
         token: 'x-access-token:${{ steps.get-app-token.outputs.token }}'
