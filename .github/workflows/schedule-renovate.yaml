@@ -5,12 +5,13 @@ concurrency: renovate-run
 
 on:
   workflow_dispatch:
-#   schedule:
-#   - cron: '0/15 * * * *'
+  schedule:
+  - cron: '0/15 * * * *'
   push:
     paths:
     - ".github/workflows/schedule-renovate.yaml"
-    - ".github/renovate.json"
+    - ".github/renovate-config.ts"
+    - ".github/renovate.json5"
     branches:
     - main
 
@@ -32,8 +33,8 @@ jobs:
 
     - name: Run Renovate
       uses: renovatebot/github-action@v25.56.5
-      env:
-        LOG_LEVEL: debug
+      # env:
+      #   LOG_LEVEL: debug
       with:
         configurationFile: .github/renovate-config.ts
         token: '${{ steps.get-app-token.outputs.token }}'
