@@ -7,5 +7,12 @@ module.exports = {
   repositories: ["bjw-s/k8s-gitops"],
   requireConfig: true,
   username: "bjw-s-renovate",
+  hostRules: [
+    {
+      hostType: 'docker',
+      username: process.env.DOCKER_HUB_USER,
+      password: process.env.DOCKER_HUB_PASSWORD,
+    },
+  ],
   packageRules: [],
 };
