@@ -1,6 +1,8 @@
 ---
 name: Schedule - Run Renovate
 
+concurrency: renovate-run
+
 on:
   workflow_dispatch:
 #   schedule:
@@ -16,17 +18,17 @@ jobs:
   renovate:
     runs-on: self-hosted
     steps:
-    - name: Get token
-      id: get_token
-      uses: machine-learning-apps/actions-app-token@master
+    - name: Get bot token
+      id: get-app-token
+      uses: getsentry/action-github-app-token@v1
       with:
-        APP_PEM: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
-        APP_ID: ${{ secrets.RENOVATE_APP_ID }}
+        app_id: ${{ secrets.RENOVATE_APP_ID }}
+        private_key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
 
     - name: Check out repository
       uses: actions/checkout@v2
       with:
-        token: ${{ steps.get_token.outputs.app_token }}
+        token: ${{ steps.get-app-token.outputs.token }}
 
     - name: Run Renovate
       uses: renovatebot/github-action@v25.56.5
@@ -34,4 +36,4 @@ jobs:
         LOG_LEVEL: debug
       with:
         configurationFile: .github/renovate.json
-        token: 'x-access-token:${{ steps.get_token.outputs.app_token }}'
+        token: '${{ secrets.get-app-token.outputs.token }}'
