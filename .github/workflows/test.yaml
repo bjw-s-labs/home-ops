@@ -18,7 +18,7 @@ jobs:
     - uses: actions/github-script@v4
       id: set-result
       with:
-        github-token: ${{ secrets.get-app-token.outputs.token }}
+        github-token: ${{ steps.get-app-token.outputs.token }}
         script: |
           return github.users.getAuthenticated()
         result-encoding: string
