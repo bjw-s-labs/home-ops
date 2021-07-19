@@ -5,15 +5,15 @@ concurrency: renovate-run
 
 on:
   workflow_dispatch:
-  # schedule:
-  # - cron: '0/15 * * * *'
-  # push:
-  #   paths:
-  #   - ".github/workflows/schedule-renovate.yaml"
-  #   - ".github/renovate-config.ts"
-  #   - ".github/renovate.json5"
-  #   branches:
-  #   - main
+  schedule:
+  - cron: '0/15 * * * *'
+  push:
+    paths:
+    - ".github/workflows/schedule-renovate.yaml"
+    - ".github/renovate-config.ts"
+    - ".github/renovate.json5"
+    branches:
+    - main
 
 jobs:
   renovate:
@@ -30,6 +30,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         token: ${{ steps.get-app-token.outputs.token }}
+        ref: main
 
     - name: Run Renovate
       uses: renovatebot/github-action@v25.56.5
