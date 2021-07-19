@@ -10,8 +10,10 @@ module.exports = {
   hostRules: [
     {
       matchHost: "docker.io",
+      abortOnError: false,
+      abortIgnoreStatusCodes: [429],
       username: process.env.DOCKER_HUB_USER,
-      password: process.env.DOCKER_HUB_PASSWORD,
+      token: process.env.DOCKER_HUB_PASSWORD,
     },
   ],
   packageRules: [],
