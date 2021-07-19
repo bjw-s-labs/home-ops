@@ -7,5 +7,6 @@ module.exports = {
   includeForks: true,
   repositories: ["bjw-s/k8s-gitops"],
   requireConfig: true,
+  username: "bjw-s-renovate",
   packageRules: [],
 };
