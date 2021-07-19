@@ -1,6 +1,5 @@
 module.exports = {
   branchPrefix: "renovate/",
-  cacheDir: "/tmp/renovate/cache",
   gitAuthor: "Renovate Bot <87644328+bjw-s-renovate[bot]@users.noreply.github.com>",
   onboarding: false,
   platform: "github",
