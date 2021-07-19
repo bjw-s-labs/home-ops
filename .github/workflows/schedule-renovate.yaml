@@ -16,12 +16,12 @@ jobs:
   renovate:
     runs-on: self-hosted
     steps:
-    - name: Get bjw-s-bot token
-      id: get-app-token
-      uses: getsentry/action-github-app-token@v1
+    - name: Get token
+      id: get_token
+      uses: machine-learning-apps/actions-app-token@master
       with:
-        app_id: ${{ secrets.RENOVATE_APP_ID }}
-        private_key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
+        APP_PEM: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
+        APP_ID: ${{ secrets.RENOVATE_APP_ID }}
 
     - name: Check out repository
       uses: actions/checkout@v2
@@ -34,4 +34,4 @@ jobs:
         LOG_LEVEL: debug
       with:
         configurationFile: .github/renovate.json
-        token: '${{ steps.get-app-token.outputs.token }}'
+        token: 'x-access-token:${{ steps.get_token.outputs.app_token }}'
