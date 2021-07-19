@@ -1,0 +1,38 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: runner-k8s-gitops
+  namespace: dev
+spec:
+  template:
+    spec:
+      repository: bjw-s/k8s-gitops
+      volumeMounts:
+      - name: cache-volume
+        mountPath: /cache
+      volumes:
+      - name: cache-volume
+        persistentVolumeClaim:
+          claimName: actions-runner-controller-runnercache
+---
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: HorizontalRunnerAutoscaler
+metadata:
+  name: k8s-gitops-autoscaler
+  namespace: dev
+spec:
+  scaleTargetRef:
+    name: runner-k8s-gitops
+  scaleUpTriggers:
+  - githubEvent:
+      checkRun:
+        types: ["created"]
+        status: "queued"
+    amount: 1
+    duration: "5m"
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: TotalNumberOfQueuedAndInProgressWorkflowRuns
+    repositoryNames:
+    - bjw-s/k8s-gitops

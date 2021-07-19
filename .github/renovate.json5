@@ -1,14 +1,17 @@
 {
-  "enabled": true,
-  "timezone": "Europe/Amsterdam",
+  "branchPrefix": "renovate/",
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate Dashboard",
-  "commitBody": "Signed-off-by: Bᴇʀɴᴅ Sᴄʜᴏʀɢᴇʀs <me@bjw-s.dev>",
-  // do not notify on closed, unmerged PRs
-  "suppressNotifications": ["prIgnoreNotification"],
-  // do not rebase PRs
+  "enabled": true,
+  "extends": ["config:base", ":gitSignOff"],
+  "gitAuthor": "Renovate Bot <renovate@whitesourcesoftware.com>",
+  "platform": "github",
   "rebaseWhen": "conflicted",
+  "repositories": ["bjw-s/k8s-gitops"],
+  "requireConfig": false,
+  "suppressNotifications": ["prIgnoreNotification"],
   "semanticCommits": "enabled",
+  "timezone": "Europe/Amsterdam",
   "helmv3": {
     "fileMatch": ["charts/.+/Chart\\.yaml$"]
   },
