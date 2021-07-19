@@ -30,6 +30,8 @@ jobs:
 
     - name: Run Renovate
       uses: renovatebot/github-action@v25.56.5
+      env:
+        LOG_LEVEL: debug
       with:
         configurationFile: .github/renovate.json
         token: 'x-access-token:${{ steps.get-app-token.outputs.token }}'
