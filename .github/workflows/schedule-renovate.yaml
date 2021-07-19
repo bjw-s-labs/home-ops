@@ -32,13 +32,6 @@ jobs:
         token: ${{ steps.get-app-token.outputs.token }}
         ref: main
 
-    - name: Store cache
-      id: cache
-      uses: actions/cache@v2
-      with:
-        path: /tmp/renovate/cache
-        key: ${{ runner.os }}-renovate
-
     - name: Run Renovate
       uses: renovatebot/github-action@v25.56.6
       env:
