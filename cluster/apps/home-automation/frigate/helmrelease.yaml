@@ -119,54 +119,6 @@ spec:
           - yuv420p
 
       cameras:
-        frontdoor:
-          ffmpeg:
-            inputs:
-              - path: ${FRIGATE_CAMERA_FRONTDOOR_MAIN}
-                roles:
-                  - clips
-                  - rtmp
-              - path: ${FRIGATE_CAMERA_FRONTDOOR_SUBSTREAM}
-                roles:
-                  - detect
-
-          # Required: width of the frame for the input with the detect role
-          width: 640
-          # Required: height of the frame for the input with the detect role
-          height: 360
-          fps: 6
-
-          clips:
-            enabled: True
-            objects:
-              - person
-            retain:
-              # Required: Default retention days (default: shown below)
-              default: 14
-
-          snapshots:
-            enabled: True
-            timestamp: True
-            retain:
-              # Required: Default retention days (default: shown below)
-              default: 14
-
-          rtmp:
-            enabled: True
-
-          motion:
-            mask:
-              - 0,182,36,179,125,158,118,0,0,0
-
-          objects:
-            track:
-              - person
-            filters:
-              person:
-                min_area: 5000
-                max_area: 100000
-                threshold: 0.65
-
         doorbell:
           ffmpeg:
             inputs:
