@@ -14,14 +14,23 @@ See my [ansible](https://github.com/bjw-s/k8s-gitops/ansible/) directory for my 
 
 ## Cluster components
 
-- [calico](https://docs.projectcalico.org/about/about-calico): For internal cluster networking.
-- [rook-ceph](https://rook.io/): Provides persistent volumes, allowing any application to consume RBD block storage or CephFS storage.
+### GitOps
+
+- [flux](https://fluxcd.io): Keeps the cluster in sync with this Git repository.
 - [Mozilla SOPS](https://toolkit.fluxcd.io/guides/mozilla-sops/): Encrypts secrets which is safe to store - even to a public repository.
+
+### Networking
+
+- [calico](https://docs.projectcalico.org/about/about-calico): For internal cluster networking.
+- [kube-vip](https://kube-vip.io/): Uses BGP to load balance the control-plane API, making it highly availible without requiring external HA proxy solutions.
 - [external-dns](https://github.com/kubernetes-sigs/external-dns): Creates DNS entries in a separate [coredns](https://github.com/coredns/coredns) deployment which lives on my router.
-- [cert-manager](https://cert-manager.io/docs/): Configured to create TLS certs for all ingress services automatically using LetsEncrypt.
-- [kube-vip](https://github.com/kube-vip/kube-vip): HA solution for Kubernetes control plane
-- [Kasten k10](https://www.kasten.io): Data backup and recovery
 - [Multus](https://github.com/k8snetworkplumbingwg/multus-cni): For allowing pods to have multiple network interfaces.
+- [cert-manager](https://cert-manager.io/docs/): Configured to create TLS certs for all ingress services automatically using [LetsEncrypt](https://letsencrypt.org).
+
+### Storage
+
+- [rook-ceph](https://rook.io/): Provides persistent volumes, allowing any application to consume RBD block storage or CephFS storage.
+- [Kasten k10](https://www.kasten.io): Data backup and recovery
 
 ## Repository structure
 
