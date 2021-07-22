@@ -1,0 +1,55 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: esphome
+  namespace: home-automation
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
+      chart: esphome
+      version: 7.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: esphome/esphome
+      tag: 1.18.0
+
+    env:
+      TZ: Europe/Amsterdam
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+        hosts:
+        - host: esphome.${DOMAIN_1}
+          paths:
+          - path: /
+        tls:
+        - secretName: tls.esphome
+          hosts:
+          - "{{ (index .Values.ingress.main.hosts 0).host }}"
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: esphome-config
+
+    resources: {}
+      # requests:
+      #   memory: 300Mi
+      #   cpu: 400m
+      # limits:
+      #   memory: 1000Mi
