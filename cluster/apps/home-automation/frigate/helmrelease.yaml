@@ -128,7 +128,6 @@ spec:
               - path: ${FRIGATE_CAMERA_FRONTDOOR_MAIN}
                 roles:
                   - clips
-                  - record
                   - rtmp
 
           # Required: width of the frame for the input with the detect role
@@ -152,6 +151,9 @@ spec:
               # Required: Default retention days (default: shown below)
               default: 14
 
+          rtmp:
+            enabled: True
+
           motion:
             mask:
               - 0,182,36,179,125,158,118,0,0,0
@@ -174,7 +176,6 @@ spec:
               - path: ${FRIGATE_CAMERA_DOORBELL_MAIN}
                 roles:
                   - clips
-                  - record
                   - rtmp
 
           # Required: width of the frame for the input with the detect role
@@ -197,6 +198,9 @@ spec:
             retain:
               # Required: Default retention days (default: shown below)
               default: 14
+
+          rtmp:
+            enabled: True
 
           objects:
             track:
