@@ -122,13 +122,13 @@ spec:
         frontdoor:
           ffmpeg:
             inputs:
-              - path: ${FRIGATE_CAMERA_FRONTDOOR_SUBSTREAM}
-                roles:
-                  - detect
               - path: ${FRIGATE_CAMERA_FRONTDOOR_MAIN}
                 roles:
                   - clips
                   - rtmp
+              - path: ${FRIGATE_CAMERA_FRONTDOOR_SUBSTREAM}
+                roles:
+                  - detect
 
           # Required: width of the frame for the input with the detect role
           width: 640
@@ -170,13 +170,13 @@ spec:
         doorbell:
           ffmpeg:
             inputs:
-              - path: ${FRIGATE_CAMERA_DOORBELL_SUBSTREAM}
-                roles:
-                  - detect
               - path: ${FRIGATE_CAMERA_DOORBELL_MAIN}
                 roles:
                   - clips
                   - rtmp
+              - path: ${FRIGATE_CAMERA_DOORBELL_SUBSTREAM}
+                roles:
+                  - detect
 
           # Required: width of the frame for the input with the detect role
           width: 720
