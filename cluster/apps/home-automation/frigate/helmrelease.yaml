@@ -173,6 +173,8 @@ spec:
                   - detect
               - path: ${FRIGATE_CAMERA_DOORBELL_MAIN}
                 roles:
+                  - clips
+                  - record
                   - rtmp
 
           # Required: width of the frame for the input with the detect role
@@ -180,6 +182,25 @@ spec:
           # Required: height of the frame for the input with the detect role
           height: 576
           fps: 15
+
+          clips:
+            enabled: True
+            objects:
+              - person
+            retain:
+              # Required: Default retention days (default: shown below)
+              default: 14
+
+          snapshots:
+            enabled: True
+            timestamp: True
+            retain:
+              # Required: Default retention days (default: shown below)
+              default: 14
+
+          objects:
+            track:
+              - person
 
     resources:
       requests:
