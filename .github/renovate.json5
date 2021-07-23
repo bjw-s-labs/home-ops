@@ -1,16 +1,18 @@
 {
   // General RenovateBot configuration
-  "enabled": true,
   "extends": [
+    ":enableRenovate",
+    ":dependencyDashboard",
+    ":semanticCommits",
     "config:base",
-    "docker:enableMajor"
+    "docker:enableMajor",
+    "github>bjw-s/k8s-gitops//.github/renovate/labels-patchlevel",
+    "github>bjw-s/k8s-gitops//.github/renovate/labels-types",
   ],
   "timezone": "Europe/Amsterdam",
-  "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate Dashboard",
   "suppressNotifications": ["prIgnoreNotification"],
   "rebaseWhen": "conflicted",
-  "semanticCommits": "enabled",
   // Set up Renovate private modules
   "hostRules": [
     {
@@ -124,37 +126,31 @@
       "matchDatasources": ["docker"],
       "matchUpdateTypes": ["major"],
       "commitMessagePrefix": "feat(images)!: ",
-      "labels": ["renovate/image-release", "deps/major"]
     },
     {
       "matchDatasources": ["docker"],
       "matchUpdateTypes": ["minor"],
       "semanticCommitType": "feat",
-      "labels": ["renovate/image-release", "deps/minor"]
     },
     {
       "matchDatasources": ["docker"],
       "matchUpdateTypes": ["patch"],
       "semanticCommitType": "fix",
-      "labels": ["renovate/image-release", "deps/patch"]
     },
     {
       "matchDatasources": ["helm"],
       "matchUpdateTypes": ["major"],
       "commitMessagePrefix": "feat(charts)!: ",
-      "labels": ["renovate/helm-chart", "deps/major"]
     },
     {
       "matchDatasources": ["helm"],
       "matchUpdateTypes": ["minor"],
       "semanticCommitType": "feat",
-      "labels": ["renovate/helm-chart", "deps/minor"]
     },
     {
       "matchDatasources": ["helm"],
       "matchUpdateTypes": ["patch"],
       "semanticCommitType": "fix",
-      "labels": ["renovate/helm-chart", "deps/patch"]
     },
     // Custom version schemes
     {
