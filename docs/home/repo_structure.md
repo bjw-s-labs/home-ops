@@ -2,7 +2,7 @@
 
 The Git repository contains the following directories under [`cluster`](https://github.com/bjw-s/k8s-gitops/tree/main/cluster){target=_blank} and are ordered below by how Flux will apply them.
 
-```
+```console
 ./cluster
 ├── ./apps
 ├── ./base

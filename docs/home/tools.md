@@ -6,7 +6,7 @@
 | [pre-commit](https://github.com/pre-commit/pre-commit) | Enforce code consistency and verifies no secrets are pushed  |
 | [stern](https://github.com/stern/stern)                | Tail logs in Kubernetes                                      |
 
-## Automate all the things!
+## Repository automation
 
 - [Github Actions](https://docs.github.com/en/actions) for checking code formatting
 - Rancher [System Upgrade Controller](https://github.com/rancher/system-upgrade-controller) to apply updates to k3s
