@@ -1,19 +1,24 @@
 {
   "packageRules": [
     {
-      "matchDatasources": ["helm", "docker"],
       "matchUpdateTypes": ["major"],
       "labels": ["deps/major"]
     },
     {
-      "matchDatasources": ["helm", "docker"],
       "matchUpdateTypes": ["minor"],
       "labels": ["deps/minor"]
     },
     {
-      "matchDatasources": ["helm", "docker"],
       "matchUpdateTypes": ["patch"],
       "labels": ["deps/patch"]
+    },
+    {
+      "matchDatasources": ["helm"],
+      "labels": ["renovate/helm-chart"]
+    },
+    {
+      "matchDatasources": ["docker"],
+      "labels": ["renovate/image-release"]
     }
   ]
 }
