@@ -13,6 +13,10 @@
   "dependencyDashboardTitle": "Renovate Dashboard",
   "suppressNotifications": ["prIgnoreNotification"],
   "rebaseWhen": "conflicted",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "to {{newValue}}",
+  "commitMessageSuffix": "",
+  "separateMinorPatch": true,
   // Set up Renovate private modules
   "hostRules": [
     {
@@ -108,16 +112,7 @@
     // Setup datasources
     {
       "matchDatasources": ["helm"],
-      "commitMessageTopic": "{{depName}}",
-      "commitMessageExtra": "to {{{newValue}}}",
-      "separateMinorPatch": true,
       "ignoreDeprecated": true
-    },
-    {
-      "matchDatasources": ["docker"],
-      "commitMessageTopic": "{{depName}}",
-      "commitMessageExtra": "to {{{newValue}}}",
-      "separateMinorPatch": true
     },
     // Custom version schemes
     {
