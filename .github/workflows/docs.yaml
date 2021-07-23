@@ -13,9 +13,42 @@ on: # yamllint disable-line rule:truthy
     - 'docs/**'
 
 jobs:
-  deploy:
+  markdownlint:
+    name: Markdownlint
     runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+
+    - name: markdownlint-cli
+      uses: nosborn/github-action-markdown-cli@v2.0.0
+      with:
+        files: 'README.md docs/**'
+
+  markdown-link-check:
+    name: Markdown link check
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+
+    - uses: gaurav-nelson/github-action-markdown-link-check@v1
+      with:
+        folder-path: 'docs'
+        file-path: './README.md'
+
+  deploy:
+    name: Deploy to GitHub Pages
     if: github.event.pull_request.head.repo.fork == false
+    runs-on: ubuntu-20.04
+    needs:
+    - markdownlint
+    - markdown-link-check
+
     steps:
     - name: Get bjw-s-bot token
       id: get-app-token
