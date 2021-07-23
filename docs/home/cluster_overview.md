@@ -2,7 +2,7 @@
 
 My cluster is [k3s](https://k3s.io/){target=_blank} provisioned on Ubuntu 21.04 nodes using the [Ansible](https://www.ansible.com/){target=_blank} galaxy role [ansible-role-k3s](https://github.com/PyratLabs/ansible-role-k3s){target=_blank}. This is a semi hyper-converged cluster, workloads and block storage are sharing the same available resources on my nodes.
 
-See my [ansible](https://github.com/bjw-s/k8s-gitops/ansible/){target=_blank} directory for my playbooks and roles.
+See my [ansible](https://github.com/bjw-s/k8s-gitops/tree/main/ansible){target=_blank} directory for my playbooks and roles.
 
 ## Hardware
 

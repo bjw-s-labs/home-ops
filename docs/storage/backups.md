@@ -17,6 +17,7 @@ If you have gotten this far, you will now know that K10 introduces the concepts 
 My current setup is that I have a single Profile ([link](https://github.com/bjw-s/k8s-gitops/blob/main/cluster/apps/system-kasten/k10/profiles/nfs.yaml)) pointing to an NFS server.
 
 I then have a single Policy ([link](https://github.com/bjw-s/k8s-gitops/blob/main/cluster/apps/system-kasten/k10/policies/apps.yaml)) that schedules snapshots and exports for:
+
 - a set of namespaces
 - all persistentVolumeClaim resources
 - that have been assigned the label `kasten.io/backup-volume: "true"`
