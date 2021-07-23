@@ -1,13 +1,28 @@
 {
+  // General RenovateBot configuration
   "enabled": true,
+  "extends": [
+    "config:base",
+    "docker:enableMajor"
+  ],
   "timezone": "Europe/Amsterdam",
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate Dashboard",
-  // do not notify on closed, unmerged PRs
   "suppressNotifications": ["prIgnoreNotification"],
-  // do not rebase PRs
   "rebaseWhen": "conflicted",
   "semanticCommits": "enabled",
+  // Set up Renovate private modules
+  "hostRules": [
+    {
+      "hostType": "docker",
+      "matchHost": "ghcr.io",
+      "encrypted": {
+        "username": "HZEdibRidGWQ8CQ2EGdGEVXMXaBE7o0FUweuspAKfz4zai6LOFVufH0cy2h1fYg6HMLCRO4WBtZ4AJbihTvu+YdniWaNKzLpcY5U+r3oTieO1LS0DrPxwMyM/AYQN8ql5KuQhNc846gFkQjof+Q+76mg+6rxVyRbHaPZTzoCcG/RytestfOS/GSfTcZ7EbLII3xXBl68cPdgGnQEQXIo58shQErFhBZuF7L50EQCvj7vYkj8ZkcD+pMjJ9r+z/HW1DdnDyQ+o7zz/MGwjle4Vy8QH2vSelr6U5+XkpB2/zymNlNMeDx1TE1k2mCAnkUDszUQMpT/f7uoyL73r2fRlg==",
+        "password": "aJeCGj365T2g+L9hwUZLoXtdseX4Hks86b6gBCQoUM/pXO8+JNDTYKh61IIdyrh1n3iJcYNNXO0L/f56RjL52Q3yFS9J6KxgNOeJ8HccZhwmMryZZmAMIBm2N5AiZ6EK3sL0lqIjoa2h/U3akhZmHhT8nRD0/LWT9JGMSr39UWcRpyJuIBqDNwOSemSPOUVdMYKeKPU/T0mQKY0b0EtAkA1RSt84aiZbf8KyghKM4MnQRrSrsXCpgUDiIgLi00CP0oJIcCGTmfdTPr9CercD1n0TBBySaZs7QuElvUCz0XPZ5IuwSfukZDm1/1kttDkGiticwhTD96Sa3hnzcdfqEQ=="
+      }
+    }
+  ],
+  // Set up Renovate Managers
   "helmv3": {
     "fileMatch": ["charts/.+/Chart\\.yaml$"]
   },
@@ -96,11 +111,6 @@
       "commitMessageExtra": "to {{{newValue}}}",
       "separateMinorPatch": true,
       "ignoreDeprecated": true
-    },
-    {
-      "matchDatasources": ["docker"],
-      "enabled": true,
-      "matchUpdateTypes": ["major", "minor", "patch"]
     },
     {
       "matchDatasources": ["docker"],
