@@ -1,9 +1,10 @@
-{% import 'links.md' as links %}
 # Cluster overview
 
-My cluster is [k3s][k3s]{target=_blank} provisioned on Ubuntu 21.04 nodes using the {{ links.external('ansible') }} galaxy role {{ links.external('ansible-role-k3s') }}. This is a semi hyper-converged cluster, workloads and block storage are sharing the same available resources on my nodes.
+{% import 'links.md.include' as links %}
 
-See my [ansible](https://github.com/bjw-s/k8s-gitops/tree/main/ansible){target=_blank} directory for my playbooks and roles.
+My cluster is {{ links.external('k3s') }} provisioned on Ubuntu 21.04 nodes using the {{ links.external('ansible') }} galaxy role {{ links.external('ansible-role-k3s') }}. This is a semi hyper-converged cluster, workloads and block storage are sharing the same available resources on my nodes.
+
+See my {{ links.repoUrl('ansible', 'tree/main/ansible') }} directory for my playbooks and roles.
 
 ## Hardware
 
