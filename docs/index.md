@@ -2,10 +2,11 @@
 hide:
   - toc
 ---
-{% import 'links.md' as links %}
 # Welcome
 
-Welcome to the documentation for .
+{% import 'links.md.include' as links %}
+
+Welcome to the documentation for my {{ links.repoUrl('k8s-gitops') }} repo.
 
 This repository _is_ my home Kubernetes cluster in a declarative state. {{ links.external('flux', 'Flux') }} watches my {{ links.repoUrl('cluster', 'tree/main/cluster') }} folder and makes the changes to my cluster based on the YAML manifests.
 
