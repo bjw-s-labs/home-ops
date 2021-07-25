@@ -1,6 +1,8 @@
 # Backups
 
-Backups of the data that lives inside my cluster are handled by [Kasten K10](https://www.kasten.io){target=_blank}. This is a commercial backup solution, but is free to use for up to 10 nodes. Please see their website to see if your use case falls under the license agreement.
+{% import 'links.md.include' as links %}
+
+Backups of the data that lives inside my cluster are handled by {{ links.external('kasten') }}. This is a commercial backup solution, but is free to use for up to 10 nodes. Please see their website to see if your use case falls under the license agreement.
 
 ## Kasten documentation
 
@@ -14,9 +16,9 @@ Others have detailed this tool much better than I can, so I am going to be a bit
 
 If you have gotten this far, you will now know that K10 introduces the concepts of Profiles and Policies. In summary, a Profile tells K10 _where_ to store the data, and a Policy tells it _what_ you want to back up.
 
-My current setup is that I have a single Profile ([link](https://github.com/bjw-s/k8s-gitops/blob/main/cluster/apps/system-kasten/k10/profiles/nfs.yaml)) pointing to an NFS server.
+My current setup is that I have a single Profile ({{ links.repoUrl('link', 'blob/main/cluster/apps/system-kasten/k10/profiles/nfs.yaml') }}) pointing to an NFS server.
 
-I then have a single Policy ([link](https://github.com/bjw-s/k8s-gitops/blob/main/cluster/apps/system-kasten/k10/policies/apps.yaml)) that schedules snapshots and exports for:
+I then have a single Policy ({{ links.repoUrl('link', 'blob/main/cluster/apps/system-kasten/k10/policies/apps.yaml') }}) that schedules snapshots and exports for:
 
 - a set of namespaces
 - all persistentVolumeClaim resources
