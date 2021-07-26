@@ -23,3 +23,39 @@ I then have a single Policy ({{ links.repoUrl('link', 'blob/main/cluster/apps/sy
 - a set of namespaces
 - all persistentVolumeClaim resources
 - that have been assigned the label `kasten.io/backup-volume: "true"`
+
+## Restoring PVCs using Kasten
+
+Recovering from a K10 backup involves the following sequence of actions:
+
+### 1. Create a Kubernetes Secret, k10-dr-secret, using the passphrase provided while enabling DR
+
+```sh
+kubectl create secret generic k10-dr-secret \
+    --namespace system-kasten \
+    --from-literal key=<passphrase>
+```
+
+### 2. Install a fresh K10 instance
+
+!!! info "Ensure that Flux has correctly deployed K10 to it's namespace `system-kasten`"
+
+### 3. Provide NFS information and credentials for the snapshot export location
+
+!!! info "Ensure that Flux has correctly deployed the `nfs` storage profile and that it's accessible within K10"
+
+### 4. Restoring the K10 backup
+
+Install the helm chart that creates the K10 restore job and wait for completion of the `k10-restore` job
+
+```sh
+helm install k10-restore kasten/k10restore --namespace=system-kasten \
+    --set sourceClusterID=<source-clusterID> \
+    --set profile.name=<location-profile-name>
+```
+
+### 5. Application recovery
+
+Upon completion of the DR Restore job, go to the Applications card, select `Removed` under the `Filter by status` drop-down menu.
+
+Click restore under the application and select a restore point to recover from.
