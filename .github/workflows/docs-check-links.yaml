@@ -1,0 +1,41 @@
+---
+name: 'Docs: Check links'
+
+on: # yamllint disable-line rule:truthy
+  repository_dispatch:
+  schedule:
+  - cron: "00 02 * * *"
+  push:
+    branches:
+    - gh-pages
+
+jobs:
+  linkChecker:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get bjw-s-bot token
+      id: get-app-token
+      uses: getsentry/action-github-app-token@v1
+      with:
+        app_id: ${{ secrets.BJWS_APP_ID }}
+        private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
+
+    - uses: actions/checkout@v2
+      with:
+        token: ${{ steps.get-app-token.outputs.token }}
+        ref: gh-pages
+
+    - name: Link Checker
+      uses: lycheeverse/lychee-action@v1.0.8
+      with:
+        args: --verbose --no-progress **/*.md **/*.html
+      env:
+        GITHUB_TOKEN: ${{ steps.get-app-token.outputs.token }}
+
+    - name: Create Issue From File
+      uses: peter-evans/create-issue-from-file@v3
+      with:
+        token: ${{ steps.get-app-token.outputs.token }}
+        title: 'Docs: Link Checker Report'
+        content-filepath: ./lychee/out.md
+        labels: documentation
