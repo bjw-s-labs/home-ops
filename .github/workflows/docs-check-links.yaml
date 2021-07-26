@@ -2,12 +2,13 @@
 name: 'Docs: Check links'
 
 on: # yamllint disable-line rule:truthy
-  repository_dispatch:
   schedule:
   - cron: "00 02 * * *"
-  push:
-    branches:
-    - gh-pages
+  workflow_run:
+    workflows:
+    - "Docs: Publish to GitHub Pages"
+    types:
+    - completed
 
 jobs:
   linkChecker:
