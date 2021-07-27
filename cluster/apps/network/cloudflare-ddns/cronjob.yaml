@@ -1,0 +1,43 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  namespace: network
+  name: cloudflare-ddns
+spec:
+  schedule: "0/30 * * * *"
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+
+          containers:
+          - name: cloudflare-ddns
+            image: ghcr.io/k8s-at-home/kubectl:v1.21.3
+            imagePullPolicy: IfNotPresent
+            env:
+            - name: TZ
+              value: Europe/Amsterdam
+            volumeMounts:
+            - mountPath: /scripts/run_ddns.sh
+              name: script
+              subPath: run_ddns.sh
+            - mountPath: /scripts/ddns_data.json
+              name: data
+              subPath: ddns_data.json
+              readOnly: true
+            command:
+            - "/bin/bash"
+            - "/scripts/run_ddns.sh"
+
+          volumes:
+          - name: script
+            configMap:
+              name: cloudflare-ddns-script
+          - name: data
+            secret:
+              secretName: cloudflare-ddns-data
