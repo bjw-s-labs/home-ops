@@ -4,7 +4,7 @@ hide:
 ---
 # Welcome
 
-{% import 'links.md.include' as links %}
+{% import 'links.jinja2' as links %}
 
 Welcome to the documentation for my {{ links.repoUrl('k8s-gitops') }} repo.
 

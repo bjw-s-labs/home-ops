@@ -1,6 +1,6 @@
 # Repository structure
 
-{% import 'links.md.include' as links %}
+{% import 'links.jinja2' as links %}
 
 The Git repository contains the following directories under {{ links.repoUrl('`cluster`', 'tree/main/cluster') }} and are ordered below by how Flux will apply them.
 

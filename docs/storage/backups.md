@@ -1,6 +1,6 @@
 # Backups
 
-{% import 'links.md.include' as links %}
+{% import 'links.jinja2' as links %}
 
 Backups of the data that lives inside my cluster are handled by {{ links.external('kasten') }}. This is a commercial backup solution, but is free to use for up to 10 nodes. Please see their website to see if your use case falls under the license agreement.
 

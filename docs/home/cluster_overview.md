@@ -1,6 +1,6 @@
 # Cluster overview
 
-{% import 'links.md.include' as links %}
+{% import 'links.jinja2' as links %}
 
 My cluster is {{ links.external('k3s') }} provisioned on Ubuntu 21.04 nodes using the {{ links.external('ansible') }} galaxy role {{ links.external('ansible-role-k3s') }}. This is a semi hyper-converged cluster, workloads and block storage are sharing the same available resources on my nodes.
 
