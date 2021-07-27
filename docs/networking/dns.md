@@ -34,9 +34,9 @@ This graph shows an example of how I expose one of my services both internally a
 
 <figure>
     <a
-      href="../../../_assets/images/dns_graph.svg"
+      href="../../_assets/images/dns_graph.svg"
       data-fancybox="gallery"
     >
-    <img src="../../../_assets/images/dns_graph.svg" width="600px" alt="DNS Graph"/>
+      <img src="../../_assets/images/dns_graph.svg" width="600px" alt="DNS Graph"/>
     </a>
 </figure>
