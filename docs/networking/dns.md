@@ -20,7 +20,7 @@ My DNS setup may seem a bit complicated at first, but it allows for completely a
 
 ### Dynamic DNS
 
-In order to keep my WAN IP address up to date on my DNS provider I use the Dynamic DNS tool that is built in to my router.
+In order to keep my WAN IP address up to date on my DNS provider I have deployed a CronJob ({{ links.repoUrl('link', 'blob/main/cluster/apps/network/cloudflare-ddns/cronjob.yaml') }}) in my cluster that periodically checks and updates those records.
 
 ## How it all works together
 
