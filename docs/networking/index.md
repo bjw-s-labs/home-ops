@@ -1,6 +1,6 @@
 # Networking
 
-{% import 'links.md.include' as links %}
+{% import 'links.jinja2' as links %}
 
 My current cluster-internal networking is implemented by {{ links.external('calico') }}.
 

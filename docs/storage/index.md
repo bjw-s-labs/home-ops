@@ -1,6 +1,6 @@
 # Storage
 
-{% import 'links.md.include' as links %}
+{% import 'links.jinja2' as links %}
 
 Storage in my cluster is handled in a number of ways.
 The in-cluster storage is provided by a {{ links.external('rook-ceph') }} cluster that is running on a number of my nodes.
