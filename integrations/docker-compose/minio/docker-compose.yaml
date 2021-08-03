@@ -12,12 +12,6 @@ services:
     - secret_key
     environment:
       MINIO_UPDATE: "off"
-    labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.minio.rule=Host(`${MINIO_HOSTNAME?Variable not set}`)"
-    - "traefik.http.routers.minio.entrypoints=websecure"
-    - "traefik.http.routers.minio.tls.certresolver=letsencrypt"
-    - "traefik.http.services.minio.loadbalancer.server.port=9000"
     volumes:
     - /volume1/Minio:/data
     - /volume1/docker/minio/config:/root/.minio
