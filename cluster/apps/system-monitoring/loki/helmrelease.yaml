@@ -17,6 +17,16 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
+    config:
+      storage_config:
+        aws:
+          s3: s3://${LOKI_MINIO_ACCESS_KEY}:${LOKI_MINIO_SECRET_KEY}@librarium.warhammer.lan:9000/loki
+          s3forcepathstyle: true
+        boltdb_shipper:
+          active_index_directory: /data/loki/index
+          cache_location: /data/loki/index_cache
+          resync_interval: 5s
+          shared_store: s3
     persistence:
       enabled: false
     serviceMonitor:
