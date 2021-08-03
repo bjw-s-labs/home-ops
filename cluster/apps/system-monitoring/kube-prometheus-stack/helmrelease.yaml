@@ -164,26 +164,33 @@ spec:
           hosts:
           - prometheus.${DOMAIN_1}
 
+      thanosService:
+        enabled: true
+
       prometheusSpec:
-        retention: 672h
-
-        ruleSelector: {}
-        ruleNamespaceSelector: {}
+        replicas: 1
+        replicaExternalLabelName: "replica"
         ruleSelectorNilUsesHelmValues: false
-        serviceMonitorSelector: {}
-        serviceMonitorNamespaceSelector: {}
         serviceMonitorSelectorNilUsesHelmValues: false
-        podMonitorSelector: {}
-        podMonitorNamespaceSelector: {}
         podMonitorSelectorNilUsesHelmValues: false
-
+        probeSelectorNilUsesHelmValues: false
+        retention: 6h
+        enableAdminAPI: true
+        walCompression: true
         storageSpec:
           volumeClaimTemplate:
             spec:
               storageClassName: "rook-ceph-block"
               resources:
                 requests:
-                  storage: 50Gi
+                  storage: 10Gi
+
+        thanos:
+          image: quay.io/thanos/thanos:v0.22.0
+          version: v0.22.0
+          objectStorageConfig:
+            name: thanos-objstore-secret
+            key: objstore.yml
 
         additionalScrapeConfigs:
         - job_name: 'opnsense-coredns'
