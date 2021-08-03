@@ -18,6 +18,7 @@ spec:
       interval: 5m
   timeout: 20m
   values:
+    replicas: 1
     deploymentStrategy:
       type: Recreate
 
@@ -25,6 +26,7 @@ spec:
       GF_EXPLORE_ENABLED: true
       GF_PANELS_DISABLE_SANITIZE_HTML: true
       GF_LOG_FILTERS: rendering:debug
+      GF_DATE_FORMATS_USE_BROWSER_LOCALE: true
       VAR_BLOCKY_URL: "http://blocky.network.svc.cluster.local:4000"
 
     admin:
@@ -65,12 +67,19 @@ spec:
     datasources:
       datasources.yaml:
         apiVersion: 1
+        deleteDatasources:
+        - name: Loki
+          orgId: 1
         datasources:
         - name: Prometheus
           type: prometheus
           url: http://prometheus-operated:9090
           access: proxy
           isDefault: true
+        - name: Loki
+          type: loki
+          access: proxy
+          url: http://loki.system-monitoring:3100
 
     dashboards:
       default:
