@@ -21,13 +21,10 @@ spec:
       repository: sirfragalot/hyperion.ng
       tag: 2.0.0-alpha.10-x86_64
 
-    podAnnotations:
-      k8s.v1.cni.cncf.io/networks: |
-        [{
-          "name":"macvlan-iot-static",
-          "namespace": "system",
-          "ips": ["${HYPERION_IOT_VLAN_IP}/24"]
-        }]
+    service:
+      main:
+        type: LoadBalancer
+        loadBalancerIP: "${LB_HYPERION}"
 
     env:
       TZ: "Europe/Amsterdam"
