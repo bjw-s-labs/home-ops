@@ -21,58 +21,42 @@ spec:
       repository: jacobalberty/unifi
       tag: v6.2.26
 
-    timezone: Europe/Amsterdam
+    env:
+      TZ: Europe/Amsterdam
 
-    persistence:
-      enabled: true
-      existingClaim: unifi-data
-
-    guiService:
-      type: LoadBalancer
-      annotations:
-        external-dns.alpha.kubernetes.io/hostname: unifi
-        coredns.io/hostname: unifi
-        traefik.ingress.kubernetes.io/service.serversscheme: https
-        metallb.universe.tf/allow-shared-ip: unifi
-      loadBalancerIP: ${LB_UNIFI}
-      externalTrafficPolicy: Local
-
-    controllerService:
-      type: LoadBalancer
-      annotations:
-        metallb.universe.tf/allow-shared-ip: unifi
-      loadBalancerIP: ${LB_UNIFI}
-      externalTrafficPolicy: Local
-
-    stunService:
-      type: LoadBalancer
-      annotations:
-        metallb.universe.tf/allow-shared-ip: unifi
-      loadBalancerIP: ${LB_UNIFI}
-      externalTrafficPolicy: Local
-
-    discoveryService:
-      type: LoadBalancer
-      annotations:
-        metallb.universe.tf/allow-shared-ip: unifi
-      loadBalancerIP: ${LB_UNIFI}
-      externalTrafficPolicy: Local
+    service:
+      main:
+        type: LoadBalancer
+        annotations:
+          coredns.io/hostname: unifi
+          traefik.ingress.kubernetes.io/service.serversscheme: https
+        loadBalancerIP: ${LB_UNIFI}
+        externalTrafficPolicy: Local
 
     ingress:
-      enabled: true
-      ingressClassName: "traefik"
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
 
-      hosts:
-      - unifi.${DOMAIN_1}
-      tls:
-      - secretName: tls.unifi-controller
         hosts:
-        - unifi.${DOMAIN_1}
+        - host: unifi.${DOMAIN_1}
+          paths:
+          - path: /
+
+        tls:
+        - secretName: tls.unifi-controller
+          hosts:
+          - unifi.${DOMAIN_1}
+
+    persistence:
+      data:
+        enabled: true
+        existingClaim: unifi-data
 
     resources:
       requests:
