@@ -17,11 +17,18 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
+    image:
+      repository: ghcr.io/k8s-at-home/loki
+
     config:
       storage_config:
         aws:
-          s3: s3://${LOKI_MINIO_ACCESS_KEY}:${LOKI_MINIO_SECRET_KEY}@librarium.warhammer.lan:9000/loki
+          bucketnames: loki
+          endpoint: librarium.warhammer.lan:9000
+          access_key_id: "${LOKI_MINIO_ACCESS_KEY}"
+          secret_access_key: "${LOKI_MINIO_SECRET_KEY}"
           s3forcepathstyle: true
+          insecure: true
         boltdb_shipper:
           active_index_directory: /data/loki/index
           cache_location: /data/loki/index_cache
