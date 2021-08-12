@@ -20,6 +20,10 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
+    image:
+      registry: ghcr.io
+      repository: k8s-at-home/promtail
+
     config:
       lokiAddress: http://loki.system-monitoring:3100/loki/api/v1/push
       snippets:
@@ -33,6 +37,7 @@ spec:
             relabel_configs:
             - source_labels: ['__syslog_message_hostname']
               target_label: host
+
     extraPorts:
       syslog:
         name: syslog
@@ -40,5 +45,6 @@ spec:
         service:
           type: LoadBalancer
           loadBalancerIP: ${LB_PROMTAIL}
+
     serviceMonitor:
       enabled: true
