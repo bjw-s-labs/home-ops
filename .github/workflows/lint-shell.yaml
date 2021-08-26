@@ -24,4 +24,5 @@ jobs:
       - if: ${{ steps.filter.outputs.shell == 'true' }}
         uses: reviewdog/action-shellcheck@v1
         with:
+          filter_mode: file
           shellcheck_flags: "${{ steps.filter.outputs.shell_files }}"
