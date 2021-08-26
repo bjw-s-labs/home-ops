@@ -6,8 +6,8 @@ metadata:
   namespace: downloads
 spec:
   dependsOn:
-  - name: vpn-gateway
-    namespace: vpn
+    - name: vpn-gateway
+      namespace: vpn
   interval: 5m
   chart:
     spec:
@@ -46,13 +46,13 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
         hosts:
-        - host: jackett.${DOMAIN_1}
-          paths:
-          - path: /
+          - host: jackett.${DOMAIN_1}
+            paths:
+              - path: /
         tls:
-        - secretName: tls.jackett
-          hosts:
-          - jackett.${DOMAIN_1}
+          - secretName: tls.jackett
+            hosts:
+              - jackett.${DOMAIN_1}
 
     resources:
       requests:

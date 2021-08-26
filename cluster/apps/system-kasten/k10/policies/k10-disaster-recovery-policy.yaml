@@ -13,14 +13,14 @@ spec:
     yearly: 1
   selector:
     matchExpressions:
-    - key: k10.kasten.io/appNamespace
-      operator: In
-      values:
-      - system-kasten
+      - key: k10.kasten.io/appNamespace
+        operator: In
+        values:
+          - system-kasten
   actions:
-  - action: backup
-    backupParameters:
-      filters: {}
-      profile:
-        name: nfs
-        namespace: system-kasten
+    - action: backup
+      backupParameters:
+        filters: {}
+        profile:
+          name: nfs
+          namespace: system-kasten

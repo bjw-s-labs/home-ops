@@ -32,11 +32,11 @@ spec:
         traefik.ingress.kubernetes.io/router.middlewares: system-security-ak-outpost-traefik-auth@kubernetescrd,system-ingress-rfc1918-ips@kubernetescrd
 
       hosts:
-      - host: echo-server.${DOMAIN_1}
-        paths:
-        - "/"
+        - host: echo-server.${DOMAIN_1}
+          paths:
+            - "/"
 
       tls:
-      - secretName: tls.echo-server
-        hosts:
-        - echo-server.${DOMAIN_1}
+        - secretName: tls.echo-server
+          hosts:
+            - echo-server.${DOMAIN_1}

@@ -22,16 +22,16 @@ spec:
       tag: v1.3.1
 
     routed_namespaces:
-    - downloads
+      - downloads
 
     publicPorts:
-    - hostname: qbittorrent #hostname assigned to the pod
-      IP: 10 # must be an integer between 2 and VXLAN_GATEWAY_FIRST_DYNAMIC_IP (20 by default)
-      ports:
-      - type: udp
-        port: ${VPN_FORWARDED_PORT_1}
-      - type: tcp
-        port: ${VPN_FORWARDED_PORT_1}
+      - hostname: qbittorrent #hostname assigned to the pod
+        IP: 10 # must be an integer between 2 and VXLAN_GATEWAY_FIRST_DYNAMIC_IP (20 by default)
+        ports:
+          - type: udp
+            port: ${VPN_FORWARDED_PORT_1}
+          - type: tcp
+            port: ${VPN_FORWARDED_PORT_1}
 
     settings:
       NOT_ROUTED_TO_GATEWAY_CIDRS: "${NETWORK_K8S_CLUSTER_CIDR} ${NETWORK_K8S_SERVICE_CIDR} ${NETWORK_MANAGEMENT_CIDR}"
@@ -57,9 +57,9 @@ spec:
     livenessProbe:
       exec:
         command:
-        - sh
-        - -c
-        - if [ $(wget -q -O- https://ipinfo.io/country) == '${VPN_COUNTRY}' ]; then exit 0; else exit $?; fi
+          - sh
+          - -c
+          - if [ $(wget -q -O- https://ipinfo.io/country) == '${VPN_COUNTRY}' ]; then exit 0; else exit $?; fi
       initialDelaySeconds: 30
       periodSeconds: 60
       failureThreshold: 1
@@ -97,16 +97,16 @@ spec:
           enabled: true
 
           egress:
-          - to:
-            - ipBlock:
-                cidr: 0.0.0.0/0
-            ports:
-            # VPN traffic port - change if your provider uses a different port
-            - port: ${VPN_PORT}
-              protocol: UDP
-          - to:
-              # Allow traffic within K8S - change if your K8S cluster uses a different CIDR
-            - ipBlock:
-                cidr: ${NETWORK_K8S_CLUSTER_CIDR}
-            - ipBlock:
-                cidr: ${NETWORK_K8S_SERVICE_CIDR}
+            - to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+              ports:
+                # VPN traffic port - change if your provider uses a different port
+                - port: ${VPN_PORT}
+                  protocol: UDP
+            - to:
+                # Allow traffic within K8S - change if your K8S cluster uses a different CIDR
+                - ipBlock:
+                    cidr: ${NETWORK_K8S_CLUSTER_CIDR}
+                - ipBlock:
+                    cidr: ${NETWORK_K8S_SERVICE_CIDR}

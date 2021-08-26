@@ -23,7 +23,7 @@ spec:
 
     podSecurityContext:
       supplementalGroups:
-      - 65539
+        - 65539
 
     env:
       TZ: "Europe/Amsterdam"
@@ -47,13 +47,13 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: system-security-ak-outpost-traefik-auth@kubernetescrd,system-ingress-rfc1918-ips@kubernetescrd
         hosts:
-        - host: readarr.${DOMAIN_1}
-          paths:
-          - path: /
+          - host: readarr.${DOMAIN_1}
+            paths:
+              - path: /
         tls:
-        - secretName: tls.readarr
-          hosts:
-          - readarr.${DOMAIN_1}
+          - secretName: tls.readarr
+            hosts:
+              - readarr.${DOMAIN_1}
 
     resources:
       requests:

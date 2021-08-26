@@ -45,15 +45,16 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
         hosts:
-        - host: kb.${DOMAIN_1}
-          paths:
-          - path: /
+          - host: kb.${DOMAIN_1}
+            paths:
+              - path: /
         tls:
-        - secretName: tls.bookstack
-          hosts:
-          - kb.${DOMAIN_1}
+          - secretName: tls.bookstack
+            hosts:
+              - kb.${DOMAIN_1}
 
-    resources: {}
+    resources:
+      {}
       # requests:
       #   cpu: "0.04"
       #   memory: "256M"

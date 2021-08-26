@@ -23,9 +23,9 @@ spec:
 
     podSecurityContext:
       supplementalGroups:
-      - 44
-      - 109
-      - 65539
+        - 44
+        - 109
+        - 65539
 
     env:
       TZ: "Europe/Amsterdam"
@@ -50,14 +50,14 @@ spec:
           external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
         hosts:
-        - host: plex.${DOMAIN_2}
-          paths:
-          - path: /
-            pathType: Prefix
+          - host: plex.${DOMAIN_2}
+            paths:
+              - path: /
+                pathType: Prefix
         tls:
-        - secretName: tls.plex
-          hosts:
-          - plex.${DOMAIN_2}
+          - secretName: tls.plex
+            hosts:
+              - plex.${DOMAIN_2}
 
     persistence:
       config:
@@ -88,8 +88,8 @@ spec:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
           nodeSelectorTerms:
-          - matchExpressions:
-            - key: feature.node.kubernetes.io/custom-intel-gpu
-              operator: In
-              values:
-              - "true"
+            - matchExpressions:
+                - key: feature.node.kubernetes.io/custom-intel-gpu
+                  operator: In
+                  values:
+                    - "true"

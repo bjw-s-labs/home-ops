@@ -6,7 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-  - name: flux-system-helm-repositories
+    - name: flux-system-helm-repositories
   interval: 10m0s
   path: ./cluster/crds
   prune: true
@@ -20,7 +20,7 @@ spec:
   postBuild:
     substitute: {}
     substituteFrom:
-    - kind: ConfigMap
-      name: cluster-settings
-    - kind: Secret
-      name: cluster-secrets
+      - kind: ConfigMap
+        name: cluster-settings
+      - kind: Secret
+        name: cluster-secrets

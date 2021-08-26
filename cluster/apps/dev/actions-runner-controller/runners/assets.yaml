@@ -10,12 +10,12 @@ spec:
       dockerdWithinRunnerContainer: true
       repository: bjw-s/assets
       volumeMounts:
-      - name: cache-volume
-        mountPath: /cache
+        - name: cache-volume
+          mountPath: /cache
       volumes:
-      - name: cache-volume
-        persistentVolumeClaim:
-          claimName: actions-runner-controller-runnercache
+        - name: cache-volume
+          persistentVolumeClaim:
+            claimName: actions-runner-controller-runnercache
 ---
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: HorizontalRunnerAutoscaler
@@ -26,15 +26,15 @@ spec:
   scaleTargetRef:
     name: runner-assets
   scaleUpTriggers:
-  - githubEvent:
-      checkRun:
-        types: ["created"]
-        status: "queued"
-    amount: 1
-    duration: "5m"
+    - githubEvent:
+        checkRun:
+          types: ["created"]
+          status: "queued"
+      amount: 1
+      duration: "5m"
   minReplicas: 1
   maxReplicas: 3
   metrics:
-  - type: TotalNumberOfQueuedAndInProgressWorkflowRuns
-    repositoryNames:
-    - bjw-s/container-assets
+    - type: TotalNumberOfQueuedAndInProgressWorkflowRuns
+      repositoryNames:
+        - bjw-s/container-assets
