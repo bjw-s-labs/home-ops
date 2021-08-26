@@ -1,16 +1,16 @@
 ---
-name: 'Docs: Publish to GitHub Pages'
+name: "Docs: Publish to GitHub Pages"
 
 on: # yamllint disable-line rule:truthy
   workflow_dispatch:
   push:
     branches:
-    - 'docs-*'
-    - main
+      - "docs-*"
+      - main
     paths:
-    - '.github/workflows/docs-publish.yaml'
-    - 'mkdocs.yaml'
-    - 'docs/**'
+      - ".github/workflows/docs-publish.yaml"
+      - "mkdocs.yaml"
+      - "docs/**"
 
 jobs:
   markdownlint:
@@ -18,67 +18,67 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 1
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
 
-    - name: markdownlint-cli
-      uses: nosborn/github-action-markdown-cli@v2.0.0
-      with:
-        files: 'README.md docs/**'
-        config_file: ".github/markdownlint.config.yaml"
+      - name: markdownlint-cli
+        uses: nosborn/github-action-markdown-cli@v2.0.0
+        with:
+          files: "README.md docs/**"
+          config_file: ".github/markdownlint.config.yaml"
 
   markdown-link-check:
     name: Markdown link check
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 1
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
 
-    - uses: gaurav-nelson/github-action-markdown-link-check@v1
-      with:
-        config-file: '.github/markdown-link-check_config.json'
-        file-path: './README.md'
+      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          config-file: ".github/markdown-link-check_config.json"
+          file-path: "./README.md"
 
   deploy:
     name: Deploy to GitHub Pages
     if: github.event.pull_request.head.repo.fork == false
     runs-on: ubuntu-20.04
     needs:
-    - markdownlint
-    - markdown-link-check
+      - markdownlint
+      - markdown-link-check
 
     steps:
-    - name: Get bjw-s-bot token
-      id: get-app-token
-      uses: getsentry/action-github-app-token@v1
-      with:
-        app_id: ${{ secrets.BJWS_APP_ID }}
-        private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
+      - name: Get bjw-s-bot token
+        id: get-app-token
+        uses: getsentry/action-github-app-token@v1
+        with:
+          app_id: ${{ secrets.BJWS_APP_ID }}
+          private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
 
-    - uses: actions/checkout@v2
-      with:
-        token: ${{ steps.get-app-token.outputs.token }}
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ steps.get-app-token.outputs.token }}
 
-    - uses: actions/setup-python@v2
-      with:
-        python-version: 3.x
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
 
-    - name: Configure Git
-      run: |
-        git config user.name "bjw-s[bot]"
-        git config user.email "bjw-s[bot]@users.noreply.github.com"
+      - name: Configure Git
+        run: |
+          git config user.name "bjw-s[bot]"
+          git config user.email "bjw-s[bot]@users.noreply.github.com"
 
-    - run: |
-        pip install \
-          mkdocs>=1.1 \
-          mkdocs-macros-plugin >=0.5 \
-          mkdocs-material >=1.0 \
-          mkdocs-minify-plugin>=0.3 \
-          mkdocs-redirects>=1.0
+      - run: |
+          pip install \
+            mkdocs>=1.1 \
+            mkdocs-macros-plugin >=0.5 \
+            mkdocs-material >=1.0 \
+            mkdocs-minify-plugin>=0.3 \
+            mkdocs-redirects>=1.0
 
-    - run: mkdocs gh-deploy --config-file ./mkdocs.yaml --force
+      - run: mkdocs gh-deploy --config-file ./mkdocs.yaml --force
 
-    - run: mkdocs --version
+      - run: mkdocs --version

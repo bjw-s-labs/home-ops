@@ -18,10 +18,10 @@ spec:
   placement:
     all:
       tolerations:
-      - effect: "NoExecute"
-        operator: "Exists"
-      - effect: "NoSchedule"
-        operator: "Exists"
+        - effect: "NoExecute"
+          operator: "Exists"
+        - effect: "NoSchedule"
+          operator: "Exists"
   monitoring:
     enabled: false
     rulesNamespace: rook-ceph
@@ -36,8 +36,8 @@ spec:
       iteration: 1
   mgr:
     modules:
-    - name: pg_autoscaler
-      enabled: true
+      - name: pg_autoscaler
+        enabled: true
   dashboard:
     enabled: true
     port: 7000
@@ -67,12 +67,12 @@ spec:
       metadataDevice:
       osdsPerDevice: "1"
     nodes:
-    - name: "k8s-master-a"
-      devices:
-      - name: "sdb"
-    - name: "k8s-master-b"
-      devices:
-      - name: "sdb"
-    - name: "k8s-master-c"
-      devices:
-      - name: "nvme0n1"
+      - name: "k8s-master-a"
+        devices:
+          - name: "sdb"
+      - name: "k8s-master-b"
+        devices:
+          - name: "sdb"
+      - name: "k8s-master-c"
+        devices:
+          - name: "nvme0n1"

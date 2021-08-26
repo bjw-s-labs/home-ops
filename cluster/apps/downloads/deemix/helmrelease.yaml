@@ -21,11 +21,11 @@ spec:
       pullPolicy: Always
 
     imagePullSecrets:
-    - name: registry-creds
+      - name: registry-creds
 
     podSecurityContext:
       supplementalGroups:
-      - 65539
+        - 65539
 
     enableServiceLinks: false
 
@@ -60,12 +60,12 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: system-security-ak-outpost-traefik-auth@kubernetescrd,system-ingress-rfc1918-ips@kubernetescrd
         hosts:
-        - host: deemix.${DOMAIN_1}
-          paths:
-          - path: /
+          - host: deemix.${DOMAIN_1}
+            paths:
+              - path: /
         tls:
-        - secretName: tls.deemix
-          hosts:
-          - deemix.${DOMAIN_1}
+          - secretName: tls.deemix
+            hosts:
+              - deemix.${DOMAIN_1}
 
     resources: {}

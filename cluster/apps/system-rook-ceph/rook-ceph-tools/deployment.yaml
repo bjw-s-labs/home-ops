@@ -18,44 +18,44 @@ spec:
     spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
-      - name: rook-ceph-tools
-        image: rook/ceph:v1.7.1
-        command: ["/tini"]
-        args: ["-g", "--", "/usr/local/bin/toolbox.sh"]
-        imagePullPolicy: IfNotPresent
+        - name: rook-ceph-tools
+          image: rook/ceph:v1.7.1
+          command: ["/tini"]
+          args: ["-g", "--", "/usr/local/bin/toolbox.sh"]
+          imagePullPolicy: IfNotPresent
 
-        env:
-        - name: ROOK_CEPH_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: rook-ceph-mon
-              key: ceph-username
-        - name: ROOK_CEPH_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: rook-ceph-mon
-              key: ceph-secret
+          env:
+            - name: ROOK_CEPH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rook-ceph-mon
+                  key: ceph-username
+            - name: ROOK_CEPH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: rook-ceph-mon
+                  key: ceph-secret
 
-        volumeMounts:
-        - mountPath: /etc/ceph
-          name: ceph-config
-        - name: mon-endpoint-volume
-          mountPath: /etc/rook
+          volumeMounts:
+            - mountPath: /etc/ceph
+              name: ceph-config
+            - name: mon-endpoint-volume
+              mountPath: /etc/rook
 
-        resources: {}
+          resources: {}
 
       volumes:
-      - name: mon-endpoint-volume
-        configMap:
-          name: rook-ceph-mon-endpoints
-          items:
-          - key: data
-            path: mon-endpoints
-      - name: ceph-config
-        emptyDir: {}
+        - name: mon-endpoint-volume
+          configMap:
+            name: rook-ceph-mon-endpoints
+            items:
+              - key: data
+                path: mon-endpoints
+        - name: ceph-config
+          emptyDir: {}
 
       tolerations:
-      - key: "node.kubernetes.io/unreachable"
-        operator: "Exists"
-        effect: "NoExecute"
-        tolerationSeconds: 5
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 5

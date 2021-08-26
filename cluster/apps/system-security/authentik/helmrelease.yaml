@@ -33,14 +33,14 @@ spec:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
 
       hosts:
-      - host: authentik.${DOMAIN_1}
-        paths:
-        - path: /
+        - host: authentik.${DOMAIN_1}
+          paths:
+            - path: /
 
       tls:
-      - secretName: tls.authentik
-        hosts:
-        - authentik.${DOMAIN_1}
+        - secretName: tls.authentik
+          hosts:
+            - authentik.${DOMAIN_1}
 
     authentik:
       secret_key: ${AUTHENTIK_SECRET_KEY}
@@ -50,12 +50,12 @@ spec:
         docker_image_base: ghcr.io/goauthentik/%(type)s:%(version)s
 
       postgresql:
-        host: '{{ .Release.Name }}-postgresql'
+        host: "{{ .Release.Name }}-postgresql"
         name: authentik
         user: authentik
         password: ${AUTHENTIK_POSTGRES_PASSWORD}
       redis:
-        host: '{{ .Release.Name }}-redis-master'
+        host: "{{ .Release.Name }}-redis-master"
         password: ${AUTHENTIK_REDIS_PASSWORD}
 
     postgresql:

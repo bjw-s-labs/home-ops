@@ -1,5 +1,4 @@
 ---
-
 - name: locale | set timezone
   community.general.timezone:
     name: "{{ timezone | default('Europe/Amsterdam') }}"
@@ -13,12 +12,12 @@
       FallbackNTP={{ ntp_servers.fallback | join(" ") }}
     dest: /etc/systemd/timesyncd.conf
   when:
-  - ntp_servers.primary is defined
-  - ntp_servers.primary is iterable
-  - ntp_servers.primary | length > 0
-  - ntp_servers.fallback is defined
-  - ntp_servers.fallback is iterable
-  - ntp_servers.fallback | length > 0
+    - ntp_servers.primary is defined
+    - ntp_servers.primary is iterable
+    - ntp_servers.primary | length > 0
+    - ntp_servers.fallback is defined
+    - ntp_servers.fallback is iterable
+    - ntp_servers.fallback | length > 0
 
 - name: locale | start systemd service
   ansible.builtin.systemd:
@@ -42,4 +41,4 @@
 - name: locale | enable ntp
   ansible.builtin.command: /usr/bin/timedatectl set-ntp true
   when:
-  - "'NTP=no' in timedatectl_result.stdout"
+    - "'NTP=no' in timedatectl_result.stdout"
