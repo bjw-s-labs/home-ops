@@ -2,6 +2,12 @@
 name: Lint - YAML files
 
 on: # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - main
+    paths:
+      - "**.yaml"
+      - "**.yml"
   pull_request:
     paths:
       - "**.yaml"
@@ -26,5 +32,6 @@ jobs:
       - if: ${{ steps.filter.outputs.yaml == 'true' }}
         uses: reviewdog/action-yamllint@v1
         with:
+          reporter: github-check
           filter_mode: file
           yamllint_flags: "-c .github/lint/.yamllint.yaml ${{ steps.filter.outputs.yaml_files }}"
