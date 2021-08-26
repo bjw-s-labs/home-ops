@@ -27,7 +27,8 @@ jobs:
               - added|modified: "**.sh"
 
       - if: ${{ steps.filter.outputs.shell == 'true' }}
-        uses: ludeeus/action-shellcheck@1.1.0
-        with:
-          scandir: ".github"
-          additional_files: "${{ steps.filter.outputs.shell_files }}"
+        uses: lumaxis/shellcheck-problem-matchers@v1.1.2
+
+      - if: ${{ steps.filter.outputs.shell == 'true' }}
+        shell: bash {0}
+        run: shellcheck ${{ steps.filter.outputs.shell_files }}; [[ $? == 1 ]]; exit $?
