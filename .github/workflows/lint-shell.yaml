@@ -1,0 +1,32 @@
+---
+name: Lint - Shell scripts
+
+on: # yamllint disable-line rule:truthy
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "**.sh"
+  pull_request:
+    paths:
+      - "**.sh"
+
+jobs:
+  main:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          list-files: shell
+          filters: |
+            shell:
+              - added|modified: "**.sh"
+
+      - if: ${{ steps.filter.outputs.shell == 'true' }}
+        uses: reviewdog/action-shellcheck@v1
+        with:
+          shellcheck_flags: "${{ steps.filter.outputs.shell_files }}"
