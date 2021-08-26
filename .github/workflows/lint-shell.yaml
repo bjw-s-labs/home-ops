@@ -27,6 +27,7 @@ jobs:
               - added|modified: "**.sh"
 
       - if: ${{ steps.filter.outputs.shell == 'true' }}
-        uses: reviewdog/action-shellcheck@v1
+        uses: ludeeus/action-shellcheck@1.1.0
         with:
-          shellcheck_flags: "${{ steps.filter.outputs.shell_files }}"
+          scandir: ".github"
+          additional_files: "${{ steps.filter.outputs.shell_files }}"
