@@ -30,6 +30,5 @@ jobs:
               - added|modified: "**.yml"
 
       - if: ${{ steps.filter.outputs.yaml == 'true' }}
-        uses: reviewdog/action-yamllint@v1
-        with:
-          yamllint_flags: "-c .github/lint/.yamllint.yaml ${{ steps.filter.outputs.yaml_files }}"
+        run: |
+          yamllint -c .github/lint/.yamllint.yaml ${{ steps.filter.outputs.yaml_files }}
