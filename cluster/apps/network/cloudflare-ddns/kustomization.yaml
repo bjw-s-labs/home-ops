@@ -1,7 +1,15 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: network
 resources:
-- secret.yaml
-- configmap.yaml
-- cronjob.yaml
+  - secret.yaml
+  - cronjob.yaml
+configMapGenerator:
+  - name: cloudflare-ddns
+    files:
+      - cloudflare-ddns.sh
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
