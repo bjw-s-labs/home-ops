@@ -1,7 +1,17 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: scripts
 resources:
-- ./configmap.yaml
-- ./secret.yaml
-- ./cronjob.yaml
+  - secret.sops.yaml
+  - cronjob.yaml
+configMapGenerator:
+  - name: mailbackup
+    files:
+      - getmail.sh
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    app: mailbackup
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
