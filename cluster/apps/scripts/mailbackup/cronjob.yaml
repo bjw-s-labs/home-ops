@@ -15,7 +15,8 @@ spec:
         spec:
           containers:
             - name: mailbackup-2020
-              image: ubuntu:focal-20201008
+              image: ubuntu:focal
+              imagePullPolicy: Always
               env:
                 - name: TZ
                   value: "Europe/Amsterdam"
@@ -23,29 +24,36 @@ spec:
                   value: "1028"
                 - name: GID
                   value: "100"
-              command: ['/bin/bash', '/scripts/getmail']
+              command:
+                - "/bin/bash"
+                - "/scripts/getmail.sh"
               volumeMounts:
-                - mountPath: /scripts/getmail
-                  name: mailbackup-config
-                  subPath: getmail
-                - mountPath: /config
-                  name: config
-                - mountPath: /config/getmailrc
-                  name: mailbackup-secrets
+                - name: mailbackup
+                  mountPath: /scripts/getmail.sh
+                  subPath: getmail.sh
+                  readOnly: true
+                # - mountPath: /config
+                #   name: config
+                - name: secrets
+                  mountPath: /config/getmailrc
                   subPath: getmailrc_2020
                   readOnly: true
                 - mountPath: /data
                   name: mailbackup-2020
-
           restartPolicy: OnFailure
-
           volumes:
-            - name: config
-              emptyDir: {}
-            - name: mailbackup-config
-              configMap:
-                name: mailbackup
-            - name: mailbackup-secrets
+            # - name: config
+            #   emptyDir: {}
+            - name: mailbackup
+              projected:
+                defaultMode: 0775
+                sources:
+                  - configMap:
+                      name: mailbackup
+                      items:
+                        - key: getmail.sh
+                          path: getmail.sh
+            - name: secrets
               secret:
                 secretName: mailbackup-secrets
             - name: mailbackup-2020
