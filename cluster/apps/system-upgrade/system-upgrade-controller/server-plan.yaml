@@ -11,18 +11,18 @@ spec:
   cordon: true
   nodeSelector:
     matchExpressions:
-    - key: node-role.kubernetes.io/master
-      operator: In
-      values:
-      - "true"
-    - key: k3s-upgrade
-      operator: In
-      values:
-      - "true"
+      - key: node-role.kubernetes.io/master
+        operator: In
+        values:
+          - "true"
+      - key: k3s-upgrade
+        operator: In
+        values:
+          - "true"
   tolerations:
-  - effect: "NoExecute"
-    operator: "Exists"
-  - effect: "NoSchedule"
-    operator: "Exists"
+    - effect: "NoExecute"
+      operator: "Exists"
+    - effect: "NoSchedule"
+      operator: "Exists"
   upgrade:
     image: rancher/k3s-upgrade

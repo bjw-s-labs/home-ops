@@ -34,20 +34,21 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
         hosts:
-        - host: esphome.${DOMAIN_1}
-          paths:
-          - path: /
+          - host: esphome.${DOMAIN_1}
+            paths:
+              - path: /
         tls:
-        - secretName: tls.esphome
-          hosts:
-          - "{{ (index .Values.ingress.main.hosts 0).host }}"
+          - secretName: tls.esphome
+            hosts:
+              - "{{ (index .Values.ingress.main.hosts 0).host }}"
 
     persistence:
       config:
         enabled: true
         existingClaim: esphome-config
 
-    resources: {}
+    resources:
+      {}
       # requests:
       #   memory: 300Mi
       #   cpu: 400m

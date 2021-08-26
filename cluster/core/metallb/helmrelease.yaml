@@ -19,10 +19,10 @@ spec:
   values:
     configInline:
       address-pools:
-      - name: default
-        protocol: layer2
-        addresses:
-        - "${METALLB_ARP_RANGE}"
+        - name: default
+          protocol: layer2
+          addresses:
+            - "${METALLB_ARP_RANGE}"
 
     prometheus:
       podMonitor:
@@ -33,7 +33,7 @@ spec:
 
     speaker:
       tolerations:
-      - effect: "NoExecute"
-        operator: "Exists"
-      - effect: "NoSchedule"
-        operator: "Exists"
+        - effect: "NoExecute"
+          operator: "Exists"
+        - effect: "NoSchedule"
+          operator: "Exists"

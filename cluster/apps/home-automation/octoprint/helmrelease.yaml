@@ -50,15 +50,15 @@ spec:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
           nodeSelectorTerms:
-          - matchExpressions:
-            - key: feature.node.kubernetes.io/custom-ender3
-              operator: In
-              values:
-              - "true"
-            - key: feature.node.kubernetes.io/custom-aukey_webcam
-              operator: In
-              values:
-              - "true"
+            - matchExpressions:
+                - key: feature.node.kubernetes.io/custom-ender3
+                  operator: In
+                  values:
+                    - "true"
+                - key: feature.node.kubernetes.io/custom-aukey_webcam
+                  operator: In
+                  values:
+                    - "true"
 
     ingress:
       main:
@@ -70,11 +70,11 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
         hosts:
-        - host: octoprint.${DOMAIN_1}
-          paths:
-          - path: /
+          - host: octoprint.${DOMAIN_1}
+            paths:
+              - path: /
 
         tls:
-        - secretName: tls.octoprint
-          hosts:
-          - octoprint.${DOMAIN_1}
+          - secretName: tls.octoprint
+            hosts:
+              - octoprint.${DOMAIN_1}

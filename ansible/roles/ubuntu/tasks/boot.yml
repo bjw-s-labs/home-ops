@@ -1,5 +1,4 @@
 ---
-
 - name: boot | grub | check for existence of grub
   ansible.builtin.stat:
     path: /etc/default/grub
@@ -14,7 +13,7 @@
     option: apparmor
     value: 0
   when:
-  - grub_result.stat.exists
+    - grub_result.stat.exists
 
 - name: boot | grub | set mitigations=off
   ansible.builtin.replace:
@@ -25,7 +24,7 @@
     option: mitigations
     value: "off"
   when:
-  - grub_result.stat.exists
+    - grub_result.stat.exists
 
 - name: boot | grub | set pti=off
   ansible.builtin.replace:
@@ -36,9 +35,9 @@
     option: pti
     value: "off"
   when:
-  - grub_result.stat.exists
+    - grub_result.stat.exists
 
 - name: boot | grub | run grub-mkconfig
   ansible.builtin.command: grub-mkconfig -o /boot/grub/grub.cfg
   when:
-  - grub_result.stat.exists
+    - grub_result.stat.exists

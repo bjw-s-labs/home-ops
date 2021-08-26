@@ -6,8 +6,8 @@ metadata:
   namespace: home-automation
 spec:
   dependsOn:
-  - name: mosquitto
-    namespace: home-automation
+    - name: mosquitto
+      namespace: home-automation
   interval: 5m
   chart:
     spec:
@@ -45,14 +45,14 @@ spec:
           traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
 
         hosts:
-        - host: zigbee2mqtt.${DOMAIN_1}
-          paths:
-          - path: /
+          - host: zigbee2mqtt.${DOMAIN_1}
+            paths:
+              - path: /
 
         tls:
-        - secretName: tls.zigbee2mqtt
-          hosts:
-          - zigbee2mqtt.${DOMAIN_1}
+          - secretName: tls.zigbee2mqtt
+            hosts:
+              - zigbee2mqtt.${DOMAIN_1}
 
     config:
       mqtt:
@@ -73,24 +73,24 @@ spec:
 
       advanced:
         log_output:
-        - console
+          - console
         network_key:
-        - 95
-        - 127
-        - 73
-        - 119
-        - 59
-        - 169
-        - 49
-        - 50
-        - 96
-        - 72
-        - 42
-        - 246
-        - 182
-        - 104
-        - 11
-        - 41
+          - 95
+          - 127
+          - 73
+          - 119
+          - 59
+          - 169
+          - 49
+          - 50
+          - 96
+          - 72
+          - 42
+          - 246
+          - 182
+          - 104
+          - 11
+          - 41
         pan_id: 6752
 
       # Both of these need to be enabled for the webui

@@ -6,8 +6,8 @@ metadata:
   namespace: downloads
 spec:
   dependsOn:
-  - name: vpn-gateway
-    namespace: vpn
+    - name: vpn-gateway
+      namespace: vpn
   interval: 5m
   chart:
     spec:
@@ -46,15 +46,16 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: system-security-ak-outpost-traefik-auth@kubernetescrd,system-ingress-rfc1918-ips@kubernetescrd
         hosts:
-        - host: prowlarr.${DOMAIN_1}
-          paths:
-          - path: /
+          - host: prowlarr.${DOMAIN_1}
+            paths:
+              - path: /
         tls:
-        - secretName: tls.prowlarr
-          hosts:
-          - "{{ (index .Values.ingress.main.hosts 0).host }}"
+          - secretName: tls.prowlarr
+            hosts:
+              - "{{ (index .Values.ingress.main.hosts 0).host }}"
 
-    resources: {}
+    resources:
+      {}
       # requests:
       #   cpu: "0.02"
       #   memory: "256M"

@@ -24,7 +24,7 @@ spec:
 
     podSecurityContext:
       supplementalGroups:
-      - 65539
+        - 65539
 
     env:
       TZ: "Europe/Amsterdam"
@@ -48,13 +48,13 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
         hosts:
-        - host: nzbget.${DOMAIN_1}
-          paths:
-          - path: /
+          - host: nzbget.${DOMAIN_1}
+            paths:
+              - path: /
         tls:
-        - secretName: tls.nzbget
-          hosts:
-          - nzbget.${DOMAIN_1}
+          - secretName: tls.nzbget
+            hosts:
+              - nzbget.${DOMAIN_1}
 
     resources:
       requests:

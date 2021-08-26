@@ -11,17 +11,17 @@ spec:
       name: letsencrypt-staging
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     solvers:
-    - dns01:
-        cloudflare:
-          apiKeySecretRef:
-            key: api_key
-            name: cloudflare-api-key-secret
-          email: ${EMAIL_1}
-      selector:
-        dnsZones:
-        - ${DOMAIN_1}
-        - ${DOMAIN_2}
-        - ${DOMAIN_3}
+      - dns01:
+          cloudflare:
+            apiKeySecretRef:
+              key: api_key
+              name: cloudflare-api-key-secret
+            email: ${EMAIL_1}
+        selector:
+          dnsZones:
+            - ${DOMAIN_1}
+            - ${DOMAIN_2}
+            - ${DOMAIN_3}
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -35,14 +35,14 @@ spec:
       name: letsencrypt-production
     server: https://acme-v02.api.letsencrypt.org/directory
     solvers:
-    - dns01:
-        cloudflare:
-          apiKeySecretRef:
-            key: api_key
-            name: cloudflare-api-key-secret
-          email: ${EMAIL_1}
-      selector:
-        dnsZones:
-        - ${DOMAIN_1}
-        - ${DOMAIN_2}
-        - ${DOMAIN_3}
+      - dns01:
+          cloudflare:
+            apiKeySecretRef:
+              key: api_key
+              name: cloudflare-api-key-secret
+            email: ${EMAIL_1}
+        selector:
+          dnsZones:
+            - ${DOMAIN_1}
+            - ${DOMAIN_2}
+            - ${DOMAIN_3}

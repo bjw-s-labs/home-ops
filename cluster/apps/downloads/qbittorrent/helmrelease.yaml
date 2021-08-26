@@ -6,8 +6,8 @@ metadata:
   namespace: downloads
 spec:
   dependsOn:
-  - name: vpn-gateway
-    namespace: vpn
+    - name: vpn-gateway
+      namespace: vpn
   interval: 5m
   chart:
     spec:
@@ -32,7 +32,7 @@ spec:
 
     podSecurityContext:
       supplementalGroups:
-      - 65539
+        - 65539
 
     settings:
       automaticPortSetup: false
@@ -60,13 +60,13 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
         hosts:
-        - host: qbittorrent.${DOMAIN_1}
-          paths:
-          - path: /
+          - host: qbittorrent.${DOMAIN_1}
+            paths:
+              - path: /
         tls:
-        - secretName: tls.qbittorrent
-          hosts:
-          - qbittorrent.${DOMAIN_1}
+          - secretName: tls.qbittorrent
+            hosts:
+              - qbittorrent.${DOMAIN_1}
 
     resources:
       requests:
