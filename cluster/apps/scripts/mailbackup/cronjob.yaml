@@ -32,8 +32,8 @@ spec:
                   mountPath: /scripts/getmail.sh
                   subPath: getmail.sh
                   readOnly: true
-                # - mountPath: /config
-                #   name: config
+                - mountPath: /config
+                  name: config
                 - name: secrets
                   mountPath: /config/getmailrc
                   subPath: getmailrc_2020
@@ -42,8 +42,8 @@ spec:
                   name: mailbackup-2020
           restartPolicy: OnFailure
           volumes:
-            # - name: config
-            #   emptyDir: {}
+            - name: config
+              emptyDir: {}
             - name: mailbackup
               projected:
                 defaultMode: 0775
