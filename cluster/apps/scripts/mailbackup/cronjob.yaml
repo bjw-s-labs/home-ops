@@ -13,50 +13,43 @@ spec:
     spec:
       template:
         spec:
+          securityContext:
+            supplementalGroups:
+              - 65541
           containers:
             - name: mailbackup-2020
-              image: ubuntu:focal
-              imagePullPolicy: Always
+              image: ghcr.io/k8s-at-home/getmail:v6.18.3
+              imagePullPolicy: IfNotPresent
               env:
                 - name: TZ
                   value: "Europe/Amsterdam"
-                - name: UID
-                  value: "1028"
-                - name: GID
-                  value: "100"
               command:
-                - "/bin/bash"
-                - "/scripts/getmail.sh"
+                - "/scripts/mailbackup.sh"
               volumeMounts:
-                - name: mailbackup
-                  mountPath: /scripts/getmail.sh
-                  subPath: getmail.sh
+                - name: mailbackup-script
+                  mountPath: /scripts/mailbackup.sh
+                  subPath: mailbackup.sh
                   readOnly: true
-                - mountPath: /config
-                  name: config
                 - name: secrets
-                  mountPath: /config/getmailrc
-                  subPath: getmailrc_2020
+                  mountPath: /config
                   readOnly: true
                 - mountPath: /data
-                  name: mailbackup-2020
+                  name: mailbackup
           restartPolicy: OnFailure
           volumes:
-            - name: config
-              emptyDir: {}
-            - name: mailbackup
+            - name: mailbackup-script
               projected:
                 defaultMode: 0775
                 sources:
                   - configMap:
                       name: mailbackup
                       items:
-                        - key: getmail.sh
-                          path: getmail.sh
+                        - key: mailbackup.sh
+                          path: mailbackup.sh
             - name: secrets
               secret:
                 secretName: mailbackup-secrets
-            - name: mailbackup-2020
+            - name: mailbackup
               nfs:
                 server: librarium.warhammer.lan
-                path: /volume1/Backup/Bernd/Email/2020
+                path: /volume1/Backup/Bernd/Email
