@@ -22,6 +22,3 @@ I have enabled the `MixedProtocolLBService=true` feature-gate on my cluster. Thi
 ### BGP
 
 Due to the way that BGP works, a node can only set up a single BGP connection to the router. Since I am already running {{ links.external('kube-vip') }} in BGP mode and I have a limited number of nodes, I am currently not using BGP mode to expose my services.
-
-!!! note
-    Currently when using BGP on Opnsense, services do not get properly load balanced. This is due to Opnsense not supporting multipath in the BSD kernel
