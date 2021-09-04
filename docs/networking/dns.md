@@ -12,7 +12,7 @@ My DNS setup may seem a bit complicated at first, but it allows for completely a
 
 ### CoreDNS with k8s_gateway
 
-{{ links.external('coredns') }} is running on my {{ links.external('opnsense') }} router. I have included the {{ links.external('coredns_k8s_gateway') }} plugin so that I can connect it directly to my cluster.
+{{ links.external('coredns') }} is running on my {{ links.external('vyos') }} router. I have included the {{ links.external('coredns_k8s_gateway') }} plugin so that I can connect it directly to my cluster.
 
 ### external-dns
 
