@@ -9,6 +9,7 @@ spec:
     spec:
       image: summerwind/actions-runner-dind
       dockerdWithinRunnerContainer: true
+      ephemeral: true
       repository: bjw-s/assets
       volumeMounts:
         - name: cache-volume
@@ -33,7 +34,7 @@ spec:
           status: "queued"
       amount: 1
       duration: "5m"
-  minReplicas: 1
+  minReplicas: 0
   maxReplicas: 3
   metrics:
     - type: TotalNumberOfQueuedAndInProgressWorkflowRuns
