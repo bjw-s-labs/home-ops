@@ -11,13 +11,17 @@ spec:
       dockerdWithinRunnerContainer: true
       ephemeral: true
       repository: bjw-s/container-images-private
+      securityContext:
+        supplementalGroups:
+          - 65542
       volumeMounts:
         - name: cache-volume
           mountPath: /cache
       volumes:
         - name: cache-volume
-          persistentVolumeClaim:
-            claimName: actions-runner-controller-runnercache
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /volume1/Cache/actions-runner-controller
 ---
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: HorizontalRunnerAutoscaler
