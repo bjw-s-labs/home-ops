@@ -1,0 +1,70 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: overleaf
+  namespace: selfhosted
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
+      chart: overleaf
+      version: 1.0.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: sharelatex/sharelatex
+      tag: 2.7.1
+
+    initContainers:
+      wait-for-redis:
+        image: groundnuty/k8s-wait-for:v1.3
+        args:
+          - "pod"
+          - "-lapp.kubernetes.io/instance=overleaf,app.kubernetes.io/name=redis"
+      wait-for-mongodb:
+        image: groundnuty/k8s-wait-for:v1.3
+        args:
+          - "pod"
+          - "-lapp.kubernetes.io/instance=overleaf,app.kubernetes.io/name=mongodb"
+
+    env:
+      TZ: "Europe/Amsterdam"
+      SHARELATEX_REDIS_HOST: overleaf-redis-master
+      REDIS_HOST: overleaf-redis-master
+      SHARELATEX_MONGO_URL: mongodb://overleaf-mongodb:27017/sharelatex
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+        hosts:
+          - host: overleaf.${DOMAIN_1}
+            paths:
+              - path: /
+        tls:
+          - secretName: tls.overleaf
+            hosts:
+              - "{{ (index .Values.ingress.main.hosts 0).host }}"
+
+    resources: {}
+
+    redis:
+      enabled: true
+      fullnameOverride: overleaf-redis
+      replica:
+        replicaCount: 1
+
+    mongodb:
+      enabled: true
+      fullnameOverride: overleaf-mongodb
