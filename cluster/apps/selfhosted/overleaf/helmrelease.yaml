@@ -26,12 +26,12 @@ spec:
 
     initContainers:
       wait-for-redis:
-        image: groundnuty/k8s-wait-for:v1.3
+        image: groundnuty/k8s-wait-for:v1.5
         args:
           - "pod"
           - "-lapp.kubernetes.io/instance=overleaf,app.kubernetes.io/name=redis"
       wait-for-mongodb:
-        image: groundnuty/k8s-wait-for:v1.3
+        image: groundnuty/k8s-wait-for:v1.5
         args:
           - "pod"
           - "-lapp.kubernetes.io/instance=overleaf,app.kubernetes.io/name=mongodb"
