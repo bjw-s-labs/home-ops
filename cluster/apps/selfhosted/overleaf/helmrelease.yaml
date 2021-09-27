@@ -65,6 +65,11 @@ spec:
             hosts:
               - "{{ (index .Values.ingress.main.hosts 0).host }}"
 
+    persistence:
+      data:
+        enabled: true
+        existingClaim: overleaf-data
+
     resources: {}
 
     redis:
