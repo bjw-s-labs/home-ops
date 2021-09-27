@@ -21,6 +21,9 @@ spec:
       repository: sharelatex/sharelatex
       tag: 2.7.1
 
+    serviceAccount:
+      name: overleaf
+
     initContainers:
       wait-for-redis:
         image: groundnuty/k8s-wait-for:v1.3
@@ -38,6 +41,11 @@ spec:
       SHARELATEX_REDIS_HOST: overleaf-redis-master
       REDIS_HOST: overleaf-redis-master
       SHARELATEX_MONGO_URL: mongodb://overleaf-mongodb:27017/sharelatex
+      SHARELATEX_APP_NAME: "BJW-S Overleaf"
+      SHARELATEX_ALLOW_PUBLIC_ACCESS: "false"
+      SHARELATEX_ALLOW_ANONYMOUS_READ_AND_WRITE_SHARING: "false"
+      SHARELATEX_BEHIND_PROXY: "true"
+      EMAIL_CONFIRMATION_DISABLED: "true"
 
     ingress:
       main:
@@ -68,3 +76,6 @@ spec:
     mongodb:
       enabled: true
       fullnameOverride: overleaf-mongodb
+      persistence:
+        enabled: true
+        existingClaim: overleaf-mongodb
