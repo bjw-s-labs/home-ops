@@ -53,12 +53,10 @@ spec:
               - vaultwarden.${DOMAIN_3}
 
     resources:
-      {}
-      # requests:
-      #   cpu: "0.01"
-      #   memory: "305M"
-      # limits:
-      #   memory: "512M"
+      requests:
+        memory: "256M"
+      limits:
+        memory: "384M"
 
     postgresql:
       enabled: true
@@ -70,3 +68,9 @@ spec:
       persistence:
         enabled: true
         existingClaim: vaultwarden-postgresql
+
+      resources:
+        requests:
+          memory: 128Mi
+        limits:
+          memory: 256Mi
