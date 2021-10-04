@@ -58,6 +58,18 @@ spec:
         host: "{{ .Release.Name }}-redis-master"
         password: ${AUTHENTIK_REDIS_PASSWORD}
 
+    resources:
+      server:
+        requests:
+          memory: 384Mi
+        limits:
+          memory: 512Mi
+      worker:
+        requests:
+          memory: 384Mi
+        limits:
+          memory: 512Mi
+
     postgresql:
       enabled: true
       persistence:
@@ -68,8 +80,21 @@ spec:
       postgresqlDatabase: authentik
       postgresqlPassword: ${AUTHENTIK_POSTGRES_PASSWORD}
 
+      resources:
+        requests:
+          memory: 256Mi
+        limits:
+          memory: 512Mi
+
     redis:
       enabled: true
       auth:
         enabled: true
         password: ${AUTHENTIK_REDIS_PASSWORD}
+
+      master:
+        resources:
+          requests:
+            memory: 32Mi
+          limits:
+            memory: 64Mi

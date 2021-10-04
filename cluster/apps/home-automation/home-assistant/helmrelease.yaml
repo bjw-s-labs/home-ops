@@ -102,6 +102,12 @@ spec:
       postgresqlDatabase: home-assistant
       postgresqlPassword: ${HASS_POSTGRES_PASSWORD}
 
+      resources:
+        requests:
+          memory: 1024Mi
+        limits:
+          memory: 2048Mi
+
     addons:
       codeserver:
         enabled: true

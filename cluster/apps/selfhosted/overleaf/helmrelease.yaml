@@ -70,13 +70,30 @@ spec:
         enabled: true
         existingClaim: overleaf-data
 
-    resources: {}
+    resources:
+      requests:
+        memory: 768Mi
+      limits:
+        memory: 1024Mi
 
     redis:
       enabled: true
       fullnameOverride: overleaf-redis
+
+      master:
+        resources:
+          requests:
+            memory: 32Mi
+          limits:
+            memory: 64Mi
+
       replica:
         replicaCount: 1
+        resources:
+          requests:
+            memory: 32Mi
+          limits:
+            memory: 64Mi
 
     mongodb:
       enabled: true
@@ -84,3 +101,9 @@ spec:
       persistence:
         enabled: true
         existingClaim: overleaf-mongodb
+
+      resources:
+        requests:
+          memory: 256Mi
+        limits:
+          memory: 512Mi
