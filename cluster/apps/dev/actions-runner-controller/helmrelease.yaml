@@ -29,12 +29,20 @@ spec:
     image:
       repository: summerwind/actions-runner-controller
 
+    resources:
+      requests:
+        memory: 64Mi
+      limits:
+        memory: 128Mi
+
     githubWebhookServer:
       enabled: true
       syncPeriod: 10m
+
       secret:
         create: false
         name: "actions-runner-controller-webhook"
+
       ingress:
         enabled: true
         annotations:
@@ -52,3 +60,9 @@ spec:
           - hosts:
               - acr-hook.${DOMAIN_1}
             secretName: tls.acr-hook
+
+      resources:
+        requests:
+          memory: 64Mi
+        limits:
+          memory: 96Mi
