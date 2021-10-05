@@ -53,4 +53,8 @@ spec:
             hosts:
               - "{{ (index .Values.ingress.main.hosts 0).host }}"
 
-    resources: {}
+    resources:
+      requests:
+        memory: 64M
+      limits:
+        memory: 128M
