@@ -23,6 +23,11 @@ spec:
           nfs:
             server: "${NAS_ADDRESS}"
             path: /volume1/Cache/actions-runner-controller
+      resources:
+        requests:
+          memory: 256Mi
+        limits:
+          memory: 384Mi
 ---
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: HorizontalRunnerAutoscaler
