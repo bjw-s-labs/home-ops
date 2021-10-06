@@ -49,6 +49,15 @@ spec:
       outposts:
         docker_image_base: ghcr.io/goauthentik/%(type)s:%(version)s
 
+      email:
+        host: ${AUTHENTIK_SMTP_SERVER}
+        port: 587
+        username: ${AUTHENTIK_SMTP_USERNAME}
+        password: ${AUTHENTIK_SMTP_PASSWORD}
+        use_tls: true
+        use_ssl: false
+        from: "Authentik <authentik@mg.${DOMAIN_1}>"
+
       postgresql:
         host: "{{ .Release.Name }}-postgresql"
         name: authentik
