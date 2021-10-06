@@ -100,6 +100,7 @@ spec:
           type: edgetpu
           device: usb
 
+      # Global objects configuration
       objects:
         track:
           - person
@@ -109,6 +110,7 @@ spec:
             max_area: 100000
             threshold: 0.5
 
+      # Global ffmpeg configuration
       ffmpeg:
         hwaccel_args:
           - -hwaccel
@@ -118,32 +120,38 @@ spec:
           - -hwaccel_output_format
           - yuv420p
 
+      # Specify camera's
       cameras:
         doorbell:
+          # Camera-specific ffmpeg configuration
           ffmpeg:
             inputs:
               - path: ${FRIGATE_CAMERA_DOORBELL_MAIN}
                 roles:
-                  - clips
                   - rtmp
               - path: ${FRIGATE_CAMERA_DOORBELL_SUBSTREAM}
                 roles:
                   - detect
 
-          # Required: width of the frame for the input with the detect role
-          width: 720
-          # Required: height of the frame for the input with the detect role
-          height: 576
-          fps: 15
-
-          clips:
+          # Enable rtmp stream for camera
+          rtmp:
             enabled: True
-            objects:
-              - person
-            retain:
-              # Required: Default retention days (default: shown below)
-              default: 14
 
+          # Camera-specific detection configuration
+          detect:
+            width: 720
+            height: 576
+            fps: 15
+
+          # Camera-specific recording configuration
+          record:
+            enabled: True
+            retain_days: 0
+            events:
+              retain:
+                default: 14
+
+          # Camera-specific snapshots configuration
           snapshots:
             enabled: True
             timestamp: True
@@ -151,9 +159,7 @@ spec:
               # Required: Default retention days (default: shown below)
               default: 14
 
-          rtmp:
-            enabled: True
-
+          # Camera-specific objects configuration
           objects:
             track:
               - person
