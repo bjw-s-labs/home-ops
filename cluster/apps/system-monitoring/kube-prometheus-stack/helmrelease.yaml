@@ -18,14 +18,6 @@ spec:
       interval: 5m
   timeout: 20m
   values:
-    server:
-      resources:
-        requests:
-          memory: 1000Mi
-          cpu: 25m
-        limits:
-          memory: 2000Mi
-
     prometheusOperator:
       createCustomResource: false
 
@@ -101,6 +93,12 @@ spec:
               resources:
                 requests:
                   storage: 10Gi
+
+        resources:
+          requests:
+            memory: 48Mi
+          limits:
+            memory: 96Mi
 
     grafana:
       enabled: false
