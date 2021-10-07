@@ -19,7 +19,9 @@ spec:
   values:
     image:
       repository: ghcr.io/home-assistant/home-assistant
-      tag: 2021.9.7
+      tag: 2021.10.0
+
+    nameOverride: "home-assistant"
 
     podAnnotations:
       secret.reloader.stakater.com/reload: home-assistant-secrets
@@ -112,6 +114,10 @@ spec:
       codeserver:
         enabled: true
 
+        image:
+          repository: ghcr.io/bjw-s/code-server
+          tag: v3.12.0
+
         git:
           deployKeySecret: home-assistant-deploykey
 
@@ -132,12 +138,13 @@ spec:
               hosts:
                 - code-domo.${DOMAIN_1}
 
+        env:
+          EXTENSIONS: keesschollaart.vscode-home-assistant
+
         args:
           - --auth
           - none
           - --user-data-dir
-          - "/config/.vscode"
-          - --extensions-dir
           - "/config/.vscode"
 
         workingDir: "/config"
