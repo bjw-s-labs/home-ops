@@ -117,6 +117,7 @@ spec:
         image:
           repository: ghcr.io/bjw-s/code-server
           tag: v3.12.0
+          pullPolicy: Always
 
         git:
           deployKeySecret: home-assistant-deploykey
@@ -139,7 +140,8 @@ spec:
                 - code-domo.${DOMAIN_1}
 
         env:
-          EXTENSIONS: keesschollaart.vscode-home-assistant
+          EXTENSION_URLS: |
+            https://marketplace.visualstudio.com/_apis/public/gallery/publishers/keesschollaart/vsextensions/vscode-home-assistant/1.21.0/vspackage
 
         args:
           - --auth
