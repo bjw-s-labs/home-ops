@@ -31,7 +31,11 @@ spec:
         existingClaim: calibre-config
       media:
         enabled: true
-        existingClaim: nfs-nas-media
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /volume1/Media
         mountPath: /data/nas-media
 
     service:
