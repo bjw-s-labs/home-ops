@@ -55,5 +55,6 @@ spec:
               configMap:
                 name: series-cleanup-config
             - name: nas-media
-              persistentVolumeClaim:
-                claimName: nfs-nas-media
+              nfs:
+                server: "${NAS_ADDRESS}"
+                path: /volume1/Media
