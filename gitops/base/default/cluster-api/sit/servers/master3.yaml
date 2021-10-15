@@ -9,6 +9,10 @@ spec:
   accepted: true
   hostname: master3.cluster-0.sit.${CLUSTER_DOMAIN}
   pxeBootAlways: true
+  configPatches:
+    - op: replace
+      path: /machine/install/disk
+      value: /dev/sda
   cpu:
     manufacturer: Intel(R) Corporation
     version: Intel(R) Core(TM) i3-6100T CPU @ 3.20GHz

@@ -504,7 +504,7 @@ spec:
               value: "cluster-0.sit.bjw-s.tech"
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
-          image: "quay.io/cilium/cilium:v1.10.5@sha256:0612218e28288db360c63677c09fafa2d17edda4f13867bcabf87056046b33bb"
+          image: "quay.io/cilium/cilium:v1.10.4@sha256:7d354052ccf2a7445101d78cebd14444c7c40129ce7889f2f04b89374dbf8a1d"
           imagePullPolicy: IfNotPresent
           lifecycle:
             postStart:
@@ -567,7 +567,7 @@ spec:
             # same directory where we install cilium cni plugin so that exec permissions
             # are available.
             - 'cp /usr/bin/cilium-mount /hostbin/cilium-mount && nsenter --cgroup=/hostproc/1/ns/cgroup --mount=/hostproc/1/ns/mnt "${BIN_PATH}/cilium-mount" $CGROUP_ROOT; rm /hostbin/cilium-mount'
-          image: "quay.io/cilium/cilium:v1.10.5@sha256:0612218e28288db360c63677c09fafa2d17edda4f13867bcabf87056046b33bb"
+          image: "quay.io/cilium/cilium:v1.10.4@sha256:7d354052ccf2a7445101d78cebd14444c7c40129ce7889f2f04b89374dbf8a1d"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /hostproc
@@ -595,7 +595,7 @@ spec:
               value: "cluster-0.sit.bjw-s.tech"
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
-          image: "quay.io/cilium/cilium:v1.10.5@sha256:0612218e28288db360c63677c09fafa2d17edda4f13867bcabf87056046b33bb"
+          image: "quay.io/cilium/cilium:v1.10.4@sha256:7d354052ccf2a7445101d78cebd14444c7c40129ce7889f2f04b89374dbf8a1d"
           imagePullPolicy: IfNotPresent
           name: clean-cilium-state
           securityContext:
@@ -649,27 +649,27 @@ spec:
             path: /opt/cni/bin
             type: DirectoryOrCreate
           name: cni-path
-        # To install cilium cni configuration in the host
+          # To install cilium cni configuration in the host
         - hostPath:
             path: /etc/cni/net.d
             type: DirectoryOrCreate
           name: etc-cni-netd
-        # To be able to load kernel modules
+          # To be able to load kernel modules
         - hostPath:
             path: /lib/modules
           name: lib-modules
-        # To access iptables concurrently with other processes (e.g. kube-proxy)
+          # To access iptables concurrently with other processes (e.g. kube-proxy)
         - hostPath:
             path: /run/xtables.lock
             type: FileOrCreate
           name: xtables-lock
-        # To read the clustermesh configuration
+          # To read the clustermesh configuration
         - name: clustermesh-secrets
           secret:
             defaultMode: 420
             optional: true
             secretName: cilium-clustermesh
-        # To read the configuration from the config map
+          # To read the configuration from the config map
         - configMap:
             name: cilium-config
           name: cilium-config-path
@@ -755,7 +755,7 @@ spec:
               value: "cluster-0.sit.bjw-s.tech"
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
-          image: "quay.io/cilium/operator-generic:v1.10.5@sha256:2d2f730f219d489ff0702923bf24c0002cd93eb4b47ba344375566202f56d972"
+          image: "quay.io/cilium/operator-generic:v1.10.4@sha256:c49a14e34634ff1a494c84b718641f27267fb3a0291ce3d74352b44f8a8d2f93"
           imagePullPolicy: IfNotPresent
           name: cilium-operator
           livenessProbe:
