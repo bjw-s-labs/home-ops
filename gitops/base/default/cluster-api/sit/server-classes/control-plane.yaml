@@ -1,0 +1,50 @@
+---
+apiVersion: metal.sidero.dev/v1alpha1
+kind: ServerClass
+metadata:
+  name: k8s-control-plane
+spec:
+  configPatches:
+    - op: replace
+      path: /machine/install/disk
+      value: /dev/sda
+    - op: replace
+      path: /persist
+      value: false
+    - op: add
+      path: /machine/kubelet/extraArgs
+      value:
+        rotate-server-certificates: true
+        feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+    - op: add
+      path: /machine/time
+      value:
+        disabled: false
+        servers:
+          - 10.1.1.1
+    - op: add
+      path: /machine/network/interfaces
+      value:
+        - interface: eth0
+          dhcp: true
+          vip:
+            ip: 10.1.1.20
+          vlans:
+            - vlanId: 40
+              dhcp: false
+    - op: replace
+      path: /cluster/proxy/disabled
+      value: true
+    - op: add
+      path: /machine/certSANs
+      value:
+        - cluster-0.sit.${CLUSTER_DOMAIN}
+    - op: replace
+      path: /cluster/network/cni
+      value:
+        name: "custom"
+        urls:
+          - "https://raw.githubusercontent.com/bjw-s/k8s-gitops/main/clusters/sit/integrations/cilium-quick-install/cluster-0-quick-install.yaml"
+  selector:
+    matchLabels:
+      controlplane: "true"

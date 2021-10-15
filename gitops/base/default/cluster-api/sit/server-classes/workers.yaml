@@ -1,0 +1,35 @@
+---
+apiVersion: metal.sidero.dev/v1alpha1
+kind: ServerClass
+metadata:
+  name: k8s-workers
+spec:
+  configPatches:
+    - op: replace
+      path: /persist
+      value: false
+    - op: add
+      path: /machine/kubelet/extraArgs
+      value:
+        rotate-server-certificates: true
+        feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+    - op: add
+      path: /machine/time
+      value:
+        disabled: false
+        servers:
+          - 10.1.1.1
+    - op: add
+      path: /machine/network/interfaces
+      value:
+        - interface: eth0
+          dhcp: true
+          vlans:
+            - vlanId: 40
+              dhcp: false
+  selector:
+    matchExpressions:
+      - key: master
+        operator: NotIn
+        values:
+          - "true"
