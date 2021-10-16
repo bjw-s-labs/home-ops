@@ -1,0 +1,44 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-namespace
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./gitops/base/system"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-multus
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./gitops/base/system/multus/base"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-multus-config
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./gitops/base/system/multus/overlays/cluster-0"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: system-multus
