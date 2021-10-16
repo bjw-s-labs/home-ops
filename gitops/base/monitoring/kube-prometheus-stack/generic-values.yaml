@@ -1,0 +1,67 @@
+---
+fullnameOverride: prometheus
+
+coreDns:
+  enabled: true
+
+kubeApiServer:
+  enabled: true
+
+kubeControllerManager:
+  enabled: false
+
+kubeEtcd:
+  enabled: false
+
+kubelet:
+  enabled: true
+  serviceMonitor:
+    metricRelabelings:
+      - action: replace
+        sourceLabels:
+          - node
+        targetLabel: instance
+
+kubeProxy:
+  enabled: false
+
+kubeScheduler:
+  enabled: false
+
+kubeStateMetrics:
+  enabled: true
+
+prometheusOperator:
+  # Setting this option to 0 to disable cpu limits
+  # see https://github.com/prometheus-operator/prometheus-operator/blob/master/cmd/operator/main.go#L175
+  configReloaderCpu: 0
+
+grafana:
+  enabled: false
+  forceDeployDashboards: true
+  sidecar:
+    dashboards:
+      multicluster:
+        global:
+          enabled: true
+
+kube-state-metrics:
+  fullnameOverride: kube-state-metrics
+
+nodeExporter:
+  serviceMonitor:
+    relabelings:
+      - action: replace
+        regex: (.*)
+        replacement: $1
+        sourceLabels:
+          - __meta_kubernetes_pod_node_name
+        targetLabel: kubernetes_node
+
+prometheus-node-exporter:
+  fullnameOverride: node-exporter
+  tolerations:
+    - effect: "NoExecute"
+      operator: "Exists"
+    - effect: "NoSchedule"
+      operator: "Exists"
