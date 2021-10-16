@@ -20,6 +20,11 @@ spec:
         servers:
           - 10.1.1.1
     - op: add
+      path: /machine/sysctls
+      value:
+        fs.inotify.max_user_watches: "524288"
+        fs.inotify.max_user_instances: "512"
+    - op: add
       path: /machine/network/interfaces
       value:
         - interface: eth0
