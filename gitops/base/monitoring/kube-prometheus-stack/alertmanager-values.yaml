@@ -61,13 +61,14 @@ alertmanager:
   #         - alertmanager.${CLUSTER_NAME}.${INGRESS_DOMAIN}
 
   alertmanagerSpec:
-    storage:
-      volumeClaimTemplate:
-        spec:
-          storageClassName: "rook-ceph-block"
-          resources:
-            requests:
-              storage: 10Gi
+    # TODO: Uncomment when storage is in place
+    # storage:
+    #   volumeClaimTemplate:
+    #     spec:
+    #       storageClassName: "rook-ceph-block"
+    #       resources:
+    #         requests:
+    #           storage: 10Gi
 
     resources:
       requests:
