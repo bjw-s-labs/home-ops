@@ -24,6 +24,13 @@ spec:
       repository: ghcr.io/koenkk/zigbee2mqtt
       tag: 1.21.2
 
+    podAnnotations:
+      backup.velero.io/backup-volumes: data
+      pre.hook.backup.velero.io/container: fsfreeze
+      pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/data"]'
+      post.hook.backup.velero.io/container: fsfreeze
+      post.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--unfreeze", "/data"]'
+
     env:
       TZ: "Europe/Amsterdam"
       ZIGBEE2MQTT_DATA: /data
@@ -102,3 +109,13 @@ spec:
         memory: 128Mi
       limits:
         memory: 192Mi
+
+    additionalContainers:
+      fsfreeze:
+        name: fsfreeze
+        image: ghcr.io/k8s-at-home/fsfreeze:v2.37-r0
+        volumeMounts:
+          - name: data
+            mountPath: /data
+        securityContext:
+          privileged: true
