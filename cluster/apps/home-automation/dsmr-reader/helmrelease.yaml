@@ -70,6 +70,23 @@ spec:
       postgresqlPassword: ${DSMR_READER_POSTGRESS_PASSWORD}
       postgresqlDatabase: dsmr-reader
 
+      primary:
+        podAnnotations:
+          backup.velero.io/backup-volumes: data
+          pre.hook.backup.velero.io/container: fsfreeze
+          pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/data"]'
+          post.hook.backup.velero.io/container: fsfreeze
+          post.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--unfreeze", "/data"]'
+
+        sidecars:
+          - name: fsfreeze
+            image: ghcr.io/k8s-at-home/fsfreeze:v2.37-r0
+            volumeMounts:
+              - name: data
+                mountPath: /data
+            securityContext:
+              privileged: true
+
       persistence:
         enabled: true
         existingClaim: dsmr-reader-postgresql
