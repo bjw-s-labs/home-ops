@@ -26,6 +26,11 @@ spec:
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "frigate-config"
+      backup.velero.io/backup-volumes: data
+      pre.hook.backup.velero.io/container: fsfreeze
+      pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/data"]'
+      post.hook.backup.velero.io/container: fsfreeze
+      post.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--unfreeze", "/data"]'
 
     env:
       TZ: Europe/Amsterdam
@@ -177,3 +182,13 @@ spec:
       limits:
         gpu.intel.com/i915: 1
         memory: 1000Mi
+
+    additionalContainers:
+      fsfreeze:
+        name: fsfreeze
+        image: ghcr.io/k8s-at-home/fsfreeze:v2.37-r0
+        volumeMounts:
+          - name: data
+            mountPath: /data
+        securityContext:
+          privileged: true
