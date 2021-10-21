@@ -21,6 +21,13 @@ spec:
       repository: vaultwarden/server
       tag: 1.23.0
 
+    podAnnotations:
+      backup.velero.io/backup-volumes: config
+      pre.hook.backup.velero.io/container: fsfreeze
+      pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/data"]'
+      post.hook.backup.velero.io/container: fsfreeze
+      post.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--unfreeze", "/data"]'
+
     env:
       TZ: "Europe/Amsterdam"
       DATABASE_URL: postgresql://vaultwarden:${VAULTWARDEN_POSTGRES_PASSWORD}@vaultwarden-postgresql:5432/vaultwarden
@@ -58,12 +65,39 @@ spec:
       limits:
         memory: "384M"
 
+    additionalContainers:
+      fsfreeze:
+        name: fsfreeze
+        image: ghcr.io/k8s-at-home/fsfreeze:v2.37-r0
+        volumeMounts:
+          - name: config
+            mountPath: /data
+        securityContext:
+          privileged: true
+
     postgresql:
       enabled: true
 
       postgresqlUsername: vaultwarden
       postgresqlPassword: ${VAULTWARDEN_POSTGRES_PASSWORD}
       postgresqlDatabase: vaultwarden
+
+      primary:
+        podAnnotations:
+          backup.velero.io/backup-volumes: data
+          pre.hook.backup.velero.io/container: fsfreeze
+          pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/data"]'
+          post.hook.backup.velero.io/container: fsfreeze
+          post.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--unfreeze", "/data"]'
+
+        sidecars:
+          - name: fsfreeze
+            image: ghcr.io/k8s-at-home/fsfreeze:v2.37-r0
+            volumeMounts:
+              - name: data
+                mountPath: /data
+            securityContext:
+              privileged: true
 
       persistence:
         enabled: true
