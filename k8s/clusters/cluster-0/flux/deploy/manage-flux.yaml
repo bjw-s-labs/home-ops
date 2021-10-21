@@ -1,0 +1,14 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: manage-flux
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  path: ./k8s/clusters/cluster-0/flux/install
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops

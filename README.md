@@ -24,6 +24,8 @@ _... managed by Flux and serviced with RenovateBot_ :robot:
 
 Welcome to my home Kubernetes cluster.
 
+### :warning: Note: I am currently migrating to a new gitops structure. This means stuff can/will break until the dust has settled.
+
 Lots of fun (to me at least :wink:) stuff can be found, poke around my [cluster](./cluster/) directory to see what my cluster is running. Feel free to open a [GitHub Issue](https://github.com/bjw-s/k8s-gitops/issues/new).
 
 For more information, head on over to my [docs](https://bjw-s.github.io/k8s-gitops/).
