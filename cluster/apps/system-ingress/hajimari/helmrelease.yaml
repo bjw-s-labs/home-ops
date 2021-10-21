@@ -21,6 +21,14 @@ spec:
       repository: ghcr.io/toboshii/hajimari
       tag: v0.1.0
 
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: "hajimari-settings"
+      backup.velero.io/backup-volumes: data
+      pre.hook.backup.velero.io/container: fsfreeze
+      pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/data"]'
+      post.hook.backup.velero.io/container: fsfreeze
+      post.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--unfreeze", "/data"]'
+
     env:
       TZ: "Europe/Amsterdam"
 
@@ -61,12 +69,19 @@ spec:
         enabled: true
         existingClaim: hajimari-data
 
-    podAnnotations:
-      configmap.reloader.stakater.com/reload: "hajimari-settings"
-
     resources:
       requests:
         cpu: 100m
         memory: 64Mi
       limits:
         memory: 128Mi
+
+    additionalContainers:
+      fsfreeze:
+        name: fsfreeze
+        image: ghcr.io/k8s-at-home/fsfreeze:v2.37-r0
+        volumeMounts:
+          - name: data
+            mountPath: /data
+        securityContext:
+          privileged: true
