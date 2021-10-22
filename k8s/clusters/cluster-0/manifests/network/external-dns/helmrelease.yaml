@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: externaldns-external
+  name: externaldns
   namespace: network
 spec:
   interval: 5m
@@ -16,6 +16,12 @@ spec:
         name: bitnami-charts
         namespace: flux-system
       interval: 5m
+
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+
   values:
     sources:
       - ingress
@@ -25,14 +31,14 @@ spec:
     txtPrefix: "k8s."
 
     cloudflare:
-      secretName: externaldns-external-secrets
+      secretName: externaldns-secrets
       email: ${EMAIL_1}
       proxied: true
 
     domainFilters:
-      - ${DOMAIN_1}
-      - ${DOMAIN_2}
-      - ${DOMAIN_3}
+      - ${PERSONAL_DOMAIN}
+      - ${FAMILY_DOMAIN}
+      - ${INGRESS_DOMAIN}
 
     annotationFilter: "external-dns/is-public=true"
 

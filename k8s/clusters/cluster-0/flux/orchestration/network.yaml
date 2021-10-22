@@ -16,6 +16,23 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
+  name: network-external-dns
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: network-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/network/external-dns"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
   name: network-unifi
   namespace: flux-system
 spec:
