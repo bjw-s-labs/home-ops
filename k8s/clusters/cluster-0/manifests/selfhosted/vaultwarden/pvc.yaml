@@ -2,10 +2,23 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: vaultwarden-config
+  namespace: selfhosted
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 1Gi
+
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
   name: vaultwarden-postgresql
   namespace: selfhosted
-  labels:
-    kasten.io/backup-volume: "true"
 spec:
   accessModes:
     - ReadWriteOnce
