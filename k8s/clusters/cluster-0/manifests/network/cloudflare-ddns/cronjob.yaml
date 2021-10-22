@@ -10,8 +10,14 @@ spec:
   successfulJobsHistoryLimit: 3
   concurrencyPolicy: Forbid
   jobTemplate:
+    metadata:
+      annotations:
+        botkube.io/disable: "true"
     spec:
       template:
+        metadata:
+          annotations:
+            botkube.io/disable: "true"
         spec:
           restartPolicy: Never
           containers:
