@@ -30,8 +30,7 @@ spec:
 
     env:
       TZ: "Europe/Amsterdam"
-      # VAULTWARDEN_POSTGRES_PASSWORD: set by valuesFrom
-      DATABASE_URL: postgresql://vaultwarden:$VAULTWARDEN_POSTGRES_PASSWORD@vaultwarden-postgresql:5432/vaultwarden
+      # DATABASE_URL: set by valuesFrom
       DOMAIN: https://vaultwarden.${FAMILY_DOMAIN}
       SIGNUPS_ALLOWED: "false"
       # ADMIN_TOKEN: set by valuesFrom
@@ -123,6 +122,6 @@ spec:
       optional: false
     - kind: Secret
       name: vaultwarden
-      valuesKey: postgresql_password
-      targetPath: env.VAULTWARDEN_POSTGRES_PASSWORD
+      valuesKey: vaultwarden_database_url
+      targetPath: env.DATABASE_URL
       optional: false
