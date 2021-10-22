@@ -53,18 +53,18 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns/is-public: "true"
-          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_2}
+          external-dns.alpha.kubernetes.io/target: ingress.${PERSONAL_DOMAIN}
           external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
         hosts:
-          - host: plex.${DOMAIN_2}
+          - host: plex.${PERSONAL_DOMAIN}
             paths:
               - path: /
                 pathType: Prefix
         tls:
           - secretName: tls.plex
             hosts:
-              - plex.${DOMAIN_2}
+              - plex.${PERSONAL_DOMAIN}
 
     persistence:
       config:
