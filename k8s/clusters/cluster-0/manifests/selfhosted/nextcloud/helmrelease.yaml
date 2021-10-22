@@ -37,13 +37,13 @@ spec:
         kubernetes.io/ingress.class: traefik
         cert-manager.io/cluster-issuer: letsencrypt-production
         external-dns/is-public: "true"
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_3}
+        external-dns.alpha.kubernetes.io/target: ingress.${FAMILY_DOMAIN}
         external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
       tls:
         - secretName: tls.nextcloud
           hosts:
-            - cloud.${DOMAIN_3}
+            - cloud.${FAMILY_DOMAIN}
 
     resources:
       requests:
@@ -53,9 +53,13 @@ spec:
         memory: "512M"
 
     nextcloud:
-      host: cloud.${DOMAIN_3}
-      username: ${NEXTCLOUD_ADMIN_USER}
-      password: ${NEXTCLOUD_ADMIN_PASSWORD}
+      host: cloud.${FAMILY_DOMAIN}
+
+      existingSecret:
+        enabled: true
+        secretName: nextcloud
+        usernameKey: nextcloud_admin_user
+        passwordKey: nextcloud_admin_password
 
       configs:
         proxy.config.php: |-
@@ -72,7 +76,7 @@ spec:
       type: postgresql
       host: nextcloud-postgresql.selfhosted
       user: nextcloud
-      password: ${NEXTCLOUD_POSTGRES_PASSWORD}
+      # password: set by valuesFrom
       database: nextcloud
 
     cronjob:
@@ -85,7 +89,7 @@ spec:
       enabled: true
 
       postgresqlUsername: nextcloud
-      postgresqlPassword: ${NEXTCLOUD_POSTGRES_PASSWORD}
+      # postgresqlPassword: set by valuesFrom
       postgresqlDatabase: nextcloud
 
       persistence:
@@ -114,3 +118,33 @@ spec:
           memory: 256Mi
         limits:
           memory: 1024Mi
+
+  postRenderers:
+    - kustomize:
+        patchesJson6902:
+          - target:
+              kind: CronJob
+              name: nextcloud-cron
+            patch:
+              - op: add
+                path: /spec/jobTemplate/metadata
+                value:
+                  annotations:
+                    botkube.io/disable: "true"
+              - op: add
+                path: /spec/jobTemplate/spec/template/metadata
+                value:
+                  annotations:
+                    botkube.io/disable: "true"
+
+  valuesFrom:
+    - kind: Secret
+      name: nextcloud
+      valuesKey: postgresql_password
+      targetPath: postgresql.postgresqlPassword
+      optional: false
+    - kind: Secret
+      name: nextcloud
+      valuesKey: postgresql_password
+      targetPath: externalDatabase.password
+      optional: false
