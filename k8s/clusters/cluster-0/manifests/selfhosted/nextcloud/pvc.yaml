@@ -2,10 +2,23 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: nextcloud-data
+  namespace: selfhosted
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 5Gi
+
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
   name: nextcloud-postgresql
   namespace: selfhosted
-  labels:
-    kasten.io/backup-volume: "true"
 spec:
   accessModes:
     - ReadWriteOnce
