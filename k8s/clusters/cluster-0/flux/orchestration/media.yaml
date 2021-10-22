@@ -1,0 +1,30 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: media-namespace
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/media"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: media-series-cleanup
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: media-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/media/series-cleanup"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
