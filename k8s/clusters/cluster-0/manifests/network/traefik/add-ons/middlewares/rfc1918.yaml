@@ -3,7 +3,7 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
   name: rfc1918-ips
-  namespace: system-ingress
+  namespace: network
 spec:
   ipWhiteList:
     sourceRange:
@@ -15,7 +15,7 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
   name: rfc1918
-  namespace: system-ingress
+  namespace: network
 spec:
   chain:
     middlewares:
