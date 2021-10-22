@@ -39,7 +39,7 @@ spec:
 
     grafana.ini:
       server:
-        root_url: "https://grafana.${DOMAIN_1}"
+        root_url: "https://grafana-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       paths:
         data: /var/lib/grafana/data
         logs: /var/log/grafana
@@ -154,15 +154,15 @@ spec:
       annotations:
         kubernetes.io/ingress.class: traefik
         cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+        external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
         traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
       hosts:
-        - "grafana.${DOMAIN_1}"
+        - "grafana-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       tls:
-        - secretName: tls.grafana
+        - secretName: grafana-${CLUSTER_NAME}-tls
           hosts:
-            - "grafana.${DOMAIN_1}"
+            - "grafana-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
     persistence:
       enabled: true
