@@ -7,16 +7,22 @@ metadata:
 spec:
   interval: 6h
   maxHistory: 2
+  timeout: 20m
   chart:
     spec:
       # renovate: registryUrl=https://prometheus-community.github.io/helm-charts
       chart: kube-prometheus-stack
-      version: 19.1.0
+      version: 19.2.2
       sourceRef:
         kind: HelmRepository
         name: prometheus-community-charts
         namespace: flux-system
-  timeout: 20m
+
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+
   valuesFrom:
     - kind: Secret
       name: kube-prometheus-stack
