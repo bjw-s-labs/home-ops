@@ -33,3 +33,16 @@ spec:
           enabled: false
         LowNodeUtilization:
           enabled: false
+
+  postRenderers:
+    - kustomize:
+        patchesJson6902:
+          - target:
+              kind: CronJob
+              name: descheduler
+            patch:
+              - op: add
+                path: /spec/jobTemplate/metadata
+                value:
+                  annotations:
+                    botkube.io/disable: "true"
