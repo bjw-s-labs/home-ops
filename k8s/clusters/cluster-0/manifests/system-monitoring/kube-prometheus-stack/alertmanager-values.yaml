@@ -43,32 +43,30 @@ alertmanager:
           severity: "warning"
         equal: ["alertname", "namespace"]
 
-  # TODO: Set to `true` when ingress is in place
-  # ingress:
-  #   enabled: false
-  #   pathType: Prefix
-  #   annotations:
-  #     kubernetes.io/ingress.class: traefik
-  #     cert-manager.io/cluster-issuer: letsencrypt-production
-  #     external-dns.alpha.kubernetes.io/target: ingress.${CLUSTER_NAME}.${INGRESS_DOMAIN}
-  #     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-  #     traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
-  #   hosts:
-  #     - alertmanager.${CLUSTER_NAME}.${INGRESS_DOMAIN}
-  #   tls:
-  #     - secretName: alertmanager-${CLUSTER_NAME}-tls
-  #       hosts:
-  #         - alertmanager.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+  ingress:
+    enabled: true
+    pathType: Prefix
+    annotations:
+      kubernetes.io/ingress.class: traefik
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+    hosts:
+      - alertmanager-${CLUSTER_NAME}.${INGRESS_DOMAIN}
+    tls:
+      - secretName: alertmanager-${CLUSTER_NAME}-tls
+        hosts:
+          - alertmanager-${CLUSTER_NAME}.${INGRESS_DOMAIN}
 
   alertmanagerSpec:
-    # TODO: Uncomment when storage is in place
-    # storage:
-    #   volumeClaimTemplate:
-    #     spec:
-    #       storageClassName: "rook-ceph-block"
-    #       resources:
-    #         requests:
-    #           storage: 10Gi
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: "rook-ceph-block"
+          resources:
+            requests:
+              storage: 10Gi
 
     resources:
       requests:
