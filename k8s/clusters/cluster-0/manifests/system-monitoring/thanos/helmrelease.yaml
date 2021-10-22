@@ -28,11 +28,11 @@ spec:
 
       ingress:
         enabled: true
-        hostname: "thanos.${DOMAIN_1}"
+        hostname: "thanos-cluster-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
         ingressClassName: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
         tls: true
@@ -40,7 +40,7 @@ spec:
     objstoreConfig: |
       type: S3
       config:
-        bucket: "thanos"
+        bucket: "thanos-${CLUSTER_NAME}"
         endpoint: "minio.selfhosted:9000"
         insecure: true
         access_key: "${THANOS_MINIO_ACCESS_KEY}"
