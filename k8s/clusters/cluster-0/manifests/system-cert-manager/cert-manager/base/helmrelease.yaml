@@ -16,15 +16,20 @@ spec:
         name: jetstack-charts
         namespace: flux-system
       interval: 5m
+
   values:
-    installCRDs: false
+    installCRDs: true
+
     webhook:
       enabled: true
+
     extraArgs:
       - --dns01-recursive-nameservers=1.1.1.1:53,9.9.9.9:53
       - --dns01-recursive-nameservers-only
       - --enable-certificate-owner-ref
+
     replicaCount: 1
+
     podDnsPolicy: "None"
     podDnsConfig:
       nameservers:
