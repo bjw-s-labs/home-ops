@@ -99,14 +99,14 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: system-monitoring-loki
+  name: system-monitoring-promtail
   namespace: flux-system
 spec:
   dependsOn:
     - name: system-monitoring-namespace
     - name: system-monitoring-kube-prom-stack
   interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/system-monitoring/loki"
+  path: "./k8s/clusters/cluster-0/manifests/system-monitoring/promtail"
   prune: true
   wait: true
   sourceRef:
