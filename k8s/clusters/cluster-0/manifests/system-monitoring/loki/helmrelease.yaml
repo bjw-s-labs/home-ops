@@ -25,8 +25,6 @@ spec:
         aws:
           bucketnames: loki
           endpoint: "minio.selfhosted:9000"
-          access_key_id: "${LOKI_MINIO_ACCESS_KEY}"
-          secret_access_key: "${LOKI_MINIO_SECRET_KEY}"
           s3forcepathstyle: true
           insecure: true
         boltdb_shipper:
@@ -34,7 +32,21 @@ spec:
           cache_location: /data/loki/index_cache
           resync_interval: 5s
           shared_store: s3
+
     persistence:
       enabled: false
+
     serviceMonitor:
       enabled: true
+
+  valuesFrom:
+    - kind: Secret
+      name: loki
+      valuesKey: minio_access_key
+      targetPath: config.storage_config.aws.access_key_id
+      optional: false
+    - kind: Secret
+      name: loki
+      valuesKey: minio_secret_key
+      targetPath: config.storage_config.aws.secret_access_key
+      optional: false
