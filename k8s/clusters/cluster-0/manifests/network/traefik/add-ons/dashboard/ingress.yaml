@@ -3,19 +3,19 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: traefik-dashboard
-  namespace: system-ingress
+  namespace: network
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
     external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
 spec:
   tls:
     - secretName: "tls.traefik-dashboard"
       hosts:
-        - "traefik.${DOMAIN_1}"
+        - "traefik-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
   rules:
-    - host: traefik.${DOMAIN_1}
+    - host: traefik-${CLUSTER_NAME}.${INGRESS_DOMAIN}
       http:
         paths:
           - path: /

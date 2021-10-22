@@ -8,7 +8,7 @@ prometheus:
       cert-manager.io/cluster-issuer: letsencrypt-production
       external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
-      traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+      traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
     hosts:
       - prometheus-${CLUSTER_NAME}.${INGRESS_DOMAIN}
     tls:
