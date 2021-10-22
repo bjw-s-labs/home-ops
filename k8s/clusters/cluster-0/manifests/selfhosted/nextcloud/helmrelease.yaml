@@ -85,6 +85,21 @@ spec:
     redis:
       enabled: true
 
+      master:
+        resources:
+          requests:
+            memory: 128Mi
+          limits:
+            memory: 256Mi
+
+      replica:
+        replicaCount: 1
+        resources:
+          requests:
+            memory: 128Mi
+          limits:
+            memory: 256Mi
+
     postgresql:
       enabled: true
 
