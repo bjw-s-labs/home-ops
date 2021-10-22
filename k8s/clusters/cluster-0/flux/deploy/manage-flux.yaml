@@ -5,10 +5,12 @@ metadata:
   name: manage-flux
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: cluster-repositories
   interval: 10m0s
-  path: ./k8s/clusters/cluster-0/flux/install
+  path: ./manifests/install
   prune: true
   wait: true
   sourceRef:
     kind: GitRepository
-    name: home-ops
+    name: flux
