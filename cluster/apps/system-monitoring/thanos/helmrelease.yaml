@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://charts.bitnami.com/bitnami
       chart: thanos
-      version: 6.0.14
+      version: 7.0.0
       sourceRef:
         kind: HelmRepository
         name: bitnami-charts
@@ -21,9 +21,11 @@ spec:
       enabled: true
       replicaLabels:
         - replica
+
       dnsDiscovery:
         sidecarsService: kube-prometheus-stack-thanos-discovery
         sidecarsNamespace: system-monitoring
+
       ingress:
         enabled: true
         hostname: "thanos.${DOMAIN_1}"
@@ -34,6 +36,7 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
         tls: true
+
     objstoreConfig: |
       type: S3
       config:
@@ -42,21 +45,27 @@ spec:
         insecure: true
         access_key: "${THANOS_MINIO_ACCESS_KEY}"
         secret_key: "${THANOS_MINIO_SECRET_KEY}"
+
     queryFrontend:
       enabled: false
+
     bucketweb:
       enabled: true
+
     compactor:
       enabled: true
       persistence:
         enabled: false
+
     storegateway:
       enabled: true
       persistence:
         enabled: true
         size: 5Gi
+
     ruler:
       enabled: false
+
     metrics:
       enabled: true
       serviceMonitor:
