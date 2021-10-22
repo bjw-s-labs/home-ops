@@ -16,13 +16,28 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
+  name: system-monitoring-kube-prom-stack
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-monitoring-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/system-monitoring/kube-prometheus-stack"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
   name: system-monitoring-node-problem-detector
   namespace: flux-system
 spec:
   dependsOn:
     - name: system-monitoring-namespace
-    # TODO: Add kube-prom-stack CRD dependency
-    # - name: system-monitoring-kube-prom-stack
+    - name: system-monitoring-kube-prom-stack
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-monitoring/node-problem-detector"
   prune: true
