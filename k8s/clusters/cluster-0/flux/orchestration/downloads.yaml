@@ -1,0 +1,145 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: downloads-namespace
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/downloads"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: downloads-jackett
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: downloads-namespace
+    - name: vpn-gateway
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/downloads/jackett"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: downloads-lidarr
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: downloads-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/downloads/lidarr"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: downloads-nzbget
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: downloads-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/downloads/nzbget"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: downloads-prowlarr
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: downloads-namespace
+    - name: vpn-gateway
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/downloads/prowlarr"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: downloads-qbittorrent
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: downloads-namespace
+    - name: vpn-gateway
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/downloads/qbittorrent"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: downloads-radarr
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: downloads-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/downloads/radarr"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: downloads-readarr
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: downloads-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/downloads/readarr"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: downloads-sonarr
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: downloads-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/downloads/sonarr"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
