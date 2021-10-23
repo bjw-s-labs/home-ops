@@ -2,8 +2,8 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: external-snapshotter-source
-  namespace: flux-system
+  name: external-snapshotter
+  namespace: system-rook-ceph
 spec:
   interval: 30m
   # renovate: datasource=github-releases
@@ -20,13 +20,13 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
   name: external-snapshotter-crds
-  namespace: flux-system
+  namespace: system-rook-ceph
 spec:
   interval: 15m
-  prune: false
+  prune: true
   sourceRef:
     kind: GitRepository
-    name: external-snapshotter-source
+    name: external-snapshotter
   healthChecks:
     - apiVersion: apiextensions.k8s.io/v1
       kind: CustomResourceDefinition
