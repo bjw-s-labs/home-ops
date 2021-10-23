@@ -1,0 +1,92 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: qbittorrent
+  namespace: downloads
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
+      chart: qbittorrent
+      version: 13.0.1
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: ghcr.io/k8s-at-home/qbittorrent
+      tag: v4.3.8
+      pullPolicy: Always
+
+    hostname: qbittorrent
+
+    podAnnotations:
+      setGateway: "true"
+      backup.velero.io/backup-volumes: config
+      pre.hook.backup.velero.io/container: fsfreeze
+      pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/data"]'
+      post.hook.backup.velero.io/container: fsfreeze
+      post.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--unfreeze", "/data"]'
+
+    podSecurityContext:
+      supplementalGroups:
+        - 65539
+
+    settings:
+      automaticPortSetup: false
+
+    env:
+      TZ: "Europe/Amsterdam"
+      UMASK: "022"
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: qbittorrent-config
+      media:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /volume1/Media
+        mountPath: /data/nas-media
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+        hosts:
+          - host: qbittorrent.${INGRESS_DOMAIN}
+            paths:
+              - path: /
+        tls:
+          - secretName: tls.qbittorrent
+            hosts:
+              - qbittorrent.${INGRESS_DOMAIN}
+
+    resources:
+      requests:
+        cpu: "0.3"
+        memory: "1000Mi"
+      limits:
+        memory: "4000Mi"
+
+    additionalContainers:
+      fsfreeze:
+        name: fsfreeze
+        image: ghcr.io/k8s-at-home/fsfreeze:v2.37-r0
+        volumeMounts:
+          - name: config
+            mountPath: /data
+        securityContext:
+          privileged: true

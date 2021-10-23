@@ -1,0 +1,58 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: jackett
+  namespace: downloads
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
+      chart: jackett
+      version: 11.1.1
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: ghcr.io/k8s-at-home/jackett
+      tag: v0.19.8
+      pullPolicy: IfNotPresent
+
+    podAnnotations:
+      setGateway: "true"
+
+    env:
+      TZ: "Europe/Amsterdam"
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: jackett-config
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+        hosts:
+          - host: jackett.${INGRESS_DOMAIN}
+            paths:
+              - path: /
+        tls:
+          - secretName: tls.jackett
+            hosts:
+              - jackett.${INGRESS_DOMAIN}
+
+    resources:
+      requests:
+        cpu: "0.02"
+        memory: "256M"
+      limits:
+        memory: "512M"
