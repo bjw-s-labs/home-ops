@@ -19,7 +19,7 @@ spec:
   values:
     image:
       repository: airsonicadvanced/airsonic-advanced
-      tag: edge-11.0.0-SNAPSHOT.20210803095157
+      tag: edge-11.0.0-SNAPSHOT.20211019030336
       pullPolicy: IfNotPresent
 
     podSecurityContext:
@@ -62,21 +62,21 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns/is-public: "true"
-          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           hajimari.io/enable: "true"
           hajimari.io/icon: "headphones-box"
 
         hosts:
-          - host: airsonic.${DOMAIN_1}
+          - host: airsonic.${INGRESS_DOMAIN}
             paths:
               - path: /
 
         tls:
           - secretName: tls.airsonic
             hosts:
-              - airsonic.${DOMAIN_1}
+              - airsonic.${INGRESS_DOMAIN}
 
     resources:
       requests:

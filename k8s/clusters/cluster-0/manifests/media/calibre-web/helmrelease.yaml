@@ -52,38 +52,38 @@ spec:
         ingressClassName: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: system-security-ak-outpost-bjw-s-outpost@kubernetescrd,system-ingress-rfc1918-ips@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: system-security-ak-outpost-bjw-s-outpost@kubernetescrd,network-rfc1918-ips@kubernetescrd
 
         hosts:
-          - host: calibre-web.${DOMAIN_1}
+          - host: calibre-web.${INGRESS_DOMAIN}
             paths:
               - path: /
 
         tls:
           - secretName: tls.calibre-web
             hosts:
-              - calibre-web.${DOMAIN_1}
+              - calibre-web.${INGRESS_DOMAIN}
 
       kobo:
         enabled: true
         ingressClassName: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
 
         hosts:
-          - host: calibre-web.${DOMAIN_1}
+          - host: calibre-web.${INGRESS_DOMAIN}
             paths:
               - path: /kobo/
 
         tls:
           - secretName: tls.calibre-web
             hosts:
-              - calibre-web.${DOMAIN_1}
+              - calibre-web.${INGRESS_DOMAIN}
 
     resources:
       requests:
