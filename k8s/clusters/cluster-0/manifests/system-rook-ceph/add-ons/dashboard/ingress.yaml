@@ -6,7 +6,7 @@ metadata:
   namespace: system-rook-ceph
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
-    external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+    external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
   labels:
@@ -15,7 +15,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: "rook.${DOMAIN_1}"
+    - host: "rook-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       http:
         paths:
           - backend:
@@ -27,5 +27,5 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - "rook.${DOMAIN_1}"
+        - "rook-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       secretName: tls.rook-ceph-mgr-dashboard
