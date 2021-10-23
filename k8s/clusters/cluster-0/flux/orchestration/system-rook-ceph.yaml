@@ -16,20 +16,20 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  # TODO: Rename this
-  name: system-rook-ceph-namespace-operator
+  name: system-rook-ceph-operator
   namespace: flux-system
 spec:
   dependsOn:
     - name: system-rook-ceph-namespace
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-rook-ceph/operator"
-  prune: false
+  prune: true
   wait: true
   sourceRef:
     kind: GitRepository
     name: home-ops
 ---
+# TODO: Remove this (if possible) when rebuilding cluster
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
@@ -46,6 +46,7 @@ spec:
     kind: GitRepository
     name: home-ops
 ---
+# TODO: Replace this with rook-ceph cluster Helm chart
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
@@ -54,7 +55,7 @@ metadata:
 spec:
   dependsOn:
     - name: system-rook-ceph-namespace
-    - name: system-rook-ceph-namespace-operator
+    - name: system-rook-ceph-operator
     - name: system-rook-ceph-external-snapshotter
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-rook-ceph/cluster"
@@ -67,12 +68,12 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: system-rook-ceph-namespace-addons
+  name: system-rook-ceph-addons
   namespace: flux-system
 spec:
   dependsOn:
     - name: system-rook-ceph-namespace
-    - name: system-rook-ceph-namespace-operator
+    - name: system-rook-ceph-operator
     - name: system-rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-rook-ceph/add-ons"
