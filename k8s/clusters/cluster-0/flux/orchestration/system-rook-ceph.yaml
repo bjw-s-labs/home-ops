@@ -16,6 +16,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
+  # TODO: Rename this
   name: system-rook-ceph-namespace-operator
   namespace: flux-system
 spec:
@@ -23,6 +24,58 @@ spec:
     - name: system-rook-ceph-namespace
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-rook-ceph/operator"
+  prune: false
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-rook-ceph-external-snapshotter
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-rook-ceph-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/system-rook-ceph/external-snapshotter"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-rook-ceph-cluster
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-rook-ceph-namespace
+    - name: system-rook-ceph-namespace-operator
+    - name: system-rook-ceph-external-snapshotter
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/system-rook-ceph/cluster"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-rook-ceph-namespace-addons
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-rook-ceph-namespace
+    - name: system-rook-ceph-namespace-operator
+    - name: system-rook-ceph-cluster
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/system-rook-ceph/add-ons"
   prune: true
   wait: true
   sourceRef:
