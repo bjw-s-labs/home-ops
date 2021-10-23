@@ -43,10 +43,10 @@ spec:
 
       conditional:
         mapping:
-          ${DOMAIN_1}: udp:${GATEWAY_MANAGEMENT}
-          ${DOMAIN_2}: udp:${GATEWAY_MANAGEMENT}
-          ${DOMAIN_3}: udp:${GATEWAY_MANAGEMENT}
-          ${DOMAIN_4}: udp:${GATEWAY_MANAGEMENT}
+          ${PERSONAL_DOMAIN}: udp:${GATEWAY_MANAGEMENT}
+          ${FAMILY_DOMAIN}: udp:${GATEWAY_MANAGEMENT}
+          ${INGRESS_DOMAIN}: udp:${GATEWAY_MANAGEMENT}
+          ${HARDWARE_DOMAIN}: udp:${GATEWAY_MANAGEMENT}
           unifi: udp:${GATEWAY_MANAGEMENT}
 
       blocking:
@@ -102,8 +102,6 @@ spec:
 
     resources:
       requests:
-        memory: 275Mi
-        cpu: "0.01"
+        memory: 256Mi
       limits:
-        # memory: 2048Mi
-        cpu: "0.1"
+        memory: 512Mi
