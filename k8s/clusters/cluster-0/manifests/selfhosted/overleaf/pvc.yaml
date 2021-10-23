@@ -4,8 +4,6 @@ kind: PersistentVolumeClaim
 metadata:
   name: overleaf-mongodb
   namespace: selfhosted
-  labels:
-    kasten.io/backup-volume: "true"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -13,5 +11,20 @@ spec:
   resources:
     requests:
       storage: 5Gi
+
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: overleaf-data
+  namespace: selfhosted
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 1Gi
 
   storageClassName: rook-ceph-block

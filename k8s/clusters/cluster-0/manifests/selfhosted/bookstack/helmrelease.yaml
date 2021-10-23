@@ -24,10 +24,10 @@ spec:
 
     env:
       TZ: "Europe/Amsterdam"
-      APP_URL: "https://kb.${DOMAIN_1}"
+      APP_URL: "https://kb.${INGRESS_DOMAIN}"
       DB_HOST: bookstack-mariadb.selfhosted
       DB_USER: bookstack
-      DB_PASS: ${BOOKSTACK_MARIADB_PASSWORD}
+      # DB_PASS: set by valuesFrom
       DB_DATABASE: bookstack
 
     persistence:
@@ -41,17 +41,17 @@ spec:
         ingressClassName: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
         hosts:
-          - host: kb.${DOMAIN_1}
+          - host: kb.${INGRESS_DOMAIN}
             paths:
               - path: /
         tls:
           - secretName: tls.bookstack
             hosts:
-              - kb.${DOMAIN_1}
+              - kb.${INGRESS_DOMAIN}
 
     resources:
       requests:
@@ -59,16 +59,15 @@ spec:
       limits:
         memory: 192Mi
 
-
     mariadb:
       enabled: true
       architecture: standalone
 
       auth:
         username: bookstack
-        password: ${BOOKSTACK_MARIADB_PASSWORD}
+        # password: set by valuesFrom
         database: bookstack
-        rootPassword: ${BOOKSTACK_MARIADB_ROOT_PASSWORD}
+        # rootPassword: set by valuesFrom
 
       primary:
         persistence:
@@ -80,3 +79,20 @@ spec:
             memory: 128Mi
           limits:
             memory: 192Mi
+
+  valuesFrom:
+    - kind: Secret
+      name: bookstack
+      valuesKey: mariadb_password
+      targetPath: env.DB_PASS
+      optional: false
+    - kind: Secret
+      name: bookstack
+      valuesKey: mariadb_password
+      targetPath: mariadb.auth.password
+      optional: false
+    - kind: Secret
+      name: bookstack
+      valuesKey: mariadb_root_password
+      targetPath: mariadb.auth.rootPassword
+      optional: false
