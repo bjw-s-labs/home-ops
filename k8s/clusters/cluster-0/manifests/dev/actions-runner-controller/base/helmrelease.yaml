@@ -16,15 +16,17 @@ spec:
         name: actions-runner-controller-charts
         namespace: flux-system
       interval: 5m
+
   install:
-    skipCRDs: true
-    crds: Skip
+    crds: CreateReplace
   upgrade:
-    crds: Skip
+    crds: CreateReplace
+
   values:
     authSecret:
       create: false
-      name: "actions-runner-controller"
+      name: "actions-runner-controller-authccccccunftbefnffglentkrdtbvbdclrijfcucufineb
+      "
 
     image:
       repository: summerwind/actions-runner-controller
@@ -49,16 +51,16 @@ spec:
           kubernetes.io/ingress.class: traefik
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns/is-public: "true"
-          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
         hosts:
-          - host: acr-hook.${DOMAIN_1}
+          - host: acr-hook.${INGRESS_DOMAIN}
             paths:
               - path: /
         tls:
           - hosts:
-              - acr-hook.${DOMAIN_1}
+              - acr-hook.${INGRESS_DOMAIN}
             secretName: tls.acr-hook
 
       resources:
