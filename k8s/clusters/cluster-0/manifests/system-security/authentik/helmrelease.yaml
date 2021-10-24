@@ -28,44 +28,44 @@ spec:
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
         # external-dns/is-public: "true"
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+        external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
         # external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
 
       hosts:
-        - host: authentik.${DOMAIN_1}
+        - host: authentik.${INGRESS_DOMAIN}
           paths:
             - path: /
 
       tls:
         - secretName: tls.authentik
           hosts:
-            - authentik.${DOMAIN_1}
+            - authentik.${INGRESS_DOMAIN}
 
     authentik:
-      secret_key: ${AUTHENTIK_SECRET_KEY}
+      # secret_key: set by valuesFrom
       log_level: debug
 
       outposts:
         docker_image_base: ghcr.io/goauthentik/%(type)s:%(version)s
 
       email:
-        host: ${AUTHENTIK_SMTP_SERVER}
+        # host: set by valuesFrom
         port: 587
-        username: ${AUTHENTIK_SMTP_USERNAME}
-        password: ${AUTHENTIK_SMTP_PASSWORD}
+        # username: set by valuesFrom
+        # password: set by valuesFrom
         use_tls: true
         use_ssl: false
-        from: "Authentik <authentik@mg.${DOMAIN_1}>"
+        from: "Authentik <authentik@mg.${INGRESS_DOMAIN}>"
 
       postgresql:
         host: "{{ .Release.Name }}-postgresql"
         name: authentik
         user: authentik
-        password: ${AUTHENTIK_POSTGRES_PASSWORD}
+        # password: set by valuesFrom
       redis:
         host: "{{ .Release.Name }}-redis-master"
-        password: ${AUTHENTIK_REDIS_PASSWORD}
+        # password: set by valuesFrom
 
     resources:
       server:
@@ -87,7 +87,7 @@ spec:
 
       postgresqlUsername: authentik
       postgresqlDatabase: authentik
-      postgresqlPassword: ${AUTHENTIK_POSTGRES_PASSWORD}
+      # postgresqlPassword: set by valuesFrom
 
       primary:
         podAnnotations:
@@ -116,7 +116,7 @@ spec:
       enabled: true
       auth:
         enabled: true
-        password: ${AUTHENTIK_REDIS_PASSWORD}
+        # password: set by valuesFrom
 
       master:
         resources:
@@ -124,3 +124,45 @@ spec:
             memory: 32Mi
           limits:
             memory: 64Mi
+
+  valuesFrom:
+    - kind: Secret
+      name: authentik
+      valuesKey: authentik_secret_key
+      targetPath: authentik.secret_key
+      optional: false
+    - kind: Secret
+      name: authentik
+      valuesKey: redis_password
+      targetPath: authentik.redis.password
+      optional: false
+    - kind: Secret
+      name: authentik
+      valuesKey: postgresql_password
+      targetPath: authentik.postgresql.password
+      optional: false
+    - kind: Secret
+      name: authentik
+      valuesKey: smtp_host
+      targetPath: authentik.email.host
+      optional: false
+    - kind: Secret
+      name: authentik
+      valuesKey: smtp_user
+      targetPath: authentik.email.username
+      optional: false
+    - kind: Secret
+      name: authentik
+      valuesKey: smtp_password
+      targetPath: authentik.email.password
+      optional: false
+    - kind: Secret
+      name: authentik
+      valuesKey: postgresql_password
+      targetPath: postgresql.postgresqlPassword
+      optional: false
+    - kind: Secret
+      name: authentik
+      valuesKey: redis_password
+      targetPath: redis.auth.password
+      optional: false
