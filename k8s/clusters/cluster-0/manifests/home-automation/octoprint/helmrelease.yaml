@@ -58,10 +58,6 @@ spec:
                   operator: In
                   values:
                     - "true"
-                # - key: feature.node.kubernetes.io/custom-aukey_webcam
-                #   operator: In
-                #   values:
-                #     - "true"
 
     ingress:
       main:
@@ -69,18 +65,18 @@ spec:
         ingressClassName: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
         hosts:
-          - host: octoprint.${DOMAIN_1}
+          - host: octoprint.${INGRESS_DOMAIN}
             paths:
               - path: /
 
         tls:
           - secretName: tls.octoprint
             hosts:
-              - octoprint.${DOMAIN_1}
+              - octoprint.${INGRESS_DOMAIN}
 
     resources:
       requests:
