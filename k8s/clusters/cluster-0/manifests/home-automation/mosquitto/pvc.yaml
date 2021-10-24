@@ -2,16 +2,14 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: esphome-config
+  name: mosquitto-data
   namespace: home-automation
-  labels:
-    kasten.io/backup-volume: "true"
 spec:
   accessModes:
     - ReadWriteOnce
 
   resources:
     requests:
-      storage: 512Mi
+      storage: 128Mi
 
   storageClassName: rook-ceph-block

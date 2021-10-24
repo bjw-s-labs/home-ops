@@ -26,13 +26,33 @@ spec:
 
     env:
       TZ: Europe/Amsterdam
-      AMCREST_HOST: ${AMCREST2MQTT_AMCREST_HOST}
-      AMCREST_USERNAME: ${AMCREST2MQTT_AMCREST_USERNAME}
-      AMCREST_PASSWORD: ${AMCREST2MQTT_AMCREST_PASSWORD}
+      AMCREST_HOST:
+        valueFrom:
+          secretKeyRef:
+            name: amcrest2mqtt
+            key: amcrest_host
+      AMCREST_USERNAME:
+        valueFrom:
+          secretKeyRef:
+            name: amcrest2mqtt
+            key: amcrest_username
+      AMCREST_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: amcrest2mqtt
+            key: amcrest_password
       MQTT_HOST: mosquitto.home-automation
       MQTT_PORT: 1883
-      MQTT_USERNAME: ${AMCREST2MQTT_MQTT_USERNAME}
-      MQTT_PASSWORD: ${AMCREST2MQTT_MQTT_PASSWORD}
+      MQTT_USERNAME:
+        valueFrom:
+          secretKeyRef:
+            name: amcrest2mqtt
+            key: mqtt_username
+      MQTT_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: amcrest2mqtt
+            key: mqtt_password
       HOME_ASSISTANT: "true"
 
     resources:
