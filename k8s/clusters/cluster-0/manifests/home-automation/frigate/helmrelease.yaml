@@ -64,11 +64,11 @@ spec:
         ingressClassName: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
         hosts:
-          - host: frigate.${DOMAIN_1}
+          - host: frigate.${INGRESS_DOMAIN}
             paths:
               - path: /
         tls:
@@ -98,8 +98,8 @@ spec:
         host: mosquitto.home-automation
         port: 1883
         topic_prefix: frigate
-        user: ${FRIGATE_MQTT_USER}
-        password: ${FRIGATE_MQTT_PASSWORD}
+        user: {{- .Values.secrets.mqtt_user -}}
+        password: {{- .Values.secrets.mqtt_password -}}
 
       database:
         path: /data/frigate.db
@@ -135,11 +135,11 @@ spec:
           # Camera-specific ffmpeg configuration
           ffmpeg:
             inputs:
-              - path: ${FRIGATE_CAMERA_DOORBELL_MAIN}
+              - path: rtsp://{{- .Values.secrets.doorbell_camera_user -}}:{{- .Values.secrets.doorbell_camera_password -}}@{{- .Values.secrets.doorbell_camera_host -}}:554/cam/realmonitor?channel=1&subtype=0
                 roles:
                   - rtmp
                   - record
-              - path: ${FRIGATE_CAMERA_DOORBELL_SUBSTREAM}
+              - path: rtsp://{{- .Values.secrets.doorbell_camera_user -}}:{{- .Values.secrets.doorbell_camera_password -}}@{{- .Values.secrets.doorbell_camera_host -}}:554/cam/realmonitor?channel=1&subtype=1
                 roles:
                   - detect
 
@@ -192,3 +192,30 @@ spec:
             mountPath: /data
         securityContext:
           privileged: true
+
+  valuesFrom:
+    - kind: Secret
+      name: frigate
+      valuesKey: mqtt_user
+      targetPath: secrets.mqtt_user
+      optional: false
+    - kind: Secret
+      name: frigate
+      valuesKey: mqtt_password
+      targetPath: secrets.mqtt_password
+      optional: false
+    - kind: Secret
+      name: frigate
+      valuesKey: doorbell_camera_host
+      targetPath: secrets.doorbell_camera_host
+      optional: false
+    - kind: Secret
+      name: frigate
+      valuesKey: doorbell_camera_user
+      targetPath: secrets.doorbell_camera_user
+      optional: false
+    - kind: Secret
+      name: frigate
+      valuesKey: doorbell_camera_password
+      targetPath: secrets.doorbell_camera_password
+      optional: false
