@@ -3,7 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: echo-server
-  namespace: system-ingress
+  namespace: selfhosted
 spec:
   interval: 5m
   chart:
@@ -27,19 +27,19 @@ spec:
       annotations:
         kubernetes.io/ingress.class: traefik
         cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+        external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: system-security-ak-outpost-bjw-s-outpost@kubernetescrd,system-ingress-rfc1918-ips@kubernetescrd
+        traefik.ingress.kubernetes.io/router.middlewares: system-security-ak-outpost-bjw-s-outpost@kubernetescrd,network-rfc1918-ips@kubernetescrd
 
       hosts:
-        - host: echo-server.${DOMAIN_1}
+        - host: echo-server.${INGRESS_DOMAIN}
           paths:
             - "/"
 
       tls:
         - secretName: tls.echo-server
           hosts:
-            - echo-server.${DOMAIN_1}
+            - echo-server.${INGRESS_DOMAIN}
 
     resources:
       requests:
