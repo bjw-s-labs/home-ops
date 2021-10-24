@@ -34,7 +34,7 @@ spec:
         [{
           "name":"macvlan-iot-static",
           "namespace": "system",
-          "ips": ["${HASS_IOT_VLAN_IP}/24"]
+          "ips": ["${HASS_VLAN_IP}/24"]
         }]
     probes:
       liveness:
@@ -56,25 +56,21 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns/is-public: "true"
-          external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_2}
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           hajimari.io/enable: "true"
           hajimari.io/icon: "home-assistant"
 
         hosts:
-          - host: domo.${DOMAIN_2}
-            paths:
-              - path: /
-          - host: domo.${DOMAIN_3}
+          - host: domo.${INGRESS_DOMAIN}
             paths:
               - path: /
 
         tls:
           - secretName: tls.home-assistant-frontend
             hosts:
-              - domo.${DOMAIN_2}
-              - domo.${DOMAIN_3}
+              - domo.${INGRESS_DOMAIN}
 
     env:
       TZ: "Europe/Amsterdam"
@@ -117,7 +113,7 @@ spec:
 
       postgresqlUsername: home-assistant
       postgresqlDatabase: home-assistant
-      postgresqlPassword: ${HASS_POSTGRES_PASSWORD}
+      # postgresqlPassword: set by valuesFrom
 
       primary:
         podAnnotations:
@@ -159,17 +155,17 @@ spec:
           ingressClassName: "traefik"
           annotations:
             cert-manager.io/cluster-issuer: letsencrypt-production
-            external-dns.alpha.kubernetes.io/target: ingress.${DOMAIN_1}
+            external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
             traefik.ingress.kubernetes.io/router.entrypoints: websecure
-            traefik.ingress.kubernetes.io/router.middlewares: system-ingress-rfc1918-ips@kubernetescrd
+            traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
           hosts:
-            - host: code-domo.${DOMAIN_1}
+            - host: code-domo.${INGRESS_DOMAIN}
               paths:
                 - path: /
           tls:
             - secretName: tls.home-assistant-code
               hosts:
-                - code-domo.${DOMAIN_1}
+                - code-domo.${INGRESS_DOMAIN}
 
         env:
           EXTENSION_URLS: |
@@ -189,3 +185,10 @@ spec:
             memory: 128Mi
           limits:
             memory: 512Mi
+
+  valuesFrom:
+    - kind: Secret
+      name: home-assistant
+      valuesKey: postgresql_password
+      targetPath: postgresql.postgresqlPassword
+      optional: false
