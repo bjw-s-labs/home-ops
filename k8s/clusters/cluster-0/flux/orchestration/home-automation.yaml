@@ -127,3 +127,20 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: home-automation-home-assistant
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: home-automation-namespace
+    - name: home-automation-mosquitto
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/home-automation/home-assistant"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
