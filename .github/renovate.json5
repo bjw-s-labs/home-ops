@@ -7,10 +7,12 @@
     ":semanticCommits",
     ":separatePatchReleases",
     "docker:enableMajor",
-    "github>bjw-s/k8s-gitops//.github/renovate/commitMessage",
-    "github>bjw-s/k8s-gitops//.github/renovate/labels",
-    "github>bjw-s/k8s-gitops//.github/renovate/privateModules",
-    "github>bjw-s/k8s-gitops//.github/renovate/semanticCommits",
+    "github>bjw-s/home-ops//.github/renovate/commitMessage",
+    "github>bjw-s/home-ops//.github/renovate/labels",
+    "github>bjw-s/home-ops//.github/renovate/privateModules",
+    "github>bjw-s/home-ops//.github/renovate/semanticCommits",
+    "github>bjw-s/home-ops//.github/renovate/allowedVersions",
+    "github>bjw-s/home-ops//.github/renovate/autoMerge",
   ],
   "timezone": "Europe/Amsterdam",
   "dependencyDashboardTitle": "Renovate Dashboard",
@@ -18,26 +20,23 @@
   "rebaseWhen": "conflicted",
   // Set up Renovate Managers
   "helmv3": {
-    "fileMatch": ["charts/.+/Chart\\.yaml$"]
+    "fileMatch": ["k8s/charts/.+/Chart\\.yaml$"]
   },
   "helm-values": {
     "fileMatch": [
-      "cluster/.+/helmrelease\\.yaml$"
+      "k8s/clusters/.+/helmrelease\\.yaml$"
     ]
   },
   "kubernetes": {
     "fileMatch": [
-      "cluster/.+\\.yaml$"
-    ],
-    "ignorePaths": [
-      "cluster/base/"
+      "k8s/clusters/.+\\.yaml$"
     ],
   },
   "regexManagers": [
     // regexManager to read and process HelmRelease files
     {
       "fileMatch": [
-        "cluster/.+\\.yaml$"
+        "k8s/clusters/.+\\.yaml$"
       ],
       "matchStrings": [
         // helm releases
@@ -45,75 +44,16 @@
       ],
       "datasourceTemplate": "helm"
     },
-    // regexManager to read and process cert-manager CRD's
+    // Generic Flux Regex Manager
     {
       "fileMatch": [
-        "cluster/crds/cert-manager/.+\\.yaml$"
+        "k8s/clusters/.+\\.yaml$"
       ],
       "matchStrings": [
-        "registryUrl=(?<registryUrl>.*?) chart=(?<depName>.*?)\n.*\\/(?<currentValue>.*?)\\/",
+        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( registryUrl=(?<registryUrl>.*?))?( versioning=(?<versioning>.*=?))?\n *tag: (?<currentValue>.*=?)"
       ],
-      "datasourceTemplate": "helm"
-    },
-    // regexManager to read and process kube-prometheus-stack CRD's
-    {
-      "fileMatch": [
-        "cluster/crds/kube-prometheus-stack/.+\\.yaml$"
-      ],
-      "matchStrings": [
-        "registryUrl=(?<registryUrl>.*?)\n *tag: (?<depName>[a-zA-Z-]+)-(?<currentValue>.*)\n",
-      ],
-      "datasourceTemplate": "helm"
-    },
-    // regexManager to read and process Traefik CRD's
-    {
-      "fileMatch": [
-        "cluster/crds/traefik/.+\\.yaml$"
-      ],
-      "matchStrings": [
-        "registryUrl=(?<registryUrl>.*?) chart=(?<depName>.*?)\n *tag: v(?<currentValue>.*)\n",
-      ],
-      "datasourceTemplate": "helm"
-    },
-    // regexManager to read and process Rook-Ceph CRD's
-    {
-      "fileMatch": [
-        "cluster/crds/rook-ceph/.+\\.yaml$"
-      ],
-      "matchStrings": [
-        "registryUrl=(?<registryUrl>.*?) chart=(?<depName>.*?)\n *tag: (?<currentValue>.*)\n",
-      ],
-      "datasourceTemplate": "helm"
-    },
-    // regexManager to read and process External Snapshotter CRD's
-    {
-      "fileMatch": [
-        "cluster/crds/external-snapshotter/.+\\.yaml$",
-      ],
-      "matchStrings": [
-        "datasource=(?<datasource>.*?)\n *url: https:\/\/github\\.com\/(?<depName>.*?)\\.git\n *ref:\n *tag: (?<currentValue>.*)\n"
-      ],
-      "datasourceTemplate": "github-releases"
-    },
-    // regexManager to read and process External DNS CRD's
-    {
-      "fileMatch": [
-        "cluster/crds/external-dns/.+\\.yaml$",
-      ],
-      "matchStrings": [
-        "datasource=(?<datasource>.*?)\n *url: https:\/\/github\\.com\/(?<depName>.*?)\\.git\n *ref:\n *tag: (?<currentValue>.*)\n"
-      ],
-      "datasourceTemplate": "github-releases"
-    },
-    // regexManager to read and process github-actions-runner runner images
-    {
-      "fileMatch": [
-        "cluster/apps/selfhosted/github-actions-runner/.+\\.yaml$"
-      ],
-      "matchStrings": [
-        "image: (?<depName>.*?):(?<currentValue>.*?)\n"
-      ],
-      "datasourceTemplate": "docker"
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+      "registryUrlTemplate": "{{#if registryUrl}}{{{registryUrl}}}{{else}}{{/if}}"
     }
   ],
   "packageRules": [
@@ -151,23 +91,6 @@
       ],
       "versioning": "regex:^version-v?(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$"
     },
-    // Pin package versions
-    // Octoprint has some weird published versions, try to ignore these
-    {
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["octoprint/octoprint"],
-      "allowedVersions": "<2.0"
-    },
-    {
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["ghcr.io/linuxserver/calibre-web"],
-      "allowedVersions": "<1"
-    },
-    {
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["influxdb"],
-      "allowedVersions": "<2"
-    },
     // Version strategies
     {
       "matchDatasources": ["docker"],
@@ -183,41 +106,6 @@
       "groupName": "rook-ceph-suite",
       "additionalBranchPrefix": "",
       "separateMinorPatch": true,
-    },
-    {
-      "matchDatasources": ["github-releases", "docker"],
-      "matchPackagePatterns": [
-        "external-snapshotter",
-        "snapshot-controller"
-      ],
-      "groupName": "external-snapshotter-suite",
-      "additionalBranchPrefix": "",
-      "separateMinorPatch": true
-    },
-    {
-      "matchPackageNames": [
-        "rancher/system-upgrade-controller"
-      ],
-      "groupName": "rancher/system-upgrade-controller",
-      "additionalBranchPrefix": "",
-      "separateMinorPatch": true,
-    },
-    // Enable auto-merge for docker images
-    {
-      "matchDatasources": ["docker"],
-      "automerge": true,
-      "automergeType": "branch",
-      "requiredStatusChecks": null,
-      "matchUpdateTypes": ["minor", "patch"],
-      "matchPackageNames": [
-        "ghcr.io/k8s-at-home/jackett",
-        "ghcr.io/k8s-at-home/lidarr",
-        "ghcr.io/k8s-at-home/plex",
-        "ghcr.io/k8s-at-home/prowlarr",
-        "ghcr.io/k8s-at-home/radarr",
-        "ghcr.io/k8s-at-home/readarr",
-        "ghcr.io/k8s-at-home/sonarr",
-      ]
     }
   ]
 }
