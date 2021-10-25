@@ -24,19 +24,22 @@
   },
   "helm-values": {
     "fileMatch": [
-      "k8s/clusters/.+/helmrelease\\.yaml$"
+      "k8s/clusters/.+/helmrelease\\.yaml$",
+      "k8s/global/.+/helmrelease\\.yaml$"
     ]
   },
   "kubernetes": {
     "fileMatch": [
-      "k8s/clusters/.+\\.yaml$"
+      "k8s/clusters/.+\\.yaml$",
+      "k8s/global/.+\\.yaml$"
     ],
   },
   "regexManagers": [
     // regexManager to read and process HelmRelease files
     {
       "fileMatch": [
-        "k8s/clusters/.+\\.yaml$"
+        "k8s/clusters/.+\\.yaml$",
+        "k8s/global/.+\\.yaml$"
       ],
       "matchStrings": [
         // helm releases
@@ -47,7 +50,8 @@
     // Generic Flux Regex Manager
     {
       "fileMatch": [
-        "k8s/clusters/.+\\.yaml$"
+        "k8s/clusters/.+\\.yaml$",
+        "k8s/global/.+\\.yaml$"
       ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( registryUrl=(?<registryUrl>.*?))?( versioning=(?<versioning>.*=?))?\n *tag: (?<currentValue>.*=?)"
