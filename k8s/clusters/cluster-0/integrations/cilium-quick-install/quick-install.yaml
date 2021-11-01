@@ -504,7 +504,7 @@ spec:
               value: "cluster-0.bjw-s.tech"
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
-          image: "quay.io/cilium/cilium:v1.10.4@sha256:7d354052ccf2a7445101d78cebd14444c7c40129ce7889f2f04b89374dbf8a1d"
+          image: "quay.io/cilium/cilium:v1.10.5@sha256:0612218e28288db360c63677c09fafa2d17edda4f13867bcabf87056046b33bb"
           imagePullPolicy: IfNotPresent
           lifecycle:
             postStart:
@@ -567,7 +567,7 @@ spec:
             # same directory where we install cilium cni plugin so that exec permissions
             # are available.
             - 'cp /usr/bin/cilium-mount /hostbin/cilium-mount && nsenter --cgroup=/hostproc/1/ns/cgroup --mount=/hostproc/1/ns/mnt "${BIN_PATH}/cilium-mount" $CGROUP_ROOT; rm /hostbin/cilium-mount'
-          image: "quay.io/cilium/cilium:v1.10.4@sha256:7d354052ccf2a7445101d78cebd14444c7c40129ce7889f2f04b89374dbf8a1d"
+          image: "quay.io/cilium/cilium:v1.10.5@sha256:0612218e28288db360c63677c09fafa2d17edda4f13867bcabf87056046b33bb"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /hostproc
@@ -595,7 +595,7 @@ spec:
               value: "cluster-0.bjw-s.tech"
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
-          image: "quay.io/cilium/cilium:v1.10.4@sha256:7d354052ccf2a7445101d78cebd14444c7c40129ce7889f2f04b89374dbf8a1d"
+          image: "quay.io/cilium/cilium:v1.10.5@sha256:0612218e28288db360c63677c09fafa2d17edda4f13867bcabf87056046b33bb"
           imagePullPolicy: IfNotPresent
           name: clean-cilium-state
           securityContext:
