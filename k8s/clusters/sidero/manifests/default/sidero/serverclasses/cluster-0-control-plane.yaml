@@ -8,22 +8,20 @@ spec:
     - op: replace
       path: /persist
       value: false
+
     - op: add
       path: /machine/kubelet/extraArgs
       value:
         rotate-server-certificates: true
         feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+
     - op: add
       path: /machine/time
       value:
         disabled: false
         servers:
           - 10.1.1.1
-    - op: add
-      path: /machine/sysctls
-      value:
-        fs.inotify.max_user_watches: "524288"
-        fs.inotify.max_user_instances: "512"
+
     - op: add
       path: /machine/network/interfaces
       value:
@@ -31,25 +29,28 @@ spec:
           dhcp: true
           vip:
             ip: 10.1.1.20
+
     - op: replace
       path: /cluster/proxy/disabled
       value: true
+
     - op: add
       path: /machine/certSANs
       value:
         - cluster-0.${HARDWARE_DOMAIN}
+
     - op: replace
-      path: /cluster
+      path: /cluster/network/cni
       value:
-        network:
-          cni:
-            name: "custom"
-            urls:
-              - "https://raw.githubusercontent.com/bjw-s/home-ops/main/k8s/clusters/cluster-0/integrations/cilium-quick-install/quick-install.yaml"
-        extraManifests:
-          - "https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/v0.2.2/deploy/ha-install.yaml"
+        name: "custom"
+        urls:
+          - "https://raw.githubusercontent.com/bjw-s/home-ops/main/k8s/clusters/cluster-0/integrations/cilium-quick-install/quick-install.yaml"
+
+    - op: replace
+      path: /cluster/extraManifests
+      value:
+        - "https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/v0.2.2/deploy/ha-install.yaml"
 
   selector:
     matchLabels:
       control-plane: "true"
-      cluster: "cluster-0"
