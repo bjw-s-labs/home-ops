@@ -1,0 +1,26 @@
+---
+apiVersion: metal.sidero.dev/v1alpha1
+kind: Server
+metadata:
+  labels:
+    cluster: cluster-0
+    control-plane: "true"
+  name: 111bb754-c3b2-11e6-805b-b30ba1d81900
+spec:
+  accepted: true
+  configPatches:
+    - op: replace
+      path: /machine/install/disk
+      value: /dev/sda
+  cpu:
+    manufacturer: Intel(R) Corporation
+    version: Intel(R) Core(TM) i3-6100T CPU @ 3.20GHz
+  hostname: anvil
+  pxeBootAlways: true
+  system:
+    family: ThinkCentre M900
+    manufacturer: LENOVO
+    productName: 10FLS22400
+    serialNumber: S4AQ2662
+    skuNumber: LENOVO_MT_10FL_BU_LENOVO_FM_ThinkCentre M900
+    version: ThinkCentre M900
