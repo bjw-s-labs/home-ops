@@ -2,7 +2,7 @@
 apiVersion: metal.sidero.dev/v1alpha1
 kind: ServerClass
 metadata:
-  name: control-plane
+  name: cluster-0-control-plane
 spec:
   configPatches:
     - op: replace
@@ -31,9 +31,6 @@ spec:
           dhcp: true
           vip:
             ip: 10.1.1.20
-          vlans:
-            - vlanId: 40
-              dhcp: false
     - op: replace
       path: /cluster/proxy/disabled
       value: true
@@ -44,7 +41,6 @@ spec:
     - op: replace
       path: /cluster
       value:
-        allowSchedulingOnMasters: true
         network:
           cni:
             name: "custom"
@@ -56,3 +52,4 @@ spec:
   selector:
     matchLabels:
       control-plane: "true"
+      cluster: "cluster-0"
