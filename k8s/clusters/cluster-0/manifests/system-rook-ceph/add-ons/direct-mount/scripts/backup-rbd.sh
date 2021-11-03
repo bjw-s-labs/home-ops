@@ -25,6 +25,11 @@ if [ -z "${application}" ]; then
   exit 1
 fi
 
+if [ -f "${target_folder}/${application}.tar.gz" ]; then
+  echo "File '${target_folder}/${application}.tar.gz' already exists"
+  exit 1
+fi
+
 if [ ! -d "${rbd_mountpath}" ]; then
   mkdir -p "${rbd_mountpath}"
 fi
