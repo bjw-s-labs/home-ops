@@ -1,0 +1,60 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: rook-ceph-cluster
+  namespace: rook-ceph
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://charts.rook.io/release
+      chart: rook-ceph-cluster
+      version: v1.7.6
+      sourceRef:
+        kind: HelmRepository
+        name: rook-ceph-charts
+        namespace: flux-system
+  values:
+    toolbox:
+      enabled: false
+
+    # TODO - Enable when kps is live
+    monitoring:
+      enabled: false
+
+    cephClusterSpec:
+      dashboard:
+        enabled: true
+        urlPrefix: /
+
+    ingress:
+      dashboard:
+        annotations:
+          traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+        host:
+          name: "rook-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          path: "/"
+        tls:
+          - hosts:
+              - "rook-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+
+    storage:
+      useAllNodes: false
+      useAllDevices: false
+      config:
+        osdsPerDevice: "1"
+      nodes:
+        - name: "delta"
+          devices:
+            - name: "sdb"
+        - name: "enigma"
+          devices:
+            - name: "sdb"
+        - name: "felix"
+          devices:
+            - name: "nvme0n1"
+
+    cephFileSystems: []
+
+    cephObjectStores: []
