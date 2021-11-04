@@ -13,7 +13,6 @@ spec:
       path: /machine/kubelet/extraArgs
       value:
         rotate-server-certificates: true
-        feature-gates: MixedProtocolLBService=true
 
     - op: add
       path: /machine/time
@@ -33,6 +32,11 @@ spec:
     - op: replace
       path: /cluster/proxy/disabled
       value: true
+
+    - op: add
+      path: /cluster/apiServer/extraArgs
+      value:
+        feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
 
     - op: add
       path: /machine/certSANs
