@@ -28,99 +28,99 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-intel-gpu-plugin
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-namespace
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-0/manifests/system/intel-gpu-plugin"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-multus
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-namespace
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-0/manifests/system/multus/base"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-multus-config
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-multus
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-0/manifests/system/multus/config"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-reloader
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-namespace
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-0/manifests/system/reloader"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-node-feature-discovery
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-namespace
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-0/manifests/system/node-feature-discovery"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-descheduler
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-namespace
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-0/manifests/system/descheduler"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-intel-gpu-plugin
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/system/intel-gpu-plugin"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-multus
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/system/multus/base"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-multus-config
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-multus
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/system/multus/config"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-reloader
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/system/reloader"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-node-feature-discovery
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/system/node-feature-discovery"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-descheduler
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/system/descheduler"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
