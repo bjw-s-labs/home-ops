@@ -79,12 +79,13 @@ spec:
             pullPolicy: IfNotPresent
 
         securityContext:
+          privileged: true
           runAsUser: 568
           runAsGroup: 568
 
         env:
           TZ: "Europe/Amsterdam"
-          IPTABLES_BACKEND: nft
+          IPTABLES_BACKEND: legacy
           KILLSWITCH: "false"
 
         configFileSecret: vpn-gateway-vpnconfig
