@@ -12,38 +12,38 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: selfhosted-nextcloud
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: selfhosted-namespace
-  interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/selfhosted/nextcloud"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: selfhosted-vaultwarden
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: selfhosted-namespace
-  interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/selfhosted/vaultwarden"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: selfhosted-nextcloud
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: selfhosted-namespace
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/selfhosted/nextcloud"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: home-ops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: selfhosted-vaultwarden
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: selfhosted-namespace
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/selfhosted/vaultwarden"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: home-ops
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
@@ -60,38 +60,38 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: selfhosted-overleaf
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: selfhosted-namespace
-  interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/selfhosted/overleaf"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: selfhosted-bookstack
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: selfhosted-namespace
-  interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/selfhosted/bookstack"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: selfhosted-overleaf
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: selfhosted-namespace
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/selfhosted/overleaf"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: home-ops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: selfhosted-bookstack
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: selfhosted-namespace
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/selfhosted/bookstack"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: home-ops
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
