@@ -117,8 +117,9 @@ spec:
 
         env:
           TZ: "Europe/Amsterdam"
-          IPTABLES_BACKEND: legacy
+          IPTABLES_BACKEND: nft
           KILLSWITCH: "true"
+          KILLSWITCH_EXCLUDEDNETWORKS_IPV4: "${NETWORK_K8S_CLUSTER_CIDR};${NETWORK_K8S_SERVICE_CIDR}"
 
         configFileSecret: qbittorrent-vpnconfig
 
