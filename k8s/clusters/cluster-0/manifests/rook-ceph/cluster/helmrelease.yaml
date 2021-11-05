@@ -30,12 +30,16 @@ spec:
     ingress:
       dashboard:
         annotations:
-          traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
         host:
           name: "rook-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
           path: "/"
         tls:
-          - hosts:
+          - secretName: tls.rook-ceph
+            hosts:
               - "rook-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
     storage:
@@ -53,6 +57,29 @@ spec:
         - name: "felix"
           devices:
             - name: "nvme0n1"
+
+    cephBlockPools:
+      - name: ceph-blockpool
+        spec:
+          failureDomain: host
+          replicated:
+            size: 3
+        storageClass:
+          enabled: true
+          name: ceph-block
+          isDefault: true
+          reclaimPolicy: Delete
+          allowVolumeExpansion: true
+          parameters:
+            imageFormat: "2"
+            imageFeatures: layering
+            csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+            csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+            csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+            csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+            csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+            csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+            csi.storage.k8s.io/fstype: ext4
 
     cephFileSystems: []
 
