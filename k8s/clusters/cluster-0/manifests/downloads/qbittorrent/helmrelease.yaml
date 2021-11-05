@@ -25,6 +25,7 @@ spec:
     hostname: qbittorrent
 
     podAnnotations:
+      secret.reloader.stakater.com/reload: "qbittorrent-vpnconfig"
       backup.velero.io/backup-volumes: config
       pre.hook.backup.velero.io/container: fsfreeze
       pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/data"]'
