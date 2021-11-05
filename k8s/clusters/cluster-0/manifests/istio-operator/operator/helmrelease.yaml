@@ -8,7 +8,7 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: /manifests/charts/operator/
+      chart: /manifests/charts/istio-operator/
       sourceRef:
         kind: GitRepository
         name: istio
@@ -23,3 +23,13 @@ spec:
   values:
     operatorNamespace: istio-operator
     watchedNamespaces: istio-system
+
+  postRenderers:
+    - kustomize:
+        # Remove namespace because it is already managed elsewhere
+        patchesStrategicMerge:
+          - kind: Namespace
+            apiVersion: v1
+            metadata:
+              name: istio-operator
+            $patch: delete
