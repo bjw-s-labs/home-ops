@@ -12,17 +12,33 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: vpn-gateway
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: vpn-namespace
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/vpn/gateway"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: home-ops
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: vpn-gateway
+  name: vpn-wireguard
   namespace: flux-system
 spec:
   dependsOn:
     - name: vpn-namespace
   interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/vpn/gateway"
+  path: "./k8s/clusters/cluster-0/manifests/vpn/wireguard"
   prune: true
   wait: true
   sourceRef:
