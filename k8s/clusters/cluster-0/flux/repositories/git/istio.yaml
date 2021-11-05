@@ -1,0 +1,17 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: istio
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  ref:
+    # renovate: datasource=github-releases depName=istio/istio
+    tag: "1.11.4"
+  url: https://github.com/istio/istio.git
+  ignore: |
+    # exclude all
+    /*
+    # include charts dirs
+    !/manifests/charts
