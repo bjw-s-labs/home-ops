@@ -23,7 +23,6 @@ spec:
       pullPolicy: IfNotPresent
 
     podAnnotations:
-      setGateway: "true"
       backup.velero.io/backup-volumes: config
       pre.hook.backup.velero.io/container: fsfreeze
       pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/data"]'
@@ -32,11 +31,16 @@ spec:
 
     env:
       TZ: "Europe/Amsterdam"
+      WAIT_FOR_VPN: "true"
 
     persistence:
       config:
         enabled: true
         existingClaim: prowlarr-config
+      shared:
+        enabled: true
+        type: emptyDir
+        mountPath: /shared
 
     ingress:
       main:
@@ -71,3 +75,43 @@ spec:
             mountPath: /data
         securityContext:
           privileged: true
+
+    addons:
+      vpn:
+        enabled: true
+        type: wireguard
+
+        wireguard:
+          image:
+            repository: ghcr.io/k8s-at-home/wireguard
+            tag: v1.0.20210914
+            pullPolicy: IfNotPresent
+
+        securityContext:
+          privileged: true
+          runAsUser: 568
+          runAsGroup: 568
+
+        env:
+          TZ: "Europe/Amsterdam"
+          IPTABLES_BACKEND: nft
+          KILLSWITCH: "true"
+          KILLSWITCH_EXCLUDEDNETWORKS_IPV4: "${NETWORK_K8S_CLUSTER_CIDR};${NETWORK_K8S_SERVICE_CIDR}"
+
+        configFileSecret: prowlarr-vpnconfig
+
+        scripts:
+          up: |-
+            #!/bin/bash
+            echo "connected" > /shared/vpnstatus
+
+          down: |-
+            #!/bin/bash
+            echo "disconnected" > /shared/vpnstatus
+
+        resources:
+          requests:
+            cpu: "0.001"
+            memory: 64Mi
+          limits:
+            memory: 128Mi
