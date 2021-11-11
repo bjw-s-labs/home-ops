@@ -1,0 +1,89 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cilium
+  namespace: kube-system
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://helm.cilium.io
+      chart: cilium
+      version: 1.10.5
+      sourceRef:
+        kind: HelmRepository
+        name: cilium-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    cluster:
+      name: "${CLUSTER_NAME}"
+      id: "${CLUSTER_ID}"
+
+    rollOutCiliumPods: true
+
+    localRedirectPolicy: true
+
+    kubeProxyReplacement: "strict"
+
+    kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
+
+    nativeRoutingCIDR: ${NETWORK_K8S_CLUSTER_CIDR}
+
+    k8sServiceHost: "cluster-0.${HARDWARE_DOMAIN}"
+    k8sServicePort: 6443
+
+    loadBalancer:
+      algorithm: "maglev"
+      mode: "dsr"
+
+    tunnel: "disabled"
+
+    autoDirectNodeRoutes: true
+
+    ipam:
+      mode: "kubernetes"
+
+    operator:
+      rollOutPods: true
+
+    containerRuntime:
+      integration: containerd
+
+    hubble:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+      metrics:
+        enabled:
+          - dns:query;ignoreAAAA
+          - drop
+          - tcp
+          - flow
+          - port-distribution
+          - icmp
+          - http
+      relay:
+        enabled: true
+        rollOutPods: true
+      ui:
+        enabled: true
+        rollOutPods: true
+        ingress:
+          enabled: true
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-production
+            traefik.ingress.kubernetes.io/router.entrypoints: websecure
+            traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+          hosts:
+            - "hubble.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          tls:
+            - secretName: hubble-tls
+              hosts:
+                - "hubble.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+
+    bgp:
+      enabled: false
+      announce:
+        loadbalancerIP: true
