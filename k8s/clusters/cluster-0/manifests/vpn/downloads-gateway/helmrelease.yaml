@@ -103,24 +103,13 @@ spec:
           enabled: true
 
           egress:
+            # Only allow traffic over the VPN port
             - to:
                 - ipBlock:
                     cidr: 0.0.0.0/0
               ports:
-                # VPN traffic port - change if your provider uses a different port
                 - port: ${VPN_PORT}
                   protocol: UDP
+            # Or cluster-internal traffic
             - to:
-                - namespaceSelector:
-                  matchLabels:
-                    kubernetes.io/metadata.name: downloads
-                - podSelector:
-                    matchLabels:
-                      app.kubernetes.io/instance: test
-                      app.kubernetes.io/name: test
-            - to:
-                # Allow traffic within K8S - change if your K8S cluster uses a different CIDR
-                - ipBlock:
-                    cidr: ${NETWORK_K8S_CLUSTER_CIDR}
-                - ipBlock:
-                    cidr: ${NETWORK_K8S_SERVICE_CIDR}
+                - namespaceSelector: {}
