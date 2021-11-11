@@ -34,16 +34,13 @@ spec:
             port: ${VPN_FORWARDED_PORT_1}
 
     settings:
-      NOT_ROUTED_TO_GATEWAY_CIDRS: "${NETWORK_K8S_CLUSTER_CIDR} ${NETWORK_K8S_SERVICE_CIDR} ${NETWORK_MANAGEMENT_CIDR}"
-      # tun0 for openvpn, wg0 for wireguard
       VPN_INTERFACE: wg0
-      # Prevent non VPN traffic to leave the gateway
+      VXLAN_ID: 43
+      VXLAN_IP_NETWORK: 172.16.1
       VPN_BLOCK_OTHER_TRAFFIC: true
-      # If VPN_BLOCK_OTHER_TRAFFIC is true, allow VPN traffic over this port
       VPN_TRAFFIC_PORT: ${VPN_PORT}
-      # Traffic to these IPs will be send through the K8S gateway
-      # change if your K8S cluster or home network uses a different CIDR
-      VPN_LOCAL_CIDRS: "${NETWORK_K8S_CLUSTER_CIDR} ${NETWORK_K8S_SERVICE_CIDR} ${NETWORK_MANAGEMENT_CIDR}"
+      NOT_ROUTED_TO_GATEWAY_CIDRS: "172.16.0.0/12 ${NETWORK_K8S_CLUSTER_CIDR} ${NETWORK_K8S_SERVICE_CIDR} ${NETWORK_MANAGEMENT_CIDR}"
+      VPN_LOCAL_CIDRS: "172.16.0.0/12 ${NETWORK_K8S_CLUSTER_CIDR} ${NETWORK_K8S_SERVICE_CIDR} ${NETWORK_MANAGEMENT_CIDR}"
 
     webhook:
       image:
