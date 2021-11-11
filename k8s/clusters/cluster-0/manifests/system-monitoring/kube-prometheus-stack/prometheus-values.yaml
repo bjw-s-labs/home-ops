@@ -10,11 +10,11 @@ prometheus:
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
       traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
     hosts:
-      - prometheus-${CLUSTER_NAME}.${INGRESS_DOMAIN}
+      - prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}
     tls:
       - secretName: prometheus-${CLUSTER_NAME}-tls
         hosts:
-          - prometheus-${CLUSTER_NAME}.${INGRESS_DOMAIN}
+          - prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}
 
   thanosService:
     enabled: true
