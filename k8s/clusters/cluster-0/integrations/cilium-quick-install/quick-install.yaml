@@ -5,6 +5,11 @@ kind: ServiceAccount
 metadata:
   name: "cilium"
   namespace: kube-system
+  annotations:
+    meta.helm.sh/release-name: cilium
+    meta.helm.sh/release-namespace: kube-system
+  labels:
+    app.kubernetes.io/managed-by: Helm
 ---
 # Source: cilium/templates/cilium-operator-serviceaccount.yaml
 apiVersion: v1
@@ -12,6 +17,11 @@ kind: ServiceAccount
 metadata:
   name: "cilium-operator"
   namespace: kube-system
+  annotations:
+    meta.helm.sh/release-name: cilium
+    meta.helm.sh/release-namespace: kube-system
+  labels:
+    app.kubernetes.io/managed-by: Helm
 ---
 # Source: cilium/templates/cilium-configmap.yaml
 apiVersion: v1
@@ -19,6 +29,11 @@ kind: ConfigMap
 metadata:
   name: cilium-config
   namespace: kube-system
+  annotations:
+    meta.helm.sh/release-name: cilium
+    meta.helm.sh/release-namespace: kube-system
+  labels:
+    app.kubernetes.io/managed-by: Helm
 data:
   # Identity allocation mode selects how identities are shared between cilium
   # nodes by setting how they are stored. The options are "crd" or "kvstore".
@@ -124,9 +139,10 @@ data:
   install-iptables-rules: "true"
   install-no-conntrack-iptables-rules: "false"
 
-  auto-direct-node-routes: "false"
+  auto-direct-node-routes: "true"
   enable-bandwidth-manager: "false"
   enable-local-redirect-policy: "false"
+  native-routing-cidr: 10.1.1.0/24
 
   kube-proxy-replacement: "strict"
   kube-proxy-replacement-healthz-bind-address: ""
@@ -134,24 +150,13 @@ data:
   node-port-bind-protection: "true"
   enable-auto-protect-node-port-range: "true"
   enable-session-affinity: "true"
+  enable-l2-neigh-discovery: "true"
   enable-endpoint-health-checking: "true"
   enable-health-checking: "true"
   enable-well-known-identities: "false"
   enable-remote-node-identity: "true"
   operator-api-serve-addr: "127.0.0.1:9234"
-  # Enable Hubble gRPC service.
-  enable-hubble: "true"
-  # UNIX domain socket for Hubble server to listen to.
-  hubble-socket-path: "/var/run/cilium/hubble.sock"
-  # An additional address for Hubble server to listen to (e.g. ":4244").
-  hubble-listen-address: ":4244"
-  hubble-disable-tls: "false"
-  hubble-tls-cert-file: /var/lib/cilium/tls/hubble/server.crt
-  hubble-tls-key-file: /var/lib/cilium/tls/hubble/server.key
-  hubble-tls-client-ca-files: /var/lib/cilium/tls/hubble/client-ca.crt
-  ipam: "cluster-pool"
-  cluster-pool-ipv4-cidr: "10.244.0.0/16"
-  cluster-pool-ipv4-mask-size: "24"
+  ipam: "kubernetes"
   disable-cnp-status-updates: "true"
   cgroup-root: "/run/cilium/cgroupv2"
 ---
@@ -160,6 +165,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: cilium
+  annotations:
+    meta.helm.sh/release-name: cilium
+    meta.helm.sh/release-namespace: kube-system
+  labels:
+    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - networking.k8s.io
@@ -259,6 +269,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: cilium-operator
+  annotations:
+    meta.helm.sh/release-name: cilium
+    meta.helm.sh/release-namespace: kube-system
+  labels:
+    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - ""
@@ -359,6 +374,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: cilium
+  annotations:
+    meta.helm.sh/release-name: cilium
+    meta.helm.sh/release-namespace: kube-system
+  labels:
+    app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -373,6 +393,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: cilium-operator
+  annotations:
+    meta.helm.sh/release-name: cilium
+    meta.helm.sh/release-namespace: kube-system
+  labels:
+    app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -382,12 +407,41 @@ subjects:
     name: "cilium-operator"
     namespace: kube-system
 ---
+# Source: cilium/templates/cilium-agent-service.yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: hubble-metrics
+  namespace: kube-system
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9091"
+    meta.helm.sh/release-name: cilium
+    meta.helm.sh/release-namespace: kube-system
+  labels:
+    k8s-app: hubble
+    app.kubernetes.io/managed-by: Helm
+spec:
+  clusterIP: None
+  type: ClusterIP
+  ports:
+    - name: hubble-metrics
+      port: 9091
+      protocol: TCP
+      targetPort: hubble-metrics
+  selector:
+    k8s-app: cilium
+---
 # Source: cilium/templates/cilium-agent-daemonset.yaml
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
+  annotations:
+    meta.helm.sh/release-name: cilium
+    meta.helm.sh/release-namespace: kube-system
   labels:
     k8s-app: cilium
+    app.kubernetes.io/managed-by: Helm
   name: cilium
   namespace: kube-system
 spec:
@@ -518,6 +572,11 @@ spec:
                 command:
                   - /cni-uninstall.sh
           name: cilium-agent
+          ports:
+            - containerPort: 9091
+              hostPort: 9091
+              name: hubble-metrics
+              protocol: TCP
           securityContext:
             capabilities:
               add:
@@ -545,9 +604,6 @@ spec:
               readOnly: true
             - mountPath: /run/xtables.lock
               name: xtables-lock
-            - mountPath: /var/lib/cilium/tls/hubble
-              name: hubble-tls
-              readOnly: true
       hostNetwork: true
       initContainers:
         # Required to mount cgroup2 filesystem on the underlying Kubernetes node.
@@ -673,27 +729,18 @@ spec:
         - configMap:
             name: cilium-config
           name: cilium-config-path
-        - name: hubble-tls
-          projected:
-            sources:
-              - secret:
-                  name: hubble-server-certs
-                  items:
-                    - key: ca.crt
-                      path: client-ca.crt
-                    - key: tls.crt
-                      path: server.crt
-                    - key: tls.key
-                      path: server.key
-                  optional: true
 ---
 # Source: cilium/templates/cilium-operator-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+    meta.helm.sh/release-name: cilium
+    meta.helm.sh/release-namespace: kube-system
   labels:
     io.cilium/app: operator
     name: cilium-operator
+    app.kubernetes.io/managed-by: Helm
   name: cilium-operator
   namespace: kube-system
 spec:
