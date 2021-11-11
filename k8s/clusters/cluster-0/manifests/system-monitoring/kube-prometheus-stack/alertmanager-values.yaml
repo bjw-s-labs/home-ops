@@ -53,11 +53,11 @@ alertmanager:
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
       traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
     hosts:
-      - alertmanager-${CLUSTER_NAME}.${INGRESS_DOMAIN}
+      - alertmanager.${CLUSTER_NAME}.${INGRESS_DOMAIN}
     tls:
       - secretName: alertmanager-${CLUSTER_NAME}-tls
         hosts:
-          - alertmanager-${CLUSTER_NAME}.${INGRESS_DOMAIN}
+          - alertmanager.${CLUSTER_NAME}.${INGRESS_DOMAIN}
 
   alertmanagerSpec:
     storage:
