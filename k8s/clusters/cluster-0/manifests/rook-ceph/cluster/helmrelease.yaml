@@ -35,12 +35,12 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
         host:
-          name: "rook-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          name: "rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
           path: "/"
         tls:
           - secretName: tls.rook-ceph
             hosts:
-              - "rook-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              - "rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
     storage:
       useAllNodes: false
