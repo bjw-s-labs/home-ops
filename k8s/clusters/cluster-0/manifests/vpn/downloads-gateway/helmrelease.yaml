@@ -100,7 +100,7 @@ spec:
             memory: 128Mi
 
         networkPolicy:
-          enabled: false
+          enabled: true
 
           egress:
             - to:
@@ -110,6 +110,14 @@ spec:
                 # VPN traffic port - change if your provider uses a different port
                 - port: ${VPN_PORT}
                   protocol: UDP
+            - to:
+                - namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: downloads
+                - podSelector:
+                    matchLabels:
+                      app.kubernetes.io/instance: test
+                      app.kubernetes.io/name: test
             - to:
                 # Allow traffic within K8S - change if your K8S cluster uses a different CIDR
                 - ipBlock:
