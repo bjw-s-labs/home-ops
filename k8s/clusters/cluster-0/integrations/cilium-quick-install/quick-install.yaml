@@ -407,31 +407,6 @@ subjects:
     name: "cilium-operator"
     namespace: kube-system
 ---
-# Source: cilium/templates/cilium-agent-service.yaml
-kind: Service
-apiVersion: v1
-metadata:
-  name: hubble-metrics
-  namespace: kube-system
-  annotations:
-    prometheus.io/scrape: "true"
-    prometheus.io/port: "9091"
-    meta.helm.sh/release-name: cilium
-    meta.helm.sh/release-namespace: kube-system
-  labels:
-    k8s-app: hubble
-    app.kubernetes.io/managed-by: Helm
-spec:
-  clusterIP: None
-  type: ClusterIP
-  ports:
-    - name: hubble-metrics
-      port: 9091
-      protocol: TCP
-      targetPort: hubble-metrics
-  selector:
-    k8s-app: cilium
----
 # Source: cilium/templates/cilium-agent-daemonset.yaml
 apiVersion: apps/v1
 kind: DaemonSet
@@ -572,11 +547,6 @@ spec:
                 command:
                   - /cni-uninstall.sh
           name: cilium-agent
-          ports:
-            - containerPort: 9091
-              hostPort: 9091
-              name: hubble-metrics
-              protocol: TCP
           securityContext:
             capabilities:
               add:
