@@ -29,8 +29,6 @@ spec:
 
     kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
 
-    nativeRoutingCIDR: ${NETWORK_MANAGEMENT_CIDR}
-
     k8sServiceHost: "cluster-0.${HARDWARE_DOMAIN}"
     k8sServicePort: 6443
 
@@ -38,9 +36,7 @@ spec:
       algorithm: "maglev"
       mode: "dsr"
 
-    tunnel: "disabled"
-
-    autoDirectNodeRoutes: true
+    tunnel: "vxlan"
 
     ipam:
       mode: "kubernetes"
