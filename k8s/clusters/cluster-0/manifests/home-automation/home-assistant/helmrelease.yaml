@@ -30,12 +30,7 @@ spec:
       pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/data"]'
       post.hook.backup.velero.io/container: fsfreeze
       post.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--unfreeze", "/data"]'
-      k8s.v1.cni.cncf.io/networks: |
-        [{
-          "name":"macvlan-iot-static",
-          "namespace": "system",
-          "ips": ["${HASS_VLAN_IP}/24"]
-        }]
+
     probes:
       liveness:
         enabled: false
