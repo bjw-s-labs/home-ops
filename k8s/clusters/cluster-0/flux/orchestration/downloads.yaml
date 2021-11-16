@@ -126,3 +126,19 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: downloads-youtubedl-material
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: downloads-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/downloads/youtubedl-material"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
