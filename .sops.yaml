@@ -1,21 +1,9 @@
 ---
 
 creation_rules:
-  - path_regex: ansible/.*\.sops\.ya?ml
-    # Personal
-    pgp: >-
-      0xBE954AA0B2A13EAD
-
-  - path_regex: cluster/.*\.ya?ml
+  - path_regex: (global|clusters)/.*\.sops\.ya?ml
     encrypted_regex: '((?i)(pass|secret($|[^N])|key|token|^data$|^stringData))'
     # Personal, Flux
-    pgp: >-
-      0xBE954AA0B2A13EAD,
-      0xEF97AF748D596FE2
-
-  - path_regex: (clusters|gitops)/.*\.sops\.ya?ml
-    encrypted_regex: '((?i)(pass|secret($|[^N])|key|token|^data$|^stringData))'
-    # Personal, Flux
-    pgp: >-
-      0xBE954AA0B2A13EAD,
-      0xEF97AF748D596FE2
+    age: >-
+      age1uk0y2ahfavgsgqvrtg5a22w5gytpdmjuatxtcw6kntmxhlcgreesuwzw5s,
+      age1hawjtl6fm5czl8cun0ve7jvsmpqpn3qlxl2lnx7ndt7682tmva2qz3drfe
