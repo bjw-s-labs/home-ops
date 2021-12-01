@@ -1,4 +1,5 @@
-apiVersion: cluster.x-k8s.io/v1alpha3
+---
+apiVersion: cluster.x-k8s.io/v1alpha4
 kind: Cluster
 metadata:
   name: cluster-0
@@ -11,14 +12,20 @@ spec:
     services:
       cidrBlocks:
         - 10.96.0.0/12
+  controlPlaneEndpoint:
+    host: cluster-0.${HARDWARE_DOMAIN}
+    port: 6443
   controlPlaneRef:
     apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
     kind: TalosControlPlane
     name: cluster-0-cp
+    namespace: default
   infrastructureRef:
     apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
     kind: MetalCluster
     name: cluster-0
+    namespace: default
+
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
 kind: MetalCluster
@@ -74,7 +81,7 @@ spec:
       generateType: join
       talosVersion: v0.13.4
 ---
-apiVersion: cluster.x-k8s.io/v1alpha3
+apiVersion: cluster.x-k8s.io/v1alpha4
 kind: MachineDeployment
 metadata:
   name: cluster-0-workers
@@ -82,8 +89,6 @@ metadata:
 spec:
   clusterName: cluster-0
   replicas: 4
-  selector:
-    matchLabels: null
   template:
     spec:
       bootstrap:
