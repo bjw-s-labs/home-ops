@@ -7,19 +7,24 @@ spec:
   configPatches:
     - op: replace
       path: /cluster/apiServer/image
+      # renovate: docker-image
       value: k8s.gcr.io/kube-apiserver:v1.22.4
     - op: replace
       path: /cluster/controllerManager/image
+      # renovate: docker-image
       value: k8s.gcr.io/kube-controller-manager:v1.22.4
     - op: replace
       path: /cluster/scheduler/image
+      # renovate: docker-image
       value: k8s.gcr.io/kube-scheduler:v1.22.4
     - op: replace
       path: /machine/kubelet/image
+      # renovate: docker-image
       value: ghcr.io/talos-systems/kubelet:v1.22.4
     - op: add
       path: /cluster/coreDNS
       value:
+        # renovate: docker-image
         image: docker.io/coredns/coredns:1.8.6
 
     - op: replace
