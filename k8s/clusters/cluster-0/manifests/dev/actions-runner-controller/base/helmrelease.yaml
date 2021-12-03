@@ -50,16 +50,16 @@ spec:
           kubernetes.io/ingress.class: traefik
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns/is-public: "true"
-          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+          external-dns.alpha.kubernetes.io/target: ingress.bjw-s.dev
           external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
         hosts:
-          - host: acr-hook.${INGRESS_DOMAIN}
+          - host: acr-hook.bjw-s.dev
             paths:
               - path: /
         tls:
           - hosts:
-              - acr-hook.${INGRESS_DOMAIN}
+              - acr-hook.bjw-s.dev
             secretName: tls.acr-hook
 
       resources:
@@ -67,3 +67,29 @@ spec:
           memory: 64Mi
         limits:
           memory: 96Mi
+
+  postRenderers:
+    - kustomize:
+        patchesJson6902:
+          - target:
+              kind: Ingress
+              group: networking.k8s.io
+              version: v1beta1
+              name: actions-runner-controller-github-webhook-server
+            patch:
+              - op: replace
+                path: /apiVersion
+                value: networking.k8s.io/v1
+              - op: remove
+                path: /spec/rules/0/http/paths/0/backend/servicePort
+              - op: remove
+                path: /spec/rules/0/http/paths/0/backend/serviceName
+              - op: add
+                path: /spec/rules/0/http/paths/0/backend/service
+                value:
+                  name: actions-runner-controller-github-webhook-server
+                  port:
+                    name: http
+              - op: add
+                path: /spec/rules/0/http/paths/0/pathType
+                value: Prefix

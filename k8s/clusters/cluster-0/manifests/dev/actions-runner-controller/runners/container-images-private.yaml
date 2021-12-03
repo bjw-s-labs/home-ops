@@ -20,9 +20,8 @@ spec:
           mountPath: /cache
       volumes:
         - name: cache-volume
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /volume1/Cache/actions-runner-controller
+          persistentVolumeClaim:
+            claimName: actions-runner-controller-cache
       resources:
         requests:
           memory: 256Mi
