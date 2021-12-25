@@ -60,6 +60,11 @@ spec:
         feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
 
     - op: add
+      path: /cluster/apiServer/certSANs
+      value:
+        - 10.5.0.2
+
+    - op: add
       path: /machine/certSANs
       value:
         - cluster-0.${HARDWARE_DOMAIN}
