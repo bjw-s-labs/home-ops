@@ -1,0 +1,117 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: vector-agent
+  namespace: system-monitoring
+spec:
+  dependsOn:
+    - name: loki
+      namespace: system-monitoring
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://helm.vector.dev
+      chart: vector-agent
+      version: 0.19.1
+      sourceRef:
+        kind: HelmRepository
+        name: vector-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    env:
+      - name: VECTOR_WATCH_CONFIG
+        value: "true"
+
+    customConfig:
+      data_dir: /vector-data-dir
+
+      # Sources
+      sources:
+        kubernetes_logs:
+          type: kubernetes_logs
+
+        opnsense_firewall_logs:
+          type: syslog
+          address: 0.0.0.0:5140
+          mode: udp
+
+      # Sinks
+      sinks:
+        loki_kubernetes_sink:
+          type: loki
+          inputs:
+            - kubernetes_logs
+          endpoint: http://loki.system-monitoring:3100
+          encoding:
+            codec: json
+          batch:
+            max_bytes: 2049000
+          out_of_order_action: rewrite_timestamp
+          remove_label_fields: true
+          remove_timestamp: true
+          labels:
+            app: >-
+              {{`{{ kubernetes.pod_labels.app\.kubernetes\.io/name }}`}}
+            container: >-
+              {{`{{ kubernetes.container_name }}`}}
+            filename: >-
+              {{`{{ kubernetes.file }}`}}
+            instance: >-
+              {{`{{ kubernetes.pod_labels.app\.kubernetes\.io/instance }}`}}
+            namespace: >-
+              {{`{{ kubernetes.pod_namespace }}`}}
+            node: >-
+              {{`{{ kubernetes.pod_node_name }}`}}
+            pod: >-
+              {{`{{ kubernetes.pod_name }}`}}
+
+        loki_vyos_firewall_sink:
+          type: loki
+          inputs:
+            - vyos_firewall_logs
+          endpoint: http://loki.system-monitoring:3100
+          encoding:
+            codec: json
+          batch:
+            max_bytes: 2049000
+          labels:
+            hostname: gateway
+
+    service:
+      enabled: true
+      type: LoadBalancer
+      ports:
+        - name: vyos-firewall
+          port: 5140
+          protocol: TCP
+          targetPort: 5140
+
+    podMonitor:
+      enabled: true
+
+    securityContext:
+      privileged: true
+
+    extraVolumes:
+      - name: journald
+        hostPath:
+          path: /var/log/journal
+
+    extraVolumeMounts:
+      - name: journald
+        mountPath: /var/log/journal
+        readOnly: true
+
+  postRenderers:
+    - kustomize:
+        patchesJson6902:
+          - target:
+              kind: Service
+              name: vector-agent
+            patch:
+              - op: add
+                path: /spec/loadBalancerIP
+                value:
+                  - ${LB_VECTOR}
