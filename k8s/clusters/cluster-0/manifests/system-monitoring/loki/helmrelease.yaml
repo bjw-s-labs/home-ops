@@ -33,6 +33,21 @@ spec:
           resync_interval: 5s
           shared_store: s3
 
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: traefik
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+      hosts:
+        - "loki.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+      tls:
+        - secretName: loki-${CLUSTER_NAME}-tls
+          hosts:
+            - "loki.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+
     persistence:
       enabled: false
 
