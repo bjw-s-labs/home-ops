@@ -32,10 +32,10 @@ spec:
         kubernetes_logs:
           type: kubernetes_logs
 
-        opnsense_firewall_logs:
-          type: syslog
-          address: 0.0.0.0:5140
-          mode: udp
+        # opnsense_firewall_logs:
+        #   type: syslog
+        #   address: 0.0.0.0:5140
+        #   mode: udp
 
       # Sinks
       sinks:
@@ -67,26 +67,26 @@ spec:
             pod: >-
               {{`{{ kubernetes.pod_name }}`}}
 
-        loki_vyos_firewall_sink:
-          type: loki
-          inputs:
-            - vyos_firewall_logs
-          endpoint: http://loki.system-monitoring:3100
-          encoding:
-            codec: json
-          batch:
-            max_bytes: 2049000
-          labels:
-            hostname: gateway
+        # loki_vyos_firewall_sink:
+        #   type: loki
+        #   inputs:
+        #     - vyos_firewall_logs
+        #   endpoint: http://loki.system-monitoring:3100
+        #   encoding:
+        #     codec: json
+        #   batch:
+        #     max_bytes: 2049000
+        #   labels:
+        #     hostname: gateway
 
-    service:
-      enabled: true
-      type: LoadBalancer
-      ports:
-        - name: vyos-firewall
-          port: 5140
-          protocol: TCP
-          targetPort: 5140
+    # service:
+    #   enabled: true
+    #   type: LoadBalancer
+    #   ports:
+    #     - name: vyos-firewall
+    #       port: 5140
+    #       protocol: TCP
+    #       targetPort: 5140
 
     podMonitor:
       enabled: true
@@ -94,24 +94,14 @@ spec:
     securityContext:
       privileged: true
 
-    extraVolumes:
-      - name: journald
-        hostPath:
-          path: /var/log/journal
-
-    extraVolumeMounts:
-      - name: journald
-        mountPath: /var/log/journal
-        readOnly: true
-
-  postRenderers:
-    - kustomize:
-        patchesJson6902:
-          - target:
-              kind: Service
-              name: vector-agent
-            patch:
-              - op: add
-                path: /spec/loadBalancerIP
-                value:
-                  - ${LB_VECTOR}
+  # postRenderers:
+  #   - kustomize:
+  #       patchesJson6902:
+  #         - target:
+  #             kind: Service
+  #             name: vector-agent
+  #           patch:
+  #             - op: add
+  #               path: /spec/loadBalancerIP
+  #               value:
+  #                 - ${LB_VECTOR}
