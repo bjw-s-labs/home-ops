@@ -22,10 +22,6 @@ spec:
   values:
     role: "Agent"
 
-    env:
-      - name: VECTOR_WATCH_CONFIG
-        value: "true"
-
     podMonitor:
       enabled: true
 
@@ -50,29 +46,8 @@ spec:
       # Sinks
       sinks:
         loki_kubernetes_sink:
-          type: loki
+          type: vector
           inputs:
             - kubernetes_logs
-          endpoint: http://loki.system-monitoring:3100
-          encoding:
-            codec: json
-          batch:
-            max_bytes: 2049000
-          out_of_order_action: rewrite_timestamp
-          remove_label_fields: true
-          remove_timestamp: true
-          labels:
-            app: >-
-              {{`{{ kubernetes.pod_labels.app\.kubernetes\.io/name }}`}}
-            container: >-
-              {{`{{ kubernetes.container_name }}`}}
-            filename: >-
-              {{`{{ kubernetes.file }}`}}
-            instance: >-
-              {{`{{ kubernetes.pod_labels.app\.kubernetes\.io/instance }}`}}
-            namespace: >-
-              {{`{{ kubernetes.pod_namespace }}`}}
-            node: >-
-              {{`{{ kubernetes.pod_node_name }}`}}
-            pod: >-
-              {{`{{ kubernetes.pod_name }}`}}
+          address: "vector-aggregator.system-monitoring:6000"
+          version: "2"
