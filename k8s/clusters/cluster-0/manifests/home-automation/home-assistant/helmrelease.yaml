@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: home-assistant
-      version: 11.2.1
+      version: 12.0.0
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
@@ -105,7 +105,7 @@ spec:
 
       image:
         repository: bitnami/postgresql
-        tag: 13.5.0
+        tag: 14.1.0
         pullPolicy: IfNotPresent
 
       persistence:
@@ -114,6 +114,7 @@ spec:
 
       postgresqlUsername: home-assistant
       postgresqlDatabase: home-assistant
+      # postgresqlPostgresPassword: set by valuesFrom
       # postgresqlPassword: set by valuesFrom
 
       primary:
@@ -144,7 +145,7 @@ spec:
         enabled: true
 
         image:
-          repository: ghcr.io/bjw-s/code-server
+          repository: ghcr.io/k8s-at-home/code-server
           tag: v3.12.0
           pullPolicy: Always
 
@@ -168,13 +169,13 @@ spec:
               hosts:
                 - code-domo.${INGRESS_DOMAIN}
 
-        # env:
-        #   EXTENSION_URLS: |
-        #     https://marketplace.visualstudio.com/_apis/public/gallery/publishers/keesschollaart/vsextensions/vscode-home-assistant/1.21.0/vspackage
-
         args:
           - --auth
           - none
+          - --user-data-dir
+          - "/config/.vscode"
+          - --extensions-dir
+          - "/config/.vscode"
 
         volumeMounts:
           - name: config
@@ -192,4 +193,9 @@ spec:
       name: home-assistant
       valuesKey: postgresql_password
       targetPath: postgresql.postgresqlPassword
+      optional: false
+    - kind: Secret
+      name: home-assistant
+      valuesKey: postgresql_admin_password
+      targetPath: postgresql.postgresqlPostgresPassword
       optional: false
