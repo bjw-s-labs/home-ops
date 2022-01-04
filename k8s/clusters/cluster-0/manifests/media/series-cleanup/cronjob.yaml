@@ -57,8 +57,11 @@ spec:
               persistentVolumeClaim:
                 claimName: series-cleanup-data
             - name: config
-              configMap:
-                name: series-cleanup-config
+              projected:
+                defaultMode: 0775
+                sources:
+                  - configMap:
+                      name: series-cleanup-config
             - name: nas-media
               nfs:
                 server: "${NAS_ADDRESS}"
