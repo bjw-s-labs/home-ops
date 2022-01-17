@@ -32,11 +32,6 @@ spec:
         enabled: true
         notiftype: short
 
-    config:
-      settings:
-        clustername: ${CLUSTER_NAME}
-      recommendations: false
-
   valuesFrom:
     - kind: Secret
       name: botkube
@@ -53,3 +48,5 @@ spec:
       valuesKey: discord-channel
       targetPath: communications.discord.channel
       optional: false
+    - kind: ConfigMap
+      name: botkube-config-values
