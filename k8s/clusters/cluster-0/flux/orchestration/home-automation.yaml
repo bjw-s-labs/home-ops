@@ -81,22 +81,6 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: home-automation-octoprint
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: home-automation-namespace
-  interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/home-automation/octoprint"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
   name: home-automation-frigate
   namespace: flux-system
 spec:
