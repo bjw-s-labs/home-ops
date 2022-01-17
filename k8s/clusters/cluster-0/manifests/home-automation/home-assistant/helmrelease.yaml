@@ -25,11 +25,6 @@ spec:
 
     podAnnotations:
       secret.reloader.stakater.com/reload: home-assistant-secrets
-      backup.velero.io/backup-volumes: config
-      pre.hook.backup.velero.io/container: fsfreeze
-      pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/data"]'
-      post.hook.backup.velero.io/container: fsfreeze
-      post.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--unfreeze", "/data"]'
 
     probes:
       liveness:
@@ -90,16 +85,6 @@ spec:
       limits:
         memory: 2000Mi
 
-    additionalContainers:
-      fsfreeze:
-        name: fsfreeze
-        image: ghcr.io/k8s-at-home/fsfreeze:v2.37-r0
-        volumeMounts:
-          - name: config
-            mountPath: /data
-        securityContext:
-          privileged: true
-
     postgresql:
       enabled: true
 
@@ -116,23 +101,6 @@ spec:
       postgresqlDatabase: home-assistant
       # postgresqlPostgresPassword: set by valuesFrom
       # postgresqlPassword: set by valuesFrom
-
-      primary:
-        podAnnotations:
-          backup.velero.io/backup-volumes: data
-          pre.hook.backup.velero.io/container: fsfreeze
-          pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/data"]'
-          post.hook.backup.velero.io/container: fsfreeze
-          post.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--unfreeze", "/data"]'
-
-        sidecars:
-          - name: fsfreeze
-            image: ghcr.io/k8s-at-home/fsfreeze:v2.37-r0
-            volumeMounts:
-              - name: data
-                mountPath: /data
-            securityContext:
-              privileged: true
 
       resources:
         requests:
