@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: nextcloud-data
   namespace: selfhosted
+  labels:
+    k10.kasten.io/backup: "true"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -19,6 +21,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: nextcloud-postgresql
   namespace: selfhosted
+  labels:
+    k10.kasten.io/backup: "true"
 spec:
   accessModes:
     - ReadWriteOnce
