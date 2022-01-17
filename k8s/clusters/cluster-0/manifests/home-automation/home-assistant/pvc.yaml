@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: home-assistant-data
   namespace: home-automation
+  annotations:
+    k10.kasten.io/backup: "true"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -19,6 +21,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: home-assistant-postgresql
   namespace: home-automation
+  annotations:
+    k10.kasten.io/backup: "true"
 spec:
   accessModes:
     - ReadWriteOnce
