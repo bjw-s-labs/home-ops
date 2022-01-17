@@ -21,9 +21,6 @@ spec:
       repository: nextcloud
       tag: "23.0.0"
 
-    podAnnotations:
-      backup.velero.io/backup-volumes: nextcloud-data
-
     env:
       PHP_MEMORY_LIMIT: 256M
 
@@ -117,23 +114,6 @@ spec:
       persistence:
         enabled: true
         existingClaim: nextcloud-postgresql
-
-      primary:
-        podAnnotations:
-          backup.velero.io/backup-volumes: data
-          pre.hook.backup.velero.io/container: fsfreeze
-          pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/data"]'
-          post.hook.backup.velero.io/container: fsfreeze
-          post.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--unfreeze", "/data"]'
-
-        sidecars:
-          - name: fsfreeze
-            image: ghcr.io/k8s-at-home/fsfreeze:v2.37-r0
-            volumeMounts:
-              - name: data
-                mountPath: /data
-            securityContext:
-              privileged: true
 
       resources:
         requests:
