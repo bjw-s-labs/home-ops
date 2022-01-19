@@ -35,19 +35,13 @@
       "k8s/global/.+\\.yaml$"
     ],
   },
+  "flux": {
+    "fileMatch": [
+      "k8s/clusters/.+\\.yaml$",
+      "k8s/global/.+\\.yaml$"
+    ]
+  },
   "regexManagers": [
-    // regexManager to read and process HelmRelease files
-    {
-      "fileMatch": [
-        "k8s/clusters/.+\\.yaml$",
-        "k8s/global/.+\\.yaml$"
-      ],
-      "matchStrings": [
-        // helm releases
-        "registryUrl=(?<registryUrl>.*?)\n *chart: (?<depName>.*?)\n *version: (?<currentValue>.*)\n",
-      ],
-      "datasourceTemplate": "helm"
-    },
     // regexManager to read and process GitHub release artifacts
     {
       "fileMatch": [
@@ -60,7 +54,7 @@
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "{{org}}/{{repo}}"
     },
-    // Generic Flux Regex Manager
+    // Generic Regex Manager
     {
       "fileMatch": [
         "k8s/clusters/.+\\.yaml$",
