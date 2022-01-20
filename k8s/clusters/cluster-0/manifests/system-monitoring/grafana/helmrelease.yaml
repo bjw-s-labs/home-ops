@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: grafana
-      version: 6.20.5
+      version: 6.20.6
       sourceRef:
         kind: HelmRepository
         name: grafana-charts
@@ -100,11 +100,6 @@ spec:
           gnetId: 5342
           revision: 5
           datasource: Prometheus
-        # Ref: https://grafana.com/grafana/dashboards/12175
-        calico-felix:
-          gnetId: 12175
-          revision: 5
-          datasource: Prometheus
         # Ref: https://grafana.com/grafana/dashboards/13665
         speedtest:
           gnetId: 13665
@@ -112,9 +107,6 @@ spec:
           datasource: Prometheus
         node-exporter-full:
           url: https://grafana.com/api/dashboards/1860/revisions/22/download
-          datasource: Prometheus
-        nginx-dashboard:
-          url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
           datasource: Prometheus
         blocky:
           url: https://raw.githubusercontent.com/0xERR0R/blocky/master/docs/blocky-grafana.json
@@ -164,8 +156,7 @@ spec:
             - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
     persistence:
-      enabled: true
-      existingClaim: grafana-data
+      enabled: false
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "grafana"
