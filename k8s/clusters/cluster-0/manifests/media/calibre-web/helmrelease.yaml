@@ -49,14 +49,14 @@ spec:
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
 
         hosts:
-          - host: calibre-web.${INGRESS_DOMAIN}
+          - host: &host "calibre-web.${INGRESS_DOMAIN}"
             paths:
               - path: /
 
         tls:
           - secretName: tls.calibre-web
             hosts:
-              - calibre-web.${INGRESS_DOMAIN}
+              - *host
 
       kobo:
         enabled: true
@@ -68,14 +68,14 @@ spec:
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
 
         hosts:
-          - host: calibre-web.${INGRESS_DOMAIN}
+          - host: *host
             paths:
               - path: /kobo/
 
         tls:
           - secretName: tls.calibre-web
             hosts:
-              - calibre-web.${INGRESS_DOMAIN}
+              - *host
 
     resources:
       requests:

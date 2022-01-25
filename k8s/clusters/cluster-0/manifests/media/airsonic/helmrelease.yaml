@@ -59,14 +59,14 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
 
         hosts:
-          - host: airsonic.${INGRESS_DOMAIN}
+          - host: &host "airsonic.${INGRESS_DOMAIN}"
             paths:
               - path: /
 
         tls:
           - secretName: tls.airsonic
             hosts:
-              - airsonic.${INGRESS_DOMAIN}
+              - *host
 
     resources:
       requests:
