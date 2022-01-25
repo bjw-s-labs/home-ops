@@ -79,13 +79,13 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
         hosts:
-          - host: "minio.${INGRESS_DOMAIN}"
+          - host: &host-minio "minio.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
                 service:
                   port: 9001
-          - host: "s3.${INGRESS_DOMAIN}"
+          - host: &host-s3 "s3.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
@@ -94,8 +94,8 @@ spec:
         tls:
           - secretName: tls.minio
             hosts:
-              - "{{ (index .Values.ingress.main.hosts 0).host }}"
-              - "{{ (index .Values.ingress.main.hosts 1).host }}"
+              - *host-minio
+              - *host-s3
 
     podAnnotations:
       secret.reloader.stakater.com/reload: "minio"
