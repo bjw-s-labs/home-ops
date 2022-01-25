@@ -54,14 +54,14 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
 
         hosts:
-          - host: domo.${INGRESS_DOMAIN}
+          - host: &host "domo.${INGRESS_DOMAIN}"
             paths:
               - path: /
 
         tls:
           - secretName: tls.home-assistant-frontend
             hosts:
-              - domo.${INGRESS_DOMAIN}
+              - *host
 
     env:
       TZ: "Europe/Amsterdam"
@@ -126,13 +126,13 @@ spec:
             traefik.ingress.kubernetes.io/router.entrypoints: websecure
             traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
           hosts:
-            - host: code-domo.${INGRESS_DOMAIN}
+            - host: &code-host "code.domo.${INGRESS_DOMAIN}"
               paths:
                 - path: /
           tls:
             - secretName: tls.home-assistant-code
               hosts:
-                - code-domo.${INGRESS_DOMAIN}
+                - *code-host
 
         args:
           - --auth

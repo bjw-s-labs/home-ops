@@ -44,14 +44,14 @@ spec:
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
 
         hosts:
-          - host: zigbee2mqtt.${INGRESS_DOMAIN}
+          - host: &host "zigbee2mqtt.${INGRESS_DOMAIN}"
             paths:
               - path: /
 
         tls:
           - secretName: tls.zigbee2mqtt
             hosts:
-              - zigbee2mqtt.${INGRESS_DOMAIN}
+              - *host
 
     config:
       mqtt:
