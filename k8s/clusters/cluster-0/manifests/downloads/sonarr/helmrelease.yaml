@@ -53,13 +53,13 @@ spec:
           hajimari.io/enable: "true"
           hajimari.io/icon: "television-box"
         hosts:
-          - host: sonarr.${INGRESS_DOMAIN}
+          - host: &host "sonarr.${INGRESS_DOMAIN}"
             paths:
               - path: /
         tls:
           - secretName: tls.sonarr
             hosts:
-              - sonarr.${INGRESS_DOMAIN}
+              - *host
 
     resources:
       requests:

@@ -53,13 +53,13 @@ spec:
           hajimari.io/enable: "true"
           hajimari.io/icon: "filmstrip"
         hosts:
-          - host: radarr.${INGRESS_DOMAIN}
+          - host: &host "radarr.${INGRESS_DOMAIN}"
             paths:
               - path: /
         tls:
           - secretName: tls.radarr
             hosts:
-              - radarr.${INGRESS_DOMAIN}
+              - *host
 
     resources:
       requests:
