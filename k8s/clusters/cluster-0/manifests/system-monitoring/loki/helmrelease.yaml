@@ -41,13 +41,13 @@ spec:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
         traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
       hosts:
-        - host: "loki.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+        - host: &host "loki.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
           paths:
             - /
       tls:
         - secretName: loki-${CLUSTER_NAME}-tls
           hosts:
-            - "loki.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            - *host
 
     persistence:
       enabled: false
