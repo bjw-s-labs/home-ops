@@ -42,14 +42,14 @@ spec:
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
 
         hosts:
-          - host: unifi.${INGRESS_DOMAIN}
+          - host: &host "unifi.${INGRESS_DOMAIN}"
             paths:
               - path: /
 
         tls:
           - secretName: tls.unifi-controller
             hosts:
-              - unifi.${INGRESS_DOMAIN}
+              - *host
 
     persistence:
       data:
