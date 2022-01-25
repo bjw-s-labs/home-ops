@@ -29,7 +29,6 @@ spec:
       GF_PANELS_DISABLE_SANITIZE_HTML: true
       GF_LOG_FILTERS: rendering:debug
       GF_DATE_FORMATS_USE_BROWSER_LOCALE: true
-      VAR_BLOCKY_URL: "http://blocky.network.svc.cluster.local:4000"
 
     admin:
       existingSecret: grafana-secrets
@@ -107,9 +106,6 @@ spec:
           datasource: Prometheus
         node-exporter-full:
           url: https://grafana.com/api/dashboards/1860/revisions/22/download
-          datasource: Prometheus
-        blocky:
-          url: https://raw.githubusercontent.com/0xERR0R/blocky/master/docs/blocky-grafana.json
           datasource: Prometheus
         flux-cluster:
           url: https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/grafana/dashboards/cluster.json

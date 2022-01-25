@@ -24,7 +24,7 @@ In order to keep my WAN IP address up to date on my DNS provider I have deployed
 
 ## How it all works together
 
-When I am connected to my home network, my DNS server is set to {{ links.external('blocky') }}. I have configured this to forward all requests for my own domain names to the {{ links.external('coredns') }} instance that is running on my router. If an Ingress or Service exists for the requested address, {{ links.external('coredns_k8s_gateway') }} will respond with the IP address that it received from my cluster. If it doesn't exist, it will respond with `NXDOMAIN`.
+When I am connected to my home network, my DNS server is set to [Adguard Home](https://github.com/AdguardTeam/AdGuardHome) that is running on my router. I have configured this to forward all requests for my own domain names to the {{ links.external('coredns') }} instance that is running on my router. If an Ingress or Service exists for the requested address, {{ links.external('coredns_k8s_gateway') }} will respond with the IP address that it received from my cluster. If it doesn't exist, it will respond with `NXDOMAIN`.
 
 When I am outside my home network, I will probably use whatever DNS is provided to me. When I request an address for one of my domains, it will query my domains DNS server and will respond with the DNS record that was set by {{ links.external('external-dns') }}.
 
