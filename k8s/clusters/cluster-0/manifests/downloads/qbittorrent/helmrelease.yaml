@@ -60,13 +60,13 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
         hosts:
-          - host: qbittorrent.${INGRESS_DOMAIN}
+          - host: &host "qbittorrent.${INGRESS_DOMAIN}"
             paths:
               - path: /
         tls:
           - secretName: tls.qbittorrent
             hosts:
-              - qbittorrent.${INGRESS_DOMAIN}
+              - *host
 
     resources:
       requests:

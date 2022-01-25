@@ -51,13 +51,13 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
         hosts:
-          - host: nzbget.${INGRESS_DOMAIN}
+          - host: &host "nzbget.${INGRESS_DOMAIN}"
             paths:
               - path: /
         tls:
           - secretName: tls.nzbget
             hosts:
-              - nzbget.${INGRESS_DOMAIN}
+              - *host
 
     resources:
       requests:
