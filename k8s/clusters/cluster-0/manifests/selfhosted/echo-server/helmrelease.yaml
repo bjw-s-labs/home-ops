@@ -31,14 +31,14 @@ spec:
         traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
 
       hosts:
-        - host: echo-server.${INGRESS_DOMAIN}
+        - host: &host "echo-server.${INGRESS_DOMAIN}"
           paths:
             - "/"
 
       tls:
         - secretName: tls.echo-server
           hosts:
-            - echo-server.${INGRESS_DOMAIN}
+            - *host
 
     resources:
       requests:
