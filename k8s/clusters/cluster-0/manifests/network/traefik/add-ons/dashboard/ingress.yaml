@@ -10,12 +10,8 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
 spec:
-  tls:
-    - secretName: "tls.traefik-dashboard"
-      hosts:
-        - "traefik.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
   rules:
-    - host: traefik.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+    - host: &host "traefik.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       http:
         paths:
           - path: /
@@ -25,3 +21,7 @@ spec:
                 name: traefik
                 port:
                   number: 9000
+  tls:
+    - secretName: "tls.traefik-dashboard"
+      hosts:
+        - *host
