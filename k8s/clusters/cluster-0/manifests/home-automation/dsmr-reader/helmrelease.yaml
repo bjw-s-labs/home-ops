@@ -47,14 +47,14 @@ spec:
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
 
         hosts:
-          - host: dsmr-reader.${INGRESS_DOMAIN}
+          - host: &host "dsmr-reader.${INGRESS_DOMAIN}"
             paths:
               - path: /
 
         tls:
           - secretName: tls.dsmr-reader
             hosts:
-              - dsmr-reader.${INGRESS_DOMAIN}
+              - *host
 
     resources:
       requests:

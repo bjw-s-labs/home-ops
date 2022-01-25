@@ -33,13 +33,13 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
         hosts:
-          - host: esphome.${INGRESS_DOMAIN}
+          - host: &host "esphome.${INGRESS_DOMAIN}"
             paths:
               - path: /
         tls:
           - secretName: tls.esphome
             hosts:
-              - "{{ (index .Values.ingress.main.hosts 0).host }}"
+              - *host
 
     persistence:
       config:
