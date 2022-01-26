@@ -1,0 +1,46 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: mayastor-namespace
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/mayastor"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: mayastor-base
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: mayastor-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/mayastor/base"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: mayastor-dependencies
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: mayastor-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/mayastor/dependencies"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
