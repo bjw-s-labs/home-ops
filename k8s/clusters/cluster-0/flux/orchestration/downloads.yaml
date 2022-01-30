@@ -142,3 +142,21 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: downloads-trash-updater
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: downloads-namespace
+    - name: downloads-sonarr
+    - name: downloads-radarr
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/downloads/trash-updater"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
