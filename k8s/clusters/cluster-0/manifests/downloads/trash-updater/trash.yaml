@@ -1,0 +1,50 @@
+# For more details on the configuration, see the Configuration Reference on the wiki here:
+# https://github.com/rcdailey/trash-updater/wiki/Configuration-Reference
+
+# Configuration specific to Sonarr
+sonarr:
+    # Set the URL/API Key to your actual instance
+  - base_url: http://sonarr.downloads:8989
+    api_key: ${SONARR_API_KEY}
+
+    # Quality definitions from the guide to sync to Sonarr. Choice: anime, series, hybrid
+    quality_definition: series
+
+    # Release profiles from the guide to sync to Sonarr. Types: anime, series
+    # You can optionally add tags and make negative scores strictly ignored
+    release_profiles:
+      - type: series
+
+# Configuration specific to Radarr.
+radarr:
+  # Set the URL/API Key to your actual instance
+  - base_url: http://radarr.downloads:7878
+    api_key: ${RADARR_API_KEY}
+
+    # Which quality definition in the guide to sync to Radarr. Only choice right now is 'movie'
+    quality_definition:
+      type: movie
+
+    # Set to 'true' to automatically remove custom formats from Radarr when they are removed from
+    # the guide or your configuration. This will NEVER delete custom formats you manually created!
+    delete_old_custom_formats: true
+
+    # custom_formats:
+    #   # A list of custom formats to sync to Radarr. Must match the "name" in the importable JSON.
+    #   # Do NOT use the heading names here, those do not work! These are case-insensitive.
+    #   - names:
+    #       - BR-DISK
+    #       - EVO (no WEB-DL)
+    #       - LQ
+    #       - x265 (720/1080p)
+    #       - 3D
+
+        # Uncomment the below properties to specify one or more quality profiles that should be
+        # updated with scores from the guide for each custom format. Without this, custom formats
+        # are synced to Radarr but no scores are set in any quality profiles.
+
+#        quality_profiles:
+#          - name: Quality Profile 1
+#          - name: Quality Profile 2
+#            #score: -9999 # Optional score to assign to all CFs. Overrides scores in the guide.
+#            #reset_unmatched_scores: true # Optionally set other scores to 0 if they are not listed in 'names' above.
