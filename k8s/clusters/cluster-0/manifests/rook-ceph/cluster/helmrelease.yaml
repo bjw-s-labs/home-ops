@@ -34,6 +34,22 @@ spec:
         enabled: true
         urlPrefix: /
 
+      storage:
+        useAllNodes: false
+        useAllDevices: false
+        config:
+          osdsPerDevice: "1"
+        nodes:
+          - name: "delta"
+            devices:
+              - name: "sdb"
+          - name: "enigma"
+            devices:
+              - name: "nvme0n1"
+          - name: "felix"
+            devices:
+              - name: "nvme0n1"
+
     ingress:
       dashboard:
         annotations:
@@ -48,22 +64,6 @@ spec:
           - secretName: tls.rook-ceph
             hosts:
               - "rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-
-    storage:
-      useAllNodes: false
-      useAllDevices: false
-      config:
-        osdsPerDevice: "1"
-      nodes:
-        - name: "delta"
-          devices:
-            - name: "sdb"
-        - name: "enigma"
-          devices:
-            - name: "sdb"
-        - name: "felix"
-          devices:
-            - name: "nvme0n1"
 
     cephBlockPools:
       - name: ceph-blockpool
