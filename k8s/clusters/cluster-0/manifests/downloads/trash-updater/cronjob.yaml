@@ -17,7 +17,7 @@ spec:
 
           initContainers:
             - name: render-config
-              image: ghcr.io/k8s-at-home/trash-updater:v1.6.6
+              image: ghcr.io/k8s-at-home/trash-updater:v1.7.0
               env:
                 - name: RADARR_API_KEY
                   valueFrom:
@@ -42,7 +42,7 @@ spec:
 
           containers:
             - name: trash-updater-sonarr
-              image: ghcr.io/k8s-at-home/trash-updater:v1.6.6
+              image: ghcr.io/k8s-at-home/trash-updater:v1.7.0
               imagePullPolicy: IfNotPresent
               env:
                 - name: TZ
@@ -59,7 +59,7 @@ spec:
                   readOnly: true
 
             - name: trash-updater-radarr
-              image: ghcr.io/k8s-at-home/trash-updater:v1.6.6
+              image: ghcr.io/k8s-at-home/trash-updater:v1.7.0
               imagePullPolicy: IfNotPresent
               env:
                 - name: TZ
