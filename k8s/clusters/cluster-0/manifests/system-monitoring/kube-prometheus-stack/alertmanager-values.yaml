@@ -29,6 +29,9 @@ alertmanager:
       routes:
         - receiver: "null"
           match:
+            alertname: InfoInhibitor
+        - receiver: "null"
+          match:
             alertname: Watchdog
         - receiver: "discord"
           match_re:
