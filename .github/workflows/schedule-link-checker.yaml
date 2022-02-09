@@ -29,7 +29,10 @@ jobs:
         id: lychee
         env:
           GITHUB_TOKEN: "${{ steps.generate-token.outputs.token }}"
-          LYCHEE_OUT: ./lychee.md
+        with:
+          args: --verbose --no-progress './**/*.md' './**/*.html'
+          output: ./lychee.md
+          format: markdown
 
       - name: Find Link Checker Issue
         id: link-checker-issue
