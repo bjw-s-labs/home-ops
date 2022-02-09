@@ -25,11 +25,14 @@ jobs:
           private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
 
       - name: Link Checker
-        uses: lycheeverse/lychee-action@v1.1.1
+        uses: lycheeverse/lychee-action@v1.2.1
         id: lychee
         env:
           GITHUB_TOKEN: "${{ steps.generate-token.outputs.token }}"
-          LYCHEE_OUT: ./lychee.md
+        with:
+          args: --verbose --no-progress './**/*.md' './**/*.html'
+          output: ./lychee.md
+          format: markdown
 
       - name: Find Link Checker Issue
         id: link-checker-issue
