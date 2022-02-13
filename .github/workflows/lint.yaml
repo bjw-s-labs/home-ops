@@ -24,13 +24,31 @@ jobs:
           app_id: ${{ secrets.BJWS_APP_ID }}
           private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
 
-      - name: Lint
-        uses: github/super-linter/slim@v4
+      - name: MegaLinter
+        uses: megalinter/megalinter/flavors/terraform@v5
         env:
-          GITHUB_TOKEN: "${{ steps.generate-token.outputs.token }}"
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'workflow_dispatch' }}
-          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: "${{ steps.generate-token.outputs.token }}"
+          ENABLE_LINTERS: >-
+            ACTION_ACTIONLINT,
+            BASH_SHELLCHECK,
+            DOCKERFILE_HADOLINT,
+            ENV_DOTENV_LINTER,
+            GIT_GIT_DIFF,
+            JSON_JSONLINT,
+            KUBERNETES_KUBEVAL,
+            MARKDOWN_MARKDOWNLINT,
+            YAML_YAMLLINT
+          KUBERNETES_DIRECTORY: k8s/clusters
+          KUBERNETES_KUBEVAL_ARGUMENTS: --ignore-missing-schemas
+          MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdownlint.yaml
+          YAML_YAMLLINT_CONFIG_FILE: .yamllint.yaml
 
-          MARKDOWN_CONFIG_FILE: .markdownlint.yaml
-          YAML_CONFIG_FILE: .yamllint.yaml
-          KUBERNETES_KUBEVAL_OPTIONS: --ignore-missing-schemas
+      - name: Archive artifacts
+        if: ${{ success() }} || ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: MegaLinter reports
+          path: |
+            report
+            mega-linter.log
