@@ -82,29 +82,6 @@ spec:
       limits:
         memory: 2000Mi
 
-    postgresql:
-      enabled: true
-
-      image:
-        repository: bitnami/postgresql
-        tag: 14.1.0
-        pullPolicy: IfNotPresent
-
-      persistence:
-        enabled: true
-        existingClaim: home-assistant-postgresql
-
-      postgresqlUsername: home-assistant
-      postgresqlDatabase: home-assistant
-      # postgresqlPostgresPassword: set by valuesFrom
-      # postgresqlPassword: set by valuesFrom
-
-      resources:
-        requests:
-          memory: 1024Mi
-        limits:
-          memory: 2048Mi
-
     addons:
       codeserver:
         enabled: true

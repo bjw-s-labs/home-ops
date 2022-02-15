@@ -15,20 +15,3 @@ spec:
       storage: 1Gi
 
   storageClassName: ceph-block
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: home-assistant-postgresql
-  namespace: home-automation
-  labels:
-    k10.kasten.io/backup: "true"
-spec:
-  accessModes:
-    - ReadWriteOnce
-
-  resources:
-    requests:
-      storage: 24Gi
-
-  storageClassName: ceph-block
