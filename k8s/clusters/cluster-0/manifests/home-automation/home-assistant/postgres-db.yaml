@@ -1,0 +1,23 @@
+---
+apiVersion: kubegres.reactive-tech.io/v1
+kind: Kubegres
+metadata:
+  name: home-assistant-postgres
+  namespace: home-automation
+spec:
+  replicas: 3
+  image: docker.io/library/postgres:14.2
+  database:
+    size: 16Gi
+    storageClassName: ceph-block
+  env:
+    - name: POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: home-assistant
+          key: postgresql_password
+    - name: POSTGRES_REPLICATION_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: home-assistant
+          key: postgresql_password
