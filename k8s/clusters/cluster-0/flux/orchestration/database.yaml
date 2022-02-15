@@ -12,3 +12,19 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: database-kubegres
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: database-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/database/kubegres"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
