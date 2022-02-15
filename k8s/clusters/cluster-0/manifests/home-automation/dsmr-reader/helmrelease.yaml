@@ -25,7 +25,7 @@ spec:
       DJANGO_TIME_ZONE: Europe/Amsterdam
       DJANGO_DATABASE_USER: dsmr-reader
       # DJANGO_DATABASE_PASSWORD: set by valuesFrom
-      DJANGO_DATABASE_HOST: dsmr-reader-postgresql.home-automation
+      DJANGO_DATABASE_HOST: dsmr-reader-postgres.home-automation
       DJANGO_DATABASE_PORT: "5432"
       DJANGO_DATABASE_NAME: dsmr-reader
 
@@ -62,34 +62,7 @@ spec:
       limits:
         memory: "512Mi"
 
-    postgresql:
-      enabled: true
-
-      image:
-        repository: bitnami/postgresql
-        tag: 13.6.0
-        pullPolicy: IfNotPresent
-
-      postgresqlUsername: dsmr-reader
-      # postgresqlPassword: set by valuesFrom
-      postgresqlDatabase: dsmr-reader
-
-      persistence:
-        enabled: true
-        existingClaim: dsmr-reader-postgresql
-
-      resources:
-        requests:
-          memory: 256Mi
-        limits:
-          memory: 512Mi
-
   valuesFrom:
-    - kind: Secret
-      name: dsmr-reader
-      valuesKey: postgresql_password
-      targetPath: postgresql.postgresqlPassword
-      optional: false
     - kind: Secret
       name: dsmr-reader
       valuesKey: postgresql_password
