@@ -40,6 +40,14 @@ spec:
             server: "${NAS_ADDRESS}"
             path: /volume1/Media
         mountPath: /data/nas-media
+      backup:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /volume1/Backup/Kubernetes/Applications/radarr
+        mountPath: /config/Backups
 
     ingress:
       main:
