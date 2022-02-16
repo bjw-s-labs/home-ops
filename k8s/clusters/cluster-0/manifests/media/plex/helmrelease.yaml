@@ -77,6 +77,15 @@ spec:
         mountPath: /storage/media
         readOnly: true
 
+      backup:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /volume1/Backup/Kubernetes/Applications/plex
+        mountPath: /config/Backups
+
     resources:
       requests:
         cpu: 35m
