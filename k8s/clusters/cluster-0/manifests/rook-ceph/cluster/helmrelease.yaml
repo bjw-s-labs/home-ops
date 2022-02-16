@@ -27,6 +27,29 @@ spec:
       bdev_async_discard = true
 
     cephClusterSpec:
+      healthCheck:
+        livenessProbe:
+          mon:
+            probe:
+              timeoutSeconds: 5
+          mgr:
+            probe:
+              timeoutSeconds: 5
+          osd:
+            probe:
+              timeoutSeconds: 5
+
+        startupProbe:
+          mon:
+            probe:
+              timeoutSeconds: 5
+          mgr:
+            probe:
+              timeoutSeconds: 5
+          osd:
+            probe:
+              timeoutSeconds: 5
+
       mgr:
         count: 2
 
