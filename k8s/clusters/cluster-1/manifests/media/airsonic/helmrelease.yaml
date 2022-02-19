@@ -18,7 +18,7 @@ spec:
   values:
     image:
       repository: ghcr.io/airsonic-advanced/airsonic-advanced
-      tag: edge-11.0.0-SNAPSHOT.20220209222511
+      tag: edge-11.0.0-SNAPSHOT.20220217094057
       pullPolicy: IfNotPresent
 
     podSecurityContext:
@@ -28,7 +28,7 @@ spec:
         - 65540
 
     env:
-      TZ: "America/Los_Angeles"
+      TZ: "${TIMEZONE}"
       JAVA_OPTS: "-Xmx768m -Dserver.forward-headers-strategy=native"
 
     enableServiceLinks: false

@@ -18,7 +18,7 @@ spec:
   values:
     image:
       repository: ghcr.io/k8s-at-home/prowlarr
-      tag: v0.2.0.1533
+      tag: v0.2.0.1539
       pullPolicy: IfNotPresent
 
     hostname: prowlarr
@@ -27,7 +27,7 @@ spec:
       setGateway: "true"
 
     env:
-      TZ: "America/Los_Angeles"
+      TZ: "${TIMEZONE}"
 
     persistence:
       config:
@@ -37,6 +37,14 @@ spec:
         enabled: true
         type: emptyDir
         mountPath: /shared
+      backup:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /volume1/Backup/Kubernetes/Applications/prowlarr
+        mountPath: /config/Backups
 
     ingress:
       main:

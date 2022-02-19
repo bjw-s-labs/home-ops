@@ -27,7 +27,7 @@ spec:
         - 65539
 
     env:
-      TZ: "America/Los_Angeles"
+      TZ: "${TIMEZONE}"
 
     service:
       main:
@@ -76,6 +76,15 @@ spec:
             path: /volume1/Media
         mountPath: /storage/media
         readOnly: true
+
+      backup:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /volume1/Backup/Kubernetes/Applications/plex
+        mountPath: /config/Backups
 
     resources:
       requests:
