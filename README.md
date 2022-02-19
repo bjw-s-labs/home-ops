@@ -24,9 +24,9 @@ _... managed by Flux and serviced with RenovateBot_ :robot:
 
 Welcome to my home operations repository.
 
-Lots of fun (to me at least :wink:) stuff can be found, poke around my [Kubernetes clusters](./k8s/clusters/) directory to see what they are running. Feel free to open a [GitHub Issue](https://github.com/bjw-s/home-ops/issues/new).
+Lots of fun (to me at least :wink:) stuff can be found, poke around my [Kubernetes clusters](./k8s/clusters/) directory to see what they are running. Feel free to open a [GitHub Issue](https://github.com/dcplaya/home-ops/issues/new).
 
-For more information, head on over to my [docs](https://bjw-s.github.io/home-ops/).
+For more information, head on over to my [docs](https://dcplaya.github.io/home-ops/).
 
 ---
 

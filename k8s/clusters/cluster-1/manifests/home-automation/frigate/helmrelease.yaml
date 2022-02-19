@@ -1,0 +1,205 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: frigate
+  namespace: home-automation
+spec:
+  dependsOn:
+    - name: mosquitto
+      namespace: home-automation
+  interval: 5m
+  chart:
+    spec:
+      chart: frigate
+      version: 7.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: ghcr.io/k8s-at-home/frigate
+      tag: v0.9.4-amd64
+
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: "frigate-config"
+
+    env:
+      TZ: America/Los_Angeles
+
+    persistence:
+      data:
+        enabled: true
+        existingClaim: frigate-data
+      media:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /volume1/IPCams/frigate
+        mountPath: /media
+      usb:
+        enabled: true
+        type: hostPath
+        hostPath: /dev/bus/usb
+      cache:
+        enabled: true
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 512Mi
+        mountPath: /dev/shm
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+        hosts:
+          - host: &host "frigate.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - secretName: tls.frigate
+            hosts:
+              - *host
+
+    securityContext:
+      privileged: true
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: feature.node.kubernetes.io/custom-coral-tpu
+                  operator: In
+                  values:
+                    - "true"
+                - key: feature.node.kubernetes.io/custom-intel-gpu
+                  operator: In
+                  values:
+                    - "true"
+
+    config: |
+      mqtt:
+        host: mosquitto.home-automation
+        port: 1883
+        topic_prefix: frigate
+        user: {{ .Values.secrets.mqtt_user }}
+        password: {{ .Values.secrets.mqtt_password }}
+
+      database:
+        path: /data/frigate.db
+
+      detectors:
+        coral:
+          type: edgetpu
+          device: usb
+
+      # Global objects configuration
+      objects:
+        track:
+          - person
+        filters:
+          person:
+            min_area: 5000
+            max_area: 100000
+            threshold: 0.5
+
+      # Global ffmpeg configuration
+      ffmpeg:
+        hwaccel_args:
+          - -hwaccel
+          - vaapi
+          - -hwaccel_device
+          - /dev/dri/renderD128
+          - -hwaccel_output_format
+          - yuv420p
+
+      # Specify camera's
+      cameras:
+        doorbell:
+          # Camera-specific ffmpeg configuration
+          ffmpeg:
+            inputs:
+              - path: rtsp://{{- .Values.secrets.doorbell_camera_user -}}:{{- .Values.secrets.doorbell_camera_password -}}@{{- .Values.secrets.doorbell_camera_host -}}:554/cam/realmonitor?channel=1&subtype=0
+                roles:
+                  - rtmp
+                  - record
+              - path: rtsp://{{- .Values.secrets.doorbell_camera_user -}}:{{- .Values.secrets.doorbell_camera_password -}}@{{- .Values.secrets.doorbell_camera_host -}}:554/cam/realmonitor?channel=1&subtype=1
+                roles:
+                  - detect
+
+          # Enable rtmp stream for camera
+          rtmp:
+            enabled: True
+
+          # Camera-specific detection configuration
+          detect:
+            width: 720
+            height: 576
+            fps: 15
+
+          # Camera-specific recording configuration
+          record:
+            enabled: True
+            retain_days: 0
+            events:
+              retain:
+                default: 14
+
+          # Camera-specific snapshots configuration
+          snapshots:
+            enabled: True
+            timestamp: True
+            retain:
+              # Required: Default retention days (default: shown below)
+              default: 14
+
+          # Camera-specific objects configuration
+          objects:
+            track:
+              - person
+
+    resources:
+      requests:
+        memory: 300Mi
+        cpu: 400m
+        gpu.intel.com/i915: 1
+      limits:
+        gpu.intel.com/i915: 1
+        memory: 1000Mi
+
+  valuesFrom:
+    - kind: Secret
+      name: frigate
+      valuesKey: mqtt_user
+      targetPath: secrets.mqtt_user
+      optional: false
+    - kind: Secret
+      name: frigate
+      valuesKey: mqtt_password
+      targetPath: secrets.mqtt_password
+      optional: false
+    - kind: Secret
+      name: frigate
+      valuesKey: doorbell_camera_host
+      targetPath: secrets.doorbell_camera_host
+      optional: false
+    - kind: Secret
+      name: frigate
+      valuesKey: doorbell_camera_user
+      targetPath: secrets.doorbell_camera_user
+      optional: false
+    - kind: Secret
+      name: frigate
+      valuesKey: doorbell_camera_password
+      targetPath: secrets.doorbell_camera_password
+      optional: false

@@ -1,0 +1,75 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: airsonic
+  namespace: media
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: airsonic
+      version: 6.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: ghcr.io/airsonic-advanced/airsonic-advanced
+      tag: edge-11.0.0-SNAPSHOT.20220209222511
+      pullPolicy: IfNotPresent
+
+    podSecurityContext:
+      runAsUser: 2000
+      runAsGroup: 2000
+      supplementalGroups:
+        - 65540
+
+    env:
+      TZ: "America/Los_Angeles"
+      JAVA_OPTS: "-Xmx768m -Dserver.forward-headers-strategy=native"
+
+    enableServiceLinks: false
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: airsonic-config
+        mountPath: /var/airsonic
+      nas-media:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /volume1/Media
+        mountPath: /storage/nas-media
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns/is-public: "true"
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+
+        hosts:
+          - host: &host "airsonic.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+
+        tls:
+          - secretName: tls.airsonic
+            hosts:
+              - *host
+
+    resources:
+      requests:
+        memory: "512M"
+      limits:
+        memory: "1024M"

@@ -1,0 +1,97 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: plex
+  namespace: media
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: plex
+      version: 6.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: ghcr.io/k8s-at-home/plex
+      tag: v1.25.5.5492-12f6b8c83
+
+    podSecurityContext:
+      supplementalGroups:
+        - 44
+        - 109
+        - 65539
+
+    env:
+      TZ: "America/Los_Angeles"
+
+    service:
+      main:
+        type: LoadBalancer
+        annotations:
+          traefik.ingress.kubernetes.io/service.serversscheme: https
+        loadBalancerIP: ${LB_PLEX}
+        externalTrafficPolicy: Local
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns/is-public: "true"
+          external-dns.alpha.kubernetes.io/target: ingress.${PERSONAL_DOMAIN}
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        hosts:
+          - host: &host "plex.${PERSONAL_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - secretName: tls.plex
+            hosts:
+              - *host
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: plex-config
+
+      transcode:
+        enabled: true
+        type: emptyDir
+        medium: Memory
+
+      nfs-nas-media:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /volume1/Media
+        mountPath: /storage/media
+        readOnly: true
+
+    resources:
+      requests:
+        cpu: 35m
+        memory: 1500Mi
+        gpu.intel.com/i915: 1
+      limits:
+        gpu.intel.com/i915: 1
+        memory: 8000Mi
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: feature.node.kubernetes.io/custom-intel-gpu
+                  operator: In
+                  values:
+                    - "true"

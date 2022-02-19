@@ -1,0 +1,25 @@
+---
+apiVersion: metal.sidero.dev/v1alpha1
+kind: Server
+metadata:
+  labels:
+    control-plane: "true"
+  name: 3a1117f3-e3ea-6b34-fea2-1c697aae5558
+spec:
+  accepted: true
+  configPatches:
+    - op: replace
+      path: /machine/install/disk
+      value: /dev/sda
+  cpu:
+    manufacturer: Intel(R) Corporation
+    version: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
+  hostname: master1.${CLUSTER_1_HARDWARE_DOMAIN}
+  pxeBootAlways: true
+  system:
+    family: PA
+    manufacturer: Intel(R) Client Systems
+    productName: NUC11PAHi5
+    serialNumber: G6PA145002UK
+    skuNumber: RNUC11PAHi5000
+    version: M15533-306

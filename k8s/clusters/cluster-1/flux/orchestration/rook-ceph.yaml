@@ -1,0 +1,104 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: rook-ceph-namespace
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./k8s/clusters/cluster-1/manifests/rook-ceph"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: rook-ceph-operator
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: rook-ceph-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-1/manifests/rook-ceph/operator"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: rook-ceph-cluster
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: rook-ceph-namespace
+    - name: rook-ceph-operator
+  interval: 5m
+  path: "./k8s/clusters/cluster-1/manifests/rook-ceph/cluster"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: rook-ceph-addons
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: rook-ceph-namespace
+    - name: rook-ceph-operator
+    - name: rook-ceph-cluster
+  interval: 5m
+  path: "./k8s/clusters/cluster-1/manifests/rook-ceph/add-ons"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: rook-ceph-snapshot-controller-base
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: cluster-crds-external-snapshotter
+    - name: rook-ceph-namespace
+    - name: rook-ceph-operator
+    - name: rook-ceph-cluster
+  interval: 5m
+  path: "./k8s/clusters/cluster-1/manifests/rook-ceph/snapshot-controller/base"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: rook-ceph-snapshot-controller-config
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: cluster-crds-external-snapshotter
+    - name: rook-ceph-namespace
+    - name: rook-ceph-operator
+    - name: rook-ceph-cluster
+    - name: rook-ceph-snapshot-controller-base
+  interval: 5m
+  path: "./k8s/clusters/cluster-1/manifests/rook-ceph/snapshot-controller/config"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
