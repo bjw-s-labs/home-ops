@@ -33,3 +33,24 @@ For more information, head on over to my [docs](https://dcplaya.github.io/home-o
 ## :handshake:&nbsp; Thanks
 
 A lot of inspiration for my cluster came from the people that have shared their clusters over at [awesome-home-kubernetes](https://github.com/k8s-at-home/awesome-home-kubernetes)
+
+
+## Installation Notes
+
+Below are the steps to bootstrap the sidero cluster
+Similar steps may be the same for other cluster stuff but havent gotten to that yet.
+
+### Create flux-system
+
+kubectl create ns flux-system  
+
+
+### Create sops-age secret
+cat ~/.config/sops/age/keys.txt |
+    kubectl -n flux-system create secret generic sops-age \
+    --from-file=age.agekey=/dev/stdin
+
+
+### Bootstrap flux & install cluster
+flux install --version=v0.27.0 --export | kubectl apply -f -
+kubectl apply -k k8s/clusters/sidero/
