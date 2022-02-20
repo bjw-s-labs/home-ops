@@ -55,6 +55,10 @@ spec:
       value:
         - interface: eth0
           dhcp: true
+          vlans:
+            # For Rook-Ceph Traffic
+            - vlanId: 40
+              dhcp: false
 
     - op: replace
       path: /cluster/proxy/disabled
