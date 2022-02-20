@@ -10,11 +10,20 @@ spec:
   configPatches:
     - op: replace
       path: /machine/install/disk
-      value: /dev/sda
+      value: /dev/nvme0n1
+    - op: add
+      path: /machine/network/hostname
+      value: cp1.${CLUSTER_1_HARDWARE_DOMAIN}
+    - op: add
+      path: /machine/sysctls
+      value:
+        fs.inotify.max_user_watches: "1048576"
+        fs.inotify.max_user_instances: "8192"
+        vm.max_map_count: "524288"
   cpu:
     manufacturer: Intel(R) Corporation
     version: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
-  hostname: master1.${CLUSTER_1_HARDWARE_DOMAIN}
+  hostname: cp1.${CLUSTER_1_HARDWARE_DOMAIN}
   pxeBootAlways: true
   system:
     family: PA
