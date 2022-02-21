@@ -32,8 +32,9 @@ spec:
     service:
       enabled: true
       type: LoadBalancer
+      annotations:
+        metallb.universe.tf/loadBalancerIPs: "${LB_TRAEFIK}"
       spec:
-        loadBalancerIP: "${LB_TRAEFIK}"
         externalTrafficPolicy: Local
 
     logs:
