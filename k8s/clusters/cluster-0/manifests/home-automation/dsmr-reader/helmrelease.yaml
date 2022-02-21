@@ -20,6 +20,19 @@ spec:
       repository: xirixiz/dsmr-reader-docker
       tag: amd64-2022.02.03
 
+    initContainers:
+      - name: wait-for-pg
+        image: busybox:latest
+        imagePullPolicy: IfNotPresent
+        command: ['sh', '-c', 'until nc -vz ${SVC_NAME}.${SVC_NAMESPACE} 5432; do echo "Waiting for postgresql..."; sleep 3; done;']
+        env:
+          - name: SVC_NAME
+            value: home-assistant-postgres
+          - name: SVC_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+
     env:
       TZ: Europe/Amsterdam
       DJANGO_TIME_ZONE: Europe/Amsterdam
