@@ -34,7 +34,7 @@ spec:
         type: LoadBalancer
         annotations:
           traefik.ingress.kubernetes.io/service.serversscheme: https
-        loadBalancerIP: ${LB_PLEX}
+          metallb.universe.tf/loadBalancerIPs: "${LB_PLEX}"
         externalTrafficPolicy: Local
 
     ingress:

@@ -28,7 +28,7 @@ spec:
         type: LoadBalancer
         annotations:
           coredns.io/hostname: unifi
-        loadBalancerIP: ${LB_UNIFI}
+          metallb.universe.tf/loadBalancerIPs: "${LB_UNIFI}"
         externalTrafficPolicy: Local
 
     ingress:

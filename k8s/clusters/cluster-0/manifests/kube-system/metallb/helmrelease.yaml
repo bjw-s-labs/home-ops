@@ -1,0 +1,35 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: metallb
+  namespace: kube-system
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: metallb
+      version: 0.12.1
+      sourceRef:
+        kind: HelmRepository
+        name: metallb-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    existingConfigMap: "metallb-config"
+    prometheus:
+      podMonitor:
+        enabled: false
+      prometheusRule:
+        enabled: false
+    speaker:
+      tolerations:
+        - effect: "NoExecute"
+          operator: "Exists"
+        - effect: "NoSchedule"
+          operator: "Exists"
+      frr:
+        enabled: true
+        image:
+          repository: docker.io/frrouting/frr
+          tag: v8.1.0

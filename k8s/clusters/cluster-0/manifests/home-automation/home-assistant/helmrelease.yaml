@@ -36,7 +36,9 @@ spec:
     service:
       main:
         type: LoadBalancer
-        loadBalancerIP: "${LB_HASS}"
+        annotations:
+          metallb.universe.tf/loadBalancerIPs: "${LB_HASS}"
+        externalTrafficPolicy: Local
         ports:
           sonos:
             enabled: true
