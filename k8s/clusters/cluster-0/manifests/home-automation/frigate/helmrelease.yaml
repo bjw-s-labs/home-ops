@@ -21,7 +21,7 @@ spec:
   values:
     image:
       repository: ghcr.io/k8s-at-home/frigate
-      tag: v0.9.4-amd64
+      tag: v0.10.0-amd64
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "frigate-config"
@@ -30,6 +30,13 @@ spec:
       TZ: Europe/Amsterdam
 
     persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: frigate-config
+        subPath: config.yaml
+        mountPath: /config/config.yml
+        readOnly: true
       data:
         enabled: true
         existingClaim: frigate-data
@@ -70,6 +77,10 @@ spec:
             hosts:
               - *host
 
+    configmap:
+      config:
+        enabled: false
+
     securityContext:
       privileged: true
 
@@ -87,87 +98,6 @@ spec:
                   values:
                     - "true"
 
-    config: |
-      mqtt:
-        host: mosquitto.home-automation
-        port: 1883
-        topic_prefix: frigate
-        user: {{ .Values.secrets.mqtt_user }}
-        password: {{ .Values.secrets.mqtt_password }}
-
-      database:
-        path: /data/frigate.db
-
-      detectors:
-        coral:
-          type: edgetpu
-          device: usb
-
-      # Global objects configuration
-      objects:
-        track:
-          - person
-        filters:
-          person:
-            min_area: 5000
-            max_area: 100000
-            threshold: 0.5
-
-      # Global ffmpeg configuration
-      ffmpeg:
-        hwaccel_args:
-          - -hwaccel
-          - vaapi
-          - -hwaccel_device
-          - /dev/dri/renderD128
-          - -hwaccel_output_format
-          - yuv420p
-
-      # Specify camera's
-      cameras:
-        doorbell:
-          # Camera-specific ffmpeg configuration
-          ffmpeg:
-            inputs:
-              - path: rtsp://{{- .Values.secrets.doorbell_camera_user -}}:{{- .Values.secrets.doorbell_camera_password -}}@{{- .Values.secrets.doorbell_camera_host -}}:554/cam/realmonitor?channel=1&subtype=0
-                roles:
-                  - rtmp
-                  - record
-              - path: rtsp://{{- .Values.secrets.doorbell_camera_user -}}:{{- .Values.secrets.doorbell_camera_password -}}@{{- .Values.secrets.doorbell_camera_host -}}:554/cam/realmonitor?channel=1&subtype=1
-                roles:
-                  - detect
-
-          # Enable rtmp stream for camera
-          rtmp:
-            enabled: True
-
-          # Camera-specific detection configuration
-          detect:
-            width: 720
-            height: 576
-            fps: 15
-
-          # Camera-specific recording configuration
-          record:
-            enabled: True
-            retain_days: 0
-            events:
-              retain:
-                default: 14
-
-          # Camera-specific snapshots configuration
-          snapshots:
-            enabled: True
-            timestamp: True
-            retain:
-              # Required: Default retention days (default: shown below)
-              default: 14
-
-          # Camera-specific objects configuration
-          objects:
-            track:
-              - person
-
     resources:
       requests:
         memory: 300Mi
@@ -181,25 +111,25 @@ spec:
     - kind: Secret
       name: frigate
       valuesKey: mqtt_user
-      targetPath: secrets.mqtt_user
+      targetPath: env.FRIGATE_MQTT_USER
       optional: false
     - kind: Secret
       name: frigate
       valuesKey: mqtt_password
-      targetPath: secrets.mqtt_password
+      targetPath: env.FRIGATE_MQTT_PASSWORD
       optional: false
     - kind: Secret
       name: frigate
       valuesKey: doorbell_camera_host
-      targetPath: secrets.doorbell_camera_host
+      targetPath: env.FRIGATE_CAMERA_DOORBELL_HOST
       optional: false
     - kind: Secret
       name: frigate
       valuesKey: doorbell_camera_user
-      targetPath: secrets.doorbell_camera_user
+      targetPath: env.FRIGATE_CAMERA_DOORBELL_USER
       optional: false
     - kind: Secret
       name: frigate
       valuesKey: doorbell_camera_password
-      targetPath: secrets.doorbell_camera_password
+      targetPath: env.FRIGATE_CAMERA_DOORBELL_PASSWORD
       optional: false
