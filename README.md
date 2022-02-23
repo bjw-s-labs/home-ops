@@ -40,17 +40,78 @@ A lot of inspiration for my cluster came from the people that have shared their 
 Below are the steps to bootstrap the sidero cluster
 Similar steps may be the same for other cluster stuff but havent gotten to that yet.
 
+### Generate Sidero Talos config
+Since this is a single node cluster, untainting the control plane allows for Sidero to run
+Also add feature gates for kubelet
+```
+talosctl gen config \
+  --config-patch='[{"op": "add", "path": "/cluster/allowSchedulingOnMasters", "value": true},{"op": "add", "path": "/machine/kubelet/extraArgs", "value": { "feature-gates": "GracefulNodeShutdown=true,MixedProtocolLBService=true" } }]' \
+  sidero \
+  https://$SIDERO_ENDPOINT:6443/
+```
+
+### Boot Talos ISO and apply the config
+```
+talosctl apply-config --insecure \
+  --nodes $SIDERO_ENDPOINT \
+  --file ./controlplane.yaml
+```
+
+### Set talosctl endpoints and nodes and merge into default talosconfig
+```
+talosctl --talosconfig=./talosconfig \
+    config endpoint $SIDERO_ENDPOINT
+
+talosctl --talosconfig=./talosconfig \
+   config node $SIDERO_ENDPOINT
+
+talosctl config merge ./talosconfig
+```
+
+Verify the default talosconfig can connect to the Talos node. It should show both the client and server (ndoe) version
+```
+talosctl version
+```
+
+
+### Bootstrap k8s
+This may take 2-5 minutes so be patient
+```
+talosctl bootstrap --nodes $SIDERO_ENDPOINT
+```
+
+### Grab kubeconfig from the node and merge it with default kubeconfig
+
+```
+talosctl kubeconfig
+```
+
+### Bootstrap Sidero
+```
+# This boostraps a entire sidero setup on your testing cluster.
+# HOST_NETWORK is critical to make it work else it doesnt have access to the ports it needs
+SIDERO_CONTROLLER_MANAGER_HOST_NETWORK=true \
+SIDERO_CONTROLLER_MANAGER_API_ENDPOINT=$SIDERO_ENDPOINT \
+clusterctl init -b talos -c talos -i sidero
+```
+
 ### Create flux-system
 
-kubectl create ns flux-system  
+```
+kubectl create ns flux-system
+```
 
 
 ### Create sops-age secret
+```
 cat ~/.config/sops/age/keys.txt |
     kubectl -n flux-system create secret generic sops-age \
     --from-file=age.agekey=/dev/stdin
+```
 
 
 ### Bootstrap flux & install cluster
+```
 flux install --version=v0.27.0 --export | kubectl apply -f -
 kubectl apply -k k8s/clusters/sidero/
+```
