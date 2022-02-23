@@ -20,14 +20,14 @@ spec:
       # Overrides DNS servers to get the intial boot to use local DNS servers. Without this, it seems to default to 1.1.1.1/8.8.8.8
       # Missing values means do not override
       # ip=<client-ip>:<server-ip>:<gw-ip>:<netmask>:<hostname>:<device>:<autoconf>:<dns0-ip>:<dns1-ip>:<ntp0-ip>
-      - ip=<:::::::10.200.1.1:10.200.1.1:10.200.1.1
+      # - ip=<:::::::10.200.1.1:10.200.1.1:10.200.1.1
       - nvme_core.io_timeout=4294967295
       - printk.devkmsg=on
       - pti=on
       - random.trust_cpu=on
       - slab_nomerge=
-      # - talos.config=http://sidero.${HARDWARE_DOMAIN}:8081/configdata?uuid=
-      - talos.config=http://10.200.0.100:8081/configdata?uuid=
+      - talos.config=http://sidero.${HARDWARE_DOMAIN}:8081/configdata?uuid=
+      # - talos.config=http://10.200.0.100:8081/configdata?uuid=
       - talos.platform=metal
-      - talos.experimental.wipe=system
+      # - talos.experimental.wipe=system
     url: https://github.com/talos-systems/talos/releases/download/v0.15.0-alpha.2/vmlinuz-amd64
