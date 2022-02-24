@@ -1,0 +1,34 @@
+---
+apiVersion: metal.sidero.dev/v1alpha1
+kind: Server
+metadata:
+  labels:
+    control-plane: "true"
+  name:  5898c6a6-38cd-4a9f-9abc-7a28045080fc 
+spec:
+  accepted: true
+  configPatches:
+    - op: replace
+      path: /machine/install/disk
+      value: /dev/sda
+    - op: add
+      path: /machine/network/hostname
+      value: cp2.${CLUSTER_1_HARDWARE_DOMAIN}
+    - op: add
+      path: /machine/sysctls
+      value:
+        fs.inotify.max_user_watches: "1048576"
+        fs.inotify.max_user_instances: "8192"
+        vm.max_map_count: "524288"
+  cpu:
+    manufacturer: QEMU
+    version:  pc-q35-6.1
+  hostname: test.${CLUSTER_1_HARDWARE_DOMAIN}
+  pxeBootAlways: true
+  system:
+    family: Unknown
+    manufacturer: QEMU
+    productName: Standard PC (Q35 + ICH9, 2009)
+    serialNumber: Unknown
+    skuNumber: Unknown
+    version: pc-q35-6.1
