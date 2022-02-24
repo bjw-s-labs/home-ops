@@ -6,13 +6,18 @@ metadata:
   namespace: home-automation
 spec:
   instances: 3
+  sgInstanceProfile: dsmr-reader
   postgres:
     version: "latest"
   pods:
     persistentVolume:
       size: 5Gi
+  configurations:
+    sgBackupConfig: dsmr-reader-s3
   initialData:
     scripts:
       - name: create-database
         script: |
           create database "dsmr-reader" owner "postgres";
+  nonProductionOptions:
+    disableClusterPodAntiAffinity: true

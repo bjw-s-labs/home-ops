@@ -1,0 +1,25 @@
+---
+apiVersion: stackgres.io/v1
+kind: SGBackupConfig
+metadata:
+  name: dsmr-reader-s3
+  namespace: home-automation
+spec:
+  baseBackups:
+    cronSchedule: '0 */12 * * *'
+    retention: 6
+  storage:
+    type: s3Compatible
+    s3Compatible:
+      endpoint: http://minio.selfhosted:9000
+      bucket: stackgres
+      region: k8s
+      enablePathStyleAddressing: true
+      awsCredentials:
+        secretKeySelectors:
+          accessKeyId:
+            name: dsmr-reader
+            key: stackgress_s3_accesskey
+          secretAccessKey:
+            name: dsmr-reader
+            key: stackgress_s3_secretkey
