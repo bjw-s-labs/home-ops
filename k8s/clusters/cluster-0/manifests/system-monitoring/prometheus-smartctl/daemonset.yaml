@@ -1,0 +1,61 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app.kubernetes.io/name: prometheus-smartctl
+  name: prometheus-smartctl
+  namespace: system-monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus-smartctl
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: prometheus-smartctl
+    spec:
+      containers:
+        - name: prometheus-smartctl
+          image: matusnovak/prometheus-smartctl:v1.3.0
+          imagePullPolicy: IfNotPresent
+
+          securityContext:
+            privileged: true
+
+          ports:
+            - containerPort: &metricsport 9902
+              name: http-metrics
+              protocol: TCP
+
+          livenessProbe:
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: *metricsport
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: *metricsport
+            timeoutSeconds: 1
+          startupProbe:
+            failureThreshold: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: *metricsport
+            timeoutSeconds: 1
+
+          resources: {}
+
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists

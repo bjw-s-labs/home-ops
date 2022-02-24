@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: prometheus-smartctl
+    app.kubernetes.io/name: prometheus-smartctl
+  name: prometheus-smartctl
+  namespace: system-monitoring
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-metrics
+      port: 9902
+      protocol: TCP
+      targetPort: http-metrics
+  selector:
+    app.kubernetes.io/name: prometheus-smartctl
