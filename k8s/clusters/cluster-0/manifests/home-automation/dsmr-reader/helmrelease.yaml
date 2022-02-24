@@ -24,14 +24,14 @@ spec:
       wait-for-pg:
         image: busybox:latest
         imagePullPolicy: IfNotPresent
-        command: ['sh', '-c', 'until nc -vz dsmr-reader-postgres.home-automation 5432; do echo "Waiting for postgresql..."; sleep 3; done;']
+        command: ['sh', '-c', 'until nc -vz dsmr-reader-postgres-primary.home-automation 5432; do echo "Waiting for postgresql..."; sleep 3; done;']
 
     env:
       TZ: Europe/Amsterdam
       DJANGO_TIME_ZONE: Europe/Amsterdam
-      DJANGO_DATABASE_USER: dsmr-reader
+      DJANGO_DATABASE_USER: postgres
       # DJANGO_DATABASE_PASSWORD: set by valuesFrom
-      DJANGO_DATABASE_HOST: dsmr-reader-postgres.home-automation
+      DJANGO_DATABASE_HOST: dsmr-reader-postgres-primary.home-automation
       DJANGO_DATABASE_PORT: "5432"
       DJANGO_DATABASE_NAME: dsmr-reader
 
@@ -70,8 +70,8 @@ spec:
 
   valuesFrom:
     - kind: Secret
-      name: dsmr-reader
-      valuesKey: postgresql_password
+      name: dsmr-reader-postgres
+      valuesKey: superuser-password
       targetPath: env.DJANGO_DATABASE_PASSWORD
       optional: false
     - kind: Secret
