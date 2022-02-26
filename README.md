@@ -112,6 +112,6 @@ cat ~/.config/sops/age/keys.txt |
 
 ### Bootstrap flux & install cluster
 ```
-flux install --version=v0.27.0 --export | kubectl apply -f -
+flux install --version=v0.27.2 --export | kubectl apply -f -
 kubectl apply -k k8s/clusters/sidero/
 ```
