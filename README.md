@@ -95,6 +95,9 @@ SIDERO_CONTROLLER_MANAGER_API_ENDPOINT=$SIDERO_ENDPOINT \
 clusterctl init -b talos -c talos -i sidero
 ```
 
+## Install Flux
+These steps will be repeated for each cluster that is created.
+Flux does not get auto-deployed on the Sidero created clusters
 ### Create flux-system
 
 ```
@@ -111,7 +114,11 @@ cat ~/.config/sops/age/keys.txt |
 
 
 ### Bootstrap flux & install cluster
+Make sure the target folder is changed for the cluster you want to deploy
+For my repo, it is the folder that contains `deploy-cluster.yaml`
 ```
+CLUSTER_TARGET_FOLDER=k8s/clusters/sidero/
+
 flux install --version=v0.27.2 --export | kubectl apply -f -
-kubectl apply -k k8s/clusters/sidero/
+kubectl apply -k $CLUSTER_TARGET_FOLDER
 ```
