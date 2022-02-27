@@ -9,10 +9,10 @@ spec:
   clusterNetwork:
     pods:
       cidrBlocks:
-        - 10.197.0.0/16
+        - ${CLUSTER_0_POD_CIDR}
     services:
       cidrBlocks:
-        - 10.97.0.0/16
+        - ${CLUSTER_1_SVC_CIDR}
   controlPlaneEndpoint:
     host: cluster-1.${HARDWARE_DOMAIN}
     port: 6443
