@@ -122,3 +122,9 @@ CLUSTER_TARGET_FOLDER=k8s/clusters/sidero/
 flux install --version=v0.27.2 --export | kubectl apply -f -
 kubectl apply -k $CLUSTER_TARGET_FOLDER
 ```
+
+# Reset Node
+```
+NODE=cp1.cluster-1
+talosctl reset  --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL --reboot --nodes $NODE 
+```
