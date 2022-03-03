@@ -35,12 +35,13 @@ metadata:
   labels:
     app.kubernetes.io/managed-by: Helm
 data:
+
   # Identity allocation mode selects how identities are shared between cilium
   # nodes by setting how they are stored. The options are "crd" or "kvstore".
   # - "crd" stores identities in kubernetes as CRDs (custom resource definition).
   #   These can be queried with:
   #     kubectl get ciliumid
-  # - "kvstore" stores identities in a kvstore, etcd or consul, that is
+  # - "kvstore" stores identities in an etcd kvstore, that is
   #   configured below. Cilium versions before 1.6 supported only the kvstore
   #   backend. Upgrades from these older cilium versions should continue using
   #   the kvstore by commenting out the identity-allocation-mode below, or
@@ -119,10 +120,10 @@ data:
   sidecar-istio-proxy-image: "cilium/istio_proxy"
 
   # Name of the cluster. Only relevant when building a mesh of clusters.
-  # cluster-name: cluster-1
+  cluster-name: cluster-1
   # Unique ID of the cluster. Must be unique across all conneted clusters and
   # in the range of 1 and 255. Only relevant when building a mesh of clusters.
-  # cluster-id: "1"
+  cluster-id: "1"
 
   # Encapsulation mode for communication between nodes
   # Possible values:
@@ -135,7 +136,6 @@ data:
 
   enable-ipv4-masquerade: "true"
   enable-ipv6-masquerade: "true"
-  # enable-bpf-masquerade: "true"
 
   enable-xt-socket-fallback: "true"
   install-iptables-rules: "true"
@@ -144,15 +144,18 @@ data:
   auto-direct-node-routes: "true"
   enable-bandwidth-manager: "false"
   enable-local-redirect-policy: "true"
-  ipv4-native-routing-cidr: ${CLUSTER_1_POD_CIDR}
+  ipv4-native-routing-cidr: 10.40.0.0/16
 
-  kube-proxy-replacement: "strict"
+  kube-proxy-replacement:  "strict"
   kube-proxy-replacement-healthz-bind-address: "0.0.0.0:10256"
   enable-health-check-nodeport: "true"
   node-port-bind-protection: "true"
   enable-auto-protect-node-port-range: "true"
+  bpf-lb-mode: "dsr"
+  bpf-lb-algorithm: "maglev"
   enable-session-affinity: "true"
   enable-l2-neigh-discovery: "true"
+  enable-endpoint-routes: "true"
   enable-endpoint-health-checking: "true"
   enable-health-checking: "true"
   enable-well-known-identities: "false"
@@ -422,8 +425,8 @@ metadata:
     meta.helm.sh/release-name: cilium
     meta.helm.sh/release-namespace: kube-system
   labels:
-    k8s-app: cilium
     app.kubernetes.io/managed-by: Helm
+    k8s-app: cilium
 spec:
   selector:
     matchLabels:
@@ -470,7 +473,7 @@ spec:
             topologyKey: kubernetes.io/hostname
       containers:
       - name: cilium-agent
-        image: "quay.io/cilium/cilium:v1.11.2@sha256:4332428fbb528bda32fffe124454458c9b716c86211266d1a03c4ddf695d7f60"
+        image: "quay.io/cilium/cilium:v1.11.0@sha256:ea677508010800214b0b5497055f38ed3bff57963fa2399bcb1c69cf9476453a"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-agent
@@ -540,7 +543,7 @@ spec:
               key: custom-cni-conf
               optional: true
         - name: KUBERNETES_SERVICE_HOST
-          value: cluster-1.elcarpenter.com
+          value: "cluster-1.elcarpenter.com"
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         lifecycle:
@@ -584,7 +587,7 @@ spec:
       hostNetwork: true
       initContainers:
       - name: clean-cilium-state
-        image: "quay.io/cilium/cilium:v1.11.2@sha256:4332428fbb528bda32fffe124454458c9b716c86211266d1a03c4ddf695d7f60"
+        image: "quay.io/cilium/cilium:v1.11.0@sha256:ea677508010800214b0b5497055f38ed3bff57963fa2399bcb1c69cf9476453a"
         imagePullPolicy: IfNotPresent
         command:
         - /init-container.sh
@@ -602,7 +605,7 @@ spec:
               key: clean-cilium-bpf-state
               optional: true
         - name: KUBERNETES_SERVICE_HOST
-          value: cluster-1.elcarpenter.com
+          value: "cluster-1.elcarpenter.com"
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         securityContext:
@@ -723,7 +726,7 @@ spec:
             topologyKey: kubernetes.io/hostname
       containers:
       - name: cilium-operator
-        image: quay.io/cilium/operator-generic:v1.11.2@sha256:4c8bea6818ee3e4932f99e9c1d7efa88b8c0f3cd516160caec878406531e45e7
+        image: quay.io/cilium/operator-generic:v1.11.0@sha256:b522279577d0d5f1ad7cadaacb7321d1b172d8ae8c8bc816e503c897b420cfe3
         imagePullPolicy: IfNotPresent
         command:
         - cilium-operator-generic
@@ -748,7 +751,7 @@ spec:
               name: cilium-config
               optional: true
         - name: KUBERNETES_SERVICE_HOST
-          value: cluster-1.elcarpenter.com
+          value: "cluster-1.elcarpenter.com"
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         livenessProbe:
