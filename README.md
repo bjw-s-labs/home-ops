@@ -119,7 +119,7 @@ For my repo, it is the folder that contains `deploy-cluster.yaml`
 ```
 CLUSTER_TARGET_FOLDER=k8s/clusters/sidero/
 
-flux install --version=v0.27.2 --export | kubectl apply -f -
+flux install --version=v0.27.3 --export | kubectl apply -f -
 kubectl apply -k $CLUSTER_TARGET_FOLDER
 ```
 
