@@ -1,0 +1,64 @@
+cluster:
+  name: "cluster-1"
+  id: "1"
+
+rollOutCiliumPods: true
+localRedirectPolicy: true
+
+# kubeProxyReplacement enables kube-proxy replacement in Cilium BPF datapath
+kubeProxyReplacement: "strict"
+kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
+
+k8sServiceHost: cluster-1.elcarpenter.com
+k8sServicePort: 6443
+
+ipam:
+  #   # -- Configure IP Address Management mode.
+  #   # ref: https://docs.cilium.io/en/stable/concepts/networking/ipam/
+  mode: "kubernetes"
+
+operator:
+  rollOutPods: true
+
+# autoDirectNodeRoutes enables installation of PodCIDR routes between worker
+# nodes if worker nodes share a common L2 network segment.
+autoDirectNodeRoutes: true
+endpointRoutes:
+  enabled: true
+
+containerRuntime:
+  integration: containerd
+
+# nativeRoutingCIDR allows to explicitly specify the CIDR for native routing. This
+# value corresponds to the configured cluster-cidr.
+nativeRoutingCIDR: 10.40.0.0/16
+
+# Cilium leverages MetalLB's simplified BGP announcement system for service type: LoadBalancer
+bgp:
+  enabled: false
+  announce:
+    loadbalancerIP: true
+
+hubble:
+  # -- Enable Hubble (true by default).
+  enabled: false
+
+ipv6:
+  # -- Enable IPv6 support.
+  enabled: false
+
+tunnel: disabled
+
+# loadBalancer is the general configuration for service load balancing
+loadBalancer:
+  # algorithm is the name of the load balancing algorithm for backend
+  # selection e.g. random or maglev
+  algorithm: maglev
+  # mode is the operation mode of load balancing for remote backends
+  # e.g. snat, dsr, hybrid
+  mode: dsr
+
+cgroup:
+  autoMount:
+    enabled: false
+  hostRoot: /sys/fs/cgroup
