@@ -48,7 +48,7 @@ spec:
         volumeSpec:
           nfs:
             server: "${NAS_ADDRESS}"
-            path: /volume1/Minio/.minio
+            path: /mnt/NFS/S3/.minio
         mountPath: /root/.minio
       data:
         enabled: true
@@ -56,7 +56,7 @@ spec:
         volumeSpec:
           nfs:
             server: "${NAS_ADDRESS}"
-            path: /volume1/Minio
+            path: /mnt/NFS/S3
         mountPath: /data
 
     service:
@@ -79,13 +79,13 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
         hosts:
-          - host: &host-minio "minio.${INGRESS_DOMAIN}"
+          - host: &host-minio "minio.dev.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
                 service:
                   port: 9001
-          - host: &host-s3 "s3.${INGRESS_DOMAIN}"
+          - host: &host-s3 "s3.dev.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
