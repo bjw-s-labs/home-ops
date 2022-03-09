@@ -86,12 +86,13 @@ spec:
     - op: add
       path: /cluster/apiServer/certSANs
       value:
-        - 10.200.1.1
+        - ${CLUSTER_1_API_IP}
         - cluster-1.${HARDWARE_DOMAIN}
 
     - op: add
       path: /machine/certSANs
       value:
+        - ${CLUSTER_1_API_IP}
         - cluster-1.${HARDWARE_DOMAIN}
 
     - op: replace
