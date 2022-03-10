@@ -70,7 +70,7 @@ spec:
     apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
     kind: MetalMachineTemplate
     name: cluster-1-cp
-  replicas: 0
+  replicas: 3
   # renovate: datasource=docker depName=ghcr.io/talos-systems/kubelet
   version: v1.23.4
 ---
@@ -93,7 +93,7 @@ metadata:
   namespace: default
 spec:
   clusterName: cluster-1
-  replicas: 0
+  replicas: 2
   template:
     spec:
       bootstrap:
