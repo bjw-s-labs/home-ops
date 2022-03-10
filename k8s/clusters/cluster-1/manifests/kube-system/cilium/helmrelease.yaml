@@ -74,6 +74,7 @@ spec:
         ingress:
           enabled: true
           annotations:
+            kubernetes.io/ingress.class: traefik
             cert-manager.io/cluster-issuer: letsencrypt-production
             external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
             traefik.ingress.kubernetes.io/router.entrypoints: websecure
