@@ -30,16 +30,16 @@ spec:
         IP: 10 # must be an integer between 2 and VXLAN_GATEWAY_FIRST_DYNAMIC_IP (20 by default)
         ports:
           - type: udp
-            port: ${VPN_FORWARDED_PORT_1}
+            port: 55954
           - type: tcp
-            port: ${VPN_FORWARDED_PORT_1}
+            port: 55954
 
     settings:
       VPN_INTERFACE: wg0
       VXLAN_ID: 43
       VXLAN_IP_NETWORK: 172.16.1
       VPN_BLOCK_OTHER_TRAFFIC: true
-      VPN_TRAFFIC_PORT: "${VPN_PORT}"
+      VPN_TRAFFIC_PORT: "51820"
       NOT_ROUTED_TO_GATEWAY_CIDRS: "172.16.0.0/12 ${NETWORK_K8S_POD_CIDR} ${NETWORK_K8S_SERVICE_CIDR} ${NETWORK_SERVERS_CIDR}"
       VPN_LOCAL_CIDRS: "172.16.0.0/12 ${NETWORK_K8S_POD_CIDR} ${NETWORK_K8S_SERVICE_CIDR} ${NETWORK_SERVERS_CIDR}"
 
@@ -105,7 +105,7 @@ spec:
                 - ipBlock:
                     cidr: 0.0.0.0/0
               ports:
-                - port: ${VPN_PORT}
+                - port: 51820
                   protocol: UDP
             - to:
                 - namespaceSelector: {}
