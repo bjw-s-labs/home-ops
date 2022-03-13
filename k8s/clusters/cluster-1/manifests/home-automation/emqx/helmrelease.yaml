@@ -1,0 +1,69 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: emqx
+  namespace: home
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://repos.emqx.io/charts
+      chart: emqx
+      version: 4.3.11
+      sourceRef:
+        kind: HelmRepository
+        name: emqx-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    # TODO: https://github.com/emqx/emqx/issues/6079
+    # image:
+    #   repository: public.ecr.aws/emqx/emqx
+    replicaCount: 3
+    recreatePods: true
+    service:
+      type: LoadBalancer
+      externalIPs:
+        - "${LB_MQTT}"
+    emqxConfig:
+      EMQX_ALLOW_ANONYMOUS: "false"
+      EMQX_ADMIN_PASSWORD: "${MQTT_EMQX_ADMIN_PASSWORD}"
+      EMQX_AUTH__MNESIA__PASSWORD_HASH: plain
+      EMQX_AUTH__USER__1__USERNAME: "${MQTT_ZIGBEE2MQTT_USERNAME}"
+      EMQX_AUTH__USER__1__PASSWORD: "${MQTT_ZIGBEE2MQTT_PASSWORD}"
+      EMQX_AUTH__USER__2__USERNAME: "${MQTT_NODE_RED_USERNAME}"
+      EMQX_AUTH__USER__2__PASSWORD: "${MQTT_NODE_RED_PASSWORD}"
+      EMQX_AUTH__USER__3__USERNAME: "${MQTT_HOME_ASSISTANT_USERNAME}"
+      EMQX_AUTH__USER__3__PASSWORD: "${MQTT_HOME_ASSISTANT_PASSWORD}"
+      EMQX_AUTH__USER__4__USERNAME: "${MQTT_FRIGATE_USERNAME}"
+      EMQX_AUTH__USER__4__PASSWORD: "${MQTT_FRIGATE_PASSWORD}"
+      EMQX_AUTH__USER__5__USERNAME: "${MQTT_PIXEL_USERNAME}"
+      EMQX_AUTH__USER__5__PASSWORD: "${MQTT_PIXEL_PASSWORD}"
+    emqxLoadedPlugins: >
+      {emqx_management, true}.
+      {emqx_recon, true}.
+      {emqx_retainer, true}.
+      {emqx_dashboard, true}.
+      {emqx_telemetry, false}.
+      {emqx_rule_engine, true}.
+      {emqx_bridge_mqtt, false}.
+      {emqx_auth_mnesia, true}.
+    persistence:
+      enabled: true
+      size: 100Mi
+      storageClass: "rook-ceph-block"
+      accessMode: ReadWriteOnce
+    # Prevents all instances running on same node
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - emqx
+              topologyKey: kubernetes.io/hostname 
