@@ -59,6 +59,15 @@ talosctl apply-config --insecure \
 
 ### Set talosctl endpoints and nodes and merge into default talosconfig
 ```
+# To pull the talosconfig from the sidero cluster
+kubectl --context=admin@sidero \
+    get secret \
+    cluster-1-talosconfig \
+    -o jsonpath='{.data.talosconfig}' \
+  | base64 -d \
+   > cluster-1-talosconfig
+
+
 talosctl --talosconfig=./talosconfig \
     config endpoint $SIDERO_ENDPOINT
 
