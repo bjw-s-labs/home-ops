@@ -9,6 +9,10 @@ spec:
   - name: ubuntu
     image: ubuntu
     command: [ "sleep", "600000" ]
+    volumeMounts:
+    - mountPath: /hostRoot
+      name: root
+      readOnly: true
   volumes:
   - name: root
     hostPath:
