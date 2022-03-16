@@ -77,4 +77,22 @@ spec:
 
     addons:
       netshoot:
-        enabled: false
+        enabled: true
+
+    additionalContainers:
+      vpn:
+        image: qmcgaw/gluetun:v3.28.0
+        securityContext:
+          capabilities:
+            add:
+              - NET_ADMIN
+        env:
+          - name: TZ
+            value: "${TIMEZONE}"
+          - name: FIREWALL_OUTBOUND_SUBNETS
+            value: "${NETWORK_K8S_POD_CIDR},${NETWORK_K8S_SERVICE_CIDR},${NETWORK_SERVERS_CIDR}"
+          - name: DNS_KEEP_NAMESERVER
+            value: "on"
+        envFrom:
+          - secretRef:
+              name: qbittorrent-vpnconfig
