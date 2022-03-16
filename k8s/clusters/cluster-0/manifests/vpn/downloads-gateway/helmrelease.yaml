@@ -55,3 +55,47 @@ spec:
     addons:
       netshoot:
         enabled: true
+
+      vpn:
+        enabled: true
+        type: wireguard
+
+        wireguard:
+          image:
+            repository: ghcr.io/k8s-at-home/wireguard
+            tag: v1.0.20210914
+            pullPolicy: IfNotPresent
+
+        securityContext:
+          runAsUser: 568
+          runAsGroup: 568
+          capabilities:
+            drop:
+              - "SYS_MODULE"
+
+        env:
+          TZ: "${TIMEZONE}"
+          IPTABLES_BACKEND: nft
+          KILLSWITCH: "false"
+
+        configFileSecret: downloads-gateway-vpnconfig
+
+        resources:
+          requests:
+            cpu: "0.001"
+            memory: 64Mi
+          limits:
+            memory: 128Mi
+
+        networkPolicy:
+          enabled: true
+
+          egress:
+            - to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+              ports:
+                - port: 51820
+                  protocol: UDP
+            - to:
+                - namespaceSelector: {}
