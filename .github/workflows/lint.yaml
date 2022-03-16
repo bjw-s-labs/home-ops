@@ -27,10 +27,9 @@ jobs:
       - name: MegaLinter
         uses: megalinter/megalinter/flavors/terraform@v5
         env:
-          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'workflow_dispatch' }}
           GITHUB_TOKEN: "${{ steps.generate-token.outputs.token }}"
           PRINT_ALPACA: false
-          ENABLE_LINTERS: ACTION_ACTIONLINT, ANSIBLE_ANSIBLE_LINT, BASH_SHELLCHECK, DOCKERFILE_HADOLINT, ENV_DOTENV_LINTER, GIT_GIT_DIFF, JSON_JSONLINT, KUBERNETES_KUBEVAL, MARKDOWN_MARKDOWNLINT, TERRAFORM_TFLINT, YAML_YAMLLINT
+          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'workflow_dispatch' }}
           KUBERNETES_DIRECTORY: k8s/clusters
           KUBERNETES_KUBEVAL_ARGUMENTS: --ignore-missing-schemas
           MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdownlint.yaml
