@@ -30,6 +30,7 @@ jobs:
           GITHUB_TOKEN: "${{ steps.generate-token.outputs.token }}"
           PRINT_ALPACA: false
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'workflow_dispatch' }}
+          DISABLE_LINTERS: KUBERNETES_KUBECONFORM,SPELL_CSPELL
           KUBERNETES_DIRECTORY: k8s/clusters
           KUBERNETES_KUBEVAL_ARGUMENTS: --ignore-missing-schemas
           MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdownlint.yaml
