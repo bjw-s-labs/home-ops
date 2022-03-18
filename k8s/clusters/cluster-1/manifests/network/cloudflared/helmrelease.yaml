@@ -37,4 +37,6 @@ spec:
         service: tcp://kubernetes.default.svc.cluster.local:443
         originRequest:
           proxyType: socks
+      - hostname: rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}.com
+        service: https://10.200.1.50:443
       - service: http_status:404
