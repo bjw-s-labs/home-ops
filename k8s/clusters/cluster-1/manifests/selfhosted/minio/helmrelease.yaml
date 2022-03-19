@@ -99,7 +99,7 @@ spec:
                 pathType: Prefix
                 service:
                   port: 9000
-          - host: &host-s3 "s3.dev.${INGRESS_DOMAIN}"
+          - host: &host-s3-dev "s3.dev.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
@@ -110,6 +110,7 @@ spec:
             hosts:
               - *host-minio
               - *host-s3
+              - *host-s3-dev
 
     podAnnotations:
       secret.reloader.stakater.com/reload: "minio"
