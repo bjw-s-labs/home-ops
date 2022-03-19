@@ -41,6 +41,14 @@ spec:
       - --console-address
       - :9001
 
+    podSecurityContext:
+      runAsUser: 1120
+      runAsGroup: 100
+      fsGroup: 100
+      supplementalGroups:
+        - 100
+      fsGroupChangePolicy: "OnRootMismatch"
+
     persistence:
       config:
         enabled: true
