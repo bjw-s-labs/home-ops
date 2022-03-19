@@ -23,12 +23,16 @@ spec:
 
     hostname: qbittorrent
 
-    podAnnotations:
-      setGateway: "true"
+    # podAnnotations:
+    #   setGateway: "true"
 
     podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 100
+      fsGroup: 568
       supplementalGroups:
-        - 65539
+        - 100
+      fsGroupChangePolicy: "OnRootMismatch"
 
     settings:
       automaticPortSetup: false
@@ -47,8 +51,8 @@ spec:
         volumeSpec:
           nfs:
             server: "${NAS_ADDRESS}"
-            path: /volume1/Media
-        mountPath: /data/nas-media
+            path: /mnt/NFS/Merged-Media
+        mountPath: /mnt/unionfs
 
     ingress:
       main:

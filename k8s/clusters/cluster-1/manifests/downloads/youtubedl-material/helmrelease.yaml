@@ -24,7 +24,7 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
-      GID: 65539
+      GID: 100
 
     persistence:
       config:
@@ -36,8 +36,8 @@ spec:
         volumeSpec:
           nfs:
             server: "${NAS_ADDRESS}"
-            path: /mnt/Media/Merged-Media/Downloads/Complete/YoutubeDL
-        mountPath: /data/nas-media/Downloads/Complete/YoutubeDL
+            path: /mnt/Media/Merged-Media/downloads/YoutubeDL
+        mountPath: /mnt/unionfs/downloads/YoutubeDL
 
     ingress:
       main:

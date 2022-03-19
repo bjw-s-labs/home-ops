@@ -22,8 +22,12 @@ spec:
       tag: "v21.2-r2333"
 
     podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 100
+      fsGroup: 568
       supplementalGroups:
-        - 65539
+        - 100
+      fsGroupChangePolicy: "OnRootMismatch"
 
     env:
       TZ: "${TIMEZONE}"
@@ -38,8 +42,8 @@ spec:
         volumeSpec:
           nfs:
             server: "${NAS_ADDRESS}"
-            path: /volume1/Media
-        mountPath: /data/nas-media
+            path: /mnt/NFS/Merged-Media
+        mountPath: /mnt/unionfs
 
     ingress:
       main:

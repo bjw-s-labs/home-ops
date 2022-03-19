@@ -22,7 +22,7 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
-      PGID: 65539
+      PGID: 100
 
     persistence:
       config:
@@ -34,8 +34,8 @@ spec:
         volumeSpec:
           nfs:
             server: "${NAS_ADDRESS}"
-            path: /volume1/Media
-        mountPath: /data/nas-media
+            path: /mnt/NFS/Merged-Media
+        mountPath: /mnt/unionfs
 
     service:
       webserver:

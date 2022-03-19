@@ -24,10 +24,14 @@ spec:
       supplementalGroups:
         - 44
         - 109
-        - 65539
+        - 100
 
     env:
       TZ: "${TIMEZONE}"
+      PUID: "1000"
+      PGID: "100"
+      ADVERTISE_IP: "https://plex.${SECRET_DOMAIN}:443"
+      PLEX_CLAIM: "${SECRET_PLEX_CLAIM_TOKEN}"
 
     service:
       main:
@@ -35,6 +39,16 @@ spec:
         annotations:
           traefik.ingress.kubernetes.io/service.serversscheme: https
         loadBalancerIP: ${LB_PLEX}
+        externalTrafficPolicy: Local
+      webtools:
+        enabled: true
+        type: NodePort
+        ports:
+          webtools:
+            enabled: true
+            port: 33400
+            protocol: TCP
+            targetPort: 33400
         externalTrafficPolicy: Local
 
     ingress:
@@ -44,7 +58,7 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns/is-public: "true"
-          external-dns.alpha.kubernetes.io/target: ingress.${PERSONAL_DOMAIN}
+          external-dns.alpha.kubernetes.io/target: ipv4.${PERSONAL_DOMAIN}
           external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
         hosts:
@@ -73,9 +87,9 @@ spec:
         volumeSpec:
           nfs:
             server: "${NAS_ADDRESS}"
-            path: /volume1/Media
-        mountPath: /storage/media
-        readOnly: true
+            path: /mnt/NFS/Merged-Media
+        mountPath: /mnt/unionfs
+        readOnly: false
 
       backup:
         enabled: true
@@ -83,8 +97,27 @@ spec:
         volumeSpec:
           nfs:
             server: "${NAS_ADDRESS}"
-            path: /volume1/Backup/Kubernetes/Applications/plex
+            path: /mnt/NFS/Backups/Kubernetes/${CLUSTER_NAME}/Applications/plex
         mountPath: /config/Backups
+
+    addons:
+      promtail:
+        enabled: true
+        image:
+          repository: grafana/promtail
+          tag: 2.4.2
+        loki: http://loki.system-monitoring.svc.cluster.local:3100/loki/api/v1/push
+        logs:
+        - name: promtail/plex
+          path: "/config/Library/Application Support/Plex Media Server/Logs/*.log"
+        - name: promtail/plex/plugins
+          path: "/config/Library/Application Support/Plex Media Server/Logs/PMS Plugin Logs/*.log"
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          readOnly: true
+        securityContext:
+          runAsUser: 568
 
     resources:
       requests:
