@@ -67,7 +67,7 @@ jobs:
           diff="${diff//'%'/'%25'}"
           diff="${diff//$'\n'/'%0A'}"
           diff="${diff//$'\r'/'%0D'}"
-          echo "::set-output name=diff::$(echo ${diff})"
+          echo "::set-output name=diff::${diff}"
 
       - name: Find Comment
         uses: peter-evans/find-comment@v2
