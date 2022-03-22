@@ -29,7 +29,12 @@ spec:
       wait-for-pg:
         image: busybox:latest
         imagePullPolicy: IfNotPresent
-        command: ['sh', '-c', 'until nc -vz home-assistant-postgres.home-automation 5432; do echo "Waiting for postgresql..."; sleep 3; done;']
+        command:
+          [
+            "sh",
+            "-c",
+            'until nc -vz home-assistant-postgres.home-automation 5432; do echo "Waiting for postgresql..."; sleep 3; done;',
+          ]
 
     probes:
       liveness:
