@@ -32,8 +32,9 @@ spec:
           service: tcp://kubernetes.default.svc.cluster.local:443
           originRequest:
             proxyType: socks
-        - hostname: rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+        - hostname: "*.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
           service: https://traefik.network.svc.cluster.local:443
-          # originRequest:
-          #   originServerName: ${INGRESS_DOMAIN}
+          originRequest:
+            noTLSVerify: true
+            originServerName: ${INGRESS_DOMAIN}
         - service: http_status:404
