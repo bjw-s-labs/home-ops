@@ -38,39 +38,20 @@ resource "cloudflare_firewall_rule" "gh_flux_api" {
 }
 
 #
-# Bots
+# Bots and threats
 #
 
-resource "cloudflare_filter" "bots" {
+resource "cloudflare_filter" "bots_and_threats" {
   for_each = cloudflare_zone.zones
   zone_id     = each.value.id
-  description = "Expression to block bots determined by CF"
-  expression  = "(cf.client.bot)"
+  description = "Expression to block bots and threats determined by CF"
+  expression  = "(cf.client.bot) or (cf.threat_score gt 14)"
 }
 
-resource "cloudflare_firewall_rule" "bots" {
-  for_each = cloudflare_filter.bots
+resource "cloudflare_firewall_rule" "bots_and_threats" {
+  for_each = cloudflare_filter.bots_and_threats
   zone_id     = cloudflare_zone.zones[each.key].id
-  description = "Firewall rule to block bots determined by CF"
-  filter_id   = each.value.id
-  action      = "block"
-}
-
-#
-# Block threats less than Medium
-#
-
-resource "cloudflare_filter" "threats" {
-  for_each = cloudflare_zone.zones
-  zone_id     = each.value.id
-  description = "Expression to block medium threats"
-  expression  = "(cf.threat_score gt 14)"
-}
-
-resource "cloudflare_firewall_rule" "threats" {
-  for_each = cloudflare_filter.threats
-  zone_id     = cloudflare_zone.zones[each.key].id
-  description = "Firewall rule to block medium threats"
+  description = "Firewall rule to block bots and threats determined by CF"
   filter_id   = each.value.id
   action      = "block"
 }
