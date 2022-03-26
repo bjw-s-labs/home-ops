@@ -31,7 +31,7 @@ spec:
         traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
 
       hosts:
-        - host: &host "echo-server.${INGRESS_DOMAIN}"
+        - host: &host "echo-server.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
           paths:
             - "/"
 

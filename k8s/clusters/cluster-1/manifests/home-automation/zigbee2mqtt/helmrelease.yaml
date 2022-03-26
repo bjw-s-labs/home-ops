@@ -44,7 +44,7 @@ spec:
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
 
         hosts:
-          - host: &host "zigbee2mqtt.${INGRESS_DOMAIN}"
+          - host: &host "zigbee2mqtt.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
               - path: /
 

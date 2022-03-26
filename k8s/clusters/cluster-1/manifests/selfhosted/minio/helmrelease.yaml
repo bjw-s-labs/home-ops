@@ -87,7 +87,7 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
         hosts:
-          - host: &host-minio "minio.dev.${INGRESS_DOMAIN}"
+          - host: &host-minio "minio.dev.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
@@ -99,7 +99,7 @@ spec:
                 pathType: Prefix
                 service:
                   port: 9000
-          - host: &host-s3-dev "s3.dev.${INGRESS_DOMAIN}"
+          - host: &host-s3-dev "s3.dev.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix

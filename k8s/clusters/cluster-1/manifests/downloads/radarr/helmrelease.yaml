@@ -63,7 +63,7 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
         hosts:
-          - host: &host "radarr.${INGRESS_DOMAIN}"
+          - host: &host "radarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
               - path: /
         tls:
