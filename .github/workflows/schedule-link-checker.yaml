@@ -25,7 +25,7 @@ jobs:
           private_key: ${{ secrets.DCPLAYA_APP_PRIVATE_KEY }}
 
       - name: Link Checker
-        uses: lycheeverse/lychee-action@v1.3.2
+        uses: lycheeverse/lychee-action@v1.4.1
         id: lychee
         env:
           GITHUB_TOKEN: "${{ steps.generate-token.outputs.token }}"
@@ -43,7 +43,7 @@ jobs:
             link-checker
 
       - name: Update Issue
-        uses: peter-evans/create-issue-from-file@v3
+        uses: peter-evans/create-issue-from-file@v4
         with:
           title: Link Checker Dashboard
           issue-number: "${{ steps.link-checker-issue.outputs.issue_number }}"
