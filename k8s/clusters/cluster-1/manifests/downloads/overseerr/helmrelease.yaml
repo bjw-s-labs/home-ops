@@ -37,14 +37,14 @@ spec:
       config:
         enabled: true
         existingClaim: overseerr-config
-      backup:
-        enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /mnt/NFS/Backups/Kubernetes/${CLUSTER_NAME}/Applications/overseerr
-        mountPath: /config/Backups
+      # backup:
+      #   enabled: true
+      #   type: custom
+      #   volumeSpec:
+      #     nfs:
+      #       server: "${NAS_ADDRESS}"
+      #       path: /mnt/NFS/Backups/Kubernetes/${CLUSTER_NAME}/Applications/overseerr
+      #   mountPath: /config/Backups
 
     ingress:
       main:
