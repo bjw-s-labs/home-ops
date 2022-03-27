@@ -61,12 +61,16 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
         hosts:
-          - host: &host "lidarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: &host-cluster "lidarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+          - host: &host "music.${INGRESS_DOMAIN}"
             paths:
               - path: /
         tls:
           - secretName: tls.lidarr
             hosts:
+              - *host-cluster
               - *host
 
     resources:
