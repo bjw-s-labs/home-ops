@@ -59,16 +59,21 @@ spec:
         ingressClassName: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+          external-dns/is-public: "true"
         hosts:
-          - host: &host "sonarr-4k.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: &host-cluster "sonarr-4k.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+          - host: &host "sonarr-4k.${INGRESS_DOMAIN}"
             paths:
               - path: /
         tls:
           - secretName: tls.sonarr-4k
             hosts:
+              - *host-cluster
               - *host
 
     resources:
