@@ -36,6 +36,14 @@ spec:
       config:
         enabled: true
         existingClaim: tautulli-config
+      backup:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /mnt/NFS/Backups/Kubernetes/${CLUSTER_NAME}/Applications/tautulli
+        mountPath: /config/backups
 
     ingress:
       main:
