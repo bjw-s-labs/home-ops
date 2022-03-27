@@ -2,13 +2,13 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: nzbget
-  namespace: downloads
+  name: tautulli
+  namespace: media
 spec:
   interval: 5m
   chart:
     spec:
-      chart: nzbget
+      chart: tautulli
       version: 12.2.0
       sourceRef:
         kind: HelmRepository
@@ -18,14 +18,15 @@ spec:
 
   values:
     image:
-      repository: ghcr.io/k8s-at-home/nzbget-testing
-      tag: "v21.2-r2333"
+      repository: ghcr.io/k8s-at-home/tautulli
+      tag: "v2.9.5"
 
     podSecurityContext:
       runAsUser: 568
       runAsGroup: 100
       fsGroup: 568
       supplementalGroups:
+        - 34
         - 100
       fsGroupChangePolicy: "OnRootMismatch"
 
@@ -35,15 +36,15 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: nzbget-config
-      media:
+        existingClaim: tautulli-config
+      backup:
         enabled: true
         type: custom
         volumeSpec:
           nfs:
             server: "${NAS_ADDRESS}"
-            path: /mnt/NFS/Merged-Media
-        mountPath: /mnt/unionfs
+            path: /mnt/NFS/Backups/Kubernetes/${CLUSTER_NAME}/Applications/tautulli
+        mountPath: /config/backups
 
     ingress:
       main:
@@ -59,20 +60,24 @@ spec:
           # external-dns.alpha.kubernetes.io/target: ${CLOUDFLARE_TUNNEL_ID}.cfargotunnel.com
           # external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
         hosts:
-          - host: &host-cluster "nzbget.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: &host-cluster "tautulli.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
               - path: /
-          - host: &host "nzbget.${INGRESS_DOMAIN}"
+          - host: &host "tautulli.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+          - host: &host-plexpy "plexpy.${INGRESS_DOMAIN}"
             paths:
               - path: /
         tls:
-          - secretName: tls.nzbget
+          - secretName: tls.tautulli
             hosts:
               - *host-cluster
               - *host
+              - *host-plexpy
 
     resources:
       requests:
         memory: "128M"
       limits:
-        memory: "2000Mi"
+        memory: "500Mi"

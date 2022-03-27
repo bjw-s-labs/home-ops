@@ -52,7 +52,7 @@ spec:
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
 
         hosts:
-          - host: &host "calibre.${INGRESS_DOMAIN}"
+          - host: &host "calibre.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
               - path: /
 

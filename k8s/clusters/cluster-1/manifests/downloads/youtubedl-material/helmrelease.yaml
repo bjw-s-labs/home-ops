@@ -49,7 +49,7 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
         hosts:
-          - host: &host "youtubedl.${INGRESS_DOMAIN}"
+          - host: &host "youtubedl.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
               - path: /
         tls:

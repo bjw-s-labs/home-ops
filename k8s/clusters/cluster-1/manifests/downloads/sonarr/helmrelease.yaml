@@ -18,7 +18,7 @@ spec:
   values:
     image:
       repository: ghcr.io/k8s-at-home/sonarr-develop
-      tag: v3.0.7.1479
+      tag: v3.0.7.1487
       pullPolicy: Always
 
     podSecurityContext:
@@ -26,6 +26,7 @@ spec:
       runAsGroup: 100
       fsGroup: 568
       supplementalGroups:
+        - 34
         - 100
       fsGroupChangePolicy: "OnRootMismatch"
 
@@ -59,16 +60,22 @@ spec:
         ingressClassName: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+          external-dns/is-public: "true"
         hosts:
+          - host: &host-cluster "sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
           - host: &host "sonarr.${INGRESS_DOMAIN}"
             paths:
               - path: /
         tls:
           - secretName: tls.sonarr
             hosts:
+              - *host-cluster
               - *host
 
     resources:

@@ -53,7 +53,7 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
         ingressClassName: "traefik"
         hosts:
-          - host: &host "acr-hook.${INGRESS_DOMAIN}"
+          - host: &host "acr-hook.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
