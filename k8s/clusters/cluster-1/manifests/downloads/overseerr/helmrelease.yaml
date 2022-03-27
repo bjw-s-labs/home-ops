@@ -2,13 +2,13 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: overseer
+  name: overseerr
   namespace: downloads
 spec:
   interval: 5m
   chart:
     spec:
-      chart: overseer
+      chart: overseerr
       version: 5.2.0
       sourceRef:
         kind: HelmRepository
@@ -17,7 +17,7 @@ spec:
       interval: 5m
   values:
     image:
-      repository: ghcr.io/sct/overseerr
+      repository: ghcr.io/sct/overseerrr
       tag: 1.26.1
       pullPolicy: Always
 
@@ -36,14 +36,14 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: overseer-config
+        existingClaim: overseerr-config
       backup:
         enabled: true
         type: custom
         volumeSpec:
           nfs:
             server: "${NAS_ADDRESS}"
-            path: /mnt/NFS/Backups/Kubernetes/${CLUSTER_NAME}/Applications/overseer
+            path: /mnt/NFS/Backups/Kubernetes/${CLUSTER_NAME}/Applications/overseerr
         mountPath: /config/Backups
 
     ingress:
@@ -58,7 +58,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
           external-dns/is-public: "true"
         hosts:
-          - host: &host-cluster "overseer.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: &host-cluster "overseerr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
               - path: /
           - host: &host "request.${INGRESS_DOMAIN}"
@@ -68,7 +68,7 @@ spec:
             paths:
               - path: /
         tls:
-          - secretName: tls.overseer
+          - secretName: tls.overseerr
             hosts:
               - *host-cluster
               - *host
