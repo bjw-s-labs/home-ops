@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu-debug
+  namespace: media
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command: [ "sleep", "6000000000000000000000000000000000000" ]
+    volumeMounts:
+    - mountPath: /hostRoot
+      name: root
+      readOnly: true
+    - mountPath: /mountedPVC
+      name: pvc
+      readOnly: false
+  volumes:
+  - name: root
+    hostPath:
+      path: /
+      type: Directory
+  - name: pvc
+    persistentVolumeClaim:
+      claimName: plex-config
