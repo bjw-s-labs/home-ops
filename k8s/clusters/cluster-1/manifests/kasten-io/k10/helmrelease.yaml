@@ -47,9 +47,9 @@ spec:
       annotations:
         kubernetes.io/ingress.class: traefik
         cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns/is-public: "false"
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: network-system-rfc1918-ips@kubernetescrd
+        traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+        external-dns/is-public: "false"
       urlPath: "k10"
       hosts:
         - k10.${CLUSTER_NAME}.${INGRESS_DOMAIN}
