@@ -6,7 +6,7 @@ metadata:
   namespace: home-automation
 spec:
   dependsOn:
-    - name: mosquitto
+    - name: emqx
       namespace: home-automation
   interval: 5m
   chart:
@@ -27,7 +27,7 @@ spec:
       configmap.reloader.stakater.com/reload: "frigate-config"
 
     env:
-      TZ: America/Los_Angeles
+      TZ: "${TIMEZONE}"
 
     persistence:
       data:
@@ -90,7 +90,7 @@ spec:
 
     config: |
       mqtt:
-        host: mqtt.home.${SECRET_DOMAIN}
+        host: mqtt.${SECRET_DOMAIN}
         port: 1883
         topic_prefix: frigate
         user: ${MQTT_FRIGATE_USERNAME}
@@ -183,29 +183,29 @@ spec:
         gpu.intel.com/i915: 1
         memory: 1000Mi
 
-  valuesFrom:
-    - kind: Secret
-      name: frigate
-      valuesKey: mqtt_user
-      targetPath: secrets.mqtt_user
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: mqtt_password
-      targetPath: secrets.mqtt_password
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: doorbell_camera_host
-      targetPath: secrets.doorbell_camera_host
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: doorbell_camera_user
-      targetPath: secrets.doorbell_camera_user
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: doorbell_camera_password
-      targetPath: secrets.doorbell_camera_password
-      optional: false
+  # valuesFrom:
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: mqtt_user
+  #     targetPath: secrets.mqtt_user
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: mqtt_password
+  #     targetPath: secrets.mqtt_password
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: doorbell_camera_host
+  #     targetPath: secrets.doorbell_camera_host
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: doorbell_camera_user
+  #     targetPath: secrets.doorbell_camera_user
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: doorbell_camera_password
+  #     targetPath: secrets.doorbell_camera_password
+  #     optional: false

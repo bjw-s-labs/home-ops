@@ -6,7 +6,7 @@ metadata:
   namespace: home-automation
 spec:
   dependsOn:
-    - name: mosquitto
+    - name: emqx
       namespace: home-automation
   interval: 5m
   chart:
@@ -56,9 +56,9 @@ spec:
     config:
       mqtt:
         base_topic: zigbee2mqtt
-        server: "mqtt://mosquitto.home-automation"
-        # user: set by valuesFrom
-        # password: set by valuesFrom
+        server: "mqtt://emqx.home-automation"
+        user: ${MQTT_FRIGATE_USERNAME}
+        password: ${MQTT_FRIGATE_PASSWORD}
 
       homeassistant: true
 
@@ -67,8 +67,8 @@ spec:
 
       permit_join: false
 
-      # serial:
-      #   port: set by valuesFrom (tcp://<ip>:6638)
+      serial:
+        port: "tcp://zigbee-gateway.iot.${INGRESS_DOMAIN}:6638"
 
       advanced:
         log_output:
@@ -101,20 +101,3 @@ spec:
         memory: 128Mi
       limits:
         memory: 192Mi
-
-  valuesFrom:
-    - kind: Secret
-      name: zigbee2mqtt
-      valuesKey: mqtt_user
-      targetPath: config.mqtt.user
-      optional: false
-    - kind: Secret
-      name: zigbee2mqtt
-      valuesKey: mqtt_password
-      targetPath: config.mqtt.password
-      optional: false
-    - kind: Secret
-      name: zigbee2mqtt
-      valuesKey: zigbee_adapter_port
-      targetPath: config.serial.port
-      optional: false
