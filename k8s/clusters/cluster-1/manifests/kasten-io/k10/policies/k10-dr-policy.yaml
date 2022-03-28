@@ -1,0 +1,27 @@
+apiVersion: config.kio.kasten.io/v1alpha1
+kind: Policy
+metadata:
+  name: k10-disaster-recovery-policy
+  namespace: kasten-io
+spec:
+  actions:
+    - action: backup
+      backupParameters:
+        filters: {}
+        profile:
+          name: k10-disaster-recovery
+          namespace: kasten-io
+  createdBy: kasten-io:k10-k10
+  frequency: "@hourly"
+  retention:
+    daily: 1
+    hourly: 4
+    monthly: 1
+    weekly: 1
+    yearly: 1
+  selector:
+    matchExpressions:
+      - key: k10.kasten.io/appNamespace
+        operator: In
+        values:
+          - kasten-io

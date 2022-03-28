@@ -1,0 +1,24 @@
+apiVersion: config.kio.kasten.io/v1alpha1
+kind: Policy
+metadata:
+  name: games-hourly
+  namespace: kasten-io
+spec:
+  actions:
+    - action: backup
+  comment: Policy for hourly snapshots of games
+  createdBy: kasten-io:k10-k10
+  frequency: "@hourly"
+  lastModifyHash: 1732223973
+  retention:
+    daily: 7
+    hourly: 24
+    monthly: 12
+    weekly: 4
+    yearly: 7
+  selector:
+    matchExpressions:
+      - key: k10.kasten.io/appNamespace
+        operator: In
+        values:
+          - games

@@ -1,0 +1,19 @@
+apiVersion: config.kio.kasten.io/v1alpha1
+kind: Profile
+metadata:
+  name: synology
+  namespace: kasten-io
+spec:
+  locationSpec:
+    credential:
+      secret:
+        apiVersion: ""
+        kind: ""
+        name: ""
+        namespace: ""
+      secretType: ""
+    fileStore:
+      claimName: k10-backups
+      path: k10/4e7688af-5177-4f2c-9905-df3eb70a72be/migration
+    type: FileStore
+  type: Location

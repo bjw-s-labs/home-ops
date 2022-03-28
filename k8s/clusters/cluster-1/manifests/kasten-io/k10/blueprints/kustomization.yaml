@@ -1,0 +1,13 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: kasten-io
+resources:
+  - https://raw.githubusercontent.com/kanisterio/kanister/0.73.0/examples/stable/maria/maria-blueprint.yaml
+  # - postgresql-blueprint.yaml
+  - secret.yaml
+  - hyperion.yaml
+  #   - pod-spec-override.yaml
+  #   - home.yaml
+  #   - media.yaml
+  - k10-disaster-recovery.yaml

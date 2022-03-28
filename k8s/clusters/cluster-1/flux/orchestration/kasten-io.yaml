@@ -1,0 +1,33 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: kasten-namespace
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./k8s/clusters/cluster-1/manifests/kasten-io"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-cluster
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: kasten-k10
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: kasten-namespace
+    - name: system-monitoring-kube-prom-stack
+    - name: rook-ceph-cluster
+    - name: rook-ceph-snapshot-controller
+  interval: 5m
+  path: "./k8s/clusters/cluster-1/manifests/kasten-io/k10"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-cluster
