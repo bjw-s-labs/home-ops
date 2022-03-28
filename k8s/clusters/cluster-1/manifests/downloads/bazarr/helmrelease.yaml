@@ -1,0 +1,86 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: bazarr
+  namespace: downloads
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: bazarr
+      version: 10.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: ghcr.io/k8s-at-home/bazarr
+      tag: v1.0.3
+      pullPolicy: Always
+
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 100
+      fsGroup: 568
+      supplementalGroups:
+        - 34
+        - 100
+      fsGroupChangePolicy: "OnRootMismatch"
+
+    env:
+      TZ: "${TIMEZONE}"
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: bazarr-config
+      media:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /mnt/NFS/Merged-Media
+        mountPath: /mnt/unionfs
+      backup:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /mnt/NFS/Backups/Kubernetes/${CLUSTER_NAME}/Applications/bazarr
+        mountPath: /config/Backups
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+          external-dns/is-public: "true"
+        hosts:
+          - host: &host-cluster "bazarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+          - host: &host "bazarr.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - secretName: tls.radarr
+            hosts:
+              - *host-cluster
+              - *host
+
+    resources:
+      requests:
+        cpu: "0.04"
+        memory: "250M"
+      limits:
+        memory: "2000M"
