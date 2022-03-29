@@ -47,5 +47,36 @@
         "lycheeverse/lychee-action"
       ]
     }
+    // Group packages
+    {
+      "matchDatasources": ["helm", "docker"],
+      "matchPackagePatterns": ["^rook.ceph"],
+      "groupName": "rook-ceph-suite",
+      "additionalBranchPrefix": "",
+      "separateMinorPatch": true,
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": [
+        "k8s.gcr.io/kube-apiserver",
+        "k8s.gcr.io/kube-controller-manager",
+        "k8s.gcr.io/kube-scheduler",
+        "ghcr.io/siderolabs/kubelet"
+      ],
+      "groupName": "kubernetes",
+      "additionalBranchPrefix": "",
+      "separateMinorPatch": true,
+    },
+    {
+      "matchDatasources": ["helm", "docker"],
+      "matchPackageNames": [
+        "quay.io/cilium/cilium",
+        "quay.io/cilium/operator-generic",
+        "cilium",
+      ],
+      "groupName": "cilium",
+      "additionalBranchPrefix": "",
+      "separateMinorPatch": true,
+    }
   ]
 }
