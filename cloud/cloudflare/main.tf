@@ -1,5 +1,4 @@
 terraform {
-
   cloud {
     organization = "bjw-s"
     workspaces {
@@ -22,8 +21,3 @@ terraform {
 data "sops_file" "cloudflare_secrets" {
   source_file = "secret.sops.yaml"
 }
-
-# data "cloudflare_zone" "zones" {
-#   for_each = cloudflare_zone.zones
-#   name = each.value.zone
-# }
