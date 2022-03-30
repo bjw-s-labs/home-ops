@@ -1,0 +1,21 @@
+module "cf_domain_ingress" {
+  source = "./cf_domain"
+  domain = data.sops_file.cloudflare_secrets.data["cloudflare_zones.ingress"]
+}
+
+resource "cloudflare_filter" "cf_domain_ingress_github_flux_webhook" {
+  zone_id     = module.cf_domain_ingress.zone_id
+  description = "Allow GitHub flux API"
+  expression = format(
+    "(ip.geoip.asnum eq 36459 and http.host eq \"flux-receiver-cluster-0.%s\")",
+    data.sops_file.cloudflare_secrets.data["cloudflare_zones.ingress"]
+  )
+}
+
+resource "cloudflare_firewall_rule" "cf_domain_ingress_github_flux_webhook" {
+  zone_id     = module.cf_domain_ingress.zone_id
+  description = "Allow GitHub flux API"
+  filter_id   = cloudflare_filter.cf_domain_ingress_github_flux_webhook.id
+  action      = "allow"
+  priority    = 1
+}

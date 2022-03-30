@@ -1,6 +1,20 @@
+terraform {
+  required_providers {
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "3.10.1"
+    }
+  }
+}
+
+resource "cloudflare_zone" "zone" {
+  zone = var.domain
+  plan = "free"
+  type = "full"
+}
+
 resource "cloudflare_zone_settings_override" "cloudflare_settings" {
-  for_each = cloudflare_zone.zones
-  zone_id     = each.value.id
+  zone_id = cloudflare_zone.zone.id
   settings {
     # /ssl-tls
     ssl = "full"
