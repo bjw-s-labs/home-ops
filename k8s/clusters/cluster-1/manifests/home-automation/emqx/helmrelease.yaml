@@ -21,8 +21,8 @@ spec:
     recreatePods: true
     service:
       type: LoadBalancer
-      externalIPs:
-        - "${LB_MQTT}"
+      loadBalancerIP: ${LB_MQTT}
+      externalTrafficPolicy: Local
     emqxConfig:
       EMQX_ALLOW_ANONYMOUS: "false"
       EMQX_ADMIN_PASSWORD: "${MQTT_EMQX_ADMIN_PASSWORD}"
