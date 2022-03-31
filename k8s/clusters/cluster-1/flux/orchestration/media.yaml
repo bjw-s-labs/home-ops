@@ -110,19 +110,4 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: media-debug69
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: media-namespace
-  interval: 6m
-  path: "./k8s/clusters/cluster-1/manifests/media/debug"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
+
