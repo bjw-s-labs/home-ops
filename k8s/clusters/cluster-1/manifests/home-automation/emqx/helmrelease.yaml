@@ -46,6 +46,32 @@ spec:
       {emqx_rule_engine, true}.
       {emqx_bridge_mqtt, false}.
       {emqx_auth_mnesia, true}.
+
+    ingress:
+      main:
+        enabled: true
+        annotations:
+          kubernetes.io/ingress.class: traefik
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+        hosts:
+          - host: &host-cluster "emqx.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+          - host: &host "mqtt.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+          - host: &mqtt-cluster "mqtt.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - secretName: tls.lidarr
+            hosts:
+              - *host-cluster
+              - *host
+              - *mqtt-cluster
+
     persistence:
       enabled: true
       size: 100Mi
