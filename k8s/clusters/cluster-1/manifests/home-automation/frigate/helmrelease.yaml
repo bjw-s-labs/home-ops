@@ -29,6 +29,15 @@ spec:
     env:
       TZ: "${TIMEZONE}"
 
+    podSecurityContext:
+      runAsUser: 997
+      runAsGroup: 100
+      fsGroup: 997
+      supplementalGroups:
+        - 34
+        - 100
+      fsGroupChangePolicy: "OnRootMismatch"
+
     persistence:
       data:
         enabled: true
@@ -57,7 +66,6 @@ spec:
         enabled: true
         ingressClassName: "traefik"
         annotations:
-          kubernetes.io/ingress.class: traefik
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
