@@ -27,29 +27,21 @@ jobs:
       - name: MegaLinter
         uses: megalinter/megalinter/flavors/terraform@v5
         env:
+          ML_ENABLE_LINTERS: >-
+            "ACTION_ACTIONLINT",
+            "ANSIBLE_ANSIBLE_LINT",
+            "COPYPASTE_JSCPD",
+            "CREDENTIALS_SECRETLINT",
+            "GIT_GIT_DIFF",
+            "KUBERNETES_KUBEVAL",
+            "MARKDOWN_MARKDOWNLINT",
+            "TERRAFORM_TERRAFORM_FMT",
+            "YAML_PRETTIER",
+            "YAML_YAMLLINT"
           GITHUB_TOKEN: "${{ steps.generate-token.outputs.token }}"
           PRINT_ALPACA: false
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'workflow_dispatch' }}
-          ENABLE_LINTERS: |-
-            ${{
-              join(
-                fromJSON('
-                  [
-                    "ACTION_ACTIONLINT",
-                    "ANSIBLE_ANSIBLE_LINT",
-                    "COPYPASTE_JSCPD",
-                    "CREDENTIALS_SECRETLINT",
-                    "GIT_GIT_DIFF",
-                    "KUBERNETES_KUBEVAL",
-                    "MARKDOWN_MARKDOWNLINT",
-                    "TERRAFORM_TERRAFORM_FMT",
-                    "YAML_PRETTIER",
-                    "YAML_YAMLLINT"
-                  ]
-                '),
-                ','
-              )
-            }}
+          ENABLE_LINTERS: ${{ join(fromJSON(\"[$ML_ENABLE_LINTERS]\"), ',') }}
           KUBERNETES_DIRECTORY: k8s
           KUBERNETES_KUBEVAL_ARGUMENTS: --ignore-missing-schemas
           MARKDOWN_MARKDOWNLINT_CONFIG_FILE: markdownlint.config.yaml
