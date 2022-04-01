@@ -30,18 +30,27 @@ jobs:
           GITHUB_TOKEN: "${{ steps.generate-token.outputs.token }}"
           PRINT_ALPACA: false
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'workflow_dispatch' }}
-          DISABLE_LINTERS: KUBERNETES_KUBECONFORM,SPELL_CSPELL
-          KUBERNETES_DIRECTORY: k8s/clusters
+          ENABLE_LINTERS: |-
+            ${{
+              join(
+                fromJSON('
+                  [
+                    "ACTION_ACTIONLINT",
+                    "ANSIBLE_ANSIBLE_LINT",
+                    "COPYPASTE_JSCPD",
+                    "CREDENTIALS_SECRETLINT",
+                    "GIT_GIT_DIFF",
+                    "KUBERNETES_KUBEVAL",
+                    "MARKDOWN_MARKDOWNLINT",
+                    "TERRAFORM_TERRAFORM_FMT",
+                    "YAML_PRETTIER",
+                    "YAML_YAMLLINT"
+                  ]
+                '),
+                ','
+              )
+            }}
+          KUBERNETES_DIRECTORY: k8s
           KUBERNETES_KUBEVAL_ARGUMENTS: --ignore-missing-schemas
-          MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdownlint.yaml
-          SPELL_MISSPELL_DISABLE_ERRORS: true
-          YAML_YAMLLINT_CONFIG_FILE: .yamllint.yaml
-
-      - name: Archive artifacts
-        if: ${{ success() }} || ${{ failure() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: MegaLinter reports
-          path: |
-            report
-            mega-linter.log
+          MARKDOWN_MARKDOWNLINT_CONFIG_FILE: markdownlint.config.yaml
+          MARKDOWN_MARKDOWNLINT_RULES_PATH: .github/
