@@ -24,29 +24,32 @@ jobs:
           app_id: ${{ secrets.BJWS_APP_ID }}
           private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
 
-      - name: Configure linters
-        id: enabled-linters
-        uses: ChocolateLoverRaj/list-to-json@v1.0
-        with:
-          list: >-
-            ACTION_ACTIONLINT
-            ANSIBLE_ANSIBLE_LINT
-            COPYPASTE_JSCPD
-            CREDENTIALS_SECRETLINT
-            GIT_GIT_DIFF
-            KUBERNETES_KUBEVAL
-            MARKDOWN_MARKDOWNLINT
-            TERRAFORM_TERRAFORM_FMT
-            YAML_PRETTIER
-            YAML_YAMLLINT
-
       - name: MegaLinter
         uses: megalinter/megalinter/flavors/terraform@v5
         env:
           GITHUB_TOKEN: "${{ steps.generate-token.outputs.token }}"
           PRINT_ALPACA: false
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'workflow_dispatch' }}
-          ENABLE_LINTERS: ${{ join(fromJSON(steps.enabled-linters.outputs.json),',') }}
+          ENABLE_LINTERS: |-
+            ${{
+              join(
+                fromJSON('
+                  [
+                    "ACTION_ACTIONLINT",
+                    "ANSIBLE_ANSIBLE_LINT",
+                    "COPYPASTE_JSCPD",
+                    "CREDENTIALS_SECRETLINT",
+                    "GIT_GIT_DIFF",
+                    "KUBERNETES_KUBEVAL",
+                    "MARKDOWN_MARKDOWNLINT",
+                    "TERRAFORM_TERRAFORM_FMT",
+                    "YAML_PRETTIER",
+                    "YAML_YAMLLINT"
+                  ]
+                '),
+                ','
+              )
+            }}
           KUBERNETES_DIRECTORY: k8s
           KUBERNETES_KUBEVAL_ARGUMENTS: --ignore-missing-schemas
           MARKDOWN_MARKDOWNLINT_CONFIG_FILE: markdownlint.config.yaml
