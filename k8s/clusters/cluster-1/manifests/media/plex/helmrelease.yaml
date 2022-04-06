@@ -42,6 +42,12 @@ spec:
         # annotations:
         #   traefik.ingress.kubernetes.io/service.serversscheme: https
         loadBalancerIP: ${LB_PLEX}
+        ports:
+          ssh:
+            enabled: true
+            port: 22
+            protocol: TCP
+            targetPort: 22
         externalTrafficPolicy: Local
       webtools:
         enabled: true
