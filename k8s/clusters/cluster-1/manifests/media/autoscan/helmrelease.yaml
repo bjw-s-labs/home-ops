@@ -42,7 +42,7 @@ spec:
 
     probes:
       liveness:
-        enabled: false
+        enabled: true
         custom: true
         ## The spec field contains the values for the default livenessProbe.
         ## If you selected custom: true, this field holds the definition of the livenessProbe.
@@ -52,8 +52,9 @@ spec:
             - /usr/bin/env
             - bash
             - -c
-            - curl --fail localhost:7878/api/v3/system/status?apiKey=`IFS=\> && while
-              read -d \< E C; do if [[ $E = "ApiKey" ]]; then echo $C; fi; done < /config/config.xml`
+            - username=`grep -B 1 'username:' /config/config.yml | tail -n1 | awk '{ print $2}'` && 
+              password=`grep -B 1 'password:' /config/config.yml | tail -n1 | awk '{ print $2}'` && 
+              curl --fail $username:$password@localhost:3030/triggers/manual
           failureThreshold: 5
           initialDelaySeconds: 60
           periodSeconds: 10
