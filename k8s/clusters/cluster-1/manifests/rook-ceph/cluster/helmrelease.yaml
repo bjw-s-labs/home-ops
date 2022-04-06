@@ -134,7 +134,8 @@ spec:
           name: ceph-filesystem
           reclaimPolicy: Delete
           allowVolumeExpansion: true
-          mountOptions: []
+          mountOptions:
+            - discard
           parameters:
             csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
             csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
