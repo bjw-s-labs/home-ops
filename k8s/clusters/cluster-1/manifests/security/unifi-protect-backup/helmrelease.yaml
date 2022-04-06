@@ -73,15 +73,11 @@ spec:
       config:
         enabled: false
         existingClaim: unifi-protect-backup-config
-      nfs-nas-media:
-        enabled: false
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /mnt/NFS/Merged-Media
-        mountPath: /mnt/unionfs
-        readOnly: false
+      rclone:
+        enabled: true
+        type: secret
+        mountPath: /rclone
+        readOnly: true
 
     ingress:
       main:
