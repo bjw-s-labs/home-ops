@@ -76,7 +76,12 @@ spec:
       rclone:
         enabled: true
         type: secret
+        secret:
           secretName: rclone-secrets
+          defaultMode: 0400
+          items:
+          - key: 190.json
+            path: keys/190.json
         mountPath: /rclone
         readOnly: true
 
