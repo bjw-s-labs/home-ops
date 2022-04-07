@@ -1,0 +1,73 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: node-red
+  namespace: home-automation
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: node-red
+      version: 10.0.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    # initContainers: #TODO #930
+    #   npm-update-modules:
+    #     image: node:12-buster-slim@sha256:426f05df1d1feefa841471c0faa22a20db286766bf528993421847f9a3b8efe3
+    #     command: ["npm", "update", "--verbose"]
+    #     workingDir: /data
+    #     volumeMounts:
+    #       - name: config
+    #         mountPath: /data
+    image:
+      repository: ghcr.io/k8s-at-home/node-red
+      tag: v2.2.2
+    env:
+      TZ: "${TIMEZONE}"
+      NODE_RED_ENABLE_SAFE_MODE: "false"
+      NODE_RED_ENABLE_PROJECTS: "true"
+    ingress:
+      main:
+        enabled: true
+        annotations:
+          kubernetes.io/ingress.class: "traefik"
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+          external-dns/is-public: "false"
+          hajimari.io/enable: "false"
+          hajimari.io/icon: "resistor-nodes"
+        hosts:
+          - host: &host-cluster "node-red.${CLUSTER_NAME}.${CLUSTER_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+          - host: &host "node-red.${CLUSTER_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - secretName: node-red-${CLUSTER_NAME}-tls
+            hosts:
+              - *host-cluster
+              - *host
+
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: node-red-config-v1
+        mountPath: "/data"
+
+    resources:
+      requests:
+        memory: 100Mi
+        cpu: 100m
+      limits:
+        memory: 500Mi
