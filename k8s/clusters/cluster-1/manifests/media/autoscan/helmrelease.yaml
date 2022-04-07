@@ -65,6 +65,16 @@ spec:
       config:
         enabled: true
         existingClaim: autoscan-config
+      configData:
+        enabled: true
+        type: secret
+        name: autoscan-config
+        defaultMode: 0500
+        items:
+        - key: config.yml
+          path: config.yml
+        mountPath: /config/
+        readOnly: true
       nfs-nas-media:
         enabled: true
         type: custom
