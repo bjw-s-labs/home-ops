@@ -37,6 +37,7 @@ spec:
       PORT: 443
       DETECTION_TYPES: 'motion,person,vehicle,ring'
       RCLONE_DESTINATION: 'security:/Unifi\ Protect'
+      RCLONE_ARGS: '--config="/rclone/rclone.conf"'
 
     envFrom:
       - secretRef:
@@ -81,8 +82,8 @@ spec:
         items:
         - key: rclone.conf
           path: rclone.conf
-        - key: 180.json
-          path: keys/180.json
+        - key: 186.json
+          path: keys/186.json
         - key: 190.json
           path: keys/190.json
         mountPath: /rclone
