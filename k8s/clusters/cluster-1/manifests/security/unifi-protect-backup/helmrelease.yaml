@@ -79,9 +79,13 @@ spec:
         name: rclone-secrets
         defaultMode: 0400
         items:
+        - key: rclone.conf
+          path: rclone.conf
+        - key: 180.json
+          path: keys/180.json
         - key: 190.json
           path: keys/190.json
-        # mountPath: /rclone
+        mountPath: /rclone
         readOnly: true
 
     ingress:
