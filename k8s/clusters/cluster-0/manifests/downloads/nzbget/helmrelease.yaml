@@ -32,6 +32,13 @@ spec:
       config:
         enabled: true
         existingClaim: nzbget-config
+      scripts:
+        enabled: true
+        type: configMap
+        name: nzbget-scripts
+        mountPath: /scripts
+        readOnly: true
+        defaultMode: 0555
       media:
         enabled: true
         type: custom
