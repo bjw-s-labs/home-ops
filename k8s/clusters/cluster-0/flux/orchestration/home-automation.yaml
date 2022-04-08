@@ -115,14 +115,31 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: home-automation-home-assistant
+  name: home-automation-home-assistant-database
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: home-automation-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/home-automation/home-assistant/database"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: home-automation-home-assistant-core
   namespace: flux-system
 spec:
   dependsOn:
     - name: home-automation-namespace
     - name: home-automation-mosquitto
+    - name: home-automation-home-assistant-database
   interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/home-automation/home-assistant"
+  path: "./k8s/clusters/cluster-0/manifests/home-automation/home-assistant/core"
   prune: true
   wait: true
   sourceRef:

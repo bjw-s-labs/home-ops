@@ -1,0 +1,35 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: home-assistant-database
+  namespace: home-automation
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: postgresql
+      version: 11.1.19
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    auth:
+      database: home-assistant
+      existingSecret: home-assistant-database
+
+    primary:
+      extendedConfiguration: |
+        max_wal_size = 2048
+        min_wal_size = 160
+      persistence:
+        enabled: true
+        existingClaim: home-assistant-postgresql
+
+      resources:
+        requests:
+          memory: 1024Mi
+        limits:
+          memory: 2048Mi
