@@ -150,15 +150,3 @@ spec:
             memory: 256Mi
           limits:
             memory: 1024Mi
-
-  valuesFrom:
-    - kind: Secret
-      name: home-assistant
-      valuesKey: postgresql_password
-      targetPath: postgresql.postgresqlPassword
-      optional: false
-    - kind: Secret
-      name: home-assistant
-      valuesKey: postgresql_admin_password
-      targetPath: postgresql.postgresqlPostgresPassword
-      optional: false
