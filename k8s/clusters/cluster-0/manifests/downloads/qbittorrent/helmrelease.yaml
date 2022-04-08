@@ -30,6 +30,24 @@ spec:
       supplementalGroups:
         - 65539
 
+    additionalContainers:
+      gitsync-nightwalker:
+        image: k8s.gcr.io/git-sync/git-sync:v3.5.0
+        volumeMounts:
+          - name: custom-ui
+            mountPath: /custom_ui
+        env:
+          - name: GIT_SYNC_REPO
+            value: https://github.com/brettpetch/nightwalker.git
+          - name: GIT_SYNC_BRANCH
+            value: "main"
+          - name: GIT_SYNC_REV
+            value: "4.3.9"
+          - name: GIT_SYNC_ROOT
+            value: /custom_ui
+          - name: GIT_SYNC_DEST
+            value: nightwalker
+
     settings:
       automaticPortSetup: false
 
@@ -49,6 +67,10 @@ spec:
             server: "${NAS_ADDRESS}"
             path: /volume1/Media
         mountPath: /data/nas-media
+      custom-ui:
+        enabled: true
+        type: emptyDir
+        mountPath: /custom_ui
 
     ingress:
       main:
