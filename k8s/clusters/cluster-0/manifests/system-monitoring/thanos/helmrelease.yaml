@@ -28,7 +28,7 @@ spec:
       ingress:
         enabled: true
         hostname: "thanos.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-        ingressClassName: "traefik"
+        ingressClassName: "nginx"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
