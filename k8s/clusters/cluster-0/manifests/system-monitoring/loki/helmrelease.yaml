@@ -35,11 +35,9 @@ spec:
     ingress:
       enabled: true
       annotations:
-        kubernetes.io/ingress.class: traefik
+        kubernetes.io/ingress.class: nginx
         cert-manager.io/cluster-issuer: letsencrypt-production
         external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
       hosts:
         - host: &host "loki.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
           paths:
