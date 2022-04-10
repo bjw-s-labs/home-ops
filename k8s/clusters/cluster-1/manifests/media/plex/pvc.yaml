@@ -6,6 +6,7 @@ metadata:
   namespace: media
   labels:
     k10.kasten.io/backup: "true"
+    k10.kasten.io/filter: "plex"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -15,3 +16,22 @@ spec:
       storage: 400Gi
 
   storageClassName: ceph-block
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: plex-config-v2
+  namespace: media
+  labels:
+    k10.kasten.io/backup: "true"
+    k10.kasten.io/filter: "plex"
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 400Gi
+
+  storageClassName: ceph-block
+
