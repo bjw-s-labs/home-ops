@@ -43,13 +43,11 @@ spec:
 
     ingress:
       create: true
-      class: traefik
+      class: nginx
       host: k10.${CLUSTER_NAME}.${INGRESS_DOMAIN}
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
         external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
       urlPath: k10
       hosts:
         - k10.${CLUSTER_NAME}.${INGRESS_DOMAIN}

@@ -75,8 +75,6 @@ spec:
           enabled: true
           annotations:
             cert-manager.io/cluster-issuer: letsencrypt-production
-            traefik.ingress.kubernetes.io/router.entrypoints: websecure
-            traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
           hosts:
             - "hubble.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
           tls:
