@@ -79,6 +79,13 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_hide_header "x-webkit-csp";
+            proxy_hide_header "content-security-policy";
+            proxy_hide_header "X-Frame-Options";
+            proxy_set_header Accept-Encoding "";
+            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/qbittorrent/nord.css"></head>';
+            sub_filter_once on;
         hosts:
           - host: &host "qbittorrent.${INGRESS_DOMAIN}"
             paths:
