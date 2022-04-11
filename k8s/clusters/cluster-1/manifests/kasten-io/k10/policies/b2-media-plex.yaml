@@ -2,16 +2,22 @@ apiVersion: config.kio.kasten.io/v1alpha1
 kind: Policy
 metadata:
   creationTimestamp: "2022-04-11T00:23:35Z"
-  generation: 2
+  generation: 4
   name: b2-media-plex
   namespace: kasten-io
-  resourceVersion: "17155704"
+  resourceVersion: "17161310"
   uid: cfd7d6cc-98e0-4cf9-b5ee-4b1a5d2f21ec
 spec:
   actions:
   - action: backup
     backupParameters:
-      filters: {}
+      filters:
+        includeResources:
+        - matchExpressions:
+          - key: app.kubernetes.io/instance
+            operator: In
+            values:
+            - plex
       profile:
         name: backblaze-b2
         namespace: kasten-io
@@ -31,7 +37,8 @@ spec:
   comment: Plex Backup (To Backblaze)
   createdBy: k10-admin
   frequency: '@daily'
-  lastModifyHash: 4099679759
+  lastModifyHash: 2101893925
+  modifiedBy: k10-admin
   retention:
     daily: 7
     monthly: 12
@@ -39,14 +46,10 @@ spec:
     yearly: 1
   selector:
     matchExpressions:
-    - key: app.kubernetes.io/instance
-      operator: In
-      values:
-      - plex
     - key: k10.kasten.io/appNamespace
       operator: In
       values:
-      - kasten-io-cluster
+      - media
   subFrequency:
     days:
     - 1
