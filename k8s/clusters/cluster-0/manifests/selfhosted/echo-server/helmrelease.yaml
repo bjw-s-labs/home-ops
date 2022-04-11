@@ -44,3 +44,13 @@ spec:
         memory: 64Mi
       limits:
         memory: 96Mi
+
+  postRenderers:
+    - kustomize:
+        patchesJson6902:
+          - target:
+              kind: Deployment
+              name: echo-server
+            patch:
+              - op: remove
+                path: /spec/template/spec/containers/0/resources/limits/cpu
