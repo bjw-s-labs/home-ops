@@ -2,7 +2,7 @@
 apiVersion: cr.kanister.io/v1alpha1
 kind: Blueprint
 metadata:
-  name: hyperion
+  name: backblaze-b2-kasten-cluster-1
   namespace: kasten-io
 actions:
   post-export:
@@ -18,19 +18,26 @@ actions:
                 imagePullPolicy: IfNotPresent
                 env:
                   - name: TZ
-                    value: ${TZ}
+                    value: ${TIMEZONE}
                 volumeMounts:
                   - name: rclone-config
                     mountPath: /config
-                  - name: k10-backups
-                    mountPath: /mnt/k10-backups
             volumes:
               - name: rclone-config
                 secret:
-                  secretName: rclone-config
-              - name: k10-backups
-                persistentVolumeClaim:
-                  claimName: k10-backups
+                  secretName: rclone-secrets
+                  defaultMode: 0666
+                  items:
+                  - key: rclone.conf
+                    path: rclone.conf
+                  - key: 180.json
+                    path: keys/180.json
+                  - key: 186.json
+                    path: keys/186.json
+                  - key: 190.json
+                    path: keys/190.json
+                  mountPath: /config/rclone
+                  readOnly: true
           command:
             - "rclone"
             - "-v"
@@ -45,4 +52,4 @@ actions:
             - "--checkers"
             - "24"
             - "/mnt/k10-backups/k10"
-            - "b2:trux-k10-backups/"
+            - "backblaze:kasten-cluster-1/"

@@ -1,0 +1,60 @@
+apiVersion: config.kio.kasten.io/v1alpha1
+kind: Policy
+metadata:
+  creationTimestamp: "2022-04-11T00:23:35Z"
+  generation: 2
+  name: b2-media-plex
+  namespace: kasten-io
+  resourceVersion: "17155704"
+  uid: cfd7d6cc-98e0-4cf9-b5ee-4b1a5d2f21ec
+spec:
+  actions:
+  - action: backup
+    backupParameters:
+      filters: {}
+      profile:
+        name: backblaze-b2
+        namespace: kasten-io
+  - action: export
+    exportParameters:
+      exportData:
+        enabled: true
+      frequency: '@daily'
+      migrationToken:
+        name: b2-media-plex-migration-token-sw8v7
+        namespace: kasten-io
+      profile:
+        name: backblaze-b2
+        namespace: kasten-io
+      receiveString: bIzAPpoanmEHwwVUh1EyhvZAGmM5EkeX1E2y1WscMbAAa89JhV2xR7PeW+GktvMcBFHCzKuNGU+u7zELhTr9gg0fsAU0dd6aUqyw6eSc1YaEj7hp7HNdYxT15ZfSKORofdcN409D0OBPlbOQ7NzHyHyOJZeWwnJ9tH3tAFydw4aw5KMyWGisz0yDoV7eFD8gxpZbYIqFgjxu00o3MTiL9929XXSzHSjrpihH94zbaJdioYyeZS3AdosHtK2Qh965Mo7HabrPKMRhBWz4oUwm8nKKr/WQa+LO0QWYBGUlBWZ8WzKL+Wsz+XH56p3J9Np5wUBtK9ZdkmIPhId72HLcF+JE87dVWAkM+JIQkYOs/P21sk2ExZrHs2xzglm/2i9p4p6sL4pHyOzgQHNwxIq7OV7gnLJcE7aaqlCrw4sNICdWi6ADY8GNYS9DDULK37G5Ag2B7vU6dOvwRlAOqAlvWzzp19FY5rJ6fWyObXRMqcMZ91AWhwqXHhVBbzQFQ8rulviKdxXfhC5ymtdekQazkG8X6/N2xQIdZa0J7XARJbEp4G55
+    retention: {}
+  comment: Plex Backup (To Backblaze)
+  createdBy: k10-admin
+  frequency: '@daily'
+  lastModifyHash: 4099679759
+  retention:
+    daily: 7
+    monthly: 12
+    weekly: 4
+    yearly: 1
+  selector:
+    matchExpressions:
+    - key: app.kubernetes.io/instance
+      operator: In
+      values:
+      - plex
+    - key: k10.kasten.io/appNamespace
+      operator: In
+      values:
+      - kasten-io-cluster
+  subFrequency:
+    days:
+    - 1
+    hours:
+    - 8
+    minutes:
+    - 0
+    months:
+    - 1
+    weekdays:
+    - 0
