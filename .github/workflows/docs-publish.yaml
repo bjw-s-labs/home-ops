@@ -12,6 +12,9 @@ on: # yamllint disable-line rule:truthy
       - "mkdocs.yaml"
       - "docs/**"
 
+env:
+  BOT_USERNAME: "bjw-s[bot]"
+
 jobs:
   markdownlint:
     name: Markdownlint
@@ -68,8 +71,8 @@ jobs:
 
       - name: Configure Git
         run: |
-          git config user.name "bjw-s[bot]"
-          git config user.email "bjw-s[bot]@users.noreply.github.com"
+          git config user.name "${{ env.BOT_USERNAME }}"
+          git config user.email "${{ env.BOT_USERNAME }}@users.noreply.github.com"
 
       - run: |
           pip install \
