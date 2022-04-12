@@ -29,14 +29,14 @@ def _setup_logging(debug):
     )
 
 
-def process_node(hostname: str, template: str, config_patches: list) -> dict:
+def process_node(hostname: str, domain: str, template: str, config_patches: list) -> dict:
     logger.info(f"Processing node {hostname}")
 
     with template.open('r') as fp:
         node_template = yaml.safe_load(fp)
 
     node_configpatches = [
-        {'op': 'add', 'path': '/machine/network/hostname', 'value': hostname}
+        {'op': 'add', 'path': '/machine/network/hostname', 'value': f"{hostname}.{domain}"}
     ]
 
     if config_patches:
@@ -154,6 +154,7 @@ def main(
     # Render control plane nodes
     for node in cluster_config['nodes']:
         hostname = node['hostname']
+        domain = node['domain']
         if node.get('controlplane') and node['controlplane']:
             template = template_controlplane
             config_patches = cluster_config['controlplane'].get(
@@ -164,11 +165,11 @@ def main(
                 'configPatches') or []
 
         config_patches = config_patches + (node.get('configPatches') or [])
-        result = process_node(hostname, template, config_patches)
+        result = process_node(hostname, domain, template, config_patches)
         if variables:
             result = parse_variables(result, r"\$\{(.*)\}", variables)
 
-        with Path.joinpath(output_folder, f"{node['hostname']}.yaml") .open('w') as fp:
+        with Path.joinpath(output_folder, f"{hostname}.yaml") .open('w') as fp:
             yaml.safe_dump(result, fp)
 
     # Render worker nodes
