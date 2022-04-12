@@ -1,12 +1,13 @@
-from curses import has_key
+from encodings import utf_8
 import jsonpatch
+import os
+import re
 import subprocess
 import sys
 import typer
 import yaml
 
 from pathlib import Path
-from typing import Optional
 from loguru import logger
 
 app = typer.Typer(add_completion=False)
@@ -14,7 +15,7 @@ app = typer.Typer(add_completion=False)
 
 def _setup_logging(debug):
     """
-    Setup the log formatter for Excludarr
+    Setup the log formatter for this script
     """
 
     log_level = "INFO"
@@ -30,7 +31,7 @@ def _setup_logging(debug):
     )
 
 
-def process_node(hostname: str, template: str, config_patches: list):
+def process_node(hostname: str, template: str, config_patches: list) -> dict:
     logger.info(f"Processing node {hostname}")
 
     with template.open('r') as fp:
@@ -45,15 +46,64 @@ def process_node(hostname: str, template: str, config_patches: list):
     node_configpatches = jsonpatch.JsonPatch(node_configpatches)
 
     result = node_configpatches.apply(node_template)
+
     return result
+
+
+def _load_variables_from_file(path: Path) -> dict:
+    file_parts = path.name.split('.')
+    if file_parts[-2] == 'sops':
+        logger.info("Detected encrypted variables file, trying to decrypt.")
+        sops_result = subprocess.run(
+            [
+                "sops", "-d", str(path)
+            ],
+            capture_output=True,
+            encoding="utf8"
+        )
+        if sops_result.returncode != 0:
+            logger.error("Could not decrypt variables file.")
+
+        data = sops_result.stdout
+    else:
+        with open(path, 'r') as fh:
+            data = fh.readlines()
+
+    output = yaml.safe_load(data)
+    return(output)
+
+
+def parse_variables(input: dict, variable_pattern: str, variables: dict) -> dict:
+    if isinstance(input, dict):
+        return {k: parse_variables(v, variable_pattern, variables) for k, v in input.items()}
+    elif isinstance(input, list):
+        return [parse_variables(v, variable_pattern, variables) for v in input]
+    elif isinstance(input, str):
+        return re.sub(variable_pattern, lambda line: _replace_variable(line, variables), input)
+
+    return input
+
+
+def _replace_variable(variable: re.Match, variables: dict) -> str:
+    from functools import reduce
+    variable_path = variable.groups()[0]
+    try:
+        env_var_value = reduce(
+            lambda a, b: a[b], variable_path.split("."), variables
+        )
+    except KeyError:
+        env_var_value = ""
+    return env_var_value
 
 
 @app.command()
 def main(
     cluster_config_file: Path = typer.Argument(
         ..., help="The YAML file containing the cluster configuration."),
-    output_folder: Path = typer.Argument(
+    output_folder: Path = typer.Option(
         None, help="Folder where the output should be written."),
+    variables_file: Path = typer.Option(
+        None, help="File containing variables to load."),
     debug: bool = False,
 ):
     _setup_logging(debug)
@@ -99,6 +149,10 @@ def main(
         )
         template_taloscfg.unlink()
 
+    variables = None
+    if variables_file and variables_file.exists():
+        variables = _load_variables_from_file(variables_file)
+
     # Render control plane nodes
     for node in cluster_config['nodes']:
         hostname = node['hostname']
@@ -113,6 +167,9 @@ def main(
 
         config_patches = config_patches + (node.get('configPatches') or [])
         result = process_node(hostname, template, config_patches)
+        if variables:
+            result = parse_variables(result, "\$\{(.*)\}", variables)
+
         with Path.joinpath(output_folder, f"{node['hostname']}.yaml") .open('w') as fp:
             yaml.safe_dump(result, fp)
 

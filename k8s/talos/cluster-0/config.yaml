@@ -1,5 +1,5 @@
 ---
-name: homeprod
+name: cluster-0
 
 nodes:
   - hostname: anvil
@@ -50,12 +50,12 @@ controlplane:
     - op: add
       path: /cluster/apiServer/certSANs
       value:
-        - cluster-0.${HARDWARE_DOMAIN}
+        - cluster-0.${domains.hardware}
 
     - op: add
       path: /machine/certSANs
       value:
-        - cluster-0.${HARDWARE_DOMAIN}
+        - cluster-0.${domains.hardware}
 
     - op: add
       path: /cluster/network/cni
