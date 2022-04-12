@@ -1,6 +1,4 @@
-from encodings import utf_8
 import jsonpatch
-import os
 import re
 import subprocess
 import sys
@@ -168,7 +166,7 @@ def main(
         config_patches = config_patches + (node.get('configPatches') or [])
         result = process_node(hostname, template, config_patches)
         if variables:
-            result = parse_variables(result, "\$\{(.*)\}", variables)
+            result = parse_variables(result, r"\$\{(.*)\}", variables)
 
         with Path.joinpath(output_folder, f"{node['hostname']}.yaml") .open('w') as fp:
             yaml.safe_dump(result, fp)
