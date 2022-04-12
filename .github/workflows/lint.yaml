@@ -25,7 +25,7 @@ jobs:
           private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
 
       - name: MegaLinter
-        uses: megalinter/megalinter/flavors/terraform@v5
+        uses: megalinter/megalinter@v5
         env:
           GITHUB_TOKEN: "${{ steps.generate-token.outputs.token }}"
           PRINT_ALPACA: false
@@ -42,6 +42,8 @@ jobs:
                     "GIT_GIT_DIFF",
                     "KUBERNETES_KUBEVAL",
                     "MARKDOWN_MARKDOWNLINT",
+                    "PYTHON_PYLINT",
+                    "PYTHON_FLAKE8",
                     "TERRAFORM_TERRAFORM_FMT",
                     "YAML_PRETTIER",
                     "YAML_YAMLLINT"
@@ -52,5 +54,9 @@ jobs:
             }}
           KUBERNETES_DIRECTORY: k8s
           KUBERNETES_KUBEVAL_ARGUMENTS: --ignore-missing-schemas
-          MARKDOWN_MARKDOWNLINT_CONFIG_FILE: markdownlint.config.yaml
+          KUBERNETES_KUBEVAL_FILTER_REGEX_INCLUDE: "(k8s/clusters|k8s/global)"
+          MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .github/linters/markdownlint.config.yaml
           MARKDOWN_MARKDOWNLINT_RULES_PATH: .github/
+          PYTHON_FLAKE8_CONFIG_FILE: .github/linters/.flake8
+          YAML_YAMLLINT_CONFIG_FILE: .github/linters/.yamllint.yaml
+          YAML_PRETTIER_FILTER_REGEX_EXCLUDE: "(.*\\.sops\\.ya?ml)"

@@ -1,0 +1,96 @@
+---
+name: cluster-0
+
+nodes:
+  - hostname: anvil
+    ip_address: 10.1.1.21
+    controlplane: true
+  - hostname: blitz
+    ip_address: 10.1.1.22
+    controlplane: true
+  - hostname: cannon
+    ip_address: 10.1.1.23
+    controlplane: true
+  - hostname: delta
+    ip_address: 10.1.1.31
+  - hostname: enigma
+    ip_address: 10.1.1.32
+  - hostname: felix
+    ip_address: 10.1.1.33
+  - hostname: goblin
+    ip_address: 10.1.1.41
+
+controlplane:
+  endpoint: "https://10.5.0.2:6443"
+
+  configPatches:
+    - op: add
+      path: /machine/kubelet/extraArgs
+      value:
+        rotate-server-certificates: "true"
+        feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+
+    - op: add
+      path: /machine/time
+      value:
+        disabled: false
+        servers:
+          - 10.1.1.1
+
+    - op: add
+      path: /machine/network/interfaces
+      value:
+        - interface: eth0
+          dhcp: true
+
+    - op: add
+      path: /cluster/proxy/disabled
+      value: true
+
+    - op: add
+      path: /cluster/apiServer/certSANs
+      value:
+        - cluster-0.${domains.hardware}
+
+    - op: add
+      path: /machine/certSANs
+      value:
+        - cluster-0.${domains.hardware}
+
+    - op: add
+      path: /cluster/network/cni
+      value:
+        name: "custom"
+        urls:
+          - "https://raw.githubusercontent.com/bjw-s/home-ops/main/k8s/clusters/cluster-0/integrations/cilium-quick-install/quick-install.yaml"
+
+    - op: replace
+      path: /cluster/extraManifests
+      value:
+        - "https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/v0.3.0/deploy/ha-install.yaml"
+
+workers:
+  configPatches:
+    - op: add
+      path: /machine/kubelet/extraArgs
+      value:
+        rotate-server-certificates: "true"
+
+    - op: add
+      path: /machine/time
+      value:
+        disabled: false
+        servers:
+          - 10.1.1.1
+
+    - op: add
+      path: /machine/sysctls
+      value:
+        fs.inotify.max_user_watches: "1048576"
+        fs.inotify.max_user_instances: "8192"
+
+    - op: add
+      path: /machine/network/interfaces
+      value:
+        - interface: eth0
+          dhcp: true
