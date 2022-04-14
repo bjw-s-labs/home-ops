@@ -1,0 +1,62 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: paperless
+  namespace: selfhosted
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: paperless
+      version: 8.6.1
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: ghcr.io/paperless-ngx/paperless-ngx
+      tag: 1.6.0
+
+    env:
+      TZ: "${TIMEZONE}"
+      PAPERLESS_OCR_LANGUAGE: nld
+      PAPERLESS_ADMIN_USER:
+        valueFrom:
+          secretKeyRef:
+            name: paperless
+            key: admin_user
+      PAPERLESS_ADMIN_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: paperless
+            key: admin_password
+
+    persistence:
+      data:
+        enabled: true
+        existingClaim: paperless-data
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        hosts:
+          - host: &host "paperless.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - secretName: radicale-tls
+            hosts:
+              - *host
+
+    resources:
+      requests:
+        memory: 128Mi
+      limits:
+        memory: 256Mi
