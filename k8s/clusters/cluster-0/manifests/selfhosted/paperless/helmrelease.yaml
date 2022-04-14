@@ -1,0 +1,103 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: paperless
+  namespace: selfhosted
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: paperless
+      version: 8.6.1
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: ghcr.io/paperless-ngx/paperless-ngx
+      tag: 1.6.0
+
+    env:
+      PAPERLESS_ADMIN_USER:
+        valueFrom:
+          secretKeyRef:
+            name: paperless
+            key: admin_user
+      PAPERLESS_ADMIN_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: paperless
+            key: admin_password
+      PAPERLESS_CONSUMER_POLLING: "60"
+      PAPERLESS_CONSUMER_RECURSIVE: "true"
+      PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
+      PAPERLESS_OCR_LANGUAGES: nld
+      PAPERLESS_OCR_LANGUAGE: nld
+      PAPERLESS_REDIS: redis://localhost:6379
+      PAPERLESS_SECRET_KEY:
+        valueFrom:
+          secretKeyRef:
+            name: paperless
+            key: secret_key
+      PAPERLESS_TIME_ZONE: "${TIMEZONE}"
+      TZ: "${TIMEZONE}"
+      USERMAP_GID: 65543
+
+    persistence:
+      data:
+        enabled: true
+        mountPath: /usr/src/paperless/data
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /volume1/Docs/paperless/data
+      media:
+        enabled: true
+        mountPath: /usr/src/paperless/media
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /volume1/Docs/paperless/media
+      consume:
+        enabled: true
+        mountPath: /usr/src/paperless/consume
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /volume1/Docs/paperless/incoming
+      export:
+        enabled: true
+        mountPath: /usr/src/paperless/export
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /volume1/Docs/paperless/export
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        hosts:
+          - host: &host "paperless.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - secretName: paperless-tls
+            hosts:
+              - *host
+
+    # -- Deploy local redis instance.
+    additionalContainers:
+      - name: broker
+        image: redis:6.2
+        imagePullPolicy: IfNotPresent
