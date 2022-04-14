@@ -20,7 +20,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: rook-ceph-snapshot-controller-config
+    - name: rook-ceph-cluster
     - name: kasten-io-namespace
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/kasten-io/k10/base"
@@ -37,7 +37,6 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: rook-ceph-snapshot-controller-config
     - name: kasten-io-namespace
     - name: kasten-io-k10-base
   interval: 5m
