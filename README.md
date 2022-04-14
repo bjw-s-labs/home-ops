@@ -137,3 +137,15 @@ kubectl apply -k $CLUSTER_TARGET_FOLDER
 NODE=cp1.cluster-1
 talosctl reset  --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL --reboot --nodes $NODE 
 ```
+
+# Upgrading Talos OS
+
+The `preseve=true` option is only for single node clusters. It saves etcd data
+```
+NODE=sidero.FQDN.com
+CONTEXT=sidero
+
+talosctl upgrade --nodes $NODE --context $CONTEXT \
+--image ghcr.io/siderolabs/installer:v1.0.2 \
+--preserve=true
+```
