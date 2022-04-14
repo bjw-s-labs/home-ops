@@ -51,6 +51,64 @@ spec:
             probe:
               timeoutSeconds: 5
 
+      resources:
+        mgr:
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+        mon:
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+        osd:
+          limits:
+            cpu: "1000m"
+            memory: "4Gi"
+          requests:
+            cpu: "500m"
+            memory: "4Gi"
+        prepareosd:
+          limits:
+            cpu: "250m"
+            memory: "200Mi"
+          requests:
+            cpu: "250m"
+            memory: "50Mi"
+        mgr-sidecar:
+          limits:
+            cpu: "250m"
+            memory: "100Mi"
+          requests:
+            cpu: "100m"
+            memory: "40Mi"
+        crashcollector:
+          limits:
+            cpu: "250m"
+            memory: "60Mi"
+          requests:
+            cpu: "100m"
+            memory: "60Mi"
+        logcollector:
+          limits:
+            cpu: "250m"
+            memory: "1Gi"
+          requests:
+            cpu: "100m"
+            memory: "100Mi"
+        cleanup:
+          limits:
+            cpu: "250m"
+            memory: "1Gi"
+          requests:
+            cpu: "250m"
+            memory: "100Mi"
+
       dashboard:
         enabled: true
         urlPrefix: /
@@ -129,10 +187,10 @@ spec:
             activeStandby: true
             resources:
               limits:
-                cpu: "2000m"
+                cpu: "500m"
                 memory: "4Gi"
               requests:
-                cpu: "1000m"
+                cpu: "250m"
                 memory: "4Gi"
         storageClass:
           enabled: true
