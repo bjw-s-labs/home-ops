@@ -20,6 +20,7 @@ spec:
 
     monitoring:
       enabled: true
+      createPrometheusRules: true
 
     configOverride: |
       [global]
@@ -50,54 +51,9 @@ spec:
             probe:
               timeoutSeconds: 5
 
-      mgr:
-        count: 2
-
       dashboard:
         enabled: true
         urlPrefix: /
-
-      resources:
-        mgr:
-          limits:
-            memory: "1Gi"
-          requests:
-            memory: "512Mi"
-        mon:
-          limits:
-            memory: "2Gi"
-          requests:
-            memory: "1Gi"
-        osd:
-          limits:
-            memory: "4Gi"
-          requests:
-            memory: "4Gi"
-        prepareosd:
-          limits:
-            memory: "200Mi"
-          requests:
-            memory: "50Mi"
-        mgr-sidecar:
-          limits:
-            memory: "100Mi"
-          requests:
-            memory: "40Mi"
-        crashcollector:
-          limits:
-            memory: "60Mi"
-          requests:
-            memory: "60Mi"
-        logcollector:
-          limits:
-            memory: "1Gi"
-          requests:
-            memory: "100Mi"
-        cleanup:
-          limits:
-            memory: "1Gi"
-          requests:
-            memory: "100Mi"
 
       storage:
         useAllNodes: false
@@ -128,6 +84,12 @@ spec:
           - secretName: tls.rook-ceph
             hosts:
               - "rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+
+    cephBlockPoolsVolumeSnapshotClass:
+      enabled: true
+      name: csi-rbdplugin-snapclass
+      annotations:
+        k10.kasten.io/is-snapshot-class: "true"
 
     cephBlockPools:
       - name: ceph-blockpool
@@ -165,6 +127,13 @@ spec:
           metadataServer:
             activeCount: 1
             activeStandby: true
+            resources:
+              limits:
+                cpu: "2000m"
+                memory: "4Gi"
+              requests:
+                cpu: "1000m"
+                memory: "4Gi"
         storageClass:
           enabled: true
           isDefault: false
