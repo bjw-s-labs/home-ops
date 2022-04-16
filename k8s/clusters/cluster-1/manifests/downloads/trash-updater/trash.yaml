@@ -3,7 +3,7 @@
 
 # Configuration specific to Sonarr
 sonarr:
-  - base_url: http://sonarr.downloads:8989
+  - base_url: https://sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}
     api_key: ${SONARR_API_KEY}
 
     quality_definition: series
@@ -13,7 +13,7 @@ sonarr:
 
 # Configuration specific to Radarr.
 radarr:
-  - base_url: http://radarr.downloads:7878
+  - base_url: https://radarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}
     api_key: ${RADARR_API_KEY}
 
     quality_definition:
