@@ -138,14 +138,29 @@ NODE=cp1.cluster-1
 talosctl reset  --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL --reboot --nodes $NODE 
 ```
 
-# Upgrading Talos OS
 
-The `preseve=true` option is only for single node clusters. It saves etcd data
+# Add 2 drives to my ZFS NAS
+https://docs.oracle.com/cd/E53394_01/html/E54801/gayrd.html#scrolltoc
+
+`-n` is for dry run
 ```
-NODE=sidero.FQDN.com
-CONTEXT=sidero
+zpool status
+zpool add Media mirror $DEV_DEVICE1 $DEV_DEVICE2 -n
 
-talosctl upgrade --nodes $NODE --context $CONTEXT \
---image ghcr.io/siderolabs/installer:v1.0.2 \
+sudo reboot
+sudo zpool import Media
+sudo reboot
+```
+
+# Upgrade Talos OS
+## Sidero Cluster
+```
+talosctl upgrade --nodes sidero.FQDN.com --context sidero \
+--image ghcr.io/siderolabs/installer:v1.0.3 \
 --preserve=true
+```
+## Workload Cluster
+```
+talosctl upgrade --nodes cp1.cluster-1.FQDN.com --context clsuter-1 \
+--image ghcr.io/siderolabs/installer:v1.0.3
 ```
