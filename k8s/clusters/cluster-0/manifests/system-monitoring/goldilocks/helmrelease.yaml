@@ -17,8 +17,21 @@ spec:
       interval: 5m
   timeout: 20m
   values:
+    controller:
+      resources:
+        requests:
+          memory: 32Mi
+        limits:
+          memory: 96Mi
+
     dashboard:
       replicaCount: 1
+      resources:
+        requests:
+          memory: 32Mi
+        limits:
+          memory: 64Mi
+
       ingress:
         enabled: true
         ingressClassName: "nginx"
