@@ -74,9 +74,11 @@ spec:
 
       resources:
         requests:
-          memory: 250Mi
+          cpu: 23m
+          memory: 324M
         limits:
-          memory: 1000Mi
+          cpu: 125m
+          memory: 324M
 
     defaultBackend:
       enabled: true
@@ -88,6 +90,13 @@ spec:
           value: ghost
         - name: SHOW_DETAILS
           value: "false"
+      resources:
+        requests:
+          cpu: 15m
+          memory: 64M
+        limits:
+          cpu: 15m
+          memory: 64M
 
   valuesFrom:
     # Cloudflare Networks
