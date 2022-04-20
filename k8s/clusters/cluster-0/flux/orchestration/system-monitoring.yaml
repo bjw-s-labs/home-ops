@@ -169,11 +169,28 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
+  name: system-monitoring-vpa
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-monitoring-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/system-monitoring/vpa"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
   name: system-monitoring-goldilocks
   namespace: flux-system
 spec:
   dependsOn:
     - name: system-monitoring-namespace
+    - name: system-monitoring-vpa
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-monitoring/goldilocks"
   prune: true
