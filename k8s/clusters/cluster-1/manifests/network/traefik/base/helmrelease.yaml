@@ -27,7 +27,7 @@ spec:
 
     deployment:
       kind: Deployment
-      replicas: 2
+      replicas: 3
 
     service:
       enabled: true
@@ -85,7 +85,8 @@ spec:
         sniStrict: true
 
     pilot:
-      enabled: false
+      enabled: true
+      token: "${TRAEFIK_PILOT_TOKEN}"
 
     experimental:
       plugins:
@@ -107,5 +108,5 @@ spec:
         cpu: "100m"
         memory: "96Mi"
       limits:
-        cpu: "300m"
-        memory: "192Mi"
+        cpu: "1000m"
+        memory: "500Mi"
