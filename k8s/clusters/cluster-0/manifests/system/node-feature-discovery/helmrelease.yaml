@@ -33,9 +33,23 @@ spec:
                     operator: In
                     values: [""]
 
+      resources:
+        requests:
+          cpu: 23m
+          memory: 64M
+        limits:
+          memory: 64M
+
     worker:
       annotations:
         configmap.reloader.stakater.com/reload: "nfd-worker-conf"
+
+      resources:
+        requests:
+          cpu: 15m
+          memory: 64M
+        limits:
+          memory: 64M
 
       tolerations:
         - effect: "NoExecute"

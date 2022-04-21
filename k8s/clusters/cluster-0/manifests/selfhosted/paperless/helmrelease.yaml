@@ -96,8 +96,21 @@ spec:
             hosts:
               - *host
 
+    resources:
+      requests:
+        cpu: 23m
+        memory: 549M
+      limits:
+        memory: 549M
+
     # -- Deploy local redis instance.
     additionalContainers:
       - name: broker
         image: redis:6.2
         imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 11m
+            memory: 32M
+          limits:
+            memory: 32M

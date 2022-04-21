@@ -53,61 +53,53 @@ spec:
 
       resources:
         mgr:
-          limits:
-            cpu: "500m"
-            memory: "1Gi"
           requests:
-            cpu: "250m"
-            memory: "512Mi"
+            cpu: "63m"
+            memory: "512M"
+          limits:
+            memory: "1485M"
         mon:
-          limits:
-            cpu: "1000m"
-            memory: "2Gi"
           requests:
-            cpu: "500m"
-            memory: "1Gi"
+            cpu: "49m"
+            memory: "1165M"
+          limits:
+            memory: "3390M"
         osd:
-          limits:
-            cpu: "1000m"
-            memory: "4Gi"
           requests:
-            cpu: "500m"
-            memory: "4Gi"
-        prepareosd:
+            cpu: "511m"
+            memory: "4067M"
           limits:
-            cpu: "250m"
-            memory: "200Mi"
+            memory: "4067M"
+        prepareosd:
           requests:
             cpu: "250m"
             memory: "50Mi"
+          limits:
+            memory: "200Mi"
         mgr-sidecar:
-          limits:
-            cpu: "250m"
-            memory: "100Mi"
           requests:
-            cpu: "100m"
-            memory: "40Mi"
+            cpu: "49m"
+            memory: "79M"
+          limits:
+            memory: "227M"
         crashcollector:
-          limits:
-            cpu: "250m"
-            memory: "60Mi"
           requests:
-            cpu: "100m"
-            memory: "60Mi"
+            cpu: "15m"
+            memory: "64M"
+          limits:
+            memory: "64M"
         logcollector:
-          limits:
-            cpu: "250m"
-            memory: "1Gi"
           requests:
             cpu: "100m"
-            memory: "100Mi"
-        cleanup:
+            memory: "100M"
           limits:
-            cpu: "250m"
-            memory: "1Gi"
+            memory: "1G"
+        cleanup:
           requests:
             cpu: "250m"
-            memory: "100Mi"
+            memory: "100M"
+          limits:
+            memory: "1G"
 
       dashboard:
         enabled: true
@@ -186,12 +178,11 @@ spec:
             activeCount: 1
             activeStandby: true
             resources:
-              limits:
-                cpu: "500m"
-                memory: "4Gi"
               requests:
-                cpu: "250m"
-                memory: "4Gi"
+                cpu: "35m"
+                memory: "64M"
+              limits:
+                memory: "144M"
         storageClass:
           enabled: true
           isDefault: false
