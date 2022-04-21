@@ -22,8 +22,15 @@ spec:
         - replica
 
       dnsDiscovery:
-        sidecarsService: prometheus-thanos-discovery
+        sidecarsService: kube-prometheus-stack-thanos-discovery
         sidecarsNamespace: system-monitoring
+
+      resources:
+        requests:
+          cpu: 15m
+          memory: 64M
+        limits:
+          memory: 99M
 
       ingress:
         enabled: true
@@ -41,14 +48,32 @@ spec:
 
     bucketweb:
       enabled: true
+      resources:
+        requests:
+          cpu: 15m
+          memory: 64M
+        limits:
+          memory: 64M
 
     compactor:
       enabled: true
+      resources:
+        requests:
+          cpu: 15m
+          memory: 64M
+        limits:
+          memory: 743M
       persistence:
         enabled: false
 
     storegateway:
       enabled: true
+      resources:
+        requests:
+          cpu: 23m
+          memory: 110M
+        limits:
+          memory: 300M
       persistence:
         enabled: true
         size: 5Gi

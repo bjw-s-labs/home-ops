@@ -17,15 +17,237 @@ spec:
         name: prometheus-community-charts
         namespace: flux-system
 
+  values:
+    ###
+    ### Component values
+    ###
+    kubeApiServer:
+      enabled: true
+
+    kubeControllerManager:
+      enabled: true
+
+    kubeEtcd:
+      enabled: true
+
+    kubelet:
+      enabled: true
+      serviceMonitor:
+        metricRelabelings:
+          - action: replace
+            sourceLabels:
+              - node
+            targetLabel: instance
+
+    kubeProxy:
+      enabled: false
+
+    kubeScheduler:
+      enabled: true
+
+    kubeStateMetrics:
+      enabled: true
+    kube-state-metrics:
+      resources:
+        requests:
+          cpu: 15m
+          memory: 64M
+        limits:
+          memory: 99M
+
+    grafana:
+      enabled: false
+      forceDeployDashboards: true
+      sidecar:
+        dashboards:
+          multicluster:
+            etcd:
+              enabled: true
+
+    nodeExporter:
+      enabled: true
+    prometheus-node-exporter:
+      resources:
+        requests:
+          cpu: 23m
+          memory: 64M
+        limits:
+          memory: 64M
+
+      prometheus:
+        monitor:
+          enabled: true
+          relabelings:
+            - action: replace
+              regex: (.*)
+              replacement: $1
+              sourceLabels:
+                - __meta_kubernetes_pod_node_name
+              targetLabel: kubernetes_node
+
+    ###
+    ### Prometheus operator values
+    ###
+    prometheusOperator:
+      resources:
+        requests:
+          cpu: 15m
+          memory: 249M
+        limits:
+          memory: 678M
+
+      prometheusConfigReloader:
+        # resource config for prometheusConfigReloader
+        resources:
+          requests:
+            cpu: 11m
+            memory: 32M
+          limits:
+            memory: 32M
+
+    ###
+    ### Prometheus instance values
+    ###
+    prometheus:
+      ingress:
+        enabled: true
+        pathType: Prefix
+        annotations:
+          kubernetes.io/ingress.class: nginx
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        hosts:
+          - prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+        tls:
+          - secretName: prometheus-${CLUSTER_NAME}-tls
+            hosts:
+              - prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+
+      thanosService:
+        enabled: true
+
+      prometheusSpec:
+        replicas: 1
+        replicaExternalLabelName: "replica"
+        ruleSelectorNilUsesHelmValues: false
+        serviceMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelectorNilUsesHelmValues: false
+        probeSelectorNilUsesHelmValues: false
+        retention: 6h
+        enableAdminAPI: true
+        walCompression: true
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: ceph-block
+              resources:
+                requests:
+                  storage: 10Gi
+        resources:
+          requests:
+            cpu: 350m
+            memory: 2678M
+          limits:
+            memory: 7307M
+
+        thanos:
+          image: quay.io/thanos/thanos:v0.25.2
+          version: v0.25.2
+          objectStorageConfig:
+            name: thanos-objstore-secret
+            key: objstore.yml
+
+    ###
+    ### Alertmanager values
+    ###
+    alertmanager:
+      config:
+        receivers:
+          - name: "null"
+          - name: "discord"
+            slack_configs:
+              - channel: "#prometheus"
+                icon_url: https://avatars3.githubusercontent.com/u/3380462
+                username: "Prometheus - ${CLUSTER_NAME}"
+                send_resolved: true
+                title: |-
+                  [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ if ne .CommonAnnotations.summary ""}}{{ .CommonAnnotations.summary }} {{ else if ne .CommonAnnotations.message ""}}{{ .CommonAnnotations.message }} {{ else if ne .CommonAnnotations.description ""}}{{ .CommonAnnotations.description }} {{ else }}{{ .CommonLabels.alertname }}{{ end }}
+                text: >-
+                  {{ range .Alerts -}}
+                    *Alert:* {{ .Annotations.title }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+                  {{ if ne .Annotations.summary ""}}*Summary:* {{ .Annotations.summary }} {{ else if ne .Annotations.message ""}}*Message:* {{ .Annotations.message }} {{ else if ne .Annotations.description ""}}*Description:* {{ .Annotations.description }}{{ end }}
+                  *Details:*
+                    {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+                    {{ end }}
+                  {{ end }}
+
+        route:
+          group_by: ["alertname", "job"]
+          group_wait: 30s
+          group_interval: 5m
+          repeat_interval: 6h
+          receiver: "discord"
+          routes:
+            - receiver: "null"
+              matchers:
+                - alertname =~ "InfoInhibitor|Watchdog"
+            - receiver: "discord"
+              match_re:
+                # severity: critical|warning
+                severity: critical
+              continue: true
+
+        inhibit_rules:
+          - source_match:
+              severity: "critical"
+            target_match:
+              severity: "warning"
+            equal: ["alertname", "namespace"]
+
+      ingress:
+        enabled: true
+        pathType: Prefix
+        annotations:
+          kubernetes.io/ingress.class: nginx
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        hosts:
+          - alertmanager.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+        tls:
+          - secretName: alertmanager-${CLUSTER_NAME}-tls
+            hosts:
+              - alertmanager.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+
+      alertmanagerSpec:
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: ceph-block
+              resources:
+                requests:
+                  storage: 1Gi
+
+        resources:
+          requests:
+            cpu: 11m
+            memory: 37M
+          limits:
+            memory: 99M
+
+      prometheus:
+        monitor:
+          enabled: true
+          relabelings:
+            - action: replace
+              regex: (.*)
+              replacement: $1
+              sourceLabels:
+                - __meta_kubernetes_pod_node_name
+              targetLabel: kubernetes_node
+
   valuesFrom:
     - kind: Secret
       name: kube-prometheus-stack
       valuesKey: discord-webhook
       targetPath: alertmanager.config.global.slack_api_url
       optional: false
-    - kind: ConfigMap
-      name: kps-generic-values
-    - kind: ConfigMap
-      name: kps-prometheus-values
-    - kind: ConfigMap
-      name: kps-alertmanager-values
