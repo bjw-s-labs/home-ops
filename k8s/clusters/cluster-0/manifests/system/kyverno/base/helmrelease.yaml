@@ -19,6 +19,13 @@ spec:
     # TODO: change this to "mode: ha" when the new version gets released
     replicaCount: 3
 
+    resources:
+      requests:
+        cpu: 203m
+        memory: 225M
+      limits:
+        memory: 857M
+
     topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
