@@ -43,7 +43,7 @@ spec:
       - name: MINIO_UPDATE
         value: "off"
       - name: MINIO_BROWSER_REDIRECT_URL
-        value: "https://minio.dev.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+        value: "https://minio.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       - name: MINIO_SERVER_URL
         value: "https://s3.${INGRESS_DOMAIN}"
 
@@ -53,7 +53,7 @@ spec:
     ingress:
       enabled: true
       ingressClassname:  "traefik"
-      hostname: &host-minio "minio.dev.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+      hostname: &host-minio "minio.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       tls: true
       extraTls:
         - hosts:
