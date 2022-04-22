@@ -1,0 +1,124 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: minio
+  namespace: selfhosted
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: /k8s/charts/kah-common-chart/
+      sourceRef:
+        kind: GitRepository
+        name: home-ops
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: quay.io/minio/minio
+      tag: RELEASE.2022-03-26T06-49-28Z
+
+    nameOverride: "minio"
+
+    env:
+      TZ: "${TIMEZONE}"
+      MINIO_UPDATE: "off"
+      MINIO_ROOT_USER:
+        valueFrom:
+          secretKeyRef:
+            name: minio
+            key: root-user
+      MINIO_ROOT_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: minio
+            key: root-password
+
+    args:
+      - server
+      - /data
+      - --console-address
+      - :9001
+
+    podSecurityContext:
+      runAsUser: 1120
+      runAsGroup: 100
+      fsGroup: 100
+      supplementalGroups:
+        - 34
+        - 100
+      fsGroupChangePolicy: "OnRootMismatch"
+
+    persistence:
+      config:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /mnt/NFS/S3/.minio.sys
+        mountPath: /root/.minio
+      data:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /mnt/NFS/S3
+        mountPath: /data
+
+    service:
+      main:
+        ports:
+          http:
+            enabled: true
+            port: 9001
+          api:
+            enabled: true
+            port: 9000
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+        hosts:
+          - host: &host-minio "minio.dev.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  port: 9001
+          - host: &host-s3 "s3.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  port: 9000
+          - host: &host-s3-dev "s3.dev.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  port: 9000
+        tls:
+          - secretName: tls.minio
+            hosts:
+              - *host-minio
+              - *host-s3
+              - *host-s3-dev
+
+    podAnnotations:
+      secret.reloader.stakater.com/reload: "minio"
+
+    resources:
+      requests:
+        memory: 100Mi
+        cpu: 100m
+      limits:
+        memory: 2000M
