@@ -8,97 +8,118 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: minio
-      version: 11.2.13
+      chart: kah-common-chart
+      version: 1.0.0
       sourceRef:
         kind: HelmRepository
-        name: bitnami-charts
+        name: k8s-at-home-charts
         namespace: flux-system
       interval: 5m
-
-  install:
-    createNamespace: true
-    remediation:
-      retries: 5
-
-  upgrade:
-    remediation:
-      retries: 5
-
   values:
     image:
-      registry: public.ecr.aws
-      repository: bitnami/minio
-    clientImage:
-      registry: public.ecr.aws
-      repository: bitnami/minio-client
+      repository: quay.io/minio/minio
+      tag: RELEASE.2022-04-16T04-26-02Z
 
-    extraEnvVars:
-      - name: TZ
-        value: "${TIMEZONE}"
-      - name: MINIO_PROMETHEUS_URL
-        value: http://prometheus-operated.system-monitoring:9090
-      - name: MINIO_PROMETHEUS_JOB_ID
-        value: minio
-      - name: MINIO_UPDATE
-        value: "off"
-      - name: MINIO_BROWSER_REDIRECT_URL
-        value: "https://minio.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-      - name: MINIO_SERVER_URL
-        value: "https://s3.${INGRESS_DOMAIN}"
+    nameOverride: "minio"
 
-    auth:
-      existingSecret: minio
+    env:
+      TZ: "${TIMEZONE}"
+      MINIO_UPDATE: "off"
+      MINIO_ROOT_USER:
+        valueFrom:
+          secretKeyRef:
+            name: minio
+            key: root-user
+      MINIO_ROOT_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: minio
+            key: root-password
 
-    ingress:
-      enabled: true
-      ingressClassname:  "traefik"
-      hostname: &host-minio "minio.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-      tls: true
-      extraTls:
-        - hosts:
-            - *host-minio
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
-    apiIngress:
-      enabled: true
-      ingressClassname: "traefik"
-      hostname: &host-s3 "s3.${INGRESS_DOMAIN}"
-      tls: true
-      extraTls:
-        - hosts:
-            - *host-s3
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+    args:
+      - server
+      - /data
+      - --console-address
+      - :9001
 
     podSecurityContext:
-      enabled: true
-     #  runAsUser: 1120
-      # runAsGroup: 100
-      fsGroup: 100
-      # supplementalGroups:
-      #   - 34
-      #   - 100
-      # fsGroupChangePolicy: "OnRootMismatch"
-
-    containerSecurityContext:
-      enabled: true
       runAsUser: 1120
-      runAsNonRoot: true
+      runAsGroup: 100
+      fsGroup: 100
+      supplementalGroups:
+        - 34
+        - 100
+      fsGroupChangePolicy: "OnRootMismatch"
 
     persistence:
-      enabled: true
-      existingClaim: minio-nfs
-      
-    prometheus:
-      servicemonitor:
+      config:
         enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /mnt/NFS/S3/.minio.sys
+        mountPath: /root/.minio
+      data:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /mnt/NFS/S3
+        mountPath: /data
+
+    service:
+      main:
+        ports:
+          http:
+            enabled: true
+            port: 9001
+          api:
+            enabled: true
+            port: 9000
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+        hosts:
+          - host: &host-minio "minio.dev.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  port: 9001
+          - host: &host-s3 "s3.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  port: 9000
+          - host: &host-s3-dev "s3.dev.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  port: 9000
+        tls:
+          - secretName: tls.minio
+            hosts:
+              - *host-minio
+              - *host-s3
+              - *host-s3-dev
 
     podAnnotations:
       secret.reloader.stakater.com/reload: "minio"
+
+    resources:
+      requests:
+        cpu: 323m
+        memory: 979M
+      limits:
+        memory: 2843M
