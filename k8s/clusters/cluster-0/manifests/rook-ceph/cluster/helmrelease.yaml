@@ -28,28 +28,16 @@ spec:
       bdev_async_discard = true
 
     cephClusterSpec:
-      healthCheck:
-        livenessProbe:
-          mon:
-            probe:
-              timeoutSeconds: 5
-          mgr:
-            probe:
-              timeoutSeconds: 5
-          osd:
-            probe:
-              timeoutSeconds: 5
+      cephVersion:
+        image: quay.io/ceph/ceph:v17.2.0
 
-        startupProbe:
-          mon:
-            probe:
-              timeoutSeconds: 5
-          mgr:
-            probe:
-              timeoutSeconds: 5
-          osd:
-            probe:
-              timeoutSeconds: 5
+      # TODO(rook-ceph): Enable host network on next rebuild
+      # network:
+      #   provider: host
+      # TODO(rook-ceph): Enable compression on next rebuild
+      # connections:
+      #   compression:
+      #     enabled: true
 
       resources:
         mgr:
@@ -100,6 +88,9 @@ spec:
             memory: "100M"
           limits:
             memory: "1G"
+
+      crashCollector:
+        disable: false
 
       dashboard:
         enabled: true
