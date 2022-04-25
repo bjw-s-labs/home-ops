@@ -47,12 +47,12 @@ spec:
             # - nfsvers=4.2
         mountPath: /mnt/unionfs
       backup:
-        enabled: false
+        enabled: true
         type: custom
         volumeSpec:
           nfs:
             server: "${NAS_ADDRESS}"
-            path: /mnt/NFS/Backups/Kubernetes/${CLUSTER_NAME}/Applications/lidarr
+            path: /mnt/Media/Backups/Kubernetes/${CLUSTER_NAME}/Applications/lidarr
           # mountOptions:
             # - nfsvers=4.2
         mountPath: /config/Backups
