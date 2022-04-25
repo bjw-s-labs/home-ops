@@ -164,3 +164,41 @@ talosctl upgrade --nodes sidero.FQDN.com --context sidero \
 talosctl upgrade --nodes cp1.cluster-1.FQDN.com --context clsuter-1 \
 --image ghcr.io/siderolabs/installer:v1.0.3
 ```
+
+## Update sidero
+
+Update sidero via `clusterctl upgrade plan` 
+you may need to reset the `SIDERO_CONTROLLER_MANAGER`... variables again to ensure it retains host-network, else you wont be able to connect to the ipxe again.
+
+```
+> clusterctl upgrade plan
+Checking cert-manager version...
+Cert-Manager is already up to date
+
+Checking new release availability...
+
+Latest release available for the v1alpha4 API Version of Cluster API (contract):
+
+NAME                    NAMESPACE       TYPE                     CURRENT VERSION   NEXT VERSION
+bootstrap-talos         cabpt-system    BootstrapProvider        v0.4.3            Already up to date
+control-plane-talos     cacppt-system   ControlPlaneProvider     v0.3.1            Already up to date
+cluster-api             capi-system     CoreProvider             v0.4.7            Already up to date
+infrastructure-sidero   sidero-system   InfrastructureProvider   v0.4.1            Already up to date
+
+You are already up to date!
+
+
+Latest release available for the v1beta1 API Version of Cluster API (contract):
+
+NAME                    NAMESPACE       TYPE                     CURRENT VERSION   NEXT VERSION
+bootstrap-talos         cabpt-system    BootstrapProvider        v0.4.3            v0.5.2
+control-plane-talos     cacppt-system   ControlPlaneProvider     v0.3.1            v0.4.4
+cluster-api             capi-system     CoreProvider             v0.4.7            v1.1.1
+infrastructure-sidero   sidero-system   InfrastructureProvider   v0.4.1            v0.5.0
+
+You can now apply the upgrade by executing the following command:
+
+clusterctl upgrade apply --contract v1beta1
+```
+
+then apply as stated (in this case, `clusterctl upgrade apply --contract v1beta1`)
