@@ -124,3 +124,36 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: selfhosted-miniflux-database
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: selfhosted-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/selfhosted/miniflux/database"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: selfhosted-miniflux
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: selfhosted-namespace
+    - name: selfhosted-miniflux-database
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/selfhosted/miniflux/application"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
