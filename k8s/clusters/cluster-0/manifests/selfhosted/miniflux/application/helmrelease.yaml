@@ -1,0 +1,90 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: miniflux
+  namespace: selfhosted
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: miniflux
+      version: 4.6.1
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: miniflux/miniflux
+      tag: 2.0.36
+
+    initContainers:
+      wait-for-pg:
+        image: busybox:latest
+        imagePullPolicy: IfNotPresent
+        command:
+          [
+            "sh",
+            "-c",
+            'until nc -vz miniflux-database-postgresql.selfhosted 5432; do echo "Waiting for postgresql..."; sleep 3; done;',
+          ]
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          # external-dns/is-public: "true"
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+          # external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+
+        hosts:
+          - host: &host "miniflux.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+
+        tls:
+          - secretName: miniflux-tls
+            hosts:
+              - *host
+
+    env:
+      TZ: "${TIMEZONE}"
+      # DATABASE_URL: set by valuesFrom
+      # ADMIN_USERNAME: set by valuesFrom
+      # ADMIN_PASSWORD: set by valuesFrom
+
+    resources:
+      requests:
+        cpu: 20m
+        memory: 256M
+      limits:
+        memory: 1028M
+
+    postgresql:
+      enabled: false
+
+  valuesFrom:
+    - kind: Secret
+      name: miniflux-database
+      valuesKey: postgres-password
+      targetPath: env.MINIFLUX_DATABASE_PASSWORD
+      optional: false
+    - kind: Secret
+      name: miniflux
+      valuesKey: miniflux_database_url
+      targetPath: env.DATABASE_URL
+      optional: false
+    - kind: Secret
+      name: miniflux
+      valuesKey: miniflux_admin_user
+      targetPath: env.ADMIN_USERNAME
+      optional: false
+    - kind: Secret
+      name: miniflux
+      valuesKey: miniflux_admin_password
+      targetPath: env.ADMIN_PASSWORD
+      optional: false
