@@ -51,9 +51,9 @@ spec:
           - host: &host "node-red.${INGRESS_DOMAIN}"
             paths:
               - path: /
-                pathType: Prefix
+                pathType: Prefix 
         tls:
-          - secretName: node-red-${CLUSTER_NAME}-tls
+          - secretName: tls.node-red
             hosts:
               - *host-cluster
               - *host
