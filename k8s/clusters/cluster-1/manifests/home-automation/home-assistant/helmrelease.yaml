@@ -22,6 +22,16 @@ spec:
 
     nameOverride: "home-assistant"
 
+    podSecurityContext:
+      # runAsUser: 568
+      # runAsGroup: 100
+      # fsGroup: 568
+      supplementalGroups:
+        - 34
+        - 100
+        - 568
+      # fsGroupChangePolicy: "OnRootMismatch"
+
     podAnnotations:
       secret.reloader.stakater.com/reload: home-assistant-secrets
 
@@ -39,7 +49,7 @@ spec:
         loadBalancerIP: "${LB_HASS}"
         ports:
           sonos:
-            enabled: true
+            enabled: false
             port: 1400
 
     ingress:
@@ -48,19 +58,22 @@ spec:
         ingressClassName: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns/is-public: "true"
-          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
-          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+          external-dns/is-public: "true"
         hosts:
-          - host: &host "home.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: &host-cluster "home.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
               - path: /
-
+          - host: &host "home.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
         tls:
           - secretName: tls.home-assistant-frontend
             hosts:
+              - *host-cluster
               - *host
 
     env:
@@ -73,7 +86,16 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: home-assistant-data
+        existingClaim: home-assistant-config-v1
+      backup:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/home-assistant
+        mountPath: /config/backups
+        readOnly: false
 
     resources:
       requests:
@@ -85,44 +107,46 @@ spec:
     addons:
       codeserver:
         enabled: true
-
         image:
-          repository: ghcr.io/k8s-at-home/code-server
-          tag: v4.3.0
-          pullPolicy: Always
-
+          repository: docker.io/codercom/code-server
+          tag: 4.3.0
+        env:
+          TZ: "${TIMEZONE}"
         git:
-          deployKeySecret: home-assistant-deploykey
-
+          deployKeySecret: code-server
+        workingDir: "/config"
+        args:
+          - --auth
+          - "none"
+          - --user-data-dir
+          - "/config/.vscode"
+          - --extensions-dir
+          - "/config/.vscode"
         ingress:
           enabled: true
           ingressClassName: "traefik"
           annotations:
-            cert-manager.io/cluster-issuer: letsencrypt-production
-            external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
-            traefik.ingress.kubernetes.io/router.entrypoints: websecure
-            traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+          external-dns/is-public: "false"
           hosts:
-            - host: &code-host "code.home.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            - host: &code-host-cluster "code.home.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              paths:
+                - path: /
+            - host: &code-host "code.home.${INGRESS_DOMAIN}"
               paths:
                 - path: /
           tls:
             - secretName: tls.home-assistant-code
               hosts:
-                - *code-host
-
-        args:
-          - --auth
-          - none
-          - --user-data-dir
-          - "/config/.vscode"
-          - --extensions-dir
-          - "/config/.vscode"
-
+                - *code-host-cluster
+                - *code-host 
         volumeMounts:
           - name: config
             mountPath: /config
-
         resources:
           requests:
             cpu: 35m
