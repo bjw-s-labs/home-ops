@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: paperless
-      version: 8.6.2
+      version: 8.7.0
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
@@ -19,6 +19,22 @@ spec:
     image:
       repository: ghcr.io/paperless-ngx/paperless-ngx
       tag: ngx-1.7.0
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        hosts:
+          - host: &host "paperless.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - secretName: paperless-tls
+            hosts:
+              - *host
 
     env:
       PAPERLESS_ADMIN_USER:
@@ -31,6 +47,7 @@ spec:
           secretKeyRef:
             name: paperless
             key: admin_password
+      PAPERLESS_ALLOWED_HOSTS: paperless.${INGRESS_DOMAIN}
       PAPERLESS_CONSUMER_POLLING: "60"
       PAPERLESS_CONSUMER_RECURSIVE: "true"
       PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
@@ -43,6 +60,7 @@ spec:
             name: paperless
             key: secret_key
       PAPERLESS_TIME_ZONE: "${TIMEZONE}"
+      PAPERLESS_URL: https://paperless.${INGRESS_DOMAIN}
       TZ: "${TIMEZONE}"
       USERMAP_GID: 65543
 
@@ -79,22 +97,6 @@ spec:
           nfs:
             server: "${NAS_ADDRESS}"
             path: /volume1/Docs/paperless/export
-
-    ingress:
-      main:
-        enabled: true
-        ingressClassName: "nginx"
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
-        hosts:
-          - host: &host "paperless.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-        tls:
-          - secretName: paperless-tls
-            hosts:
-              - *host
 
     resources:
       requests:
