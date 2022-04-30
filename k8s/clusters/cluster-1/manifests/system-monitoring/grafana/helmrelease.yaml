@@ -99,11 +99,6 @@ spec:
           gnetId: 5342
           revision: 5
           datasource: Prometheus
-        # Ref: https://grafana.com/grafana/dashboards/13665
-        speedtest:
-          gnetId: 13665
-          revision: 1
-          datasource: Prometheus
         node-exporter-full:
           url: https://grafana.com/api/dashboards/1860/revisions/22/download
           datasource: Prometheus
@@ -119,11 +114,105 @@ spec:
         sonarr:
           url: https://raw.githubusercontent.com/k8s-at-home/grafana-dashboards/main/sonarr.json
           datasource: Prometheus
+        # Ref: https://grafana.com/grafana/dashboards/7845
+        zfs:
+          gnetId: 7845
+          revision: 4
+          datasource: Prometheus
+        # Ref: https://grafana.com/grafana/dashboards/13502
+        minio:
+          gnetId: 13502
+          revision: 10
+          datasource: Prometheus
+
+      networking:
+        blackbox:
+          url: https://raw.githubusercontent.com/jr0dd/grafana-dashboards/main/blackbox.json
+          datasource: Prometheus
+        # Ref: https://grafana.com/grafana/dashboards/15513
+        cert-manager:
+          url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/cert-manager/dashboards/cert-manager.json
+          datasource: Prometheus
+        cilium-agent:
+          gnetId: 15513
+          revision: 1
+          datasource: Prometheus
+        # Ref: https://grafana.com/grafana/dashboards/15514
+        cilium-operator:
+          gnetId: 15514
+          revision: 1
+          datasource: Prometheus
+        # Ref: https://grafana.com/grafana/dashboards/15515
+        cilium-hubble:
+          gnetId: 15515
+          revision: 1
+          datasource: Prometheus
+        # Ref: https://grafana.com/grafana/dashboards/11315
+        unifi-client-insights:
+          gnetId: 11315
+          revision: 8
+          datasource: Prometheus
+        # Ref: https://grafana.com/grafana/dashboards/11311
+        unifi-network-sites:
+          gnetId: 11311
+          revision: 4
+          datasource: Prometheus
+        # Ref: https://grafana.com/grafana/dashboards/11314
+        unifi-uap-insights:
+          gnetId: 11314
+          revision: 9
+          datasource: Prometheus
+        # Ref: https://grafana.com/grafana/dashboards/11312
+        unifi-usw-insights:
+          gnetId: 11312
+          revision: 8
+          datasource: Prometheus
+        # Ref: https://grafana.com/grafana/dashboards/13665
+        speedtest:
+          gnetId: 13665
+          revision: 1
+          datasource: Prometheus
+        speedtest2:
+          url: https://raw.githubusercontent.com/jr0dd/grafana-dashboards/main/speedtest.json
+          datasource: Prometheus
+        
+      thanos:
+        bucket-replicate:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/bucket-replicate.json
+          datasource: Prometheus
+        compact:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/compact.json
+          datasource: Prometheus
+        overview:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/overview.json
+          datasource: Prometheus
+        query:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/query.json
+          datasource: Prometheus
+        query-frontend:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/query-frontend.json
+          datasource: Prometheus
+        receive:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/receive.json
+          datasource: Prometheus
+        rule:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/rule.json
+          datasource: Prometheus
+        sidecar:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/sidecar.json
+          datasource: Prometheus
+        store:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/store.json
+          datasource: Prometheus
 
     sidecar:
       dashboards:
         enabled: true
         searchNamespace: ALL
+        folderAnnotation: grafana_folder
+        provider:
+          allowUiUpdates: true
+          disableDelete: false
       datasources:
         enabled: true
         searchNamespace: ALL
@@ -134,10 +223,16 @@ spec:
     plugins:
       - natel-discrete-panel
       - pr0ps-trackmap-panel
-      - grafana-piechart-panel
       - vonage-status-panel
+      - grafana-piechart-panel
+      - grafana-polystat-panel
       - grafana-worldmap-panel
       - grafana-clock-panel
+      - grafana-singlestat-panel
+      - mxswat-separator-panel
+      - farski-blendstat-panel
+      - speakyourcode-button-panel
+      - snuids-trafficlights-panel
 
     serviceMonitor:
       enabled: true

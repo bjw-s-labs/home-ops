@@ -19,7 +19,17 @@ spec:
     image:
       repository: ghcr.io/miguelndecarvalho/speedtest-exporter
       tag: v3.5.1
+    controller:
+      enabled: true
+      replicas: 1
+      strategy: RollingUpdate
     env:
       TZ: "${TIMEZONE}"
     metrics:
       enabled: true
+      prometheusRule:
+        enabled: true
+        downloadLimit: 450
+        uploadLimit: 450
+        pingLimit: 25
+        jitterLimit: 10
