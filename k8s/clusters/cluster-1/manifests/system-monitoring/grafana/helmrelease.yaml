@@ -147,9 +147,11 @@ spec:
       annotations:
         # kubernetes.io/ingress.class: traefik
         cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
         traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+        external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+        external-dns/is-public: "true"
       hosts:
         - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       tls:
