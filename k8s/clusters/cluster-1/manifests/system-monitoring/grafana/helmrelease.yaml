@@ -147,6 +147,23 @@ spec:
 
     dashboards:
       default:
+        node-exporter-full:
+          url: https://grafana.com/api/dashboards/1860/revisions/22/download
+          datasource: Prometheus
+        minio:
+          gnetId: 13502
+          revision: 10
+          datasource: Prometheus
+      
+      flux:
+        flux-cluster:
+          url: https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/grafana/dashboards/cluster.json
+          datasource: Prometheus
+        flux-control-plane:
+          url: https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/grafana/dashboards/control-plane.json
+          datasource: Prometheus
+
+      storage:
         # Ref: https://grafana.com/grafana/dashboards/2842
         ceph-cluster:
           gnetId: 2842
@@ -162,25 +179,12 @@ spec:
           gnetId: 5342
           revision: 5
           datasource: Prometheus
-        node-exporter-full:
-          url: https://grafana.com/api/dashboards/1860/revisions/22/download
-          datasource: Prometheus
-        flux-cluster:
-          url: https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/grafana/dashboards/cluster.json
-          datasource: Prometheus
-        flux-control-plane:
-          url: https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/grafana/dashboards/control-plane.json
-          datasource: Prometheus
         # Ref: https://grafana.com/grafana/dashboards/7845
         zfs:
           gnetId: 7845
           revision: 4
           datasource: Prometheus
         # Ref: https://grafana.com/grafana/dashboards/13502
-        minio:
-          gnetId: 13502
-          revision: 10
-          datasource: Prometheus
 
       media:
         radarr:
