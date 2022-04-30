@@ -33,6 +33,22 @@ spec:
     env:
       TZ: "${TIMEZONE}"
 
+    metrics:
+      enabled: true
+      serviceMonitor:
+        interval: 3m
+        scrapeTimeout: 1m
+      prometheusRule:
+        enabled: true
+      exporter:
+        image:
+          repository: ghcr.io/onedr0p/exportarr
+          tag: v1.0.0
+        env:
+          port: 9794
+          additionalMetrics: true
+          unknownQueueItems: true
+
     persistence:
       config:
         enabled: true
@@ -44,8 +60,6 @@ spec:
           nfs:
             server: "${NAS_ADDRESS}"
             path: /Merged-Media
-          # mountOptions:
-            # - nfsvers=4.2
         mountPath: /mnt/unionfs
       backup:
         enabled: true
@@ -54,8 +68,6 @@ spec:
           nfs:
             server: "${NAS_ADDRESS}"
             path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/sonarr-4k
-          # mountOptions:
-            # - nfsvers=4.2
         mountPath: /config/Backups
 
     ingress:

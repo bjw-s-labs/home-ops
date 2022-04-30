@@ -41,10 +41,13 @@ spec:
       prometheusRule:
         enabled: true
       exporter:
+        image:
+          repository: ghcr.io/onedr0p/exportarr
+          tag: v1.0.0
         env:
           port: 9794
           additionalMetrics: true
-          unknownQueueItems: false
+          unknownQueueItems: true
 
     persistence:
       config:

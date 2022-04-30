@@ -41,10 +41,13 @@ spec:
       prometheusRule:
         enabled: true
       exporter:
+        image:
+          repository: ghcr.io/onedr0p/exportarr
+          tag: v1.0.0
         env:
           port: 9794
           additionalMetrics: true
-          unknownQueueItems: false
+          unknownQueueItems: true
 
     persistence:
       config:
@@ -57,8 +60,6 @@ spec:
           nfs:
             server: "${NAS_ADDRESS}"
             path: /Merged-Media
-          # mountOptions:
-            # - nfsvers=4.2
         mountPath: /mnt/unionfs
       backup:
         enabled: true
@@ -67,8 +68,6 @@ spec:
           nfs:
             server: "${NAS_ADDRESS}"
             path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/sonarr
-          # mountOptions:
-            # - nfsvers=4.2
         mountPath: /config/Backups
 
     ingress:
