@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: paperless
-      version: 8.7.0
+      version: 8.7.1
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
@@ -47,7 +47,6 @@ spec:
           secretKeyRef:
             name: paperless
             key: admin_password
-      PAPERLESS_ALLOWED_HOSTS: paperless.${INGRESS_DOMAIN}
       PAPERLESS_CONSUMER_POLLING: "60"
       PAPERLESS_CONSUMER_RECURSIVE: "true"
       PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
