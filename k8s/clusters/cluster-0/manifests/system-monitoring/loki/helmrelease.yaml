@@ -20,10 +20,15 @@ spec:
       repository: ghcr.io/k8s-at-home/loki
 
     config:
+      limits_config:
+        enforce_metric_name: false
+        reject_old_samples: true
+        reject_old_samples_max_age: 168h
+        ingestion_rate_mb: 16
+        ingestion_burst_size_mb: 24
+
       storage_config:
         aws:
-          bucketnames: loki
-          endpoint: "minio.selfhosted:9000"
           s3forcepathstyle: true
           insecure: true
         boltdb_shipper:
@@ -31,6 +36,21 @@ spec:
           cache_location: /data/loki/index_cache
           resync_interval: 5s
           shared_store: s3
+
+      compactor:
+        retention_enabled: true
+
+      ruler:
+        storage:
+          type: local
+          local:
+            directory: /rules
+        rule_path: /tmp/scratch
+        alertmanager_url: http://alertmanager-operated.system-monitoring:9093
+        ring:
+          kvstore:
+            store: inmemory
+        enable_api: true
 
     ingress:
       enabled: true
@@ -61,13 +81,19 @@ spec:
         memory: 324M
 
   valuesFrom:
+    - kind: ConfigMap
+      name: loki-ceph-bucket
+      valuesKey: BUCKET_NAME
+      targetPath: config.storage_config.aws.bucketnames
+    - kind: ConfigMap
+      name: loki-ceph-bucket
+      valuesKey: BUCKET_HOST
+      targetPath: config.storage_config.aws.endpoint
     - kind: Secret
-      name: loki-s3
-      valuesKey: minio_access_key
+      name: loki-ceph-bucket
+      valuesKey: AWS_ACCESS_KEY_ID
       targetPath: config.storage_config.aws.access_key_id
-      optional: false
     - kind: Secret
-      name: loki-s3
-      valuesKey: minio_secret_key
+      name: loki-ceph-bucket
+      valuesKey: AWS_SECRET_ACCESS_KEY
       targetPath: config.storage_config.aws.secret_access_key
-      optional: false
