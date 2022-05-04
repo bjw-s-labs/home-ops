@@ -26,3 +26,10 @@ spec:
         - op: replace
           path: /spec/template/spec/containers/0/resources/limits/memory
           value: 2Gi
+    - target:
+        kind: Namespace
+        name: flux-system
+      patch: |-
+        - op: add
+          path: /metadata/labels/goldilocks.fairwinds.com~1enabled
+          value: "true"
