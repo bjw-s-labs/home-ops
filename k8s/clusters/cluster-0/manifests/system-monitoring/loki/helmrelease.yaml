@@ -19,6 +19,10 @@ spec:
     image:
       repository: ghcr.io/k8s-at-home/loki
 
+    env:
+      - name: TZ
+        value: ${TIMEZONE}
+
     config:
       limits_config:
         enforce_metric_name: false
@@ -51,6 +55,37 @@ spec:
           kvstore:
             store: inmemory
         enable_api: true
+
+    alerting_groups:
+      #
+      # zigbee2mqtt
+      #
+      - name: zigbee2mqtt
+        rules:
+          - alert: ZigbeeUnableToReachMQTT
+            expr: |
+              sum(count_over_time({app="zigbee2mqtt"} |~ "(?i)not connected to mqtt server"[2m])) > 0
+            for: 2m
+            labels:
+              severity: critical
+              category: logs
+            annotations:
+              summary: "Zigbee2mqtt is unable to reach MQTT"
+
+      #
+      # frigate
+      #
+      - name: frigate
+        rules:
+          - alert: FrigateUnableToReachMQTT
+            expr: |
+              sum(count_over_time({app="frigate"} |~ "(?i)unable to connect to mqtt server"[2m])) > 0
+            for: 2m
+            labels:
+              severity: critical
+              category: logs
+            annotations:
+              summary: "Frigate is unable to reach MQTT"
 
     ingress:
       enabled: true
