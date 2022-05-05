@@ -30,6 +30,10 @@ spec:
       config:
         enabled: true
         existingClaim: youtubedl-material-config
+      db-data:
+        enabled: true
+        existingClaim: youtubedl-material-database
+        mountPath: "-"
       media:
         enabled: true
         type: custom
@@ -60,4 +64,19 @@ spec:
         cpu: 15m
         memory: 145M
       limits:
-        memory: 270M
+        memory: 379M
+
+    # -- Deploy local mongodb instance.
+    additionalContainers:
+      - name: database
+        image: mongo:5.0.8
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /data/db
+            name: db-data
+        resources:
+          requests:
+            cpu: 10m
+            memory: 256M
+          limits:
+            memory: 256M
