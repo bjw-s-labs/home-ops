@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: trilio-cluster-0-tls
+  namespace: trilio
+spec:
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: letsencrypt-production
+  secretName: trilio-cluster-0-tls
+  dnsNames:
+    - trilio.${CLUSTER_NAME}.${INGRESS_DOMAIN}
