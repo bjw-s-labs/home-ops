@@ -26,6 +26,20 @@ spec:
     podAnnotations:
       setGateway: "true"
 
+    initContainers:
+      copy-config:
+        image: busybox:latest
+        command:
+          - "/bin/sh"
+          - -c
+        args:
+          - cp /data/configfiles/* /data/config/; chown -R 568:568 /data/config
+        volumeMounts:
+          - name: config
+            mountPath: /data/config
+          - name: configfiles
+            mountPath: /data/configfiles
+
     podSecurityContext:
       supplementalGroups:
         - 65539
@@ -33,30 +47,33 @@ spec:
     settings:
       automaticPortSetup: false
 
-    # Just spin & wait forever
-    command:
-      - /bin/bash
-      - -c
-      - --
-    args:
-      - "while true; do sleep 30; done;"
-    probes:
-      liveness:
-        enabled: false
-      readiness:
-        enabled: false
-      startup:
-        enabled: false
-
     env:
       TZ: "${TIMEZONE}"
       UMASK: "022"
       USE_PROFILE: "true"
 
     persistence:
+      cache:
+        enabled: true
+        type: emptyDir
+        mountPath: /config/qBittorrent/cache
+
       config:
         enabled: true
+        type: emptyDir
+        mountPath: /config/qBittorrent/config
+
+      configfiles:
+        enabled: true
+        type: configMap
+        name: qbittorrent-config
+        mountPath: "-"
+
+      data:
+        enabled: true
         existingClaim: qbittorrent-config
+        mountPath: /config/qBittorrent/data
+
       media:
         enabled: true
         type: custom
