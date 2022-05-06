@@ -1,0 +1,40 @@
+---
+apiVersion: "triliovault.trilio.io/v1"
+kind: "ClusterBackupPlan"
+metadata:
+  name: "cluster-backupplan"
+spec:
+  backupComponents:
+    - namespace: "downloads"
+    - namespace: "home-automation"
+    - namespace: "media"
+    - namespace: "network"
+    - namespace: "scripts"
+    - namespace: "selfhosted"
+
+  backupConfig:
+    retentionPolicy:
+      apiVersion: "triliovault.trilio.io/v1"
+      kind: "Policy"
+      name: "cluster-retention-policy"
+      namespace: "trilio"
+
+    schedulePolicy:
+      incrementalBackupPolicy:
+        apiVersion: "triliovault.trilio.io/v1"
+        kind: "Policy"
+        name: "cluster-schedule-policy"
+        namespace: "trilio"
+
+    target:
+      apiVersion: "triliovault.trilio.io/v1"
+      kind: "Target"
+      name: "nas"
+      namespace: "trilio"
+
+  includeResources:
+    labelSelector:
+      - matchLabels:
+          triliovault.trilio.io/backup: "true"
+
+  retainHelmApps: false
