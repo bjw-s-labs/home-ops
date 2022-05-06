@@ -33,9 +33,25 @@ spec:
     settings:
       automaticPortSetup: false
 
+    # Just spin & wait forever
+    command:
+      - /bin/bash
+      - -c
+      - --
+    args:
+      - "while true; do sleep 30; done;"
+    probes:
+      liveness:
+        enabled: false
+      readiness:
+        enabled: false
+      startup:
+        enabled: false
+
     env:
       TZ: "${TIMEZONE}"
       UMASK: "022"
+      USE_PROFILE: "true"
 
     persistence:
       config:
