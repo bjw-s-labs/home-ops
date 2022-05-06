@@ -1,10 +1,15 @@
 ---
 apiVersion: "triliovault.trilio.io/v1"
-kind: "BackupPlan"
+kind: "ClusterBackupPlan"
 metadata:
-  name: "home-automation"
-  namespace: "home-automation"
+  name: "cluster"
 spec:
+  backupComponents:
+    - namespace: "downloads"
+      retainHelmApps: false
+    - namespace: "home-automation"
+      retainHelmApps: false
+
   backupConfig:
     retentionPolicy:
       apiVersion: "triliovault.trilio.io/v1"
@@ -30,7 +35,6 @@ spec:
       - matchExpressions:
           - key: "triliovault.trilio.io/backup"
             operator: "DoesNotExist"
-
   includeResources:
     labelSelector:
       - matchLabels:
