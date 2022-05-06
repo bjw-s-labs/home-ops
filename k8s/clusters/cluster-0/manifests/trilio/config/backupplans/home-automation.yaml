@@ -1,17 +1,10 @@
 ---
 apiVersion: "triliovault.trilio.io/v1"
-kind: "ClusterBackupPlan"
+kind: "BackupPlan"
 metadata:
-  name: "cluster-backupplan"
+  name: "home-automation"
+  namespace: "home-automation"
 spec:
-  backupComponents:
-    - namespace: "downloads"
-    - namespace: "home-automation"
-    - namespace: "media"
-    - namespace: "network"
-    - namespace: "scripts"
-    - namespace: "selfhosted"
-
   backupConfig:
     retentionPolicy:
       apiVersion: "triliovault.trilio.io/v1"
@@ -31,6 +24,12 @@ spec:
       kind: "Target"
       name: "nas"
       namespace: "trilio"
+
+  excludeResources:
+    labelSelector:
+      - matchExpressions:
+          - key: "triliovault.trilio.io/backup"
+            operator: "DoesNotExist"
 
   includeResources:
     labelSelector:
