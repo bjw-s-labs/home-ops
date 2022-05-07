@@ -110,4 +110,23 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
-
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: media-plex-meta-manager
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: media-namespace
+    - name: media-plex
+    - name: media-tautulli
+    - name: downloads-sonarr
+    - name: downloads-radarr
+  interval: 5m
+  path: "./k8s/clusters/cluster-1/manifests/media/plex-meta-manager"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops

@@ -1,0 +1,71 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: plex-media-manager
+  namespace: media
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+          initContainers:
+            - name: render-dynamic-config
+              image: chrisjohnson00/jinja-init:v1.0.0
+              env:
+                # source and destination files
+                - name: JINJA_SRC_FILE
+                  value: /config_src/tv.yaml
+                - name: JINJA_DEST_FILE
+                  value: /config/tv.yaml
+                # let's be verbose
+                - name: VERBOSE
+                  value: "1"
+              volumeMounts:
+                # configMap mount point
+                - name: pmm-tv-config-jinja-template
+                  mountPath: /config_src
+                # target directory mount point; the final config file will be created here
+                - name: config
+                  mountPath: /config
+          containers:
+            - name: plex-media-manager
+              image: meisnate12/plex-meta-manager:v1.15.1
+              imagePullPolicy: IfNotPresent
+              args: [ "--run", "--read-only-config" ]
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 256Mi
+                requests:
+                  cpu: 100m
+                  memory: 125Mi
+              volumeMounts:
+                - name: config
+                  mountPath: /config
+                - name: pmm-config
+                  mountPath: /config/config.yml
+                  subPath: config.yml
+                - name: pmm-movie-config
+                  mountPath: /config/movies.yaml
+                  subPath: movies.yaml
+                - name: pmm-tv-config
+                  mountPath: /config/tv.yaml
+                  subPath: tv.yaml
+          volumes:
+            - name: config
+              persistentVolumeClaim:
+                claimName: plex-media-manager-v1
+            - configMap:
+                name: pmm-config
+              name: pmm-config
+            - configMap:
+                name: pmm-movie-config
+              name: pmm-movie-config
+            - configMap:
+                name: pmm-tv-config
+              name: pmm-tv-config
+          restartPolicy: OnFailure
