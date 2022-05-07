@@ -41,11 +41,9 @@ spec:
         defaultMode: 0555
       media:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /volume1/Media
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Media
         mountPath: /data/nas-media
 
     ingress:
