@@ -12,6 +12,11 @@ spec:
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
+            fsGroup: 1000
+            supplementalGroups:
+              - 34
+              - 100
+            fsGroupChangePolicy: "OnRootMismatch"
           # initContainers:
           #   - name: render-dynamic-config
           #     image: chrisjohnson00/jinja-init:v1.0.0
