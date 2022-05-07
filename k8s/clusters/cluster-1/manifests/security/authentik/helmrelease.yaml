@@ -1,0 +1,109 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: authentik
+  namespace: security
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://charts.goauthentik.io/
+      chart: authentik
+      version: 2022.4.1
+      sourceRef:
+        kind: HelmRepository
+        name: authentik-charts
+        namespace: flux-system
+      interval: 5m
+
+  dependsOn:
+    - name: cert-manager
+      namespace: cert-manager
+
+  install:
+    remediation:
+      retries: 4
+  upgrade:
+    remediation:
+      remediateLastFailure: true
+
+  values:
+    fullnameOverride: authentik
+    image:
+      repository: ghcr.io/goauthentik/server
+      tag: 2022.4.1
+
+    geoip:
+      enabled: true
+
+    authentik:
+      outposts:
+        docker_image_base: ghcr.io/goauthentik/%(type)s:%(version)s
+
+      secret_key: "${SECRET_AUTHENTIK_SECRET_KEY}"
+
+      error_reporting:
+        enabled: false
+
+      postgresql:
+        host: "authentik-postgresql"
+        name: "authentik"
+        user: "authentik"
+        password: "${AUTHENTIK_POSTGRES_PASSWORD}"
+        s3_backup:
+          access_key: "${AUTHENTIK_S3_ACCESS_KEY}"
+          bucket: "authentik-postgresql-backup"
+          secret_key: "${AUTHENTIK_S3_SECRET}"
+          host: "http://s3.${INGRESS_DOMAIN}"
+
+      redis:
+        host: "{{ .Release.Name }}-redis-master"
+        password: ${AUTHENTIK_REDIS_PASSWORD}
+
+      email:
+        host: ${SMTP_HOST}
+        port: 587
+        use_tls: true
+        username: ${SMTP_USERNAME}
+        password:  ${SMTP_PASSWORD}
+        from: "no-reply@${INGRESS_DOMAIN}"
+
+    ingress:
+      enabled: true
+      ingressClassName: "traefik"
+      annotations:
+        hajimari.io/enable: "true"
+        hajimari.io/icon: "account-lock-outline"
+        hajimari.io/instance: "bloop-xyz,bloop-quarky"
+        hajimari.io/appName: "Login Settings"
+        hajimari.io/url: "https://auth.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+        cert-manager.io/cluster-issuer: "letsencrypt-production"
+        traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+        traefik.ingress.kubernetes.io/router.middlewares: "networking-chain-no-auth@kubernetescrd"
+
+      hosts:
+        - host: &host-cluster "auth.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          paths:
+            - path: "/"
+              pathType: Prefix
+        - host: &host "auth.${INGRESS_DOMAIN}"
+          paths:
+            - path: "/"
+              pathType: Prefix
+      tls:
+        - hosts:
+            - *host-cluster
+            - *host
+          secretName: "tls.authentik"
+
+    postgresql:
+      enabled: true
+      postgresqlPassword: "${SECRET_AUTHENTIK_POSTGRES_PASSWORD}"
+
+    redis:
+      enabled: true
+
+    prometheus:
+      serviceMonitor:
+        create: true
