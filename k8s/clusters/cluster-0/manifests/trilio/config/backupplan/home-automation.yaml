@@ -1,0 +1,43 @@
+---
+apiVersion: triliovault.trilio.io/v1
+kind: BackupPlan
+metadata:
+  name: home-automation
+  namespace: home-automation
+spec:
+  backupConfig:
+    retentionPolicy:
+      apiVersion: triliovault.trilio.io/v1
+      kind: Policy
+      name: retention
+      namespace: trilio
+
+    schedulePolicy:
+      fullBackupPolicy:
+        apiVersion: triliovault.trilio.io/v1
+        kind: Policy
+        name: weekly-schedule
+        namespace: home-automation
+
+      incrementalBackupPolicy:
+        apiVersion: triliovault.trilio.io/v1
+        kind: Policy
+        name: daily-schedule
+        namespace: home-automation
+
+    target:
+      apiVersion: triliovault.trilio.io/v1
+      kind: Target
+      name: nas
+      namespace: home-automation
+
+  excludeResources:
+    labelSelector:
+      - matchExpressions:
+          - key: "triliovault.trilio.io/backup"
+            operator: "DoesNotExist"
+
+  includeResources:
+    labelSelector:
+      - matchLabels:
+          triliovault.trilio.io/backup: "true"
