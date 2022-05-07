@@ -1,0 +1,14 @@
+---
+apiVersion: "triliovault.trilio.io/v1"
+kind: "Target"
+metadata:
+  name: "nas"
+  namespace: "media"
+spec:
+  nfsCredentials:
+    nfsExport: "${NAS_ADDRESS}:/volume1/Backup/Kubernetes/trilio/cluster-0/media"
+  objectStoreCredentials:
+    bucketName: ""
+  thresholdCapacity: "512Gi"
+  type: "NFS"
+  vendor: "Other"

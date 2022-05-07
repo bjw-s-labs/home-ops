@@ -2,13 +2,14 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: trilio-config-target
+  name: trilio-config-backupplan
   namespace: flux-system
 spec:
   dependsOn:
-    - name: trilio-operator
+    - name: trilio-config-target
+    - name: trilio-config-policy
   interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/trilio/config/target"
+  path: "./k8s/clusters/cluster-0/manifests/trilio/config/backupplan"
   prune: true
   wait: true
   sourceRef:

@@ -1,0 +1,43 @@
+---
+apiVersion: triliovault.trilio.io/v1
+kind: BackupPlan
+metadata:
+  name: selfhosted
+  namespace: selfhosted
+spec:
+  backupConfig:
+    retentionPolicy:
+      apiVersion: triliovault.trilio.io/v1
+      kind: Policy
+      name: retention
+      namespace: trilio
+
+    schedulePolicy:
+      fullBackupPolicy:
+        apiVersion: triliovault.trilio.io/v1
+        kind: Policy
+        name: weekly-schedule
+        namespace: selfhosted
+
+      incrementalBackupPolicy:
+        apiVersion: triliovault.trilio.io/v1
+        kind: Policy
+        name: daily-schedule
+        namespace: selfhosted
+
+    target:
+      apiVersion: triliovault.trilio.io/v1
+      kind: Target
+      name: nas
+      namespace: selfhosted
+
+  excludeResources:
+    labelSelector:
+      - matchExpressions:
+          - key: "triliovault.trilio.io/backup"
+            operator: "DoesNotExist"
+
+  includeResources:
+    labelSelector:
+      - matchLabels:
+          triliovault.trilio.io/backup: "true"
