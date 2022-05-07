@@ -33,19 +33,15 @@ spec:
         existingClaim: lidarr-config
       media:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /volume1/Media
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Media
         mountPath: /data/nas-media
       backup:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /volume1/Backup/Kubernetes/Applications/lidarr
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Backup/Kubernetes/Applications/lidarr
         mountPath: /config/Backups
 
     ingress:

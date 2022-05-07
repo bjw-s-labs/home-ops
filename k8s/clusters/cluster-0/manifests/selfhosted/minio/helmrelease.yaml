@@ -45,19 +45,15 @@ spec:
     persistence:
       config:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /volume1/Minio/.minio
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Minio/.minio
         mountPath: /root/.minio
       data:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /volume1/Minio
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Minio
         mountPath: /data
 
     service:
