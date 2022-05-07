@@ -42,11 +42,9 @@ spec:
         existingClaim: frigate-data
       media:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /volume1/IPCams/frigate
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/IPCams/frigate
         mountPath: /media
       usb:
         enabled: true

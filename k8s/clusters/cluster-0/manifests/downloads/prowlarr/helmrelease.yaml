@@ -39,11 +39,9 @@ spec:
         mountPath: /shared
       backup:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /volume1/Backup/Kubernetes/Applications/prowlarr
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Backup/Kubernetes/Applications/prowlarr
         mountPath: /config/Backups
 
     ingress:

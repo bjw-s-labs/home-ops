@@ -88,11 +88,9 @@ spec:
         existingClaim: home-assistant-data
       backup:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /volume1/Backup/Kubernetes/Applications/home-assistant
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Backup/Kubernetes/Applications/home-assistant
         mountPath: /config/backups
 
     resources:
