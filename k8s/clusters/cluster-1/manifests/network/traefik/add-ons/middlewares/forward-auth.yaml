@@ -1,0 +1,11 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: authentik
+  namespace: network
+spec:
+  forwardAuth:
+    address: https://auth.${CLUSTER_NAME}.${INGRESS_DOMAIN}/outpost.goauthentik.io/auth/traefik
+    trustForwardHeader: true
+    authResponseHeadersRegex: ^.*$
