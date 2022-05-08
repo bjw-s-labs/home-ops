@@ -42,15 +42,15 @@ spec:
         kubernetes_logs:
           type: kubernetes_logs
 
-      talos_kernel_logs:
-        type: socket
-        mode: udp
-        address: 127.0.0.1:12000
-
-      talos_service_logs:
-        type: socket
-        mode: udp
-        address: 127.0.0.1:12001
+        talos_kernel_logs:
+          type: socket
+          mode: udp
+          address: 127.0.0.1:12000
+  
+        talos_service_logs:
+          type: socket
+          mode: udp
+          address: 127.0.0.1:12001
 
       # Sinks
       sinks:
@@ -61,16 +61,17 @@ spec:
           address: "vector-aggregator.system-monitoring:6000"
           version: "2"
 
-      talos_kernel_sink:
-        type: vector
-        inputs:
-          - talos_kernel_logs
-        address: "vector-aggregator.system-monitoring:6050"
-        version: "2"
-        
-      talos_service_sink:
-        type: vector
-        inputs:
-          - talos_service_logs
-        address: "vector-aggregator.system-monitoring:6051"
-        version: "2"
+        talos_kernel_sink:
+          type: vector
+          inputs:
+            - talos_kernel_logs
+          address: "vector-aggregator.system-monitoring:6050"
+          version: "2"
+          
+        talos_service_sink:
+          type: vector
+          inputs:
+            - talos_service_logs
+          address: "vector-aggregator.system-monitoring:6051"
+          version: "2"
+  
