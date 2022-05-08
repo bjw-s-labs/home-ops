@@ -76,15 +76,13 @@ spec:
       enabled: true
       ingressClassName: "traefik"
       annotations:
-        hajimari.io/enable: "true"
-        hajimari.io/icon: "account-lock-outline"
-        hajimari.io/instance: "bloop-xyz,bloop-quarky"
-        hajimari.io/appName: "Login Settings"
-        hajimari.io/url: "https://auth.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-        cert-manager.io/cluster-issuer: "letsencrypt-production"
-        traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
-        # traefik.ingress.kubernetes.io/router.middlewares: "networking-chain-no-auth@kubernetescrd"
-
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns/is-public: "true"
+        external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+        # traefik.ingress.kubernetes.io/router.middlewares: "network-chain-no-auth@kubernetescrd"
       hosts:
         - host: &host-cluster "auth.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
           paths:
@@ -95,11 +93,11 @@ spec:
             - path: "/"
               pathType: Prefix
       tls:
-        - hosts:
-            - *host-cluster
+        - secretName: tls.authentik
+          hosts:
             - *host
-          secretName: "tls.authentik"
-
+            - *host-cluster
+            
     postgresql:
       enabled: true
       postgresqlPassword: "${AUTHENTIK_POSTGRES_PASSWORD}"
