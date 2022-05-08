@@ -43,6 +43,11 @@ spec:
         feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
 
     - op: add
+      path: /machine/install/extraKernelArgs
+      value:
+      - talos.logging.kernel=udp://127.0.0.1:12000/
+
+    - op: add
       path: /machine/time
       value:
         disabled: true

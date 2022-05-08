@@ -41,6 +41,16 @@ spec:
           type: vector
           version: "2"
 
+      talos_kernel_logs:
+        address: 0.0.0.0:6050
+        type: http
+        encoding: json
+
+      talos_service_logs:
+        address: 0.0.0.0:6051
+        type: http
+        encoding: json
+
         vyos_logs:
           address: 0.0.0.0:6001
           type: vector
@@ -75,6 +85,44 @@ spec:
               {{`{{ kubernetes.pod_node_name }}`}}
             pod: >-
               {{`{{ kubernetes.pod_name }}`}}
+
+        talos_kernel:
+          type: loki
+          inputs:
+            - talos_kernel_logs
+          endpoint: http://loki.system-monitoring:3100
+          encoding:
+            codec: json
+          batch:
+            max_bytes: 400000
+          out_of_order_action: rewrite_timestamp
+          labels:
+            hostname: >-
+              {{`{{ host }}`}}
+            talos_level: >-
+              {{`{{ talos-level }}`}}
+            priority: >-
+              {{`{{ priority }}`}}
+            facility: >-
+              {{`{{ facility }}`}}
+              
+        talos_service:
+          type: loki
+          inputs:
+            - talos_service_logs
+          endpoint: http://loki.system-monitoring:3100
+          encoding:
+            codec: json
+          batch:
+            max_bytes: 400000
+          out_of_order_action: rewrite_timestamp
+          labels:
+            hostname: >-
+              {{`{{ host }}`}}
+            talos_level: >-
+              {{`{{ talos-level }}`}}
+            talos_service: >-
+              {{`{{ talos-service }}`}}
 
         loki_vyos:
           type: loki
