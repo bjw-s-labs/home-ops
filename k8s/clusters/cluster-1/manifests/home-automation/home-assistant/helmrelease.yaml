@@ -43,6 +43,10 @@ spec:
       startup:
         enabled: false
 
+    hostNetwork: true
+    # -- Defaults to "ClusterFirst" if hostNetwork is false and "ClusterFirstWithHostNet" if hostNetwork is true.
+    dnsPolicy:   ClusterFirstWithHostNet
+
     service:
       main:
         type: LoadBalancer
