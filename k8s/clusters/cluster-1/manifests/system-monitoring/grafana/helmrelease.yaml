@@ -17,7 +17,7 @@ spec:
       interval: 5m
   timeout: 20m
   values:
-    replicas: 1
+    replicas: 3
     deploymentStrategy:
       type: Recreate
 
@@ -29,6 +29,9 @@ spec:
       GF_PANELS_DISABLE_SANITIZE_HTML: true
       GF_LOG_FILTERS: rendering:debug
       GF_DATE_FORMATS_USE_BROWSER_LOCALE: true
+      GF_DATE_FORMATS_FULL_DATE: "MMM Do, YYYY hh:mm:ss a"
+      GF_SECURITY_ALLOW_EMBEDDING: true
+      GF_SECURITY_COOKIE_SAMESITE: grafana
 
     admin:
       existingSecret: grafana-secrets
@@ -305,6 +308,7 @@ spec:
 
     ingress:
       enabled: true
+      ingressClassName: "traefik"
       annotations:
         # kubernetes.io/ingress.class: traefik
         cert-manager.io/cluster-issuer: letsencrypt-production
@@ -314,14 +318,28 @@ spec:
         external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
         external-dns/is-public: "true"
       hosts:
-        - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+        - &host "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       tls:
         - secretName: grafana-${CLUSTER_NAME}-tls
           hosts:
-            - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            - *host
 
     persistence:
       enabled: false
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "grafana"
+
+    # Prevents replicas from running all on the same nodes
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - grafana
+              topologyKey: kubernetes.io/hostname
