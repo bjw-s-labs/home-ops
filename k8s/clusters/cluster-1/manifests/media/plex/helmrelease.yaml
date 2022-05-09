@@ -81,7 +81,7 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918@kubernetescrd
         hosts:
-          - host: &host "plex.${PERSONAL_DOMAIN}"
+          - host: &host "plex.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
