@@ -306,9 +306,6 @@ spec:
     serviceMonitor:
       enabled: true
 
-    ingress:
-      enabled: true
-      ingressClassName: "traefik"
       annotations:
         # kubernetes.io/ingress.class: traefik
         cert-manager.io/cluster-issuer: letsencrypt-production
@@ -318,11 +315,11 @@ spec:
         external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
         external-dns/is-public: "true"
       hosts:
-        - &host "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+        - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       tls:
         - secretName: grafana-${CLUSTER_NAME}-tls
           hosts:
-            - *host
+            - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
     persistence:
       enabled: false
