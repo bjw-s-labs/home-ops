@@ -3,7 +3,7 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
   name: secure-headers
-  namespace: network
+  namespace: networking
 spec:
   headers:
     frameDeny: true
@@ -14,25 +14,16 @@ spec:
       - "PUT"
     accessControlAllowOriginList:
       - "https://${INGRESS_DOMAIN}"
-      - "https://auth.${INGRESS_DOMAIN}"
-      - "https://${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-      - "https://auth.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-    # accessControlAllowOriginListRegex:
-    #   - "https://(.*)?${XYZ_DOMAIN_REV}([^\\s\\x60!()\\[\\]{};:'\\x22.,<>?«»“”‘’]*)"
-    #   - "https://(.*)?${SECRET_DOMAIN_REV}([^\\s\\x60!()\\[\\]{};:'\\x22.,<>?«»“”‘’]*)"
-    #   - "https://(.*)?${CLASSIC_DOMAIN_REV}([^\\s\\x60!()\\[\\]{};:'\\x22.,<>?«»“”‘’]*)"
     accessControlMaxAge: 100
     addVaryHeader: true
     stsPreload: true
     forceSTSHeader: true
     contentTypeNosniff: true
     stsIncludeSubdomains: true
-    # 2y as recommended by mozilla
     stsSeconds: 63072000
     hostsProxyHeaders:
       - "X-Forwarded-Host"
       - "Forwarded"
-    contentSecurityPolicy: "frame-ancestors 'self' *.bloopnet.xac.im:* *.xac.im *.quarkynet.com *.bloopnet.xyz;" # script-src 'self' code.iconify.design cdnjs.cloudflare.com; object-src 'self'; require-trusted-types-for 'script';"
     customResponseHeaders:
       X-xss-protection: "1"
       X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex,"
