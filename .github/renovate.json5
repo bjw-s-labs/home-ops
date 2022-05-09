@@ -1,6 +1,6 @@
 {
   // General RenovateBot configuration
-  "extends": [
+  extends: [
     ":enableRenovate",
     "config:base",
     ":disableRateLimiting",
@@ -17,155 +17,150 @@
     "github>bjw-s/home-ops//.github/renovate/autoMerge",
     "github>bjw-s/home-ops//.github/renovate/updateSchedule",
   ],
-  "platform": "github",
-  "username": "bjw-s-bot[bot]",
-  "repositories": ["bjw-s/home-ops"],
-  "onboarding": false,
-  "requireConfig": false,
-  "gitAuthor": "bjw-s-bot <87358111+bjw-s[bot]@users.noreply.github.com>",
-  "timezone": "Europe/Amsterdam",
-  "dependencyDashboardTitle": "Renovate Dashboard",
-  "suppressNotifications": ["prIgnoreNotification"],
-  "rebaseWhen": "conflicted",
+  platform: "github",
+  username: "bjw-s-bot[bot]",
+  repositories: ["bjw-s/home-ops"],
+  onboarding: false,
+  requireConfig: false,
+  gitAuthor: "bjw-s-bot <87358111+bjw-s[bot]@users.noreply.github.com>",
+  timezone: "Europe/Amsterdam",
+  dependencyDashboardTitle: "Renovate Dashboard",
+  suppressNotifications: ["prIgnoreNotification"],
+  rebaseWhen: "conflicted",
   // Set up Renovate Managers
   "helm-values": {
-    "fileMatch": [
+    fileMatch: [
       "k8s/clusters/.+/helmrelease\\.yaml$",
-      "k8s/global/.+/helmrelease\\.yaml$"
-    ]
-  },
-  "kubernetes": {
-    "fileMatch": [
-      "k8s/clusters/.+\\.yaml$",
-      "k8s/global/.+\\.yaml$"
+      "k8s/global/.+/helmrelease\\.yaml$",
     ],
   },
-  "flux": {
-   "fileMatch": [
-     "k8s/clusters/.+\\.yaml$",
-     "k8s/global/.+\\.yaml$"
-   ]
+  kubernetes: {
+    fileMatch: ["k8s/clusters/.+\\.yaml$", "k8s/global/.+\\.yaml$"],
   },
-  "regexManagers": [
+  flux: {
+    fileMatch: ["k8s/clusters/.+\\.yaml$", "k8s/global/.+\\.yaml$"],
+  },
+  regexManagers: [
     // regexManager to read and process GitHub release artifacts
     {
-      "fileMatch": [
-        "k8s/clusters/.+\\.yaml$",
-        "k8s/global/.+\\.yaml$"
+      fileMatch: ["k8s/clusters/.+\\.yaml$", "k8s/global/.+\\.yaml$"],
+      matchStrings: [
+        "https://github.com/(?<org>.*=?)/(?<repo>.*=?)/releases/download/(?<currentValue>.*=?)/.*",
       ],
-      "matchStrings": [
-        "https:\/\/github.com\/(?<org>.*=?)\/(?<repo>.*=?)\/releases\/download\/(?<currentValue>.*=?)\/.*"
-      ],
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "{{org}}/{{repo}}"
+      datasourceTemplate: "github-releases",
+      depNameTemplate: "{{org}}/{{repo}}",
     },
     // Generic Regex Manager
     {
-      "fileMatch": [
-        "k8s/clusters/.+\\.yaml$",
-        "k8s/global/.+\\.yaml$"
+      fileMatch: ["k8s/clusters/.+\\.yaml$", "k8s/global/.+\\.yaml$"],
+      matchStrings: [
+        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( registryUrl=(?<registryUrl>.*?))?( versioning=(?<versioning>.*=?))?\n .*: (?<currentValue>.*=?)",
       ],
-      "matchStrings": [
-        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( registryUrl=(?<registryUrl>.*?))?( versioning=(?<versioning>.*=?))?\n .*: (?<currentValue>.*=?)"
-      ],
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
-      "registryUrlTemplate": "{{#if registryUrl}}{{{registryUrl}}}{{else}}{{/if}}"
+      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+      registryUrlTemplate: "{{#if registryUrl}}{{{registryUrl}}}{{else}}{{/if}}",
     },
     // Generic Docker image Regex manager
     {
-      "fileMatch": [
-        "k8s/clusters/.+\\.yaml$",
-        "k8s/global/.+\\.yaml$"
+      fileMatch: ["k8s/clusters/.+\\.yaml$", "k8s/global/.+\\.yaml$"],
+      matchStrings: [
+        "# renovate: docker-image( registryUrl=(?<registryUrl>.*?))?( versioning=(?<versioning>.*=?))?\n .*: (?<depName>.*?):(?<currentValue>.*=?)",
       ],
-      "matchStrings": [
-        "# renovate: docker-image( registryUrl=(?<registryUrl>.*?))?( versioning=(?<versioning>.*=?))?\n .*: (?<depName>.*?):(?<currentValue>.*=?)"
-      ],
-      "datasourceTemplate": "docker",
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}docker{{/if}}",
-      "registryUrlTemplate": "{{#if registryUrl}}{{{registryUrl}}}{{else}}{{/if}}"
-    }
+      datasourceTemplate: "docker",
+      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}docker{{/if}}",
+      registryUrlTemplate: "{{#if registryUrl}}{{{registryUrl}}}{{else}}{{/if}}",
+    },
   ],
-  "packageRules": [
+  packageRules: [
     // Setup datasources
     {
-      "matchDatasources": ["helm"],
-      "ignoreDeprecated": true
+      matchDatasources: ["helm"],
+      ignoreDeprecated: true,
     },
     {
-      "matchDatasources": ["docker"],
-      "commitMessageExtra": "to {{newVersion}}",
+      matchDatasources: ["docker"],
+      commitMessageExtra: "to {{newVersion}}",
     },
     // Custom version schemes
     {
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["blakeblackshear/frigate"],
-      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$"
+      matchDatasources: ["docker"],
+      matchPackageNames: ["blakeblackshear/frigate"],
+      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$",
     },
     {
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["xirixiz/dsmr-reader-docker"],
-      "versioning": "regex:^(?<compatibility>.*)-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-\\d+\\.\\d+\\.\\d+$"
+      matchDatasources: ["docker"],
+      matchPackageNames: ["xirixiz/dsmr-reader-docker"],
+      versioning: "regex:^(?<compatibility>.*)-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-\\d+\\.\\d+\\.\\d+$",
     },
     {
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["quay.io/minio/minio"],
-      "versioning": "regex:^RELEASE\\.(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})"
+      matchDatasources: ["docker"],
+      matchPackageNames: ["quay.io/minio/minio"],
+      versioning: "regex:^RELEASE\\.(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})",
     },
     {
-      "matchDatasources": ["docker"],
-      "matchPackageNames": [
+      matchDatasources: ["docker"],
+      matchPackageNames: [
         "ghcr.io/linuxserver/calibre",
-        "ghcr.io/linuxserver/calibre-web"
+        "ghcr.io/linuxserver/calibre-web",
       ],
-      "versioning": "regex:^version-v?(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$"
+      versioning: "regex:^version-v?(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
     },
     {
-      "matchDatasources": ["docker"],
-      "matchPackageNames": [
-        "ghcr.io/airsonic-advanced/airsonic-advanced"
-      ],
-      "versioning": "regex:^edge-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-SNAPSHOT\\.(?<build>\\d+)$"
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/airsonic-advanced/airsonic-advanced"],
+      versioning: "regex:^edge-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-SNAPSHOT\\.(?<build>\\d+)$",
     },
     {
-      "matchDatasources": ["docker"],
-      "matchPackageNames": [
-        "ghcr.io/paperless-ngx/paperless-ngx"
-      ],
-      "versioning": "regex:^ngx-?(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$"
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/paperless-ngx/paperless-ngx"],
+      versioning: "regex:^ngx-?(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
     },
     // Version strategies
     {
-      "matchDatasources": ["docker"],
-      "matchPackageNames": [
-        "ghcr.io/k8s-at-home/plex"
-      ],
-      "versioning": "loose"
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/k8s-at-home/plex"],
+      versioning: "loose",
     },
     {
-      "matchDatasources": ["docker"],
-      "matchPackageNames": [
-        "tomsquest/docker-radicale"
-      ],
-      "versioning": "pep440"
+      matchDatasources: ["docker"],
+      matchPackageNames: ["tomsquest/docker-radicale"],
+      versioning: "pep440",
     },
     // Group packages
     {
-      "matchDatasources": ["helm", "docker"],
-      "matchPackagePatterns": ["^rook.ceph"],
-      "groupName": "rook-ceph-suite",
-      "additionalBranchPrefix": "",
-      "separateMinorPatch": true,
+      matchDatasources: ["helm", "docker"],
+      matchPackagePatterns: ["^rook.ceph"],
+      groupName: "rook-ceph-suite",
+      additionalBranchPrefix: "",
+      separateMinorPatch: true,
+      stabilityDays: 2,
     },
     {
-      "matchDatasources": ["helm", "docker"],
-      "matchPackageNames": [
+      matchDatasources: ["helm", "docker"],
+      matchPackageNames: [
         "quay.io/cilium/cilium",
         "quay.io/cilium/operator-generic",
         "cilium",
       ],
-      "groupName": "cilium",
-      "additionalBranchPrefix": "",
-      "separateMinorPatch": true,
-    }
-  ]
+      groupName: "cilium",
+      additionalBranchPrefix: "",
+      separateMinorPatch: true,
+      stabilityDays: 2,
+    },
+    {
+      groupName: "thanos-suite",
+      matchDatasources: ["docker", "github-releases", "helm"],
+      matchPackagePatterns: ["quay.io/thanos/thanos", "thanos"],
+      additionalBranchPrefix: "",
+      separateMinorPatch: true,
+      stabilityDays: 2,
+    },
+    {
+      groupName: "vector-suite",
+      matchDatasources: ["docker", "github-releases", "helm"],
+      matchPackagePatterns: ["vector"],
+      additionalBranchPrefix: "",
+      separateMinorPatch: true,
+      stabilityDays: 2,
+    },
+  ],
 }
