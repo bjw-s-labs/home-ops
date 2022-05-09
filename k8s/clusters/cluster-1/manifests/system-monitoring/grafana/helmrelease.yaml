@@ -306,20 +306,23 @@ spec:
     serviceMonitor:
       enabled: true
 
-      annotations:
-        # kubernetes.io/ingress.class: traefik
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
-        external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
-        external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
-        external-dns/is-public: "true"
-      hosts:
-        - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-      tls:
-        - secretName: grafana-${CLUSTER_NAME}-tls
-          hosts:
-            - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    ingress:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          # kubernetes.io/ingress.class: traefik
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+          external-dns/is-public: "true"
+        hosts:
+          - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+        tls:
+          - secretName: grafana-${CLUSTER_NAME}-tls
+            hosts:
+              - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
     persistence:
       enabled: false
