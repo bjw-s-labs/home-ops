@@ -311,10 +311,6 @@ spec:
         ingressClassName: "traefik"
         annotations:
           # kubernetes.io/ingress.class: traefik
-          # Needed due to multiple replicas to allow me to login
-          traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
-          traefik.ingress.kubernetes.io/service.sticky.cookie.name: cookie
-          traefik.ingress.kubernetes.io/service.sticky.cookie.secure: "true"
           cert-manager.io/cluster-issuer: letsencrypt-production
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
@@ -327,6 +323,13 @@ spec:
           - secretName: grafana-${CLUSTER_NAME}-tls
             hosts:
               - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            
+    service:
+      annotations:
+          # Needed due to multiple replicas to allow me to login
+          traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
+          traefik.ingress.kubernetes.io/service.sticky.cookie.name: cookie
+          traefik.ingress.kubernetes.io/service.sticky.cookie.secure: "true"
 
     persistence:
       enabled: false
