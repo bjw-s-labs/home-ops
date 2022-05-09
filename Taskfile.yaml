@@ -1,0 +1,17 @@
+---
+version: "3"
+
+vars:
+  PROJECT_DIR:
+    sh: "git rev-parse --show-toplevel"
+
+dotenv: ['Taskfile.env']
+
+includes:
+  cluster: .taskfiles/cluster.yaml
+
+tasks:
+  pre-commit:
+    desc: Run pre-commit
+    cmds:
+      - pre-commit run --all-files
