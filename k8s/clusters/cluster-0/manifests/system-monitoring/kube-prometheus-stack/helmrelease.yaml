@@ -48,6 +48,18 @@ spec:
     kubeStateMetrics:
       enabled: true
     kube-state-metrics:
+      metricLabelsAllowlist:
+        - "persistentvolumeclaims=[*]"
+      prometheus:
+        monitor:
+          enabled: true
+          relabelings:
+            - action: replace
+              regex: (.*)
+              replacement: $1
+              sourceLabels:
+                - __meta_kubernetes_pod_node_name
+              targetLabel: kubernetes_node
       resources:
         requests:
           cpu: 15m
@@ -153,6 +165,7 @@ spec:
 
         thanos:
           image: quay.io/thanos/thanos:v0.26.0
+          # renovate: datasource=docker depName=quay.io/thanos/thanos
           version: v0.25.2
           objectStorageConfig:
             name: thanos-objstore-secret
