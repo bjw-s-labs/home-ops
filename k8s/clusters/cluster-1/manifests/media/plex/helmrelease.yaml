@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: plex
-      version: 6.3.1
+      version: 6.3.2
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
@@ -26,16 +26,24 @@ spec:
 
     podSecurityContext:
       supplementalGroups:
-        - 34
-        - 44
-        - 109
-        - 100
+        - 34 # backup
+        - 44 # videro
+        - 109 # render
+        - 100 # users
 
     env:
       TZ: "${TIMEZONE}"
       PUID: "1000"
       PGID: "100"
       ADVERTISE_IP: "https://plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}:443"
+      # PLEX_PREFERENCE_1: "FriendlyName=plex-kubernetes"
+      # PLEX_PREFERENCE_2: "EnableIPv6=0"
+      # PLEX_PREFERENCE_3: "logDebug=0"
+      # PLEX_PREFERENCE_4: "DisableTLSv1_0=1"
+      # PLEX_PREFERENCE_5: "LanNetworksBandwidth=xxx.xxx.xxx.0/18\,xxx.xxx.xxx.0/24\,xxx.xxx.xxx.0/24"
+      # PLEX_PREFERENCE_6: "TranscoderQuality=2"
+      # PLEX_PREFERENCE_7: "TreatWanIpAsLocal=0"
+      # PLEX_PREFERENCE_8: "TranscoderH264BackgroundPreset=fast"
 
     service:
       main:
@@ -60,6 +68,51 @@ spec:
             protocol: TCP
             targetPort: 33400
         externalTrafficPolicy: Local
+      dlna-udp:
+        enabled: true
+        port: 1900
+        targetPort: 1900
+        protocol: UDP
+      dlna-tcp:
+        enabled: true
+        port: 32469
+        targetPort: 32469
+        protocol: TCP
+      plex-companion:
+        enabled: true
+        port: 3005
+        targetPort: 3005
+        protocol: TCP
+      plex-roku:
+        enabled: true
+        port: 8234
+        targetPort: 8234
+        protocol: TCP
+      gdm-1:
+        enabled: true
+        port: 32410
+        targetPort: 32410
+        protocol: UDP
+      gdm-2:
+        enabled: true
+        port: 32412
+        targetPort: 32412
+        protocol: UDP
+      gdm3:
+        enabled: true
+        port: 32413
+        targetPort: 32413
+        protocol: UDP
+      gdm-4:
+        enabled: true
+        port: 32414
+        targetPort: 32414
+        protocol: UDP
+      bonjour:
+        enabled: true
+        port: 5353
+        targetPort: 5353
+        protocol: UDP
 
     ingress:
       main:
