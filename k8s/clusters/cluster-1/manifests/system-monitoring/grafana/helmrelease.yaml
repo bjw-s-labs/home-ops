@@ -29,9 +29,9 @@ spec:
       GF_PANELS_DISABLE_SANITIZE_HTML: true
       GF_LOG_FILTERS: rendering:debug
       GF_DATE_FORMATS_USE_BROWSER_LOCALE: true
-      # GF_DATE_FORMATS_FULL_DATE: "MMM Do, YYYY hh:mm:ss a"
-      # GF_SECURITY_ALLOW_EMBEDDING: false
-      # GF_SECURITY_COOKIE_SAMESITE: none
+      GF_DATE_FORMATS_FULL_DATE: "MMM Do, YYYY hh:mm:ss a"
+      GF_SECURITY_ALLOW_EMBEDDING: false
+      GF_SECURITY_COOKIE_SAMESITE: grafana
 
     admin:
       existingSecret: grafana-secrets
@@ -311,6 +311,10 @@ spec:
         ingressClassName: "traefik"
         annotations:
           # kubernetes.io/ingress.class: traefik
+          # Needed due to multiple replicas to allow me to login
+          traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
+          traefik.ingress.kubernetes.io/service.sticky.cookie.name: cookie
+          traefik.ingress.kubernetes.io/service.sticky.cookie.secure: "true"
           cert-manager.io/cluster-issuer: letsencrypt-production
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918-ips@kubernetescrd
