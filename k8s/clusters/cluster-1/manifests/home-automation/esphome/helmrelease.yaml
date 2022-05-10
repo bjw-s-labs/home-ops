@@ -51,6 +51,57 @@ spec:
         enabled: true
         existingClaim: esphome-config
 
+
+    addons:
+      codeserver:
+        enabled: true
+        image:
+          repository: docker.io/codercom/code-server
+          tag: 4.4.0
+        env:
+          TZ: "${TIMEZONE}"
+        git:
+          deployKeySecret: code-server
+        workingDir: "/config"
+        args:
+          - --auth
+          - "none"
+          - --user-data-dir
+          - "/config/.vscode"
+          - --extensions-dir
+          - "/config/.vscode"
+        ingress:
+          enabled: true
+          ingressClassName: "traefik"
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-production
+            traefik.ingress.kubernetes.io/router.entrypoints: websecure
+            traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918@kubernetescrd
+            external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+            external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+            external-dns/is-public: "false"
+          hosts:
+            - host: &code-host-cluster "code.esphome.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              paths:
+                - path: /
+            - host: &code-host "code.esphome.${INGRESS_DOMAIN}"
+              paths:
+                - path: /
+          tls:
+            - secretName: tls.home-assistant-code
+              hosts:
+                - *code-host-cluster
+                - *code-host 
+        volumeMounts:
+          - name: config
+            mountPath: /config
+        resources:
+          requests:
+            cpu: 35m
+            memory: 128Mi
+          limits:
+            memory: 512Mi
+
     resources:
       requests:
         memory: 256Mi
