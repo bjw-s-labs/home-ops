@@ -19,10 +19,16 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
+    image:
+      repository: timberio/vector
+      tag: 0.21.2-debian
+
     role: "Stateless-Aggregator"
 
     podMonitor:
       enabled: true
+      jobLabel: vector-aggregator
+      port: prometheus-sink
 
     service:
       enabled: true
@@ -53,6 +59,24 @@ spec:
           type: vector
           version: "2"
 
+        journal_logs:
+          type: vector
+          address: 0.0.0.0:6002
+          version: "2"
+
+        vector_metrics:
+          type: internal_metrics
+
+      # Transformations
+      transforms:
+        kubernetes_logs_remap:
+          type: remap
+          inputs:
+            - kubernetes_logs
+          source: |
+            # Standardize 'app' index
+            .custom_app_name = .pod_labels."app.kubernetes.io/name" || .pod_labels.app || .pod_labels."k8s-app" || "unknown"
+
       # Sinks
       sinks:
         loki_kubernetes:
@@ -64,24 +88,16 @@ spec:
             codec: json
           batch:
             max_bytes: 2049000
-          out_of_order_action: rewrite_timestamp
+          out_of_order_action: accept
           remove_label_fields: true
           remove_timestamp: true
           labels:
             app: >-
-              {{`{{ kubernetes.pod_labels.app\.kubernetes\.io/name }}`}}
-            container: >-
-              {{`{{ kubernetes.container_name }}`}}
-            filename: >-
-              {{`{{ kubernetes.file }}`}}
-            instance: >-
-              {{`{{ kubernetes.pod_labels.app\.kubernetes\.io/instance }}`}}
+              {{`{{ custom_app_name }}`}}
             namespace: >-
               {{`{{ kubernetes.pod_namespace }}`}}
             node: >-
               {{`{{ kubernetes.pod_node_name }}`}}
-            pod: >-
-              {{`{{ kubernetes.pod_name }}`}}
 
         loki_vyos:
           type: loki
@@ -99,6 +115,28 @@ spec:
             syslog_identifier: >-
               {{`{{ SYSLOG_IDENTIFIER }}`}}
 
+        loki_journal:
+          type: loki
+          inputs:
+            - journal_logs
+          endpoint: http://loki.system-monitoring:3100
+          encoding:
+            codec: json
+          batch:
+            max_bytes: 2049000
+          out_of_order_action: accept
+          remove_label_fields: true
+          remove_timestamp: true
+          labels:
+            hostname: >-
+              {{`{{ host }}`}}
+
+        prometheus_sink:
+          type: prometheus_exporter
+          inputs:
+            - vector_metrics
+          address: 0.0.0.0:9090
+
   postRenderers:
     - kustomize:
         patchesJson6902:
@@ -109,3 +147,6 @@ spec:
               - op: add
                 path: /spec/loadBalancerIP
                 value: ${LB_VECTOR_AGGREGATOR}
+              - op: replace
+                path: /spec/externalTrafficPolicy
+                value: Local

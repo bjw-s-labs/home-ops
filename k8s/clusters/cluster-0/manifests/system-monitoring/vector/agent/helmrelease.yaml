@@ -19,6 +19,10 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
+    image:
+      repository: timberio/vector
+      tag: 0.21.2-debian
+
     role: "Agent"
 
     podMonitor:
@@ -46,14 +50,40 @@ spec:
 
       # Sources
       sources:
+        journal_logs:
+          type: journald
+          journal_directory: /var/log/journal
+
         kubernetes_logs:
           type: kubernetes_logs
+          pod_annotation_fields:
+            container_image: "container_image"
+            container_name: "container_name"
+            pod_annotations: "pod_annotations"
+            pod_labels: "pod_labels"
+            pod_name: "pod_name"
+
+        vector_metrics:
+          type: internal_metrics
 
       # Sinks
       sinks:
+        loki_journal_sink:
+          type: vector
+          inputs:
+            - journal_logs
+          address: "vector-aggregator.system-monitoring:6002"
+          version: "2"
+
         loki_kubernetes_sink:
           type: vector
           inputs:
             - kubernetes_logs
           address: "vector-aggregator.system-monitoring:6000"
           version: "2"
+
+        prometheus_sink:
+          type: prometheus_exporter
+          inputs:
+            - vector_metrics
+          address: 0.0.0.0:9090
