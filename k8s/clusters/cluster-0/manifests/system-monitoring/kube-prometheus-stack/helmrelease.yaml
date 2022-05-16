@@ -123,9 +123,9 @@ spec:
     prometheus:
       ingress:
         enabled: true
+        ingressClassName: nginx
         pathType: Prefix
         annotations:
-          kubernetes.io/ingress.class: nginx
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
         hosts:
@@ -232,9 +232,9 @@ spec:
 
       ingress:
         enabled: true
+        ingressClassName: nginx
         pathType: Prefix
         annotations:
-          kubernetes.io/ingress.class: nginx
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
         hosts:
