@@ -113,9 +113,9 @@ spec:
     ingress:
       enabled: true
       annotations:
-        kubernetes.io/ingress.class: nginx
         cert-manager.io/cluster-issuer: letsencrypt-production
         external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+      ingressClassName: nginx
       hosts:
         - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       tls:
