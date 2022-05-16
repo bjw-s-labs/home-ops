@@ -1,0 +1,130 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: blackbox-exporter
+  namespace: system-monitoring
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: prometheus-blackbox-exporter
+      version: 5.7.0
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    fullnameOverride: blackbox-exporter
+
+    image:
+      repository: quay.io/prometheus/blackbox-exporter
+
+    ingress:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+      className: nginx
+      hosts:
+        - host: &host "blackbox.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: blackbox-${CLUSTER_NAME}-tls
+          hosts:
+            - *host
+
+    allowIcmp: true
+
+    config:
+      modules:
+        http_2xx:
+          prober: http
+          timeout: 5s
+          http:
+            valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+            follow_redirects: true
+            preferred_ip_protocol: "ip4"
+        icmp:
+          prober: icmp
+          timeout: 30s
+          icmp:
+            preferred_ip_protocol: "ip4"
+
+    serviceMonitor:
+      enabled: true
+      defaults:
+        labels:
+          release: prometheus
+        interval: 2m
+        scrapeTimeout: 30s
+      targets:
+        # PiKVM
+        - module: http_2xx
+          name: pikvm-http
+          url: "https://pikvm.${INGRESS_DOMAIN}"
+        - module: icmp
+          name: pikvm-icmp
+          url: diego.${HARDWARE_DOMAIN}
+
+        # Robot vacuums
+        - module: icmp
+          name: valetudo-living-room-icmp
+          url: livingroom-vacuum.${HARDWARE_DOMAIN}
+        - module: http_2xx
+          name: valetudo-living-room-http
+          url: "http://livingroom-vacuum.${HARDWARE_DOMAIN}"
+
+        # Room-assistant nodes
+        - module: icmp
+          name: athena-icmp
+          url: athena.${HARDWARE_DOMAIN}
+        - module: icmp
+          name: bruno-icmp
+          url: bruno.${HARDWARE_DOMAIN}
+        - module: icmp
+          name: carmen-icmp
+          url: carmen.${HARDWARE_DOMAIN}
+
+        # Other devices
+        - module: icmp
+          name: zigbee-controller-icmp
+          url: hallway-zigbee-adapter.${HARDWARE_DOMAIN}
+
+        - module: icmp
+          name: nas-icmp
+          url: nas.${HARDWARE_DOMAIN}
+
+    prometheusRule:
+      enabled: true
+      additionalLabels:
+        app: prometheus-operator
+        release: prometheus
+      rules:
+        - alert: BlackboxSslCertificateWillExpireSoon
+          expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 3
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            description: |-
+              The SSL certificate for {{"{{ $labels.target }}"}} will expire in less than 3 days
+        - alert: BlackboxSslCertificateExpired
+          expr: probe_ssl_earliest_cert_expiry - time() <= 0
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            description: |-
+              The SSL certificate for {{"{{ $labels.target }}"}} has expired
+        - alert: BlackboxProbeFailed
+          expr: probe_success == 0
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            description: |-
+              The host {{"{{ $labels.target }}"}} is currently unreachable
