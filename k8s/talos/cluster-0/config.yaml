@@ -38,6 +38,18 @@ controlplane:
         feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
 
     - op: add
+      path: /machine/install/extraKernelArgs
+      value:
+        - "talos.logging.kernel=udp://10.45.0.2:6050/"
+
+    - op: add
+      path: /machine/logging
+      value:
+        destinations:
+          - endpoint: "udp://10.45.0.2:6051/"
+            format: json_lines
+
+    - op: add
       path: /machine/time
       value:
         disabled: false
@@ -58,6 +70,26 @@ controlplane:
       path: /cluster/apiServer/certSANs
       value:
         - cluster-0.${domains.hardware}
+
+    - op: add
+      path: /cluster/apiServer/extraArgs
+      value:
+        feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+
+    - op: add
+      path: /cluster/controllerManager/extraArgs
+      value:
+        feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+
+    - op: add
+      path: /cluster/proxy/extraArgs
+      value:
+        feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+
+    - op: add
+      path: /cluster/scheduler/extraArgs
+      value:
+        feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
 
     - op: add
       path: /machine/certSANs
@@ -82,6 +114,7 @@ workers:
       path: /machine/kubelet/extraArgs
       value:
         rotate-server-certificates: "true"
+        feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
 
     - op: add
       path: /machine/time
@@ -101,3 +134,15 @@ workers:
       value:
         - interface: eth0
           dhcp: true
+
+    - op: add
+      path: /machine/install/extraKernelArgs
+      value:
+        - "talos.logging.kernel=udp://10.45.0.2:6050/"
+
+    - op: add
+      path: /machine/logging
+      value:
+        destinations:
+          - endpoint: "udp://10.45.0.2:6051/"
+            format: json_lines

@@ -25,6 +25,9 @@ spec:
 
     role: "Stateless-Aggregator"
 
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: vector-aggregator
+
     podMonitor:
       enabled: true
       jobLabel: vector-aggregator
@@ -67,15 +70,50 @@ spec:
         vector_metrics:
           type: internal_metrics
 
+        talos_kernel_logs:
+          address: 0.0.0.0:6050
+          type: socket
+          mode: udp
+          max_length: 102400
+          decoding:
+            codec: json
+          host_key: __host
+
+        talos_service_logs:
+          address: 0.0.0.0:6051
+          type: socket
+          mode: udp
+          max_length: 102400
+          decoding:
+            codec: json
+          host_key: __host
+
       # Transformations
       transforms:
-        kubernetes_logs_remap:
+        talos_kernel_logs_xform:
           type: remap
           inputs:
-            - kubernetes_logs
-          source: |
-            # Standardize 'app' index
-            .custom_app_name = .pod_labels."app.kubernetes.io/name" || .pod_labels.app || .pod_labels."k8s-app" || "unknown"
+            - talos_kernel_logs
+          source: |-
+            .__host, .err = replace(.__host, "10.1.1.21", "anvil")
+            .__host = replace(.__host, "10.1.1.22", "blitz")
+            .__host = replace(.__host, "10.1.1.23", "cannon")
+            .__host = replace(.__host, "10.1.1.31", "delta")
+            .__host = replace(.__host, "10.1.1.32", "enigma")
+            .__host = replace(.__host, "10.1.1.33", "felix")
+            .__host = replace(.__host, "10.1.1.41", "goblin")
+        talos_service_logs_xform:
+          type: remap
+          inputs:
+            - talos_service_logs
+          source: |-
+            .__host, .err = replace(.__host, "10.1.1.21", "anvil")
+            .__host = replace(.__host, "10.1.1.22", "blitz")
+            .__host = replace(.__host, "10.1.1.23", "cannon")
+            .__host = replace(.__host, "10.1.1.31", "delta")
+            .__host = replace(.__host, "10.1.1.32", "enigma")
+            .__host = replace(.__host, "10.1.1.33", "felix")
+            .__host = replace(.__host, "10.1.1.41", "goblin")
 
       # Sinks
       sinks:
@@ -87,17 +125,25 @@ spec:
           encoding:
             codec: json
           batch:
-            max_bytes: 2049000
-          out_of_order_action: accept
+            max_bytes: 400000
+          out_of_order_action: rewrite_timestamp
           remove_label_fields: true
           remove_timestamp: true
           labels:
-            app: >-
-              {{`{{ custom_app_name }}`}}
-            namespace: >-
-              {{`{{ kubernetes.pod_namespace }}`}}
-            node: >-
-              {{`{{ kubernetes.pod_node_name }}`}}
+            k8s_app: >-
+              {{`{{ "kubernetes.pod_labels.app\.kubernetes\.io/name" }}`}}
+            k8s_container: >-
+              {{`{{ "kubernetes.container_name" }}`}}
+            k8s_filename: >-
+              {{`{{ "kubernetes.file" }}`}}
+            k8s_instance: >-
+              {{`{{ "kubernetes.pod_labels.app\.kubernetes\.io/instance" }}`}}
+            k8s_namespace: >-
+              {{`{{ "kubernetes.pod_namespace" }}`}}
+            k8s_node: >-
+              {{`{{ "kubernetes.pod_node_name" }}`}}
+            k8s_pod: >-
+              {{`{{ "kubernetes.pod_name" }}`}}
 
         loki_vyos:
           type: loki
@@ -131,11 +177,41 @@ spec:
             hostname: >-
               {{`{{ host }}`}}
 
-        prometheus_sink:
-          type: prometheus_exporter
+        talos_kernel:
+          type: loki
           inputs:
-            - vector_metrics
-          address: 0.0.0.0:9090
+            - talos_kernel_logs_xform
+          endpoint: http://loki.system-monitoring:3100
+          encoding:
+            codec: json
+            except_fields:
+              - __host
+          batch:
+            max_bytes: 1048576
+          out_of_order_action: rewrite_timestamp
+          labels:
+            hostname: >-
+              {{`{{ __host }}`}}
+            service: >-
+              {{`{{ facility }}`}}
+
+        talos_service:
+          type: loki
+          inputs:
+            - talos_service_logs_xform
+          endpoint: http://loki.system-monitoring:3100
+          encoding:
+            codec: json
+            except_fields:
+              - __host
+          batch:
+            max_bytes: 400000
+          out_of_order_action: rewrite_timestamp
+          labels:
+            hostname: >-
+              {{`{{ __host }}`}}
+            service: >-
+              {{`{{ "talos-service" }}`}}
 
   postRenderers:
     - kustomize:
