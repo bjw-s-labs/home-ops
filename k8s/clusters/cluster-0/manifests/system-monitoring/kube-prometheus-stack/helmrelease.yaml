@@ -171,6 +171,15 @@ spec:
             name: thanos-objstore-secret
             key: objstore.yml
 
+        additionalScrapeConfigs:
+          - job_name: node-exporter
+            scrape_interval: 1m
+            scrape_timeout: 10s
+            honor_timestamps: true
+            static_configs:
+              - targets:
+                  - "pikvm.${HARDWARE_DOMAIN}:9100"
+
     ###
     ### Alertmanager values
     ###
