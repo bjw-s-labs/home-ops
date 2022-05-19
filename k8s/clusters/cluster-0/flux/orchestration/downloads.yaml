@@ -130,7 +130,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: downloads-trash-updater
+  name: downloads-recyclarr
   namespace: flux-system
 spec:
   dependsOn:
@@ -138,7 +138,7 @@ spec:
     - name: downloads-sonarr
     - name: downloads-radarr
   interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/downloads/trash-updater"
+  path: "./k8s/clusters/cluster-0/manifests/downloads/recyclarr"
   prune: true
   wait: true
   sourceRef:
