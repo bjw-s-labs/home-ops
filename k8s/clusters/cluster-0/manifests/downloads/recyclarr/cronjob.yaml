@@ -17,7 +17,7 @@ spec:
 
           initContainers:
             - name: render-config
-              image: ghcr.io/k8s-at-home/recyclarr:v2.0.0
+              image: ghcr.io/k8s-at-home/recyclarr:v2.0.1
               env:
                 - name: RADARR_API_KEY
                   valueFrom:
@@ -42,14 +42,11 @@ spec:
 
           containers:
             - name: recyclarr-sonarr
-              image: ghcr.io/k8s-at-home/recyclarr:v2.0.0
+              image: ghcr.io/k8s-at-home/recyclarr:v2.0.1
               imagePullPolicy: IfNotPresent
               env:
                 - name: TZ
                   value: "${TIMEZONE}"
-                # TODO: Remove once new version is pushed
-                - name: XDG_CONFIG_HOME
-                  value: /config
               command:
                 - /app/recyclarr
               args:
@@ -63,14 +60,11 @@ spec:
                   readOnly: true
 
             - name: recyclarr-radarr
-              image: ghcr.io/k8s-at-home/recyclarr:v2.0.0
+              image: ghcr.io/k8s-at-home/recyclarr:v2.0.1
               imagePullPolicy: IfNotPresent
               env:
                 - name: TZ
                   value: "${TIMEZONE}"
-                # TODO: Remove once new version is pushed
-                - name: XDG_CONFIG_HOME
-                  value: /config
               command:
                 - /app/recyclarr
               args:
