@@ -37,3 +37,25 @@ provider "registry.terraform.io/foltik/vyos" {
     "zh:f376900c2d1c20f876090e361d92ed49ca412ad92412f6e48df9a58da19edb1a",
   ]
 }
+
+provider "registry.terraform.io/tenstad/remote" {
+  version     = "0.0.24"
+  constraints = "0.0.24"
+  hashes = [
+    "h1:74uLkgbszKJM4t+BOCK0G41sEJII6+2MExVO8RUulac=",
+    "zh:023b33665cb990d20781c66791fad860be6fdf62be14b53e1fcd0a1219393800",
+    "zh:06e899417a6e3edada0326bee9ecff5ca6f45ac90e0d9af8cbe0df9927bb1d18",
+    "zh:132705ef823d7a7ac28ed23bbb355dc23fef01123fc896d1c05c5beed176218f",
+    "zh:26e1dc590a670d3faebced51c732fe73370688760dcbbfd8a79de871b812adf8",
+    "zh:4137bfd779324d8579a91a8836a77e7ccbf59a19ea5eb24b2ac128eec2364780",
+    "zh:5f01a98a2b2697ce4c73d2c663314c7554c1ad539946f3f9296affca7967c599",
+    "zh:7da919517ada72f677fae8902f2ead190bcbc677666db7603d52be4d06deb9cf",
+    "zh:85773c1a2dd5a3b14d2daf05fdee98644cdb3c81bc0636b2d7b44eebb3f4ca0b",
+    "zh:a0c394c9d41e6a60b7e337cc10faffc220ffc5de13c41e8c75c091ea9729a09d",
+    "zh:c0be880a97eabc22b1350c581577823724ca2061f39d391aa7736936539a45a9",
+    "zh:d0fd999501072060a1baf5ac5e058aa60c493cf052b21781663dc5a5b465625c",
+    "zh:db8a37c9340440d33deb57d99784a919e0f543e5c5f8b092245d3366d087d75d",
+    "zh:f569b65999264a9416862bca5cd2a6177d94ccb0424f3a4ef424428912b9cb3c",
+    "zh:fec832dda56f6b2bd3b7c4848143b7d6d0c696be749dcab5a63bc4d6b1ccb4ed",
+  ]
+}
