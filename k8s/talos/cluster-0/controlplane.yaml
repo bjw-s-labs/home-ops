@@ -309,7 +309,7 @@ cluster:
   secret: ${cluster.secret} # Shared secret of cluster (base64 encoded random 32 bytes).
   # Provides control plane specific configuration options.
   controlPlane:
-    endpoint: https://10.5.0.2:6443 # Endpoint is the canonical controlplane endpoint, which can be an IP address or a DNS hostname.
+    endpoint: "https://cluster-0.${domains.hardware}:6443" # Endpoint is the canonical controlplane endpoint, which can be an IP address or a DNS hostname.
   clusterName: cluster-0 # Configures the cluster's name.
   # Provides cluster specific network configuration options.
   network:
