@@ -15,6 +15,11 @@ terraform {
       source  = "carlpett/sops"
       version = "0.6.3"
     }
+
+    remote = {
+      source  = "tenstad/remote"
+      version = "0.0.24"
+    }
   }
 }
 
@@ -28,6 +33,7 @@ module "config" {
   config = local.config
 
   providers = {
-    vyos = vyos
+    vyos   = vyos.vyos
+    remote = remote.vyos
   }
 }
