@@ -9,7 +9,7 @@ metadata:
     policies.kyverno.io/description: >-
       The ndots value controls where DNS lookups are first performed in a cluster
       and needs to be set to a lower value than the default of 5 in some cases.
-      This policy mutates all Pods to add the ndots option with a value of 1.
+      This policy mutates all Pods to add the ndots option with a value of 2.
 spec:
   rules:
     - name: add-ndots
@@ -23,4 +23,4 @@ spec:
             dnsConfig:
               options:
                 - name: ndots
-                  value: "3"
+                  value: "2"
