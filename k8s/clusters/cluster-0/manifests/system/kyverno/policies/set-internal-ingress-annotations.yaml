@@ -3,6 +3,12 @@ apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
   name: set-internal-ingress-annotations
+  annotations:
+    policies.kyverno.io/title: Set internal ingress annotations
+    policies.kyverno.io/subject: Ingress
+    policies.kyverno.io/description: >-
+      This policy sets an explicit RFC1918 whitelist for any Ingress
+      that has not been marked as publically exposed.
 spec:
   rules:
     - name: set-internal-ingress-annotations
