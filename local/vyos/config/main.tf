@@ -4,5 +4,10 @@ terraform {
       source  = "Foltik/vyos"
       version = "0.3.1"
     }
+
+    remote = {
+      source = "tenstad/remote"
+      version = "0.0.24"
+    }
   }
 }
