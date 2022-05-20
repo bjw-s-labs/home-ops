@@ -28,7 +28,7 @@ nodes:
     ip_address: 10.1.1.41
 
 controlplane:
-  endpoint: "https://10.5.0.2:6443"
+  endpoint: "https://cluster-0.${domains.hardware}:6443"
 
   configPatches:
     - op: add
@@ -63,12 +63,20 @@ controlplane:
           dhcp: true
 
     - op: add
+      path: /machine/network/extraHostEntries
+      value:
+        - ip: ${cluster.endpointIP}
+          aliases:
+            - cluster-0.${domains.hardware}
+
+    - op: add
       path: /cluster/proxy/disabled
       value: true
 
     - op: add
       path: /cluster/apiServer/certSANs
       value:
+        - ${cluster.endpointIP}
         - ${builtin.hostname}
         - ${builtin.hostname}.${domains.hardware}
         - cluster-0.${domains.hardware}
@@ -96,6 +104,7 @@ controlplane:
     - op: add
       path: /machine/certSANs
       value:
+        - ${cluster.endpointIP}
         - ${builtin.hostname}.${domains.hardware}
         - cluster-0.${domains.hardware}
 
@@ -143,6 +152,13 @@ workers:
       value:
         - interface: eth0
           dhcp: true
+
+    - op: add
+      path: /machine/network/extraHostEntries
+      value:
+        - ip: ${cluster.endpointIP}
+          aliases:
+            - cluster-0.${domains.hardware}
 
     - op: add
       path: /machine/install/extraKernelArgs

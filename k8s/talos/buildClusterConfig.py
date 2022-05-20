@@ -1,3 +1,4 @@
+from ipaddress import ip_address
 import jsonpatch
 import re
 import subprocess
@@ -5,8 +6,9 @@ import sys
 import typer
 import yaml
 
-from pathlib import Path
 from loguru import logger
+from pathlib import Path
+from typing import List
 
 app = typer.Typer(add_completion=False)
 
@@ -58,6 +60,24 @@ def process_node(
     return result
 
 
+def _deep_merge(dict1: dict, dict2: dict) -> dict:
+    """ Merges two dicts. If keys are conflicting, dict2 is preferred. """
+    def _val(v1, v2):
+        if isinstance(v1, dict) and isinstance(v2, dict):
+            return _deep_merge(v1, v2)
+        return v2 or v1
+    return {k: _val(dict1.get(k), dict2.get(k)) for k in dict1.keys() | dict2.keys()}
+
+
+def _load_variables(variable_files: List[Path]) -> dict:
+    variables = dict()
+    for variables_file in variable_files:
+        if variables_file.exists():
+            variables = _deep_merge(variables, _load_variables_from_file(variables_file))
+
+    return variables
+
+
 def _load_variables_from_file(path: Path) -> dict:
     file_parts = path.name.split(".")
     if file_parts[-2] == "sops":
@@ -70,8 +90,7 @@ def _load_variables_from_file(path: Path) -> dict:
 
         data = sops_result.stdout
     else:
-        with open(path, "r") as fh:
-            data = fh.readlines()
+        data = path.read_text()
 
     output = yaml.safe_load(data)
     return output
@@ -111,7 +130,7 @@ def main(
     output_folder: Path = typer.Option(
         None, help="Folder where the output should be written."
     ),
-    variables_file: Path = typer.Option(
+    variables_file: List[Path] = typer.Option(
         None, help="File containing variables to load."
     ),
     debug: bool = False,
@@ -165,13 +184,12 @@ def main(
         )
         template_taloscfg.unlink()
 
-    variables = None
-    if variables_file and variables_file.exists():
-        variables = _load_variables_from_file(variables_file)
+    variables = _load_variables(variables_file)
 
     # Render nodes
     for node in cluster_config["nodes"]:
         hostname = node["hostname"]
+        node_ip_address = node["ip_address"]
         if "domain" in node and node["domain"]:
             domain = node["domain"]
         else:
@@ -188,12 +206,14 @@ def main(
         result = process_node(hostname, domain, template, config_patches)
         if variables:
             variables["builtin"] = dict(
-                hostname = hostname
+                hostname = hostname,
+                ip_address = node_ip_address
             )
         else:
             variables = dict(
                 builtin = dict (
-                    hostname = hostname
+                    hostname = hostname,
+                    ip_address = node_ip_address
                 )
             )
 
