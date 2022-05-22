@@ -48,23 +48,28 @@ spec:
             sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/calibreweb/nord.css"></head>';
             sub_filter_once on;
         hosts:
-          - host: &host "calibre-web.${INGRESS_DOMAIN}"
+          - host: &host-main "calibre-web.${INGRESS_DOMAIN}"
             paths:
               - path: /
         tls:
           - secretName: tls.calibre-web
             hosts:
-              - *host
+              - *host-main
 
       kobo:
         enabled: true
         ingressClassName: "nginx"
         annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
         hosts:
-          - host: "calibre-kobo.${INGRESS_DOMAIN}"
+          - host: &host-kobo "calibre-kobo.${INGRESS_DOMAIN}"
             paths:
               - path: /kobo/
+        tls:
+          - secretName: tls.calibre-web-kobo
+            hosts:
+              - *host-kobo
 
     resources:
       requests:
