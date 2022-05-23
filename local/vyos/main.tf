@@ -9,7 +9,7 @@ terraform {
   required_providers {
     vyos = {
       source  = "Foltik/vyos"
-      version = "0.3.2"
+      version = "0.3.3"
     }
     sops = {
       source  = "carlpett/sops"
