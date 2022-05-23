@@ -5,7 +5,7 @@ resource "vyos_config" "system-hostname" {
 
 resource "vyos_config" "system-domain_name" {
   key   = "system domain-name"
-  value = var.config.domain_name
+  value = sensitive(var.config.domain_name)
 }
 
 resource "vyos_config" "system-name_server" {
