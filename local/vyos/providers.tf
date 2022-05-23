@@ -1,7 +1,7 @@
 provider "vyos" {
   alias = "vyos"
 
-  url = data.sops_file.vyos_secrets.data["api.url"]
+  url = "https://${local.config.fqdn}:${local.config.api.port}"
   key = data.sops_file.vyos_secrets.data["api.key"]
 }
 
@@ -11,9 +11,9 @@ provider "remote" {
   max_sessions = 2
 
   conn {
-    host             = data.sops_file.vyos_secrets.data["ssh.host"]
-    port             = 22
-    user             = data.sops_file.vyos_secrets.data["ssh.user"]
+    host             = local.config.fqdn
+    port             = local.config.ssh.port
+    user             = local.config.ssh.user
     private_key_path = pathexpand("~/.ssh/identities/personal/id_personal")
 
     sudo = true
