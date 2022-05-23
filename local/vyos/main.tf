@@ -31,6 +31,7 @@ module "config" {
   source = "./config"
 
   config = local.config
+  networks = local.networks
 
   providers = {
     vyos   = vyos.vyos
