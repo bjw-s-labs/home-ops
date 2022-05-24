@@ -61,7 +61,11 @@
     },
     // Generic Docker image Regex manager
     {
-      fileMatch: ["k8s/clusters/.+\\.yaml$", "k8s/global/.+\\.yaml$"],
+      fileMatch: [
+        "k8s/clusters/.+\\.yaml$",
+        "k8s/global/.+\\.yaml$",
+        "local/vyos/.+settings\\.yaml$"
+      ],
       matchStrings: [
         "# renovate: docker-image( registryUrl=(?<registryUrl>.*?))?( versioning=(?<versioning>.*=?))?\n .*: (?<depName>.*?):(?<currentValue>.*=?)",
       ],
