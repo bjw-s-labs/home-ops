@@ -29,6 +29,6 @@ resource "vyos_config_block_tree" "interface-rescue" {
   path = "interfaces ethernet eth2"
   configs = {
     "address"     = "${cidrhost(var.networks.rescue, 1)}/24"
-    "description" = "LAN"
+    "description" = "RESCUE"
   }
 }

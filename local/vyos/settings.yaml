@@ -1,5 +1,5 @@
 ---
-# Variables referring to "${secrets}" come from secrets.sops.yaml
+# Variables referring to "{secrets}" come from secrets.sops.yaml
 
 config:
   hostname: "gateway"
@@ -23,6 +23,11 @@ config:
       - name: personal
         type: ssh-ed25519
         key: ${secrets.ssh.keys.personal}
+
+  containers:
+    coredns:
+      # renovate: docker-image
+      image: ghcr.io/k8s-at-home/coredns:v1.9.1
 
 networks:
   lan: "10.1.0.0/24"
