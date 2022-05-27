@@ -1,0 +1,99 @@
+---
+config:
+  hostname: "gateway"
+  domain_name: "${domains.hardware}"
+  fqdn: "gateway.${domains.hardware}"
+  upstream_name_server: "1.1.1.1"
+  time_zone: "Europe/Amsterdam"
+
+  api:
+    listen_address: "0.0.0.0"
+    port: 8443
+    keys:
+      terraform:
+        ${secrets.api.key}
+
+  ssh:
+    user: ${secrets.ssh.user}
+    port: 22
+    disable_password_login: true
+    keys:
+      - name: personal
+        type: ssh-ed25519
+        key: ${secrets.ssh.keys.personal}
+
+  interfaces:
+    wan:
+      device: eth0
+    lan:
+      device: eth1
+    rescue:
+      device: eth2
+    trusted:
+      device: eth1.20
+    iot:
+      device: eth1.40
+    video:
+      device: eth1.50
+    wireguard_trusted:
+      device: wg01
+
+  nat:
+    port-forwards:
+      - description: HTTPS
+        protocol: tcp
+        interface: wan
+        port: 443
+        address: ${address_book.services.k8s_ingress.ipv4_addr}
+      - description: HTTP
+        protocol: tcp
+        interface: wan
+        port: 80
+        address: ${address_book.services.k8s_ingress.ipv4_addr}
+      - description: Force DNS for IoT
+        port: 53
+        protocol: tcp_udp
+        interface: iot
+        destinationAddress: "!${address_book.services.vyos_adguard_home.ipv4_addr}"
+        address: ${address_book.services.vyos_adguard_home.ipv4_addr}
+      - description: Force DNS for Video
+        port: 53
+        protocol: tcp_udp
+        interface: video
+        destinationAddress: "!${address_book.services.vyos_adguard_home.ipv4_addr}"
+        address: ${address_book.services.vyos_adguard_home.ipv4_addr}
+      - description: Force NTP for LAN
+        port: 123
+        protocol: udp
+        interface: lan
+        destinationAddress: "!${cidrhost(networks.lan, 1)}"
+        address: "${cidrhost(networks.lan, 1)}"
+      - description: Force NTP for Trusted
+        port: 123
+        protocol: udp
+        interface: trusted
+        destinationAddress: "!${cidrhost(networks.trusted, 1)}"
+        address: "${cidrhost(networks.trusted, 1)}"
+      - description: Force NTP for IoT
+        port: 123
+        protocol: udp
+        interface: iot
+        destinationAddress: "!${cidrhost(networks.iot, 1)}"
+        address: "${cidrhost(networks.iot, 1)}"
+      - description: Force NTP for Video
+        port: 123
+        protocol: udp
+        interface: video
+        destinationAddress: "!${cidrhost(networks.video, 1)}"
+        address: "${cidrhost(networks.video, 1)}"
+      - description: Force NTP for Wireguard Trusted
+        port: 123
+        protocol: udp
+        interface: wireguard_trusted
+        destinationAddress: "!${cidrhost(networks.wireguard_trusted, 1)}"
+        address: "${cidrhost(networks.wireguard_trusted, 1)}"
+
+  containers:
+    coredns:
+      # renovate: docker-image
+      image: ghcr.io/k8s-at-home/coredns:v1.9.2

@@ -27,11 +27,17 @@ data "sops_file" "vyos_secrets" {
   source_file = "secret.sops.yaml"
 }
 
+data "sops_file" "domains" {
+  source_file = pathexpand("${path.module}/../domains.sops.yaml")
+}
+
 module "config" {
   source = "./config"
 
-  config = local.config
-  networks = local.networks
+  config       = local.config
+  networks     = local.networks
+  domains      = local.domains
+  address_book = local.address_book
 
   providers = {
     vyos   = vyos.vyos

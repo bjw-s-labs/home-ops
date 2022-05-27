@@ -1,0 +1,443 @@
+---
+# ----------------
+# Devices
+# ----------------
+hosts:
+  # ----------------------
+  # LAN
+  # ----------------------
+  gateway:
+    network: lan
+    ipv4_hostid: 1
+  switch01:
+    mac_addr: e0:63:da:5c:f3:3d
+    network: lan
+    ipv4_hostid: 11
+    groups:
+      - unifi_devices
+  switch02:
+    mac_addr: 68:d7:9a:3c:b0:75
+    network: lan
+    ipv4_hostid: 12
+    groups:
+      - unifi_devices
+  switch03:
+    mac_addr: e0:63:da:85:4b:0f
+    network: lan
+    ipv4_hostid: 13
+    groups:
+      - unifi_devices
+  switch04:
+    mac_addr: 74:83:c2:0c:19:90
+    network: lan
+    ipv4_hostid: 14
+    groups:
+      - unifi_devices
+  ap01:
+    mac_addr: 44:d9:e7:fc:21:f9
+    network: lan
+    ipv4_hostid: 21
+    groups:
+      - unifi_devices
+  ap02:
+    mac_addr: fc:ec:da:b6:27:87
+    network: lan
+    ipv4_hostid: 22
+    groups:
+      - unifi_devices
+  ap03:
+    mac_addr: e0:63:da:ac:d4:3e
+    network: lan
+    ipv4_hostid: 23
+    groups:
+      - unifi_devices
+  ap04:
+    mac_addr: 80:2a:a8:d3:0b:b3
+    network: lan
+    ipv4_hostid: 24
+    groups:
+      - unifi_devices
+
+  # ----------------------
+  # Servers
+  # ----------------------
+  librarium:
+    mac_addr: 00:11:32:9a:e3:5f
+    network: servers
+    ipv4_hostid: 11
+    aliases:
+      - nas.bjw-s.tech
+    groups:
+      - nas
+  anvil:
+    mac_addr: 00:23:24:d6:93:cb
+    network: servers
+    ipv4_hostid: 21
+    aliases:
+      - master1.cluster-0.bjw-s.tech
+    groups:
+      - k8s_nodes
+  blitz:
+    mac_addr: 00:23:24:d6:93:52
+    network: servers
+    ipv4_hostid: 22
+    aliases:
+      - master2.cluster-0.bjw-s.tech
+    groups:
+      - k8s_nodes
+  cannon:
+    mac_addr: 00:23:24:d5:8b:00
+    network: servers
+    ipv4_hostid: 23
+    aliases:
+      - master3.cluster-0.bjw-s.tech
+    groups:
+      - k8s_nodes
+  delta:
+    # mac_addr: 94:c6:91:a6:84:87 # Internal NIC
+    mac_addr: 00:e0:4c:68:18:23 # USB NIC
+    network: servers
+    ipv4_hostid: 31
+    aliases:
+      - worker1.cluster-0.bjw-s.tech
+    groups:
+      - k8s_nodes
+  enigma:
+    # mac_addr: 1c:69:7a:64:f3:63 # Internal NIC
+    mac_addr: 00:e0:4c:68:18:2d # USB NIC
+    network: servers
+    ipv4_hostid: 32
+    aliases:
+      - worker2.cluster-0.bjw-s.tech
+    groups:
+      - k8s_nodes
+  felix:
+    # mac_addr: 1c:69:7a:68:d2:c1 # Internal NIC
+    mac_addr: 00:e0:4c:68:02:b1 # USB NIC
+    network: servers
+    ipv4_hostid: 33
+    aliases:
+      - worker3.cluster-0.bjw-s.tech
+    groups:
+      - k8s_nodes
+  goblin:
+    # mac_addr: 44:8a:5b:dd:8c:9f # Internal NIC
+    mac_addr: 00:e0:4c:08:25:64 # USB NIC
+    network: servers
+    ipv4_hostid: 41
+    aliases:
+      - worker4.cluster-0.bjw-s.tech
+    groups:
+      - k8s_nodes
+
+  # ----------------------
+  # Trusted
+  # ----------------------
+  delphi:
+    mac_addr: f8:4d:89:7a:db:8b
+    network: trusted
+    ipv4_hostid: 21
+    aliases:
+      - bernd-macbook.bjw-s.tech
+    groups:
+      - sonos_controllers
+      - plex_clients
+  manyie-macbook:
+    mac_addr: 8c:85:90:18:42:38
+    network: trusted
+    ipv4_hostid: 22
+  bernd-iphone:
+    mac_addr: 24:5e:48:98:39:1c
+    network: trusted
+    ipv4_hostid: 31
+    groups:
+      - ios_devices
+      - plex_clients
+      - sonos_controllers
+  bernd-ipad:
+    mac_addr: 54:62:e2:53:72:1b
+    network: trusted
+    ipv4_hostid: 32
+    groups:
+      - ios_devices
+      - plex_clients
+      - sonos_controllers
+  manyie-iphone:
+    mac_addr: 44:f2:1b:28:cf:e9
+    network: trusted
+    ipv4_hostid: 33
+    groups:
+      - ios_devices
+      - plex_clients
+      - sonos_controllers
+  manyie-ipad:
+    mac_addr: 94:bf:2d:f0:3f:c3
+    network: trusted
+    ipv4_hostid: 34
+    groups:
+      - ios_devices
+      - plex_clients
+      - sonos_controllers
+  eva-ipad:
+    mac_addr: aa:ab:96:ce:f8:03
+    network: trusted
+    ipv4_hostid: 35
+    groups:
+      - ios_devices
+      - plex_clients
+  kitchen-ipad:
+    mac_addr: 34:e2:fd:ac:7c:fa
+    network: trusted
+    ipv4_hostid: 36
+    groups:
+      - ios_devices
+      - plex_clients
+      - sonos_controllers
+
+  # ----------------------
+  # IOT
+  # ----------------------
+  livingroom-nest:
+    mac_addr: 64:16:66:9a:e0:51
+    network: iot
+    ipv4_hostid: 11
+  kitchen-oven:
+    mac_addr: 68:a4:0e:34:fc:6f
+    network: iot
+    ipv4_hostid: 12
+  kitchen-coffeemaker:
+    mac_addr: 68:a4:0e:35:43:72
+    network: iot
+    ipv4_hostid: 13
+  livingroom-tv:
+    mac_addr: 74:40:be:0d:54:9a
+    network: iot
+    ipv4_hostid: 14
+  livingroom-harmony-hub:
+    mac_addr: 00:04:20:fd:2d:e4
+    network: iot
+    ipv4_hostid: 15
+  livingroom-shield:
+    mac_addr: 48:b0:2d:2d:4b:cc
+    network: iot
+    ipv4_hostid: 16
+    groups:
+      - plex_clients
+      - android_tv_players
+  livingroom-receiver:
+    mac_addr: 00:05:cd:82:29:21
+    network: iot
+    ipv4_hostid: 17
+  livingroom-vacuum:
+    mac_addr: 50:ec:50:1d:37:3c
+    network: iot
+    ipv4_hostid: 18
+  livingroom-airpurifier:
+    mac_addr: 78:11:dc:bc:eb:de
+    network: iot
+    ipv4_hostid: 19
+  livingroom-nintendo-switch:
+    mac_addr: 98:41:5c:b2:98:2e
+    network: iot
+    ipv4_hostid: 20
+  garden-wlanthermo:
+    mac_addr: 8c:aa:b5:c1:ce:c8
+    network: iot
+    ipv4_hostid: 21
+    groups:
+      - esp
+  upstairs-vacuum:
+    mac_addr: 7c:49:eb:94:4a:58
+    network: iot
+    ipv4_hostid: 22
+  livingroom-mediabox:
+    mac_addr: 18:9c:27:3f:52:4c
+    network: iot
+    ipv4_hostid: 31
+  garden-sunscreen-esp:
+    mac_addr: 80:7d:3a:74:4a:30
+    network: iot
+    ipv4_hostid: 41
+    groups:
+      - esp
+  backyard-shed-esp:
+    mac_addr: b4:e6:2d:59:de:0c
+    network: iot
+    ipv4_hostid: 42
+    groups:
+      - esp
+  hallway-doorbell-chime-esp:
+    mac_addr: cc:50:e3:55:c4:dc
+    network: iot
+    ipv4_hostid: 43
+    groups:
+      - esp
+  hallway-p1reader-esp:
+    mac_addr: c4:5b:be:49:4c:c8
+    network: iot
+    ipv4_hostid: 45
+    aliases:
+      - k8s-worker-a.warhammer.lan
+    groups:
+      - esp
+  hallway-zigbee-adapter:
+    mac_addr: 94:b9:7e:6b:bc:03
+    network: iot
+    ipv4_hostid: 46
+    groups:
+      - esp
+  bernd-ereader:
+    mac_addr: 58:b0:d4:6e:53:29
+    network: iot
+    ipv4_hostid: 51
+    groups:
+      - ereaders
+  manyie-ereader:
+    mac_addr: 58:b0:d4:67:f5:74
+    network: iot
+    ipv4_hostid: 52
+    groups:
+      - ereaders
+  garage-tablet:
+    mac_addr: 4c:ef:c0:68:91:ba
+    network: iot
+    ipv4_hostid: 53
+    groups:
+      - wall_displays
+  hallway-tablet:
+    mac_addr: 4c:ef:c0:00:50:aa
+    network: iot
+    ipv4_hostid: 54
+    groups:
+      - wall_displays
+  study-printer:
+    mac_addr: 80:2b:f9:d4:3a:be
+    network: iot
+    ipv4_hostid: 55
+    groups:
+      - printers
+      - scanners
+  horus:
+    mac_addr: b8:27:eb:b2:09:b0
+    network: iot
+    ipv4_hostid: 56
+    aliases:
+      - fluiddpi.bjw-s.tech
+    groups:
+      - 3d_printer_controllers
+  athena: # Pi Zero W Downstairs
+    mac_addr: b8:27:eb:56:d4:b5
+    network: iot
+    ipv4_hostid: 57
+    groups:
+      - esp
+  bruno: # Pi Zero W Upstairs
+    mac_addr: b8:27:eb:75:6f:77
+    network: iot
+    ipv4_hostid: 58
+    groups:
+      - esp
+  carmen: # Pi Zero W Attic
+    mac_addr: b8:27:eb:60:64:85
+    network: iot
+    ipv4_hostid: 59
+    groups:
+      - esp
+  diego: # Pi 4 PiKVM
+    mac_addr: dc:a6:32:93:f5:83
+    network: iot
+    ipv4_hostid: 60
+    aliases:
+      - pikvm.bjw-s.tech
+    groups:
+      - vector_journald_allowed
+  kitchen-sonos:
+    mac_addr: 48:a6:b8:d3:6c:f4
+    network: iot
+    ipv4_hostid: 61
+    groups:
+      - sonos_players
+      - plex_clients
+  livingroom-sonos:
+    mac_addr: 94:9f:3e:04:88:2a
+    network: iot
+    ipv4_hostid: 62
+    groups:
+      - sonos_players
+      - plex_clients
+  study-upstairs-sonos:
+    mac_addr: 48:a6:b8:dc:6c:7e
+    network: iot
+    ipv4_hostid: 63
+    groups:
+      - sonos_players
+      - plex_clients
+  bedroom-eva-sonos:
+    mac_addr: 34:7e:5c:3c:d2:72
+    network: iot
+    ipv4_hostid: 64
+    groups:
+      - sonos_players
+      - plex_clients
+  study-sonos:
+    mac_addr: b8:e9:37:55:d8:6c
+    network: iot
+    ipv4_hostid: 65
+    groups:
+      - sonos_players
+      - plex_clients
+  livingroom-receiver-sonos:
+    mac_addr: b8:e9:37:9b:f5:c6
+    network: iot
+    ipv4_hostid: 66
+    groups:
+      - sonos_players
+      - plex_clients
+  # ----------------------
+  # Video
+  # ----------------------
+  driveway-camera-doorbell:
+    mac_addr: 9c:8e:cd:30:a1:e6
+    network: video
+    ipv4_hostid: 12
+  # ----------------------
+  # Guest
+  # ----------------------
+  manyie-work-laptop:
+    mac_addr: 14:f6:d8:32:46:41
+    network: guest
+    ipv4_hostid: 11
+    groups:
+      - printer_allowed
+
+# -------------------
+# (Virtual) Services
+# -------------------
+services:
+  k8s_unifi:
+    ipv4_addr: 10.45.0.4
+  k8s_ingress:
+    ipv4_addr: 10.45.0.1
+  k8s_vector_aggregator:
+    ipv4_addr: 10.45.0.2
+  k8s_hass:
+    ipv4_addr: 10.45.0.11
+  k8s_plex:
+    ipv4_addr: 10.45.0.20
+  k8s_mqtt:
+    ipv4_addr: 10.45.0.10
+  k8s_api:
+    ipv4_addr: 10.5.0.2
+  vyos_coredns:
+    ipv4_addr: 10.5.0.3
+  vyos_adguard_home:
+    ipv4_addr: 10.5.0.6
+
+# -----------------------
+# Manual static mappings
+# -----------------------
+static_mappings:
+  - hostname: unifi
+    service: k8s_unifi
+  - hostname: cluster-0.bjw-s.tech
+    service: k8s_api
