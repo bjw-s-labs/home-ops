@@ -1,5 +1,5 @@
 resource "vyos_config_block" "vyos-ssh-keys" {
-  for_each = {for key in var.config.ssh.keys:  key.name => key}
+  for_each = { for key in var.config.ssh.keys : key.name => key }
 
   path = "system login user vyos authentication public-keys ${each.key}"
   configs = {

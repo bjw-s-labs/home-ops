@@ -1,0 +1,66 @@
+(common) {
+  errors
+  log error
+  reload
+  loadbalance
+  cache
+  loop
+  local
+
+  prometheus :9153
+}
+
+(local_hosts) {
+  hosts /config/hosts {
+    ttl 1
+    reload 5s
+    fallthrough
+  }
+}
+
+(local_hosts_without_fallthrough) {
+  hosts /config/hosts {
+    ttl 1
+    reload 5s
+  }
+}
+
+(k8s_gateway) {
+  forward . 10.45.0.3:53
+}
+
+. {
+  import common
+  import local_hosts
+
+  forward . tls://1.1.1.1 tls://1.0.0.1 {
+    tls_servername cloudflare-dns.com
+  }
+
+  health {
+    lameduck 5s
+  }
+}
+
+${sensitive(domains.ingress)} {
+  import common
+  import local_hosts
+  import k8s_gateway
+}
+
+${sensitive(domains.family)} {
+  import common
+  import local_hosts
+  import k8s_gateway
+}
+
+${sensitive(domains.personal)} {
+  import common
+  import local_hosts
+  import k8s_gateway
+}
+
+${sensitive(domains.hardware)} {
+  import common
+  import local_hosts_without_fallthrough
+}

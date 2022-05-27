@@ -6,12 +6,15 @@ resource "vyos_config_block_tree" "container_network-services" {
   }
 }
 
-# resource "remote_file" "container-coredns-corefile" {
-#   provider    = remote
-#   path        = "/config/coredns/Corefile"
-#   content     = ""
-#   permissions = "0644"
-# }
+resource "remote_file" "container-coredns-corefile" {
+  provider = remote
+  path     = "/config/coredns/Corefile"
+  content = templatefile(
+    pathexpand("${path.module}/../files/coredns/Corefile.tftpl"),
+    { domains = var.domains }
+  )
+  permissions = "0644"
+}
 
 resource "vyos_config_block_tree" "container-coredns" {
   path = "container name vyos-coredns"
@@ -28,6 +31,6 @@ resource "vyos_config_block_tree" "container-coredns" {
 
   depends_on = [
     vyos_config_block_tree.container_network-services,
-    # remote_file.container-coredns-corefile
+    remote_file.container-coredns-corefile
   ]
 }
