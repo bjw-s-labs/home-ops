@@ -62,6 +62,14 @@ spec:
         interval: 2m
         scrapeTimeout: 30s
       targets:
+        # FluiddPi
+        - module: http_2xx
+          name: fluiddpi-http
+          url: "http://fluiddpi.${HARDWARE_DOMAIN}"
+        - module: icmp
+          name: fluiddpi-icmp
+          url: horus.${HARDWARE_DOMAIN}
+
         # PiKVM
         - module: http_2xx
           name: pikvm-http
