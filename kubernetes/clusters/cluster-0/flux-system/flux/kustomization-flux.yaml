@@ -1,0 +1,45 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: flux
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  path: ./manifests/install
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux
+
+  patches:
+    - target:
+        kind: Deployment
+        labelSelector: control-plane=controller
+      patch: |-
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: not-used
+        spec:
+          template:
+            spec:
+              containers:
+                - name: manager
+                  resources:
+                    requests:
+                      memory: 512Mi
+                    limits:
+                      memory: "2Gi"
+
+    - target:
+        kind: Namespace
+        labelSelector: app.kubernetes.io/instance=flux-system
+      patch: |-
+        apiVersion: apps/v1
+        kind: Namespace
+        metadata:
+          name: not-used
+          labels:
+            goldilocks.fairwinds.com~1enabled: "true"
