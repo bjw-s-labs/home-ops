@@ -28,16 +28,11 @@ spec:
       config:
         enabled: true
         existingClaim: calibre-config
-      media:
+      nfs-nas-media:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /Merged-Media
-          # mountOptions:
-            # - nfsvers=4.2
+        existingClaim: media-nfs-share-pvc
         mountPath: /mnt/unionfs
+        readOnly: false
 
     service:
       webserver:

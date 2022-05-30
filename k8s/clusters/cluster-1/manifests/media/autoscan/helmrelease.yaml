@@ -77,11 +77,7 @@ spec:
         readOnly: true
       nfs-nas-media:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /Merged-Media
+        existingClaim: media-nfs-share-pvc
         mountPath: /mnt/unionfs
         readOnly: false
 
