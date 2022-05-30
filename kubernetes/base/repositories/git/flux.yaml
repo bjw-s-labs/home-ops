@@ -1,0 +1,14 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: flux
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  url: https://github.com/fluxcd/flux2
+  ignore: |
+    # exclude all
+    /*
+    # include manifest dir
+    !/manifests
