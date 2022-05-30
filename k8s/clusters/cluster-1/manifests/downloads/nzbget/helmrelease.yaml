@@ -36,14 +36,11 @@ spec:
       config:
         enabled: true
         existingClaim: nzbget-config
-      media:
+      nfs-nas-media:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /Merged-Media
+        existingClaim: downloads-nfs-share-pvc
         mountPath: /mnt/unionfs
+        readOnly: false
       intermediate:
         enabled: true
         type: emptyDir

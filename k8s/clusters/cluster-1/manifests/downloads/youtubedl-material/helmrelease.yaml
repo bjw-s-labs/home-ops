@@ -30,14 +30,11 @@ spec:
       config:
         enabled: true
         existingClaim: youtubedl-material-config
-      media:
+      nfs-nas-media:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /Merged-Media/downloads/YoutubeDL
+        existingClaim: downloads-nfs-share-pvc
         mountPath: /mnt/unionfs/downloads/YoutubeDL
+        readOnly: false
 
     ingress:
       main:

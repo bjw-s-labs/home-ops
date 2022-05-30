@@ -53,14 +53,11 @@ spec:
       config:
         enabled: true
         existingClaim: sonarr-config
-      media:
+      nfs-nas-media:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /Merged-Media
+        existingClaim: downloads-nfs-share-pvc
         mountPath: /mnt/unionfs
+        readOnly: false
       backup:
         enabled: true
         type: custom
