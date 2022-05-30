@@ -4,9 +4,6 @@ kind: HelmRelease
 metadata:
   name: common
 spec:
-  dependsOn:
-    - name: mosquitto
-      namespace: home-automation
   values:
     global:
       nameOverride: frigate
@@ -19,7 +16,7 @@ spec:
       TZ: ${TIMEZONE}
     envFrom:
       - secretRef:
-          name: frigate-secret
+          name: frigate-secrets
 
     service:
       main:
