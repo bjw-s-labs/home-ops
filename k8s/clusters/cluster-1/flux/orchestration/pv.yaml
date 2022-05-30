@@ -26,3 +26,18 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: selfhosted-pv
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./k8s/clusters/cluster-1/pv/selfhosted"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+

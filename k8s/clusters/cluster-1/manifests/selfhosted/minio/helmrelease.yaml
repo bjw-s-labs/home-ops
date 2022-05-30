@@ -62,11 +62,8 @@ spec:
         mountPath: /root/.minio
       data:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /S3
+        existingClaim: selfhosted-nfs-share-pvc
+        readOnly: false
         mountPath: /data
 
     service:
