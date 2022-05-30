@@ -1,0 +1,16 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: home-ops
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  ref:
+    branch: main
+  url: https://github.com/bjw-s/home-ops.git
+  ignore: |
+    # exclude all
+    /*
+    # include gitops dirs
+    !/kubernetes
