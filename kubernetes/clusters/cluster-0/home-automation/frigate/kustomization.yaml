@@ -15,5 +15,15 @@ generatorOptions:
   disableNameSuffixHash: true
   annotations:
     kustomize.toolkit.fluxcd.io/substitute: disabled
+patchesJson6902:
+  - target:
+      group: helm.toolkit.fluxcd.io
+      version: v2beta1
+      kind: HelmRelease
+      name: common
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: frigate
 patchesStrategicMerge:
   - helm-values.yaml
