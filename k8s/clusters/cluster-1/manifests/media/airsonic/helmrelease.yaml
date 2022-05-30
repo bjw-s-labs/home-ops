@@ -40,15 +40,18 @@ spec:
         enabled: true
         existingClaim: airsonic-config
         mountPath: /var/airsonic
-      nas-media:
+      nfs-nas-media:
         enabled: true
+        existingClaim: media-nfs-share-pvc
+        mountPath: /mnt/unionfs
+        readOnly: false
+      nas-media:
+        enabled: false
         type: custom
         volumeSpec:
           nfs:
             server: "${NAS_ADDRESS}"
             path: /Merged-Media
-          # mountOptions:
-            # - nfsvers=4.2
         mountPath: /mnt/unionfs
 
     ingress:
