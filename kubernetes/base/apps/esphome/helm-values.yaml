@@ -1,0 +1,26 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: common
+spec:
+  values:
+    global:
+      nameOverride: esphome
+
+    image:
+      repository: esphome/esphome
+      tag: 2022.4.0
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 512M
+      limits:
+        memory: 1024M
+
+    service:
+      main:
+        ports:
+          http:
+            port: 6052
