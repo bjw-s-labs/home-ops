@@ -67,11 +67,10 @@ spec:
       # - "--entryPoints.web.forwardedHeaders.trustedIPs=127.0.0.1/32,10.0.0.0/8"
       # - "--entryPoints.web.address=:443"                                                                                                  # DO NOT ENABLE. Prevents Traefik from starting since its trying to bind to this port
       - "--entryPoints.web.proxyProtocol.insecure"
-      - "--entryPoints.web.proxyProtocol.trustedIPs=10.0.0.0/8"
-      - "--entryPoints.web.forwardedHeaders.insecure=true"
+      # - "--entryPoints.web.proxyProtocol.trustedIPs=10.0.0.0/8"
+      # - "--entryPoints.web.forwardedHeaders.insecure=true"
       - "--entryPoints.websecure.proxyProtocol.insecure"
       - "--entryPoints.websecure.proxyProtocol.trustedIPs=10.0.0.0/8"
-      - "--entryPoints.websecure.forwardedHeaders.insecure=true"
       # Add plugin/dynamic file provider for theme-park
       - "--experimental.plugins.rewritebody.modulename=github.com/packruler/rewrite-body"
       - "--experimental.plugins.rewritebody.version=v0.5.1"
