@@ -1,0 +1,47 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: loki
+spec:
+  values:
+    env:
+      - name: TZ
+        value: ${TIMEZONE}
+
+    config:
+      ruler:
+        alertmanager_url: http://kube-prometheus-stack-alertmanager.monitoring:9093
+
+    ingress:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+      ingressClassName: nginx
+      hosts:
+        - host: &host "loki.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          paths:
+            - /
+      tls:
+        - secretName: loki-${CLUSTER_NAME}-tls
+          hosts:
+            - *host
+
+  valuesFrom:
+    - kind: ConfigMap
+      name: loki-ceph-bucket
+      valuesKey: BUCKET_NAME
+      targetPath: config.storage_config.aws.bucketnames
+    - kind: ConfigMap
+      name: loki-ceph-bucket
+      valuesKey: BUCKET_HOST
+      targetPath: config.storage_config.aws.endpoint
+    - kind: Secret
+      name: loki-ceph-bucket
+      valuesKey: AWS_ACCESS_KEY_ID
+      targetPath: config.storage_config.aws.access_key_id
+    - kind: Secret
+      name: loki-ceph-bucket
+      valuesKey: AWS_SECRET_ACCESS_KEY
+      targetPath: config.storage_config.aws.secret_access_key

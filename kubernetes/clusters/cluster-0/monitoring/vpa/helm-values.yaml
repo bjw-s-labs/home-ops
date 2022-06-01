@@ -1,0 +1,12 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: vpa
+spec:
+  values:
+    recommender:
+      extraArgs:
+        storage: prometheus
+        prometheus-address: |-
+          http://thanos-query.monitoring.svc.cluster.local:9090

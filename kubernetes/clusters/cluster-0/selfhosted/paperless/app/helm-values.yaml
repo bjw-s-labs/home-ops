@@ -1,0 +1,60 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: paperless
+spec:
+  values:
+    env:
+      PAPERLESS_CONSUMER_POLLING: "60"
+      PAPERLESS_CONSUMER_RECURSIVE: "true"
+      PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
+      PAPERLESS_OCR_LANGUAGES: nld
+      PAPERLESS_OCR_LANGUAGE: nld
+      PAPERLESS_REDIS: redis://paperless-redis-master.selfhosted.svc.cluster.local:6379
+      PAPERLESS_TASK_WORKERS: 2
+      PAPERLESS_TIME_ZONE: "${TIMEZONE}"
+      PAPERLESS_URL: https://paperless.${INGRESS_DOMAIN}
+      TZ: "${TIMEZONE}"
+      USERMAP_GID: 65543
+    envFrom:
+      - secretRef:
+          name: paperless-secrets
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        hosts:
+          - host: &host "paperless.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - secretName: paperless-tls
+            hosts:
+              - *host
+
+    persistence:
+      data:
+        enabled: true
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Docs/paperless/data
+      media:
+        enabled: true
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Docs/paperless/media
+      consume:
+        enabled: true
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Docs/paperless/incoming
+      export:
+        enabled: true
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Docs/paperless/export

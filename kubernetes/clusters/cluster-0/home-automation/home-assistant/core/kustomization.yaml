@@ -1,0 +1,10 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: home-automation
+resources:
+  - ../../../../../base/apps/home-assistant
+  - ./secret-codeserver.sops.yaml
+  - ./secret-home-assistant.sops.yaml
+patchesStrategicMerge:
+  - helm-values.yaml
