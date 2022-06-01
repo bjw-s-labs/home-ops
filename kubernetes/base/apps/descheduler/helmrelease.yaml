@@ -1,0 +1,75 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: descheduler
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: descheduler
+      version: 0.23.2
+      sourceRef:
+        kind: HelmRepository
+        name: kubernetes-sigs-descheduler
+        namespace: flux-system
+      interval: 5m
+  values:
+    kind: Deployment
+    replicas: 3
+
+    leaderElection:
+      enabled: true
+
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: "descheduler"
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 64M
+      limits:
+        memory: 143M
+
+    deschedulerPolicy:
+      strategies:
+        RemoveDuplicates:
+          enabled: true
+
+        RemovePodsViolatingNodeTaints:
+          enabled: true
+
+        RemovePodsViolatingNodeAffinity:
+          enabled: true
+          params:
+            nodeAffinityType:
+              - requiredDuringSchedulingIgnoredDuringExecution
+
+        RemovePodsViolatingTopologySpreadConstraint:
+          enabled: true
+          params:
+            includeSoftConstraints: true
+
+        RemovePodsViolatingInterPodAntiAffinity:
+          enabled: true
+          params:
+            nodeFit: true
+
+        LowNodeUtilization:
+          enabled: false
+
+        RemoveFailedPods:
+          enabled: true
+          params:
+            failedPods:
+              includingInitContainers: true
+              excludeOwnerKinds:
+                - "Job"
+              minPodLifetimeSeconds: 3600
+
+        RemovePodsHavingTooManyRestarts:
+          enabled: true
+          params:
+            podsHavingTooManyRestarts:
+              podRestartThreshold: 100
+              includingInitContainers: true

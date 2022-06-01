@@ -1,0 +1,31 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: common
+spec:
+  values:
+    global:
+      nameOverride: nzbget
+
+    image:
+      repository: ghcr.io/k8s-at-home/nzbget-testing
+      tag: "v21.2-r2333"
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: nzbget-config
+
+    service:
+      main:
+        ports:
+          http:
+            port: 6789
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: "477M"
+      limits:
+        memory: "890M"

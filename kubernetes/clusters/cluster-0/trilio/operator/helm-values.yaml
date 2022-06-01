@@ -1,0 +1,17 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: trilio-operator
+spec:
+  values:
+    installTVK:
+      enabled: true
+      applicationScope: Cluster
+      tvkInstanceName: "cluster-0"
+      ingressConfig:
+        host: "trilio.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+        tlsSecretName: "trilio-${CLUSTER_NAME}-tls"
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        ingressClass: "nginx"

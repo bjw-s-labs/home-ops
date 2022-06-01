@@ -1,0 +1,27 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: trilio-operator
+spec:
+  interval: 5m
+  releaseName: trilio-operator
+  chart:
+    spec:
+      chart: k8s-triliovault-operator
+      version: 2.9.2
+      sourceRef:
+        kind: HelmRepository
+        name: trilio
+        namespace: flux-system
+  values:
+    preflight:
+      enabled: false
+
+    installTVK:
+      ComponentConfiguration:
+        ingressController:
+          enabled: false
+
+    observability:
+      enabled: false

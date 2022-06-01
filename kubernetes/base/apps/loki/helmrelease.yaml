@@ -1,0 +1,53 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: loki
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: loki
+      version: 2.11.1
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: ghcr.io/k8s-at-home/loki
+
+    config:
+      limits_config:
+        enforce_metric_name: false
+        reject_old_samples: true
+        reject_old_samples_max_age: 168h
+        ingestion_rate_mb: 16
+        ingestion_burst_size_mb: 24
+
+      storage_config:
+        aws:
+          s3forcepathstyle: true
+          insecure: true
+        boltdb_shipper:
+          active_index_directory: /data/loki/index
+          cache_location: /data/loki/index_cache
+          resync_interval: 5s
+          shared_store: s3
+
+      compactor:
+        retention_enabled: true
+
+    persistence:
+      enabled: false
+
+    serviceMonitor:
+      enabled: true
+
+    resources:
+      requests:
+        cpu: 78m
+        memory: 325M
+      limits:
+        memory: 421M

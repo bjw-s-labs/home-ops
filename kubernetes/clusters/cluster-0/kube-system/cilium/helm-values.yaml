@@ -1,0 +1,27 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cilium
+spec:
+  values:
+    cluster:
+      name: "${CLUSTER_NAME}"
+      id: "${CLUSTER_ID}"
+
+    nativeRoutingCIDR: ${NETWORK_K8S_POD_CIDR}
+
+    k8sServiceHost: "cluster-0.${HARDWARE_DOMAIN}"
+
+    hubble:
+      ui:
+        ingress:
+          enabled: true
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-production
+          hosts:
+            - "hubble.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          tls:
+            - secretName: hubble-tls
+              hosts:
+                - "hubble.${CLUSTER_NAME}.${INGRESS_DOMAIN}"

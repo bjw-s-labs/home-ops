@@ -6,16 +6,14 @@
     ":disableRateLimiting",
     ":dependencyDashboard",
     ":semanticCommits",
-    ":separatePatchReleases",
     "docker:enableMajor",
     ":enablePreCommit",
-    "github>bjw-s/home-ops//.github/renovate/commitMessage",
-    "github>bjw-s/home-ops//.github/renovate/labels",
-    // "github>bjw-s/home-ops//.github/renovate/privateModules",
-    "github>bjw-s/home-ops//.github/renovate/semanticCommits",
-    "github>bjw-s/home-ops//.github/renovate/allowedVersions",
-    "github>bjw-s/home-ops//.github/renovate/autoMerge",
-    "github>bjw-s/home-ops//.github/renovate/updateSchedule",
+    "github>bjw-s/home-ops//.github/renovate/allowedVersions.json5",
+    "github>bjw-s/home-ops//.github/renovate/autoMerge.json5",
+    "github>bjw-s/home-ops//.github/renovate/commitMessage.json5",
+    "github>bjw-s/home-ops//.github/renovate/labels.json5",
+    "github>bjw-s/home-ops//.github/renovate/semanticCommits.json5",
+    "github>bjw-s/home-ops//.github/renovate/updateSchedule.json5",
   ],
   platform: "github",
   username: "bjw-s-bot[bot]",
@@ -26,60 +24,31 @@
   timezone: "Europe/Amsterdam",
   dependencyDashboardTitle: "Renovate Dashboard",
   suppressNotifications: ["prIgnoreNotification"],
+  commitBodyTable: true,
   rebaseWhen: "conflicted",
   // Set up Renovate Managers
+  flux: {
+    fileMatch: ["kubernetes/.+\\.yaml$"],
+  },
   "helm-values": {
-    fileMatch: [
-      "k8s/clusters/.+/helmrelease\\.yaml$",
-      "k8s/global/.+/helmrelease\\.yaml$",
-    ],
+    fileMatch: ["kubernetes/.+\\.yaml$"],
   },
   kubernetes: {
-    fileMatch: ["k8s/clusters/.+\\.yaml$", "k8s/global/.+\\.yaml$"],
-  },
-  flux: {
-    fileMatch: ["k8s/clusters/.+\\.yaml$", "k8s/global/.+\\.yaml$"],
+    fileMatch: ["kubernetes/.+\\.yaml$"],
   },
   regexManagers: [
-    // regexManager to read and process GitHub release artifacts
     {
-      fileMatch: ["k8s/clusters/.+\\.yaml$", "k8s/global/.+\\.yaml$"],
-      matchStrings: [
-        "https://github.com/(?<org>.*=?)/(?<repo>.*=?)/releases/download/(?<currentValue>.*=?)/.*",
-      ],
-      datasourceTemplate: "github-releases",
-      depNameTemplate: "{{org}}/{{repo}}",
-    },
-    // Generic Regex Manager
-    {
-      fileMatch: ["k8s/clusters/.+\\.yaml$", "k8s/global/.+\\.yaml$"],
+      description: "Process various dependencies",
+      fileMatch: ["kubernetes/.+\\.ya?ml$"],
       matchStrings: [
         "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( registryUrl=(?<registryUrl>.*?))?( versioning=(?<versioning>.*=?))?\n .*: (?<currentValue>.*=?)",
       ],
       versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
       registryUrlTemplate: "{{#if registryUrl}}{{{registryUrl}}}{{else}}{{/if}}",
     },
-    // Generic Docker image Regex manager
-    {
-      fileMatch: [
-        "k8s/clusters/.+\\.yaml$",
-        "k8s/global/.+\\.yaml$",
-        "local/vyos/.+\\.yaml$"
-      ],
-      matchStrings: [
-        "# renovate: docker-image( registryUrl=(?<registryUrl>.*?))?( versioning=(?<versioning>.*=?))?\n .*: (?<depName>.*?):(?<currentValue>.*=?)",
-      ],
-      datasourceTemplate: "docker",
-      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}docker{{/if}}",
-      registryUrlTemplate: "{{#if registryUrl}}{{{registryUrl}}}{{else}}{{/if}}",
-    },
   ],
   packageRules: [
     // Setup datasources
-    {
-      matchDatasources: ["helm"],
-      ignoreDeprecated: true,
-    },
     {
       matchDatasources: ["docker"],
       commitMessageExtra: "to {{newVersion}}",
@@ -97,21 +66,11 @@
     },
     {
       matchDatasources: ["docker"],
-      matchPackageNames: ["quay.io/minio/minio"],
-      versioning: "regex:^RELEASE\\.(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})",
-    },
-    {
-      matchDatasources: ["docker"],
       matchPackageNames: [
         "ghcr.io/linuxserver/calibre",
         "ghcr.io/linuxserver/calibre-web",
       ],
       versioning: "regex:^version-v?(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
-    },
-    {
-      matchDatasources: ["docker"],
-      matchPackageNames: ["ghcr.io/airsonic-advanced/airsonic-advanced"],
-      versioning: "regex:^edge-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-SNAPSHOT\\.(?<build>\\d+)$",
     },
     // Version strategies
     {
@@ -126,10 +85,11 @@
     },
     // Group packages
     {
-      matchDatasources: ["helm", "docker"],
-      matchPackagePatterns: ["^rook.ceph"],
-      groupName: "rook-ceph-suite",
-      additionalBranchPrefix: "",
+      description: "Rook-Ceph image and chart",
+      groupName: "Rook Ceph",
+      matchPackagePatterns: ["rook.ceph"],
+      matchDatasources: ["docker", "helm"],
+      group: { commitMessageTopic: "{{{groupName}}} group" },
       separateMinorPatch: true,
       stabilityDays: 2,
     },

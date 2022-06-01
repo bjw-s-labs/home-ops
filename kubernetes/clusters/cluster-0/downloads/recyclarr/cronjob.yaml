@@ -1,0 +1,34 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: recyclarr
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          initContainers:
+            - name: render-config
+              env:
+                - name: RADARR_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: recyclarr-secrets
+                      key: radarrApiKey
+                - name: SONARR_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: recyclarr-secrets
+                      key: sonarrApiKey
+
+          containers:
+            - name: recyclarr-sonarr
+              env:
+                - name: TZ
+                  value: "${TIMEZONE}"
+
+            - name: recyclarr-radarr
+              env:
+                - name: TZ
+                  value: "${TIMEZONE}"

@@ -1,0 +1,41 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: grafana
+spec:
+  values:
+    admin:
+      existingSecret: grafana-secrets
+      userKey: adminUser
+      passwordKey: adminPass
+
+    grafana.ini:
+      server:
+        root_url: "https://grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+
+    datasources:
+      datasources.yaml:
+        datasources:
+          - name: Prometheus
+            type: prometheus
+            url: http://thanos-query.monitoring:9090/
+            access: proxy
+            isDefault: true
+          - name: Loki
+            type: loki
+            access: proxy
+            url: http://loki.monitoring:3100
+
+    ingress:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+      ingressClassName: nginx
+      hosts:
+        - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+      tls:
+        - secretName: grafana-${CLUSTER_NAME}-tls
+          hosts:
+            - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"

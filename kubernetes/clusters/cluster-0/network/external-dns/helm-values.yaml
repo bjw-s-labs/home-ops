@@ -1,0 +1,25 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: externaldns
+spec:
+  values:
+    sources:
+      - ingress
+
+    provider: cloudflare
+    policy: sync
+    txtPrefix: "k8s."
+
+    cloudflare:
+      secretName: externaldns-secrets
+      email: ${EMAIL_1}
+      proxied: true
+
+    domainFilters:
+      - ${PERSONAL_DOMAIN}
+      - ${FAMILY_DOMAIN}
+      - ${INGRESS_DOMAIN}
+
+    annotationFilter: "external-dns/is-public=true"
