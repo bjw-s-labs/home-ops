@@ -1,0 +1,19 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namePrefix: k8s-gateway-
+resources:
+  - ../kah-common-chart
+  - ./rbac.yaml
+patchesJson6902:
+  - target:
+      group: helm.toolkit.fluxcd.io
+      version: v2beta1
+      kind: HelmRelease
+      name: common
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: k8s-gateway
+patchesStrategicMerge:
+  - helm-values.yaml

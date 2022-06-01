@@ -1,0 +1,48 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: nzbget
+spec:
+  values:
+    podSecurityContext:
+      supplementalGroups:
+        - 65539
+
+    env:
+      TZ: "${TIMEZONE}"
+
+    persistence:
+      scripts:
+        enabled: true
+        type: configMap
+        name: nzbget-scripts
+        mountPath: /scripts
+        readOnly: true
+        defaultMode: 0555
+      media:
+        enabled: true
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Media
+        mountPath: /data/nas-media
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_set_header Accept-Encoding "";
+            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/nzbget/nord.css"></head>';
+            sub_filter_once on;
+        hosts:
+          - host: &host "nzbget.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - secretName: tls.nzbget
+            hosts:
+              - *host

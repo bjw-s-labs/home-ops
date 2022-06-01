@@ -1,0 +1,32 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: common
+spec:
+  values:
+    global:
+      nameOverride: radicale
+
+    image:
+      repository: tomsquest/docker-radicale
+      tag: 3.1.7.0
+
+    service:
+      main:
+        ports:
+          http:
+            port: 5232
+
+    persistence:
+      data:
+        enabled: true
+        existingClaim: radicale-data
+        mountPath: /data
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 79M
+      limits:
+        memory: 79M

@@ -1,0 +1,16 @@
+---
+apiVersion: "triliovault.trilio.io/v1"
+kind: "Target"
+metadata:
+  name: "nas"
+  namespace: "selfhosted"
+spec:
+  enableBrowsing: true
+  nfsCredentials:
+    nfsExport: "${NAS_ADDRESS}:/volume1/Backup/Kubernetes/trilio/cluster-0/selfhosted"
+    nfsOptions: nfsvers=4.1,rsize=8192,wsize=8192,nosuid,nconnect=8,noatime
+  objectStoreCredentials:
+    bucketName: ""
+  thresholdCapacity: "512Gi"
+  type: "NFS"
+  vendor: "Other"

@@ -1,0 +1,35 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: common
+spec:
+  values:
+    global:
+      nameOverride: calibre-web
+
+    image:
+      repository: ghcr.io/linuxserver/calibre-web
+      tag: version-0.6.18
+
+    env:
+      PUID: "1001"
+      PGID: "1001"
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: calibre-web-config
+
+    service:
+      main:
+        ports:
+          http:
+            port: 8083
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 204M
+      limits:
+        memory: 380M

@@ -1,0 +1,48 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: common
+spec:
+  values:
+    global:
+      nameOverride: plex
+
+    image:
+      repository: ghcr.io/k8s-at-home/plex
+      tag: v1.26.2.5797-5bd057d2b
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: plex-config
+
+      transcode:
+        enabled: true
+        type: emptyDir
+        medium: Memory
+
+    service:
+      main:
+        ports:
+          http:
+            port: 32400
+
+    resources:
+      requests:
+        cpu: 49m
+        memory: 4282M
+        gpu.intel.com/i915: 1
+      limits:
+        gpu.intel.com/i915: 1
+        memory: 7982M
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: feature.node.kubernetes.io/custom-intel-gpu
+                  operator: In
+                  values:
+                    - "true"

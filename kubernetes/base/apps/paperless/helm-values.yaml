@@ -1,0 +1,44 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: common
+spec:
+  values:
+    global:
+      nameOverride: paperless
+
+    image:
+      repository: ghcr.io/paperless-ngx/paperless-ngx
+      tag: 1.7.1
+
+    env:
+      COMPOSE_PROJECT_NAME: paperless
+      PAPERLESS_PORT: 8000
+
+    service:
+      main:
+        ports:
+          http:
+            port: 8000
+
+    persistence:
+      data:
+        enabled: false
+        mountPath: /usr/src/paperless/data
+      media:
+        enabled: false
+        mountPath: /usr/src/paperless/media
+      consume:
+        enabled: false
+        mountPath: /usr/src/paperless/consume
+      export:
+        enabled: false
+        mountPath: /usr/src/paperless/export
+
+    resources:
+      requests:
+        cpu: 23m
+        memory: 2975M
+      limits:
+        memory: 6572M
