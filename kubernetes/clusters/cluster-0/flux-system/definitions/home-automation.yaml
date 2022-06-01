@@ -1,48 +1,48 @@
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: home-automation-mosquitto
-  namespace: flux-system
-  labels:
-    component.cluster-0/part-of: definitions
-spec:
-  path: "./kubernetes/clusters/cluster-0/home-automation/mosquitto"
-  prune: true
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: home-automation-frigate
-  namespace: flux-system
-  labels:
-    component.cluster-0/part-of: definitions
-spec:
-  path: "./kubernetes/clusters/cluster-0/home-automation/frigate"
-  prune: true
-  dependsOn:
-    - name: home-automation-mosquitto
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: home-automation-amcrest2mqtt
-  namespace: flux-system
-  labels:
-    component.cluster-0/part-of: definitions
-spec:
-  path: "./kubernetes/clusters/cluster-0/home-automation/amcrest2mqtt"
-  prune: true
-  dependsOn:
-    - name: home-automation-mosquitto
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: home-automation-esphome
-  namespace: flux-system
-  labels:
-    component.cluster-0/part-of: definitions
-spec:
-  path: "./kubernetes/clusters/cluster-0/home-automation/esphome"
-  prune: true
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: home-automation-mosquitto
+#   namespace: flux-system
+#   labels:
+#     component.cluster-0/part-of: definitions
+# spec:
+#   path: "./kubernetes/clusters/cluster-0/home-automation/mosquitto"
+#   prune: true
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: home-automation-frigate
+#   namespace: flux-system
+#   labels:
+#     component.cluster-0/part-of: definitions
+# spec:
+#   path: "./kubernetes/clusters/cluster-0/home-automation/frigate"
+#   prune: true
+#   dependsOn:
+#     - name: home-automation-mosquitto
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: home-automation-amcrest2mqtt
+#   namespace: flux-system
+#   labels:
+#     component.cluster-0/part-of: definitions
+# spec:
+#   path: "./kubernetes/clusters/cluster-0/home-automation/amcrest2mqtt"
+#   prune: true
+#   dependsOn:
+#     - name: home-automation-mosquitto
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: home-automation-esphome
+#   namespace: flux-system
+#   labels:
+#     component.cluster-0/part-of: definitions
+# spec:
+#   path: "./kubernetes/clusters/cluster-0/home-automation/esphome"
+#   prune: true
