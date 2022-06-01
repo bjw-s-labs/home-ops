@@ -1,0 +1,84 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: trilio-namespace
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/trilio"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: trilio-operator
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  dependsOn:
+    - name: trilio-namespace
+    - name: cert-manager-issuers
+  path: "./kubernetes/clusters/cluster-0/trilio/operator"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: trilio-config
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  dependsOn:
+    - name: trilio-operator
+    - name: rook-ceph-cluster
+  path: "./kubernetes/clusters/cluster-0/trilio/config"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: trilio-config-targets
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  dependsOn:
+    - name: trilio-config
+    - name: downloads-namespace
+    - name: home-automation-namespace
+    - name: media-namespace
+    - name: network-namespace
+    - name: selfhosted-namespace
+  path: "./kubernetes/clusters/cluster-0/trilio/config/targets"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: trilio-config-policies
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  dependsOn:
+    - name: trilio-config-targets
+  path: "./kubernetes/clusters/cluster-0/trilio/config/policies"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: trilio-config-backupplans
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  dependsOn:
+    - name: trilio-config-targets
+    - name: trilio-config-policies
+  path: "./kubernetes/clusters/cluster-0/trilio/config/backupplans"
+  prune: true

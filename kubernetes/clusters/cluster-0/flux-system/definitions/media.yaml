@@ -1,0 +1,50 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: media-namespace
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/media"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: media-plex
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/media/plex"
+  prune: true
+  dependsOn:
+    - name: media-namespace
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: media-series-cleanup
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/media/series-cleanup"
+  prune: true
+  dependsOn:
+    - name: media-namespace
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: media-calibre
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/media/calibre"
+  prune: true
+  dependsOn:
+    - name: media-namespace

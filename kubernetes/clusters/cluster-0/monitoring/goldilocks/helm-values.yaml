@@ -1,0 +1,25 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: goldilocks
+spec:
+  values:
+    dashboard:
+      ingress:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+
+        hosts:
+          - host: &host "goldilocks.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+                type: Prefix
+
+        tls:
+          - secretName: tls.goldilocks
+            hosts:
+              - *host

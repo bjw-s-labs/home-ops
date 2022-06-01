@@ -1,0 +1,35 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: calibre
+spec:
+  values:
+    env:
+      TZ: "${TIMEZONE}"
+      PGID: 65539
+
+    persistence:
+      media:
+        enabled: true
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Media
+        mountPath: /data/nas-media
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        hosts:
+          - host: &host "calibre.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+
+        tls:
+          - secretName: tls.calibre
+            hosts:
+              - *host

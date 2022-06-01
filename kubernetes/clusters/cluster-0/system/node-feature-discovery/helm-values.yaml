@@ -1,0 +1,43 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: node-feature-discovery
+spec:
+  values:
+    worker:
+      annotations:
+        configmap.reloader.stakater.com/reload: "nfd-worker-conf"
+
+      config:
+        core:
+          labelSources:
+            - custom
+            - pci
+            - usb
+
+        sources:
+          usb:
+            deviceClassWhitelist:
+              - "02"
+              - "03"
+              - "0a"
+              - "ef"
+              - "fe"
+              - "ff"
+            deviceLabelFields:
+              - "class"
+              - "vendor"
+              - "device"
+
+          custom:
+            - name: "intel-gpu"
+              matchOn:
+                - pciId:
+                    class: ["0300"]
+                    vendor: ["8086"]
+
+            - name: "coral-tpu"
+              matchOn:
+                - usbId:
+                    vendor: ["1a6e", "18d1"]

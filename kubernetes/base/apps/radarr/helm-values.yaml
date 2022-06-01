@@ -1,0 +1,49 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: common
+spec:
+  values:
+    global:
+      nameOverride: radarr
+
+    image:
+      repository: ghcr.io/k8s-at-home/radarr-develop
+      tag: v4.1.0.6175
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: radarr-config
+
+    service:
+      main:
+        ports:
+          http:
+            port: 7878
+
+    probes:
+      liveness:
+        enabled: true
+        custom: true
+        spec:
+          exec:
+            command:
+              - /usr/bin/env
+              - bash
+              - -c
+              - curl --fail localhost:7878/api/v3/system/status?apiKey=`IFS=\> && while
+                read -d \< E C; do if [[ $E = "ApiKey" ]]; then echo $C; fi; done < /config/config.xml`
+          failureThreshold: 5
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 10
+
+    resources:
+      requests:
+        cpu: 23m
+        memory: 629M
+      limits:
+        memory: 1174M

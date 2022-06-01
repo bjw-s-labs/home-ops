@@ -1,0 +1,72 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: common
+spec:
+  values:
+    image:
+      repository: quay.io/oriedge/k8s_gateway
+      tag: v0.3.0
+      pullPolicy: IfNotPresent
+
+    nameOverride: "k8s-gateway"
+
+    args: ["-conf", "/etc/coredns/Corefile"]
+
+    serviceAccount:
+      create: true
+      name: k8s-gateway
+
+    service:
+      main:
+        ports:
+          http:
+            enabled: false
+          dns:
+            enabled: true
+            port: 53
+            targetPort: 1053
+            protocol: UDP
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: k8s-gateway-config
+        mountPath: /etc/coredns
+        readOnly: true
+
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: "k8s-gateway-config"
+
+    probes:
+      readiness:
+        custom: true
+        spec:
+          httpGet:
+            path: /ready
+            port: 8181
+            scheme: HTTP
+      liveness:
+        custom: true
+        spec:
+          httpGet:
+            path: /health
+            port: 8080
+            scheme: HTTP
+      startup:
+        custom: true
+        spec:
+          httpGet:
+            path: /ready
+            port: 8181
+            scheme: HTTP
+
+    configmap:
+      config:
+        enabled: true
+        data:
+          Corefile: ""
+
+    resources: {}

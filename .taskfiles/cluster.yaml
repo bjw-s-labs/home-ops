@@ -28,11 +28,6 @@ tasks:
       - |
         kubectl run debug-{{.VOLUME}} -n {{.NAMESPACE}} -i --tty --rm --image=null --overrides='
           {
-            "metadata": {
-              "annotations": {
-                "botkube.io/disable": "true"
-              }
-            },
             "spec": {
               "containers": [
                 {
@@ -94,11 +89,6 @@ tasks:
       - |
         kubectl run debug-{{.NODE}} -i --tty --rm --image="docker.io/library/alpine:3.15" --privileged --overrides='
           {
-            "metadata": {
-              "annotations": {
-                "botkube.io/disable": "true"
-              }
-            },
             "spec": {
               "nodeSelector": {
                 "kubernetes.io/hostname": "{{.NODE}}"

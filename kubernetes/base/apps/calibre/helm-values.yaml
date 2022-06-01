@@ -1,0 +1,45 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: common
+spec:
+  values:
+    global:
+      nameOverride: calibre
+
+    image:
+      repository: ghcr.io/linuxserver/calibre
+      tag: version-v5.42.0
+
+    env:
+      PUID: "1001"
+      PGID: "1001"
+      UMASK_SET: "022"
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: calibre-config
+
+    service:
+      main:
+        ports:
+          http:
+            port: 8080
+      webserver:
+        enabled: true
+        type: ClusterIP
+        ports:
+          webserver:
+            enabled: true
+            port: 8081
+            protocol: TCP
+            targetPort: 8081
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 324M
+      limits:
+        memory: 604M

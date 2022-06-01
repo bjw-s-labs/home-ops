@@ -1,0 +1,18 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rook-direct-mount
+spec:
+  template:
+    spec:
+      containers:
+        - name: rook-direct-mount
+          volumeMounts:
+            - name: nas-backup
+              mountPath: /mnt/nas-backup
+      volumes:
+        - name: nas-backup
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /volume1/Backup/Kubernetes

@@ -35,3 +35,56 @@ spec:
     - name: system-kyverno-app
   path: "./kubernetes/clusters/cluster-0/system/kyverno/policies"
   prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-reloader
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  dependsOn:
+    - name: system-namespace
+  path: "./kubernetes/clusters/cluster-0/system/reloader"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-descheduler
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  dependsOn:
+    - name: system-namespace
+  path: "./kubernetes/clusters/cluster-0/system/descheduler"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-node-feature-discovery
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  dependsOn:
+    - name: system-namespace
+  path: "./kubernetes/clusters/cluster-0/system/node-feature-discovery"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-intel-gpu-plugin
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  dependsOn:
+    - name: system-namespace
+    - name: system-node-feature-discovery
+  path: "./kubernetes/clusters/cluster-0/system/intel-gpu-plugin"
+  prune: true

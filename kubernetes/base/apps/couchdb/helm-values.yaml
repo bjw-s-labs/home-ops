@@ -1,0 +1,50 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: common
+spec:
+  values:
+    global:
+      nameOverride: couchdb
+
+    initContainers:
+      init-config:
+        image: busybox:latest
+        command:
+          - "sh"
+          - "-c"
+          - "cp /tmp/config/*.ini /default.d/; ls -lrt /default.d;"
+        volumeMounts:
+          - name: config
+            mountPath: /tmp/config
+          - name: config-storage
+            mountPath: /default.d
+
+    image:
+      repository: docker.io/library/couchdb
+      tag: 3.2.2
+
+    service:
+      main:
+        ports:
+          http:
+            port: 5984
+
+    persistence:
+      config-storage:
+        enabled: true
+        type: emptyDir
+        mountPath: /opt/couchdb/etc/default.d
+
+      data:
+        enabled: true
+        existingClaim: couchdb
+        mountPath: /opt/couchdb/data
+
+    resources:
+      requests:
+        cpu: 23m
+        memory: 79M
+      limits:
+        memory: 79M

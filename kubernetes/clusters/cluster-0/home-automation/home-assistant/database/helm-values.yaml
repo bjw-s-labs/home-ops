@@ -1,0 +1,21 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: postgresql
+spec:
+  values:
+    auth:
+      database: home-assistant
+      existingSecret: home-assistant-database
+
+    primary:
+      persistence:
+        existingClaim: home-assistant-postgresql
+
+      resources:
+        requests:
+          cpu: 23m
+          memory: 3667M
+        limits:
+          memory: 7332M

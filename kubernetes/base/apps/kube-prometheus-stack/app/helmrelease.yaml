@@ -1,0 +1,215 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+spec:
+  interval: 6h
+  maxHistory: 2
+  timeout: 20m
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      version: 35.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+
+  values:
+    ###
+    ### Component values
+    ###
+    kubeApiServer:
+      enabled: true
+
+    kubeControllerManager:
+      enabled: false
+
+    kubeEtcd:
+      enabled: false
+
+    kubelet:
+      enabled: true
+      serviceMonitor:
+        metricRelabelings:
+          - action: replace
+            sourceLabels:
+              - node
+            targetLabel: instance
+
+    kubeProxy:
+      enabled: false
+
+    kubeScheduler:
+      enabled: false
+
+    kubeStateMetrics:
+      enabled: true
+    kube-state-metrics:
+      metricLabelsAllowlist:
+        - "persistentvolumeclaims=[*]"
+      prometheus:
+        monitor:
+          enabled: true
+          relabelings:
+            - action: replace
+              regex: (.*)
+              replacement: $1
+              sourceLabels:
+                - __meta_kubernetes_pod_node_name
+              targetLabel: kubernetes_node
+      resources:
+        requests:
+          cpu: 15m
+          memory: 127M
+        limits:
+          memory: 153M
+
+    grafana:
+      enabled: false
+      forceDeployDashboards: true
+      sidecar:
+        dashboards:
+          multicluster:
+            etcd:
+              enabled: true
+
+    nodeExporter:
+      enabled: true
+    prometheus-node-exporter:
+      resources:
+        requests:
+          cpu: 23m
+          memory: 64M
+        limits:
+          memory: 64M
+
+      prometheus:
+        monitor:
+          enabled: true
+          relabelings:
+            - action: replace
+              regex: (.*)
+              replacement: $1
+              sourceLabels:
+                - __meta_kubernetes_pod_node_name
+              targetLabel: kubernetes_node
+
+    ###
+    ### Prometheus operator values
+    ###
+    prometheusOperator:
+      resources:
+        requests:
+          cpu: 35m
+          memory: 273M
+        limits:
+          memory: 326M
+
+      prometheusConfigReloader:
+        # resource config for prometheusConfigReloader
+        resources:
+          requests:
+            cpu: 11m
+            memory: 32M
+          limits:
+            memory: 32M
+
+    ###
+    ### Prometheus instance values
+    ###
+    prometheus:
+      thanosService:
+        enabled: true
+
+      prometheusSpec:
+        replicas: 1
+        replicaExternalLabelName: "replica"
+        ruleSelectorNilUsesHelmValues: false
+        serviceMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelectorNilUsesHelmValues: false
+        probeSelectorNilUsesHelmValues: false
+        retentionSize: "6GB"
+        retention: 2d
+        enableAdminAPI: true
+        walCompression: true
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: ceph-block
+              resources:
+                requests:
+                  storage: 10Gi
+        resources:
+          requests:
+            cpu: 587m
+            memory: 4993M
+          limits:
+            memory: 5977M
+
+        thanos:
+          image: quay.io/thanos/thanos:v0.26.0
+          # renovate: datasource=docker depName=quay.io/thanos/thanos
+          version: v0.26.0
+          objectStorageConfig:
+            name: thanos-objstore-secret
+            key: objstore.yml
+
+    ###
+    ### Alertmanager values
+    ###
+    alertmanager:
+      config:
+        receivers:
+          - name: "null"
+
+        route:
+          group_by: ["alertname", "job"]
+          group_wait: 30s
+          group_interval: 5m
+          repeat_interval: 6h
+          receiver: "discord"
+          routes:
+            - receiver: "null"
+              matchers:
+                - alertname =~ "InfoInhibitor|Watchdog"
+            - receiver: "discord"
+              match_re:
+                # severity: critical|warning
+                severity: critical
+              continue: true
+
+        inhibit_rules:
+          - source_match:
+              severity: "critical"
+            target_match:
+              severity: "warning"
+            equal: ["alertname", "namespace"]
+
+      alertmanagerSpec:
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: ceph-block
+              resources:
+                requests:
+                  storage: 1Gi
+
+        resources:
+          requests:
+            cpu: 11m
+            memory: 50M
+          limits:
+            memory: 99M
+
+      prometheus:
+        monitor:
+          enabled: true
+          relabelings:
+            - action: replace
+              regex: (.*)
+              replacement: $1
+              sourceLabels:
+                - __meta_kubernetes_pod_node_name
+              targetLabel: kubernetes_node
