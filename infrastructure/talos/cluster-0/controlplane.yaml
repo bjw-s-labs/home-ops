@@ -19,7 +19,7 @@ machine:
 
   # Used to provide additional options to the kubelet.
   kubelet:
-    image: ghcr.io/siderolabs/kubelet:v1.23.5 # The `image` field is an optional reference to an alternative kubelet image.
+    image: ghcr.io/siderolabs/kubelet:v1.23.7 # The `image` field is an optional reference to an alternative kubelet image.
 
     # # The `ClusterDNS` field is an optional reference to an alternative kubelet clusterDNS ip list.
     # clusterDNS:
@@ -131,7 +131,7 @@ machine:
   # Used to provide instructions for installations.
   install:
     disk: /dev/sda # The disk used for installations.
-    image: ghcr.io/siderolabs/installer:v1.0.0 # Allows for supplying the image used to perform the installation.
+    image: ghcr.io/siderolabs/installer:v1.0.5 # Allows for supplying the image used to perform the installation.
     bootloader: true # Indicates if a bootloader should be installed.
     wipe: false # Indicates if the installation disk should be wiped at installation time.
 
@@ -342,7 +342,7 @@ cluster:
     key: ${cluster.serviceAccount.key}
   # API server specific configuration options.
   apiServer:
-    image: k8s.gcr.io/kube-apiserver:v1.23.5 # The container image used in the API server manifest.
+    image: k8s.gcr.io/kube-apiserver:v1.23.7 # The container image used in the API server manifest.
     # Extra certificate subject alternative names for the API server's certificate.
     certSANs:
       - 10.5.0.2
@@ -369,13 +369,13 @@ cluster:
     #         kind: PodSecurityConfiguration
   # Controller manager server specific configuration options.
   controllerManager:
-    image: k8s.gcr.io/kube-controller-manager:v1.23.5 # The container image used in the controller manager manifest.
+    image: k8s.gcr.io/kube-controller-manager:v1.23.7 # The container image used in the controller manager manifest.
   # Kube-proxy server-specific configuration options
   proxy:
-    image: k8s.gcr.io/kube-proxy:v1.23.5 # The container image used in the kube-proxy manifest.
+    image: k8s.gcr.io/kube-proxy:v1.23.7 # The container image used in the kube-proxy manifest.
   # Scheduler server specific configuration options.
   scheduler:
-    image: k8s.gcr.io/kube-scheduler:v1.23.5 # The container image used in the scheduler manifest.
+    image: k8s.gcr.io/kube-scheduler:v1.23.7 # The container image used in the scheduler manifest.
   # Configures cluster member discovery.
   discovery:
     enabled: true # Enable the cluster membership discovery feature.
