@@ -1,0 +1,68 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: rook-ceph-namespace
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/rook-ceph"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: rook-ceph-snapshot-controller
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  dependsOn:
+    - name: rook-ceph-namespace
+  path: "./kubernetes/clusters/cluster-0/rook-ceph/snapshot-controller"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: rook-ceph-operator
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  dependsOn:
+    - name: rook-ceph-namespace
+    - name: monitoring-kps-crds
+  path: "./kubernetes/clusters/cluster-0/rook-ceph/operator"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: rook-ceph-cluster
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  dependsOn:
+    - name: rook-ceph-namespace
+    - name: rook-ceph-operator
+    - name: rook-ceph-snapshot-controller
+  path: "./kubernetes/clusters/cluster-0/rook-ceph/cluster"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: rook-ceph-addons
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  dependsOn:
+    - name: rook-ceph-namespace
+    - name: rook-ceph-operator
+    - name: rook-ceph-cluster
+  path: "./kubernetes/clusters/cluster-0/rook-ceph/add-ons"
+  prune: true

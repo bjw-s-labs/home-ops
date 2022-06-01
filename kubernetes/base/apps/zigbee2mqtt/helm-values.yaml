@@ -1,0 +1,35 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: common
+spec:
+  values:
+    global:
+      nameOverride: zigbee2mqtt
+
+    image:
+      repository: docker.io/koenkk/zigbee2mqtt
+      tag: 1.25.1
+
+    env:
+      ZIGBEE2MQTT_DATA: /data
+
+    service:
+      main:
+        ports:
+          http:
+            port: 8080
+
+    persistence:
+      data:
+        enabled: true
+        mountPath: "/data"
+        existingClaim: zigbee2mqtt-data
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 127M
+      limits:
+        memory: 1364M

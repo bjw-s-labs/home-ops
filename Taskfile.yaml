@@ -5,7 +5,7 @@ vars:
   PROJECT_DIR:
     sh: "git rev-parse --show-toplevel"
   NAS_ADDRESS:
-    sh: "sops --decrypt k8s/global/flux/vars/global-secrets.sops.yaml | yq '.stringData.NAS_ADDRESS'"
+    sh: "sops --decrypt kubernetes/base/config/secret.sops.yaml | yq '.stringData.NAS_ADDRESS'"
 
 includes:
   cluster: .taskfiles/cluster.yaml

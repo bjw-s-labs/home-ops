@@ -1,0 +1,79 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+spec:
+  values:
+    prometheus:
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        pathType: Prefix
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        hosts:
+          - prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+        tls:
+          - secretName: prometheus-${CLUSTER_NAME}-tls
+            hosts:
+              - prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+
+      thanosService:
+        enabled: true
+
+      prometheusSpec:
+        additionalScrapeConfigs:
+          - job_name: node-exporter
+            scrape_interval: 1m
+            scrape_timeout: 10s
+            honor_timestamps: true
+            static_configs:
+              - targets:
+                  - "athena.${HARDWARE_DOMAIN}:9100"
+                  - "bruno.${HARDWARE_DOMAIN}:9100"
+                  - "carmen.${HARDWARE_DOMAIN}:9100"
+                  - "diego.${HARDWARE_DOMAIN}:9100"
+
+    alertmanager:
+      config:
+        receivers:
+          - name: "null"
+          - name: "discord"
+            slack_configs:
+              - channel: "#prometheus"
+                icon_url: https://avatars3.githubusercontent.com/u/3380462
+                username: "Prometheus - ${CLUSTER_NAME}"
+                send_resolved: true
+                title: |-
+                  [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ if ne .CommonAnnotations.summary ""}}{{ .CommonAnnotations.summary }} {{ else if ne .CommonAnnotations.message ""}}{{ .CommonAnnotations.message }} {{ else if ne .CommonAnnotations.description ""}}{{ .CommonAnnotations.description }} {{ else }}{{ .CommonLabels.alertname }}{{ end }}
+                text: >-
+                  {{ range .Alerts -}}
+                    *Alert:* {{ .Annotations.title }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+                  {{ if ne .Annotations.summary ""}}*Summary:* {{ .Annotations.summary }} {{ else if ne .Annotations.message ""}}*Message:* {{ .Annotations.message }} {{ else if ne .Annotations.description ""}}*Description:* {{ .Annotations.description }}{{ end }}
+                  *Details:*
+                    {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+                    {{ end }}
+                  {{ end }}
+
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        pathType: Prefix
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        hosts:
+          - alertmanager.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+        tls:
+          - secretName: alertmanager-${CLUSTER_NAME}-tls
+            hosts:
+              - alertmanager.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+
+  valuesFrom:
+    - kind: Secret
+      name: kube-prometheus-stack
+      valuesKey: discord-webhook
+      targetPath: alertmanager.config.global.slack_api_url
+      optional: false

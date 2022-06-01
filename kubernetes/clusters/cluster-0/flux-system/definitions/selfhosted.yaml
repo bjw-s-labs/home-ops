@@ -1,0 +1,117 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: selfhosted-namespace
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/selfhosted"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: selfhosted-radicale
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/selfhosted/radicale"
+  prune: true
+  dependsOn:
+    - name: selfhosted-namespace
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: selfhosted-paperless-redis
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/selfhosted/paperless/redis"
+  prune: true
+  dependsOn:
+    - name: selfhosted-namespace
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: selfhosted-paperless-app
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/selfhosted/paperless/app"
+  prune: true
+  dependsOn:
+    - name: selfhosted-namespace
+    - name: selfhosted-paperless-redis
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: selfhosted-miniflux-database
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/selfhosted/miniflux/database"
+  prune: true
+  dependsOn:
+    - name: selfhosted-namespace
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: selfhosted-miniflux-app
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/selfhosted/miniflux/app"
+  prune: true
+  dependsOn:
+    - name: selfhosted-namespace
+    - name: selfhosted-miniflux-database
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: selfhosted-theme-park
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/selfhosted/theme-park"
+  prune: true
+  dependsOn:
+    - name: selfhosted-namespace
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: selfhosted-cdn
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/selfhosted/cdn"
+  prune: true
+  dependsOn:
+    - name: selfhosted-namespace
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: selfhosted-obsidian-couchdb
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/selfhosted/obsidian-couchdb"
+  prune: true
+  dependsOn:
+    - name: selfhosted-namespace

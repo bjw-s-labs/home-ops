@@ -1,0 +1,67 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: common
+spec:
+  values:
+    global:
+      nameOverride: home-assistant
+
+    image:
+      repository: ghcr.io/home-assistant/home-assistant
+      tag: 2022.5.5
+
+    service:
+      main:
+        ports:
+          http:
+            port: 8123
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: home-assistant-data
+
+    probes:
+      liveness:
+        enabled: false
+      readiness:
+        enabled: false
+      startup:
+        enabled: false
+
+    resources:
+      requests:
+        cpu: 126m
+        memory: 411M
+      limits:
+        memory: 4417M
+
+    addons:
+      codeserver:
+        enabled: false
+
+        image:
+          repository: ghcr.io/k8s-at-home/code-server
+          tag: v4.4.0
+          pullPolicy: Always
+
+        args:
+          - --auth
+          - none
+          - --user-data-dir
+          - "/config/.vscode"
+          - --extensions-dir
+          - "/config/.vscode"
+
+        volumeMounts:
+          - name: config
+            mountPath: /config
+
+        resources:
+          requests:
+            cpu: 11m
+            memory: 94M
+          limits:
+            memory: 1007M

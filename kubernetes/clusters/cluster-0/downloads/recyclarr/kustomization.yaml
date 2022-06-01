@@ -1,0 +1,15 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: downloads
+resources:
+  - ../../../../base/apps/recyclarr
+  - ./secret.sops.yaml
+patchesStrategicMerge:
+  - cronjob.yaml
+configMapGenerator:
+  - name: recyclarr-config
+    files:
+      - recyclarr.yaml
+generatorOptions:
+  disableNameSuffixHash: true

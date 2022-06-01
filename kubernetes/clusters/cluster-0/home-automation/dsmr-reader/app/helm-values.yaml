@@ -1,0 +1,53 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: dsmr-reader
+spec:
+  values:
+    initContainers:
+      wait-for-pg:
+        image: busybox:latest
+        imagePullPolicy: IfNotPresent
+        command:
+          [
+            "sh",
+            "-c",
+            'until nc -vz dsmr-reader-postgresql.home-automation 5432; do echo "Waiting for postgresql..."; sleep 3; done;',
+          ]
+
+    env:
+      TZ: "${TIMEZONE}"
+      DJANGO_TIME_ZONE: "${TIMEZONE}"
+      DJANGO_DATABASE_USER: postgres
+      DJANGO_DATABASE_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: dsmr-reader-database
+            key: postgres-password
+      DJANGO_DATABASE_HOST: dsmr-reader-postgresql.home-automation
+      DJANGO_DATABASE_PORT: "5432"
+      DJANGO_DATABASE_NAME: dsmr-reader
+      DATALOGGER_INPUT_METHOD: ipv4
+      DATALOGGER_NETWORK_PORT: "8088"
+    envFrom:
+      - secretRef:
+          name: dsmr-reader-secrets
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+
+        hosts:
+          - host: &host "dsmr-reader.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+
+        tls:
+          - secretName: tls.dsmr-reader
+            hosts:
+              - *host

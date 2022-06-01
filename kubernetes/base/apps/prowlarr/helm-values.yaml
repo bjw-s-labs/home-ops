@@ -1,0 +1,31 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: common
+spec:
+  values:
+    global:
+      nameOverride: prowlarr
+
+    image:
+      repository: ghcr.io/k8s-at-home/prowlarr
+      tag: v0.4.0.1796
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: prowlarr-config
+
+    service:
+      main:
+        ports:
+          http:
+            port: 9696
+
+    resources:
+      requests:
+        cpu: 20m
+        memory: 273M
+      limits:
+        memory: 508M
