@@ -79,7 +79,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
           external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          # traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
         hosts:
           - host: &host "plex.${INGRESS_DOMAIN}"
             paths:

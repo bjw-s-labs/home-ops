@@ -2,14 +2,14 @@
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  name: chain-global-auth
+  name: chain-external
   namespace: network
 spec:
   chain:
     middlewares:
       - name: network-rate-limit@kubernetescrd
       - name: network-secure-headers@kubernetescrd
-      - name: network-chain-external@kubernetescrd
+      # - name: network-chain-external@kubernetescrd
       # - name: network-error-pages@kubernetescrd
-      - name: security-ak-outpost-authentik-embedded-outpost@kubernetescrd
+      # - name: security-ak-outpost-authentik-embedded-outpost@kubernetescrd
       

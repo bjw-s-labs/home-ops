@@ -56,7 +56,7 @@ spec:
           kubernetes.io/ingress.class: traefik
           cert-manager.io/cluster-issuer: letsencrypt-production
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: network-rfc1918@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
         hosts:
           - host: &host-cluster "emqx.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
