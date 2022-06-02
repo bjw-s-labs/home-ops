@@ -11,6 +11,8 @@ metadata:
       and needs to be set to a lower value than the default of 5 in some cases.
       This policy mutates all Pods to add the ndots option with a value of 2.
 spec:
+  mutateExistingOnPolicyUpdate: true
+  generateExistingOnPolicyUpdate: true
   rules:
     - name: add-ndots
       match:
