@@ -10,6 +10,8 @@ metadata:
       This policy sets an explicit RFC1918 whitelist for any Ingress
       that has not been marked as publically exposed.
 spec:
+  mutateExistingOnPolicyUpdate: true
+  generateExistingOnPolicyUpdate: true
   rules:
     - name: set-internal-ingress-annotations
       match:
