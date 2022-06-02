@@ -42,10 +42,17 @@
       description: "Process various dependencies",
       fileMatch: ["kubernetes/.+\\.ya?ml$"],
       matchStrings: [
-        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( registryUrl=(?<registryUrl>.*?))?( versioning=(?<versioning>.*=?))?\n .*: (?<currentValue>.*=?)",
+        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*=?))?\n .*: (?<currentValue>.*=?)",
       ],
       versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
-      registryUrlTemplate: "{{#if registryUrl}}{{{registryUrl}}}{{else}}{{/if}}",
+    },
+    {
+      description: "Process CRD dependencies - Chart and Github Release are the same version",
+      fileMatch: ["kubernetes/.+\\.ya?ml$"],
+      matchStrings: [
+        "# renovate: registryUrl=(?<registryUrl>\\S+) chart=(?<depName>\\S+)\n.*?(?<currentValue>[^-\\s]*)\n",
+      ],
+      datasourceTemplate: "helm",
     },
   ],
   packageRules: [
