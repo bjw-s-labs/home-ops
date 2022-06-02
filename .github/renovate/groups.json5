@@ -1,0 +1,50 @@
+{
+  packageRules: [
+    {
+      description: "Rook-Ceph image and chart",
+      groupName: "Rook Ceph",
+      matchPackagePatterns: ["rook.ceph"],
+      matchDatasources: ["docker", "helm"],
+      group: { commitMessageTopic: "{{{groupName}}} group" },
+      separateMinorPatch: true,
+      stabilityDays: 2,
+    },
+    {
+      matchDatasources: ["helm", "docker"],
+      matchPackageNames: [
+        "quay.io/cilium/cilium",
+        "quay.io/cilium/operator-generic",
+        "cilium",
+      ],
+      groupName: "cilium",
+      additionalBranchPrefix: "",
+      separateMinorPatch: true,
+      stabilityDays: 2,
+    },
+    {
+      groupName: "thanos-suite",
+      matchDatasources: ["docker", "github-releases", "helm"],
+      matchPackagePatterns: ["quay.io/thanos/thanos", "thanos"],
+      additionalBranchPrefix: "",
+      separateMinorPatch: true,
+      stabilityDays: 2,
+    },
+    {
+      groupName: "vector-suite",
+      matchDatasources: ["docker", "github-releases", "helm"],
+      matchPackagePatterns: ["vector"],
+      additionalBranchPrefix: "",
+      separateMinorPatch: true,
+      stabilityDays: 2,
+    },
+    {
+      description: "External Snapshotter image and kustomization",
+      groupName: "External Snapshotter",
+      matchPackagePatterns: ["external-snapshotter", "snapshot-controller"],
+      matchDatasources: ["docker", "github-releases"],
+      group: { commitMessageTopic: "{{{groupName}}} group" },
+      separateMinorPatch: true,
+      stabilityDays: 2,
+    },
+  ],
+}
