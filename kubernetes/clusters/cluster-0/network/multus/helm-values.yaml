@@ -1,0 +1,11 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: multus
+spec:
+  values:
+    cni:
+      paths:
+        config: /etc/cni/net.d
+        bin: /opt/cni/bin
