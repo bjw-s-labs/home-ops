@@ -40,19 +40,6 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: network-multus
-  namespace: flux-system
-  labels:
-    component.cluster-0/part-of: definitions
-spec:
-  dependsOn:
-    - name: network-namespace
-  path: "./kubernetes/clusters/cluster-0/network/multus"
-  prune: true
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
   name: network-k8s-gateway
   namespace: flux-system
   labels:
