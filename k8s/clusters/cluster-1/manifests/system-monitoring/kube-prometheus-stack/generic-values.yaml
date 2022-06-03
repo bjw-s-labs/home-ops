@@ -20,10 +20,10 @@ kubeEtcd:
     - "cp1.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
     - "cp2.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
     - "cp3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-  # service:
-  #   enabled: true
-  #   port: 2381
-  #   targetPort: 2381
+  service:
+    enabled: true
+    port: 2381
+    targetPort: 2381
 
 kubelet:
   enabled: true
@@ -42,7 +42,7 @@ kubeProxy:
     - "cp3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
 kubeScheduler:
-  enabled: true
+  enabled: false
   endpoints:
     - "cp1.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
     - "cp2.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
