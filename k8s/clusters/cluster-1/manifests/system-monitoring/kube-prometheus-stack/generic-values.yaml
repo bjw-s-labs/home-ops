@@ -8,10 +8,22 @@ kubeApiServer:
   enabled: true
 
 kubeControllerManager:
-  enabled: false
+  enabled: true
+  endpoints:
+    - "cp1.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    - "cp2.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    - "cp3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
 kubeEtcd:
-  enabled: false
+  enabled: true
+  endpoints:
+    - "cp1.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    - "cp2.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    - "cp3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+  service:
+    enabled: true
+    port: 2381
+    targetPort: 2381
 
 kubelet:
   enabled: true
@@ -23,10 +35,18 @@ kubelet:
         targetLabel: instance
 
 kubeProxy:
-  enabled: false
+  enabled: true
+  endpoints:
+    - "cp1.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    - "cp2.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    - "cp3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
 kubeScheduler:
-  enabled: false
+  enabled: true
+  endpoints:
+    - "cp1.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    - "cp2.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    - "cp3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
 kubeStateMetrics:
   enabled: true
@@ -47,6 +67,18 @@ grafana:
 
 kube-state-metrics:
   fullnameOverride: kube-state-metrics
+  metricLabelsAllowlist:
+    - "persistentvolumeclaims=[*]"
+  prometheus:
+    monitor:
+      enabled: true
+      relabelings:
+        - action: replace
+          regex: (.*)
+          replacement: $1
+          sourceLabels:
+            - __meta_kubernetes_pod_node_name
+          targetLabel: kubernetes_node
 
 prometheus-node-exporter:
   fullnameOverride: node-exporter
