@@ -50,10 +50,10 @@ prometheus:
         key: objstore.yml
 
     additionalScrapeConfigs:
-        - job_name: zfs
+        - job_name: node_exporter
           scrape_interval: 1m
           scrape_timeout: 10s
           honor_timestamps: true
           static_configs:
             - targets:
-                - "nas00.${INGRESS_DOMAIN}:9134"
+                - "nas00.${INGRESS_DOMAIN}:9100"
