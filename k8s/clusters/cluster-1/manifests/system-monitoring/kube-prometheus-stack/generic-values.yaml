@@ -8,14 +8,14 @@ kubeApiServer:
   enabled: true
 
 kubeControllerManager:
-  enabled: true
+  enabled: false
   endpoints:
     - "cp1.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
     - "cp2.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
     - "cp3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
 kubeEtcd:
-  enabled: true
+  enabled: false
   endpoints:
     - "cp1.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
     - "cp2.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
@@ -35,7 +35,7 @@ kubelet:
         targetLabel: instance
 
 kubeProxy:
-  enabled: true
+  enabled: false
   endpoints:
     - "cp1.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
     - "cp2.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
