@@ -8,11 +8,11 @@ kubeApiServer:
   enabled: true
 
 kubeControllerManager:
-  enabled: true
+  enabled: false
   endpoints:
-    - 10.200.1.109                    # cp1
-    - 10.200.1.108                    # cp2
-    - 10.200.1.111                    # cp3
+    - "cp1.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    - "cp2.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    - "cp3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
 kubeEtcd:
   enabled: true
