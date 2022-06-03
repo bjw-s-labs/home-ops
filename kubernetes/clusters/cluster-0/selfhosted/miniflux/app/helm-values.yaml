@@ -18,6 +18,22 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
+      DATABASE_URL:
+        valueFrom:
+          secretKeyRef:
+            name: miniflux-secrets
+            key: DATABASE_URL
+      CREATE_ADMIN: '1'
+      ADMIN_USERNAME:
+        valueFrom:
+          secretKeyRef:
+            name: miniflux-secrets
+            key: ADMIN_USERNAME
+      ADMIN_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: miniflux-secrets
+            key: ADMIN_PASSWORD
       POLLING_SCHEDULER: "entry_frequency"
       POLLING_FREQUENCY: "15"
       MINIFLUX_DATABASE_PASSWORD:
@@ -25,9 +41,6 @@ spec:
           secretKeyRef:
             name: miniflux-database
             key: postgres-password
-    envFrom:
-      - secretRef:
-          name: miniflux-secrets
 
     ingress:
       main:
