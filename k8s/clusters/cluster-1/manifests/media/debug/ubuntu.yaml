@@ -13,14 +13,23 @@ spec:
     - mountPath: /hostRoot
       name: root
       readOnly: true
-    - mountPath: /mountedPVC
-      name: pvc
-      readOnly: false
+    # - mountPath: /mountedPVC
+    #   name: pvc
+    #   readOnly: false
+    securityContext:
+      privileged: true
+    resources:
+      requests:
+        memory: "640Mi"
+        cpu: "250m"
+      limits:
+        memory: "4096Mi"
+        cpu: "2000m"
   volumes:
   - name: root
     hostPath:
       path: /
       type: Directory
-  - name: pvc
-    persistentVolumeClaim:
-      claimName: plex-config
+  # - name: pvc
+  #   persistentVolumeClaim:
+  #     claimName: plex-config
