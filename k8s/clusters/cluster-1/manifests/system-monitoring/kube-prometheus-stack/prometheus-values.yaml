@@ -48,3 +48,12 @@ prometheus:
       objectStorageConfig:
         name: thanos-objstore-secret
         key: objstore.yml
+
+      additionalScrapeConfigs:
+          - job_name: zfs
+            scrape_interval: 1m
+            scrape_timeout: 10s
+            honor_timestamps: true
+            static_configs:
+              - targets:
+                  - "nas00.${INGRESS_DOMAIN}/metrics:9134"
