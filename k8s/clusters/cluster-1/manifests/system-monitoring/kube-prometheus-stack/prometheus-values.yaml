@@ -57,3 +57,11 @@ prometheus:
           static_configs:
             - targets:
                 - "nas00.${INGRESS_DOMAIN}:9100"
+        - job_name: "netdata-scrape"
+          metrics_path: "/api/v1/allmetrics"
+          params:
+            format: [prometheus_all_hosts]
+          honor_labels: true
+          static_configs:
+            - targets:
+                - nas00.${INGRESS_DOMAIN}:19999
