@@ -22,24 +22,61 @@ config:
         type: ssh-ed25519
         key: ${secrets.ssh.keys.personal}
 
-  interfaces:
-    wan:
-      device: eth0
-    lan:
-      device: eth1
-    rescue:
-      device: eth2
-    trusted:
-      device: eth1.20
-    iot:
-      device: eth1.40
-    video:
-      device: eth1.50
-    wireguard_trusted:
-      device: wg01
+  wan:
+    interface: eth0
+  lan:
+    interface: eth1
+    dhcp:
+      domain_name:
+      default_router:
+      name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
+      start:
+      stop:
+  rescue:
+    interface: eth2
+    dhcp:
+      domain_name:
+      default_router:
+      name_server:
+      start:
+      stop:
+  servers:
+    interface: eth1.10
+    dhcp:
+      domain_name:
+      default_router:
+      name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
+      start:
+      stop:
+  trusted:
+    interface: eth1.20
+    dhcp:
+      domain_name:
+      default_router:
+      name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
+      start:
+      stop:
+  iot:
+    interface: eth1.40
+    dhcp:
+      domain_name:
+      default_router:
+      name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
+      start:
+      stop:
+  video:
+    interface: eth1.50
+    dhcp:
+      domain_name:
+      default_router:
+      name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
+      start:
+      stop:
+  wireguard_trusted:
+    interface: wg01
 
   nat:
-    port-forwards:
+    destination:
       - description: HTTPS
         protocol: tcp
         interface: wan
