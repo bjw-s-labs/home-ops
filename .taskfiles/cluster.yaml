@@ -32,7 +32,7 @@ tasks:
               "containers": [
                 {
                   "name": "debug",
-                  "image": "docker.io/library/alpine:3.15",
+                  "image": "docker.io/library/ubuntu:focal",
                   "command": [
                     "/bin/sh"
                   ],
@@ -87,7 +87,7 @@ tasks:
     silent: true
     cmds:
       - |
-        kubectl run debug-{{.NODE}} -i --tty --rm --image="docker.io/library/alpine:3.15" --privileged --overrides='
+        kubectl run debug-{{.NODE}} -i --tty --rm --image="docker.io/library/ubuntu:focal" --privileged --overrides='
           {
             "spec": {
               "nodeSelector": {
