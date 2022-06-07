@@ -1,4 +1,3 @@
----
 # ----------------
 # Devices
 # ----------------
@@ -70,7 +69,8 @@ hosts:
     groups:
       - nas
   anvil:
-    mac_addr: 00:23:24:d6:93:cb
+    # mac_addr: 00:23:24:d6:93:cb # Internal NIC
+    mac_addr: 00:e0:4c:0b:03:d6 # USB NIC
     network: servers
     ipv4_hostid: 21
     aliases:
@@ -78,7 +78,8 @@ hosts:
     groups:
       - k8s_nodes
   blitz:
-    mac_addr: 00:23:24:d6:93:52
+    # mac_addr: 00:23:24:d6:93:52 # Internal NIC
+    mac_addr: 00:e0:4c:0b:03:fd # USB NIC
     network: servers
     ipv4_hostid: 22
     aliases:
@@ -86,7 +87,8 @@ hosts:
     groups:
       - k8s_nodes
   cannon:
-    mac_addr: 00:23:24:d5:8b:00
+    # mac_addr: 00:23:24:d5:8b:00 # Internal NIC
+    mac_addr: 00:e0:4c:0b:04:e8 # USB NIC
     network: servers
     ipv4_hostid: 23
     aliases:
@@ -121,12 +123,9 @@ hosts:
     groups:
       - k8s_nodes
   goblin:
-    # mac_addr: 44:8a:5b:dd:8c:9f # Internal NIC
-    mac_addr: 00:e0:4c:08:25:64 # USB NIC
+    mac_addr: 00:e0:4c:08:25:64
     network: servers
-    ipv4_hostid: 41
-    aliases:
-      - worker4.cluster-0.bjw-s.tech
+    ipv4_hostid: 24
     groups:
       - k8s_nodes
 
@@ -318,7 +317,7 @@ hosts:
       - printers
       - scanners
   horus:
-    mac_addr: b8:27:eb:b2:09:b0
+    mac_addr: b8:27:eb:e7:5c:e5
     network: iot
     ipv4_hostid: 56
     aliases:
@@ -392,7 +391,12 @@ hosts:
     ipv4_hostid: 66
     groups:
       - sonos_players
-      - plex_clients
+  hallway-sonos-boost:
+    mac_addr: 78:28:ca:7a:54:92
+    network: iot
+    ipv4_hostid: 67
+    groups:
+      - sonos_players
   # ----------------------
   # Video
   # ----------------------
