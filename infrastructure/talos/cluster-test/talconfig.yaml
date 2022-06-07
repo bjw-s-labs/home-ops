@@ -47,22 +47,35 @@ controlPlane:
         extraArgs:
           feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
           rotate-server-certificates: "true"
-      network:
-        interfaces:
-          - dhcp: true
-            interface: eth0
       time:
         disabled: false
         servers:
           - 10.1.1.1
       token: ${machineToken}
 endpoint: https://10.1.1.24:6443
+
 nodes:
   - controlPlane: true
     hostname: goblin
     installDisk: /dev/sda
     ipAddress: 10.1.1.24
+    inlinePatch:
+      machine:
+        network:
+          interfaces:
+            - interface: eth0
+              dhcp: true
+            - interface: eth1
+              dhcp: true
+              addresses: []
+              vlans:
+                - vlanId: 40
+                  dhcp: false
+                  addresses:
+                    - 10.1.3.140/24
+
 talosVersion: v1.0.5
+
 worker:
   inlinePatch:
     cluster:
