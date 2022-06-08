@@ -9,18 +9,29 @@ spec:
       nameOverride: phpipam
 
     image:
-      repository: esphome/esphome
-      tag: 2022.5.1
+      repository: phpipam/phpipam-www
+      tag: v1.5.0
 
-    resources:
-      requests:
-        cpu: 15m
-        memory: 512M
-      limits:
-        memory: 1024M
+    env:
+      IPAM_DATABASE_USER: phpipam
+      IPAM_DATABASE_NAME: phpipam
+
+    dnsConfig:
+      options:
+        - name: ndots
+          value: "1"
+
+    resources: {}
+
+    securityContext:
+      allowPrivilegeEscalation: true
+      capabilities:
+        add:
+          - NET_ADMIN
+          - NET_RAW
 
     service:
       main:
         ports:
           http:
-            port: 6052
+            port: 80

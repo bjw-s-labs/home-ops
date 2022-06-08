@@ -1,0 +1,44 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cron
+  labels:
+    app: phpipam
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 0
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 600
+      template:
+        spec:
+          automountServiceAccountToken: false
+
+          containers:
+            - name: cronjob
+              image: phpipam/phpipam-www:v1.5.0
+              env:
+                - name: IPAM_DATABASE_USER
+                  value: phpipam
+                - name: IPAM_DATABASE_NAME
+                  value: phpipam
+              command:
+                - /bin/sh
+              args:
+                - -c
+                - >-
+                  /set_timezone &&
+                  su apache -s /bin/sh -c "/usr/bin/php /phpipam/functions/scripts/pingCheck.php" &&
+                  su apache -s /bin/sh -c "/usr/bin/php /phpipam/functions/scripts/discoveryCheck.php" &&
+                  su apache -s /bin/sh -c "/usr/bin/php /phpipam/functions/scripts/resolveIPaddresses.php"
+
+              securityContext:
+                allowPrivilegeEscalation: true
+                capabilities:
+                  add:
+                    - NET_ADMIN
+                    - NET_RAW
+
+          restartPolicy: OnFailure
