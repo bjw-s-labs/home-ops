@@ -1,5 +1,5 @@
 resource "vyos_config_block_tree" "interface-wan" {
-  path = "interfaces ethernet ${var.config.wan.interface}"
+  path = "interfaces ethernet ${var.config.zones.wan.interface}"
   configs = {
     "address"     = "dhcp"
     "description" = "WAN"
@@ -7,7 +7,7 @@ resource "vyos_config_block_tree" "interface-wan" {
 }
 
 resource "vyos_config_block_tree" "interface-lan" {
-  path = "interfaces ethernet ${var.config.lan.interface}"
+  path = "interfaces ethernet ${var.config.zones.lan.interface}"
   configs = {
     "address"     = "${cidrhost(var.networks.lan, 1)}/24"
     "description" = "LAN"
@@ -26,7 +26,7 @@ resource "vyos_config_block_tree" "interface-lan" {
 }
 
 resource "vyos_config_block_tree" "interface-rescue" {
-  path = "interfaces ethernet ${var.config.rescue.interface}"
+  path = "interfaces ethernet ${var.config.zones.rescue.interface}"
   configs = {
     "address"     = "${cidrhost(var.networks.rescue, 1)}/24"
     "description" = "RESCUE"
