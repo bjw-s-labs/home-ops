@@ -16,7 +16,7 @@ resource "vyos_config_block_tree" "service-dhcp-server" {
         "shared-network-name ${upper(zone)} subnet ${var.networks[zone]} default-router" = lookup(zone_config.dhcp, "default_router", cidrhost(var.networks[zone], 1))
         "shared-network-name ${upper(zone)} subnet ${var.networks[zone]} lease"          = "86400"
         "shared-network-name ${upper(zone)} subnet ${var.networks[zone]} name-server"    = lookup(zone_config.dhcp, "name_server", cidrhost(var.networks[zone], 1))
-        "shared-network-name ${upper(zone)} subnet ${var.networks[zone]} range 0 start"  = lookup(zone_config.dhcp, "start", cidrhost(var.networks[zone], 100))
+        "shared-network-name ${upper(zone)} subnet ${var.networks[zone]} range 0 start"  = lookup(zone_config.dhcp, "start", cidrhost(var.networks[zone], 200))
         "shared-network-name ${upper(zone)} subnet ${var.networks[zone]} range 0 stop"   = lookup(zone_config.dhcp, "start", cidrhost(var.networks[zone], 254))
       } if lookup(zone_config, "dhcp", false) != false
     ]...),
