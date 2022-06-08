@@ -44,7 +44,7 @@ Similar steps may be the same for other cluster stuff but havent gotten to that 
 Since this is a single node cluster, untainting the control plane allows for Sidero to run
 Also add feature gates for kubelet
 
-```
+``` bash
 talosctl gen config \
   --config-patch='[{"op": "add", "path": "/cluster/allowSchedulingOnMasters", "value": true},{"op": "add", "path": "/machine/kubelet/extraArgs", "value": { "feature-gates": "GracefulNodeShutdown=true,MixedProtocolLBService=true" } }]' \
   sidero \
@@ -53,7 +53,7 @@ talosctl gen config \
 
 ### Boot Talos ISO and apply the config
 
-```
+``` bash
 talosctl apply-config --insecure \
   --nodes $SIDERO_ENDPOINT \
   --file ./controlplane.yaml
@@ -61,7 +61,7 @@ talosctl apply-config --insecure \
 
 ### Set talosctl endpoints and nodes and merge into default talosconfig
 
-```
+``` bash
 # To pull the talosconfig from the sidero cluster
 kubectl --context=admin@sidero \
     get secret \
@@ -81,25 +81,25 @@ talosctl config merge ./talosconfig
 ```
 
 Verify the default talosconfig can connect to the Talos node. It should show both the client and server (ndoe) version
-```
+``` bash
 talosctl version
 ```
-
 
 ### Bootstrap k8s
 This may take 2-5 minutes so be patient
 
-```
+``` bash
 talosctl bootstrap --nodes $SIDERO_ENDPOINT
 ```
 
 ### Grab kubeconfig from the node and merge it with default kubeconfig
 
-```
+``` bash
 talosctl kubeconfig
 ```
 
 ### Bootstrap Sidero
+
 ```
 # This boostraps a entire sidero setup on your testing cluster.
 # HOST_NETWORK is critical to make it work else it doesnt have access to the ports it needs
