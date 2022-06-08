@@ -1,0 +1,47 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: phpipam
+spec:
+  values:
+    initContainers:
+      wait-for-db:
+        image: busybox:latest
+        imagePullPolicy: IfNotPresent
+        command:
+          [
+            "sh",
+            "-c",
+            'until nc -vz phpipam-mariadb.selfhosted.svc.cluster.local 3306; do echo "Waiting for mariadb..."; sleep 3; done;',
+          ]
+
+    env:
+      TZ: "${TIMEZONE}"
+      IPAM_DATABASE_HOST: phpipam-mariadb.selfhosted.svc.cluster.local
+      IPAM_DATABASE_PASS:
+        valueFrom:
+          secretKeyRef:
+            name: phpipam-database
+            key: mariadb-password
+      IPAM_DATABASE_WEBHOST: "%"
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns/is-public: "true"
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+
+        hosts:
+          - host: &host "phpipam.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+
+        tls:
+          - secretName: phpipam-tls
+            hosts:
+              - *host
