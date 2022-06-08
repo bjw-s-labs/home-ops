@@ -22,58 +22,43 @@ config:
         type: ssh-ed25519
         key: ${secrets.ssh.keys.personal}
 
-  wan:
-    interface: eth0
-  lan:
-    interface: eth1
-    dhcp:
-      domain_name:
-      default_router:
-      name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
-      start:
-      stop:
-  rescue:
-    interface: eth2
-    dhcp:
-      domain_name:
-      default_router:
-      name_server:
-      start:
-      stop:
-  servers:
-    interface: eth1.10
-    dhcp:
-      domain_name:
-      default_router:
-      name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
-      start:
-      stop:
-  trusted:
-    interface: eth1.20
-    dhcp:
-      domain_name:
-      default_router:
-      name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
-      start:
-      stop:
-  iot:
-    interface: eth1.40
-    dhcp:
-      domain_name:
-      default_router:
-      name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
-      start:
-      stop:
-  video:
-    interface: eth1.50
-    dhcp:
-      domain_name:
-      default_router:
-      name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
-      start:
-      stop:
-  wireguard_trusted:
-    interface: wg01
+  zones:
+    wan:
+      interface: eth0
+    lan:
+      interface: eth1
+      dhcp:
+        name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
+    rescue:
+      interface: eth2
+      dhcp:
+        name_server: ${cidrhost(networks["rescue"], 1)}
+    servers:
+      interface: eth1.10
+      dhcp:
+        domain_name: ${domains.hardware}
+        name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
+    trusted:
+      interface: eth1.20
+      dhcp:
+        domain_name: ${domains.hardware}
+        name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
+    guest:
+      interface: eth1.30
+      dhcp:
+        name_server: "1.1.1.1"
+    iot:
+      interface: eth1.40
+      dhcp:
+        domain_name: ${domains.hardware}
+        name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
+    video:
+      interface: eth1.50
+      dhcp:
+        domain_name: ${domains.hardware}
+        name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
+    wireguard_trusted:
+      interface: wg01
 
   nat:
     destination:

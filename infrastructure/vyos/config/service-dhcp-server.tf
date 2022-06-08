@@ -1,5 +1,5 @@
 resource "vyos_config_block_tree" "service-dhcp-server" {
-  path = "service dhcp"
+  path = "service dhcp-server"
 
   configs = merge(
     {
@@ -7,25 +7,25 @@ resource "vyos_config_block_tree" "service-dhcp-server" {
       "hostfile-update" = "" # Create DNS record per client lease, by adding clients to /etc/hosts file. Entry will have format: <shared-network-name>_<hostname>.<domain-name>
       "host-decl-name"  = "" # Will drop <shared-network-name>_ from client DNS record, using only the host declaration name and domain: <hostname>.<domain-name>
     },
+
     merge([
-      # Loop over zones
-      for index, zone in ["lan", "rescue", "servers", "trusted", "iot", "video"] :
-      {
-        "shared-network-name ${zone} domain-name"                                 = var.config[zone].dhcp.domain_name != "" ? var.config[zone].dhcp.domain_name : null,
-        "shared-network-name ${zone} ping-check"                                  = "",
-        "shared-network-name ${zone} subnet ${var.networks[zone]} default-router" = var.config[zone].dhcp.name_server != "" ? var.config[zone].dhcp.default_router : cidrhost(var.networks[zone], 1)
-        "shared-network-name ${zone} subnet ${var.networks[zone]} lease"          = "86400",
-        "shared-network-name ${zone} subnet ${var.networks[zone]} name-server"    = var.config[zone].dhcp.name_server != "" ? var.config[zone].dhcp.name_server : cidrhost(var.networks[zone], 1)
-        "shared-network-name ${zone} subnet ${var.networks[zone]} range 0 start"  = var.config[zone].dhcp.start != "" ? var.config[zone].dhcp.start : 100
-        "shared-network-name ${zone} subnet ${var.networks[zone]} range 0 stop"   = var.config[zone].dhcp.stop != "" ? var.config[zone].dhcp.stop : 254
-      }
+      for zone, zone_config in var.config.zones : {
+        "shared-network-name ${upper(zone)} authoritative"                               = ""
+        "shared-network-name ${upper(zone)} ping-check"                                  = ""
+        "shared-network-name ${upper(zone)} subnet ${var.networks[zone]} domain-name"    = lookup(zone_config.dhcp, "domain_name", null)
+        "shared-network-name ${upper(zone)} subnet ${var.networks[zone]} default-router" = lookup(zone_config.dhcp, "default_router", cidrhost(var.networks[zone], 1))
+        "shared-network-name ${upper(zone)} subnet ${var.networks[zone]} lease"          = "86400"
+        "shared-network-name ${upper(zone)} subnet ${var.networks[zone]} name-server"    = lookup(zone_config.dhcp, "name_server", cidrhost(var.networks[zone], 1))
+        "shared-network-name ${upper(zone)} subnet ${var.networks[zone]} range 0 start"  = lookup(zone_config.dhcp, "start", cidrhost(var.networks[zone], 100))
+        "shared-network-name ${upper(zone)} subnet ${var.networks[zone]} range 0 stop"   = lookup(zone_config.dhcp, "start", cidrhost(var.networks[zone], 254))
+      } if lookup(zone_config, "dhcp", false) != false
     ]...),
-    # merge([
-    #   # static allocation
-    #   for host in local.host_by_name_with_mac : {
-    #     "shared-network-name lan subnet ${var.config.lan.cidr} static-mapping ${host.name}${trimsuffix(host.name, ".") != host.name ? "" : ".${var.config.lan.dhcp.domain_name}" } mac-address" = host.mac
-    #     "shared-network-name lan subnet ${var.config.lan.cidr} static-mapping ${host.name}${trimsuffix(host.name, ".") != host.name ? "" : ".${var.config.lan.dhcp.domain_name}" } ip-address" = host.ip
-    #   } if lookup(host, "is_dhcp", true)
-    # ]...),
+
+    merge([
+      for hostname, host in var.address_book.hosts : {
+        "shared-network-name ${upper(host.network)} subnet ${var.networks[host.network]} static-mapping ${hostname} mac-address" = host.mac_addr
+        "shared-network-name ${upper(host.network)} subnet ${var.networks[host.network]} static-mapping ${hostname} ip-address"  = cidrhost(var.networks[host.network], host.ipv4_hostid)
+      } if lookup(host, "mac_addr", false) != false
+    ]...),
   )
 }
