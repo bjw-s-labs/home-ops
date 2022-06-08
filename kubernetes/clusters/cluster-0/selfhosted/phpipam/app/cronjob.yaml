@@ -1,0 +1,23 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: phpipam-cron
+spec:
+  schedule: "*/15 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: cronjob
+              env:
+                - name: TZ
+                  value: "${TIMEZONE}"
+                - name: IPAM_DATABASE_HOST
+                  value: phpipam-mariadb.selfhosted.svc.cluster.local
+                - name: IPAM_DATABASE_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: phpipam-database
+                      key: mariadb-password
