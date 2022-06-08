@@ -1,62 +1,18 @@
 ---
 clustername: cluster-test
-controlPlane:
-  inlinePatch:
-    cluster:
-      aescbcEncryptionSecret: ${aescbcEncryptionKey}
-      aggregatorCA:
-        crt: ${k8sAggregatorCert}
-        key: ${k8sAggregatorCertKey}
-      allowSchedulingOnMasters: true
-      apiServer:
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      ca:
-        crt: ${clusterCert}
-        key: ${clusterCertKey}
-      controllerManager:
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      etcd:
-        ca:
-          crt: ${etcdCert}
-          key: ${etcdCertKey}
-      extraManifests:
-        - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/v0.5.0/deploy/ha-install.yaml
-      network:
-        cni:
-          name: custom
-          urls:
-            - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-test/cni/install.yaml
-      proxy:
-        disabled: true
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      scheduler:
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      secret: ${clusterSecret}
-      serviceAccount:
-        key: ${k8sServiceAccountKey}
-      token: ${clusterToken}
-    machine:
-      ca:
-        crt: ${machineCert}
-        key: ${machineCertKey}
-      kubelet:
-        extraArgs:
-          feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
-          rotate-server-certificates: "true"
-      time:
-        disabled: false
-        servers:
-          - 10.1.1.1
-      token: ${machineToken}
+
+talosVersion: v1.0.6
+kubernetesVersion: 1.23.7
 endpoint: https://10.1.1.24:6443
+
+cniConfig:
+  name: custom
+  urls:
+    - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-test/cni/install.yaml
 
 nodes:
   - controlPlane: true
-    hostname: goblin
+    hostname: goblin.${domainName}
     installDisk: /dev/sda
     ipAddress: 10.1.1.24
     inlinePatch:
@@ -74,7 +30,57 @@ nodes:
                   addresses:
                     - 10.1.3.140/24
 
-talosVersion: v1.0.5
+controlPlane:
+  inlinePatch:
+    cluster:
+      aescbcEncryptionSecret: ${aescbcEncryptionKey}
+      aggregatorCA:
+        crt: ${k8sAggregatorCert}
+        key: ${k8sAggregatorCertKey}
+      allowSchedulingOnMasters: true
+      apiServer:
+        certSANs:
+          - cluster-test.${domainName}
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      ca:
+        crt: ${clusterCert}
+        key: ${clusterCertKey}
+      controllerManager:
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      etcd:
+        ca:
+          crt: ${etcdCert}
+          key: ${etcdCertKey}
+      extraManifests:
+        - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/v0.5.0/deploy/ha-install.yaml
+      proxy:
+        disabled: true
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      scheduler:
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      secret: ${clusterSecret}
+      serviceAccount:
+        key: ${k8sServiceAccountKey}
+      token: ${clusterToken}
+    machine:
+      ca:
+        crt: ${machineCert}
+        key: ${machineCertKey}
+      certSANs:
+        - cluster-test.${domainName}
+      kubelet:
+        extraArgs:
+          feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+          rotate-server-certificates: "true"
+      time:
+        disabled: false
+        servers:
+          - 10.1.1.1
+      token: ${machineToken}
 
 worker:
   inlinePatch:
