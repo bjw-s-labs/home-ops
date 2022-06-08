@@ -34,15 +34,16 @@ For more information, head on over to my [docs](https://dcplaya.github.io/home-o
 
 A lot of inspiration for my cluster came from the people that have shared their clusters over at [awesome-home-kubernetes](https://github.com/k8s-at-home/awesome-home-kubernetes)
 
-
 ## Installation Notes
 
 Below are the steps to bootstrap the sidero cluster
 Similar steps may be the same for other cluster stuff but havent gotten to that yet.
 
 ### Generate Sidero Talos config
+
 Since this is a single node cluster, untainting the control plane allows for Sidero to run
 Also add feature gates for kubelet
+
 ```
 talosctl gen config \
   --config-patch='[{"op": "add", "path": "/cluster/allowSchedulingOnMasters", "value": true},{"op": "add", "path": "/machine/kubelet/extraArgs", "value": { "feature-gates": "GracefulNodeShutdown=true,MixedProtocolLBService=true" } }]' \
@@ -51,6 +52,7 @@ talosctl gen config \
 ```
 
 ### Boot Talos ISO and apply the config
+
 ```
 talosctl apply-config --insecure \
   --nodes $SIDERO_ENDPOINT \
@@ -58,6 +60,7 @@ talosctl apply-config --insecure \
 ```
 
 ### Set talosctl endpoints and nodes and merge into default talosconfig
+
 ```
 # To pull the talosconfig from the sidero cluster
 kubectl --context=admin@sidero \
@@ -85,6 +88,7 @@ talosctl version
 
 ### Bootstrap k8s
 This may take 2-5 minutes so be patient
+
 ```
 talosctl bootstrap --nodes $SIDERO_ENDPOINT
 ```
@@ -105,8 +109,10 @@ clusterctl init -b talos -c talos -i sidero
 ```
 
 ## Install Flux
+
 These steps will be repeated for each cluster that is created.
 Flux does not get auto-deployed on the Sidero created clusters
+
 ### Create flux-system
 
 ```
@@ -133,6 +139,7 @@ kubectl apply -k $CLUSTER_TARGET_FOLDER
 ```
 
 # Reset Node
+
 ```
 NODE=cp1.cluster-1
 talosctl reset  --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL --reboot --nodes $NODE 
@@ -140,9 +147,11 @@ talosctl reset  --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL 
 
 
 # Add 2 drives to my ZFS NAS
+
 https://docs.oracle.com/cd/E53394_01/html/E54801/gayrd.html#scrolltoc
 
 `-n` is for dry run
+
 ```
 zpool status
 zpool add Media mirror $DEV_DEVICE1 $DEV_DEVICE2 -n
@@ -153,13 +162,16 @@ sudo reboot
 ```
 
 # Upgrade Talos OS
+
 ## Sidero Cluster
+
 ```
 talosctl upgrade --nodes sidero.FQDN.com --context sidero \
 --image ghcr.io/siderolabs/installer:v1.0.4 \
 --preserve=true
 ```
 ## Workload Cluster
+
 ```
 talosctl upgrade --nodes cp1.cluster-1.FQDN.com --context clsuter-1 \
 --image ghcr.io/siderolabs/installer:v1.0.4
