@@ -49,6 +49,10 @@ controlPlane:
       controllerManager:
         extraArgs:
           feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      discovery:
+        registries:
+          service:
+            disabled: true
       etcd:
         ca:
           crt: ${etcdCert}
@@ -89,6 +93,10 @@ worker:
       ca:
         crt: ${clusterCert}
         key: ${clusterCertKey}
+      discovery:
+        registries:
+          service:
+            disabled: true
       secret: ${clusterSecret}
       token: ${clusterToken}
     machine:
