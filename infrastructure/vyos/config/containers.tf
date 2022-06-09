@@ -14,6 +14,8 @@ resource "remote_file" "container-coredns-corefile" {
     { domains = var.domains }
   )
   permissions = "0644"
+  owner       = "0"   # root
+  group       = "104" # vyattacfg
 }
 
 resource "vyos_config_block_tree" "container-coredns" {
