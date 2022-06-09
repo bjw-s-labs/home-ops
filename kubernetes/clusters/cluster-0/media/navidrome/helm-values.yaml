@@ -34,7 +34,9 @@ spec:
         ingressClassName: "nginx"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns/is-public: "true"
           external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
         hosts:
           - host: &host "navidrome.${INGRESS_DOMAIN}"
             paths:
