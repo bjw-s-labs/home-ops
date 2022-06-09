@@ -13,25 +13,49 @@ cniConfig:
 nodes:
   - hostname: anvil.${domainName}
     controlplane: true
-    ip_address: 10.1.1.21
+    ipAddress: 10.1.1.21
     installDisk: /dev/sda
   - hostname: blitz.${domainName}
-    ip_address: 10.1.1.22
+    ipAddress: 10.1.1.22
     installDisk: /dev/sda
     controlplane: true
   - hostname: cannon.${domainName}
-    ip_address: 10.1.1.23
+    ipAddress: 10.1.1.23
     installDisk: /dev/sda
     controlplane: true
   - hostname: delta.${domainName}
-    ip_address: 10.1.1.31
+    ipAddress: 10.1.1.31
     installDisk: /dev/sda
+    configPatches:
+      - op: add
+        path: /machine/network/interfaces/0/vlans
+        value:
+          - vlanId: 40
+            dhcp: false
+            addresses:
+              - 10.1.3.141/24
   - hostname: enigma.${domainName}
-    ip_address: 10.1.1.32
+    ipAddress: 10.1.1.32
     installDisk: /dev/sda
+    configPatches:
+      - op: add
+        path: /machine/network/interfaces/0/vlans
+        value:
+          - vlanId: 40
+            dhcp: false
+            addresses:
+              - 10.1.3.142/24
   - hostname: felix.${domainName}
-    ip_address: 10.1.1.33
+    ipAddress: 10.1.1.33
     installDisk: /dev/sda
+    configPatches:
+      - op: add
+        path: /machine/network/interfaces/0/vlans
+        value:
+          - vlanId: 40
+            dhcp: false
+            addresses:
+              - 10.1.3.143/24
 
 controlPlane:
   inlinePatch:
@@ -97,6 +121,9 @@ controlPlane:
           - ip: ${clusterEndpointIP}
             aliases:
               - cluster-0.${domainName}
+        interfaces:
+          - interface: eth0
+            dhcp: true
       time:
         disabled: false
         servers:
@@ -136,6 +163,9 @@ worker:
           - ip: ${clusterEndpointIP}
             aliases:
               - cluster-0.${domainName}
+        interfaces:
+          - interface: eth0
+            dhcp: true
       sysctls:
         fs.inotify.max_user_watches: "1048576"
         fs.inotify.max_user_instances: "8192"
