@@ -29,12 +29,12 @@ spec:
         interval: 2m
         scrapeTimeout: 30s
       targets:
-        # FluiddPi
+        # 3D Printer controller
         - module: http_2xx
-          name: fluiddpi-http
-          url: "http://fluiddpi.${HARDWARE_DOMAIN}"
+          name: horus-http
+          url: "http://horus.${HARDWARE_DOMAIN}"
         - module: icmp
-          name: fluiddpi-icmp
+          name: horus-icmp
           url: horus.${HARDWARE_DOMAIN}
 
         # PiKVM
