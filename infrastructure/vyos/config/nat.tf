@@ -21,7 +21,7 @@ resource "vyos_config_block_tree" "nat-destination" {
 
   configs = merge(
     merge([
-      for index, rule in var.config.nat.destination:
+      for index, rule in var.config.nat.destination :
       {
         "rule ${100 + index} description" : "${rule.description}"
         "rule ${100 + index} destination address" : contains(keys(rule), "destinationAddress") ? rule.destinationAddress : null
