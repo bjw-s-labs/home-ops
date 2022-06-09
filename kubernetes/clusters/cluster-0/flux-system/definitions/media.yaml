@@ -61,3 +61,17 @@ spec:
   prune: true
   dependsOn:
     - name: media-namespace
+    - name: media-calibre
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: media-navidrome
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/media/navidrome"
+  prune: true
+  dependsOn:
+    - name: media-namespace
