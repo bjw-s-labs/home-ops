@@ -315,7 +315,7 @@ metadata:
   name: cilium-operator
   namespace: kube-system
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app.kubernetes.io/managed-by: Helm
@@ -370,7 +370,7 @@ spec:
                   name: cilium-config
                   optional: true
             - name: KUBERNETES_SERVICE_HOST
-              value: 10.1.1.24
+              value: 10.5.0.2
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
           image: quay.io/cilium/operator-generic:v1.11.5@sha256:8ace281328b27d4216218c604d720b9a63a8aec2bd1996057c79ab0168f9d6d8
@@ -481,7 +481,7 @@ spec:
                   name: cilium-config
                   optional: true
             - name: KUBERNETES_SERVICE_HOST
-              value: 10.1.1.24
+              value: 10.5.0.2
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
           image: quay.io/cilium/cilium:v1.11.5@sha256:79e66c3c2677e9ecc3fd5b2ed8e4ea7e49cf99ed6ee181f2ef43400c4db5eef0
@@ -599,7 +599,7 @@ spec:
                   name: cilium-config
                   optional: true
             - name: KUBERNETES_SERVICE_HOST
-              value: 10.1.1.24
+              value: 10.5.0.2
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
           image: quay.io/cilium/cilium:v1.11.5@sha256:79e66c3c2677e9ecc3fd5b2ed8e4ea7e49cf99ed6ee181f2ef43400c4db5eef0

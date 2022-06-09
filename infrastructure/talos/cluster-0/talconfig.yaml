@@ -1,0 +1,150 @@
+---
+clustername: cluster-0
+
+talosVersion: v1.0.6
+kubernetesVersion: 1.23.7
+endpoint: "https://cluster-0.${domainName}:6443"
+
+cniConfig:
+  name: custom
+  urls:
+    - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-0/cni/install.yaml
+
+nodes:
+  - hostname: anvil.${domainName}
+    controlplane: true
+    ip_address: 10.1.1.21
+    installDisk: /dev/sda
+  - hostname: blitz.${domainName}
+    ip_address: 10.1.1.22
+    installDisk: /dev/sda
+    controlplane: true
+  - hostname: cannon.${domainName}
+    ip_address: 10.1.1.23
+    installDisk: /dev/sda
+    controlplane: true
+  - hostname: delta.${domainName}
+    ip_address: 10.1.1.31
+    installDisk: /dev/sda
+  - hostname: enigma.${domainName}
+    ip_address: 10.1.1.32
+    installDisk: /dev/sda
+  - hostname: felix.${domainName}
+    ip_address: 10.1.1.33
+    installDisk: /dev/sda
+
+controlPlane:
+  inlinePatch:
+    cluster:
+      aescbcEncryptionSecret: ${aescbcEncryptionKey}
+      aggregatorCA:
+        crt: ${k8sAggregatorCert}
+        key: ${k8sAggregatorCertKey}
+      apiServer:
+        certSANs:
+          - ${clusterEndpointIP}
+          - cluster-0.${domainName}
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      ca:
+        crt: ${clusterCert}
+        key: ${clusterCertKey}
+      controllerManager:
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      discovery:
+        registries:
+          service:
+            disabled: true
+      etcd:
+        ca:
+          crt: ${etcdCert}
+          key: ${etcdCertKey}
+      extraManifests:
+        - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/v0.5.0/deploy/ha-install.yaml
+      proxy:
+        disabled: true
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      scheduler:
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      secret: ${clusterSecret}
+      serviceAccount:
+        key: ${k8sServiceAccountKey}
+      token: ${clusterToken}
+
+    machine:
+      ca:
+        crt: ${machineCert}
+        key: ${machineCertKey}
+      certSANs:
+        - ${clusterEndpointIP}
+        - cluster-0.${domainName}
+      kubelet:
+        extraArgs:
+          feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+          rotate-server-certificates: "true"
+      install:
+        extraKernelArgs:
+          - "talos.logging.kernel=udp://10.45.0.2:6050/"
+      logging:
+        destinations:
+          - endpoint: "udp://10.45.0.2:6051/"
+            format: json_lines
+      network:
+        extraHostEntries:
+          - ip: ${clusterEndpointIP}
+            aliases:
+              - cluster-0.${domainName}
+      time:
+        disabled: false
+        servers:
+          - 10.1.1.1
+      token: ${machineToken}
+
+worker:
+  inlinePatch:
+    cluster:
+      aescbcEncryptionSecret: ${aescbcEncryptionKey}
+      ca:
+        crt: ${clusterCert}
+        key: ${clusterCertKey}
+      secret: ${clusterSecret}
+      token: ${clusterToken}
+      discovery:
+        registries:
+          service:
+            disabled: true
+
+    machine:
+      ca:
+        crt: ${machineCert}
+        key: ${machineCertKey}
+      certSANs:
+        - ${clusterEndpointIP}
+        - cluster-0.${domainName}
+      install:
+        extraKernelArgs:
+          - "talos.logging.kernel=udp://10.45.0.2:6050/"
+      logging:
+        destinations:
+          - endpoint: "udp://10.45.0.2:6051/"
+            format: json_lines
+      network:
+        extraHostEntries:
+          - ip: ${clusterEndpointIP}
+            aliases:
+              - cluster-0.${domainName}
+      sysctls:
+        fs.inotify.max_user_watches: "1048576"
+        fs.inotify.max_user_instances: "8192"
+      time:
+        disabled: false
+        servers:
+          - 10.1.1.1
+      token: ${machineToken}
+      kubelet:
+        extraArgs:
+          rotate-server-certificates: "true"
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
