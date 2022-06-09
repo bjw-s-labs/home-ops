@@ -28,6 +28,13 @@ spec:
         path: /volume1/Media/Library/Kids/Music
         mountPath: /music/kids
 
+    service:
+      main:
+        type: LoadBalancer
+        annotations:
+          metallb.universe.tf/loadBalancerIPs: "${LB_NAVIDROME}"
+        externalTrafficPolicy: Local
+
     ingress:
       main:
         enabled: true
