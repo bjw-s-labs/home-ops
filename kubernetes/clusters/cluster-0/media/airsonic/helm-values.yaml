@@ -2,17 +2,19 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: navidrome
+  name: airsonic
 spec:
   values:
     podSecurityContext:
       supplementalGroups:
         - 65539
 
+    podAnnotations:
+      k8s.v1.cni.cncf.io/networks: macvlan-static-iot-airsonic
+
     env:
       TZ: "${TIMEZONE}"
-      ND_LASTFM_ENABLED: "false"
-      ND_ENABLESTARRATING: "false"
+      JAVA_OPTS: "-Xmx768m -Dserver.forward-headers-strategy=native"
 
     persistence:
       music-main:
@@ -28,13 +30,6 @@ spec:
         path: /volume1/Media/Library/Kids/Music
         mountPath: /music/kids
 
-    service:
-      main:
-        type: LoadBalancer
-        annotations:
-          metallb.universe.tf/loadBalancerIPs: "${LB_NAVIDROME}"
-        externalTrafficPolicy: Local
-
     ingress:
       main:
         enabled: true
@@ -45,10 +40,10 @@ spec:
           external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
         hosts:
-          - host: &host "navidrome.${INGRESS_DOMAIN}"
+          - host: &host "airsonic.${INGRESS_DOMAIN}"
             paths:
               - path: /
         tls:
-          - secretName: tls.navidrome
+          - secretName: tls.airsonic
             hosts:
               - *host
