@@ -43,9 +43,16 @@ spec:
         feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
 
     - op: add
-      path: /machine/install/extraKernelArgs
+      path: /machine/install/logging
       value:
-      - talos.logging.kernel=udp://127.0.0.1:12000/
+        destinations:
+          - endpoint: udp://vector.elcarpenter.com:6051
+            format: json
+
+    - op: add
+      path: /machine/install/extraKernelArgs
+      value: talos.logging.kernel=udp://vector.elcarpenter.com:6050/
+
 
     - op: add
       path: /machine/time
@@ -110,6 +117,7 @@ spec:
           # Add multus
           # Multus has an odd setup that wont work with Talos / Flux without exposing a service account
           # - "https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset-thick-plugin.yml"
+
     - op: replace
       path: /cluster/extraManifests
       value:
