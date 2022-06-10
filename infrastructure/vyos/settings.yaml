@@ -10,8 +10,7 @@ config:
     listen_address: "0.0.0.0"
     port: 8443
     keys:
-      terraform:
-        ${secrets.api.key}
+      terraform: ${secrets.api.key}
 
   ssh:
     user: ${secrets.ssh.user}
@@ -23,42 +22,416 @@ config:
         key: ${secrets.ssh.keys.personal}
 
   zones:
+    local:
+      description: Local router zone
+      local_zone: true
+      firewall:
+        default:
+          default: drop
+          rules:
+            - accept_established: null
+            - accept_related: null
+            - drop_invalid: null
+            - accept_ntp: null
+            - accept_dhcp: null
+        fromZones:
+          - zones:
+              - lan
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_ssh: null
+              - accept_ntp: null
+              - accept_dhcp: null
+          - zones:
+              - trusted
+              - wg_trusted
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_icmp: null
+              - accept_ssh: null
+              - accept_ntp: null
+              - accept_dhcp: null
+              - accept_igmp: null
+              - accept_mdns: null
+              - accept_vyos_api: null
+              - accept_discovery_from_sonos_players: null
+              - accept_discovery_from_sonos_controllers: null
+          - zones:
+              - iot
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_ssh: null
+              - accept_ntp: null
+              - accept_dhcp: null
+              - accept_igmp: null
+              - accept_mdns: null
+              - accept_discovery_from_sonos_players: null
+              - accept_discovery_from_sonos_controllers: null
+          - zones:
+              - servers
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_icmp: null
+              - accept_ntp: null
+              - accept_dhcp: null
+              - accept_bgp: null
+              - accept_tftp: null
+              - accept_prometheus_from_k8s_nodes: null
+          - zones:
+              - wan
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_wireguard: null
+          - zones:
+              - guest
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_dhcp: null
+
     wan:
       interface: eth0
+      firewall:
+        default:
+          default: accept
+          defaultLog: false
+          rules:
+            - accept_established: null
+            - accept_related: null
+            - drop_invalid: null
+        fromZones:
+          - zones:
+              - video
+            default: drop
+            defaultLog: false
+            rules: []
+
     lan:
       interface: eth1
       dhcp:
         name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
+      firewall:
+        default:
+          default: drop
+          rules:
+            - accept_established: null
+            - accept_related: null
+            - drop_invalid: null
+
+        fromZones:
+          - zones:
+              - trusted
+              - wg_trusted
+            default: accept
+            defaultLog: false
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+          - zones:
+              - servers
+            default: drop
+            defaultLog: false
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_icmp: null
+
     rescue:
       interface: eth2
       dhcp:
         name_server: ${cidrhost(networks["rescue"], 1)}
+
     servers:
       interface: eth1.10
       dhcp:
         domain_name: ${domains.hardware}
         name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
+      firewall:
+        default:
+          default: drop
+          rules:
+            - accept_established: null
+            - accept_related: null
+            - drop_invalid: null
+
+        fromZones:
+          - zones:
+              - trusted
+              - wg_trusted
+              - services
+            default: accept
+            defaultLog: false
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_icmp: null
+          - zones:
+              - wan
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_ingress_from_cloudflare: null
+          - zones:
+              - lan
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_icmp: null
+              - accept_unifi_inform: null
+              - accept_unifi_stun: null
+          - zones:
+              - iot
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_mqtt: null
+              - accept_nas_smb_from_scanners: null
+              - accept_plex_from_plex_clients: null
+              - accept_hass_from_wall_displays: null
+              - accept_hass_from_3d_printer_controllers: null
+              - accept_hass_control_from_sonos_players: null
+              - accept_k8s_ingress_from_sonos_players: null
+              - accept_k8s_ingress_from_ereaders: null
+              - accept_k8s_ingress_from_wall_displays: null
+              - accept_vector_journald_from_allowed_devices: null
+          - zones:
+              - local
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_bgp: null
+              - accept_k8s_api: null
+              - accept_dns: null
+
     trusted:
       interface: eth1.20
       dhcp:
         domain_name: ${domains.hardware}
         name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
+      firewall:
+        default:
+          default: drop
+          rules:
+            - accept_established: null
+            - accept_related: null
+            - drop_invalid: null
+        fromZones:
+          - zones:
+              - local
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_igmp: null
+              - accept_mdns: null
+              - accept_discovery_from_sonos_players: null
+          - zones:
+              - wg_trusted
+            default: accept
+            defaultLog: false
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+          - zones:
+              - iot
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_udp_from_sonos_players_to_sonos_controllers: null
+              - accept_tcp_from_sonos_players_to_sonos_controllers: null
+          - zones:
+              - servers
+            default: drop
+            defaultLog: false
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_icmp: null
+
     guest:
       interface: eth1.30
       dhcp:
         name_server: "1.1.1.1"
+      firewall:
+        default:
+          default: drop
+          rules:
+            - accept_established: null
+            - accept_related: null
+            - drop_invalid: null
+
     iot:
       interface: eth1.40
       dhcp:
         domain_name: ${domains.hardware}
         name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
+      firewall:
+        default:
+          default: drop
+          rules:
+            - accept_established: null
+            - accept_related: null
+            - drop_invalid: null
+        fromZones:
+          - zones:
+              - trusted
+              - wg_trusted
+            default: accept
+            defaultLog: false
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_icmp: null
+              - accept_app_control_from_sonos_controllers_tcp: null
+              - accept_app_control_from_sonos_controllers_udp: null
+          - zones:
+              - servers
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_icmp: null
+              - accept_p1reader_from_k8s_nodes: null
+              - accept_adb_from_k8s_nodes: null
+              - accept_3d_printer_control_from_k8s_nodes: null
+              - accept_k8s_nodes: null
+          - zones:
+              - local
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_igmp: null
+              - accept_mdns: null
+              - accept_discovery_from_sonos_controllers: null
+          - zones:
+              - guest
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_tcp_printer_from_allowed_devices: null
+              - accept_udp_printer_from_allowed_devices: null
+
     video:
       interface: eth1.50
       dhcp:
         domain_name: ${domains.hardware}
         name_server: ${address_book.services.vyos_adguard_home.ipv4_addr}
-    wireguard_trusted:
+      firewall:
+        default:
+          default: drop
+          rules:
+            - accept_established: null
+            - accept_related: null
+            - drop_invalid: null
+        fromZones:
+          - zones:
+              - trusted
+              - wg_trusted
+            default: accept
+            defaultLog: false
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_icmp: null
+          - zones:
+              - servers
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_icmp: null
+              - accept_k8s_nodes: null
+
+    wg_trusted:
       interface: wg01
+      firewall:
+        default:
+          default: drop
+          rules:
+            - accept_established: null
+            - accept_related: null
+            - drop_invalid: null
+
+        fromZones:
+          - zones:
+              - local
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+              - accept_igmp: null
+              - accept_mdns: null
+          - zones:
+              - iot
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
+
+    services:
+      description: VyOS services zone
+      interface: cni-services
+      firewall:
+        default:
+          default: accept
+          defaultLog: false
+          rules:
+            - accept_established: null
+            - accept_related: null
+            - accept_dns: null
+            - drop_invalid: null
+        fromZones:
+          - zones:
+              - wan
+              - guest
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - drop_invalid: null
 
   nat:
     destination:
@@ -111,9 +484,9 @@ config:
       - description: Force NTP for Wireguard Trusted
         port: 123
         protocol: udp
-        interface: wireguard_trusted
-        destinationAddress: "!${cidrhost(networks.wireguard_trusted, 1)}"
-        address: "${cidrhost(networks.wireguard_trusted, 1)}"
+        interface: wg_trusted
+        destinationAddress: "!${cidrhost(networks.wg_trusted, 1)}"
+        address: "${cidrhost(networks.wg_trusted, 1)}"
 
   containers:
     coredns:
