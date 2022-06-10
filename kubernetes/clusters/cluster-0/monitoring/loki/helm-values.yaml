@@ -28,6 +28,13 @@ spec:
           hosts:
             - *host
 
+    resources:
+      requests:
+        cpu: 49m
+        memory: 512M
+      limits:
+        memory: 883M
+
   valuesFrom:
     - kind: ConfigMap
       name: loki-ceph-bucket
