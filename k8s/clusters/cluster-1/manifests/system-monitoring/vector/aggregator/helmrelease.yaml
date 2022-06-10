@@ -37,9 +37,17 @@ spec:
       # Sources
       sources:
         kubernetes_logs:
-          address: 0.0.0.0:6000
+          address: 0.0.0.0:6010
           type: vector
           version: "2"
+
+        journal_logs:
+          type: vector
+          address: 0.0.0.0:6000
+          version: "2"
+
+        vector_metrics:
+          type: internal_metrics
 
         vyos_logs:
           address: 0.0.0.0:6001
@@ -85,6 +93,22 @@ spec:
               {{`{{ kubernetes.pod_node_name }}`}}
             pod: >-
               {{`{{ kubernetes.pod_name }}`}}
+
+        loki_journal:
+          type: loki
+          inputs:
+            - journal_logs
+          endpoint: http://loki-gateway:80
+          encoding:
+            codec: json
+          batch:
+            max_bytes: 2049000
+          out_of_order_action: accept
+          remove_label_fields: true
+          remove_timestamp: true
+          labels:
+            hostname: >-
+              {{`{{ host }}`}}
 
         talos_kernel:
           type: loki
