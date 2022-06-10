@@ -35,9 +35,10 @@ spec:
 
     # To allow non SSL Prometheus metrics
     - op: add
-      path: /machine/etcd/extraArgs/listen-metrics-urls
+      path: /machine/etcd/extraArgs/
       value:
-        - http://0.0.0.0:2381
+        listen-metrics-urls:
+          - "http://0.0.0.0:2381"
 
     - op: replace
       path: /persist
