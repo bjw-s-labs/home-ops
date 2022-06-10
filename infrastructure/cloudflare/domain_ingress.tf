@@ -19,3 +19,14 @@ resource "cloudflare_firewall_rule" "cf_domain_ingress_github_flux_webhook" {
   action      = "allow"
   priority    = 1
 }
+
+resource "cloudflare_page_rule" "cf_domain_ingress_airsonic_bypass_cache" {
+  zone_id = module.cf_domain_ingress.zone_id
+  target  = format("airsonic.%s/*", module.cf_domain_ingress.zone)
+  status  = "active"
+
+  actions {
+    cache_level         = "bypass"
+    disable_performance = true
+  }
+}
