@@ -34,11 +34,9 @@ spec:
         bind-address: 0.0.0.0
 
     # To allow non SSL Prometheus metrics
-    - op: replace
-      path: /machine/etcd/extraArgs
-      value:
-        listen-metrics-urls:
-          - "http://0.0.0.0:2381"
+    - op: add
+      path: /machine/etcd/extraArgs/listen-metrics-urls/0
+      value: http://0.0.0.0:2381
 
     - op: replace
       path: /persist
