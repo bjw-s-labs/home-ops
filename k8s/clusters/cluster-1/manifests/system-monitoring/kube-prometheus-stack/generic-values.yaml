@@ -34,8 +34,10 @@ kubelet:
           - node
         targetLabel: instance
 
+# Disabled since kubeProxy is disabled in my talos config. 
+# I think due to me using HAProxy externally
 kubeProxy:
-  enabled: true
+  enabled: false
   endpoints:
     - 10.200.1.109                    # cp1
     - 10.200.1.108                    # cp2
