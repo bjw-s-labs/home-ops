@@ -8,13 +8,6 @@ kubeApiServer:
   enabled: true
 
 kubeControllerManager:
-  enabled: true
-  endpoints:
-    - 10.200.1.109                    # cp1
-    - 10.200.1.108                    # cp2
-    - 10.200.1.111                    # cp3
-
-kubeEtcd:
   enabled: false
   endpoints:
     - 10.200.1.109                    # cp1
@@ -24,6 +17,17 @@ kubeEtcd:
     enabled: true
     port: 2379
     targetPort: 2379
+
+kubeEtcd:
+  enabled: true
+  endpoints:
+    - 10.200.1.109                    # cp1
+    - 10.200.1.108                    # cp2
+    - 10.200.1.111                    # cp3
+  service:
+    enabled: true
+    port: 2381
+    targetPort: 2381
     
 kubelet:
   enabled: true
