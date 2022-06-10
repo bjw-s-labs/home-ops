@@ -34,10 +34,11 @@ data "sops_file" "domains" {
 module "config" {
   source = "./config"
 
-  config       = local.config
-  networks     = local.networks
-  domains      = local.domains
-  address_book = local.address_book
+  config         = local.config
+  networks       = local.networks
+  domains        = local.domains
+  address_book   = local.address_book
+  firewall_rules = local.firewall_rules
 
   providers = {
     vyos   = vyos.vyos

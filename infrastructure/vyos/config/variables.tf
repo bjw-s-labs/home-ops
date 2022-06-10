@@ -17,3 +17,8 @@ variable "address_book" {
   description = "address book"
   type        = any
 }
+
+variable "firewall_rules" {
+  description = "firewall rules"
+  type = any
+}
