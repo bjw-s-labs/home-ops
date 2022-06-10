@@ -27,6 +27,12 @@ spec:
         # renovate: docker-image
         image: docker.io/coredns/coredns:1.9.3
 
+      # Override defaults to allow prometheus logging
+    - op: add
+      path: /cluster/controllerManager/extraArgs
+      value:
+        bind-address: 0.0.0.0
+        
     - op: replace
       path: /persist
       value: false
@@ -41,6 +47,8 @@ spec:
       path: /cluster/scheduler/extraArgs
       value:
         feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+        # Override defaults to allow prometheus logging
+        bind-address: 0.0.0.0
 
     - op: add
       path: /machine/install/logging
