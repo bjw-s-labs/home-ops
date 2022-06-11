@@ -20,13 +20,6 @@ spec:
             'until nc -vz home-assistant-postgresql.home-automation 5432; do echo "Waiting for postgresql..."; sleep 3; done;',
           ]
 
-    service:
-      main:
-        type: LoadBalancer
-        annotations:
-          metallb.universe.tf/loadBalancerIPs: "${LB_HASS}"
-        externalTrafficPolicy: Local
-
     ingress:
       main:
         enabled: true
