@@ -4,5 +4,7 @@ kind: Kustomization
 namespace: home-automation
 resources:
   - ../../../../base/apps/mosquitto
+  - ./networkattachmentdefinition.yaml
+  - ./secret.sops.yaml
 patchesStrategicMerge:
   - helm-values.yaml

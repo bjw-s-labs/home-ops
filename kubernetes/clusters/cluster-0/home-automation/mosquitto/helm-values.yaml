@@ -5,9 +5,8 @@ metadata:
   name: mosquitto
 spec:
   values:
-    image:
-      repository: eclipse-mosquitto
-      tag: 2.0.14
+    podAnnotations:
+      k8s.v1.cni.cncf.io/networks: macvlan-static-iot-mosquitto
 
     service:
       main:
