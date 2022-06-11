@@ -1,0 +1,15 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kyverno
+spec:
+  values:
+    replicaCount: 2
+
+    resources:
+      requests:
+        cpu: 224m
+        memory: 443M
+      limits:
+        memory: 671M
