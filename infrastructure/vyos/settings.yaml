@@ -488,6 +488,14 @@ config:
         destinationAddress: "!${cidrhost(networks.wg_trusted, 1)}"
         address: "${cidrhost(networks.wg_trusted, 1)}"
 
+  firewall:
+    network_groups: []
+
+    port_groups:
+      - name: wireguard
+        ports:
+          - 51820
+
   containers:
     coredns:
       # renovate: docker-image
