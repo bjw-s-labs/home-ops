@@ -57,6 +57,15 @@ spec:
         path: /volume1/Backup/Kubernetes/Applications/plex
         mountPath: /config/Backups
 
+    resources:
+      requests:
+        cpu: 35m
+        memory: 9617M
+        gpu.intel.com/i915: 1
+      limits:
+        gpu.intel.com/i915: 1
+        memory: 12G
+
     dnsConfig:
       options:
         - name: ndots
