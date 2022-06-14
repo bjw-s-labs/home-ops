@@ -35,6 +35,7 @@ locals {
       for index, rule in lookup(zone.fw_config, "rules", []) : {
         "policy" : "${zone.zoneFrom}-${zone.zoneTo}"
         "description" : "Rule: ${keys(rule)[0]}"
+        "log" : lookup(var.firewall_rules[keys(rule)[0]], "log", null)
         "index" : index + 1
         "action" : lookup(var.firewall_rules[keys(rule)[0]], "action", null)
         "protocol" : lookup(var.firewall_rules[keys(rule)[0]], "protocol", null)

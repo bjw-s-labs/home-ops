@@ -209,7 +209,6 @@ config:
             rules:
               - accept_established: null
               - accept_related: null
-              - drop_invalid: null
               - accept_mqtt: null
               - accept_nas_smb_from_scanners: null
               - accept_plex_from_plex_clients: null
@@ -220,6 +219,7 @@ config:
               - accept_k8s_ingress_from_ereaders: null
               - accept_k8s_ingress_from_wall_displays: null
               - accept_vector_journald_from_allowed_devices: null
+              - drop_invalid: null
           - zones:
               - local
             default: drop
@@ -489,7 +489,10 @@ config:
         address: "${cidrhost(networks.wg_trusted, 1)}"
 
   firewall:
-    network_groups: []
+    network_groups:
+      - name: k8s_services
+        networks:
+          - 10.45.0.0/16
 
     port_groups:
       - name: wireguard
