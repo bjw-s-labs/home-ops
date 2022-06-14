@@ -107,9 +107,11 @@ accept_ingress_from_cloudflare:
     port: http,https
     address-group: k8s_ingress
 
-accept_mqtt:
+accept_mqtt_from_mqtt_clients:
   action: accept
   protocol: tcp
+  source:
+    address-group: mqtt_clients
   destination:
     port: 1883
     address-group: k8s_mqtt
