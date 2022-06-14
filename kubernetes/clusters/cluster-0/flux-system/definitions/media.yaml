@@ -66,13 +66,27 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: media-airsonic
+  name: media-navidrome
   namespace: flux-system
   labels:
     component.cluster-0/part-of: definitions
 spec:
-  path: "./kubernetes/clusters/cluster-0/media/airsonic"
+  path: "./kubernetes/clusters/cluster-0/media/navidrome"
   prune: true
   dependsOn:
     - name: media-namespace
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: media-bonob
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/media/bonob"
+  prune: true
+  dependsOn:
+    - name: media-namespace
+    - name: media-navidrome
     - name: network-multus
