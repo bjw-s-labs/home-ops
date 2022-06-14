@@ -80,6 +80,7 @@ resource "vyos_config_block_tree" "firewall_name" {
     merge([
       for rule in local.firewall_rules_per_policy : {
         "${rule.policy} rule ${rule.index} description" = rule.description
+        "${rule.policy} rule ${rule.index} log"         = lookup(rule, "log", false) == true ? "enable" : null
         "${rule.policy} rule ${rule.index} action"      = rule.action
         "${rule.policy} rule ${rule.index} protocol"    = rule.protocol
 
