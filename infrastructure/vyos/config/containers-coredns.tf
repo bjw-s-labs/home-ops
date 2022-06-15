@@ -1,17 +1,25 @@
-resource "vyos_config_block_tree" "container_network-services" {
-  path = "container network services"
-
-  configs = {
-    "prefix" = "${var.networks.services}"
-  }
-}
-
 resource "remote_file" "container-coredns-corefile" {
   provider = remote
   path     = "/config/coredns/Corefile"
   content = templatefile(
     pathexpand("${path.module}/../files/coredns/Corefile.tftpl"),
     { domains = var.domains }
+  )
+  permissions = "0644"
+  owner       = "0"   # root
+  group       = "104" # vyattacfg
+}
+
+resource "remote_file" "container-coredns-hosts" {
+  provider = remote
+  path     = "/config/coredns/hosts"
+  content = templatefile(
+    pathexpand("${path.module}/../files/coredns/hosts.tftpl"),
+    {
+      address_book = var.address_book,
+      config       = var.config
+      networks     = var.networks
+    }
   )
   permissions = "0644"
   owner       = "0"   # root
