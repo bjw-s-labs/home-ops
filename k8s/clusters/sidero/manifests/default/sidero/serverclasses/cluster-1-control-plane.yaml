@@ -57,13 +57,18 @@ spec:
         # Override defaults to allow prometheus logging
         bind-address: 0.0.0.0
 
-    # - op: add
-    #   path: /machine/install/logging
-    #   value:
-    #     destinations:
-    #       - endpoint: udp://vector.elcarpenter.com:6051
-    #         format: json
-
+# need to change vector to run as a daemonset so it can access localhost logs
+    - op: add
+      path: /machine/install/extraKernelArgs
+      value:
+        - talos.logging.kernel=tcp://127.0.0.1:9301
+    - op: add
+      path: /machine/logging
+      value:
+        destinations:
+          - endpoint: tcp://127.0.0.1:9302
+            format: json_lines
+    
     - op: add
       path: /machine/install/extraKernelArgs
       value: 
