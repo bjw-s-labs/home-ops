@@ -40,7 +40,10 @@
   regexManagers: [
     {
       description: "Process various dependencies",
-      fileMatch: ["kubernetes/.+\\.ya?ml$"],
+      fileMatch: [
+        "infrastructure/.+\\.yaml$",
+        "kubernetes/.+\\.ya?ml$"
+      ],
       matchStrings: [
         "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*=?))?\n .*: (?<currentValue>.*=?)",
       ],
@@ -60,11 +63,10 @@
         "infrastructure/.+\\.yaml$"
       ],
       matchStrings: [
-        "# renovate: docker-image( registryUrl=(?<registryUrl>.*?))?( versioning=(?<versioning>.*=?))?\n .*: (?<depName>.*?):(?<currentValue>.*=?)",
+        "# renovate: docker-image( versioning=(?<versioning>.*=?))?\n .*: (?<depName>.*?):(?<currentValue>.*=?)",
       ],
       datasourceTemplate: "docker",
-      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}docker{{/if}}",
-      registryUrlTemplate: "{{#if registryUrl}}{{{registryUrl}}}{{else}}{{/if}}",
+      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
     },
   ],
   packageRules: [
