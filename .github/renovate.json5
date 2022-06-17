@@ -54,6 +54,18 @@
       ],
       datasourceTemplate: "helm",
     },
+    {
+      description: "Generic Docker image Regex manager",
+      fileMatch: [
+        "infrastructure/.+\\.yaml$"
+      ],
+      matchStrings: [
+        "# renovate: docker-image( registryUrl=(?<registryUrl>.*?))?( versioning=(?<versioning>.*=?))?\n .*: (?<depName>.*?):(?<currentValue>.*=?)",
+      ],
+      datasourceTemplate: "docker",
+      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}docker{{/if}}",
+      registryUrlTemplate: "{{#if registryUrl}}{{{registryUrl}}}{{else}}{{/if}}",
+    },
   ],
   packageRules: [
     // Setup datasources
