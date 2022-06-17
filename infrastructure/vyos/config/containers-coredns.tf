@@ -41,6 +41,7 @@ resource "vyos_config_block_tree" "container-coredns" {
 
   depends_on = [
     vyos_config_block_tree.container_network-services,
-    remote_file.container-coredns-corefile
+    remote_file.container-coredns-corefile,
+    remote_file.container-coredns-hosts
   ]
 }
