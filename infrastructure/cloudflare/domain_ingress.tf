@@ -20,9 +20,9 @@ resource "cloudflare_firewall_rule" "cf_domain_ingress_github_flux_webhook" {
   priority    = 1
 }
 
-resource "cloudflare_page_rule" "cf_domain_ingress_airsonic_bypass_cache" {
+resource "cloudflare_page_rule" "cf_domain_ingress_navidrome_bypass_cache" {
   zone_id = module.cf_domain_ingress.zone_id
-  target  = format("airsonic.%s/*", module.cf_domain_ingress.zone)
+  target  = format("navidrome.%s/*", module.cf_domain_ingress.zone)
   status  = "active"
 
   actions {
