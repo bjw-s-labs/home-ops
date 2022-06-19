@@ -16,7 +16,7 @@ spec:
 
           initContainers:
             - name: render-config
-              image: ghcr.io/k8s-at-home/recyclarr:v2.2.0
+              image: ghcr.io/k8s-at-home/recyclarr:v2.2.1
               command:
                 - "/bin/bash"
                 - -c
@@ -30,7 +30,7 @@ spec:
 
           containers:
             - name: recyclarr-sonarr
-              image: ghcr.io/k8s-at-home/recyclarr:v2.2.0
+              image: ghcr.io/k8s-at-home/recyclarr:v2.2.1
               imagePullPolicy: IfNotPresent
               command:
                 - /app/recyclarr
@@ -47,7 +47,7 @@ spec:
                   readOnly: true
 
             - name: recyclarr-radarr
-              image: ghcr.io/k8s-at-home/recyclarr:v2.2.0
+              image: ghcr.io/k8s-at-home/recyclarr:v2.2.1
               imagePullPolicy: IfNotPresent
               command:
                 - /app/recyclarr
