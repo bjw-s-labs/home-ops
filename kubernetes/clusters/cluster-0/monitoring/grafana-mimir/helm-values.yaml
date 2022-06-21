@@ -9,6 +9,9 @@ spec:
       chart: mimir-distributed
       version: 2.2.0-weekly.191
   values:
+    alertmanager:
+      enabled: false
+
     mimir:
       structuredConfig:
         multitenancy_enabled: false
@@ -22,29 +25,18 @@ spec:
           s3:
             insecure: true
 
-        ruler_storage:
-          backend: s3
-          s3:
-            insecure: true
+      ruler:
+        enabled: false
+
+      compactor:
+        persistentVolume:
+          size: 10Gi
+
+      ingester:
+        persistentVolume:
+          size: 10Gi
 
   valuesFrom:
-    - kind: ConfigMap
-      name: mimir-ruler-ceph-bucket
-      valuesKey: BUCKET_NAME
-      targetPath: mimir.structuredConfig.ruler_storage.s3.bucket_name
-    - kind: ConfigMap
-      name: mimir-ruler-ceph-bucket
-      valuesKey: BUCKET_HOST
-      targetPath: mimir.structuredConfig.ruler_storage.s3.endpoint
-    - kind: Secret
-      name: mimir-ruler-ceph-bucket
-      valuesKey: AWS_ACCESS_KEY_ID
-      targetPath: mimir.structuredConfig.ruler_storage.s3.access_key_id
-    - kind: Secret
-      name: mimir-ruler-ceph-bucket
-      valuesKey: AWS_SECRET_ACCESS_KEY
-      targetPath: mimir.structuredConfig.ruler_storage.s3.secret_access_key
-
     - kind: ConfigMap
       name: mimir-tsdb-ceph-bucket
       valuesKey: BUCKET_NAME
