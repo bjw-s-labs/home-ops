@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: grafana-mimir
+  name: mimir
 spec:
   chart:
     spec:
@@ -25,16 +25,16 @@ spec:
           s3:
             insecure: true
 
-      ruler:
-        enabled: false
+    ruler:
+      enabled: false
 
-      compactor:
-        persistentVolume:
-          size: 10Gi
+    compactor:
+      persistentVolume:
+        size: 10Gi
 
-      ingester:
-        persistentVolume:
-          size: 10Gi
+    ingester:
+      persistentVolume:
+        size: 10Gi
 
   valuesFrom:
     - kind: ConfigMap
