@@ -19,7 +19,7 @@ spec:
         datasources:
           - name: Prometheus
             type: prometheus
-            url: http://grafana-mimir-query-frontend.monitoring.svc.cluster.local:8080/prometheus
+            url: http://grafana-mimir-nginx.monitoring.svc.cluster.local:80/prometheus
             access: proxy
             isDefault: true
             jsonData:
@@ -28,21 +28,18 @@ spec:
             secureJsonData:
               httpHeaderValue1: anonymous
 
-          - name: Mimir Alertmanager
-            uid: alertmanager
-            type: alertmanager
-            access: proxy
-            url: http://grafana-mimir-alertmanager.monitoring.svc.cluster.local:8080
-            jsonData:
-              httpHeaderName1: X-Scope-OrgID
-              implementation: 'cortex'
-            secureJsonData:
-              httpHeaderValue1: anonymous
-
           - name: Loki
             type: loki
             access: proxy
-            url: http://loki.monitoring:3100
+            url: http://loki.monitoring.svc.cluster.local:3100
+
+          - name: Alertmanager
+            uid: alertmanager
+            type: alertmanager
+            access: proxy
+            url: http://kube-prometheus-stack-alertmanager.monitoring.svc.cluster.local:9093
+            jsonData:
+              implementation: 'prometheus'
 
     ingress:
       enabled: true
