@@ -19,9 +19,14 @@ spec:
         datasources:
           - name: Prometheus
             type: prometheus
-            url: http://thanos-query.monitoring:9090/
+            url: http://grafana-mimir-query-frontend.monitoring.svc.cluster.local:8080/prometheus
             access: proxy
             isDefault: true
+            jsonData:
+              httpHeaderName1: X-Scope-OrgID
+            secureJsonData:
+              httpHeaderValue1: anonymous
+
           - name: Loki
             type: loki
             access: proxy
