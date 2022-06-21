@@ -11,14 +11,11 @@ spec:
   values:
     mimir:
       structuredConfig:
+        multitenancy_enabled: false
+
         limits:
           max_global_series_per_metric: 0
           max_global_series_per_user: 0
-
-        alertmanager_storage:
-          backend: s3
-          s3:
-            insecure: true
 
         blocks_storage:
           backend: s3
@@ -31,23 +28,6 @@ spec:
             insecure: true
 
   valuesFrom:
-    - kind: ConfigMap
-      name: mimir-ruler-ceph-bucket
-      valuesKey: BUCKET_NAME
-      targetPath: mimir.structuredConfig.alertmanager_storage.s3.bucket_name
-    - kind: ConfigMap
-      name: mimir-ruler-ceph-bucket
-      valuesKey: BUCKET_HOST
-      targetPath: mimir.structuredConfig.alertmanager_storage.s3.endpoint
-    - kind: Secret
-      name: mimir-ruler-ceph-bucket
-      valuesKey: AWS_ACCESS_KEY_ID
-      targetPath: mimir.structuredConfig.alertmanager_storage.s3.access_key_id
-    - kind: Secret
-      name: mimir-ruler-ceph-bucket
-      valuesKey: AWS_SECRET_ACCESS_KEY
-      targetPath: mimir.structuredConfig.alertmanager_storage.s3.secret_access_key
-
     - kind: ConfigMap
       name: mimir-ruler-ceph-bucket
       valuesKey: BUCKET_NAME
