@@ -24,6 +24,18 @@ spec:
             isDefault: true
             jsonData:
               httpHeaderName1: X-Scope-OrgID
+              alertmanagerUid: 'alertmanager'
+            secureJsonData:
+              httpHeaderValue1: anonymous
+
+          - name: Mimir Alertmanager
+            uid: alertmanager
+            type: alertmanager
+            access: proxy
+            url: http://grafana-mimir-alertmanager.monitoring.svc.cluster.local:8080
+            jsonData:
+              httpHeaderName1: X-Scope-OrgID
+              implementation: 'cortex'
             secureJsonData:
               httpHeaderValue1: anonymous
 
