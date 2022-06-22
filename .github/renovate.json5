@@ -1,13 +1,13 @@
 {
   // General RenovateBot configuration
   extends: [
-    ":enableRenovate",
     "config:base",
+    "docker:enableMajor",
     ":disableRateLimiting",
     ":dependencyDashboard",
     ":semanticCommits",
-    "docker:enableMajor",
     ":enablePreCommit",
+    ":automergeDigest",
     "github>bjw-s/home-ops//.github/renovate/allowedVersions.json5",
     "github>bjw-s/home-ops//.github/renovate/autoMerge.json5",
     "github>bjw-s/home-ops//.github/renovate/commitMessage.json5",
@@ -40,10 +40,7 @@
   regexManagers: [
     {
       description: "Process various dependencies",
-      fileMatch: [
-        "infrastructure/.+\\.yaml$",
-        "kubernetes/.+\\.ya?ml$"
-      ],
+      fileMatch: ["infrastructure/.+\\.yaml$", "kubernetes/.+\\.ya?ml$"],
       matchStrings: [
         "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*=?))?\n .*: (?<currentValue>.*=?)",
       ],
@@ -59,9 +56,7 @@
     },
     {
       description: "Generic Docker image Regex manager",
-      fileMatch: [
-        "infrastructure/.+\\.yaml$"
-      ],
+      fileMatch: ["infrastructure/.+\\.yaml$"],
       matchStrings: [
         "# renovate: docker-image( versioning=(?<versioning>.*=?))?\n .*: (?<depName>.*?):(?<currentValue>.*=?)",
       ],
@@ -96,9 +91,7 @@
     },
     {
       matchDatasources: ["docker"],
-      matchPackageNames: [
-        "docker.io/timberio/vector"
-      ],
+      matchPackageNames: ["docker.io/timberio/vector"],
       versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$",
     },
     // Version strategies
