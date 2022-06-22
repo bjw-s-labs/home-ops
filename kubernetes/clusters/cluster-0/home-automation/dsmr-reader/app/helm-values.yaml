@@ -7,15 +7,16 @@ spec:
   values:
     initContainers:
       wait-for-pg:
-        image: busybox:latest
+        image: ghcr.io/patrickdappollonio/wait-for:v1.0.0
         imagePullPolicy: IfNotPresent
+        env:
+          - name: POSTGRES_HOST
+            value: dsmr-reader-postgresql.home-automation.svc.cluster.local:5432
         command:
-          [
-            "sh",
-            "-c",
-            'until nc -vz dsmr-reader-postgresql.home-automation 5432; do echo "Waiting for postgresql..."; sleep 3; done;',
-          ]
-
+          - /wait-for
+        args:
+          - --host="$(POSTGRES_HOST)"
+          - --verbose
     env:
       TZ: "${TIMEZONE}"
       DJANGO_TIME_ZONE: "${TIMEZONE}"
