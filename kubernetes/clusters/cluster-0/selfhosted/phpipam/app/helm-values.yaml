@@ -7,14 +7,16 @@ spec:
   values:
     initContainers:
       wait-for-db:
-        image: busybox:latest
+        image: ghcr.io/patrickdappollonio/wait-for:v1.0.0
         imagePullPolicy: IfNotPresent
+        env:
+          - name: MARIADB_HOST
+            value: phpipam-mariadb.selfhosted.svc.cluster.local 3306
         command:
-          [
-            "sh",
-            "-c",
-            'until nc -vz phpipam-mariadb.selfhosted.svc.cluster.local 3306; do echo "Waiting for mariadb..."; sleep 3; done;',
-          ]
+          - /wait-for
+        args:
+          - --host="$(MARIADB_HOST)"
+          - --verbose
 
     env:
       TZ: "${TIMEZONE}"

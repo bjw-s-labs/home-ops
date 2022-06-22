@@ -6,15 +6,17 @@ metadata:
 spec:
   values:
     initContainers:
-      wait-for-pg:
-        image: busybox:latest
+      wait-for-db:
+        image: ghcr.io/patrickdappollonio/wait-for:v1.0.0
         imagePullPolicy: IfNotPresent
+        env:
+          - name: POSTGRES_HOST
+            value: miniflux-postgresql.selfhosted.svc.cluster.local:5432
         command:
-          [
-            "sh",
-            "-c",
-            'until nc -vz miniflux-postgresql.selfhosted 5432; do echo "Waiting for postgresql..."; sleep 3; done;',
-          ]
+          - /wait-for
+        args:
+          - --host="$(POSTGRES_HOST)"
+          - --verbose
 
     env:
       TZ: "${TIMEZONE}"

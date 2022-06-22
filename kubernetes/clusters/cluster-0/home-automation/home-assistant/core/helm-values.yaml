@@ -10,15 +10,17 @@ spec:
       k8s.v1.cni.cncf.io/networks: macvlan-static-iot-hass
 
     initContainers:
-      wait-for-pg:
-        image: busybox:latest
+      wait-for-db:
+        image: ghcr.io/patrickdappollonio/wait-for:v1.0.0
         imagePullPolicy: IfNotPresent
+        env:
+          - name: POSTGRES_HOST
+            value: home-assistant-postgresql.home-automation.svc.cluster.local:5432
         command:
-          [
-            "sh",
-            "-c",
-            'until nc -vz home-assistant-postgresql.home-automation 5432; do echo "Waiting for postgresql..."; sleep 3; done;',
-          ]
+          - /wait-for
+        args:
+          - --host="$(POSTGRES_HOST)"
+          - --verbose
 
     ingress:
       main:
