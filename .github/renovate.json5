@@ -29,18 +29,18 @@
   rebaseWhen: "conflicted",
   // Set up Renovate Managers
   flux: {
-    fileMatch: ["kubernetes/.+\\.yaml$"],
+    fileMatch: ["kubernetes/.+\\.ya?ml$"],
   },
   "helm-values": {
-    fileMatch: ["kubernetes/.+\\.yaml$"],
+    fileMatch: ["kubernetes/.+\\.ya?ml$"],
   },
   kubernetes: {
-    fileMatch: ["kubernetes/.+\\.yaml$"],
+    fileMatch: ["kubernetes/.+\\.ya?ml$"],
   },
   regexManagers: [
     {
       description: "Process various dependencies",
-      fileMatch: ["infrastructure/.+\\.yaml$", "kubernetes/.+\\.ya?ml$"],
+      fileMatch: ["infrastructure/.+\\.ya?ml$", "kubernetes/.+\\.ya?ml$"],
       matchStrings: [
         "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*=?))?\n .*: (?<currentValue>.*=?)",
       ],
@@ -56,12 +56,21 @@
     },
     {
       description: "Generic Docker image Regex manager",
-      fileMatch: ["infrastructure/.+\\.yaml$"],
+      fileMatch: ["infrastructure/.+\\.ya?ml$"],
       matchStrings: [
         "# renovate: docker-image( versioning=(?<versioning>.*=?))?\n .*: (?<depName>.*?):(?<currentValue>.*=?)",
       ],
       datasourceTemplate: "docker",
       versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+    },
+    {
+      description: "Raw GitHub URL Regex manager",
+      fileMatch: ["infrastructure/.+\\.ya?ml$", "kubernetes/.+\\.ya?ml$"],
+      matchStrings: [
+        "https:\\/\\/raw.githubusercontent.com\\/(?<depName>[\\w\\d\\-_]+\\/[\\w\\d\\-_]+)\\/(?<currentValue>[\\w\\d\\.\\-_]+)\\/.*",
+      ],
+      datasourceTemplate: "github-releases",
+      versioningTemplate: "semver",
     },
   ],
   packageRules: [
