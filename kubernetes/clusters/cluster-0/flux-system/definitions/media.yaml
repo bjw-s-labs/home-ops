@@ -104,3 +104,16 @@ spec:
   dependsOn:
     - name: media-namespace
     - name: media-plex
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: media-jellyfin
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/media/jellyfin"
+  prune: true
+  dependsOn:
+    - name: media-namespace
