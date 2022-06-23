@@ -90,3 +90,17 @@ spec:
     - name: media-namespace
     - name: media-navidrome
     - name: network-multus
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: media-plex-trakt-sync
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/media/plex-trakt-sync"
+  prune: true
+  dependsOn:
+    - name: media-namespace
+    - name: media-plex
