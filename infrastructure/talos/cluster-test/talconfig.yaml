@@ -1,7 +1,7 @@
 ---
-clustername: cluster-test
+clusterName: cluster-test
 
-talosVersion: v1.0.6
+talosVersion: v1.1.0
 kubernetesVersion: 1.23.7
 endpoint: https://10.1.1.24:6443
 
@@ -15,20 +15,17 @@ nodes:
     hostname: goblin.${domainName}
     installDisk: /dev/sda
     ipAddress: 10.1.1.24
-    inlinePatch:
-      machine:
-        network:
-          interfaces:
-            - interface: eth0
-              dhcp: true
-            - interface: eth1
-              dhcp: true
-              addresses: []
-              vlans:
-                - vlanId: 40
-                  dhcp: false
-                  addresses:
-                    - 10.1.3.140/24
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+      - interface: eth1
+        dhcp: true
+        addresses: []
+        vlans:
+          - vlanId: 40
+            dhcp: false
+            addresses:
+              - 10.1.3.140/24
 
 controlPlane:
   inlinePatch:
