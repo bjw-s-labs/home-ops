@@ -1,0 +1,23 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: plex-trakt-sync
+spec:
+  values:
+    args:
+      - watch
+    env:
+      TZ: "${TIMEZONE}"
+    persistence:
+      config-yaml:
+        enabled: true
+        type: configMap
+        name: plex-tract-sync-config-yaml
+        subPath: config.yml
+        mountPath: /app/config/config.yml
+        readOnly: true
+    dnsConfig:
+      options:
+        - name: ndots
+          value: "1"
