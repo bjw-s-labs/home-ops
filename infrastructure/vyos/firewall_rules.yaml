@@ -175,23 +175,14 @@ accept_plex_from_plex_clients:
     port: 32400
     address-group: k8s_plex
 
-accept_hass_from_wall_displays:
+accept_jellyfin_from_jellyfin_clients:
   action: accept
   protocol: tcp
   source:
-    address-group: wall_displays
+    address-group: jellyfin_clients
   destination:
-    address-group: k8s_hass
-    port: 8123
-
-accept_hass_from_3d_printer_controllers:
-  action: accept
-  protocol: tcp
-  source:
-    address-group: 3d_printer_controllers
-  destination:
-    address-group: k8s_hass
-    port: 8123
+    port: 8096
+    address-group: k8s_jellyfin
 
 accept_3d_printer_control_from_k8s_nodes:
   action: accept
@@ -260,15 +251,6 @@ accept_k8s_ingress_from_sonos_players:
   destination:
     port: http,https
     address-group: k8s_ingress
-
-accept_hass_control_from_sonos_players:
-  action: accept
-  protocol: tcp
-  source:
-    address-group: sonos_players
-  destination:
-    port: 1400
-    address-group: k8s_hass
 
 accept_k8s_ingress_from_ereaders:
   action: accept
