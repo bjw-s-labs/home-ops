@@ -1,7 +1,7 @@
 ---
-clustername: cluster-0
+clusterName: cluster-0
 
-talosVersion: v1.0.6
+talosVersion: v1.1.0
 kubernetesVersion: 1.23.7
 endpoint: "https://cluster-0.${domainName}:6443"
 
@@ -12,24 +12,24 @@ cniConfig:
 
 nodes:
   - hostname: anvil.${domainName}
-    controlplane: true
+    controlPlane: true
     ipAddress: 10.1.1.21
     installDisk: /dev/sda
   - hostname: blitz.${domainName}
     ipAddress: 10.1.1.22
     installDisk: /dev/sda
-    controlplane: true
+    controlPlane: true
   - hostname: cannon.${domainName}
     ipAddress: 10.1.1.23
     installDisk: /dev/sda
-    controlplane: true
+    controlPlane: true
   - hostname: delta.${domainName}
     ipAddress: 10.1.1.31
     installDisk: /dev/sda
-    configPatches:
-      - op: add
-        path: /machine/network/interfaces/0/vlans
-        value:
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+        vlans:
           - vlanId: 40
             dhcp: false
             addresses:
@@ -37,10 +37,10 @@ nodes:
   - hostname: enigma.${domainName}
     ipAddress: 10.1.1.32
     installDisk: /dev/sda
-    configPatches:
-      - op: add
-        path: /machine/network/interfaces/0/vlans
-        value:
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+        vlans:
           - vlanId: 40
             dhcp: false
             addresses:
@@ -48,10 +48,10 @@ nodes:
   - hostname: felix.${domainName}
     ipAddress: 10.1.1.33
     installDisk: /dev/sda
-    configPatches:
-      - op: add
-        path: /machine/network/interfaces/0/vlans
-        value:
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+        vlans:
           - vlanId: 40
             dhcp: false
             addresses:
@@ -121,9 +121,6 @@ controlPlane:
           - ip: ${clusterEndpointIP}
             aliases:
               - cluster-0.${domainName}
-        interfaces:
-          - interface: eth0
-            dhcp: true
       time:
         disabled: false
         servers:
@@ -163,9 +160,6 @@ worker:
           - ip: ${clusterEndpointIP}
             aliases:
               - cluster-0.${domainName}
-        interfaces:
-          - interface: eth0
-            dhcp: true
       sysctls:
         fs.inotify.max_user_watches: "1048576"
         fs.inotify.max_user_instances: "8192"
