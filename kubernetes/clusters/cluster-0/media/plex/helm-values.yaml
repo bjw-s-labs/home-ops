@@ -44,11 +44,8 @@ spec:
     persistence:
       nfs-nas-media:
         enabled: true
-        type: nfs
-        server: "${NAS_ADDRESS}"
-        path: /volume1/Media
+        existingClaim: media-nfs-nas-media
         mountPath: /storage/media
-        readOnly: true
 
       backup:
         enabled: true
