@@ -13,6 +13,19 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
+  name: media-nfs-shares
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/media/_nfs-shares"
+  prune: true
+  dependsOn:
+    - name: media-namespace
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
   name: media-plex
   namespace: flux-system
   labels:
@@ -22,6 +35,7 @@ spec:
   prune: true
   dependsOn:
     - name: media-namespace
+    - name: media-nfs-shares
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
@@ -117,3 +131,4 @@ spec:
   prune: true
   dependsOn:
     - name: media-namespace
+    - name: media-nfs-shares

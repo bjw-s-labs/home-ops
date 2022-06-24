@@ -41,17 +41,16 @@ spec:
     persistence:
       nfs-nas-media:
         enabled: true
-        type: nfs
-        server: "${NAS_ADDRESS}"
-        path: /volume1/Media
+        existingClaim: media-nfs-nas-media
         mountPath: /storage/media
-        readOnly: true
 
     resources:
       requests:
         cpu: 100m
+        memory: 2G
         gpu.intel.com/i915: 1
       limits:
+        memory: 8G
         gpu.intel.com/i915: 1
 
     dnsConfig:
