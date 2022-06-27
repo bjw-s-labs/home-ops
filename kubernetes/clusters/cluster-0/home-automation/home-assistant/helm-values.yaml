@@ -15,11 +15,14 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
           - name: POSTGRES_HOST
-            value: home-assistant-postgresql.home-automation.svc.cluster.local:5432
+            valueFrom:
+              secretKeyRef:
+                name: database-home-assistant-user
+                key: HOST
         command:
           - /wait-for
         args:
-          - --host="$(POSTGRES_HOST)"
+          - --host="$(POSTGRES_HOST):5432"
           - --verbose
 
     ingress:
@@ -44,6 +47,11 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
+      SECRET_RECORDER_DB_URL:
+        valueFrom:
+          secretKeyRef:
+            name: database-home-assistant-user
+            key: POSTGRES_URL
 
     envFrom:
       - secretRef:
