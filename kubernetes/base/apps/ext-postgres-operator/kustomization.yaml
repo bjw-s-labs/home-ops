@@ -1,0 +1,17 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - github.com/movetokube/postgres-operator/deploy?ref=1.1.1
+images:
+  - name: movetokube/postgres-operator
+    newTag: 1.1.1
+patchesJson6902:
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: ext-postgres-operator
+    patch: |-
+      - op: remove
+        path: /spec/template/spec/containers/0/envFrom
