@@ -36,3 +36,17 @@ spec:
   dependsOn:
     - name: database-namespace
     - name: database-cloudnativepg-operator
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: database-ext-postgres-operator
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/database/ext-postgres-operator"
+  prune: true
+  dependsOn:
+    - name: database-namespace
+    - name: database-cloudnativepg-clusters
