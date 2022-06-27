@@ -2,7 +2,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - github.com/movetokube/postgres-operator/deploy?ref=1.1.1
+  - https://raw.githubusercontent.com/movetokube/postgres-operator/1.1.1/deploy/crds/db.movetokube.com_postgres_crd.yaml
+  - https://raw.githubusercontent.com/movetokube/postgres-operator/1.1.1/deploy/crds/db.movetokube.com_postgresusers_crd.yaml
+  - https://raw.githubusercontent.com/movetokube/postgres-operator/1.1.1/deploy/operator.yaml
+  - https://raw.githubusercontent.com/movetokube/postgres-operator/1.1.1/deploy/role.yaml
+  - https://raw.githubusercontent.com/movetokube/postgres-operator/1.1.1/deploy/role_binding.yaml
+  - https://raw.githubusercontent.com/movetokube/postgres-operator/1.1.1/deploy/service_account.yaml
 images:
   - name: movetokube/postgres-operator
     newTag: 1.1.1
