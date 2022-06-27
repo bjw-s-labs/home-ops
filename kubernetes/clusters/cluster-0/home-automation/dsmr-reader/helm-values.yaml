@@ -11,24 +11,39 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
           - name: POSTGRES_HOST
-            value: dsmr-reader-postgresql.home-automation.svc.cluster.local:5432
+            valueFrom:
+              secretKeyRef:
+                name: database-dsmr-reader-user
+                key: HOST
         command:
           - /wait-for
         args:
-          - --host="$(POSTGRES_HOST)"
+          - --host="$(POSTGRES_HOST):5432"
           - --verbose
     env:
       TZ: "${TIMEZONE}"
       DJANGO_TIME_ZONE: "${TIMEZONE}"
-      DJANGO_DATABASE_USER: postgres
+      DJANGO_DATABASE_USER:
+        valueFrom:
+          secretKeyRef:
+            name: database-dsmr-reader-user
+            key: LOGIN
       DJANGO_DATABASE_PASSWORD:
         valueFrom:
           secretKeyRef:
-            name: dsmr-reader-database
-            key: postgres-password
-      DJANGO_DATABASE_HOST: dsmr-reader-postgresql.home-automation
+            name: database-dsmr-reader-user
+            key: PASSWORD
+      DJANGO_DATABASE_HOST:
+        valueFrom:
+          secretKeyRef:
+            name: database-dsmr-reader-user
+            key: HOST
       DJANGO_DATABASE_PORT: "5432"
-      DJANGO_DATABASE_NAME: dsmr-reader
+      DJANGO_DATABASE_NAME:
+        valueFrom:
+          secretKeyRef:
+            name: database-dsmr-reader-user
+            key: DATABASE_NAME
       DATALOGGER_INPUT_METHOD: ipv4
       DATALOGGER_NETWORK_PORT: "8088"
     envFrom:
