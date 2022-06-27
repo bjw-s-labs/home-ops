@@ -22,3 +22,17 @@ spec:
   prune: true
   dependsOn:
     - name: database-namespace
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: database-cloudnativepg-clusters
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/database/cloudnative-pg/clusters"
+  prune: true
+  dependsOn:
+    - name: database-namespace
+    - name: database-cloudnativepg-operator
