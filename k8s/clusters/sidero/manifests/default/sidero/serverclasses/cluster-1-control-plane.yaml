@@ -48,12 +48,12 @@ spec:
       path: /machine/kubelet/extraArgs
       value:
         rotate-server-certificates: true
-        feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+        feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true,EphemeralContainers=true
 
     - op: add
       path: /cluster/scheduler/extraArgs
       value:
-        feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+        feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true,EphemeralContainers=true
         # Override defaults to allow prometheus logging
         bind-address: 0.0.0.0
 
@@ -115,7 +115,7 @@ spec:
     - op: add
       path: /cluster/apiServer/extraArgs
       value:
-        feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+        feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true,EphemeralContainers=true
 
     - op: add
       path: /cluster/apiServer/certSANs

@@ -46,7 +46,7 @@ Also add feature gates for kubelet
 
 ``` bash
 talosctl gen config \
-  --config-patch='[{"op": "add", "path": "/cluster/allowSchedulingOnMasters", "value": true},{"op": "add", "path": "/machine/kubelet/extraArgs", "value": { "feature-gates": "GracefulNodeShutdown=true,MixedProtocolLBService=true" } }]' \
+  --config-patch='[{"op": "add", "path": "/cluster/allowSchedulingOnMasters", "value": true},{"op": "add", "path": "/machine/kubelet/extraArgs", "value": { "feature-gates": "GracefulNodeShutdown=true,MixedProtocolLBService=true,EphemeralContainers=true" } }]' \
   sidero \
   https://$SIDERO_ENDPOINT:6443/
 ```
