@@ -9,9 +9,10 @@ spec:
       name: "${CLUSTER_NAME}"
       id: "${CLUSTER_ID}"
 
-    nativeRoutingCIDR: ${NETWORK_K8S_POD_CIDR}
-
+    ipv4NativeRoutingCIDR: ${NETWORK_K8S_POD_CIDR}
     k8sServiceHost: "cluster-0.${HARDWARE_DOMAIN}"
+    tunnel: "disabled" # disable  vxlan encapsulating
+    auto-direct-node-routes: true
 
     hubble:
       ui:
