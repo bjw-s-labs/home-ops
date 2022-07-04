@@ -4,6 +4,10 @@ kubeProxyReplacement: "strict"
 k8sServiceHost: 10.1.1.24
 k8sServicePort: 6443
 
+ipv4NativeRoutingCIDR: 10.244.0.0/16
+tunnel: "disabled"
+auto-direct-node-routes: true
+
 operator:
   replicas: 1
 
@@ -14,7 +18,4 @@ bgp:
   enabled: false
 
 hubble:
-  enabled: false
-
-ipv6:
   enabled: false

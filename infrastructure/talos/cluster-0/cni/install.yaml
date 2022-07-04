@@ -240,6 +240,7 @@ subjects:
 ---
 apiVersion: v1
 data:
+  agent-not-ready-taint-key: node.cilium.io/agent-not-ready
   annotate-k8s-node: "true"
   arping-refresh-period: 30s
   auto-direct-node-routes: "false"
@@ -278,6 +279,7 @@ data:
   install-iptables-rules: "true"
   install-no-conntrack-iptables-rules: "false"
   ipam: kubernetes
+  ipv4-native-routing-cidr: 10.244.0.0/16
   kube-proxy-replacement: strict
   kube-proxy-replacement-healthz-bind-address: ""
   monitor-aggregation: medium
@@ -290,7 +292,7 @@ data:
   remove-cilium-node-taints: "true"
   set-cilium-is-up-condition: "true"
   sidecar-istio-proxy-image: cilium/istio_proxy
-  tunnel: vxlan
+  tunnel: disabled
   unmanaged-pod-watcher-interval: "15"
 kind: ConfigMap
 metadata:
@@ -373,7 +375,7 @@ spec:
               value: 10.5.0.2
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
-          image: quay.io/cilium/operator-generic:v1.11.5@sha256:8ace281328b27d4216218c604d720b9a63a8aec2bd1996057c79ab0168f9d6d8
+          image: quay.io/cilium/operator-generic:v1.11.6@sha256:9f6063c7bcaede801a39315ec7c166309f6a6783e98665f6693939cf1701bc17
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
@@ -422,7 +424,6 @@ spec:
       annotations:
         meta.helm.sh/release-name: cilium
         meta.helm.sh/release-namespace: kube-system
-        scheduler.alpha.kubernetes.io/critical-pod: ""
       labels:
         app.kubernetes.io/managed-by: Helm
         k8s-app: cilium
@@ -484,7 +485,7 @@ spec:
               value: 10.5.0.2
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
-          image: quay.io/cilium/cilium:v1.11.5@sha256:79e66c3c2677e9ecc3fd5b2ed8e4ea7e49cf99ed6ee181f2ef43400c4db5eef0
+          image: quay.io/cilium/cilium:v1.11.6@sha256:f7f93c26739b6641a3fa3d76b1e1605b15989f25d06625260099e01c8243f54c
           imagePullPolicy: IfNotPresent
           lifecycle:
             postStart:
@@ -505,7 +506,7 @@ spec:
                 - name: brief
                   value: "true"
               path: /healthz
-              port: 9876
+              port: 9879
               scheme: HTTP
             periodSeconds: 30
             successThreshold: 1
@@ -519,7 +520,7 @@ spec:
                 - name: brief
                   value: "true"
               path: /healthz
-              port: 9876
+              port: 9879
               scheme: HTTP
             periodSeconds: 30
             successThreshold: 1
@@ -534,7 +535,7 @@ spec:
                 - name: brief
                   value: "true"
               path: /healthz
-              port: 9876
+              port: 9879
               scheme: HTTP
             periodSeconds: 2
             successThreshold: 1
@@ -573,7 +574,7 @@ spec:
               value: /run/cilium/cgroupv2
             - name: BIN_PATH
               value: /opt/cni/bin
-          image: quay.io/cilium/cilium:v1.11.5@sha256:79e66c3c2677e9ecc3fd5b2ed8e4ea7e49cf99ed6ee181f2ef43400c4db5eef0
+          image: quay.io/cilium/cilium:v1.11.6@sha256:f7f93c26739b6641a3fa3d76b1e1605b15989f25d06625260099e01c8243f54c
           imagePullPolicy: IfNotPresent
           name: mount-cgroup
           securityContext:
@@ -602,7 +603,7 @@ spec:
               value: 10.5.0.2
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
-          image: quay.io/cilium/cilium:v1.11.5@sha256:79e66c3c2677e9ecc3fd5b2ed8e4ea7e49cf99ed6ee181f2ef43400c4db5eef0
+          image: quay.io/cilium/cilium:v1.11.6@sha256:f7f93c26739b6641a3fa3d76b1e1605b15989f25d06625260099e01c8243f54c
           imagePullPolicy: IfNotPresent
           name: clean-cilium-state
           resources:
