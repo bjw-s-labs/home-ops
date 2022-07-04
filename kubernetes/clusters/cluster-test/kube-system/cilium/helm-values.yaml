@@ -1,0 +1,22 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cilium
+spec:
+  values:
+    cluster:
+      name: "${CLUSTER_NAME}"
+      id: "${CLUSTER_ID}"
+
+    nativeRoutingCIDR: ${NETWORK_K8S_POD_CIDR}
+
+    k8sServiceHost: "10.1.1.24"
+
+    operator:
+      replicas: 1
+
+    hubble:
+      ui:
+        ingress:
+          enabled: false

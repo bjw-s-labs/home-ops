@@ -1,0 +1,37 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cert-manager-namespace
+  namespace: flux-system
+  labels:
+    component.cluster-test/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-test/cert-manager"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cert-manager-app
+  namespace: flux-system
+  labels:
+    component.cluster-test/part-of: definitions
+spec:
+  dependsOn:
+    - name: cert-manager-namespace
+  path: "./kubernetes/clusters/cluster-test/cert-manager/cert-manager/app"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cert-manager-issuers
+  namespace: flux-system
+  labels:
+    component.cluster-test/part-of: definitions
+spec:
+  dependsOn:
+    - name: cert-manager-app
+  path: "./kubernetes/clusters/cluster-test/cert-manager/cert-manager/issuers"
+  prune: true
