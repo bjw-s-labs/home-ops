@@ -1,0 +1,36 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: flux
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: flux-repositories
+  interval: 10m0s
+  path: ./manifests/install
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux
+
+  patches:
+    - target:
+        kind: Deployment
+        labelSelector: control-plane=controller
+      patch: |-
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: not-used
+        spec:
+          template:
+            spec:
+              containers:
+                - name: manager
+                  resources:
+                    requests:
+                      memory: 256Mi
+                    limits:
+                      memory: "2Gi"
