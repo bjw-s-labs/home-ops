@@ -12,14 +12,20 @@ spec:
     policy: sync
     txtPrefix: "k8s."
 
-    cloudflare:
-      secretName: externaldns-secrets
-      email: ${EMAIL_1}
-      proxied: true
+    env:
+      - name: CF_API_EMAIL
+        value: ${EMAIL_1}
+      - name: CF_API_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: externaldns-secrets
+            key: cloudflare_api_token
 
     domainFilters:
       - ${PERSONAL_DOMAIN}
       - ${FAMILY_DOMAIN}
       - ${INGRESS_DOMAIN}
 
-    annotationFilter: "external-dns/is-public=true"
+    extraArgs:
+      - --cloudflare-proxied
+      - --annotation-filter=external-dns/is-public in (true)
