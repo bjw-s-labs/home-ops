@@ -423,6 +423,14 @@ config:
             - drop_invalid: null
         fromZones:
           - zones:
+              - servers
+            default: accept
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - accept_k8s_api: null
+              - drop_invalid: null
+          - zones:
               - wan
               - guest
             default: drop
