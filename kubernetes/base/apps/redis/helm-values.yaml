@@ -1,0 +1,29 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: common
+spec:
+  values:
+    global:
+      nameOverride: redis
+
+    image:
+      repository: docker.io/library/redis
+      tag: 7.0.2
+
+    service:
+      main:
+        ports:
+          http:
+            enabled: false
+          redis:
+            enabled: true
+            port: 6379
+
+    resources:
+      requests:
+        cpu: 23m
+        memory: 64M
+      limits:
+        memory: 64M
