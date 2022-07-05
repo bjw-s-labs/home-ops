@@ -1,0 +1,25 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: downloads-gateway-pod-gateway
+  namespace: vpn
+  labels:
+    app.kubernetes.io/instance: downloads-gateway
+    app.kubernetes.io/name: pod-gateway
+spec:
+  egress:
+    - ports:
+        - port: 51820
+          protocol: UDP
+      to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+    - to:
+        - namespaceSelector: {}
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: downloads-gateway
+      app.kubernetes.io/name: pod-gateway
+  policyTypes:
+    - Egress

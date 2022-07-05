@@ -7,6 +7,7 @@ spec:
   values:
     podAnnotations:
       configmap.reloader.stakater.com/reload: "downloads-gateway-pod-gateway"
+      secret.reloader.stakater.com/reload: "downloads-gateway-vpnconfig"
 
     DNS: 172.16.1.1
 
@@ -35,46 +36,36 @@ spec:
       netshoot:
         enabled: true
 
-      vpn:
-        enabled: true
-        type: wireguard
-
-        wireguard:
-          image:
-            repository: ghcr.io/k8s-at-home/wireguard
-            tag: v1.0.20210914
-            pullPolicy: IfNotPresent
+    additionalContainers:
+      gluetun:
+        image: qmcgaw/gluetun:v3.30.0
 
         securityContext:
-          runAsUser: 568
-          runAsGroup: 568
           capabilities:
-            drop:
-              - "SYS_MODULE"
+            add:
+              - NET_ADMIN
+
+        lifecycle:
+          postStart:
+            exec:
+              command:
+                - "/bin/sh"
+                - "-c"
+                - |
+                  ip rule add from all lookup main suppress_prefixlength 0 preference 50;
 
         env:
-          TZ: "${TIMEZONE}"
-          IPTABLES_BACKEND: nft
-          KILLSWITCH: "false"
+          - name: TZ
+            value: "${TIMEZONE}"
+          - name: VPN_TYPE
+            value: wireguard
+          - name: VPN_INTERFACE
+            value: wg0
+          - name: FIREWALL
+            value: "off"
+          - name: DOT
+            value: "off"
 
-        configFileSecret: downloads-gateway-vpnconfig
-
-        resources:
-          requests:
-            cpu: "0.001"
-            memory: 64Mi
-          limits:
-            memory: 128Mi
-
-        networkPolicy:
-          enabled: true
-
-          egress:
-            - to:
-                - ipBlock:
-                    cidr: 0.0.0.0/0
-              ports:
-                - port: 51820
-                  protocol: UDP
-            - to:
-                - namespaceSelector: {}
+        envFrom:
+          - secretRef:
+              name: downloads-gateway-vpnconfig
