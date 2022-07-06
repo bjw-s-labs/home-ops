@@ -5,6 +5,9 @@ metadata:
   name: miniflux
 spec:
   values:
+    podAnnotations:
+      secret.reloader.stakater.com/reload: miniflux-secrets
+
     initContainers:
       wait-for-db:
         image: ghcr.io/patrickdappollonio/wait-for:v1.0.0
@@ -13,8 +16,8 @@ spec:
           - name: POSTGRES_HOST
             valueFrom:
               secretKeyRef:
-                name: database-miniflux-user
-                key: HOST
+                name: miniflux-secrets
+                key: POSTGRES_HOST
         command:
           - /wait-for
         args:
@@ -26,7 +29,7 @@ spec:
       DATABASE_URL:
         valueFrom:
           secretKeyRef:
-            name: database-miniflux-user
+            name: miniflux-secrets
             key: POSTGRES_URL
       CREATE_ADMIN: '1'
       ADMIN_USERNAME:
