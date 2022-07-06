@@ -20,7 +20,7 @@ metadata:
 spec:
   dependsOn:
     - name: network-namespace
-    - name: network-metallb
+    - name: network-metallb-config
   path: "./kubernetes/clusters/cluster-0/network/ingress-nginx"
   prune: true
 ---
@@ -40,14 +40,29 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: network-metallb
+  name: network-metallb-app
   namespace: flux-system
   labels:
     component.cluster-0/part-of: definitions
 spec:
   dependsOn:
     - name: network-namespace
-  path: "./kubernetes/clusters/cluster-0/network/metallb"
+    - name: monitoring-kps-crds
+  path: "./kubernetes/clusters/cluster-0/network/metallb/app"
+  prune: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: network-metallb-config
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  dependsOn:
+    - name: network-namespace
+    - name: network-metallb-app
+  path: "./kubernetes/clusters/cluster-0/network/metallb/config"
   prune: true
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
@@ -60,7 +75,7 @@ metadata:
 spec:
   dependsOn:
     - name: network-namespace
-    - name: network-metallb
+    - name: network-metallb-config
   path: "./kubernetes/clusters/cluster-0/network/k8s-gateway"
   prune: true
 ---
