@@ -123,12 +123,16 @@ hosts:
     groups:
       - k8s_nodes
   goblin:
-    mac_addr: 00:e0:4c:08:25:64
+    # mac_addr: 00:e0:4c:08:25:64 # Internal NIC
+    mac_addr: CE:BB:30:DB:62:12 # Bridge
     network: servers
     ipv4_hostid: 24
-    groups:
-      - k8s_nodes
-
+    aliases:
+      - libvirt-01.bjw-s.tech
+  vm-docker-01:
+    mac_addr: 52:54:00:b2:2f:86
+    network: servers
+    ipv4_hostid: 51
   # ----------------------
   # Trusted
   # ----------------------
