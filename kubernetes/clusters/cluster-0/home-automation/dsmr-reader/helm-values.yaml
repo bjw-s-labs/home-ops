@@ -5,6 +5,11 @@ metadata:
   name: dsmr-reader
 spec:
   values:
+    podAnnotations:
+      secret.reloader.stakater.com/reload: dsmr-reader-secrets
+
+    enableServiceLinks: false
+
     initContainers:
       wait-for-db:
         image: ghcr.io/patrickdappollonio/wait-for:v1.0.0
@@ -13,42 +18,54 @@ spec:
           - name: POSTGRES_HOST
             valueFrom:
               secretKeyRef:
-                name: database-dsmr-reader-user
-                key: HOST
+                name: dsmr-reader-secrets
+                key: POSTGRES_HOST
         command:
           - /wait-for
         args:
           - --host="$(POSTGRES_HOST):5432"
           - --verbose
+
     env:
       TZ: "${TIMEZONE}"
+
       DJANGO_TIME_ZONE: "${TIMEZONE}"
       DJANGO_DATABASE_USER:
         valueFrom:
           secretKeyRef:
-            name: database-dsmr-reader-user
-            key: LOGIN
+            name: dsmr-reader-secrets
+            key: POSTGRES_USER
       DJANGO_DATABASE_PASSWORD:
         valueFrom:
           secretKeyRef:
-            name: database-dsmr-reader-user
-            key: PASSWORD
+            name: dsmr-reader-secrets
+            key: POSTGRES_PASSWORD
       DJANGO_DATABASE_HOST:
         valueFrom:
           secretKeyRef:
-            name: database-dsmr-reader-user
-            key: HOST
+            name: dsmr-reader-secrets
+            key: POSTGRES_HOST
       DJANGO_DATABASE_PORT: "5432"
-      DJANGO_DATABASE_NAME:
+      DJANGO_DATABASE_NAME: dsmr-reader
+
+      DSMRREADER_REMOTE_DATALOGGER_INPUT_METHOD: ipv4
+      DSMRREADER_REMOTE_DATALOGGER_NETWORK_PORT: "8088"
+      DSMRREADER_REMOTE_DATALOGGER_NETWORK_HOST:
         valueFrom:
           secretKeyRef:
-            name: database-dsmr-reader-user
-            key: DATABASE_NAME
-      DATALOGGER_INPUT_METHOD: ipv4
-      DATALOGGER_NETWORK_PORT: "8088"
-    envFrom:
-      - secretRef:
-          name: dsmr-reader-secrets
+            name: dsmr-reader-secrets
+            key: DATALOGGER_NETWORK_HOST
+
+      DSMRREADER_ADMIN_USER:
+        valueFrom:
+          secretKeyRef:
+            name: dsmr-reader-secrets
+            key: DSMRREADER_ADMIN_USER
+      DSMRREADER_ADMIN_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: dsmr-reader-secrets
+            key: DSMRREADER_ADMIN_PASSWORD
 
     ingress:
       main:
