@@ -20,6 +20,7 @@ spec:
         enabled: false
       prometheusRule:
         enabled: false
+
     speaker:
       tolerations:
         - effect: "NoExecute"
@@ -31,3 +32,15 @@ spec:
         image:
           repository: docker.io/frrouting/frr
           tag: v8.2.2
+
+    crds:
+      enabled: true
+
+  postRenderers:
+    - kustomize:
+        patchesStrategicMerge:
+          - $patch: delete
+            apiVersion: admissionregistration.k8s.io/v1
+            kind: ValidatingWebhookConfiguration
+            metadata:
+              name: validating-webhook-configuration

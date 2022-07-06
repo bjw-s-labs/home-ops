@@ -1,0 +1,15 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: metallb
+spec:
+  values:
+    prometheus:
+      serviceAccount: kube-prometheus-stack-prometheus
+      namespace: monitoring
+
+      podMonitor:
+        enabled: true
+      prometheusRule:
+        enabled: true
