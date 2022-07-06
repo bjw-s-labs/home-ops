@@ -10,12 +10,26 @@ resource "libvirt_pool" "cluster" {
   path = "/var/libvirt/cluster_storage"
 }
 
+resource "libvirt_pool" "images" {
+  name = "images"
+  type = "dir"
+  path = "/var/libvirt/images"
+}
+
+resource "libvirt_volume" "fedora-coreos" {
+  name             = "fedora-coreos-${local.settings.coreos.version}-qemu.x86_64.qcow2"
+  pool             = libvirt_pool.images.name
+  format           = "qcow2"
+  base_volume_name = "fedora-coreos-${local.settings.coreos.version}-qemu.x86_64.qcow2"
+}
+
 resource "libvirt_volume" "docker_01_fcos" {
   name             = "fcos-base-${random_uuid.docker_01_volume.id}.qcow2"
   pool             = libvirt_pool.cluster.name
   format           = "qcow2"
   size             = "20442450944"
-  base_volume_name = "fedora-coreos-${local.settings.coreos.version}-qemu.x86_64.qcow2"
+  base_volume_name = libvirt_volume.fedora-coreos.name
+  base_volume_pool = libvirt_pool.images.name
 }
 
 resource "libvirt_volume" "docker_01_persist" {
