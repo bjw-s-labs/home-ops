@@ -1,0 +1,11 @@
+---
+apiVersion: metallb.io/v1beta2
+kind: BGPPeer
+metadata:
+  name: gateway
+  namespace: network
+spec:
+  peerAddress: ${GATEWAY_MANAGEMENT}
+  peerASN: 64512
+  myASN: 64512
+  holdTime: 1m30s
