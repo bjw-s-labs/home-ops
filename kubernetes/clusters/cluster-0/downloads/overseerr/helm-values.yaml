@@ -1,0 +1,34 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: overseerr
+spec:
+  values:
+    env:
+      TZ: "${TIMEZONE}"
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_set_header Accept-Encoding "";
+            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/overseerr/nord.css"></head>';
+            sub_filter_once on;
+        hosts:
+          - host: &host "overseerr.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - secretName: tls.overseerr
+            hosts:
+              - *host
+
+    dnsConfig:
+      options:
+        - name: ndots
+          value: "1"
