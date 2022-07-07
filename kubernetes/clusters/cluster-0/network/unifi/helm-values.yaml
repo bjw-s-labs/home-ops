@@ -8,6 +8,14 @@ spec:
     env:
       TZ: "${TIMEZONE}"
 
+    persistence:
+      backup:
+        enabled: true
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Backup/Kubernetes/Applications/unifi
+        mountPath: /unifi/data/backup
+
     service:
       main:
         type: LoadBalancer
