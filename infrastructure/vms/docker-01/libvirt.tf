@@ -43,9 +43,13 @@ data "ct_config" "docker_01" {
   content = templatefile(
     "ignition.yaml",
     {
-      hostname          = local.settings.hostname
-      postgres_image    = local.settings.containers.postgres.image
-      postgres_password = data.sops_file.vm_secrets.data["postgres.postgres_password"]
+      hostname = local.settings.hostname
+      nas = "nas.${local.domains.hardware}"
+      postgres = {
+        image    = local.settings.containers.postgres.image
+        password = data.sops_file.vm_secrets.data["postgres.postgres_password"]
+      }
+      postgres_backup = local.settings.containers.postgres_backup
     }
   )
   strict       = true
