@@ -7,3 +7,14 @@ containers:
   postgres:
     # renovate: docker-image
     image: docker.io/library/postgres:14.3
+
+  postgres_backup:
+    # renovate: docker-image
+    image: docker.io/prodrigestivill/postgres-backup-local:14
+    databases:
+      - dsmr-reader
+      - home-assistant
+      - miniflux
+    run_as:
+      user: 1031
+      group: 65541
