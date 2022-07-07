@@ -9,22 +9,6 @@ spec:
       secret.reloader.stakater.com/reload: home-assistant-secrets
       k8s.v1.cni.cncf.io/networks: macvlan-static-iot-hass
 
-    initContainers:
-      wait-for-db:
-        image: ghcr.io/patrickdappollonio/wait-for:v1.0.0
-        imagePullPolicy: IfNotPresent
-        env:
-          - name: POSTGRES_HOST
-            valueFrom:
-              secretKeyRef:
-                name: database-home-assistant-user
-                key: HOST
-        command:
-          - /wait-for
-        args:
-          - --host="$(POSTGRES_HOST):5432"
-          - --verbose
-
     ingress:
       main:
         enabled: true
@@ -47,11 +31,6 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
-      SECRET_RECORDER_DB_URL:
-        valueFrom:
-          secretKeyRef:
-            name: database-home-assistant-user
-            key: POSTGRES_URL
 
     envFrom:
       - secretRef:
