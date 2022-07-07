@@ -27,3 +27,18 @@ resource "postgresql_database" "miniflux" {
   allow_connections = true
   depends_on = [postgresql_role.miniflux]
 }
+
+resource "postgresql_role" "home-assistant" {
+  name            = "home-assistant"
+  login           = true
+  password        = data.sops_file.database_secrets.data["postgres.roles.home-assistant.password"]
+}
+
+resource "postgresql_database" "home-assistant" {
+  name              = "home-assistant"
+  owner             = "home-assistant"
+  lc_collate        = "C"
+  connection_limit  = -1
+  allow_connections = true
+  depends_on = [postgresql_role.home-assistant]
+}
