@@ -505,6 +505,13 @@ config:
         ports:
           - 51820
 
+  bgp:
+    local_as: 64512
+    router_id: ${cidrhost(networks.lan, 1)}
+    neighbor_groups:
+      - group: k8s_nodes
+        remote_as: 64512
+
   containers:
     coredns:
       # renovate: docker-image

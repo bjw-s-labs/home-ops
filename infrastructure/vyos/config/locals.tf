@@ -45,4 +45,26 @@ locals {
       }
     ]
   ])
+
+  host_groups = distinct(
+    flatten([
+      for host in var.address_book.hosts : [
+        for group in host.groups : group
+      ] if lookup(host, "groups", false) != false
+    ])
+  )
+
+  host_groups_with_addresses = merge(flatten([
+    for host_group in local.host_groups : [
+      {
+        "${host_group}": {
+          "addresses": flatten([
+            for host in var.address_book.hosts:
+              cidrhost(var.networks[host.network], host.ipv4_hostid)
+              if contains(lookup(host, "groups", []), host_group)
+          ])
+        }
+      }
+    ]
+  ])...)
 }
