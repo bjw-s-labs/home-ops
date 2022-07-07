@@ -1,0 +1,36 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: common
+spec:
+  values:
+    global:
+      nameOverride: overseerr
+
+    image:
+      repository: ghcr.io/sct/overseerr
+      tag: 1.29.1
+
+    env:
+      LOG_LEVEL: "info"
+      PORT: 80
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: overseerr-config
+        mountPath: /app/config
+
+    service:
+      main:
+        ports:
+          http:
+            port: 80
+
+    resources:
+      requests:
+        cpu: 10m
+        memory: 250M
+      limits:
+        memory: 500M
