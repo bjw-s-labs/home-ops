@@ -25,6 +25,8 @@ spec:
             mountPath: /data/configfiles
 
     podSecurityContext:
+      runAsGroup: 568
+      runAsUser: 568
       supplementalGroups:
         - 65539
 
@@ -77,11 +79,7 @@ spec:
 
     additionalContainers:
       backup:
-        image: ghcr.io/bjw-s/pmb:v0.1.0
-
-        securityContext:
-          runAsGroup: 568
-          runAsUser: 568
+        image: ghcr.io/bjw-s/pmb:v0.1.1
 
         volumeMounts:
           - name: data
@@ -96,5 +94,3 @@ spec:
             value: /data/qbittorrent_data
           - name: PMB__DESTINATION
             value: /data/nas-backup
-          - name: PMB__HEALTHCHECK_PORT
-            value: "18080"
