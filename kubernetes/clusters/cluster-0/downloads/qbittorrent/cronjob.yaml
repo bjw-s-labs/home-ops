@@ -1,0 +1,59 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: qbittorrent-backup
+  namespace: downloads
+spec:
+  schedule: "0 0 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      ttlSecondsAfterFinished: 300
+      template:
+        spec:
+          securityContext:
+            runAsGroup: 568
+            runAsUser: 568
+            supplementalGroups:
+              - 65539
+          automountServiceAccountToken: false
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: ghcr.io/bjw-s/pmb:v0.2.1
+              env:
+                - name: TZ
+                  value: "${TIMEZONE}"
+                - name: PMB__SOURCE_DIR
+                  value: /data/qbittorrent_data
+                - name: PMB__DESTINATION_DIR
+                  value: /data/nas-backup
+                - name: PMB__KEEP_DAYS
+                  value: "14"
+              volumeMounts:
+                - name: data
+                  mountPath: /data/qbittorrent_data
+                - name: backup
+                  mountPath: /data/nas-backup
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: qbittorrent-config
+            - name: backup
+              nfs:
+                server: "${NAS_ADDRESS}"
+                path: /volume1/Backup/Kubernetes/Applications/qbittorrent
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values:
+                          - qbittorrent
+                  topologyKey: kubernetes.io/hostname
