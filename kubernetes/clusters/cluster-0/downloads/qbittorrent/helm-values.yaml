@@ -47,13 +47,6 @@ spec:
         path: /volume1/Media
         mountPath: /data/nas-media
 
-      backup:
-        enabled: true
-        type: nfs
-        server: "${NAS_ADDRESS}"
-        path: /volume1/Backup/Kubernetes/Applications/qbittorrent
-        mountPath: "-"
-
     ingress:
       main:
         enabled: true
@@ -76,21 +69,3 @@ spec:
           - secretName: tls.qbittorrent
             hosts:
               - *host
-
-    additionalContainers:
-      backup:
-        image: ghcr.io/bjw-s/pmb:v0.1.1
-
-        volumeMounts:
-          - name: data
-            mountPath: /data/qbittorrent_data
-          - name: backup
-            mountPath: /data/nas-backup
-
-        env:
-          - name: TZ
-            value: "${TIMEZONE}"
-          - name: PMB__SOURCE
-            value: /data/qbittorrent_data
-          - name: PMB__DESTINATION
-            value: /data/nas-backup
