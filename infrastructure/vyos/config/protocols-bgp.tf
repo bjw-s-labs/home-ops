@@ -11,9 +11,9 @@ resource "vyos_config_block_tree" "protocols-bgp" {
       for neighbour_group in var.config.bgp.neighbor_groups : [
         for hostname, host in var.address_book.hosts : [
           {
-            "neighbor ${cidrhost(var.networks[host.network], host.ipv4_hostid)} remote-as": neighbour_group.remote_as
-            "neighbor ${cidrhost(var.networks[host.network], host.ipv4_hostid)} description": hostname
-            "neighbor ${cidrhost(var.networks[host.network], host.ipv4_hostid)} address-family ipv4-unicast": ""
+            "neighbor ${cidrhost(var.networks[host.network], host.ipv4_hostid)} remote-as" : neighbour_group.remote_as
+            "neighbor ${cidrhost(var.networks[host.network], host.ipv4_hostid)} description" : hostname
+            "neighbor ${cidrhost(var.networks[host.network], host.ipv4_hostid)} address-family ipv4-unicast" : ""
           }
         ] if contains(lookup(host, "groups", []), neighbour_group.group)
       ]

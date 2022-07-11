@@ -20,5 +20,5 @@ variable "address_book" {
 
 variable "firewall_rules" {
   description = "firewall rules"
-  type = any
+  type        = any
 }

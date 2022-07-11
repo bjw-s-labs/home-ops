@@ -1,7 +1,7 @@
 resource "remote_file" "container-haproxy-config" {
-  provider    = remote
-  path        = "/config/haproxy/haproxy.cfg"
-  content     = templatefile(
+  provider = remote
+  path     = "/config/haproxy/haproxy.cfg"
+  content = templatefile(
     pathexpand("${path.module}/../files/haproxy/haproxy.cfg.tftpl"),
     { domains = var.domains }
   )
@@ -18,8 +18,8 @@ resource "vyos_config_block_tree" "container-haproxy-k8s-api" {
 
     "network services address" = "${cidrhost(var.networks.services, 2)}"
 
-    "volume config destination"  = "/usr/local/etc/haproxy/haproxy.cfg"
-    "volume config source"       = "/config/haproxy/haproxy.cfg"
+    "volume config destination" = "/usr/local/etc/haproxy/haproxy.cfg"
+    "volume config source"      = "/config/haproxy/haproxy.cfg"
   }
 
   depends_on = [
