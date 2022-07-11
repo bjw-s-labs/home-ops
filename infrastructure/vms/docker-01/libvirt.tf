@@ -44,7 +44,7 @@ data "ct_config" "docker_01" {
     "ignition.yaml",
     {
       hostname = local.settings.hostname
-      nas = "nas.${local.domains.hardware}"
+      nas      = "nas.${local.domains.hardware}"
       postgres = {
         image    = local.settings.containers.postgres.image
         password = data.sops_file.vm_secrets.data["postgres.postgres_password"]
