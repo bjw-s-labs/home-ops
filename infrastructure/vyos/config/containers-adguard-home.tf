@@ -15,8 +15,8 @@ resource "vyos_config_block_tree" "container-adguard-home" {
 
     "network services address" = "${cidrhost(var.networks.services, 6)}"
 
-    "volume hosts destination"  = "/etc/hosts"
-    "volume hosts source"       = "/config/adguard-home/hosts"
+    "volume hosts destination"   = "/etc/hosts"
+    "volume hosts source"        = "/config/adguard-home/hosts"
     "volume config destination"  = "/opt/adguardhome/conf"
     "volume config source"       = "/config/adguard-home/conf"
     "volume workdir destination" = "/opt/adguardhome/work"
