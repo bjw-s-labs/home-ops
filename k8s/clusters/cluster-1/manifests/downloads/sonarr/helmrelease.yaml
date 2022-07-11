@@ -101,22 +101,12 @@ spec:
 
     # Prevents instance from running on same node as Plex
     affinity:
-          podAntiAffinity:
-            # preferredDuringSchedulingIgnoredDuringExecution:
-            #   - weight: 100
-            #     podAffinityTerm:
-            #       labelSelector:
-            #         matchExpressions:
-            #           - key: app.kubernetes.io/name
-            #             operator: In
-            #             values:
-            #               - plex
-            #       topologyKey: kubernetes.io/hostname
-            requiredDuringSchedulingIgnoredDuringExecution:
-              - labelSelector:
-                    matchExpressions:
-                      - key: app.kubernetes.io/name
-                        operator: In
-                        values:
-                          - plex
-                topologyKey: kubernetes.io/hostname
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - plex
+            topologyKey: kubernetes.io/hostname
