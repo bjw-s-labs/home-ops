@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: nzbget-backup
+  name: home-assistant-backup
   namespace: downloads
 spec:
   schedule: "@daily"
@@ -18,7 +18,7 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: backup
-              image: ghcr.io/bjw-s/pmb:v0.3.1
+              image: ghcr.io/bjw-s/pmb:v0.3.0
               securityContext:
                 privileged: true
               env:
@@ -40,11 +40,11 @@ spec:
           volumes:
             - name: data
               persistentVolumeClaim:
-                claimName: nzbget-config
+                claimName: home-assistant-data
             - name: backup
               nfs:
                 server: "${NAS_ADDRESS}"
-                path: /volume1/Backup/Kubernetes/Applications/nzbget
+                path: /volume1/Backup/Kubernetes/Applications/home-assistant
           affinity:
             podAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -53,5 +53,5 @@ spec:
                       - key: app.kubernetes.io/name
                         operator: In
                         values:
-                          - nzbget
+                          - home-assistant
                   topologyKey: kubernetes.io/hostname
