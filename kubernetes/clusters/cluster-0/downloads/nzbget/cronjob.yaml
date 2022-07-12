@@ -14,13 +14,13 @@ spec:
       ttlSecondsAfterFinished: 3600
       template:
         spec:
-          securityContext:
-            privileged: true
           automountServiceAccountToken: false
           restartPolicy: OnFailure
           containers:
             - name: backup
               image: ghcr.io/bjw-s/pmb:v0.3.0
+              securityContext:
+                privileged: true
               env:
                 - name: TZ
                   value: "${TIMEZONE}"
