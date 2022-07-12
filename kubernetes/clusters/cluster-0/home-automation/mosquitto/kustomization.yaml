@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: home-automation
 resources:
   - ../../../../base/apps/mosquitto
+  - ./cronjob.yaml
   - ./secret.sops.yaml
 patchesStrategicMerge:
   - helm-values.yaml
