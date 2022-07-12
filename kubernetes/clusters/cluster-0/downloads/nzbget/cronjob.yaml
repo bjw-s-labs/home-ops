@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: qbittorrent-backup
+  name: nzbget-backup
   namespace: downloads
 spec:
   schedule: "@daily"
@@ -25,7 +25,7 @@ spec:
                 - name: TZ
                   value: "${TIMEZONE}"
                 - name: PMB__SOURCE_DIR
-                  value: /data/qbittorrent_data
+                  value: /data/nzbget_config
                 - name: PMB__DESTINATION_DIR
                   value: /data/nas-backup
                 - name: PMB__FSFREEZE
@@ -34,17 +34,17 @@ spec:
                   value: "7"
               volumeMounts:
                 - name: data
-                  mountPath: /data/qbittorrent_data
+                  mountPath: /data/nzbget_config
                 - name: backup
                   mountPath: /data/nas-backup
           volumes:
             - name: data
               persistentVolumeClaim:
-                claimName: qbittorrent-config
+                claimName: nzbget-config
             - name: backup
               nfs:
                 server: "${NAS_ADDRESS}"
-                path: /volume1/Backup/Kubernetes/Applications/qbittorrent
+                path: /volume1/Backup/Kubernetes/Applications/nzbget
           affinity:
             podAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -53,5 +53,5 @@ spec:
                       - key: app.kubernetes.io/name
                         operator: In
                         values:
-                          - qbittorrent
+                          - nzbget
                   topologyKey: kubernetes.io/hostname
