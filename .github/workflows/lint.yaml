@@ -42,12 +42,12 @@ jobs:
                     "ACTION_ACTIONLINT",
                     "ANSIBLE_ANSIBLE_LINT",
                     "COPYPASTE_JSCPD",
-                    "CREDENTIALS_SECRETLINT",
-                    "GIT_GIT_DIFF",
                     "KUBERNETES_KUBEVAL",
                     "MARKDOWN_MARKDOWNLINT",
-                    "PYTHON_PYLINT",
                     "PYTHON_FLAKE8",
+                    "PYTHON_PYLINT",
+                    "REPOSITORY_GIT_DIFF",
+                    "REPOSITORY_SECRETLINT",
                     "TERRAFORM_TERRAFORM_FMT",
                     "YAML_PRETTIER",
                     "YAML_YAMLLINT"
@@ -63,4 +63,5 @@ jobs:
           MARKDOWN_MARKDOWNLINT_RULES_PATH: .github/
           PYTHON_FLAKE8_CONFIG_FILE: .github/linters/.flake8
           YAML_YAMLLINT_CONFIG_FILE: .github/linters/.yamllint.yaml
+          YAML_PRETTIER_CONFIG_FILE: .github/linters/.prettierrc.yaml
           YAML_PRETTIER_FILTER_REGEX_EXCLUDE: "(.*\\.sops\\.ya?ml)"
