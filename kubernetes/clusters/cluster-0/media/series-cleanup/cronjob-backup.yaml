@@ -2,8 +2,8 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: home-assistant-backup
-  namespace: home-automation
+  name: series-cleanup-backup
+  namespace: media
 spec:
   schedule: "@daily"
   concurrencyPolicy: Forbid
@@ -40,18 +40,8 @@ spec:
           volumes:
             - name: data
               persistentVolumeClaim:
-                claimName: home-assistant-data
+                claimName: series-cleanup-data
             - name: backup
               nfs:
                 server: "${NAS_ADDRESS}"
-                path: /volume1/Backup/Kubernetes/Applications/home-assistant
-          affinity:
-            podAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                - labelSelector:
-                    matchExpressions:
-                      - key: app.kubernetes.io/name
-                        operator: In
-                        values:
-                          - home-assistant
-                  topologyKey: kubernetes.io/hostname
+                path: /volume1/Backup/Kubernetes/Applications/series-cleanup
