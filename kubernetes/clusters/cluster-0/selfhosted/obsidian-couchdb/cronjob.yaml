@@ -2,8 +2,8 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: home-assistant-backup
-  namespace: home-automation
+  name: obsidian-couchdb-backup
+  namespace: selfhosted
 spec:
   schedule: "@daily"
   concurrencyPolicy: Forbid
@@ -40,11 +40,11 @@ spec:
           volumes:
             - name: data
               persistentVolumeClaim:
-                claimName: home-assistant-data
+                claimName: obsidian-couchdb
             - name: backup
               nfs:
                 server: "${NAS_ADDRESS}"
-                path: /volume1/Backup/Kubernetes/Applications/home-assistant
+                path: /volume1/Backup/Kubernetes/Applications/obsidian-couchdb
           affinity:
             podAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -53,5 +53,5 @@ spec:
                       - key: app.kubernetes.io/name
                         operator: In
                         values:
-                          - home-assistant
+                          - obsidian-couchdb
                   topologyKey: kubernetes.io/hostname

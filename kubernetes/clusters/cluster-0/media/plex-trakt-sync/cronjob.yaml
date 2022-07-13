@@ -2,8 +2,8 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: home-assistant-backup
-  namespace: home-automation
+  name: plex-trakt-sync-backup
+  namespace: media
 spec:
   schedule: "@daily"
   concurrencyPolicy: Forbid
@@ -40,11 +40,11 @@ spec:
           volumes:
             - name: data
               persistentVolumeClaim:
-                claimName: home-assistant-data
+                claimName: plex-trakt-sync-config
             - name: backup
               nfs:
                 server: "${NAS_ADDRESS}"
-                path: /volume1/Backup/Kubernetes/Applications/home-assistant
+                path: /volume1/Backup/Kubernetes/Applications/plex-trakt-sync
           affinity:
             podAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -53,5 +53,5 @@ spec:
                       - key: app.kubernetes.io/name
                         operator: In
                         values:
-                          - home-assistant
+                          - plex-trakt-sync
                   topologyKey: kubernetes.io/hostname
