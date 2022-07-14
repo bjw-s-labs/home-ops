@@ -1,0 +1,93 @@
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: pmb-cronjob-controller
+  annotations:
+    policies.kyverno.io/title: pmb CronJob controller
+    policies.kyverno.io/subject: Deployment,StatefulSet
+    policies.kyverno.io/description: >-
+      This policy generates a backup CronJob for
+      Deployments, StatefulSets
+spec:
+  mutateExistingOnPolicyUpdate: true
+  generateExistingOnPolicyUpdate: true
+  rules:
+    - name: create-cronjob
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+                - StatefulSet
+
+      context:
+        - name: appName
+          variable:
+            jmesPath: 'request.object.spec.template.metadata.annotations."pmb.bjw-s.dev/app" || request.object.metadata.annotations."app.kubernetes.io/name" || request.object.metadata.name'
+
+        - name: claimName
+          variable:
+            jmesPath: '(request.object.spec.template.spec.volumes[? @.name == ''{{ request.object.metadata.annotations."pmb.bjw-s.dev/volume" || '''' }}''] | [0].persistentVolumeClaim.claimName) || '''''
+
+      preconditions:
+        all:
+          - key: "{{ claimName }}"
+            operator: NotEquals
+            value: ""
+
+      generate:
+        synchronize: true
+        apiVersion: batch/v1
+        kind: CronJob
+        name: "{{ appName }}-backup"
+        namespace: "{{request.object.metadata.namespace}}"
+        data:
+          metadata:
+            ownerReferences:
+              - apiVersion: "{{request.object.apiVersion}}"
+                kind: "{{request.object.kind}}"
+                name: "{{request.object.metadata.name}}"
+                uid: "{{request.object.metadata.uid}}"
+          spec:
+            schedule: "@daily"
+            concurrencyPolicy: Forbid
+            successfulJobsHistoryLimit: 0
+            failedJobsHistoryLimit: 2
+            suspend: true
+            jobTemplate:
+              spec:
+                ttlSecondsAfterFinished: 3600
+                template:
+                  spec:
+                    automountServiceAccountToken: false
+                    restartPolicy: OnFailure
+                    containers:
+                      - name: backup
+                        image: ghcr.io/bjw-s/pmb:v0.4.0
+                        imagePullPolicy: Always
+                        securityContext:
+                          privileged: true
+                        env:
+                          - name: KOPIA_PASSWORD
+                            value: "${KOPIA_PASSWORD}"
+                        volumeMounts:
+                          - name: data
+                            mountPath: /data/src
+                          - name: backup
+                            mountPath: /data/dest
+                    volumes:
+                      - name: data
+                        persistentVolumeClaim:
+                          claimName: "{{ claimName }}"
+                      - name: backup
+                        nfs:
+                          server: "${NAS_ADDRESS}"
+                          path: "/volume1/Backup/Kubernetes/Applications/{{ appName }}"
+
+                    affinity:
+                      podAffinity:
+                        requiredDuringSchedulingIgnoredDuringExecution:
+                          - labelSelector:
+                              matchExpressions: "{{ items(request.object.spec.selector.matchLabels, 'key', 'value')[].{key: key, operator: 'In', values: [value] } }}"
+                            topologyKey: kubernetes.io/hostname
