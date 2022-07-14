@@ -18,25 +18,18 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: backup
-              image: ghcr.io/bjw-s/pmb:v0.3.1
+              image: ghcr.io/bjw-s/pmb:v0.4.0
+              imagePullPolicy: Always
               securityContext:
                 privileged: true
               env:
-                - name: TZ
-                  value: "${TIMEZONE}"
-                - name: PMB__SOURCE_DIR
-                  value: /data/source
-                - name: PMB__DESTINATION_DIR
-                  value: /data/nas-backup
-                - name: PMB__FSFREEZE
-                  value: "true"
-                - name: PMB__KEEP_DAYS
-                  value: "7"
+                - name: KOPIA_PASSWORD
+                  value: "${KOPIA_PASSWORD}"
               volumeMounts:
                 - name: data
-                  mountPath: /data/source
+                  mountPath: /data/src
                 - name: backup
-                  mountPath: /data/nas-backup
+                  mountPath: /data/dest
           volumes:
             - name: data
               persistentVolumeClaim:
