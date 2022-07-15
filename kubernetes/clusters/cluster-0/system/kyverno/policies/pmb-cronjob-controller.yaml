@@ -20,21 +20,19 @@ spec:
               kinds:
                 - Deployment
                 - StatefulSet
+              annotations:
+                pmb.bjw-s.dev/volume: "*"
 
       context:
         - name: appName
           variable:
             jmesPath: 'request.object.spec.template.metadata.annotations."pmb.bjw-s.dev/app" || request.object.metadata.annotations."app.kubernetes.io/name" || request.object.metadata.name'
-
+        - name: volume
+          variable:
+            jmesPath: request.object.metadata.annotations."pmb.bjw-s.dev/volume" || request.oldobject.metadata.annotations."pmb.bjw-s.dev/volume"
         - name: claimName
           variable:
-            jmesPath: '(request.object.spec.template.spec.volumes[? @.name == ''{{ request.object.metadata.annotations."pmb.bjw-s.dev/volume" || '''' }}''] | [0].persistentVolumeClaim.claimName) || '''''
-
-      preconditions:
-        all:
-          - key: "{{ claimName }}"
-            operator: NotEquals
-            value: ""
+            jmesPath: "(request.object.spec.template.spec.volumes[? @.name == '{{ volume }}'] | [0].persistentVolumeClaim.claimName) || ''"
 
       generate:
         synchronize: true
@@ -83,7 +81,6 @@ spec:
                         nfs:
                           server: "${NAS_ADDRESS}"
                           path: "/volume1/Backup/Kubernetes/Applications/{{ appName }}"
-
                     affinity:
                       podAffinity:
                         requiredDuringSchedulingIgnoredDuringExecution:
