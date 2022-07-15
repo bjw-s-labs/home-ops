@@ -20,7 +20,7 @@
   username: "bjw-s-bot[bot]",
   repositories: ["bjw-s/home-ops"],
   onboarding: false,
-  requireConfig: false,
+  requireConfig: "optional",
   gitAuthor: "bjw-s-bot <87358111+bjw-s[bot]@users.noreply.github.com>",
   timezone: "Europe/Amsterdam",
   dependencyDashboardTitle: "Renovate Dashboard",
@@ -43,12 +43,12 @@
       "kubernetes/.+\\.ya?ml$"
     ],
     ignorePaths: [
-      "kubernetes/**/config/.+\\.ya?ml$"
+      "kubernetes/.+/config/.+\\.ya?ml$"
     ],
   },
   regexManagers: [
     {
-      description: "Process various dependencies",
+      description: ["Process various dependencies"],
       fileMatch: [
         "infrastructure/.+\\.ya?ml$",
         "kubernetes/.+\\.ya?ml$"
@@ -59,20 +59,20 @@
       versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
     },
     {
-      description: "Process CRD dependencies - Chart and Github Release are the same version",
+      description: ["Process CRD dependencies - Chart and Github Release are the same version"],
       fileMatch: [
-        "kubernetes/.+\\.ya?ml$
-      "],
+        "kubernetes/.+\\.ya?ml$"
+      ],
       matchStrings: [
         "# renovate: registryUrl=(?<registryUrl>\\S+) chart=(?<depName>\\S+)\n.*?(?<currentValue>[^-\\s]*)\n",
       ],
       datasourceTemplate: "helm",
     },
     {
-      description: "Generic Docker image Regex manager",
+      description: ["Generic Docker image Regex manager"],
       fileMatch: [
-        "infrastructure/.+\\.ya?ml$
-      "],
+        "infrastructure/.+\\.ya?ml$"
+      ],
       matchStrings: [
         "# renovate: docker-image( versioning=(?<versioning>.*=?))?\n .*: (?<depName>.*?):(?<currentValue>.*=?)",
       ],
@@ -80,10 +80,10 @@
       versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
     },
     {
-      description: "Raw GitHub URL Regex manager",
+      description: ["Raw GitHub URL Regex manager"],
       fileMatch: [
-        "infrastructure/.+\\.ya?ml$", "kubernetes/.+\\.ya?ml$
-      "],
+        "infrastructure/.+\\.ya?ml$", "kubernetes/.+\\.ya?ml$"
+      ],
       matchStrings: [
         "https:\\/\\/raw.githubusercontent.com\\/(?<depName>[\\w\\d\\-_]+\\/[\\w\\d\\-_]+)\\/(?<currentValue>[\\w\\d\\.\\-_]+)\\/.*",
       ],
