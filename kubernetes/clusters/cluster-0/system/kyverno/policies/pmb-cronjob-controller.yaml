@@ -26,13 +26,13 @@ spec:
       context:
         - name: appName
           variable:
-            jmesPath: 'request.object.spec.template.metadata.annotations."pmb.bjw-s.dev/app" || request.object.metadata.annotations."app.kubernetes.io/name" || request.object.metadata.name'
+            jmesPath: "request.object.metadata.annotations.\"pmb.bjw-s.dev/app\" || request.object.metadata.annotations.\"app.kubernetes.io/name\" || request.object.metadata.name"
         - name: volume
           variable:
-            jmesPath: request.object.metadata.annotations."pmb.bjw-s.dev/volume" || request.oldobject.metadata.annotations."pmb.bjw-s.dev/volume"
+            jmesPath: "request.object.metadata.annotations.\"pmb.bjw-s.dev/volume\""
         - name: claimName
           variable:
-            jmesPath: "(request.object.spec.template.spec.volumes[? @.name == '{{ volume }}'] | [0].persistentVolumeClaim.claimName) || ''"
+            jmesPath: "(request.object.spec.template.spec.volumes[? @.name == '{{ volume }}'] | [0].persistentVolumeClaim.claimName) || \"\""
 
       generate:
         synchronize: true
@@ -49,6 +49,7 @@ spec:
                 uid: "{{request.object.metadata.uid}}"
           spec:
             schedule: "@daily"
+            suspend: false
             concurrencyPolicy: Forbid
             successfulJobsHistoryLimit: 0
             failedJobsHistoryLimit: 2
