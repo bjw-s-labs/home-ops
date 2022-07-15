@@ -1,6 +1,5 @@
 {
-  // General RenovateBot configuration
-  extends: [
+  "extends": [
     "config:base",
     "docker:enableMajor",
     ":disableRateLimiting",
@@ -14,123 +13,110 @@
     "github>bjw-s/home-ops//.github/renovate/groups.json5",
     "github>bjw-s/home-ops//.github/renovate/labels.json5",
     "github>bjw-s/home-ops//.github/renovate/semanticCommits.json5",
-    "github>bjw-s/home-ops//.github/renovate/updateSchedule.json5",
+    "github>bjw-s/home-ops//.github/renovate/updateSchedule.json5"
   ],
-  platform: "github",
-  username: "bjw-s-bot[bot]",
-  repositories: ["bjw-s/home-ops"],
-  onboarding: false,
-  requireConfig: "optional",
-  gitAuthor: "bjw-s-bot <87358111+bjw-s[bot]@users.noreply.github.com>",
-  timezone: "Europe/Amsterdam",
-  dependencyDashboardTitle: "Renovate Dashboard",
-  suppressNotifications: ["prIgnoreNotification"],
-  commitBodyTable: true,
-  rebaseWhen: "conflicted",
-  // Set up Renovate Managers
-  flux: {
-    fileMatch: [
-      "kubernetes/.+\\.ya?ml$"
-    ],
+  "platform": "github",
+  "username": "bjw-s-bot[bot]",
+  "repositories": ["bjw-s/home-ops"],
+  "onboarding": false,
+  "requireConfig": "optional",
+  "gitAuthor": "bjw-s-bot <87358111+bjw-s[bot]@users.noreply.github.com>",
+  "timezone": "Europe/Amsterdam",
+  "dependencyDashboardTitle": "Renovate Dashboard",
+  "suppressNotifications": ["prIgnoreNotification"],
+  "commitBodyTable": true,
+  "rebaseWhen": "conflicted",
+  "flux": {
+    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
   },
   "helm-values": {
-    fileMatch: [
-      "kubernetes/.+\\.ya?ml$"
-    ],
+    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
   },
-  kubernetes: {
-    fileMatch: [
-      "kubernetes/.+\\.ya?ml$"
-    ],
-    ignorePaths: [
-      "kubernetes/.+/config/.+\\.ya?ml$"
-    ],
+  "kubernetes": {
+    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
   },
-  regexManagers: [
+  "regexManagers": [
     {
-      description: ["Process various dependencies"],
-      fileMatch: [
+      "description": ["Process various dependencies"],
+      "fileMatch": [
         "infrastructure/.+\\.ya?ml$",
         "kubernetes/.+\\.ya?ml$"
       ],
-      matchStrings: [
+      "matchStrings": [
         "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*=?))?\n .*: (?<currentValue>.*=?)",
       ],
-      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
     },
     {
-      description: ["Process CRD dependencies - Chart and Github Release are the same version"],
-      fileMatch: [
-        "kubernetes/.+\\.ya?ml$"
-      ],
-      matchStrings: [
+      "description": ["Process CRD dependencies - Chart and Github Release are the same version"],
+      "fileMatch": ["kubernetes/.+\\.ya?ml$"],
+      "matchStrings": [
         "# renovate: registryUrl=(?<registryUrl>\\S+) chart=(?<depName>\\S+)\n.*?(?<currentValue>[^-\\s]*)\n",
       ],
-      datasourceTemplate: "helm",
+      "datasourceTemplate": "helm"
     },
     {
-      description: ["Generic Docker image Regex manager"],
-      fileMatch: [
-        "infrastructure/.+\\.ya?ml$"
-      ],
-      matchStrings: [
+      "description": ["Generic Docker image Regex manager"],
+      "fileMatch": ["infrastructure/.+\\.ya?ml$"],
+      "matchStrings": [
         "# renovate: docker-image( versioning=(?<versioning>.*=?))?\n .*: (?<depName>.*?):(?<currentValue>.*=?)",
       ],
-      datasourceTemplate: "docker",
-      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
     },
     {
-      description: ["Raw GitHub URL Regex manager"],
-      fileMatch: [
-        "infrastructure/.+\\.ya?ml$", "kubernetes/.+\\.ya?ml$"
+      "description": ["Raw GitHub URL Regex manager"],
+      "fileMatch": [
+        "infrastructure/.+\\.ya?ml$",
+        "kubernetes/.+\\.ya?ml$"
       ],
-      matchStrings: [
+      "matchStrings": [
         "https:\\/\\/raw.githubusercontent.com\\/(?<depName>[\\w\\d\\-_]+\\/[\\w\\d\\-_]+)\\/(?<currentValue>[\\w\\d\\.\\-_]+)\\/.*",
       ],
-      datasourceTemplate: "github-releases",
-      versioningTemplate: "semver",
-    },
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver"
+    }
   ],
-  packageRules: [
+  "packageRules": [
     // Setup datasources
     {
-      matchDatasources: ["docker"],
-      commitMessageExtra: "to {{newVersion}}",
+      "matchDatasources": ["docker"],
+      "commitMessageExtra": "to {{newVersion}}"
     },
     // Custom version schemes
     {
-      matchDatasources: ["docker"],
-      matchPackageNames: ["blakeblackshear/frigate"],
-      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["blakeblackshear/frigate"],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$"
     },
     {
-      matchDatasources: ["docker"],
-      matchPackageNames: ["xirixiz/dsmr-reader-docker"],
-      versioning: "regex:^(?<compatibility>.*)-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<build>\\d+\\.\\d+\\.\\d+)$",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["xirixiz/dsmr-reader-docker"],
+      "versioning": "regex:^(?<compatibility>.*)-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<build>\\d+\\.\\d+\\.\\d+)$"
     },
     {
-      matchDatasources: ["docker"],
-      matchPackageNames: [
+      "matchDatasources": ["docker"],
+      "matchPackageNames": [
         "ghcr.io/linuxserver/calibre",
-        "ghcr.io/linuxserver/calibre-web",
+        "ghcr.io/linuxserver/calibre-web"
       ],
-      versioning: "regex:^version-v?(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
+      "versioning": "regex:^version-v?(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$"
     },
     {
-      matchDatasources: ["docker"],
-      matchPackageNames: ["docker.io/timberio/vector"],
-      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["docker.io/timberio/vector"],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$"
     },
     // Version strategies
     {
-      matchDatasources: ["docker"],
-      matchPackageNames: ["ghcr.io/k8s-at-home/plex"],
-      versioning: "loose",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/k8s-at-home/plex"],
+      "versioning": "loose"
     },
     {
-      matchDatasources: ["docker"],
-      matchPackageNames: ["tomsquest/docker-radicale"],
-      versioning: "pep440",
-    },
-  ],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["tomsquest/docker-radicale"],
+      "versioning": "pep440"
+    }
+  ]
 }
