@@ -61,11 +61,13 @@ jobs:
           app_id: ${{ secrets.BJWS_APP_ID }}
           private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
 
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           token: ${{ steps.get-app-token.outputs.token }}
 
-      - uses: actions/setup-python@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: 3.x
 
@@ -74,7 +76,8 @@ jobs:
           git config user.name "${{ env.BOT_USERNAME }}"
           git config user.email "${{ env.BOT_USERNAME }}@users.noreply.github.com"
 
-      - run: |
+      - name: Set up mkdocs
+        run: |
           pip install \
             mkdocs>=1.1 \
             mkdocs-macros-plugin >=0.5 \
@@ -82,6 +85,6 @@ jobs:
             mkdocs-minify-plugin>=0.3 \
             mkdocs-redirects>=1.0
 
-      - run: mkdocs gh-deploy --config-file ./mkdocs.yaml --force
-
-      - run: mkdocs --version
+      - name: Deploy documentation
+        run: |
+          mkdocs gh-deploy --config-file ./mkdocs.yaml --force
