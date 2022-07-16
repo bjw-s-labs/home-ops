@@ -96,3 +96,29 @@ module "pmb" {
     "BJWS_APP_PRIVATE_KEY" = data.sops_file.github_secrets.data["apps.bjws_bot.private_key"]
   }
 }
+
+module "renovate-config" {
+  source  = "mineiros-io/repository/github"
+  version = "0.16.2"
+
+  name        = "renovate-config"
+  description = "Renovate configuration presets"
+  topics      = ["renovate", "gitops", "ci"]
+  visibility  = "public"
+
+  auto_init              = true
+  allow_merge_commit     = false
+  allow_squash_merge     = true
+  allow_auto_merge       = true
+  delete_branch_on_merge = true
+
+  has_issues   = true
+  has_wiki     = false
+  has_projects = false
+  is_template  = false
+
+  plaintext_secrets = {
+    "BJWS_APP_ID"          = data.sops_file.github_secrets.data["apps.bjws_bot.app_id"]
+    "BJWS_APP_PRIVATE_KEY" = data.sops_file.github_secrets.data["apps.bjws_bot.private_key"]
+  }
+}
