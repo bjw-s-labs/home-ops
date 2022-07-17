@@ -26,3 +26,13 @@ spec:
         - op: replace
           path: /spec/template/spec/containers/0/resources/limits/memory
           value: 2Gi
+    - target:
+        group: networking.k8s.io
+        version: v1
+        kind: NetworkPolicy
+      patch: |-
+        $patch: delete
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: not-used
