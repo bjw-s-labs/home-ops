@@ -1,0 +1,35 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plexautolanguages
+  namespace: media
+  labels:
+    app: plexautolanguages
+spec:
+  selector:
+    matchLabels:
+      app: plexautolanguages
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: plexautolanguages
+    spec:
+      containers:
+        - name: plexautolanguages
+          image: remirigal/plex-auto-languages:v1.1.3
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 50m
+              memory: 100Mi
+            limits:
+              memory: 1Gi
+          env:
+            - name: TZ
+              value: "${TIMEZONE}"
+            - name: PLEX_URL
+              value: http://plex.media:32400
+            - name: PLEX_TOKEN
+              value: "${PLEX_TOKEN}"
