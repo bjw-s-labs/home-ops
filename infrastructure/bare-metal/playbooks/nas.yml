@@ -1,0 +1,14 @@
+---
+- hosts:
+    - storage
+  gather_facts: false
+  become: false
+  any_errors_fatal: true
+
+  pre_tasks:
+    - name: Gathering facts
+      ansible.builtin.gather_facts:
+      become: true
+
+  roles:
+    - nas.apps

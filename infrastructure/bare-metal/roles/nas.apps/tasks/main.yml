@@ -1,0 +1,8 @@
+---
+- name: Install Python docker packages
+  ansible.builtin.pip:
+    name:
+      - docker==5.0.3
+
+# Manage applications
+- import_tasks: minio.yml
