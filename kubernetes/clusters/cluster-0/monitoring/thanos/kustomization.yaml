@@ -3,7 +3,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: monitoring
 resources:
-  - ../../../../base/apps/mimir
-  - objectbucketclaim.yaml
+  - ../../../../base/apps/thanos
+  - ./objectbucketclaim.yaml
 patchesStrategicMerge:
   - helm-values.yaml
