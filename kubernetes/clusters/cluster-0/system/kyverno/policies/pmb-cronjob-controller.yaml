@@ -60,28 +60,51 @@ spec:
                   spec:
                     automountServiceAccountToken: false
                     restartPolicy: OnFailure
+                    initContainers:
+                      # Stagger jobs to run randomly within X seconds to avoid bringing down all apps at once
+                      - name: wait
+                        image: ghcr.io/onedr0p/alpine:3.16.0@sha256:e2d3ff4b577f9a3740f2fa4d1f129b83c04a4af0160311d2bb854e71bd56d980
+                        command: ["/scripts/sleep.sh"]
+                        args: ["1", "900"]
+
                     containers:
                       - name: backup
-                        image: ghcr.io/bjw-s/pmb:v0.4.0@sha256:10388afc2a2f6a9f2ae7ec15aee5d919c3d274fd862c753abd6a91f656bf6958
-                        imagePullPolicy: Always
-                        securityContext:
-                          privileged: true
+                        image: ghcr.io/onedr0p/kopia:0.11.3@sha256:db13525a2779b77e4c1db2e14470a369a2c8c9ebac575706c1141f0a786c7f62
                         env:
+                          - name: KOPIA_CACHE_DIRECTORY
+                            value: /data/backups/{{ appName }}/cache
+                          - name: KOPIA_LOG_DIR
+                            value: /data/backups/{{ appName }}/logs
                           - name: KOPIA_PASSWORD
                             value: "${KOPIA_PASSWORD}"
+                        command:
+                          - /bin/bash
+                          - -c
+                          - |-
+                            printf "\e[1;32m%-6s\e[m\n" "[01/09] Create repo ..."          && [[ ! -f /data/backups/kopia.repository.f ]] && kopia repository create filesystem --path=/data/backups
+                            printf "\e[1;32m%-6s\e[m\n" "[02/09] Connect to repo ..."      && kopia repo connect filesystem --path=/data/backups --override-hostname=cluster --override-username=root
+                            printf "\e[1;32m%-6s\e[m\n" "[03/09] Set policies ..."         && kopia policy set /{{ appName }} --compression=zstd --keep-latest 14 --keep-hourly 0 --keep-daily 7 --keep-weekly 2 --keep-monthly 0 --keep-annual 0
+                            printf "\e[1;32m%-6s\e[m\n" "[04/09] Freeze config vol ..."    && fsfreeze -f /{{ appName }}
+                            printf "\e[1;32m%-6s\e[m\n" "[05/09] Back up config vol ..."   && kopia snap create /{{ appName }}
+                            printf "\e[1;32m%-6s\e[m\n" "[06/09] Unfreeze config vol ..."  && fsfreeze -u /{{ appName }}
+                            printf "\e[1;32m%-6s\e[m\n" "[07/09] List snaps ..."           && kopia snap list /{{ appName }}
+                            printf "\e[1;32m%-6s\e[m\n" "[08/09] Show stats ..."           && kopia content stats
+                            printf "\e[1;32m%-6s\e[m\n" "[09/09] Disconnect from repo ..." && kopia repo disconnect
+                        securityContext:
+                          privileged: true
                         volumeMounts:
-                          - name: data
-                            mountPath: /data/src
+                          - name: appdata
+                            mountPath: "/{{ appName }}"
                           - name: backup
-                            mountPath: /data/dest
+                            mountPath: /data/backups
                     volumes:
-                      - name: data
+                      - name: appdata
                         persistentVolumeClaim:
                           claimName: "{{ claimName }}"
                       - name: backup
                         nfs:
                           server: "${NAS_ADDRESS}"
-                          path: "/volume1/Backup/Kubernetes/Applications/{{ appName }}"
+                          path: "/volume1/Backup/Kubernetes/Kopia"
                     affinity:
                       podAffinity:
                         requiredDuringSchedulingIgnoredDuringExecution:
