@@ -1,0 +1,71 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kopia
+spec:
+  values:
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: kopia-config
+
+    env:
+      KOPIA_PASSWORD: "${KOPIA_PASSWORD}"
+
+    ingress:
+      main:
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+
+        hosts:
+          - host: &host "kopia.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+
+        tls:
+          - secretName: kopia.tls
+            hosts:
+              - *host
+
+    persistence:
+      config:
+        enabled: true
+        type: "configMap"
+        name: "kopia-config"
+        mountPath: /config/repository.config
+        subPath: repository.config
+        readOnly: true
+
+      backup:
+        enabled: true
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Backup/Kubernetes/Applications
+        mountPath: /backups
+
+    configmap:
+      config:
+        enabled: true
+        data:
+          repository.config: |
+            {
+              "storage": {
+                "type": "filesystem",
+                "config": {
+                  "path": "/backups",
+                  "dirShards": null
+                }
+              },
+              "caching": {
+                "cacheDirectory": "cache",
+                "maxCacheSize": 5242880000,
+                "maxMetadataCacheSize": 5242880000,
+                "maxListCacheDuration": 30
+              },
+              "hostname": "cluster",
+              "username": "root",
+              "description": "Cluster",
+              "enableActions": false,
+              "formatBlobCacheDuration": 900000000000
+            }
