@@ -20,12 +20,22 @@ spec:
             hosts:
               - prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}
 
-      prometheusSpec:
-        remoteWrite:
-          - url: http://mimir-distributor.monitoring.svc.cluster.local:8080/api/v1/push
+      thanosService:
+        enabled: true
+      thanosServiceMonitor:
+        enabled: true
 
+      prometheusSpec:
         externalLabels:
           cluster: ${CLUSTER_NAME}
+
+        thanos:
+          image: quay.io/thanos/thanos:v0.27.0
+          # renovate: datasource=docker depName=quay.io/thanos/thanos
+          version: "v0.27.0"
+          objectStorageConfig:
+            name: thanos-objstore-secret
+            key: objstore.yml
 
         additionalScrapeConfigs:
           - job_name: node-exporter
