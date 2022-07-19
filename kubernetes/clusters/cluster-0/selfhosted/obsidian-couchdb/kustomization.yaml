@@ -9,6 +9,9 @@ resources:
 patchesStrategicMerge:
   - helm-values.yaml
   - pvc.yaml
+commonLabels:
+  app.kubernetes.io/name: couchdb
+  app.kubernetes.io/instance: obsidian-couchdb
 configMapGenerator:
   - name: couchdb-config
     files:
