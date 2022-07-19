@@ -5,4 +5,8 @@ namespace: media
 resources:
   - ../../../../base/apps/plex
 patchesStrategicMerge:
-  - helm-values.yaml
+  - ./helm-values.yaml
+  - ./pvc.yaml
+commonLabels:
+  app.kubernetes.io/name: plex
+  app.kubernetes.io/instance: plex

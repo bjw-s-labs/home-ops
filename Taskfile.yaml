@@ -9,9 +9,14 @@ vars:
 
 includes:
   cluster: .taskfiles/cluster.yaml
-  backup: .taskfiles/backups.yaml
+  snapshot: .taskfiles/snapshot.yaml
 
 tasks:
+  default:
+    silent: true
+    cmds:
+      - task -l
+
   pre-commit:
     desc: Run pre-commit
     cmds:

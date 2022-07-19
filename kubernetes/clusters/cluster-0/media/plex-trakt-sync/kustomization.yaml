@@ -5,11 +5,15 @@ namespace: media
 resources:
   - ../../../../base/apps/plex-trakt-sync
 patchesStrategicMerge:
-  - helm-values.yaml
+  - ./helm-values.yaml
+  - ./pvc.yaml
+commonLabels:
+  app.kubernetes.io/name: plex-trakt-sync
+  app.kubernetes.io/instance: plex-trakt-sync
 configMapGenerator:
   - name: plex-tract-sync-config-yaml
     files:
-      - config/config.yml
+      - ./config/config.yml
 generatorOptions:
   disableNameSuffixHash: true
   annotations:
