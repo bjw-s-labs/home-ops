@@ -5,8 +5,12 @@ namespace: selfhosted
 resources:
   - ../../../../base/apps/radicale
   - ./secret.sops.yaml
+  - ./pvc.yaml
 patchesStrategicMerge:
-  - helm-values.yaml
+  - ./helm-values.yaml
+commonLabels:
+  app.kubernetes.io/name: radicale
+  app.kubernetes.io/instance: radicale
 configMapGenerator:
   - name: radicale-config
     files:
