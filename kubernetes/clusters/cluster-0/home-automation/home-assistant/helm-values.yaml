@@ -33,14 +33,6 @@ spec:
       - secretRef:
           name: home-assistant-secrets
 
-    persistence:
-      backup:
-        enabled: true
-        type: nfs
-        server: "${NAS_ADDRESS}"
-        path: /volume1/Backup/Kubernetes/Applications/home-assistant
-        mountPath: /config/backups
-
     dnsConfig:
       options:
         - name: ndots
