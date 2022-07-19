@@ -1,0 +1,73 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: tautulli
+spec:
+  chart:
+    spec:
+      chart: kah-common-chart
+      interval: 15m
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      version: 1.1.2
+  interval: 15m
+  values:
+    global:
+      nameOverride: tautulli
+
+    image:
+      repository: ghcr.io/onedr0p/tautulli
+      tag: 2.10.2@sha256:5321a6ea24ffd5463e9758d64c478595dd74d50b53fe8693e4a5e07f9b5fd238
+
+    service:
+      main:
+        ports:
+          http:
+            port: 8181
+
+    ingress:
+      main:
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_set_header Accept-Encoding "";
+            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/tautulli/nord.css"></head>';
+            sub_filter_once on;
+        enabled: true
+        hosts:
+          - host: tautulli.${INGRESS_DOMAIN}
+            paths:
+              - path: /
+                pathType: Prefix
+        ingressClassName: nginx
+        tls:
+          - hosts:
+              - tautulli.${INGRESS_DOMAIN}
+            secretName: tls.tautulli
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: tautulli-config
+
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: "OnRootMismatch"
+
+    resources:
+      requests:
+        cpu: 10m
+        memory: 250Mi
+      limits:
+        memory: 500Mi
+
+    dnsConfig:
+      options:
+        - name: ndots
+          value: "1"
