@@ -4,6 +4,11 @@ kind: PersistentVolumeClaim
 metadata:
   name: series-cleanup-data
   namespace: media
+  labels:
+    app.kubernetes.io/name: series-cleanup
+    app.kubernetes.io/instance: series-cleanup
+    snapshot.home.arpa/enabled: "true"
+    snapshot.home.arpa/nodeAffinity: "false"
 spec:
   accessModes:
     - ReadWriteOnce

@@ -5,4 +5,8 @@ namespace: media
 resources:
   - ../../../../base/apps/navidrome
 patchesStrategicMerge:
-  - helm-values.yaml
+  - ./helm-values.yaml
+  - ./pvc.yaml
+commonLabels:
+  app.kubernetes.io/name: navidrome
+  app.kubernetes.io/instance: navidrome

@@ -6,4 +6,8 @@ resources:
   - ../../../../base/apps/mosquitto
   - ./secret.sops.yaml
 patchesStrategicMerge:
-  - helm-values.yaml
+  - ./helm-values.yaml
+  - ./pvc.yaml
+commonLabels:
+  app.kubernetes.io/name: mosquitto
+  app.kubernetes.io/instance: mosquitto

@@ -4,6 +4,10 @@ kind: PersistentVolumeClaim
 metadata:
   name: esphome-config
   namespace: home-automation
+  labels:
+    app.kubernetes.io/name: esphome
+    app.kubernetes.io/instance: esphome
+    snapshot.home.arpa/enabled: "true"
 spec:
   accessModes:
     - ReadWriteOnce

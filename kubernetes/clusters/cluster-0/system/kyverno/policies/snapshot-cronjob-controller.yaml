@@ -2,56 +2,70 @@
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
-  name: pmb-cronjob-controller
+  name: snapshot-cronjob-controller
   annotations:
-    policies.kyverno.io/title: pmb CronJob controller
-    policies.kyverno.io/subject: Deployment,StatefulSet
+    policies.kyverno.io/title: Snapshot CronJob controller
+    policies.kyverno.io/subject: PersistentVolumeClaim
     policies.kyverno.io/description: >-
-      This policy generates a backup CronJob for
-      Deployments, StatefulSets
+      This policy creates a snapshot CronJob for labeled PersistentVolumeClaims
 spec:
   mutateExistingOnPolicyUpdate: true
   generateExistingOnPolicyUpdate: true
   rules:
-    - name: create-cronjob
+    - name: create-snapshot-cronjob
       match:
         any:
           - resources:
               kinds:
-                - Deployment
-                - StatefulSet
-              annotations:
-                pmb.bjw-s.dev/volume: "*"
+                - PersistentVolumeClaim
+              selector:
+                matchLabels:
+                  snapshot.home.arpa/enabled: "true"
+                  app.kubernetes.io/name: "*"
+                  app.kubernetes.io/instance: "*"
 
       context:
-        - name: appName
-          variable:
-            jmesPath: "request.object.metadata.annotations.\"pmb.bjw-s.dev/app\" || request.object.metadata.annotations.\"app.kubernetes.io/name\" || request.object.metadata.name"
-        - name: volume
-          variable:
-            jmesPath: "request.object.metadata.annotations.\"pmb.bjw-s.dev/volume\""
         - name: claimName
           variable:
-            jmesPath: "(request.object.spec.template.spec.volumes[? @.name == '{{ volume }}'] | [0].persistentVolumeClaim.claimName) || \"\""
+            jmesPath: "request.object.metadata.name"
+        - name: namespace
+          variable:
+            jmesPath: "request.object.metadata.namespace || 'default'"
+        - name: nodeAffinity
+          variable:
+            value:
+              enabled: "{{ (request.object.metadata.labels.\"snapshot.home.arpa/nodeAffinity\" || 'true') == 'true' }}"
+              labels:
+                - key: "app.kubernetes.io/name"
+                  operator: "In"
+                  values:
+                    - "{{ request.object.metadata.labels.\"app.kubernetes.io/name\" }}"
+                - key: "app.kubernetes.io/instance"
+                  operator: "In"
+                  values:
+                    - "{{ request.object.metadata.labels.\"app.kubernetes.io/instance\" }}"
 
       generate:
         synchronize: true
         apiVersion: batch/v1
         kind: CronJob
-        name: "{{ appName }}-backup"
-        namespace: "{{request.object.metadata.namespace}}"
+        name: "{{ claimName }}-backup"
+        namespace: "{{ request.object.metadata.namespace }}"
         data:
           metadata:
+            labels:
+              app.kubernetes.io/name: "{{ request.object.metadata.labels.\"app.kubernetes.io/name\" }}"
+              app.kubernetes.io/instance: "{{ request.object.metadata.labels.\"app.kubernetes.io/instance\" }}"
             ownerReferences:
-              - apiVersion: "{{request.object.apiVersion}}"
-                kind: "{{request.object.kind}}"
-                name: "{{request.object.metadata.name}}"
-                uid: "{{request.object.metadata.uid}}"
+              - apiVersion: "{{ request.object.apiVersion }}"
+                kind: "{{ request.object.kind }}"
+                name: "{{ request.object.metadata.name }}"
+                uid: "{{ request.object.metadata.uid }}"
           spec:
             schedule: "@daily"
             suspend: false
             concurrencyPolicy: Forbid
-            successfulJobsHistoryLimit: 0
+            successfulJobsHistoryLimit: 1
             failedJobsHistoryLimit: 2
             jobTemplate:
               spec:
@@ -72,9 +86,9 @@ spec:
                         image: ghcr.io/onedr0p/kopia:0.11.3@sha256:db13525a2779b77e4c1db2e14470a369a2c8c9ebac575706c1141f0a786c7f62
                         env:
                           - name: KOPIA_CACHE_DIRECTORY
-                            value: /data/backups/{{ appName }}/cache
+                            value: /data/backups/{{ namespace }}/{{ claimName }}/cache
                           - name: KOPIA_LOG_DIR
-                            value: /data/backups/{{ appName }}/logs
+                            value: /data/backups/{{ namespace }}/{{ claimName }}/logs
                           - name: KOPIA_PASSWORD
                             value: "${KOPIA_PASSWORD}"
                         command:
@@ -83,18 +97,18 @@ spec:
                           - |-
                             printf "\e[1;32m%-6s\e[m\n" "[01/09] Create repo ..."          && [[ ! -f /data/backups/kopia.repository.f ]] && kopia repository create filesystem --path=/data/backups
                             printf "\e[1;32m%-6s\e[m\n" "[02/09] Connect to repo ..."      && kopia repo connect filesystem --path=/data/backups --override-hostname=cluster --override-username=root
-                            printf "\e[1;32m%-6s\e[m\n" "[03/09] Set policies ..."         && kopia policy set /{{ appName }} --compression=zstd --keep-latest 14 --keep-hourly 0 --keep-daily 7 --keep-weekly 2 --keep-monthly 0 --keep-annual 0
-                            printf "\e[1;32m%-6s\e[m\n" "[04/09] Freeze config vol ..."    && fsfreeze -f /{{ appName }}
-                            printf "\e[1;32m%-6s\e[m\n" "[05/09] Back up config vol ..."   && kopia snap create /{{ appName }}
-                            printf "\e[1;32m%-6s\e[m\n" "[06/09] Unfreeze config vol ..."  && fsfreeze -u /{{ appName }}
-                            printf "\e[1;32m%-6s\e[m\n" "[07/09] List snaps ..."           && kopia snap list /{{ appName }}
+                            printf "\e[1;32m%-6s\e[m\n" "[03/09] Set policies ..."         && kopia policy set /data/{{ namespace }}/{{ claimName }} --compression=zstd --keep-latest 14 --keep-hourly 0 --keep-daily 7 --keep-weekly 2 --keep-monthly 0 --keep-annual 0
+                            printf "\e[1;32m%-6s\e[m\n" "[04/09] Freeze config vol ..."    && fsfreeze -f /data/{{ namespace }}/{{ claimName }}
+                            printf "\e[1;32m%-6s\e[m\n" "[05/09] Back up config vol ..."   && kopia snap create /data/{{ namespace }}/{{ claimName }}
+                            printf "\e[1;32m%-6s\e[m\n" "[06/09] Unfreeze config vol ..."  && fsfreeze -u /data/{{ namespace }}/{{ claimName }}
+                            printf "\e[1;32m%-6s\e[m\n" "[07/09] List snaps ..."           && kopia snap list /data/{{ namespace }}/{{ claimName }}
                             printf "\e[1;32m%-6s\e[m\n" "[08/09] Show stats ..."           && kopia content stats
                             printf "\e[1;32m%-6s\e[m\n" "[09/09] Disconnect from repo ..." && kopia repo disconnect
                         securityContext:
                           privileged: true
                         volumeMounts:
                           - name: appdata
-                            mountPath: "/{{ appName }}"
+                            mountPath: "/data/{{ namespace }}/{{ claimName }}"
                           - name: backup
                             mountPath: /data/backups
                     volumes:
@@ -105,9 +119,10 @@ spec:
                         nfs:
                           server: "${NAS_ADDRESS}"
                           path: "/volume1/Backup/Kubernetes/Kopia"
+
                     affinity:
                       podAffinity:
                         requiredDuringSchedulingIgnoredDuringExecution:
-                          - labelSelector:
-                              matchExpressions: "{{ items(request.object.spec.selector.matchLabels, 'key', 'value')[].{key: key, operator: 'In', values: [value] } }}"
-                            topologyKey: kubernetes.io/hostname
+                          - topologyKey: kubernetes.io/hostname
+                            labelSelector:
+                              matchExpressions: "{{ nodeAffinity.enabled && nodeAffinity.labels || [] }}"
