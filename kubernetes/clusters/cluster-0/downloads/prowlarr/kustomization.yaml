@@ -5,4 +5,8 @@ namespace: downloads
 resources:
   - ../../../../base/apps/prowlarr
 patchesStrategicMerge:
-  - helm-values.yaml
+  - ./helm-values.yaml
+  - ./pvc.yaml
+commonLabels:
+  app.kubernetes.io/name: prowlarr
+  app.kubernetes.io/instance: prowlarr

@@ -5,4 +5,8 @@ namespace: downloads
 resources:
   - ../../../../base/apps/sonarr
 patchesStrategicMerge:
-  - helm-values.yaml
+  - ./helm-values.yaml
+  - ./pvc.yaml
+commonLabels:
+  app.kubernetes.io/name: sonarr
+  app.kubernetes.io/instance: sonarr
