@@ -3,8 +3,9 @@ apiVersion: metal.sidero.dev/v1alpha1
 kind: Server
 metadata:
   labels:
-    control-plane: "true"
-  name:  5898c6a6-38cd-4a9f-9abc-7a28045080fc 
+    control-plane: "false"
+    worker: "true"
+  name:   4c4c4544-004b-5710-804d-c8c04f515731
 spec:
   accepted: true
   configPatches:
@@ -13,7 +14,7 @@ spec:
       value: /dev/sda
     - op: add
       path: /machine/network/hostname
-      value: cp2.${CLUSTER_1_HARDWARE_DOMAIN}
+      value: worker1.${CLUSTER_1_HARDWARE_DOMAIN}
     - op: add
       path: /machine/sysctls
       value:
@@ -21,14 +22,12 @@ spec:
         fs.inotify.max_user_instances: "8192"
         vm.max_map_count: "524288"
   cpu:
-    manufacturer: QEMU
-    version:  pc-q35-6.1
-  hostname: test.${CLUSTER_1_HARDWARE_DOMAIN}
+    manufacturer: Intel
+    version:  Intel(R) Xeon(R) CPU E5-2650 0 @ 2.00GHz
+  hostname: worker1.${CLUSTER_1_HARDWARE_DOMAIN}
   pxeBootAlways: true
   system:
-    family: Unknown
-    manufacturer: QEMU
-    productName: Standard PC (Q35 + ICH9, 2009)
-    serialNumber: Unknown
-    skuNumber: Unknown
-    version: pc-q35-6.1
+    family: SKU=NotProvided;ModelName=PowerEdge R720xd
+    manufacturer: Dell Inc.
+    skuNumber: HKWMQW1 
+    version: PowerEdge R720xd 
