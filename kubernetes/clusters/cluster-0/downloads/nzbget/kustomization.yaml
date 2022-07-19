@@ -6,6 +6,10 @@ resources:
   - ../../../../base/apps/nzbget
 patchesStrategicMerge:
   - helm-values.yaml
+  - ./pvc.yaml
+commonLabels:
+  app.kubernetes.io/name: nzbget
+  app.kubernetes.io/instance: nzbget
 configMapGenerator:
   - name: nzbget-scripts
     files:

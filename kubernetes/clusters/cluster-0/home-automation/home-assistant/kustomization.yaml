@@ -8,4 +8,8 @@ resources:
   - ./secret-codeserver.sops.yaml
   - ./secret-home-assistant.sops.yaml
 patchesStrategicMerge:
-  - helm-values.yaml
+  - ./helm-values.yaml
+  - ./pvc.yaml
+commonLabels:
+  app.kubernetes.io/name: home-assistant
+  app.kubernetes.io/instance: home-assistant

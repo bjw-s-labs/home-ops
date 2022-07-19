@@ -6,6 +6,10 @@ resources:
   - ../../../../base/apps/qbittorrent
 patchesStrategicMerge:
   - helm-values.yaml
+  - ./pvc.yaml
+commonLabels:
+  app.kubernetes.io/name: qbittorrent
+  app.kubernetes.io/instance: qbittorrent
 configMapGenerator:
   - name: qbittorrent-config
     files:

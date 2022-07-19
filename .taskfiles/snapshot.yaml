@@ -1,0 +1,23 @@
+---
+version: "3"
+
+tasks:
+  create:
+    desc: Create a job to snapshot a PVC (ex. task NAMESPACE=media PVC=plex-config-v1 snapshot:create)
+    interactive: true
+    vars:
+      TS:
+        sh: date "+%Y%m%d%H%M%S"
+    preconditions:
+      - sh: kubectl -n {{.NAMESPACE}} get cronjob {{.PVC}}-backup
+        msg: "Error: cronjob/{{.APP}}-backup in namespace/{{.NAMESPACE}} not found"
+      - sh: kubectl -n {{.NAMESPACE}} get pvc {{.PVC}}
+        msg: "Error: pvc/{{.PVC}} in namespace/{{.NAMESPACE}} not found"
+    cmds:
+      - |
+        kubectl -n {{.NAMESPACE}} create job --from=cronjob/{{.PVC}}-backup {{.PVC}}-backup-{{.TS}} --dry-run=client --output yaml \
+          | yq eval "del(.spec.template.spec.initContainers)" - \
+          | kubectl apply -f -
+      - kubectl -n {{.NAMESPACE}} wait --for condition=complete --timeout=1m job/{{.PVC}}-backup-{{.TS}}
+      - kubectl -n {{.NAMESPACE}} logs -f job/{{.PVC}}-backup-{{.TS}}
+      - kubectl -n {{.NAMESPACE}} delete job {{.PVC}}-backup-{{.TS}}
