@@ -4,7 +4,8 @@ version: "3"
 vars:
   NAMESPACE: '{{ .NAMESPACE | default "default" }}'
   KOPIA_NAMESPACE: '{{ .KOPIA_NAMESPACE | default "default" }}'
-  TS: '{{now | date "20060102150405"}}'
+  TS: '{{ now | date "20060102150405" }}'
+  TIMEOUT: '{{ .TIMEOUT | default "1m" }}'
 
 x-preconditions:
   - &has-cronjob
@@ -43,10 +44,8 @@ tasks:
         kubectl -n {{.NAMESPACE}} create job --from=cronjob/{{.PVC}}-snapshot {{.SNAPSHOT_JOB_NAME}} --dry-run=client --output yaml \
           | yq eval "del(.spec.template.spec.initContainers)" - \
           | kubectl apply -f -
-      - task: _wait_for_pod
-        vars:
-          NAMESPACE: "{{ .NAMESPACE }}"
-          SELECTOR: "{{ .SNAPSHOT_JOB_SELECTOR }}"
+      - sleep 2
+      - kubectl -n {{.NAMESPACE}} wait pod --for condition=ready --selector={{.SNAPSHOT_JOB_SELECTOR}} --timeout={{.TIMEOUT}}
       - kubectl -n {{.NAMESPACE}} logs -f job/{{.SNAPSHOT_JOB_NAME}} -c backup
 
   restore:
@@ -80,18 +79,6 @@ tasks:
       - kubectl -n {{.NAMESPACE}} scale {{.NAME}} --replicas 0
       - kubectl -n {{.NAMESPACE}} wait pod --for delete --selector="{{.APP_SELECTOR}}" --timeout=2m
       - envsubst < <(cat {{.RESTORE_JOB_FILENAME}}) | kubectl apply -f -
-      - task: _wait_for_pod
-        vars:
-          NAMESPACE: "{{ .NAMESPACE }}"
-          SELECTOR: "{{ .RESTORE_JOB_SELECTOR }}"
-      - kubectl -n {{.NAMESPACE}} logs -f job/{{.RESTORE_JOB_NAME}} -c restore
-
-  _wait_for_pod:
-    silent: true
-    vars:
-      TIMEOUT: '{{ .TIMEOUT | default "1m" }}'
-      SELECTOR: '{{ .SELECTOR }}'
-    cmds:
-      - echo "Waiting 5 seconds for pod to come online"
-      - sleep 5
-      - kubectl -n {{.NAMESPACE}} wait pod --for condition=ready --selector={{.SELECTOR}} --timeout={{.TIMEOUT}}
+      - sleep 2
+      - kubectl -n {{.NAMESPACE}} wait job/{{.RESTORE_JOB_NAME}} --for condition=complete --timeout={{.TIMEOUT}}
+      - kubectl -n {{.NAMESPACE}} logs job/{{.RESTORE_JOB_NAME}} -c restore
