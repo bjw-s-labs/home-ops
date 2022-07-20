@@ -48,6 +48,14 @@ tasks:
       - kubectl -n {{.NAMESPACE}} wait pod --for condition=ready --selector={{.SNAPSHOT_JOB_SELECTOR}} --timeout={{.TIMEOUT}}
       - kubectl -n {{.NAMESPACE}} logs -f job/{{.SNAPSHOT_JOB_NAME}} -c backup
 
+  create_all:
+    desc: Run `task snapshot:create` for all PVC's that have snapshots enabled
+    cmds:
+      - |
+        kubectl get pvc --all-namespaces --no-headers=true --selector="snapshot.home.arpa/enabled=true" \
+          | awk "{print \$1,\$2}" \
+          | xargs -L1 sh -c 'task snapshot:create NAMESPACE=$0 PVC=$1'
+
   restore:
     desc: Spawn a job to restore an app from a snapshot (task snapshot:restore APP=plex [SNAPSHOT=(latest|<snapshot-id>) NAMESPACE=<namespace> KOPIA_NAMESPACE=<namespace> TIMEOUT=<timeout>])
     vars:
