@@ -21,8 +21,8 @@ spec:
             - -c
             - |-
               shopt -s dotglob
-              printf "\e[1;32m%-6s\e[m\n" "[01/03] Remove previous data ..." && rm -rf /data/${NAMESPACE}/${PVC}/*
-              printf "\e[1;32m%-6s\e[m\n" "[02/03] Connect to repo ..."      && kopia repo connect filesystem --path=/snapshots --override-hostname=cluster --override-username=root
+              printf "\e[1;32m%-6s\e[m\n" "[01/03] Connect to repo ..."      && kopia repo connect filesystem --path=/snapshots --override-hostname=cluster --override-username=root
+              printf "\e[1;32m%-6s\e[m\n" "[02/03] Remove previous data ..." && rm -rf /data/${NAMESPACE}/${PVC}/*
               printf "\e[1;32m%-6s\e[m\n" "[03/03] Restore snapshot ..."     && kopia snap restore "${SNAPSHOT}" /data/${NAMESPACE}/${PVC}
               printf "\e[1;32m%-6s\e[m\n" "[09/09] Disconnect from repo ..." && kopia repo disconnect
           volumeMounts:
