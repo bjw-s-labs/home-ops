@@ -1,0 +1,141 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  chart:
+    spec:
+      chart: grafana
+      interval: 5m
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+      version: 6.32.5
+  interval: 5m
+  timeout: 20m
+  values:
+    replicas: 1
+
+    image:
+      repository: ghcr.io/k8s-at-home/grafana
+
+    admin:
+      existingSecret: grafana-secrets
+      passwordKey: adminPass
+      userKey: adminUser
+
+    dashboardProviders:
+      dashboardproviders.yaml:
+        apiVersion: 1
+        providers:
+          - disableDeletion: false
+            editable: true
+            folder: ""
+            name: default
+            options:
+              path: /var/lib/grafana/dashboards/default
+            orgId: 1
+            type: file
+
+    dashboards:
+      default:
+        node-exporter-full:
+          datasource: Prometheus
+          url: https://grafana.com/api/dashboards/1860/revisions/22/download
+
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+          - access: proxy
+            isDefault: true
+            name: Prometheus
+            type: prometheus
+            url: http://thanos-query.monitoring:9090
+          - access: proxy
+            name: Loki
+            type: loki
+            url: http://loki.monitoring.svc.cluster.local:3100
+        deleteDatasources:
+          - name: Loki
+            orgId: 1
+
+    deploymentStrategy:
+      type: Recreate
+
+    env:
+      GF_DATE_FORMATS_USE_BROWSER_LOCALE: true
+      GF_EXPLORE_ENABLED: true
+      GF_LOG_FILTERS: rendering:debug
+      GF_PANELS_DISABLE_SANITIZE_HTML: true
+
+    grafana.ini:
+      analytics:
+        check_for_updates: false
+      auth.basic:
+        disable_login_form: false
+      grafana_net:
+        url: https://grafana.net
+      log:
+        mode: console
+      paths:
+        data: /var/lib/grafana/data
+        logs: /var/log/grafana
+        plugins: /var/lib/grafana/plugins
+        provisioning: /etc/grafana/provisioning
+      server:
+        root_url: https://grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+
+    imageRenderer:
+      enabled: true
+
+    ingress:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+      hosts:
+        - grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+      ingressClassName: nginx
+      tls:
+        - hosts:
+            - grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+          secretName: grafana-${CLUSTER_NAME}-tls
+
+    persistence:
+      enabled: false
+
+    plugins:
+      - natel-discrete-panel
+      - pr0ps-trackmap-panel
+      - grafana-piechart-panel
+      - vonage-status-panel
+      - grafana-worldmap-panel
+      - grafana-clock-panel
+
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: grafana
+
+    resources:
+      limits:
+        memory: 219M
+      requests:
+        cpu: 23m
+        memory: 127M
+
+    serviceMonitor:
+      enabled: true
+
+    sidecar:
+      dashboards:
+        enabled: true
+        labelValue: ""
+        searchNamespace: ALL
+      datasources:
+        enabled: true
+        labelValue: ""
+        searchNamespace: ALL
+      logLevel: INFO
