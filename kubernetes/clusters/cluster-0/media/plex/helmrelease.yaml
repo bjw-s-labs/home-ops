@@ -1,0 +1,98 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: plex
+  namespace: media
+spec:
+  chart:
+    spec:
+      chart: kah-common-chart
+      interval: 15m
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      version: 1.1.2
+  interval: 15m
+  values:
+    global:
+      nameOverride: plex
+
+    image:
+      repository: ghcr.io/k8s-at-home/plex
+      tag: v1.27.2.5929-a806c5905@sha256:df1768fa98033e6b09fb604e7050f7c80a13ed499d40a1d8f487ad3e8968197e
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: feature.node.kubernetes.io/custom-intel-gpu
+                  operator: In
+                  values:
+                    - "true"
+
+    dnsConfig:
+      options:
+        - name: ndots
+          value: "1"
+
+    service:
+      main:
+        annotations:
+          metallb.universe.tf/loadBalancerIPs: ${LB_PLEX}
+        externalTrafficPolicy: Local
+        ports:
+          http:
+            port: 32400
+        type: LoadBalancer
+
+    ingress:
+      main:
+        enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+          external-dns.alpha.kubernetes.io/target: ingress.${PERSONAL_DOMAIN}
+          external-dns/is-public: "true"
+          nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+        hosts:
+          - host: plex.${PERSONAL_DOMAIN}
+            paths:
+              - path: /
+                pathType: Prefix
+        ingressClassName: nginx
+        tls:
+          - hosts:
+              - plex.${PERSONAL_DOMAIN}
+            secretName: tls.plex
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: plex-config
+      nfs-nas-media:
+        enabled: true
+        mountPath: /storage/media
+        path: /volume1/Media
+        server: ${NAS_ADDRESS}
+        type: nfs
+      transcode:
+        enabled: true
+        type: emptyDir
+
+    podSecurityContext:
+      supplementalGroups:
+        - 44
+        - 109
+        - 65539
+
+    resources:
+      requests:
+        cpu: 100m
+        gpu.intel.com/i915: 1
+        memory: 4282M
+      limits:
+        gpu.intel.com/i915: 1
+        memory: 12G
