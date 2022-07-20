@@ -1,24 +1,67 @@
 ---
 version: "3"
 
+x-vars: &vars
+  NAMESPACE: '{{ .NAMESPACE | default "default" }}'
+  KOPIA_NAMESPACE: '{{ .KOPIA_NAMESPACE | default "default" }}'
+  SNAPSHOT: '{{.SNAPSHOT | default "latest"}}'
+  TS: '{{now | date "20060102150405"}}'
+  JOB_NAME: '{{.PVC}}-backup-{{.TS}}'
+  SELECTOR: "job-name={{.JOB_NAME}}"
+
+x-preconditions:
+  - &has-cronjob
+    sh: kubectl get cronjob -n {{.NAMESPACE}} {{.PVC}}-backup
+    msg: "CronJob '{{.PVC}}-backup' in namespace '{{.NAMESPACE}}' not found"
+  - &has-pvc
+    sh: kubectl get pvc -n {{.NAMESPACE}} {{.PVC}}
+    msg: "PersistentVolumeClaim '{{.PVC}}' in namespace '{{.NAMESPACE}}' not found"
+  - &has-restore-job
+    msg: "File '{{.PROJECT_DIR}}/hack/restore-job.yaml' not found"
+    sh: "test -f {{.PROJECT_DIR}}/hack/restore-job.yaml"
+  - &has-kopia-deployment
+    msg: "deployment/kopia in namespace/{{.KOPIA_NAMESPACE }} not found"
+    sh: kubectl -n {{.KOPIA_NAMESPACE }} get deployment kopia
+
 tasks:
-  create:
-    desc: Create a job to snapshot a PVC (ex. task NAMESPACE=media PVC=plex-config-v1 snapshot:create)
-    interactive: true
-    vars:
-      NAMESPACE: "{{ .NAMESPACE | default \"default\" }}"
-      TS:
-        sh: date "+%Y%m%d%H%M%S"
+  list:
+    desc: List all existing snapshots for an app (task snapshot:list PVC=plex-config [NAMESPACE=<namespace> KOPIA_NAMESPACE=<namespace>])
+    vars: *vars
     preconditions:
-      - sh: kubectl -n {{.NAMESPACE}} get cronjob {{.PVC}}-backup
-        msg: "Error: cronjob/{{.PVC}}-backup in namespace/{{.NAMESPACE}} not found"
-      - sh: kubectl -n {{.NAMESPACE}} get pvc {{.PVC}}
-        msg: "Error: pvc/{{.PVC}} in namespace/{{.NAMESPACE}} not found"
+      - *has-kopia-deployment
     cmds:
+      - kubectl -n {{.KOPIA_NAMESPACE }} exec -it deployment/kopia -- kopia snapshot list /data/{{.NAMESPACE}}/{{.PVC}} {{.CLI_ARGS}}
+
+  create:
+    desc: Create a job to snapshot a PVC (ex. task snapshot:create PVC=plex-config [NAMESPACE=<namespace>])
+    vars: *vars
+    preconditions:
+      - *has-cronjob
+      - *has-pvc
+    cmds:
+      - defer: kubectl -n {{.NAMESPACE}} delete job {{.JOB_NAME}}
       - |
-        kubectl -n {{.NAMESPACE}} create job --from=cronjob/{{.PVC}}-backup {{.PVC}}-backup-{{.TS}} --dry-run=client --output yaml \
+        kubectl -n {{.NAMESPACE}} create job --from=cronjob/{{.PVC}}-backup {{.JOB_NAME}} --dry-run=client --output yaml \
           | yq eval "del(.spec.template.spec.initContainers)" - \
           | kubectl apply -f -
-      - kubectl -n {{.NAMESPACE}} wait --for condition=complete --timeout={{.TIMEOUT | default "1m"}} job/{{.PVC}}-backup-{{.TS}}
-      - kubectl -n {{.NAMESPACE}} logs -f job/{{.PVC}}-backup-{{.TS}}
-      - kubectl -n {{.NAMESPACE}} delete job {{.PVC}}-backup-{{.TS}}
+      - task: _wait_for_pod
+        vars:
+          NAMESPACE: "{{ .NAMESPACE }}"
+          SELECTOR: "{{ .SELECTOR }}"
+      - kubectl -n {{.NAMESPACE}} logs -f job/{{.JOB_NAME}}
+
+  _wait_for_pod:
+    silent: true
+    vars:
+      TIMEOUT: '{{ .TIMEOUT | default "1m" }}'
+    cmds:
+      - echo "Waiting 5 seconds for pod to come online"
+      - |
+        for (( i=1; i<=5; i++ ))
+        do
+          if $(kubectl -n {{.NAMESPACE}} get pod --selector={{.SELECTOR}}) > /dev/null 2>&1; then
+            break
+          fi
+          sleep 1
+        done
+      - kubectl -n {{.NAMESPACE}} wait pod --for condition=ready --selector={{.SELECTOR}} --timeout={{.TIMEOUT}}
