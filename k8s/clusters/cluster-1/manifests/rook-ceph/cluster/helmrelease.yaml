@@ -26,9 +26,6 @@ spec:
       [global]
       bdev_enable_discard = true
       bdev_async_discard = true
-      # osd_scrub_begin_hour = 6
-      # osd_scrub_end_hour = 12
-      # osd_scrub_sleep = 0.1
 
     cephClusterSpec:
       cephVersion:
@@ -57,7 +54,7 @@ spec:
               timeoutSeconds: 5
 
       mgr:
-        count: 2
+        count: 1
 
       dashboard:
         enabled: true
@@ -67,7 +64,7 @@ spec:
         mgr:
           limits:
             cpu: "2000m"
-            memory: "1Gi"
+            memory: "2Gi"
           requests:
             cpu: "500m"
             memory: "512Mi"
