@@ -33,20 +33,15 @@ spec:
       TZ: "${TIMEZONE}"
       KOPIA_PASSWORD: "none"
 
-    command: ["/bin/sh","-c"]
+    command: kopia
     args:
-      - >
-        echo "Go to sleep now!" &&
-        sleep 60000000000
-    # command: kopia
-    # args:
-    #   - server
-    #   - --insecure
-    #   - --address
-    #   - 0.0.0.0:80
-    #   - --metrics-listen-addr
-    #   - 0.0.0.0:8080
-    #   - --without-password
+      - server
+      - --insecure
+      - --address
+      - 0.0.0.0:80
+      - --metrics-listen-addr
+      - 0.0.0.0:8080
+      - --without-password
 
     service:
       main:
