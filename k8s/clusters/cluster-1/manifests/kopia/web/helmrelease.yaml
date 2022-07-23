@@ -93,10 +93,7 @@ spec:
         readOnly: true
       snapshots:
         enabled: true
-        type: nfs
-        server: "nas00.${INGRESS_DOMAIN}"
-        path: /mnt/NFS/Backups/Kopia
-        mountPath: /snapshots
+        existingClaim: kopia-nfs-share-pvc
     podAnnotations:
       configmap.reloader.stakater.com/reload: *app
     resources:
