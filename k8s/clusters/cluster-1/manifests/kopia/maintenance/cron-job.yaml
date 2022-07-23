@@ -15,6 +15,11 @@ spec:
       ttlSecondsAfterFinished: 259200
       template:
         spec:
+          podSecurityContext:
+            # runAsUser: 34
+            supplementalGroups:
+              - 34
+              - 100
           automountServiceAccountToken: false
           restartPolicy: OnFailure
           containers:
