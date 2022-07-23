@@ -6,6 +6,9 @@ metadata:
   namespace: downloads
   labels:
     k10.kasten.io/backup: "true"
+    app.kubernetes.io/name: &name radarr
+    app.kubernetes.io/instance: *name
+    policy.home.arpa/snapshot: "true"
 spec:
   accessModes:
     - ReadWriteOnce
