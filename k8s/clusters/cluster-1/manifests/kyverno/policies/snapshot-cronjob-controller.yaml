@@ -104,8 +104,9 @@ spec:
                         persistentVolumeClaim:
                           claimName: "{{ claimName }}"
                       - name: snapshots
-                        persistentVolumeClaim:
-                          claimName: kopia-nfs-share-pvc
+                        nfs:
+                          server: "${NAS_ADDRESS}"
+                          path: /Backups/Kopia
                     affinity:
                       podAffinity:
                         requiredDuringSchedulingIgnoredDuringExecution:

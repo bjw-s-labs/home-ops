@@ -47,8 +47,8 @@ spec:
           volumes:
             - name: snapshots
               nfs:
-                server: "nas00.${INGRESS_DOMAIN}"
-                path: /mnt/NFS/Backups/Kopia
+                server: "${NAS_ADDRESS}"
+                path: /Backups/Kopia
             - name: remote-config
               secret:
                 secretName: *app
