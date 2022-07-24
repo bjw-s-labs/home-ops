@@ -2,22 +2,30 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: unifi-protect-backup
+  name: &app unifi-protect-backup
   namespace: security
 spec:
-  interval: 5m
+  interval: 15m
   chart:
     spec:
-      chart: radarr
-      version: 16.2.3
+      chart: kah-common-chart
+      version: 1.1.2
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
         namespace: flux-system
-      interval: 5m
-
+      interval: 15m
+  install:
+    createNamespace: true
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
   values:
-    fullnameOverride: unifi-protect-backup
+    global:
+      nameOverride: *app
+    # fullnameOverride: unifi-protect-backup
     image:
       repository: ghcr.io/ep1cman/unifi-protect-backup
       tag: "0.7.1"
