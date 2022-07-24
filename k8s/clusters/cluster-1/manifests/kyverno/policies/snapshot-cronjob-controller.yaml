@@ -97,6 +97,7 @@ spec:
                             printf "\e[1;32m%-6s\e[m\n" "[08/10] Show stats ..."               && kopia content stats
                             printf "\e[1;32m%-6s\e[m\n" "[09/10] Show maintenance info ..."    && kopia maintenance info
                             printf "\e[1;32m%-6s\e[m\n" "[10/10] Disconnect from repo ..."     && kopia repo disconnect
+                            printf "\e[1;32m%-6s\e[m\n" "[11/10] Sleeping to debug ..."        && /scripts/sleep.sh 6000
                         volumeMounts:
                           - name: "{{ appName }}-data"
                             mountPath: "/data/{{ namespace }}/{{ appName }}"
