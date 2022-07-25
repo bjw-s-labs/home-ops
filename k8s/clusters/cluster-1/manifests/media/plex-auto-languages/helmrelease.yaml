@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: plex-auto-languages
+  name: &app plex-auto-languages
   namespace: media
 spec:
   interval: 5m
@@ -15,8 +15,16 @@ spec:
         name: k8s-at-home-charts
         namespace: flux-system
       interval: 5m
-
+  install:
+    createNamespace: true
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
   values:
+    global:
+      nameOverride: *app
     fullnameOverride: plex-auto-languages
     image:
       repository: remirigal/plex-auto-languages
