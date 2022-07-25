@@ -11,8 +11,10 @@ spec:
   accepted: true
   configPatches:
     - op: replace
-      path: /machine/install/disk
-      value: /dev/sda
+      path: /machine/install/diskSelector/size
+      value: <= 500GB
+      # path: /machine/install/disk
+      # value: /dev/sda
     - op: add
       path: /machine/network/hostname
       value: work1.${CLUSTER_1_HARDWARE_DOMAIN}
