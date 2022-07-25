@@ -22,6 +22,11 @@ spec:
 
     nameOverride: "home-assistant"
 
+    hostAliases:
+      - ip: "10.200.1.50"
+        hostnames:
+        - "home.${INGRESS_DOMAIN}"
+
     podSecurityContext:
       # runAsUser: 568
       # runAsGroup: 100
@@ -33,6 +38,7 @@ spec:
       # fsGroupChangePolicy: "OnRootMismatch"
 
     podAnnotations:
+      k8s.v1.cni.cncf.io/networks: hass-iot-dhcp
       secret.reloader.stakater.com/reload: home-assistant-secrets
 
     probes:
