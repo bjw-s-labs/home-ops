@@ -94,10 +94,13 @@ spec:
         - interface: eth0
           dhcp: true
           # disableSearchDomain: true   <--- This isnt the right spot to put this
-          # vlans:
-          #   # For Rook-Ceph Traffic
-          #   - vlanId: 2040
-          #     dhcp: true
+          vlans:
+            # Home LAN
+            - vlanId: 2
+              dhcp: true
+            # IoT Network
+            - vlanId: 100
+              dhcp: true
 
     # - op: replace
     #   path: /machine/network/nameservers
@@ -135,9 +138,6 @@ spec:
         name: "custom"
         urls:
           - "https://raw.githubusercontent.com/dcplaya/home-ops/main/k8s/clusters/cluster-1/integrations/cilium-quick-install/quick-install.yaml"
-          # Add multus
-          # Multus has an odd setup that wont work with Talos / Flux without exposing a service account
-          # - "https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset-thick-plugin.yml"
 
     - op: replace
       path: /cluster/extraManifests

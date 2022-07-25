@@ -49,11 +49,13 @@ spec:
       value:
         - interface: eth0
           dhcp: true
-          # disableSearchDomain: true   <--- This isnt the right spot to put this
-          # vlans:
-          # # For Rook-Ceph Traffic
-          #   - vlanId: 2040
-          #     dhcp: true
+          vlans:
+            # Home LAN
+            - vlanId: 2
+              dhcp: true
+            # IoT Network
+            - vlanId: 100
+              dhcp: true
 
     # - op: replace
     #   path: /machine/network/nameservers
