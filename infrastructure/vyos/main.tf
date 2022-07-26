@@ -39,6 +39,7 @@ module "config" {
   domains        = local.domains
   address_book   = local.address_book
   firewall_rules = local.firewall_rules
+  secrets        = sensitive(yamldecode(nonsensitive(data.sops_file.vyos_secrets.raw)))
 
   providers = {
     vyos   = vyos.vyos
