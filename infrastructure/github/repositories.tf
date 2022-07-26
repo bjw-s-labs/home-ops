@@ -127,6 +127,7 @@ module "library-charts" {
   name        = "library-charts"
   description = "Helm library charts"
   topics      = ["helm", "kubernetes"]
+  homepage_url = "https://bjw-s.github.io/library-charts/"
   visibility  = "public"
 
   auto_init              = true
@@ -151,7 +152,20 @@ module "library-charts" {
     local.default_issue_labels
   )
 
+  branches = [
+    { name = "gh-pages" }
+  ]
+
   push_collaborators = [
     "onedr0p"
   ]
+
+  pages = {
+    custom_404 = true
+    html_url   = "https://bjw-s.github.io/library-charts/"
+    status     = "built"
+    url        = "https://api.github.com/repos/bjw-s/library-charts/pages"
+    branch     = "gh-pages"
+    path       = "/"
+  }
 }
