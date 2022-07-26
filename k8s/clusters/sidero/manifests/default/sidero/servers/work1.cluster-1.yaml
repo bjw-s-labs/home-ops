@@ -10,12 +10,12 @@ spec:
   cordoned: false
   accepted: true
   configPatches:
-    - op: add
-      path: /machine/install/diskSelector/size
-      value: '<= 500GB'
     # - op: add
-      # path: /machine/install/disk
-      # value: /dev/sda
+    #   path: /machine/install/diskSelector/size
+    #   value: '<= 500GB'
+    - op: add
+      path: /machine/install/disk
+      value: /dev/sda
     - op: add
       path: /machine/network/hostname
       value: work1.${CLUSTER_1_HARDWARE_DOMAIN}
