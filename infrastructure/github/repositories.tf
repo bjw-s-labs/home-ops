@@ -124,11 +124,11 @@ module "library-charts" {
   source  = "mineiros-io/repository/github"
   version = "0.16.2"
 
-  name        = "library-charts"
-  description = "Helm library charts"
-  topics      = ["helm", "kubernetes"]
+  name         = "library-charts"
+  description  = "Helm library charts"
+  topics       = ["helm", "kubernetes"]
   homepage_url = "https://bjw-s.github.io/library-charts/"
-  visibility  = "public"
+  visibility   = "public"
 
   auto_init              = true
   allow_merge_commit     = false
@@ -153,7 +153,13 @@ module "library-charts" {
   )
 
   branches = [
-    { name = "gh-pages" }
+    {
+      name          = "development"
+      source_branch = "main"
+    },
+    {
+      name = "gh-pages"
+    }
   ]
 
   push_collaborators = [
