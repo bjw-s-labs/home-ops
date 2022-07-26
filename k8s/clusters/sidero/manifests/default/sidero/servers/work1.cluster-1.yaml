@@ -20,6 +20,17 @@ spec:
       path: /machine/network/hostname
       value: work1.${CLUSTER_1_HARDWARE_DOMAIN}
     - op: add
+      path: /machine/network/interfaces
+      value:
+        - interface: eth1
+          vlans:
+            # Home LAN
+            - vlanId: 2
+              dhcp: true
+            # IoT Network
+            - vlanId: 100
+              dhcp: true
+    - op: add
       path: /machine/sysctls
       value:
         fs.inotify.max_user_watches: "1048576"
