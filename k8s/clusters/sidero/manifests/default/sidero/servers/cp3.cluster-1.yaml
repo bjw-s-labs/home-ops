@@ -16,6 +16,19 @@ spec:
       path: /machine/network/hostname
       value: cp3.${CLUSTER_1_HARDWARE_DOMAIN}
     - op: add
+      path: /machine/network/interfaces
+      value:
+        - interface: eth0
+          dhcp: true
+          # disableSearchDomain: true   <--- This isnt the right spot to put this
+          vlans:
+            # Home LAN
+            - vlanId: 2
+              dhcp: true
+            # IoT Network
+            - vlanId: 100
+              dhcp: true
+    - op: add
       path: /machine/sysctls
       value:
         fs.inotify.max_user_watches: "1048576"
