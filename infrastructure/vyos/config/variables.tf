@@ -22,3 +22,8 @@ variable "firewall_rules" {
   description = "firewall rules"
   type        = any
 }
+
+variable "secrets" {
+  description = "secrets"
+  type        = any
+}
