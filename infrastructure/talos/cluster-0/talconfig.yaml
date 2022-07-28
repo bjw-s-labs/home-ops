@@ -1,14 +1,12 @@
 ---
 clusterName: cluster-0
 
-talosVersion: v1.1.0
+talosVersion: v1.1.2
 kubernetesVersion: 1.24.2
 endpoint: "https://cluster-0.${domainName}:6443"
 
 cniConfig:
-  name: custom
-  urls:
-    - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-0/cni/install.yaml
+  name: none
 
 nodes:
   - hostname: anvil.${domainName}
