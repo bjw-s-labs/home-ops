@@ -120,12 +120,12 @@ module "renovate-config" {
   )
 }
 
-module "library-charts" {
+module "helm-charts" {
   source  = "mineiros-io/repository/github"
   version = "0.16.2"
 
-  name         = "library-charts"
-  description  = "Helm library charts"
+  name         = "helm-charts"
+  description  = "A collection of Helm charts"
   topics       = ["helm", "kubernetes"]
   homepage_url = "https://bjw-s.github.io/library-charts/"
   visibility   = "public"
@@ -168,9 +168,9 @@ module "library-charts" {
 
   pages = {
     custom_404 = true
-    html_url   = "https://bjw-s.github.io/library-charts/"
+    html_url   = "https://bjw-s.github.io/helm-charts/"
     status     = "built"
-    url        = "https://api.github.com/repos/bjw-s/library-charts/pages"
+    url        = "https://api.github.com/repos/bjw-s/helm-charts/pages"
     branch     = "gh-pages"
     path       = "/"
   }
