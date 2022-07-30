@@ -59,14 +59,13 @@ provider "registry.terraform.io/hashicorp/random" {
 }
 
 provider "registry.terraform.io/poseidon/ct" {
-  version     = "0.10.0"
-  constraints = "0.10.0"
+  version     = "0.11.0"
+  constraints = "0.11.0"
   hashes = [
-    "h1:ia66UHDiA9Sz2YSp1huHmGASqQAHJhRZCC+eYxLi74U=",
-    "zh:1cbddce9526070805d7bec8c74a7921d4599da03d6d7326a0a79ffa12195bcfb",
-    "zh:4ce65ada0301a011a273838ca1ae4f585c099a2de5dc91f720988d4036d7247e",
-    "zh:6ac4505ff1bb7445605c6afa7787859ec2b1e7c42b9a35719add97dfbb48c42c",
-    "zh:9b1826f69e4a46561aa1826423112e7b786ff8b0fa1433337f3e022d1d57cead",
-    "zh:b7b8b61f079bfcad030d7ecab8561a38f892d73216a7adc4400c1d51afd6c651",
+    "h1:91Xdcfd+Z8jbDW6434iUGAXU7yq5Nx2G+tG25DKe/qk=",
+    "h1:CXw6rEXbGvO+1en8nviruLjuvKfDyJmphkwlEwcT9PQ=",
+    "h1:Xwk15V79x2Msl8ScY3duk/wfHWB0ZN60pHE734eGCOs=",
+    "h1:tHMDZhzgfaNOwCwskfsm/JjW3XLmPymmxgPjQOrhLtg=",
+    "h1:vsSet6gnO4AbOK4jRfiS1hmPvoyOzigtgMojDsqSW4E=",
   ]
 }
