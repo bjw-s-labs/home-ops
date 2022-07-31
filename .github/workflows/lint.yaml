@@ -7,9 +7,13 @@ on: # yamllint disable-line rule:truthy
     branches:
       - main
 
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   build:
-    name: Lint
+    name: MegaLinter
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,25 +29,37 @@ jobs:
           private_key: ${{ secrets.DCPLAYA_APP_PRIVATE_KEY }}
 
       - name: MegaLinter
-        uses: oxsecurity/megalinter/flavors/terraform@v6
+        uses: oxsecurity/megalinter@v6.2.0
         env:
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'workflow_dispatch' }}
           GITHUB_TOKEN: "${{ steps.generate-token.outputs.token }}"
           PRINT_ALPACA: false
           ENABLE_LINTERS: >-
-            ACTION_ACTIONLINT,
-            BASH_SHELLCHECK,
-            DOCKERFILE_HADOLINT,
-            ENV_DOTENV_LINTER,
-            GIT_GIT_DIFF,
-            JSON_JSONLINT,
-            KUBERNETES_KUBEVAL,
-            MARKDOWN_MARKDOWNLINT,
-            YAML_YAMLLINT
+            ${{
+              join(
+                fromJSON('
+                  [
+                    "ACTION_ACTIONLINT",
+                    "ANSIBLE_ANSIBLE_LINT",
+                    "COPYPASTE_JSCPD",
+                    "KUBERNETES_KUBEVAL",
+                    "MARKDOWN_MARKDOWNLINT",
+                    "REPOSITORY_GIT_DIFF",
+                    "REPOSITORY_SECRETLINT",
+                    "TERRAFORM_TERRAFORM_FMT",
+                    "YAML_PRETTIER",
+                    "YAML_YAMLLINT"
+                  ]
+                '),
+                ','
+              )
+            }}
           KUBERNETES_DIRECTORY: k8s/clusters
           KUBERNETES_KUBEVAL_ARGUMENTS: --ignore-missing-schemas
           MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdownlint.yaml
-          YAML_YAMLLINT_CONFIG_FILE: .yamllint.yaml
+          YAML_YAMLLINT_CONFIG_FILE: .github/linters/.yamllint.yaml
+          YAML_PRETTIER_CONFIG_FILE: .github/linters/.prettierrc.yaml
+          YAML_PRETTIER_FILTER_REGEX_EXCLUDE: "(.*\\.sops\\.ya?ml)"
 
       - name: Archive artifacts
         if: ${{ success() }} || ${{ failure() }}
