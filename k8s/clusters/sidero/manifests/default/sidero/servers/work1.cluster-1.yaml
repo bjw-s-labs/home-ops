@@ -23,17 +23,15 @@ spec:
         - interface: eth0
           dhcp: true
         - interface: eth1
+          dhcpOptions:
+            routeMetric: 1024
           vlans:
             # Home LAN
             - vlanId: 2
               dhcp: true
-              dhcpOptions:
-                  routeMetric: 1024
             # IoT Network
             - vlanId: 100
               dhcp: true
-              dhcpOptions:
-                  routeMetric: 1024
     - op: add
       path: /machine/sysctls
       value:
