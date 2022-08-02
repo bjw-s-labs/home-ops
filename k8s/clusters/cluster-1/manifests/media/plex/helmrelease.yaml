@@ -133,14 +133,14 @@ spec:
           tag: 2.6.1
         loki: http://loki.system-monitoring.svc.cluster.local:3100/loki/api/v1/push
         logs:
-        - name: promtail/plex
-          path: "/config/Library/Application Support/Plex Media Server/Logs/*.log"
-        - name: promtail/plex/plugins
-          path: "/config/Library/Application Support/Plex Media Server/Logs/PMS Plugin Logs/*.log"
+          - name: promtail/plex
+            path: "/config/Library/Application Support/Plex Media Server/Logs/*.log"
+          - name: promtail/plex/plugins
+            path: "/config/Library/Application Support/Plex Media Server/Logs/PMS Plugin Logs/*.log"
         volumeMounts:
-        - name: config
-          mountPath: /config
-          readOnly: true
+          - name: config
+            mountPath: /config
+            readOnly: true
         securityContext:
           runAsUser: 568
 
@@ -179,7 +179,7 @@ spec:
           periodSeconds: 10
           timeoutSeconds: 1
           failureThreshold: 3
-    
+
       # -- Redainess probe configuration
       # @default -- See below
       readiness:
@@ -195,7 +195,7 @@ spec:
           periodSeconds: 10
           timeoutSeconds: 1
           failureThreshold: 3
-    
+
       # -- Startup probe configuration
       # @default -- See below
       startup:
