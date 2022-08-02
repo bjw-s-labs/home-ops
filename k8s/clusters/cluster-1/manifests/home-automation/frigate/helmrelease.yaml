@@ -90,7 +90,7 @@ spec:
       config:
         # -- Store frigate configuration as a ConfigMap
         enabled: true
-    
+
         # -- See [docs](https://blakeblackshear.github.io/frigate/) for more details.
         # @default -- see URL to default config
         data:
@@ -101,15 +101,15 @@ spec:
               topic_prefix: frigate
               user: ${MQTT_FRIGATE_USERNAME}
               password: ${MQTT_FRIGATE_PASSWORD}
-      
+
             database:
               path: /data/frigate.db
-      
+
             detectors:
               coral:
                 type: edgetpu
                 device: usb
-      
+
             # Global objects configuration
             objects:
               track:
@@ -119,7 +119,7 @@ spec:
                   min_area: 5000
                   max_area: 100000
                   threshold: 0.5
-      
+
             # Global ffmpeg configuration
             # ffmpeg:
             #   hwaccel_args:
@@ -129,7 +129,7 @@ spec:
             #     - /dev/dri/renderD128
             #     - -hwaccel_output_format
             #     - yuv420p
-      
+
             # Specify camera's
             cameras:
                     living-room:
@@ -179,7 +179,7 @@ spec:
                       # width: 640
                       # height: 360
                       # fps: 5
-      
+
     resources:
       requests:
         memory: 300Mi
