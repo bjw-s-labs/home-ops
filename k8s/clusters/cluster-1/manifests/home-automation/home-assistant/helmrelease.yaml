@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: home-assistant
-      version: 13.4.0
+      version: 13.4.1
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
@@ -25,7 +25,7 @@ spec:
     hostAliases:
       - ip: "10.200.1.50"
         hostnames:
-        - "home.${INGRESS_DOMAIN}"
+          - "home.${INGRESS_DOMAIN}"
 
     podSecurityContext:
       # runAsUser: 568
@@ -51,7 +51,7 @@ spec:
 
     hostNetwork: true
     # -- Defaults to "ClusterFirst" if hostNetwork is false and "ClusterFirstWithHostNet" if hostNetwork is true.
-    dnsPolicy:   ClusterFirstWithHostNet
+    dnsPolicy: ClusterFirstWithHostNet
 
     service:
       main:
@@ -153,7 +153,7 @@ spec:
             - secretName: tls.home-assistant-code
               hosts:
                 - *code-host-cluster
-                - *code-host 
+                - *code-host
         volumeMounts:
           - name: config
             mountPath: /config
