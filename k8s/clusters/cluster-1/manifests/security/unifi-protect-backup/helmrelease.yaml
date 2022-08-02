@@ -71,12 +71,12 @@ spec:
         spec:
           exec:
             command:
-            - /usr/bin/env
-            - bash
-            - -c
-            - username=`grep -B 1 'username:' /config/config.yml | tail -n1 | awk '{ print $2}'` && 
-              password=`grep -B 1 'password:' /config/config.yml | tail -n1 | awk '{ print $2}'` && 
-              curl --fail $username:$password@localhost:3030/triggers/manual
+              - /usr/bin/env
+              - bash
+              - -c
+              - username=`grep -B 1 'username:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
+                password=`grep -B 1 'password:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
+                curl --fail $username:$password@localhost:3030/triggers/manual
           failureThreshold: 5
           initialDelaySeconds: 60
           periodSeconds: 10
@@ -93,14 +93,14 @@ spec:
         name: rclone-secrets
         defaultMode: 0666
         items:
-        - key: rclone.conf
-          path: rclone.conf
-        - key: 180.json
-          path: keys/180.json
-        - key: 186.json
-          path: keys/186.json
-        - key: 190.json
-          path: keys/190.json
+          - key: rclone.conf
+            path: rclone.conf
+          - key: 180.json
+            path: keys/180.json
+          - key: 186.json
+            path: keys/186.json
+          - key: 190.json
+            path: keys/190.json
         mountPath: /config/rclone
         readOnly: true
 

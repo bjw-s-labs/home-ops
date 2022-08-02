@@ -57,12 +57,12 @@ spec:
         spec:
           exec:
             command:
-            - /usr/bin/env
-            - bash
-            - -c
-            - username=`grep -B 1 'username:' /config/config.yml | tail -n1 | awk '{ print $2}'` && 
-              password=`grep -B 1 'password:' /config/config.yml | tail -n1 | awk '{ print $2}'` && 
-              curl --fail $username:$password@localhost:3030/triggers/manual
+              - /usr/bin/env
+              - bash
+              - -c
+              - username=`grep -B 1 'username:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
+                password=`grep -B 1 'password:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
+                curl --fail $username:$password@localhost:3030/triggers/manual
           failureThreshold: 5
           initialDelaySeconds: 60
           periodSeconds: 10
@@ -79,8 +79,8 @@ spec:
         name: autoscan-config
         defaultMode: 0550
         items:
-        - key: config.yml
-          path: config.yml
+          - key: config.yml
+            path: config.yml
         mountPath: /test/
         readOnly: true
       nfs-nas-media:
