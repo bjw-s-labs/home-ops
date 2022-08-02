@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: grafana
-      version: 6.32.9
+      version: 6.32.10
       sourceRef:
         kind: HelmRepository
         name: grafana-charts
@@ -171,7 +171,7 @@ spec:
           gnetId: 13502
           revision: 10
           datasource: Prometheus
-      
+
       flux:
         flux-cluster:
           url: https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/monitoring-config/dashboards/cluster.json
@@ -216,7 +216,7 @@ spec:
           datasource: Prometheus
         sonarr:
           url: https://raw.githubusercontent.com/k8s-at-home/grafana-dashboards/main/sonarr.json
-          datasource: Prometheus    
+          datasource: Prometheus
 
       networking:
         blackbox:
@@ -265,7 +265,7 @@ spec:
           gnetId: 13665
           revision: 4
           datasource: Prometheus
-        
+
       thanos:
         bucket-replicate:
           url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/bucket-replicate.json
@@ -328,29 +328,29 @@ spec:
       enabled: true
 
     ingress:
-        enabled: true
-        ingressClassName: "traefik"
-        annotations:
-          # kubernetes.io/ingress.class: traefik
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
-          external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
-          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
-          external-dns/is-public: "true"
-        hosts:
-          - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-        tls:
-          - secretName: grafana-${CLUSTER_NAME}-tls
-            hosts:
-              - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-            
+      enabled: true
+      ingressClassName: "traefik"
+      annotations:
+        # kubernetes.io/ingress.class: traefik
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+        external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+        external-dns/is-public: "true"
+      hosts:
+        - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+      tls:
+        - secretName: grafana-${CLUSTER_NAME}-tls
+          hosts:
+            - "grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+
     service:
       annotations:
-          # Needed due to multiple replicas to allow me to login
-          traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
-          traefik.ingress.kubernetes.io/service.sticky.cookie.name: grafana
-          traefik.ingress.kubernetes.io/service.sticky.cookie.secure: "true"
+        # Needed due to multiple replicas to allow me to login
+        traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
+        traefik.ingress.kubernetes.io/service.sticky.cookie.name: grafana
+        traefik.ingress.kubernetes.io/service.sticky.cookie.secure: "true"
 
     persistence:
       enabled: false
