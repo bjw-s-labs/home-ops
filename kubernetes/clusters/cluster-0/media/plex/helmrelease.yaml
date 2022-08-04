@@ -40,13 +40,12 @@ spec:
 
     service:
       main:
-        annotations:
-          metallb.universe.tf/loadBalancerIPs: ${LB_PLEX}
+        type: LoadBalancer
         externalTrafficPolicy: Local
+        loadBalancerIP: "${SVC_PLEX_ADDR}"
         ports:
           http:
             port: 32400
-        type: LoadBalancer
 
     ingress:
       main:
