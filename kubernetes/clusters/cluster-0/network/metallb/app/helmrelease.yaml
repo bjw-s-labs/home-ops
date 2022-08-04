@@ -16,10 +16,13 @@ spec:
       interval: 5m
   values:
     prometheus:
+      serviceAccount: kube-prometheus-stack-prometheus
+      namespace: monitoring
+
       podMonitor:
-        enabled: false
+        enabled: true
       prometheusRule:
-        enabled: false
+        enabled: true
 
     speaker:
       tolerations:
@@ -35,12 +38,3 @@ spec:
 
     crds:
       enabled: true
-
-  postRenderers:
-    - kustomize:
-        patchesStrategicMerge:
-          - $patch: delete
-            apiVersion: admissionregistration.k8s.io/v1
-            kind: ValidatingWebhookConfiguration
-            metadata:
-              name: validating-webhook-configuration
