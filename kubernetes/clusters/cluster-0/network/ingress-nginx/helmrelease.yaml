@@ -4,9 +4,19 @@ kind: HelmRelease
 metadata:
   name: ingress-nginx
 spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: ingress-nginx
+      version: 4.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: ingress-nginx
+        namespace: flux-system
+      interval: 5m
   values:
     controller:
-      replicaCount: 2
+      replicaCount: 3
 
       service:
         enabled: true
@@ -45,10 +55,13 @@ spec:
           namespaceSelector:
             any: true
         prometheusRule:
-          enabled: false
+          enabled: true
+
+      extraArgs:
+        default-ssl-certificate: "network/${INGRESS_DOMAIN/./-}-tls"
 
       topologySpreadConstraints:
-        - maxSkew: 1
+        - maxSkew: 2
           topologyKey: kubernetes.io/hostname
           whenUnsatisfiable: DoNotSchedule
           labelSelector:
