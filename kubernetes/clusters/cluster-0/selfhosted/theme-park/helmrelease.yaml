@@ -2,19 +2,27 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: common
+  name: theme-park
+  namespace: selfhosted
 spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: kah-common-chart
+      version: 1.2.2
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      interval: 15m
+
   values:
     global:
-      nameOverride: cdn
+      nameOverride: theme-park
 
     image:
-      repository: ghcr.io/bjw-s/assets
-      tag: latest
-      pullPolicy: Always
-
-    imagePullSecrets:
-      - name: registry-creds
+      repository: ghcr.io/k8s-at-home/theme-park
+      tag: v1.9.11@sha256:0334313135100f748e5dcb01355b6d858f9f635debcde958d0864352d91a4021
 
     service:
       main:
@@ -25,16 +33,15 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "nginx"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns/is-public: "true"
           external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
-          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+
         hosts:
-          - host: &host "cdn.${INGRESS_DOMAIN}"
+          - host: &host "theme-park.${INGRESS_DOMAIN}"
             paths:
               - path: /
+
         tls:
           - hosts:
               - *host
