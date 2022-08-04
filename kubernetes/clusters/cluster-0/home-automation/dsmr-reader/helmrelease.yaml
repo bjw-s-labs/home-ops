@@ -3,12 +3,29 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: dsmr-reader
+  namespace: home-automation
 spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: kah-common-chart
+      version: 1.2.2
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      interval: 15m
+
   values:
+    global:
+      nameOverride: dsmr-reader
+
+    image:
+      repository: xirixiz/dsmr-reader-docker
+      tag: amd64-5.5.1-2022.07.02
+
     podAnnotations:
       secret.reloader.stakater.com/reload: dsmr-reader-secrets
-
-    enableServiceLinks: false
 
     initContainers:
       wait-for-db:
@@ -25,6 +42,8 @@ spec:
         args:
           - --host="$(POSTGRES_HOST):5432"
           - --verbose
+
+    enableServiceLinks: false
 
     env:
       DJANGO_TIME_ZONE: "Europe/Amsterdam"
@@ -65,6 +84,12 @@ spec:
             name: dsmr-reader-secrets
             key: DSMRREADER_ADMIN_PASSWORD
 
+    service:
+      main:
+        ports:
+          http:
+            port: 80
+
     ingress:
       main:
         enabled: true
@@ -81,3 +106,10 @@ spec:
         tls:
           - hosts:
               - *host
+
+    resources:
+      requests:
+        cpu: 49m
+        memory: 298M
+      limits:
+        memory: 595M
