@@ -2,31 +2,18 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: home-automation
-namePrefix: frigate-
 resources:
-  - ../../../../base/apps/kah-common-chart
+  - ./helmrelease.yaml
   - ./pvc.yaml
   - ./secret.sops.yaml
 configMapGenerator:
-  - name: config
+  - name: frigate-config
     files:
       - config/config.yaml
 generatorOptions:
   disableNameSuffixHash: true
   annotations:
     kustomize.toolkit.fluxcd.io/substitute: disabled
-patchesJson6902:
-  - target:
-      group: helm.toolkit.fluxcd.io
-      version: v2beta1
-      kind: HelmRelease
-      name: common
-    patch: |-
-      - op: replace
-        path: /metadata/name
-        value: frigate
-patchesStrategicMerge:
-  - helm-values.yaml
 commonLabels:
   app.kubernetes.io/name: frigate
   app.kubernetes.io/instance: frigate
