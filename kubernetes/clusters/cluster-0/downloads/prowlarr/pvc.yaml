@@ -5,3 +5,12 @@ metadata:
   name: prowlarr-config
   labels:
     snapshot.home.arpa/enabled: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 1Gi
+
+  storageClassName: ceph-block
