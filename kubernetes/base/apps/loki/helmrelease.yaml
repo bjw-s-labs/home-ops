@@ -4,7 +4,7 @@ kind: HelmRelease
 metadata:
   name: loki
 spec:
-  interval: 5m
+  interval: 15m
   chart:
     spec:
       chart: loki
@@ -13,7 +13,7 @@ spec:
         kind: HelmRepository
         name: grafana
         namespace: flux-system
-      interval: 5m
+      interval: 15m
   values:
     image:
       repository: ghcr.io/k8s-at-home/loki

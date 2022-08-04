@@ -4,7 +4,7 @@ kind: HelmRelease
 metadata:
   name: kube-prometheus-stack
 spec:
-  interval: 6h
+  interval: 15m
   maxHistory: 2
   timeout: 20m
   chart:
@@ -15,6 +15,7 @@ spec:
         kind: HelmRepository
         name: prometheus-community
         namespace: flux-system
+      interval: 15m
 
   values:
     ###
