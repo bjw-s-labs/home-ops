@@ -112,12 +112,11 @@ spec:
           external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
         host:
-          name: "rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          name: &host rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}
           path: "/"
         tls:
-          - secretName: tls.rook-ceph
-            hosts:
-              - "rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - hosts:
+              - *host
 
     cephBlockPoolsVolumeSnapshotClass:
       enabled: true

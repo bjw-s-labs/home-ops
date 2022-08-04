@@ -49,15 +49,14 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        ingressClassName: nginx
         hosts:
-          - host: calibre.${INGRESS_DOMAIN}
+          - host: &host calibre.${INGRESS_DOMAIN}
             paths:
               - path: /
-        ingressClassName: nginx
         tls:
           - hosts:
-              - calibre.${INGRESS_DOMAIN}
-            secretName: tls.calibre
+              - *host
 
     persistence:
       config:

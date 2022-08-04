@@ -14,11 +14,10 @@ spec:
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
         hosts:
-          - prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+          - &host_prometheus prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}
         tls:
-          - secretName: prometheus-${CLUSTER_NAME}-tls
-            hosts:
-              - prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+          - hosts:
+              - *host_prometheus
 
       thanosService:
         enabled: true
@@ -78,11 +77,10 @@ spec:
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
         hosts:
-          - alertmanager.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+          - &host_alertmanager alertmanager.${CLUSTER_NAME}.${INGRESS_DOMAIN}
         tls:
-          - secretName: alertmanager-${CLUSTER_NAME}-tls
-            hosts:
-              - alertmanager.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+          - hosts:
+              - *host_alertmanager
 
   valuesFrom:
     - kind: Secret
