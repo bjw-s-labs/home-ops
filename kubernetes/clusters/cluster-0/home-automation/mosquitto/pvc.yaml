@@ -3,5 +3,15 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mosquitto-data
+  namespace: home-automation
   labels:
     snapshot.home.arpa/enabled: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 128Mi
+
+  storageClassName: ceph-block
