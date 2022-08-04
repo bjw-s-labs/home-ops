@@ -2,17 +2,58 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: common
+  name: k8s-gateway
+  namespace: network
 spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: kah-common-chart
+      version: 1.2.2
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      interval: 15m
+
   values:
     image:
       repository: quay.io/oriedge/k8s_gateway
       tag: v0.3.1
       pullPolicy: IfNotPresent
 
-    nameOverride: "k8s-gateway"
+    global:
+      nameOverride: "k8s-gateway"
+
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: "k8s-gateway-config"
 
     args: ["-conf", "/etc/coredns/Corefile"]
+
+    configmap:
+      config:
+        enabled: true
+        data:
+          Corefile: |
+            .:1053 {
+              errors
+              log
+              health {
+                lameduck 5s
+              }
+              ready
+
+              k8s_gateway ${PERSONAL_DOMAIN} ${FAMILY_DOMAIN} ${INGRESS_DOMAIN} {
+                apex  k8s-gateway.network
+                resources Ingress Service
+                ttl 300
+              }
+
+              prometheus 0.0.0.0:9153
+              loop
+              reload
+              loadbalance
+            }
 
     serviceAccount:
       create: true
@@ -20,6 +61,9 @@ spec:
 
     service:
       main:
+        type: LoadBalancer
+        externalTrafficPolicy: Local
+        loadBalancerIP: "${SVC_K8S_GATEWAY_ADDR}"
         ports:
           http:
             enabled: false
@@ -36,9 +80,6 @@ spec:
         name: k8s-gateway-config
         mountPath: /etc/coredns
         readOnly: true
-
-    podAnnotations:
-      configmap.reloader.stakater.com/reload: "k8s-gateway-config"
 
     probes:
       readiness:
@@ -62,11 +103,5 @@ spec:
             path: /ready
             port: 8181
             scheme: HTTP
-
-    configmap:
-      config:
-        enabled: true
-        data:
-          Corefile: ""
 
     resources: {}
