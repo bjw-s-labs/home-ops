@@ -21,8 +21,7 @@ spec:
           annotations:
             cert-manager.io/cluster-issuer: letsencrypt-production
           hosts:
-            - "hubble.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            - &host hubble.${CLUSTER_NAME}.${INGRESS_DOMAIN}
           tls:
-            - secretName: hubble-tls
-              hosts:
-                - "hubble.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            - hosts:
+                - *host

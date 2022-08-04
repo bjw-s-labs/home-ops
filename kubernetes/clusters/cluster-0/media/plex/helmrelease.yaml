@@ -57,15 +57,15 @@ spec:
           external-dns.alpha.kubernetes.io/target: ingress.${PERSONAL_DOMAIN}
           external-dns/is-public: "true"
           nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+        ingressClassName: nginx
         hosts:
-          - host: plex.${PERSONAL_DOMAIN}
+          - host: &host plex.${PERSONAL_DOMAIN}
             paths:
               - path: /
                 pathType: Prefix
-        ingressClassName: nginx
         tls:
           - hosts:
-              - plex.${PERSONAL_DOMAIN}
+              - *host
             secretName: tls.plex
 
     persistence:

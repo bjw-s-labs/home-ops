@@ -44,29 +44,27 @@ spec:
             proxy_set_header Accept-Encoding "";
             sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/calibreweb/nord.css"></head>';
             sub_filter_once on;
+        ingressClassName: nginx
         hosts:
-          - host: calibre-web.${INGRESS_DOMAIN}
+          - host: &host calibre-web.${INGRESS_DOMAIN}
             paths:
               - path: /
-        ingressClassName: nginx
         tls:
           - hosts:
-              - calibre-web.${INGRESS_DOMAIN}
-            secretName: tls.calibre-web
+              - *host
       kobo:
         enabled: true
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        ingressClassName: nginx
         hosts:
-          - host: calibre-kobo.${INGRESS_DOMAIN}
+          - host: &host_kobo calibre-kobo.${INGRESS_DOMAIN}
             paths:
               - path: /kobo/
-        ingressClassName: nginx
         tls:
           - hosts:
-              - calibre-kobo.${INGRESS_DOMAIN}
-            secretName: tls.calibre-web-kobo
+              - *host_kobo
 
     persistence:
       config:
