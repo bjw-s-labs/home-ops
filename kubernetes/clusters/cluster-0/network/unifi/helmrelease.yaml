@@ -2,8 +2,20 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: common
+  name: unifi
+  namespace: network
 spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: kah-common-chart
+      version: 1.2.2
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      interval: 15m
+
   values:
     global:
       nameOverride: unifi
@@ -22,6 +34,9 @@ spec:
 
     service:
       main:
+        type: LoadBalancer
+        loadBalancerIP: "${SVC_UNIFI_ADDR}"
+        externalTrafficPolicy: Local
         ports:
           http:
             port: 8443
@@ -60,6 +75,16 @@ spec:
         enabled: true
         annotations:
           nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        ingressClassName: "nginx"
+        hosts:
+          - host: &host "unifi.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
 
     persistence:
       data:
