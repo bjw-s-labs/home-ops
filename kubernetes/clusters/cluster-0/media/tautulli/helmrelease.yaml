@@ -38,16 +38,15 @@ spec:
             sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/tautulli/nord.css"></head>';
             sub_filter_once on;
         enabled: true
+        ingressClassName: nginx
         hosts:
-          - host: tautulli.${INGRESS_DOMAIN}
+          - host: &host tautulli.${INGRESS_DOMAIN}
             paths:
               - path: /
                 pathType: Prefix
-        ingressClassName: nginx
         tls:
           - hosts:
-              - tautulli.${INGRESS_DOMAIN}
-            secretName: tls.tautulli
+              - *host
 
     persistence:
       config:

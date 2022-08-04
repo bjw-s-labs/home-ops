@@ -97,13 +97,12 @@ spec:
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
         external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
-      hosts:
-        - grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}
       ingressClassName: nginx
+      hosts:
+        - &host grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}
       tls:
         - hosts:
-            - grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}
-          secretName: grafana-${CLUSTER_NAME}-tls
+            - *host
 
     persistence:
       enabled: false
