@@ -3,13 +3,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: home-automation
 resources:
-  - ../../../../base/apps/home-assistant
+  - ./pvc.yaml
+  - ./helmrelease.yaml
   - ./networkattachmentdefinition.yaml
   - ./secret-codeserver.sops.yaml
   - ./secret-home-assistant.sops.yaml
-patchesStrategicMerge:
-  - ./helm-values.yaml
-  - ./pvc.yaml
 commonLabels:
   app.kubernetes.io/name: home-assistant
   app.kubernetes.io/instance: home-assistant
