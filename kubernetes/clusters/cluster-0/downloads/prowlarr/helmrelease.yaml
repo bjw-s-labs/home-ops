@@ -33,13 +33,23 @@ spec:
       fsGroup: 568
       fsGroupChangePolicy: "OnRootMismatch"
 
+    env:
+      PROWLARR__INSTANCE_NAME: Prowlarr
+      PROWLARR__PORT: &port 9696
+      PROWLARR__LOG_LEVEL: info
+      PROWLARR__ANALYTICS_ENABLED: "False"
+
+    envFrom:
+      - secretRef:
+          name: prowlarr
+
     hostname: prowlarr
 
     service:
       main:
         ports:
           http:
-            port: 9696
+            port: *port
 
     ingress:
       main:
