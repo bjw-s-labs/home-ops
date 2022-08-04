@@ -9,8 +9,7 @@ spec:
       main:
         type: LoadBalancer
         externalTrafficPolicy: Local
-        annotations:
-          metallb.universe.tf/loadBalancerIPs: "${LB_K8S_GATEWAY}"
+        loadBalancerIP: "${SVC_K8S_GATEWAY_ADDR}"
 
     configmap:
       config:
