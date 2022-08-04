@@ -4,7 +4,7 @@ kind: HelmRelease
 metadata:
   name: descheduler
 spec:
-  interval: 5m
+  interval: 15m
   chart:
     spec:
       chart: descheduler
@@ -13,7 +13,7 @@ spec:
         kind: HelmRepository
         name: kubernetes-sigs-descheduler
         namespace: flux-system
-      interval: 5m
+      interval: 15m
   values:
     kind: Deployment
     replicas: 1

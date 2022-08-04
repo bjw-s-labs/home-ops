@@ -4,7 +4,7 @@ kind: HelmRelease
 metadata:
   name: metallb
 spec:
-  interval: 5m
+  interval: 15m
   chart:
     spec:
       chart: metallb
@@ -13,7 +13,7 @@ spec:
         kind: HelmRepository
         name: metallb
         namespace: flux-system
-      interval: 5m
+      interval: 15m
   values:
     prometheus:
       serviceAccount: kube-prometheus-stack-prometheus
