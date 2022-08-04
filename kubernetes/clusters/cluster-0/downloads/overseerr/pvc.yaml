@@ -3,5 +3,15 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: overseerr-config
+  namespace: downloads
   labels:
     snapshot.home.arpa/enabled: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 1Gi
+
+  storageClassName: ceph-block
