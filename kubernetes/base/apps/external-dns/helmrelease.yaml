@@ -4,7 +4,7 @@ kind: HelmRelease
 metadata:
   name: externaldns
 spec:
-  interval: 5m
+  interval: 15m
   chart:
     spec:
       chart: external-dns
@@ -13,7 +13,7 @@ spec:
         kind: HelmRepository
         name: kubernetes-sigs-external-dns
         namespace: flux-system
-      interval: 5m
+      interval: 15m
 
   values:
     serviceMonitor:
