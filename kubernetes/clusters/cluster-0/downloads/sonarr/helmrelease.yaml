@@ -1,0 +1,96 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: sonarr
+  namespace: downloads
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: kah-common-chart
+      version: 1.2.2
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      interval: 15m
+
+  values:
+    global:
+      nameOverride: sonarr
+
+    image:
+      repository: ghcr.io/onedr0p/sonarr-develop
+      tag: 3.0.8.1548@sha256:511ece95a1a91643cd563c8fc8a8faf1ba544c6f9b3553968b070425ea896c12
+
+    podSecurityContext:
+      supplementalGroups:
+        - 65539
+
+    env:
+      SONARR__INSTANCE_NAME: Sonarr
+      SONARR__PORT: &port 8989
+      SONARR__APPLICATION_URL: "https://sonarr.${INGRESS_DOMAIN}"
+      SONARR__LOG_LEVEL: info
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_set_header Accept-Encoding "";
+            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/sonarr/nord.css"></head>';
+            sub_filter_once on;
+        hosts:
+          - host: &host "sonarr.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: sonarr-config
+      media:
+        enabled: true
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Media
+        mountPath: /data/nas-media
+
+    probes:
+      liveness:
+        enabled: true
+        custom: true
+        spec:
+          exec:
+            command:
+              - /usr/bin/env
+              - bash
+              - -c
+              - curl --fail localhost:8989/api/v3/system/status?apiKey=`IFS=\> && while
+                read -d \< E C; do if [[ $E = "ApiKey" ]]; then echo $C; fi; done < /config/config.xml`
+          failureThreshold: 5
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 10
+
+    resources:
+      requests:
+        cpu: 23m
+        memory: 324M
+      limits:
+        memory: 728M
