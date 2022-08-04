@@ -2,11 +2,23 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: common
+  name: paperless-redis
+  namespace: selfhosted
 spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: kah-common-chart
+      version: 1.2.2
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      interval: 15m
+
   values:
     global:
-      nameOverride: redis
+      nameOverride: paperless-redis
 
     image:
       repository: docker.io/library/redis

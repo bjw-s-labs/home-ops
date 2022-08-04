@@ -2,10 +2,16 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: couchdb
+  name: obsidian-couchdb
+  namespace: selfhosted
   labels:
     snapshot.home.arpa/enabled: "true"
 spec:
+  accessModes:
+    - ReadWriteOnce
+
   resources:
     requests:
       storage: 10Gi
+
+  storageClassName: ceph-block

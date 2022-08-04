@@ -1,0 +1,101 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: obsidian-couchdb
+  namespace: selfhosted
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: kah-common-chart
+      version: 1.2.2
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      interval: 15m
+
+  values:
+    global:
+      nameOverride: couchdb
+
+    image:
+      repository: docker.io/library/couchdb
+      tag: 3.2.2
+
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: "obsidian-couchdb-config"
+      secret.reloader.stakater.com/reload: "obsidian-couchdb"
+
+    initContainers:
+      init-config:
+        image: busybox:latest@sha256:ef320ff10026a50cf5f0213d35537ce0041ac1d96e9b7800bafd8bc9eff6c693
+        command:
+          - "sh"
+          - "-c"
+          - "cp /tmp/config/*.ini /default.d/; ls -lrt /default.d;"
+        volumeMounts:
+          - name: config
+            mountPath: /tmp/config
+          - name: config-storage
+            mountPath: /default.d
+
+    env:
+      COUCHDB_USER:
+        valueFrom:
+          secretKeyRef:
+            name: obsidian-couchdb
+            key: couchdb-user
+      COUCHDB_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: obsidian-couchdb
+            key: couchdb-password
+
+    service:
+      main:
+        ports:
+          http:
+            port: 5984
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns/is-public: "true"
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+        hosts:
+          - host: &host "obsidian-db.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: obsidian-couchdb-config
+        mountPath: "-"
+
+      config-storage:
+        enabled: true
+        type: emptyDir
+        mountPath: /opt/couchdb/etc/default.d
+
+      data:
+        enabled: true
+        existingClaim: obsidian-couchdb
+        mountPath: /opt/couchdb/data
+
+    resources:
+      requests:
+        cpu: 23m
+        memory: 79M
+      limits:
+        memory: 79M
