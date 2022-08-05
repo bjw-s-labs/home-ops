@@ -1,0 +1,88 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: loki
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: loki
+      version: 2.13.3
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+      interval: 15m
+  values:
+    image:
+      repository: ghcr.io/k8s-at-home/loki
+
+    config:
+      limits_config:
+        enforce_metric_name: false
+        reject_old_samples: true
+        reject_old_samples_max_age: 168h
+        ingestion_rate_mb: 16
+        ingestion_burst_size_mb: 24
+
+      ruler:
+        alertmanager_url: http://kube-prometheus-stack-alertmanager.monitoring:9093
+
+      storage_config:
+        aws:
+          s3forcepathstyle: true
+          insecure: true
+        boltdb_shipper:
+          active_index_directory: /data/loki/index
+          cache_location: /data/loki/index_cache
+          resync_interval: 5s
+          shared_store: s3
+
+      compactor:
+        retention_enabled: true
+
+    ingress:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+      ingressClassName: nginx
+      hosts:
+        - host: &host "loki-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          paths:
+            - /
+      tls:
+        - hosts:
+            - *host
+
+    persistence:
+      enabled: false
+
+    resources:
+      requests:
+        cpu: 49m
+        memory: 512M
+      limits:
+        memory: 883M
+
+    serviceMonitor:
+      enabled: true
+
+  valuesFrom:
+    - kind: Secret
+      name: loki-secrets
+      valuesKey: S3_BUCKET_NAME
+      targetPath: config.storage_config.aws.bucketnames
+    - kind: Secret
+      name: loki-secrets
+      valuesKey: S3_BUCKET_HOST
+      targetPath: config.storage_config.aws.endpoint
+    - kind: Secret
+      name: loki-secrets
+      valuesKey: S3_ACCESS_KEY
+      targetPath: config.storage_config.aws.access_key_id
+    - kind: Secret
+      name: loki-secrets
+      valuesKey: S3_SECRET_KEY
+      targetPath: config.storage_config.aws.secret_access_key
