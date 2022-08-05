@@ -31,6 +31,10 @@ data "sops_file" "domains" {
   source_file = pathexpand("${path.module}/../domains.sops.yaml")
 }
 
+data "sops_file" "address_book" {
+  source_file = pathexpand("${path.module}/../address_book.sops.yaml")
+}
+
 module "config" {
   source = "./config"
 

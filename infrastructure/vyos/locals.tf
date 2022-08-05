@@ -13,7 +13,7 @@ locals {
 
   domains        = yamldecode(nonsensitive(data.sops_file.domains.raw))
   networks       = yamldecode(file(pathexpand("${path.module}/../networks.yaml")))
-  address_book   = yamldecode(file(pathexpand("${path.module}/../address_book.yaml")))
+  address_book   = yamldecode(nonsensitive(data.sops_file.address_book.raw))
   firewall_rules = yamldecode(file(pathexpand("${path.module}/firewall_rules.yaml")))
 
   config = local._config.config
