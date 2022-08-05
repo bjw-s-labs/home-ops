@@ -2,7 +2,17 @@
 ansible_host: "10.1.1.11"
 ansible_python_interpreter: /volume1/@appstore/python310/bin/python3
 
+certificates:
+  - common_name: "*.{{ domains.ingress }}"
+    email: "postmaster@{{ domains.ingress }}"
+  - common_name: "*.{{ domains.hardware }}"
+    email: "postmaster@{{ domains.hardware }}"
+
 apps:
   minio:
     image: quay.io/minio/minio:RELEASE.2022-07-17T15-43-14Z
     data_folder: /volume1/docker/minio/data
+
+  syno_cli:
+    image: ghcr.io/reddec/syno-cli:0.1.2
+    data_folder: /volume1/docker/syno_cli

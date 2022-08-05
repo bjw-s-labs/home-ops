@@ -11,7 +11,7 @@
     name: "{{ apps.minio.image }}"
 
 - name: "MinIO : Manage container"
-  docker_container:
+  community.docker.docker_container:
     name: "minio"
     image: "{{ apps.minio.image }}"
     state: started

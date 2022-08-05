@@ -10,5 +10,10 @@
       ansible.builtin.gather_facts:
       become: true
 
+    - name: Load domains file
+      community.sops.load_vars:
+        file: ../../domains.sops.yaml
+        name: domains
+
   roles:
     - nas.apps
