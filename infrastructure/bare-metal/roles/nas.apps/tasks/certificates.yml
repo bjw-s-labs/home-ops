@@ -1,0 +1,27 @@
+---
+- name: "Certificates : {{ item.common_name }} : Sanitize common_name"
+  set_fact:
+    clean_common_name: "{{ item.common_name  | replace('*.', '') | replace('.', '-') }}"
+
+- name: "Certificates : {{ item.common_name }} : Manage data folder"
+  ansible.builtin.file:
+    path: "{{ apps.syno_cli.data_folder }}/syno-cli_{{ clean_common_name }}"
+    state: directory
+    mode: "0755"
+
+- name: "Certificates : {{ item.common_name }} : Manage syno-cli container"
+  community.docker.docker_container:
+    name: "syno-cli_{{ clean_common_name }}"
+    image: "{{ apps.syno_cli.image }}"
+    state: started
+    command: certificates auto
+    volumes:
+      - "{{ apps.syno_cli.data_folder }}/syno-cli_{{ clean_common_name }}:/var/syno"
+    env:
+      SYNOLOGY_URL: http://172.17.0.1:5000
+      SYNOLOGY_USER: "{{ syno_cli.user }}"
+      SYNOLOGY_PASSWORD: "{{ syno_cli.password }}"
+      DOMAINS: "{{ item.common_name }}"
+      PROVIDER: cloudflare
+      CF_API_EMAIL: "{{ item.email }}"
+      CF_DNS_API_TOKEN: "{{ syno_cli.cloudflare_token }}"
