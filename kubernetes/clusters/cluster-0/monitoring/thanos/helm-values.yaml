@@ -38,23 +38,23 @@ spec:
                 expr: absent(up{job="kube-prometheus-stack-prometheus"})
 
   valuesFrom:
-    - kind: ConfigMap
-      name: thanos-ceph-bucket
-      valuesKey: BUCKET_NAME
+    - kind: Secret
+      name: thanos
+      valuesKey: S3_BUCKET_NAME
       targetPath: objstoreConfig.config.bucket
-    - kind: ConfigMap
-      name: thanos-ceph-bucket
-      valuesKey: BUCKET_HOST
+    - kind: Secret
+      name: thanos
+      valuesKey: S3_BUCKET_HOST
       targetPath: objstoreConfig.config.endpoint
-    - kind: ConfigMap
-      name: thanos-ceph-bucket
-      valuesKey: BUCKET_REGION
+    - kind: Secret
+      name: thanos
+      valuesKey: S3_BUCKET_REGION
       targetPath: objstoreConfig.config.region
     - kind: Secret
-      name: thanos-ceph-bucket
-      valuesKey: AWS_ACCESS_KEY_ID
+      name: thanos
+      valuesKey: S3_ACCESS_KEY
       targetPath: objstoreConfig.config.access_key
     - kind: Secret
-      name: thanos-ceph-bucket
-      valuesKey: AWS_SECRET_ACCESS_KEY
+      name: thanos
+      valuesKey: S3_SECRET_KEY
       targetPath: objstoreConfig.config.secret_key
