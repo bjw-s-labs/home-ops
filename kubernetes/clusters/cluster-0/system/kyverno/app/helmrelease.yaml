@@ -3,6 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: kyverno
+  namespace: system
 spec:
   interval: 15m
   chart:
@@ -15,14 +16,14 @@ spec:
         namespace: flux-system
       interval: 15m
   values:
-    replicaCount: 1
+    replicaCount: 3
 
     resources:
       requests:
-        cpu: 203m
-        memory: 256M
+        cpu: 247m
+        memory: 443M
       limits:
-        memory: 512M
+        memory: 1336M
 
     topologySpreadConstraints:
       - maxSkew: 1
