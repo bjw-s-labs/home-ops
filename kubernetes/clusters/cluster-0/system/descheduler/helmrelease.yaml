@@ -3,6 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: descheduler
+  namespace: system
 spec:
   interval: 15m
   chart:
@@ -16,7 +17,7 @@ spec:
       interval: 15m
   values:
     kind: Deployment
-    replicas: 1
+    replicas: 2
 
     leaderElection:
       enabled: true
