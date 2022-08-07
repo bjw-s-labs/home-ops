@@ -1,11 +1,4 @@
 terraform {
-  cloud {
-    organization = "bjw-s"
-    workspaces {
-      name = "home-s3-provisioner"
-    }
-  }
-
   required_providers {
     b2 = {
       source = "Backblaze/b2"
