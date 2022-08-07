@@ -3,6 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: goldilocks
+  namespace: monitoring
 spec:
   interval: 15m
   chart:
@@ -26,6 +27,20 @@ spec:
 
     dashboard:
       replicaCount: 1
+      ingress:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        hosts:
+          - host: &host "goldilocks-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+                type: Prefix
+        tls:
+          - hosts:
+              - *host
       resources:
         requests:
           cpu: 15m
