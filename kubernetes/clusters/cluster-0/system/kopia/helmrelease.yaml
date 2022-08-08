@@ -3,13 +3,51 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: kopia
+  namespace: system
 spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: kah-common-chart
+      version: 1.2.2
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      interval: 15m
+
   values:
+    global:
+      nameOverride: kopia
+
+    image:
+      repository: ghcr.io/onedr0p/kopia
+      tag: 0.11.3@sha256:37e10143585ff2e668a10d878d854831e92bfb7f482f823d1f58af3910fcff41
+
     podAnnotations:
       configmap.reloader.stakater.com/reload: kopia-config
 
+    command: kopia
+    args:
+      - server
+      - --insecure
+      - --address
+      - 0.0.0.0:80
+      - --metrics-listen-addr
+      - 0.0.0.0:8080
+      - --without-password
+
     env:
       KOPIA_PASSWORD: "none"
+
+    service:
+      main:
+        ports:
+          http:
+            port: 80
+          metrics:
+            enabled: true
+            port: 8080
 
     ingress:
       main:
@@ -44,28 +82,9 @@ spec:
         path: /volume1/Backup/Kubernetes/Kopia
         mountPath: /backups
 
-    configmap:
-      config:
-        enabled: true
-        data:
-          repository.config: |
-            {
-              "storage": {
-                "type": "filesystem",
-                "config": {
-                  "path": "/backups",
-                  "dirShards": null
-                }
-              },
-              "caching": {
-                "cacheDirectory": "cache",
-                "maxCacheSize": 5242880000,
-                "maxMetadataCacheSize": 5242880000,
-                "maxListCacheDuration": 30
-              },
-              "hostname": "cluster",
-              "username": "root",
-              "description": "Cluster",
-              "enableActions": false,
-              "formatBlobCacheDuration": 900000000000
-            }
+    resources:
+      requests:
+        cpu: 10m
+        memory: 250Mi
+      limits:
+        memory: 500Mi
