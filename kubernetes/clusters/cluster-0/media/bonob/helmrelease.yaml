@@ -5,16 +5,17 @@ metadata:
   name: bonob
   namespace: media
 spec:
+  interval: 15m
   chart:
     spec:
-      chart: kah-common-chart
+      chart: common-chart
+      version: 0.1.0
       interval: 15m
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home
+        name: bjw-s
         namespace: flux-system
-      version: 1.2.2
-  interval: 15m
+
   values:
     global:
       nameOverride: bonob
