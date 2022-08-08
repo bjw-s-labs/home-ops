@@ -101,3 +101,16 @@ spec:
   prune: true
   dependsOn:
     - name: selfhosted-namespace
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: selfhosted-privatebin
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/selfhosted/privatebin"
+  prune: true
+  dependsOn:
+    - name: selfhosted-namespace
