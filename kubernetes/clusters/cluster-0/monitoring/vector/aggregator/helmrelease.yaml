@@ -3,13 +3,34 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: vector-aggregator
+  namespace: monitoring
 spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: vector
+      version: 0.14.0
+      sourceRef:
+        kind: HelmRepository
+        name: vector
+        namespace: flux-system
+      interval: 15m
   values:
-    service:
-      enabled: true
-      type: LoadBalancer
+    image:
+      repository: timberio/vector
+      tag: 0.23.0-debian
+
+    role: "Stateless-Aggregator"
+
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: vector-aggregator
 
     customConfig:
+      data_dir: /vector-data-dir
+
+      api:
+        enabled: false
+
       # Sources
       sources:
         kubernetes_logs:
@@ -171,6 +192,22 @@ spec:
             service: >-
               {{`{{ "talos-service" }}`}}
 
+    podMonitor:
+      enabled: true
+      jobLabel: vector-aggregator
+      port: prometheus-sink
+
+    resources:
+      requests:
+        cpu: 35m
+        memory: 249M
+      limits:
+        memory: 454M
+
+    service:
+      enabled: true
+      type: LoadBalancer
+
   postRenderers:
     - kustomize:
         patchesJson6902:
@@ -180,7 +217,7 @@ spec:
             patch:
               - op: add
                 path: /spec/loadBalancerIP
-                value: ${LB_VECTOR_AGGREGATOR}
+                value: ${SVC_VECTOR_AGGREGATOR_ADDR}
               - op: replace
                 path: /spec/externalTrafficPolicy
                 value: Local
