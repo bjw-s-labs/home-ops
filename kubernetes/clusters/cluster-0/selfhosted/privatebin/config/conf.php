@@ -72,7 +72,7 @@ creators = "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 
 ; (optional) if your website runs behind a reverse proxy or load balancer,
 ; set the HTTP header containing the visitors IP address, i.e. X_FORWARDED_FOR
-header = "X_FORWARDED_FOR"
+header = "CF-Connecting-IP"
 
 [purge]
 ; minimum time limit between two purgings of expired pastes, it is only
