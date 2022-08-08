@@ -3,7 +3,24 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: actions-runner-controller
+  namespace: dev
 spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: actions-runner-controller
+      version: 0.20.2
+      sourceRef:
+        kind: HelmRepository
+        name: actions-runner-controller
+        namespace: flux-system
+      interval: 15m
+
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+
   values:
     authSecret:
       create: false
@@ -11,11 +28,6 @@ spec:
 
     githubWebhookServer:
       enabled: true
-      syncPeriod: 10m
-
-      secret:
-        create: false
-        name: "actions-runner-controller-webhook"
 
       ingress:
         enabled: true
@@ -33,3 +45,21 @@ spec:
         tls:
           - hosts:
               - *host
+
+      resources:
+        requests:
+          memory: 64Mi
+        limits:
+          memory: 96Mi
+
+      secret:
+        create: false
+        name: "actions-runner-controller-webhook"
+
+      syncPeriod: 10m
+
+    resources:
+      requests:
+        memory: 64Mi
+      limits:
+        memory: 128Mi
