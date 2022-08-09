@@ -1,0 +1,68 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: glauth
+  namespace: security
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 0.1.1
+      interval: 15m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controller:
+      replicas: 3
+      strategy: RollingUpdate
+      rollingUpdate:
+        surge: 1
+
+    image:
+      repository: docker.io/glauth/glauth
+      tag: v2.1.0
+
+    podAnnotations:
+      secret.reloader.stakater.com/reload: glauth-config
+
+    podSecurityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+      fsGroupChangePolicy: "OnRootMismatch"
+
+    command: ["/app/glauth", "-c", "/config"]
+
+    service:
+      main:
+        ports:
+          http:
+            port: 5555
+          ldap:
+            enabled: true
+            port: 389
+
+    persistence:
+      config:
+        enabled: true
+        type: secret
+        name: glauth-config
+        items:
+          - key: server.toml
+            path: server.toml
+          - key: users.toml
+            path: users.toml
+          - key: groups.toml
+            path: groups.toml
+
+    resources:
+      requests:
+        cpu: 10m
+        memory: 100Mi
+      limits:
+        memory: 200Mi
