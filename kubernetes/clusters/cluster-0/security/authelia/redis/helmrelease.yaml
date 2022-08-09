@@ -1,0 +1,50 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: authelia-redis
+  namespace: security
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 0.1.1
+      interval: 15m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controller:
+      strategy: RollingUpdate
+
+    image:
+      repository: public.ecr.aws/docker/library/redis
+      tag: 7.0.4
+
+    command: ["redis-server", "--requirepass", "$(REDIS_PASSWORD)"]
+
+    env:
+      REDIS_REPLICATION_MODE: master
+
+    envFrom:
+      - secretRef:
+          name: authelia-redis
+
+    service:
+      main:
+        ports:
+          http:
+            enabled: false
+          redis:
+            enabled: true
+            port: 6379
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 64M
+      limits:
+        memory: 128M
