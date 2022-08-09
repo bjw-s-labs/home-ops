@@ -1,20 +1,28 @@
 ---
-kubeProxyReplacement: "strict"
-
-k8sServiceHost: 10.5.0.2
-k8sServicePort: 6443
-
-ipv4NativeRoutingCIDR: 10.244.0.0/16
-tunnel: "disabled"
-auto-direct-node-routes: true
-
-ipam:
-  mode: "kubernetes"
-
+autoDirectNodeRoutes: true
 bgp:
-  enabled: false
   announce:
     loadbalancerIP: true
-
+  enabled: false
+containerRuntime:
+  integration: containerd
+endpointRoutes:
+  enabled: true
 hubble:
   enabled: false
+ipam:
+  mode: kubernetes
+ipv4NativeRoutingCIDR: 10.244.0.0/16
+k8sServiceHost: 10.5.0.2
+k8sServicePort: 6443
+kubeProxyReplacement: strict
+loadBalancer:
+  algorithm: maglev
+  mode: dsr
+localRedirectPolicy: true
+operator:
+  rollOutPods: true
+rollOutCiliumPods: true
+securityContext:
+  privileged: true
+tunnel: disabled
