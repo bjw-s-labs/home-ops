@@ -2,7 +2,7 @@
 clusterName: cluster-0
 
 talosVersion: v1.1.2
-kubernetesVersion: 1.24.2
+kubernetesVersion: 1.24.3
 endpoint: "https://cluster-0.${domainName}:6443"
 
 cniConfig:
@@ -104,6 +104,13 @@ controlPlane:
       certSANs:
         - ${clusterEndpointIP}
         - cluster-0.${domainName}
+      files:
+        - content: |
+            [plugins."io.containerd.grpc.v1.cri"]
+              enable_unprivileged_ports = true
+              enable_unprivileged_icmp = true
+          path: /var/cri/conf.d/allow-unpriv-ports.toml
+          op: create
       kubelet:
         extraArgs:
           feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
@@ -147,6 +154,13 @@ worker:
       certSANs:
         - ${clusterEndpointIP}
         - cluster-0.${domainName}
+      files:
+        - content: |
+            [plugins."io.containerd.grpc.v1.cri"]
+              enable_unprivileged_ports = true
+              enable_unprivileged_icmp = true
+          path: /var/cri/conf.d/allow-unpriv-ports.toml
+          op: create
       install:
         extraKernelArgs:
           - "talos.logging.kernel=udp://10.45.0.2:6050/"
