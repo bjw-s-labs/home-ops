@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: privatebin
+  name: pastey
   namespace: selfhosted
 spec:
   interval: 15m
@@ -18,27 +18,23 @@ spec:
 
   values:
     image:
-      repository: privatebin/nginx-fpm-alpine
-      tag: 1.4.0
+      repository: cesura/pastey
+      tag: 0.4.3
       pullPolicy: Always
 
-    podAnnotations:
-      configmap.reloader.stakater.com/reload: "privatebin-config"
-
-    podSecurityContext:
-      runAsUser: 65534
-      runAsGroup: 82
-      fsGroup: 82
-      fsGroupChangePolicy: "OnRootMismatch"
-
     env:
-      PHP_TZ: "Europe/Amsterdam"
+      PASTEY_DATA_DIRECTORY: "/data"
+      PASTEY_LISTEN_PORT: &port 5000
+      PASTEY_USE_WHITELIST: "True"
+      PASTEY_RESTRICT_PASTING: "True"
+      PASTEY_WHITELIST_CIDR: "127.0.0.1/32,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+      PASTEY_BEHIND_PROXY: "True"
 
     service:
       main:
         ports:
           http:
-            port: 8080
+            port: *port
 
     ingress:
       main:
@@ -58,21 +54,14 @@ spec:
               - *host
 
     persistence:
-      config:
-        enabled: true
-        type: configMap
-        name: privatebin-config
-        mountPath: "/srv/cfg"
-        readOnly: true
-
       data:
         enabled: true
-        existingClaim: privatebin-data
-        mountPath: /srv/data
+        existingClaim: pastey-data
+        mountPath: /data
 
-    resources:
-      requests:
-        cpu: 15m
-        memory: 64M
-      limits:
-        memory: 64M
+    # resources:
+    #   requests:
+    #     cpu: 15m
+    #     memory: 64M
+    #   limits:
+    #     memory: 64M
