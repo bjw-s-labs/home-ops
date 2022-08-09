@@ -13,3 +13,11 @@ module "minio_bucket_loki" {
     minio = minio.nas
   }
 }
+
+module "minio_bucket_postgresql" {
+  source      = "./minio_bucket"
+  bucket_name = "postgresql"
+  providers = {
+    minio = minio.nas
+  }
+}
