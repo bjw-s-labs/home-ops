@@ -13,11 +13,10 @@ spec:
         kind: HelmRepository
         name: cilium
         namespace: flux-system
-      version: 1.11.7
+      version: 1.12.0
   interval: 15m
 
   values:
-    auto-direct-node-routes: true
     autoDirectNodeRoutes: true
     bgp:
       announce:
@@ -72,4 +71,6 @@ spec:
     operator:
       rollOutPods: true
     rollOutCiliumPods: true
+    securityContext:
+      privileged: true
     tunnel: disabled
