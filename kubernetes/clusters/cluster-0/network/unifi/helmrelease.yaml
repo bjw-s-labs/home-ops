@@ -72,8 +72,6 @@ spec:
         enabled: true
         annotations:
           nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
         ingressClassName: "nginx"
         hosts:
           - host: &host "unifi.${INGRESS_DOMAIN}"

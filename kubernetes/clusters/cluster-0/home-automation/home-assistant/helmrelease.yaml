@@ -45,16 +45,11 @@ spec:
         enabled: true
         ingressClassName: "nginx"
         annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns/is-public: "true"
-          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
-          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-
+          external-dns.home.arpa/enabled: "true"
         hosts:
           - host: &host "domo.${INGRESS_DOMAIN}"
             paths:
               - path: /
-
         tls:
           - hosts:
               - *host
@@ -102,9 +97,6 @@ spec:
         ingress:
           enabled: true
           ingressClassName: "nginx"
-          annotations:
-            cert-manager.io/cluster-issuer: letsencrypt-production
-            external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           hosts:
             - host: &code-host "code.domo.${INGRESS_DOMAIN}"
               paths:
