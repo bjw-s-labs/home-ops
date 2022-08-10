@@ -75,8 +75,29 @@ spec:
     grafana.ini:
       analytics:
         check_for_updates: false
+      auth:
+        signout_redirect_url: "https://auth.${INGRESS_DOMAIN}/logout"
+        oauth_auto_login: false
       auth.basic:
-        disable_login_form: false
+        enabled: false
+      auth.generic_oauth:
+        enabled: true
+        name: Authelia
+        client_id: "${SECRET_GRAFANA_OAUTH_CLIENT_ID}"
+        client_secret: "${SECRET_GRAFANA_OAUTH_CLIENT_SECRET}"
+        scopes: "openid profile email groups"
+        empty_scopes: false
+        auth_url: "https://auth.${INGRESS_DOMAIN}/api/oidc/authorization"
+        token_url: "https://auth.${INGRESS_DOMAIN}/api/oidc/token"
+        api_url: "https://auth.${INGRESS_DOMAIN}/api/oidc/userinfo"
+        login_attribute_path: preferred_username
+        groups_attribute_path: groups
+        name_attribute_path: name
+        use_pkce: true
+      auth.generic_oauth.group_mapping:
+        role_attribute_path: |
+          contains(groups[*], 'admins') && 'Admin'
+        org_id: 1
       grafana_net:
         url: https://grafana.net
       log:
