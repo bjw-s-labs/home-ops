@@ -87,7 +87,7 @@ spec:
         plugins: /var/lib/grafana/plugins
         provisioning: /etc/grafana/provisioning
       server:
-        root_url: https://grafana-${CLUSTER_NAME}.${INGRESS_DOMAIN}
+        root_url: https://grafana.${INGRESS_DOMAIN}
 
     imageRenderer:
       enabled: true
@@ -99,7 +99,7 @@ spec:
         external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
       ingressClassName: nginx
       hosts:
-        - &host grafana-${CLUSTER_NAME}.${INGRESS_DOMAIN}
+        - &host grafana.${INGRESS_DOMAIN}
       tls:
         - hosts:
             - *host
