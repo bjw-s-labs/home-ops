@@ -5,6 +5,15 @@ namespace: downloads
 resources:
   - ./helmrelease.yaml
   - ./pvc.yaml
+  - ./secret.sops.yaml
 commonLabels:
   app.kubernetes.io/name: sonarr
   app.kubernetes.io/instance: sonarr
+configMapGenerator:
+  - name: sonarr-pushover
+    files:
+      - scripts/pushover-notify.sh
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
