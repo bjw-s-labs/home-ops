@@ -18,6 +18,11 @@ spec:
     controller:
       replicaCount: 3
 
+      updateStrategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxSurge: 1
+
       service:
         enabled: true
         type: LoadBalancer
@@ -59,7 +64,7 @@ spec:
         default-ssl-certificate: "network/${INGRESS_DOMAIN/./-}-tls"
 
       topologySpreadConstraints:
-        - maxSkew: 2
+        - maxSkew: 1
           topologyKey: kubernetes.io/hostname
           whenUnsatisfiable: DoNotSchedule
           labelSelector:
