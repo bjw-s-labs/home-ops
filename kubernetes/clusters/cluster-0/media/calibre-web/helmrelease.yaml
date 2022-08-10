@@ -35,6 +35,7 @@ spec:
       main:
         enabled: true
         annotations:
+          auth.home.arpa/enabled: "true"
           nginx.ingress.kubernetes.io/configuration-snippet: |
             proxy_set_header Accept-Encoding "";
             sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/calibreweb/nord.css"></head>';
