@@ -35,8 +35,6 @@ spec:
       main:
         enabled: true
         annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           nginx.ingress.kubernetes.io/configuration-snippet: |
             proxy_set_header Accept-Encoding "";
             sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/calibreweb/nord.css"></head>';
@@ -51,9 +49,6 @@ spec:
               - *host
       kobo:
         enabled: true
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
         ingressClassName: nginx
         hosts:
           - host: &host_kobo calibre-kobo.${INGRESS_DOMAIN}
