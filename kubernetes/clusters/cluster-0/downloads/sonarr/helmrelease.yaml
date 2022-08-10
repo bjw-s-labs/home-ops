@@ -21,15 +21,25 @@ spec:
       repository: ghcr.io/onedr0p/sonarr-develop
       tag: 3.0.9.1555@sha256:5a199fd43948708972b881b01b57278b511c09e943d4a6829a3acc50a72008df
 
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: sonarr-pushover
+      secret.reloader.stakater.com/reload: sonarr
+
     podSecurityContext:
       supplementalGroups:
         - 65539
 
     env:
+      PUSHOVER_APP_URL: &host "sonarr.${INGRESS_DOMAIN}"
+      PUSHOVER_PRIORITY: "-1"
       SONARR__INSTANCE_NAME: Sonarr
       SONARR__PORT: &port 8989
       SONARR__APPLICATION_URL: "https://sonarr.${INGRESS_DOMAIN}"
       SONARR__LOG_LEVEL: info
+
+    envFrom:
+      - secretRef:
+          name: sonarr
 
     service:
       main:
@@ -47,7 +57,7 @@ spec:
             sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/sonarr/nord.css"></head>';
             sub_filter_once on;
         hosts:
-          - host: &host "sonarr.${INGRESS_DOMAIN}"
+          - host: *host
             paths:
               - path: /
         tls:
@@ -64,24 +74,14 @@ spec:
         server: "${NAS_ADDRESS}"
         path: /volume1/Media
         mountPath: /data/nas-media
-
-    probes:
-      liveness:
+      scripts:
         enabled: true
-        custom: true
-        spec:
-          exec:
-            command:
-              - /usr/bin/env
-              - bash
-              - -c
-              - curl --fail localhost:8989/api/v3/system/status?apiKey=`IFS=\> && while
-                read -d \< E C; do if [[ $E = "ApiKey" ]]; then echo $C; fi; done < /config/config.xml`
-          failureThreshold: 5
-          initialDelaySeconds: 60
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 10
+        type: configMap
+        name: sonarr-pushover
+        subPath: pushover-notify.sh
+        mountPath: /scripts/pushover-notify.sh
+        defaultMode: 0775
+        readOnly: true
 
     resources:
       requests:
