@@ -44,9 +44,6 @@ spec:
 
     ingress:
       enabled: true
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
       ingressClassName: nginx
       hosts:
         - host: &host "loki-${CLUSTER_NAME}.${INGRESS_DOMAIN}"

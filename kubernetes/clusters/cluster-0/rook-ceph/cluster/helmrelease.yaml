@@ -108,8 +108,6 @@ spec:
       ingressClassName: "nginx"
       dashboard:
         annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
         host:
           name: &host rook-${CLUSTER_NAME}.${INGRESS_DOMAIN}
