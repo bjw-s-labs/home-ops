@@ -21,6 +21,10 @@ spec:
       repository: ghcr.io/onedr0p/radarr-develop
       tag: 4.2.0.6438@sha256:387057843009aba5371cf7587b8301a03bcb920d30be225d7892331061d23bfe
 
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: radarr-pushover
+      secret.reloader.stakater.com/reload: radarr
+
     podSecurityContext:
       runAsUser: 568
       runAsGroup: 568
@@ -30,10 +34,16 @@ spec:
         - 65539
 
     env:
+      PUSHOVER_APP_URL: &host "radarr.${INGRESS_DOMAIN}"
+      PUSHOVER_PRIORITY: "-1"
       RADARR__INSTANCE_NAME: Radarr
       RADARR__PORT: &port 7878
       RADARR__APPLICATION_URL: "https://radarr.${INGRESS_DOMAIN}"
       RADARR__LOG_LEVEL: info
+
+    envFrom:
+      - secretRef:
+          name: radarr
 
     service:
       main:
@@ -51,7 +61,7 @@ spec:
             sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/radarr/nord.css"></head>';
             sub_filter_once on;
         hosts:
-          - host: &host "radarr.${INGRESS_DOMAIN}"
+          - host: *host
             paths:
               - path: /
         tls:
@@ -69,3 +79,12 @@ spec:
         server: "${NAS_ADDRESS}"
         path: /volume1/Media
         mountPath: /data/nas-media
+
+      scripts:
+        enabled: true
+        type: configMap
+        name: radarr-pushover
+        subPath: pushover-notify.sh
+        mountPath: /scripts/pushover-notify.sh
+        defaultMode: 0775
+        readOnly: true
