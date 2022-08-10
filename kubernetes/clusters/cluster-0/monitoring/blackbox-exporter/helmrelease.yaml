@@ -21,8 +21,6 @@ spec:
     image:
       repository: quay.io/prometheus/blackbox-exporter
 
-    allowIcmp: true
-
     config:
       modules:
         http_2xx:
@@ -80,6 +78,12 @@ spec:
           annotations:
             description: |-
               The host {{"{{ $labels.target }}"}} is currently unreachable
+
+    securityContext:
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        add: ["NET_RAW"]
 
     serviceMonitor:
       enabled: true
