@@ -5,6 +5,8 @@ namespace: selfhosted
 resources:
   - ./helmrelease.yaml
   - ./secret.sops.yaml
+patchesStrategicMerge:
+  - patches/postgres.yaml
 commonLabels:
   app.kubernetes.io/name: miniflux
   app.kubernetes.io/instance: miniflux
