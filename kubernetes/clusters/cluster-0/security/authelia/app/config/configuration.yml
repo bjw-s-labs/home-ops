@@ -32,3 +32,18 @@ identity_providers:
         redirect_uris:
           - "https://grafana.${INGRESS_DOMAIN}/login/generic_oauth"
         userinfo_signing_algorithm: none
+
+      - id: miniflux
+        description: Miniflux
+        secret: "${SECRET_MINIFLUX_OAUTH_CLIENT_SECRET}"
+        public: false
+        authorization_policy: two_factor
+        pre_configured_consent_duration: 1y
+        scopes:
+          - openid
+          - profile
+          - groups
+          - email
+        redirect_uris:
+          - "https://miniflux.${INGRESS_DOMAIN}/oauth2/oidc/callback"
+        userinfo_signing_algorithm: none
