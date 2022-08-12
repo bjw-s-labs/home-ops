@@ -127,7 +127,7 @@ module "helm-charts" {
   name         = "helm-charts"
   description  = "A collection of Helm charts"
   topics       = ["helm", "kubernetes"]
-  homepage_url = "https://bjw-s.github.io/library-charts/"
+  homepage_url = "https://bjw-s.github.io/helm-charts/"
   visibility   = "public"
 
   auto_init              = true
@@ -174,6 +174,38 @@ module "helm-charts" {
     branch     = "gh-pages"
     path       = "/"
   }
+}
+
+module "helm-charts-actions" {
+  source  = "mineiros-io/repository/github"
+  version = "0.16.2"
+
+  name         = "helm-charts-actions"
+  description  = "A collection of GitHub actions to use with helm-charts repo"
+  topics       = ["helm", "github-actions"]
+  visibility   = "public"
+
+  auto_init              = true
+  allow_merge_commit     = false
+  allow_squash_merge     = true
+  allow_auto_merge       = true
+  delete_branch_on_merge = true
+
+  has_issues   = true
+  has_wiki     = false
+  has_projects = false
+  is_template  = false
+
+  plaintext_secrets = {
+    "BJWS_APP_ID"          = data.sops_file.github_secrets.data["apps.bjws_bot.app_id"]
+    "BJWS_APP_PRIVATE_KEY" = data.sops_file.github_secrets.data["apps.bjws_bot.private_key"]
+  }
+
+  issue_labels_merge_with_github_labels = false
+  issue_labels = concat(
+    [],
+    local.default_issue_labels
+  )
 }
 
 module "gh-workflows" {
