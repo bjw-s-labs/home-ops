@@ -1,3 +1,4 @@
+---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -40,8 +41,8 @@ spec:
             - name: plex-media-manager
               image: meisnate12/plex-meta-manager:v1.17.3
               imagePullPolicy: IfNotPresent
-              # command: [ "sleep", "600000" ]
-              args: [ "--run", "--read-only-config" ]
+              # command: ["sleep", "600000"]
+              args: ["--run", "--read-only-config"]
               resources:
                 limits:
                   cpu: 1000m
@@ -58,9 +59,6 @@ spec:
                 - name: pmm-movie-config
                   mountPath: /config/movies.yaml
                   subPath: movies.yaml
-                # - name: pmm-tv-config-jinja-template
-                #   mountPath: /config/tv.yaml
-                #   subPath: tv.yaml
           volumes:
             - name: config
               persistentVolumeClaim:
