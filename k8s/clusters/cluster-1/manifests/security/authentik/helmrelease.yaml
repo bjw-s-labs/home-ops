@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://charts.goauthentik.io/
       chart: authentik
-      version: 2022.7.3
+      version: 2022.8.3
       sourceRef:
         kind: HelmRepository
         name: authentik-charts
@@ -69,7 +69,7 @@ spec:
         port: 587
         use_tls: true
         username: ${SMTP_USERNAME}
-        password:  ${SMTP_PASSWORD}
+        password: ${SMTP_PASSWORD}
         from: "no-reply@${INGRESS_DOMAIN}"
 
     ingress:
@@ -96,7 +96,7 @@ spec:
           hosts:
             - *host
             - *host-cluster
-            
+
     postgresql:
       enabled: true
       postgresqlPassword: "${AUTHENTIK_POSTGRES_PASSWORD}"
