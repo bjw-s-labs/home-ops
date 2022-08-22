@@ -8,26 +8,26 @@ spec:
     - op: replace
       path: /cluster/apiServer/image
       # renovate: docker-image
-      value: k8s.gcr.io/kube-apiserver:v1.24.3
+      value: k8s.gcr.io/kube-apiserver:v1.24.4
     - op: replace
       path: /cluster/controllerManager/image
       # renovate: docker-image
-      value: k8s.gcr.io/kube-controller-manager:v1.24.3
+      value: k8s.gcr.io/kube-controller-manager:v1.24.4
     - op: replace
       path: /cluster/scheduler/image
       # renovate: docker-image
-      value: k8s.gcr.io/kube-scheduler:v1.24.3
+      value: k8s.gcr.io/kube-scheduler:v1.24.4
     - op: replace
       path: /machine/kubelet/image
       # renovate: docker-image
-      value: ghcr.io/siderolabs/kubelet:v1.24.3
+      value: ghcr.io/siderolabs/kubelet:v1.24.4
     - op: add
       path: /cluster/coreDNS
       value:
         # renovate: docker-image
         image: docker.io/coredns/coredns:1.9.3
 
-      # Override defaults to allow prometheus logging
+    # Override defaults to allow prometheus logging
     - op: add
       path: /cluster/controllerManager/extraArgs
       value:
@@ -57,7 +57,7 @@ spec:
         # Override defaults to allow prometheus logging
         bind-address: 0.0.0.0
 
-# need to change vector to run as a daemonset so it can access localhost logs
+    # need to change vector to run as a daemonset so it can access localhost logs
     - op: add
       path: /machine/install/extraKernelArgs
       value:
@@ -68,10 +68,10 @@ spec:
         destinations:
           - endpoint: tcp://127.0.0.1:9302
             format: json_lines
-    
+
     - op: add
       path: /machine/install/extraKernelArgs
-      value: 
+      value:
         - talos.logging.kernel=udp://vector.elcarpenter.com:6050/
 
 

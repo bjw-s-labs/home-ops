@@ -8,7 +8,7 @@ spec:
     - op: replace
       path: /machine/kubelet/image
       # renovate: docker-image
-      value: ghcr.io/siderolabs/kubelet:v1.24.3
+      value: ghcr.io/siderolabs/kubelet:v1.24.4
 
     - op: replace
       path: /persist
@@ -19,7 +19,7 @@ spec:
       value:
         rotate-server-certificates: true
 
-# need to change vector to run as a daemonset so it can access localhost logs
+    # need to change vector to run as a daemonset so it can access localhost logs
     - op: add
       path: /machine/install/extraKernelArgs
       value:
@@ -44,25 +44,6 @@ spec:
         fs.inotify.max_user_watches: "1048576"
         fs.inotify.max_user_instances: "8192"
 
-    # - op: add
-    #   path: /machine/network/interfaces
-    #   value:
-    #     - interface: eth0
-    #       dhcp: true
-        # - interface: eth1
-        #   vlans:
-        #     # Home LAN
-        #     - vlanId: 2
-        #       dhcp: true
-        #     # IoT Network
-        #     - vlanId: 100
-        #       dhcp: true
-
-    # - op: replace
-    #   path: /machine/network/nameservers
-    #   value:
-    #     - 10.255.253.1
-        
   selector:
     matchExpressions:
       - key: control-plane
