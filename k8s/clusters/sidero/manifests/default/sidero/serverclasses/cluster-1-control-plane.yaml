@@ -27,7 +27,7 @@ spec:
         # renovate: docker-image
         image: docker.io/coredns/coredns:1.9.3
 
-      # Override defaults to allow prometheus logging
+    # Override defaults to allow prometheus logging
     - op: add
       path: /cluster/controllerManager/extraArgs
       value:
@@ -57,7 +57,7 @@ spec:
         # Override defaults to allow prometheus logging
         bind-address: 0.0.0.0
 
-# need to change vector to run as a daemonset so it can access localhost logs
+    # need to change vector to run as a daemonset so it can access localhost logs
     - op: add
       path: /machine/install/extraKernelArgs
       value:
@@ -68,10 +68,10 @@ spec:
         destinations:
           - endpoint: tcp://127.0.0.1:9302
             format: json_lines
-    
+
     - op: add
       path: /machine/install/extraKernelArgs
-      value: 
+      value:
         - talos.logging.kernel=udp://vector.elcarpenter.com:6050/
 
 
