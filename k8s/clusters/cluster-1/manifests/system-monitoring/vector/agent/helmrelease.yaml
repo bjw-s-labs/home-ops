@@ -12,7 +12,7 @@ spec:
   chart:
     spec:
       chart: vector
-      version: 0.14.0
+      version: 0.15.1
       sourceRef:
         kind: HelmRepository
         name: vector-charts
@@ -59,7 +59,7 @@ spec:
           type: socket
           mode: udp
           address: 127.0.0.1:9301
-  
+
         talos_service_logs:
           type: socket
           mode: udp
@@ -87,7 +87,7 @@ spec:
             - talos_kernel_logs
           address: "vector-aggregator.system-monitoring:6050"
           version: "2"
-          
+
         talos_service_sink:
           type: vector
           inputs:
@@ -100,4 +100,3 @@ spec:
           inputs:
             - vector_metrics
           address: 0.0.0.0:9090
-  
