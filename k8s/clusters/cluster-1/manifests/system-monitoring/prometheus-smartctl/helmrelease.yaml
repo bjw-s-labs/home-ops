@@ -8,10 +8,11 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: /k8s/charts/kah-common-chart/
+      chart: kah-common-chart
+      version: 1.2.2
       sourceRef:
-        kind: GitRepository
-        name: home-ops
+        kind: HelmRepository
+        name: k8s-at-home-charts
         namespace: flux-system
       interval: 5m
   values:
@@ -23,7 +24,7 @@ spec:
 
     image:
       repository: matusnovak/prometheus-smartctl
-      tag: v2.0.1
+      tag: v2.1.0
 
     nameOverride: "prometheus-smartctl"
 
