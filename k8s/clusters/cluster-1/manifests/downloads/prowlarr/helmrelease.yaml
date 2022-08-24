@@ -29,6 +29,16 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
+      PROWLARR_INSTANCE_NAME: Prowlarr
+      PROWLARR__PORT: &port 9696
+      PROWLARR__APPLICATION_URL: *host-cluster
+      PROWLARR__LOG_LEVEL: info
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
 
     podSecurityContext:
       runAsUser: 568

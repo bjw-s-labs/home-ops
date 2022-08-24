@@ -33,6 +33,16 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
+      OVERSEERR__INSTANCE_NAME: Overseer
+      OVERSEERR__PORT: &port 5055
+      OVERSEERR__APPLICATION_URL: *host-cluster
+      OVERSEERR__LOG_LEVEL: info
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
 
     persistence:
       config:

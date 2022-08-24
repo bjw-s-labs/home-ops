@@ -33,6 +33,16 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
+      SONARR_INSTANCE_NAME: Sonarr
+      SONARR__PORT: &port 8989
+      SONARR__APPLICATION_URL: *host-cluster
+      SONARR__LOG_LEVEL: info
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
 
     metrics:
       enabled: true

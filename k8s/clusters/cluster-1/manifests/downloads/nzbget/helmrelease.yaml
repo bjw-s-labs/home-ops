@@ -32,6 +32,16 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
+      NZBGET__INSTANCE_NAME: NZBGet
+      NZBGET__PORT: &port 6789
+      NZBGET__APPLICATION_URL: *host-cluster
+      NZBGET__LOG_LEVEL: info
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
 
     persistence:
       config:

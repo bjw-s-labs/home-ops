@@ -33,6 +33,16 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
+      BAZARR__INSTANCE_NAME: Bazarr
+      BAZARR__PORT: &port 6767
+      BAZARR__APPLICATION_URL: *host-cluster
+      BAZARR__LOG_LEVEL: info
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
 
     persistence:
       config:

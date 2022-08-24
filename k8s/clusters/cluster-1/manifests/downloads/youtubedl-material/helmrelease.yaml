@@ -25,6 +25,16 @@ spec:
     env:
       TZ: "${TIMEZONE}"
       GID: 100
+      YOUTUBEDL_INSTANCE_NAME: YouTubeDL-Material
+      YOUTUBEDL__PORT: &port 17442
+      YOUTUBEDL__APPLICATION_URL: *host-cluster
+      YOUTUBEDL__LOG_LEVEL: info
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
 
     persistence:
       config:

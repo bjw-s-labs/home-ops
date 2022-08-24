@@ -42,6 +42,16 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
+      RADARR_INSTANCE_NAME: Radarr-4k
+      RADARR__PORT: &port 7878
+      RADARR__APPLICATION_URL: *host-cluster
+      RADARR__LOG_LEVEL: info
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
 
     metrics:
       enabled: true

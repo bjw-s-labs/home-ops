@@ -41,6 +41,25 @@ spec:
     env:
       TZ: "${TIMEZONE}"
       UMASK: "022"
+      QBITTORRENT_INSTANCE_NAME: QBitTorrent
+      QBITTORRENT__PORT: &port 8080
+      QBITTORRENT__APPLICATION_URL: *host-cluster
+      QBITTORRENT__LOG_LEVEL: info
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+      bittorrent:
+        enabled: false
+        type: ClusterIP
+        ports:
+          bittorrent:
+            enabled: true
+            port: 6881
+            protocol: TCP
+            targetPort: 6881
 
     persistence:
       config:
@@ -76,7 +95,3 @@ spec:
         memory: "1000Mi"
       limits:
         memory: "1500Mi"
-
-    addons:
-      netshoot:
-        enabled: false

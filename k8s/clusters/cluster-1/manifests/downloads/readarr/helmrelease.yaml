@@ -32,6 +32,16 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
+      READARR_INSTANCE_NAME: Readarr
+      READARR__PORT: &port 8787
+      READARR__APPLICATION_URL: *host-cluster
+      READARR__LOG_LEVEL: info
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
 
     persistence:
       config:
