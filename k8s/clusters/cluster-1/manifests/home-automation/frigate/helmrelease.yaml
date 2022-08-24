@@ -34,16 +34,16 @@ spec:
       FRIGATE__APPLICATION_URL: &host "frigate.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       FRIGATE__LOG_LEVEL: info
 
-service:
-  main:
-    ports:
-      http:
-        port: *port
-      rtmp:
-        enabled: false
-        port: 1935
-        protocol: TCP
-        targetPort: 1935
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+          rtmp:
+            enabled: false
+            port: 1935
+            protocol: TCP
+            targetPort: 1935
 
     persistence:
       data:
