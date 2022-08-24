@@ -5,22 +5,22 @@ metadata:
   name: youtubedl-material
   namespace: downloads
 spec:
-  interval: 5m
+  interval: 15m
   chart:
     spec:
-      chart: youtubedl-material
-      version: 4.4.2
+      chart: app-template
+      version: 0.1.1
+      interval: 15m
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s
         namespace: flux-system
-      interval: 5m
-
+        
   values:
     image:
       repository: tzahi12345/youtubedl-material
       tag: "nightly"
-      pullPolicy: Always
+      pullPolicy: IfNotPresent
 
     env:
       TZ: "${TIMEZONE}"

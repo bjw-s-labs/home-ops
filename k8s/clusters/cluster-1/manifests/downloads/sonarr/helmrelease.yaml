@@ -5,21 +5,22 @@ metadata:
   name: sonarr
   namespace: downloads
 spec:
-  interval: 5m
+  interval: 15m
   chart:
     spec:
-      chart: sonarr
-      version: 16.3.2
+      chart: app-template
+      version: 0.1.1
+      interval: 15m
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s
         namespace: flux-system
-      interval: 5m
+        
   values:
     image:
       repository: ghcr.io/k8s-at-home/sonarr-develop
       tag: v3.0.9.1555
-      pullPolicy: Always
+      pullPolicy: IfNotPresent
 
     podSecurityContext:
       runAsUser: 568

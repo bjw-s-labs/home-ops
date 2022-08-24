@@ -5,21 +5,22 @@ metadata:
   name: overseerr
   namespace: downloads
 spec:
-  interval: 5m
+  interval: 15m
   chart:
     spec:
-      chart: overseerr
-      version: 5.4.2
+      chart: app-template
+      version: 0.1.1
+      interval: 15m
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s
         namespace: flux-system
-      interval: 5m
+        
   values:
     image:
       repository: ghcr.io/sct/overseerr
       tag: 1.29.1
-      pullPolicy: Always
+      pullPolicy: IfNotPresent
 
     # podSecurityContext:
     #   runAsUser: 568
