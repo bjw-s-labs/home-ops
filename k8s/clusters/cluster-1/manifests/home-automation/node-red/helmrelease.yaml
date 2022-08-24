@@ -5,16 +5,17 @@ metadata:
   name: node-red
   namespace: home-automation
 spec:
-  interval: 5m
+  interval: 15m
   chart:
     spec:
-      chart: node-red
-      version: 10.3.2
+      chart: app-template
+      version: 0.1.1
+      interval: 15m
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s
         namespace: flux-system
-      interval: 5m
+
   values:
     # initContainers: #TODO #930
     #   npm-update-modules:
@@ -27,10 +28,22 @@ spec:
     image:
       repository: ghcr.io/k8s-at-home/node-red
       tag: v3.0.2
+
     env:
       TZ: "${TIMEZONE}"
       NODE_RED_ENABLE_SAFE_MODE: "false"
       NODE_RED_ENABLE_PROJECTS: "true"
+      NODE_RED__INSTANCE_NAME: NodeRed
+      NODE_RED__PORT: &port 1880
+      NODE_RED__APPLICATION_URL: &host-cluster "node-red.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+      NODE_RED__LOG_LEVEL: info
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+
     ingress:
       main:
         enabled: true
@@ -44,7 +57,7 @@ spec:
           hajimari.io/enable: "false"
           hajimari.io/icon: "resistor-nodes"
         hosts:
-          - host: &host-cluster "node-red.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: *host-cluster
             paths:
               - path: /
                 pathType: Prefix
@@ -57,7 +70,6 @@ spec:
             hosts:
               - *host-cluster
               - *host
-
 
     persistence:
       config:

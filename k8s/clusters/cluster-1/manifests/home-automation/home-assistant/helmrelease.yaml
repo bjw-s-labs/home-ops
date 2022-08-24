@@ -5,20 +5,36 @@ metadata:
   name: home-assistant
   namespace: home-automation
 spec:
-  interval: 5m
+  interval: 15m
   chart:
     spec:
-      chart: home-assistant
-      version: 13.4.2
+      chart: app-template
+      version: 0.1.1
+      interval: 15m
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s
         namespace: flux-system
-      interval: 5m
+
   values:
     image:
       repository: ghcr.io/home-assistant/home-assistant
       tag: 2022.8.6
+
+    env:
+      TZ: "${TIMEZONE}"
+      HASS__INSTANCE_NAME: Home-Assistant
+      HASS__PORT: &port 8123
+      HASS__APPLICATION_URL: &host-cluster "home.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+      HASS__LOG_LEVEL: info
+
+    service:
+      main:
+        type: LoadBalancer
+        loadBalancerIP: "${LB_HASS}"
+        ports:
+          http:
+            port: *port
 
     nameOverride: "home-assistant"
 
@@ -53,15 +69,6 @@ spec:
     # -- Defaults to "ClusterFirst" if hostNetwork is false and "ClusterFirstWithHostNet" if hostNetwork is true.
     dnsPolicy: ClusterFirstWithHostNet
 
-    service:
-      main:
-        type: LoadBalancer
-        loadBalancerIP: "${LB_HASS}"
-        ports:
-          sonos:
-            enabled: false
-            port: 1400
-
     ingress:
       main:
         enabled: true
@@ -74,7 +81,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
           external-dns/is-public: "true"
         hosts:
-          - host: &host-cluster "home.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: *host-cluster
             paths:
               - path: /
           - host: &host "home.${INGRESS_DOMAIN}"
@@ -85,9 +92,6 @@ spec:
             hosts:
               - *host-cluster
               - *host
-
-    env:
-      TZ: "${TIMEZONE}"
 
     envFrom:
       - secretRef:

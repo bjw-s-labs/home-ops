@@ -8,16 +8,17 @@ spec:
   dependsOn:
     - name: emqx
       namespace: home-automation
-  interval: 5m
+  interval: 15m
   chart:
     spec:
-      chart: zigbee2mqtt
-      version: 9.4.2
+      chart: app-template
+      version: 0.1.1
+      interval: 15m
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s
         namespace: flux-system
-      interval: 5m
+
   values:
     image:
       repository: ghcr.io/koenkk/zigbee2mqtt
@@ -27,6 +28,16 @@ spec:
       TZ: "${TIMEZONE}"
       ZIGBEE2MQTT_DATA: /data
       # DEBUG: "zigbee-herdsman*"
+      ZIGBEE2MQTT__INSTANCE_NAME: Zigbee2MQTT
+      ZIGBEE2MQTT__PORT: &port 8080
+      ZIGBEE2MQTT__APPLICATION_URL: &host "zigbee2mqtt.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+      ZIGBEE2MQTT__LOG_LEVEL: info
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
 
     persistence:
       data:
@@ -44,7 +55,7 @@ spec:
           traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
 
         hosts:
-          - host: &host "zigbee2mqtt.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: *host
             paths:
               - path: /
 

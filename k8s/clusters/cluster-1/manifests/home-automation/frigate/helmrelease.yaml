@@ -8,16 +8,17 @@ spec:
   dependsOn:
     - name: emqx
       namespace: home-automation
-  interval: 5m
+  interval: 15m
   chart:
     spec:
-      chart: frigate
-      version: 8.2.2
+      chart: app-template
+      version: 0.1.1
+      interval: 15m
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s
         namespace: flux-system
-      interval: 5m
+
   values:
     image:
       repository: ghcr.io/k8s-at-home/frigate
@@ -28,6 +29,21 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
+      FRIGATE__INSTANCE_NAME: Frigate
+      FRIGATE__PORT: &port 5000
+      FRIGATE__APPLICATION_URL: &host "frigate.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+      FRIGATE__LOG_LEVEL: info
+
+service:
+  main:
+    ports:
+      http:
+        port: *port
+      rtmp:
+        enabled: false
+        port: 1935
+        protocol: TCP
+        targetPort: 1935
 
     persistence:
       data:
@@ -62,7 +78,7 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
         hosts:
-          - host: &host "frigate.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: *host
             paths:
               - path: /
         tls:
