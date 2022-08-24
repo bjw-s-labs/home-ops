@@ -34,7 +34,7 @@ spec:
       TZ: "${TIMEZONE}"
       NZBGET__INSTANCE_NAME: NZBGet
       NZBGET__PORT: &port 6789
-      NZBGET__APPLICATION_URL: *host-cluster
+      NZBGET__APPLICATION_URL: &host-cluster "nzbget.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       NZBGET__LOG_LEVEL: info
 
     service:
@@ -70,7 +70,7 @@ spec:
           # external-dns.alpha.kubernetes.io/target: ${CLOUDFLARE_TUNNEL_ID}.cfargotunnel.com
           # external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
         hosts:
-          - host: &host-cluster "nzbget.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: *host-cluster
             paths:
               - path: /
           - host: &host "nzbget.${INGRESS_DOMAIN}"

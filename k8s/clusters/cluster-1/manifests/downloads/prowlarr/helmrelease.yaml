@@ -31,7 +31,7 @@ spec:
       TZ: "${TIMEZONE}"
       PROWLARR_INSTANCE_NAME: Prowlarr
       PROWLARR__PORT: &port 9696
-      PROWLARR__APPLICATION_URL: *host-cluster
+      PROWLARR__APPLICATION_URL: &host "prowlarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       PROWLARR__LOG_LEVEL: info
 
     service:
@@ -78,7 +78,7 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
         hosts:
-          - host: &host "prowlarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: *host-cluster
             paths:
               - path: /
         tls:

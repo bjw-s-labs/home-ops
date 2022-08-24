@@ -43,7 +43,7 @@ spec:
       UMASK: "022"
       QBITTORRENT_INSTANCE_NAME: QBitTorrent
       QBITTORRENT__PORT: &port 8080
-      QBITTORRENT__APPLICATION_URL: *host-cluster
+      QBITTORRENT__APPLICATION_URL: &host "qbittorrent.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       QBITTORRENT__LOG_LEVEL: info
 
     service:
@@ -81,7 +81,7 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
         hosts:
-          - host: &host "qbittorrent.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: *host-cluster
             paths:
               - path: /
         tls:

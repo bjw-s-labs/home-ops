@@ -35,7 +35,7 @@ spec:
       TZ: "${TIMEZONE}"
       SONARR_INSTANCE_NAME: Sonarr
       SONARR__PORT: &port 8989
-      SONARR__APPLICATION_URL: *host-cluster
+      SONARR__APPLICATION_URL: &host-cluster "sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       SONARR__LOG_LEVEL: info
 
     service:
@@ -91,7 +91,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
           external-dns/is-public: "true"
         hosts:
-          - host: &host-cluster "sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: *host-cluster
             paths:
               - path: /
           - host: &host "sonarr.${INGRESS_DOMAIN}"

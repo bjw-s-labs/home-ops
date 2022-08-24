@@ -35,7 +35,7 @@ spec:
       TZ: "${TIMEZONE}"
       BAZARR__INSTANCE_NAME: Bazarr
       BAZARR__PORT: &port 6767
-      BAZARR__APPLICATION_URL: *host-cluster
+      BAZARR__APPLICATION_URL: &host-cluster "bazarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       BAZARR__LOG_LEVEL: info
 
     service:
@@ -74,7 +74,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
           external-dns/is-public: "true"
         hosts:
-          - host: &host-cluster "bazarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: *host-cluster
             paths:
               - path: /
           - host: &host "bazarr.${INGRESS_DOMAIN}"

@@ -34,7 +34,7 @@ spec:
       TZ: "${TIMEZONE}"
       READARR_INSTANCE_NAME: Readarr
       READARR__PORT: &port 8787
-      READARR__APPLICATION_URL: *host-cluster
+      READARR__APPLICATION_URL: &host "readarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       READARR__LOG_LEVEL: info
 
     service:
@@ -73,7 +73,7 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
         hosts:
-          - host: &host "readarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: *host-cluster
             paths:
               - path: /
         tls:

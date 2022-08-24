@@ -35,7 +35,7 @@ spec:
       TZ: "${TIMEZONE}"
       RADARR_INSTANCE_NAME: Radarr
       RADARR__PORT: &port 7878
-      RADARR__APPLICATION_URL: *host-cluster
+      RADARR__APPLICATION_URL: &host-cluster "radarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       RADARR__LOG_LEVEL: info
 
     service:
@@ -90,7 +90,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
           external-dns/is-public: "true"
         hosts:
-          - host: &host-cluster "radarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: *host-cluster
             paths:
               - path: /
           - host: &host "radarr.${INGRESS_DOMAIN}"

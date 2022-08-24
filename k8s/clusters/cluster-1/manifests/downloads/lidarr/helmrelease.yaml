@@ -34,7 +34,7 @@ spec:
       TZ: "${TIMEZONE}"
       LIDARR__INSTANCE_NAME: Lidarr
       LIDARR__PORT: &port 8686
-      LIDARR__APPLICATION_URL: *host-cluster
+      LIDARR__APPLICATION_URL: &host-cluster "lidarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       LIDARR__LOG_LEVEL: info
 
     service:
@@ -70,7 +70,7 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
         hosts:
-          - host: &host-cluster "lidarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: *host-cluster
             paths:
               - path: /
           - host: &host "music.${INGRESS_DOMAIN}"

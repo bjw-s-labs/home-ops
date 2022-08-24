@@ -35,7 +35,7 @@ spec:
       TZ: "${TIMEZONE}"
       OVERSEERR__INSTANCE_NAME: Overseer
       OVERSEERR__PORT: &port 5055
-      OVERSEERR__APPLICATION_URL: *host-cluster
+      OVERSEERR__APPLICATION_URL: &host-cluster "overseerr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       OVERSEERR__LOG_LEVEL: info
 
     service:
@@ -71,7 +71,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
           external-dns/is-public: "true"
         hosts:
-          - host: &host-cluster "overseerr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: *host-cluster
             paths:
               - path: /
           - host: &host "request.${INGRESS_DOMAIN}"
