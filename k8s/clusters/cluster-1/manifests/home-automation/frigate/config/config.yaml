@@ -1,9 +1,9 @@
 mqtt:
-  host: mqtt.${INGRESS_DOMAIN}
+  host: "{FRIGATE_MQTT_SERVER}"
   port: 1883
   topic_prefix: frigate
-  user: ${MQTT_FRIGATE_USERNAME}
-  password: ${MQTT_FRIGATE_PASSWORD}
+  user: "{FRIGATE_MQTT_USERNAME}"
+  password: "{FRIGATE_MQTT_PASSWORD}"
 
 database:
   path: /data/frigate.db
@@ -38,7 +38,7 @@ cameras:
         living-room:
           ffmpeg:
             inputs:
-              - path: rtsp://unifi.${INGRESS_DOMAIN}:7447/azUhHEqKsTILYSdR
+              - path: "{FRIGATE_CAMERA_1}"
                 roles:
                   - detect
                   - rtmp
@@ -49,7 +49,7 @@ cameras:
         dining-room:
           ffmpeg:
             inputs:
-              - path: rtsp://unifi.server.${INGRESS_DOMAIN}:7447/KOF0Fng0FwIRT2ug
+              - path: "{FRIGATE_CAMERA_2}"
                 roles:
                   - detect
                   - rtmp
@@ -63,7 +63,7 @@ cameras:
         front-door:
           ffmpeg:
             inputs:
-              - path: rtsp://unifi.server.${INGRESS_DOMAIN}:7447/1xYtZJaXQrqnIctQ
+              - path: "{FRIGATE_CAMERA_3}"
                 roles:
                   - detect
                   - rtmp
@@ -74,7 +74,7 @@ cameras:
         back-door:
           ffmpeg:
             inputs:
-              - path: rtsp://unifi.server.${INGRESS_DOMAIN}:7447/ZjAMogmEORupfL1w
+              - path: "{FRIGATE_CAMERA_4}"
                 roles:
                   - detect
                   - rtmp
