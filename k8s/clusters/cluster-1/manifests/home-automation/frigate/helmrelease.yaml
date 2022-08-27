@@ -35,9 +35,9 @@ spec:
       FRIGATE__LOG_LEVEL: info
       FRIGATE_MQTT_PASSWORD: ${MQTT_FRIGATE_PASSWORD}
 
-    # envFrom:
-    #   - secretRef:
-    #       name: frigate-secrets
+    envFrom:
+      - secretRef:
+          name: frigate-secrets
 
     service:
       main:
