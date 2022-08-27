@@ -33,10 +33,11 @@ spec:
       FRIGATE__PORT: &port 5000
       FRIGATE__APPLICATION_URL: &host "frigate.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       FRIGATE__LOG_LEVEL: info
+      FRIGATE_MQTT_PASSWORD: ${MQTT_FRIGATE_PASSWORD}
 
-    envFrom:
-      - secretRef:
-          name: frigate-secrets
+    # envFrom:
+    #   - secretRef:
+    #       name: frigate-secrets
 
     service:
       main:
