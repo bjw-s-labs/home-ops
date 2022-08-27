@@ -34,6 +34,10 @@ spec:
       FRIGATE__APPLICATION_URL: &host "frigate.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       FRIGATE__LOG_LEVEL: info
 
+    envFrom:
+      - secretRef:
+          name: frigate-secrets
+
     service:
       main:
         ports:
