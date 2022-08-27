@@ -177,12 +177,19 @@ talosctl upgrade --nodes cp1.cluster-1.FQDN.com --context cluster-1 \
 --image ghcr.io/siderolabs/installer:v1.1.0
 ```
 
+It seems to be better to wipe the disk and let iPXE boot reinstall.
+Do one at a time and allow Rook to go healthy after each one
+```bash
+export NODE_NAME=cp1.cluster-1.FQDN.com
+talosctl reset --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL -n $NODE_NAME
+```
+
 ## Update sidero
 
 Update sidero via `clusterctl upgrade plan` 
 you may need to reset the `SIDERO_CONTROLLER_MANAGER`... variables again to ensure it retains host-network, else you wont be able to connect to the ipxe again.
 
-```
+```bash
 > clusterctl upgrade plan
 Checking cert-manager version...
 Cert-Manager is already up to date
