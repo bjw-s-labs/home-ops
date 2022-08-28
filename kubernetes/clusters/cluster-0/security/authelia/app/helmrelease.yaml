@@ -20,8 +20,6 @@ spec:
     controller:
       replicas: 3
       strategy: RollingUpdate
-      rollingUpdate:
-        surge: 1
 
     podSecurityContext:
       runAsUser: 568
@@ -86,7 +84,7 @@ spec:
         memory: 250Mi
 
     topologySpreadConstraints:
-      - maxSkew: 1
+      - maxSkew: 2
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: DoNotSchedule
         labelSelector:
