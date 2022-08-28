@@ -20,8 +20,6 @@ spec:
 
       updateStrategy:
         type: RollingUpdate
-        rollingUpdate:
-          maxSurge: 1
 
       service:
         enabled: true
@@ -64,7 +62,7 @@ spec:
         default-ssl-certificate: "network/${INGRESS_DOMAIN/./-}-tls"
 
       topologySpreadConstraints:
-        - maxSkew: 1
+        - maxSkew: 2
           topologyKey: kubernetes.io/hostname
           whenUnsatisfiable: DoNotSchedule
           labelSelector:
