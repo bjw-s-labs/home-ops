@@ -146,7 +146,7 @@ spec:
 
     resources:
       requests:
-        cpu: 10000m
+        cpu: 35m
         memory: 1500Mi
         # gpu.intel.com/i915: 1
       limits:
@@ -157,11 +157,17 @@ spec:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
           nodeSelectorTerms:
+            # - matchExpressions:
+            #     - key: feature.node.kubernetes.io/custom-intel-gpu
+            #       operator: In
+            #       values:
+            #         - "true"
             - matchExpressions:
-                - key: feature.node.kubernetes.io/custom-intel-gpu
+                - key: kubernetes.io/hostname
                   operator: In
                   values:
-                    - "true"
+                    - "work1"
+
 
     probes:
       # -- Liveness probe configuration
