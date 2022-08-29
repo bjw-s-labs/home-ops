@@ -148,25 +148,25 @@ spec:
       requests:
         cpu: 35m
         memory: 1500Mi
-        # gpu.intel.com/i915: 1
+        gpu.intel.com/i915: 1
       limits:
-        # gpu.intel.com/i915: 1
+        gpu.intel.com/i915: 1
         memory: 8000Mi
 
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
           nodeSelectorTerms:
-            # - matchExpressions:
-            #     - key: feature.node.kubernetes.io/custom-intel-gpu
-            #       operator: In
-            #       values:
-            #         - "true"
             - matchExpressions:
-                - key: kubernetes.io/hostname
+                - key: feature.node.kubernetes.io/custom-intel-gpu
                   operator: In
                   values:
-                    - "work1"
+                    - "true"
+            # - matchExpressions:
+            #     - key: kubernetes.io/hostname
+            #       operator: In
+            #       values:
+            #         - "work1"
 
 
     probes:
