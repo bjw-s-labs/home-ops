@@ -3,6 +3,7 @@ resource "vyos_config_block_tree" "interface-wan" {
   configs = {
     "address"     = "dhcp"
     "description" = "WAN"
+    "hw-id"       = "00:f4:21:68:3e:9c"
   }
 }
 
@@ -11,6 +12,7 @@ resource "vyos_config_block_tree" "interface-lan" {
   configs = {
     "address"     = "${cidrhost(var.networks.lan, 1)}/24"
     "description" = "LAN"
+    "hw-id"       = "00:f4:21:68:3e:9d"
 
     "vif 10 description" = "SERVERS"
     "vif 10 address"     = "${cidrhost(var.networks.servers, 1)}/24"
@@ -30,5 +32,6 @@ resource "vyos_config_block_tree" "interface-rescue" {
   configs = {
     "address"     = "${cidrhost(var.networks.rescue, 1)}/24"
     "description" = "RESCUE"
+    "hw-id"       = "00:f4:21:68:3e:9e"
   }
 }
