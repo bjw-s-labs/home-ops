@@ -51,9 +51,9 @@ backend k8s_controlplane
     mode tcp
     option ssl-hello-chk
     balance     roundrobin
-        server master1 master1.cluster-0.${domains.hardware}:6443 check
-        server master2 master2.cluster-0.${domains.hardware}:6443 check
-        server master3 master3.cluster-0.${domains.hardware}:6443 check
+        server worker1 worker1.cluster-0.${domains.hardware}:6443 check
+        server worker2 worker2.cluster-0.${domains.hardware}:6443 check
+        server worker3 worker3.cluster-0.${domains.hardware}:6443 check
 
 backend talos_controlplane
     option httpchk GET /healthz
@@ -61,6 +61,6 @@ backend talos_controlplane
     mode tcp
     option ssl-hello-chk
     balance     roundrobin
-        server master1 master1.cluster-0.${domains.hardware}:50000 check
-        server master2 master2.cluster-0.${domains.hardware}:50000 check
-        server master3 master3.cluster-0.${domains.hardware}:50000 check
+        server worker1 worker1.cluster-0.${domains.hardware}:50000 check
+        server worker2 worker2.cluster-0.${domains.hardware}:50000 check
+        server worker3 worker3.cluster-0.${domains.hardware}:50000 check

@@ -9,20 +9,21 @@ cniConfig:
   name: none
 
 nodes:
-  - hostname: anvil.${domainName}
-    controlPlane: true
-    ipAddress: 10.1.1.21
-    installDisk: /dev/sda
-  - hostname: blitz.${domainName}
-    ipAddress: 10.1.1.22
-    installDisk: /dev/sda
-    controlPlane: true
-  - hostname: cannon.${domainName}
-    ipAddress: 10.1.1.23
-    installDisk: /dev/sda
-    controlPlane: true
+  # - hostname: anvil.${domainName}
+  #   controlPlane: true
+  #   ipAddress: 10.1.1.21
+  #   installDisk: /dev/sda
+  # - hostname: blitz.${domainName}
+  #   ipAddress: 10.1.1.22
+  #   installDisk: /dev/sda
+  #   controlPlane: true
+  # - hostname: cannon.${domainName}
+  #   ipAddress: 10.1.1.23
+  #   installDisk: /dev/sda
+  #   controlPlane: true
   - hostname: delta.${domainName}
     ipAddress: 10.1.1.31
+    controlPlane: true
     installDisk: /dev/sda
     networkInterfaces:
       - interface: eth0
@@ -34,6 +35,7 @@ nodes:
               - 10.1.3.141/24
   - hostname: enigma.${domainName}
     ipAddress: 10.1.1.32
+    controlPlane: true
     installDisk: /dev/sda
     networkInterfaces:
       - interface: eth0
@@ -45,6 +47,7 @@ nodes:
               - 10.1.3.142/24
   - hostname: felix.${domainName}
     ipAddress: 10.1.1.33
+    controlPlane: true
     installDisk: /dev/sda
     networkInterfaces:
       - interface: eth0
@@ -62,6 +65,7 @@ controlPlane:
       aggregatorCA:
         crt: ${k8sAggregatorCert}
         key: ${k8sAggregatorCertKey}
+      allowSchedulingOnMasters: true
       apiServer:
         admissionControl: []
         certSANs:
