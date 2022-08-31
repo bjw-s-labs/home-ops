@@ -9,18 +9,6 @@ cniConfig:
   name: none
 
 nodes:
-  # - hostname: anvil.${domainName}
-  #   controlPlane: true
-  #   ipAddress: 10.1.1.21
-  #   installDisk: /dev/sda
-  # - hostname: blitz.${domainName}
-  #   ipAddress: 10.1.1.22
-  #   installDisk: /dev/sda
-  #   controlPlane: true
-  # - hostname: cannon.${domainName}
-  #   ipAddress: 10.1.1.23
-  #   installDisk: /dev/sda
-  #   controlPlane: true
   - hostname: delta.${domainName}
     ipAddress: 10.1.1.31
     controlPlane: true
@@ -131,52 +119,6 @@ controlPlane:
           - ip: ${clusterEndpointIP}
             aliases:
               - cluster-0.${domainName}
-      time:
-        disabled: false
-        servers:
-          - 10.1.1.1
-      token: ${machineToken}
-
-worker:
-  inlinePatch:
-    cluster:
-      aescbcEncryptionSecret: ${aescbcEncryptionKey}
-      ca:
-        crt: ${clusterCert}
-        key: ${clusterCertKey}
-      secret: ${clusterSecret}
-      token: ${clusterToken}
-      discovery:
-        registries:
-          service:
-            disabled: true
-
-    machine:
-      ca:
-        crt: ${machineCert}
-        key: ${machineCertKey}
-      certSANs:
-        - ${clusterEndpointIP}
-        - cluster-0.${domainName}
-      files:
-        - content: |
-            [plugins."io.containerd.grpc.v1.cri"]
-              enable_unprivileged_ports = true
-              enable_unprivileged_icmp = true
-          path: /var/cri/conf.d/allow-unpriv-ports.toml
-          op: create
-      install:
-        extraKernelArgs:
-          - "talos.logging.kernel=udp://10.45.0.2:6050/"
-      logging:
-        destinations:
-          - endpoint: "udp://10.45.0.2:6051/"
-            format: json_lines
-      network:
-        extraHostEntries:
-          - ip: ${clusterEndpointIP}
-            aliases:
-              - cluster-0.${domainName}
       sysctls:
         fs.inotify.max_user_watches: "1048576"
         fs.inotify.max_user_instances: "8192"
@@ -185,7 +127,3 @@ worker:
         servers:
           - 10.1.1.1
       token: ${machineToken}
-      kubelet:
-        extraArgs:
-          rotate-server-certificates: "true"
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
