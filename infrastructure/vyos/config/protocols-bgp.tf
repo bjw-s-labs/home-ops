@@ -3,7 +3,7 @@ resource "vyos_config_block_tree" "protocols-bgp" {
   configs = merge(
     {
       # main setup
-      "local-as"             = var.config.bgp.local_as
+      "system-as"             = var.config.bgp.local_as
       "parameters router-id" = var.config.bgp.router_id
     },
 
