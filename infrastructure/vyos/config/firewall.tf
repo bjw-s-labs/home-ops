@@ -42,7 +42,7 @@ resource "vyos_config_block_tree" "firewall_group_network-group" {
   configs = merge(
     {
       # Cloudflare IPv4
-      "cloudflare-ipv4 network" = jsonencode(jsondecode(data.http.cloudflare_ips.body).result.ipv4_cidrs)
+      "cloudflare-ipv4 network" = jsonencode(jsondecode(data.http.cloudflare_ips.response_body).result.ipv4_cidrs)
     },
 
     # From config
