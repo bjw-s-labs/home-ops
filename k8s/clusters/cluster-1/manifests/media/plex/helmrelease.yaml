@@ -34,7 +34,7 @@ spec:
         - 109 # render
         - 100 # users
         - 1000
-      fsGroupChangePolicy: "OnRootMismatch"
+      # fsGroupChangePolicy: "OnRootMismatch"
 
     env:
       TZ: "${TIMEZONE}"
@@ -106,18 +106,18 @@ spec:
         existingClaim: plex-config
 
       transcode:
-        enabled: false
+        enabled: true
         type: emptyDir
         # medium: Memory
 
       nfs-nas-media:
-        enabled: false
+        enabled: true
         existingClaim: media-nfs-share-pvc
         mountPath: /mnt/unionfs
         readOnly: false
 
       backup:
-        enabled: false
+        enabled: true
         type: custom
         volumeSpec:
           nfs:
@@ -127,7 +127,7 @@ spec:
 
     addons:
       promtail:
-        enabled: false
+        enabled: true
         image:
           repository: grafana/promtail
           tag: 2.6.1
