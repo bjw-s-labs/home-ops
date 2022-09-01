@@ -3,9 +3,9 @@ apiVersion: metal.sidero.dev/v1alpha1
 kind: Server
 metadata:
   labels:
-    control-plane: "true"
-    worker: "false"
-  name: a0356854-fe76-4b00-9530-17dda3fb3c72
+    control-plane: "false"
+    worker: "true"
+  name: ae4af264-39e1-468c-8680-a8133e752ff8
 spec:
   cordoned: false
   accepted: true
@@ -16,7 +16,7 @@ spec:
         size: '<= 200GB'
     - op: add
       path: /machine/network/hostname
-      value: cp4.${CLUSTER_1_HARDWARE_DOMAIN}
+      value: work4.${CLUSTER_1_HARDWARE_DOMAIN}
     - op: add
       path: /machine/network/interfaces
       value:
@@ -28,9 +28,14 @@ spec:
         #     # Home LAN
         #     - vlanId: 2
         #       dhcp: true
+        #       dhcpOptions:
+        #       # Default is 1024
+        #         routeMetric: 2000
         #     # IoT Network
         #     - vlanId: 100
         #       dhcp: true
+        #       dhcpOptions:
+        #         routeMetric: 2000
     - op: add
       path: /machine/network/disableSearchDomain
       value: true
@@ -43,7 +48,7 @@ spec:
   cpu:
     manufacturer: QEMU
     version:  pc-q35-6.2
-  hostname: cp4.${CLUSTER_1_HARDWARE_DOMAIN}
+  hostname: work4.${CLUSTER_1_HARDWARE_DOMAIN}
   pxeBootAlways: true
   system:
     family: Unknown
