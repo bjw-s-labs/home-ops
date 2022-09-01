@@ -5,3 +5,8 @@ namespace: home-automation
 resources:
   - ./helmrelease.yaml
   - ./secret.sops.yaml
+patchesStrategicMerge:
+  - patches/postgres.yaml
+commonLabels:
+  app.kubernetes.io/name: dsmr-reader
+  app.kubernetes.io/instance: dsmr-reader
