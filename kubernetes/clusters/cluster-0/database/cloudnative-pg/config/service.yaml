@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: database
+  annotations:
+    coredns.io/hostname: "postgres.${INGRESS_DOMAIN}"
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  loadBalancerIP: "${SVC_POSTGRES_ADDR}"
+  ports:
+    - name: postgres
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    postgresql: postgres
+    role: primary
