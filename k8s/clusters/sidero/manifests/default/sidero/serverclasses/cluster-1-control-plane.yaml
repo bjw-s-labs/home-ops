@@ -58,16 +58,16 @@ spec:
         bind-address: 0.0.0.0
 
     # need to change vector to run as a daemonset so it can access localhost logs
-    - op: add
-      path: /machine/install/extraKernelArgs
-      value:
-        - talos.logging.kernel=tcp://127.0.0.1:9301
-    - op: add
-      path: /machine/logging
-      value:
-        destinations:
-          - endpoint: tcp://127.0.0.1:9302
-            format: json_lines
+    # - op: add
+    #   path: /machine/install/extraKernelArgs
+    #   value:
+    #     - talos.logging.kernel=tcp://127.0.0.1:9301
+    # - op: add
+    #   path: /machine/logging
+    #   value:
+    #     destinations:
+    #       - endpoint: tcp://127.0.0.1:9302
+    #         format: json_lines
 
     # - op: add
     #   path: /machine/install/extraKernelArgs
@@ -79,7 +79,7 @@ spec:
       value:
         disabled: true
         servers:
-          - time.cloudflare.com
+          - 10.255.253.1
 
     - op: add
       path: /machine/sysctls
