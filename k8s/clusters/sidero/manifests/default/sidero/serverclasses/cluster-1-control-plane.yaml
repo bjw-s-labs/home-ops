@@ -86,10 +86,6 @@ spec:
       value:
         fs.inotify.max_user_watches: "1048576"
         fs.inotify.max_user_instances: "8192"
-    
-    # - op: add
-    #   path: /cluster/allowSchedulingOnMasters
-    #   value: true
 
     - op: replace
       path: /cluster/proxy/disabled
@@ -99,6 +95,9 @@ spec:
       path: /cluster/apiServer/extraArgs
       value:
         feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true,EphemeralContainers=true
+
+    - op: remove
+      path: /cluster/apiServer/admissionControl
 
     - op: add
       path: /cluster/apiServer/certSANs
