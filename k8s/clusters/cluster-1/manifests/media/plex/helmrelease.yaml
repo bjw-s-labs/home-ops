@@ -106,7 +106,7 @@ spec:
         existingClaim: plex-config
 
       transcode:
-        enabled: true
+        enabled: false
         type: emptyDir
         # medium: Memory
 
@@ -117,7 +117,7 @@ spec:
         readOnly: false
 
       backup:
-        enabled: true
+        enabled: false
         type: custom
         volumeSpec:
           nfs:
@@ -127,7 +127,7 @@ spec:
 
     addons:
       promtail:
-        enabled: true
+        enabled: false
         image:
           repository: grafana/promtail
           tag: 2.6.1
