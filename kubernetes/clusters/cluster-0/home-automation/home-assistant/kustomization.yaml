@@ -8,6 +8,8 @@ resources:
   - ./networkattachmentdefinition.yaml
   - ./secret-codeserver.sops.yaml
   - ./secret-home-assistant.sops.yaml
+patchesStrategicMerge:
+  - patches/postgres.yaml
 commonLabels:
   app.kubernetes.io/name: home-assistant
   app.kubernetes.io/instance: home-assistant

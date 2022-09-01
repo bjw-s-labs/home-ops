@@ -1,0 +1,37 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: home-assistant
+  namespace: home-automation
+spec:
+  values:
+    initContainers:
+      init-db:
+        image: ghcr.io/onedr0p/postgres-initdb:14.5@sha256:c2964bfb8cb3d3f8bf27271c6648c95c8c097ae7bdc03796b1504cf6e1411206
+        env:
+          - name: POSTGRES_HOST
+            valueFrom:
+              secretKeyRef:
+                name: home-assistant-secrets
+                key: POSTGRES_HOST
+          - name: POSTGRES_DB
+            valueFrom:
+              secretKeyRef:
+                name: home-assistant-secrets
+                key: POSTGRES_DB
+          - name: POSTGRES_SUPER_PASS
+            valueFrom:
+              secretKeyRef:
+                name: postgres-superuser
+                key: password
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: home-assistant-secrets
+                key: POSTGRES_USER
+          - name: POSTGRES_PASS
+            valueFrom:
+              secretKeyRef:
+                name: home-assistant-secrets
+                key: POSTGRES_PASSWORD
