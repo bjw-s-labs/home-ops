@@ -30,7 +30,10 @@ transforms:
       }
 
       # Extract separate fields from message
-      split_message.fields = strip_whitespace(split_message.fields)
+      split_message.fields, split_err = strip_whitespace(split_message.fields)
+      if split_err != null {
+        abort
+      }
       .message, parse_err = parse_key_value(split_message.fields, whitespace: "strict")
       if parse_err != null {
         abort
