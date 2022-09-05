@@ -39,3 +39,13 @@ subjects:
   - kind: ServiceAccount
     name: home-dns
     namespace: kube-system
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: home-dns-token
+  namespace: kube-system
+  annotations:
+    kubernetes.io/service-account.name: home-dns
+type: kubernetes.io/service-account-token
+
