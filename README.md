@@ -100,7 +100,7 @@ talosctl kubeconfig
 
 ### Bootstrap Sidero
 
-```
+```bash
 # This boostraps a entire sidero setup on your testing cluster.
 # HOST_NETWORK is critical to make it work else it doesnt have access to the ports it needs
 SIDERO_CONTROLLER_MANAGER_HOST_NETWORK=true \
@@ -190,7 +190,7 @@ Update sidero via `clusterctl upgrade plan`
 you may need to reset the `SIDERO_CONTROLLER_MANAGER`... variables again to ensure it retains host-network, else you wont be able to connect to the ipxe again.
 
 ```bash
-> clusterctl upgrade plan
+> clusterctl upgrade plan --kubeconfig-context admin@sidero
 Checking cert-manager version...
 Cert-Manager is already up to date
 
