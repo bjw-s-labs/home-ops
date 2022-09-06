@@ -16,12 +16,16 @@ spec:
           automountServiceAccountToken: false
 
           securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 65541
 
           containers:
             - name: mailbackup-2020
-              image: ghcr.io/k8s-at-home/getmail:v6.18.9@sha256:3d329dcb5bd047920f99d377c56ef99a100014803e2f6c9fd4a00947a9a1993d
+              image: ghcr.io/bjw-s/getmail:6.18.9@sha256:a2842ca827b692b0dcab47426c18a0a155f1daa24468e7a80765941187436d0d
               imagePullPolicy: IfNotPresent
               command:
                 - "/scripts/mailbackup.sh"
