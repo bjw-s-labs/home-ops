@@ -18,8 +18,8 @@ spec:
 
   values:
     image:
-      repository: ghcr.io/k8s-at-home/frigate
-      tag: v0.10.1-amd64
+      repository: docker.io/blakeblackshear/frigate
+      tag: 0.10.1-amd64
 
     envFrom:
       - secretRef:
@@ -32,7 +32,7 @@ spec:
             port: &port 5000
 
     probes:
-      liveness:
+      liveness: &probe
         enabled: true
         custom: true
         spec:
@@ -117,10 +117,6 @@ spec:
           nodeSelectorTerms:
             - matchExpressions:
                 - key: feature.node.kubernetes.io/custom-coral-tpu
-                  operator: In
-                  values:
-                    - "true"
-                - key: feature.node.kubernetes.io/custom-intel-gpu
                   operator: In
                   values:
                     - "true"
