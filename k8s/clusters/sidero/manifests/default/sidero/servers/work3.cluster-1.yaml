@@ -22,20 +22,20 @@ spec:
       value:
         - interface: eth0
           dhcp: true
-        # - interface: eth1
-        #   dhcp: false
-        #   vlans:
-        #     # Home LAN
-        #     - vlanId: 2
-        #       dhcp: true
-        #       dhcpOptions:
-        #       # Default is 1024
-        #         routeMetric: 2000
-        #     # IoT Network
-        #     - vlanId: 100
-        #       dhcp: true
-        #       dhcpOptions:
-        #         routeMetric: 2000
+        - interface: eth1
+          dhcp: false
+          vlans:
+            # Home LAN
+            - vlanId: 2
+              dhcp: true
+              dhcpOptions:
+              # Default is 1024
+                routeMetric: 2002
+            # IoT Network
+            - vlanId: 100
+              dhcp: true
+              dhcpOptions:
+                routeMetric: 2100
     - op: add
       path: /machine/network/disableSearchDomain
       value: true
