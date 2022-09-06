@@ -100,12 +100,26 @@ metadata:
   labels:
     component.cluster-0/part-of: definitions
 spec:
-  path: "./kubernetes/clusters/cluster-0/home-automation/home-assistant"
+  path: "./kubernetes/clusters/cluster-0/home-automation/home-assistant/app"
   prune: true
   dependsOn:
     - name: home-automation-namespace
     - name: network-multus
     - name: database-cloudnative-pg-config
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: home-automation-home-assistant-code-server
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/home-automation/home-assistant/code-server"
+  prune: true
+  dependsOn:
+    - name: home-automation-namespace
+    - name: home-automation-home-assistant
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
