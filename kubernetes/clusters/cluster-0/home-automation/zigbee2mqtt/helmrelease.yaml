@@ -23,33 +23,12 @@ spec:
 
     env:
       ZIGBEE2MQTT_DATA: /data
-      ZIGBEE2MQTT_CONFIG_AVAILABILITY: "true"
-      ZIGBEE2MQTT_CONFIG_ADVANCED_LEGACY_API: "false"
-      ZIGBEE2MQTT_CONFIG_ADVANCED_LEGACY_AVAILABILITY_PAYLOAD: "false"
-      ZIGBEE2MQTT_CONFIG_FRONTEND_PORT: &port "8080"
-      ZIGBEE2MQTT_CONFIG_FRONTEND_URL: https://zigbee2mqtt.${INGRESS_DOMAIN}
-      ZIGBEE2MQTT_CONFIG_MQTT_SERVER: "mqtt://mosquitto.home-automation.svc.cluster.local"
-      ZIGBEE2MQTT_CONFIG_MQTT_USER:
-        valueFrom:
-          secretKeyRef:
-            name: zigbee2mqtt
-            key: mqtt_user
-      ZIGBEE2MQTT_CONFIG_MQTT_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: zigbee2mqtt
-            key: mqtt_password
-      ZIGBEE2MQTT_CONFIG_SERIAL_PORT:
-        valueFrom:
-          secretKeyRef:
-            name: zigbee2mqtt
-            key: zigbee_adapter_port
 
     service:
       main:
         ports:
           http:
-            port: *port
+            port: 8080
 
     ingress:
       main:
