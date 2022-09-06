@@ -17,8 +17,8 @@ spec:
   interval: 15m
   values:
     image:
-      repository: ghcr.io/k8s-at-home/plex
-      tag: v1.28.2.6151-914ddd2b3@sha256:0ee8a1a30f2f4dc1c5b2d7277dd409cd8cb1891c3a35df3f627c289a8cf4f236
+      repository: ghcr.io/onedr0p/plex
+      tag: 1.28.2.6151-914ddd2b3@sha256:0b1c10bda8403bb984eb8ae77ec19dd5abdaacc57e2ec42be4316f9dafec6977
 
     affinity:
       nodeAffinity:
@@ -48,10 +48,15 @@ spec:
       main:
         enabled: true
         annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns.alpha.kubernetes.io/target: ingress.${PERSONAL_DOMAIN}
           external-dns.home.arpa/enabled: "true"
           nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            location = / {
+              if ($http_x_plex_device = ""){
+                return 301 $scheme://$host/web/index.html;
+              }
+            }
         ingressClassName: nginx
         hosts:
           - host: &host plex.${PERSONAL_DOMAIN}
@@ -78,6 +83,10 @@ spec:
         type: emptyDir
 
     podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: "OnRootMismatch"
       supplementalGroups:
         - 44
         - 109
