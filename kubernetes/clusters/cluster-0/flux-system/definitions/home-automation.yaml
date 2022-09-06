@@ -81,6 +81,20 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
+  name: home-automation-zigbee2mqtt-exporter
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/home-automation/zigbee2mqtt-exporter"
+  prune: true
+  dependsOn:
+    - name: home-automation-namespace
+    - name: home-automation-zigbee2mqtt
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
   name: home-automation-home-assistant
   namespace: flux-system
   labels:
