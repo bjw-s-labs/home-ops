@@ -18,3 +18,8 @@ tasks:
     cmds:
       - kubectl get hr --all-namespaces | grep False | awk '{print $2, $1}' | xargs -l bash -c 'flux suspend hr $0 -n $1'
       - kubectl get hr --all-namespaces | grep False | awk '{print $2, $1}' | xargs -l bash -c 'flux resume hr $0 -n $1'
+
+  fu:
+    desc: Force reconcile of the git repo because I am impatient
+    cmds:
+      - flux reconcile source git home-ops --context admin@cluster-1
