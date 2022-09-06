@@ -21,57 +21,35 @@ spec:
       repository: docker.io/koenkk/zigbee2mqtt
       tag: 1.27.2
 
-    config:
-      mqtt:
-        base_topic: zigbee2mqtt
-        server: "mqtt://mosquitto.home-automation.svc.cluster.local"
-        # user: set by valuesFrom
-        # password: set by valuesFrom
-
-      homeassistant: true
-
-      device_options:
-        retain: true
-
-      permit_join: false
-
-      # serial:
-      #   port: set by valuesFrom (tcp://<ip>:6638)
-
-      advanced:
-        log_output:
-          - console
-        network_key:
-          - 95
-          - 127
-          - 73
-          - 119
-          - 59
-          - 169
-          - 49
-          - 50
-          - 96
-          - 72
-          - 42
-          - 246
-          - 182
-          - 104
-          - 11
-          - 41
-        pan_id: 6752
-
-      # Both of these need to be enabled for the webui
-      frontend:
-        port: 8080
-
     env:
       ZIGBEE2MQTT_DATA: /data
+      ZIGBEE2MQTT_CONFIG_AVAILABILITY: "true"
+      ZIGBEE2MQTT_CONFIG_ADVANCED_LEGACY_API: "false"
+      ZIGBEE2MQTT_CONFIG_ADVANCED_LEGACY_AVAILABILITY_PAYLOAD: "false"
+      ZIGBEE2MQTT_CONFIG_FRONTEND_PORT: &port "8080"
+      ZIGBEE2MQTT_CONFIG_FRONTEND_URL: https://zigbee2mqtt.${INGRESS_DOMAIN}
+      ZIGBEE2MQTT_CONFIG_MQTT_SERVER: "mqtt://mosquitto.home-automation.svc.cluster.local"
+      ZIGBEE2MQTT_CONFIG_MQTT_USER:
+        valueFrom:
+          secretKeyRef:
+            name: zigbee2mqtt
+            key: mqtt_user
+      ZIGBEE2MQTT_CONFIG_MQTT_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: zigbee2mqtt
+            key: mqtt_password
+      ZIGBEE2MQTT_CONFIG_SERIAL_PORT:
+        valueFrom:
+          secretKeyRef:
+            name: zigbee2mqtt
+            key: zigbee_adapter_port
 
     service:
       main:
         ports:
           http:
-            port: 8080
+            port: *port
 
     ingress:
       main:
@@ -97,20 +75,3 @@ spec:
         memory: 127M
       limits:
         memory: 1364M
-
-  valuesFrom:
-    - kind: Secret
-      name: zigbee2mqtt
-      valuesKey: mqtt_user
-      targetPath: config.mqtt.user
-      optional: false
-    - kind: Secret
-      name: zigbee2mqtt
-      valuesKey: mqtt_password
-      targetPath: config.mqtt.password
-      optional: false
-    - kind: Secret
-      name: zigbee2mqtt
-      valuesKey: zigbee_adapter_port
-      targetPath: config.serial.port
-      optional: false
