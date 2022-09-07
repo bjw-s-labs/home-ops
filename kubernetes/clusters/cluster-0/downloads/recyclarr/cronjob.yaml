@@ -15,6 +15,11 @@ spec:
         spec:
           automountServiceAccountToken: false
 
+          dnsConfig:
+            options:
+              - name: ndots
+                value: "1"
+
           initContainers:
             - name: render-config
               image: ghcr.io/onedr0p/recyclarr:2.4.1@sha256:a44a40fcb927f1f6da25998e020ba14b5b992cc7ef12b1e61b9d07d998630ce9
