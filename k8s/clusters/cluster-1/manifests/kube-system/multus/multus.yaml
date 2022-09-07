@@ -99,6 +99,15 @@ metadata:
   name: multus
   namespace: kube-system
 ---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/service-account-token
+metadata:
+  name: multus
+  namespace: kube-system
+  annotations:
+    kubernetes.io/service-account.name: "multus"
+---
 kind: ConfigMap
 apiVersion: v1
 metadata:
