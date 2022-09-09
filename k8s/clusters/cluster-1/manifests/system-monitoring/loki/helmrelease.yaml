@@ -51,9 +51,9 @@ spec:
           paths:
             - /
       tls:
-        - hosts:
+        - secretName: loki-${CLUSTER_NAME}-tls
+          hosts:
             - *host
-            # secretName: loki-${CLUSTER_NAME}-tls
 
     persistence:
       enabled: false
