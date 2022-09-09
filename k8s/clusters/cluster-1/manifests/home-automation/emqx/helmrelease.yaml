@@ -49,21 +49,26 @@ spec:
         path: /
         pathType: Prefix
         hosts:
-          - host: &host-cluster "emqx.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-          - host: &host "mqtt.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-          - host: &mqtt-cluster "mqtt.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
+          - &host "emqx.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
         tls:
-          - secretName: tls.lidarr
-            hosts:
-              - *host-cluster
+          - hosts:
               - *host
-              - *mqtt-cluster
+        # hosts:
+        #   - host: &host-cluster "emqx.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+        #     paths:
+        #       - path: /
+        #   - host: &host "mqtt.${INGRESS_DOMAIN}"
+        #     paths:
+        #       - path: /
+        #   - host: &mqtt-cluster "mqtt.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+        #     paths:
+        #       - path: /
+        # tls:
+        #   - secretName: tls.lidarr
+        #     hosts:
+        #       - *host-cluster
+        #       - *host
+        #       - *mqtt-cluster
 
     metrics:
       enabled: false
