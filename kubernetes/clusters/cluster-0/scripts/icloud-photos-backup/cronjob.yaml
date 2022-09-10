@@ -1,0 +1,98 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: icloud-photos-backup
+  namespace: scripts
+spec:
+  schedule: "0 3 30 * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          automountServiceAccountToken: false
+
+          securityContext:
+            runAsUser: 1031
+            runAsGroup: 100
+            fsGroup: 2000
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 65541
+
+          containers:
+            - name: icloud-bernd
+              image: icloudpd/icloudpd:1.7.2
+              imagePullPolicy: IfNotPresent
+              command:
+                - icloudpd
+              args:
+                - --directory
+                - /data
+                - --cookie-directory
+                - /cookies
+                - --folder-structure
+                - "{:%Y/%Y-%m}"
+                - --size
+                - original
+                - --auto-delete
+                - --username
+                - "$(ICLOUD_USERNAME)"
+                - --password
+                - "$(ICLOUD_PASSWORD)"
+                - --smtp-host
+                - "$(SMTP_HOST)"
+                - --smtp-port
+                - "587"
+                - --smtp-username
+                - "$(SMTP_USERNAME)"
+                - --smtp-password
+                - "$(SMTP_PASSWORD)"
+                - --notification-email
+                - ${EMAIL_1}
+              env:
+                - name: ICLOUD_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: icloud-photos-backup-secrets
+                      key: bernd_icloud_user
+                - name: ICLOUD_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: icloud-photos-backup-secrets
+                      key: bernd_icloud_pass
+                - name: SMTP_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: icloud-photos-backup-secrets
+                      key: smtp_server
+                - name: SMTP_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: icloud-photos-backup-secrets
+                      key: smtp_user
+                - name: SMTP_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: icloud-photos-backup-secrets
+                      key: smtp_password
+
+              volumeMounts:
+                - mountPath: /cookies
+                  name: cookies
+                  subPath: bernd
+                - mountPath: /data
+                  name: nas-backup-icloud-photos
+                  subPath: Bernd
+
+          restartPolicy: OnFailure
+
+          volumes:
+            - name: cookies
+              persistentVolumeClaim:
+                claimName: icloud-photos-backup-cookies
+            - name: nas-backup-icloud-photos
+              nfs:
+                server: "${NAS_ADDRESS}"
+                path: /volume1/Backup/Photos/iCloud
