@@ -9,27 +9,32 @@ spec:
   chart:
     spec:
       chart: metallb
-      version: 0.12.1
+      version: 0.13.5
       sourceRef:
         kind: HelmRepository
         name: metallb-charts
         namespace: flux-system
-      interval: 5m
+      interval: 10m
+  test:
+    enable: false # Enable helm test
+  install:
+    createNamespace: true
+    remediation: # perform remediation when helm install fails
+      retries: 3
+  upgrade:
+    remediation: # perform remediation when helm upgrade fails
+      retries: 3
+      remediateLastFailure: true # remediate the last failure, when no retries remain
+    cleanupOnFail: true
+  rollback:
+    timeout: 10m
+    recreate: true
+    cleanupOnFail: true
   values:
-    existingConfigMap: "metallb-config"
-    prometheus:
-      podMonitor:
-        enabled: false
-      prometheusRule:
-        enabled: false
+    controller:
+      logLevel: debug
     speaker:
-      tolerations:
-        - effect: "NoExecute"
-          operator: "Exists"
-        - effect: "NoSchedule"
-          operator: "Exists"
+      tolerateMaster: true
+      logLevel: debug
       frr:
         enabled: true
-        image:
-          repository: docker.io/frrouting/frr
-          tag: v8.3.1
