@@ -35,8 +35,19 @@ spec:
         readOnly: false
 
     service:
+      main:
+        ports:
+          http:
+            port: 8080
       webserver:
         enabled: true
+        type: ClusterIP
+        ports:
+          webserver:
+            enabled: true
+            port: 8081
+            protocol: TCP
+            targetPort: 8081
 
     ingress:
       main:
