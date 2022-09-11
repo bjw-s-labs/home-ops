@@ -10,19 +10,19 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: plex
-      version: 6.4.3
+      chart: app-template
+      version: 0.1.1
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s
         namespace: flux-system
-      interval: 5m
+      interval: 15m
   values:
     image:
       # repository: plexinc/pms-docker
       # tag: plexpass
-      repository: ghcr.io/k8s-at-home/plex
-      tag: v1.28.2.6151-914ddd2b3
+      repository: ghcr.io/onedr0p/plex
+      tag: 1.28.2.6151-914ddd2b3@sha256:0b1c10bda8403bb984eb8ae77ec19dd5abdaacc57e2ec42be4316f9dafec6977
 
     podSecurityContext:
       runAsUser: 568
