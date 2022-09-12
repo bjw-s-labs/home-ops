@@ -37,10 +37,10 @@ spec:
     policy: sync
     sources:
       - ingress
-    txtPrefix: "k8s."
+    txtPrefix: "${CLUSTER_NAME}"
     txtOwnerId: "default"
     domainFilters:
-      - "${SECRET_PUBLIC_DOMAIN}"
+      - "${INGRESS_DOMAIN}"
     serviceMonitor:
       enabled: true
     resources:
