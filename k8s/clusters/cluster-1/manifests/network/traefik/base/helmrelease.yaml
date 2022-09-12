@@ -71,6 +71,9 @@ spec:
       # - "--entryPoints.web.forwardedHeaders.insecure=true"
       - "--entryPoints.websecure.proxyProtocol.insecure"
       - "--entryPoints.websecure.proxyProtocol.trustedIPs=10.0.0.0/8"
+      - "--entrypoints.websecure.transport.respondingtimeouts.idletimeout=600"
+      - "--serverstransport.forwardingtimeouts.dialtimeout=600"
+      - "--serverstransport.forwardingtimeouts.idleconntimeout=600"
       # Add plugin/dynamic file provider for theme-park
       - "--experimental.plugins.rewritebody.modulename=github.com/packruler/rewrite-body"
       - "--experimental.plugins.rewritebody.version=v0.5.1"
