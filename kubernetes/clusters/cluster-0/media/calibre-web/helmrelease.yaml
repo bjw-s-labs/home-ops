@@ -17,13 +17,18 @@ spec:
   interval: 15m
   values:
     image:
-      repository: ghcr.io/linuxserver/calibre-web
-      tag: version-0.6.19
+      repository: ghcr.io/bjw-s/calibre-web
+      tag: 0.6.19@sha256:8b4913f8a28789ea9c30c6383b93b2a0e69162300b43bf32f20274d6df3dd321
 
-    env:
-      DOCKER_MODS: ghcr.io/linuxserver/mods:universal-calibre
-      PGID: "65539"
-      PUID: "1001"
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: "OnRootMismatch"
+      supplementalGroups:
+        - 65539
+
+    enableServiceLinks: false
 
     service:
       main:
