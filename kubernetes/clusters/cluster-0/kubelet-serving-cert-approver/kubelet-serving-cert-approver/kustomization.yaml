@@ -4,3 +4,15 @@ kind: Kustomization
 namespace: kubelet-serving-cert-approver
 resources:
   - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/v0.6.1/deploy/ha-install.yaml
+patchesJSON6902:
+  - target:
+      version: v1
+      kind: Namespace
+      name: kubelet-serving-cert-approver
+    patch: |-
+      - op: remove
+        path: /metadata/labels/pod-security.kubernetes.io~1audit
+      - op: remove
+        path: /metadata/labels/pod-security.kubernetes.io~1enforce
+      - op: remove
+        path: /metadata/labels/pod-security.kubernetes.io~1warn
