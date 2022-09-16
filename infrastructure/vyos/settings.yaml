@@ -383,6 +383,18 @@ config:
 
     wg_trusted:
       interface: wg01
+      port: 51820
+      private_key: ${secrets.wireguard.private_key}
+      peers:
+        ipad-bernd:
+          ipv4_hostid: 4
+          public_key: EYuUoDoCIcSYbnjNyPSsZUcz4Yp032AHWflYlH2V1EM=
+        iphone-bernd:
+          ipv4_hostid: 2
+          public_key: 608IT2YRPTCabLMGnpYfIWhgDnEpLV5IIpYi5J7m3As=
+        macbook-bernd:
+          ipv4_hostid: 3
+          public_key: iWKTc88fDBhqlsAgoCXYvkBdf9wG4YBZ8XTg/+0Ln2I=
       firewall:
         default:
           default: drop

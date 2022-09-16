@@ -35,3 +35,22 @@ resource "vyos_config_block_tree" "interface-rescue" {
     "hw-id"       = "00:f4:21:68:3e:9e"
   }
 }
+
+resource "vyos_config_block_tree" "interface-wireguard" {
+  path = "interfaces wireguard ${var.config.zones.wg_trusted.interface}"
+  configs = merge(
+    {
+      "address"     = "${cidrhost(var.networks.wg_trusted, 1)}/24"
+      "description" = "WIREGUARD"
+      "port"        = "${var.config.zones.wg_trusted.port}"
+      "private-key" = "${var.config.zones.wg_trusted.private_key}"
+    },
+
+    merge(flatten([
+      for peer, peer_config in var.config.zones.wg_trusted.peers : {
+        "peer ${peer} allowed-ips" = "${cidrhost(var.networks.wg_trusted, peer_config.ipv4_hostid)}/32"
+        "peer ${peer} public-key"  = "${peer_config.public_key}"
+      }
+    ])...),
+  )
+}
