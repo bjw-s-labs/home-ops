@@ -26,6 +26,7 @@ spec:
       PAPERLESS_CONSUMER_POLLING: "60"
       PAPERLESS_CONSUMER_RECURSIVE: "true"
       PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
+      PAPERLESS_ENABLE_HTTP_REMOTE_USER: "true"
       PAPERLESS_OCR_LANGUAGES: nld
       PAPERLESS_OCR_LANGUAGE: nld
       PAPERLESS_PORT: 8000
@@ -49,6 +50,8 @@ spec:
       main:
         enabled: true
         ingressClassName: "nginx"
+        annotations:
+          auth.home.arpa/enabled: "true"
         hosts:
           - host: &host "paperless.${INGRESS_DOMAIN}"
             paths:
