@@ -88,6 +88,70 @@ spec:
                   name: nas-backup-icloud-photos
                   subPath: Bernd
 
+            - name: icloud-manyie
+              image: icloudpd/icloudpd:1.7.2@sha256:bd40d79f9646ab6bc76f6a1cb075deb0564100e9e0d1d54ff04656ac3917a468
+              imagePullPolicy: IfNotPresent
+              command:
+                - icloudpd
+              args:
+                - --directory
+                - /data
+                - --cookie-directory
+                - /cookies
+                - --folder-structure
+                - "{:%Y/%Y-%m}"
+                - --size
+                - original
+                - --auto-delete
+                - --username
+                - "$(ICLOUD_USERNAME)"
+                - --password
+                - "$(ICLOUD_PASSWORD)"
+                - --smtp-host
+                - "$(SMTP_HOST)"
+                - --smtp-port
+                - "587"
+                - --smtp-username
+                - "$(SMTP_USERNAME)"
+                - --smtp-password
+                - "$(SMTP_PASSWORD)"
+                - --notification-email
+                - ${EMAIL_1}
+              env:
+                - name: ICLOUD_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: icloud-photos-backup-secrets
+                      key: manyie_icloud_user
+                - name: ICLOUD_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: icloud-photos-backup-secrets
+                      key: manyie_icloud_pass
+                - name: SMTP_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: icloud-photos-backup-secrets
+                      key: smtp_server
+                - name: SMTP_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: icloud-photos-backup-secrets
+                      key: smtp_user
+                - name: SMTP_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: icloud-photos-backup-secrets
+                      key: smtp_password
+
+              volumeMounts:
+                - mountPath: /cookies
+                  name: cookies
+                  subPath: man-yie
+                - mountPath: /data
+                  name: nas-backup-icloud-photos
+                  subPath: Man-Yie
+
           restartPolicy: OnFailure
 
           volumes:
