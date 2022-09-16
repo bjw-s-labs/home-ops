@@ -1,0 +1,14 @@
+---
+- name: Restart node-exporter
+  ansible.builtin.systemd:
+    name: node-exporter.service
+    state: restarted
+    enabled: true
+    daemon_reload: true
+
+- name: Restart vector
+  ansible.builtin.systemd:
+    name: vector.service
+    state: restarted
+    enabled: true
+    daemon_reload: true
