@@ -32,7 +32,7 @@
   block:
     - name: Create node-exporter systemd file
       ansible.builtin.template:
-        src: node-exporter/node-exporter.service.j2
+        src: node-exporter.service.j2
         dest: /etc/systemd/system/node-exporter.service
         mode: 0644
   notify: Restart node-exporter

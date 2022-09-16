@@ -1,0 +1,27 @@
+---
+# renovate: datasource=github-releases depName=mKeRix/room-assistant
+room_assistant_version: "2.20.0"
+
+room_assistant_config:
+  global:
+    instanceName: "{{ room_assistant.instanceName }}"
+    integrations:
+      - homeAssistant
+      - bluetoothLowEnergy
+
+  homeAssistant:
+    mqttUrl: "mqtt://{{ mqtt.host }}:{{ mqtt.port | default(1883) }}"
+    mqttOptions:
+      username: "{{ mqtt.user }}"
+      password: "{{ mqtt.password }}"
+
+  bluetoothLowEnergy:
+    timeout: 60
+    allowlist:
+      - "81964F0A-D800-4518-87C8-1471EB740F2C"
+      - "946813D9-AEA0-4CC8-B665-67BDFDC6F839"
+    tagOverrides:
+      "81964F0A-D800-4518-87C8-1471EB740F2C":
+        name: iPhone Bernd
+      "946813D9-AEA0-4CC8-B665-67BDFDC6F839":
+        name: iPhone ManYie
