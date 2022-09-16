@@ -21,17 +21,6 @@
   },
   "regexManagers": [
     {
-      "description": ["Process various dependencies"],
-      "fileMatch": [
-        "infrastructure/.+\\.ya?ml$",
-        "kubernetes/.+\\.ya?ml$"
-      ],
-      "matchStrings": [
-        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*=?))?\n.*: (?<currentValue>.*=?)",
-      ],
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
-    },
-    {
       "description": ["Process CRD dependencies - Chart and Github Release are the same version"],
       "fileMatch": ["kubernetes/.+\\.ya?ml$"],
       "matchStrings": [
