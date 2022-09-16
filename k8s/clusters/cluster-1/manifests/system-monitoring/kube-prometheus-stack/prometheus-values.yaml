@@ -10,23 +10,43 @@ prometheus:
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
       traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
     hosts:
-      - prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+      - &host-prometheus prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}
     tls:
       - secretName: prometheus-${CLUSTER_NAME}-tls
         hosts:
-          - prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+          - *host-prometheus
 
   thanosService:
     enabled: true
+  thanosServiceMonitor:
+    enabled: true
+  thanosIngress:
+    enabled: true
+    pathType: Prefix
+    ingressClassName: "traefik"
+    annotations:
+      kubernetes.io/ingress.class: traefik
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
+    hosts:
+      - &host "thanos-sidecar.${CLUSTER_NAME}.${SECRET_PUBLIC_DOMAIN}"
+    tls:
+      - hosts:
+          - *host
 
   prometheusSpec:
-    replicas: 2
-    replicaExternalLabelName: "replica"
+    replicas: 3
+    replicaExternalLabelName: "__replica__"
+    externalLabels:
+      cluster: ${CLUSTER_NAME}
     ruleSelectorNilUsesHelmValues: false
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
     probeSelectorNilUsesHelmValues: false
     retention: 6h
+    retentionSize: 7GB
     enableAdminAPI: true
     walCompression: true
     storageSpec:
@@ -43,13 +63,21 @@ prometheus:
         memory: 4096Mi
 
     thanos:
-      image: quay.io/thanos/thanos:v0.23.1
-      version: v0.22.0
+      image: quay.io/thanos/thanos:v0.28.0
+      # renovate: datasource=docker depName=quay.io/thanos/thanos
+      version: "v0.28.0"
       objectStorageConfig:
         name: thanos-objstore-secret
         key: objstore.yml
 
     additionalScrapeConfigs:
+        - job_name: coredns
+          scrape_interval: 1m
+          scrape_timeout: 10s
+          honor_timestamps: true
+          static_configs:
+            - targets:
+                - "vyos.${INGRESS_DOMAIN}:9153"
         - job_name: node-exporter
           scrape_interval: 1m
           scrape_timeout: 10s

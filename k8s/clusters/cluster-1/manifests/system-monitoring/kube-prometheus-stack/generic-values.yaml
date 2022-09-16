@@ -8,7 +8,7 @@ kubeApiServer:
   enabled: true
 
 kubeControllerManager:
-  enabled: false
+  enabled: true
   endpoints:
     - 10.200.1.109                    # cp1
     - 10.200.1.108                    # cp2
@@ -41,7 +41,7 @@ kubelet:
 # Disabled since kubeProxy is disabled in my talos config. 
 # I think due to me using HAProxy externally
 kubeProxy:
-  enabled: false
+  enabled: true
   endpoints:
     - 10.200.1.109                    # cp1
     - 10.200.1.108                    # cp2
@@ -49,7 +49,7 @@ kubeProxy:
 
 # Need to add port info, helm chart complains about 
 kubeScheduler:
-  enabled: false
+  enabled: true
   endpoints:
     - 10.200.1.109                    # cp1
     - 10.200.1.108                    # cp2
