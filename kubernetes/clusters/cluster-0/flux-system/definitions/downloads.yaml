@@ -54,6 +54,19 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
+  name: downloads-sabnzbd
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  path: "./kubernetes/clusters/cluster-0/downloads/sabnzbd"
+  prune: true
+  dependsOn:
+    - name: downloads-namespace
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
   name: downloads-radarr
   namespace: flux-system
   labels:
