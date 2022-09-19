@@ -44,9 +44,21 @@ spec:
 
     service:
       main:
+        type: LoadBalancer
+        annotations:
+          traefik.ingress.kubernetes.io/service.serversscheme: https
+        loadBalancerIP: ${LB_HYPERHDR}
         ports:
           http:
             port: 8090
+      unknown1:
+        ports:
+          http:
+            port: 19444
+      unknown2:
+        ports:
+          http:
+            port: 19445
 
     probes:
       liveness:
