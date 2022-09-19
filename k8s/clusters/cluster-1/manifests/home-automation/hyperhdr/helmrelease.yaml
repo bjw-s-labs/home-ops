@@ -30,14 +30,14 @@ spec:
       repository:  ghcr.io/dcplaya/hyperhdr
       tag: "v18.0.0.0"
 
-    # podSecurityContext:
-    #   runAsUser: 568
-    #   runAsGroup: 100
-    #   fsGroup: 568
-    #   supplementalGroups:
-    #     - 34
-    #     - 100
-    #   fsGroupChangePolicy: "OnRootMismatch"
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 100
+      fsGroup: 568
+      supplementalGroups:
+        - 34
+        - 100
+      fsGroupChangePolicy: "OnRootMismatch"
 
     env:
       TZ: "${TIMEZONE}"
