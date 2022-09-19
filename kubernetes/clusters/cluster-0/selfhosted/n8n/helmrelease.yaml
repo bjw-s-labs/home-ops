@@ -1,0 +1,56 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: n8n
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 0.2.1
+      interval: 15m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    image:
+      repository: docker.io/n8nio/n8n
+      tag: 0.194.0
+
+    env:
+      GENERIC_TIMEZONE: "Europe/Amsterdam"
+      N8N_PORT: &port 5678
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        hosts:
+          - host: &host "n8n.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: n8n-config
+        mountPath: /home/node/.n8n
+
+    resources:
+      requests:
+        cpu: 20m
+        memory: 128M
+      limits:
+        memory: 512M
