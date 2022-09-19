@@ -167,7 +167,7 @@ sudo reboot
 
 ```
 talosctl upgrade --nodes sidero.FQDN.com --context sidero \
---image ghcr.io/siderolabs/installer:v1.1.0 \
+--image ghcr.io/siderolabs/installer:v1.2.1 \
 --preserve=true
 ```
 ## Workload Cluster
