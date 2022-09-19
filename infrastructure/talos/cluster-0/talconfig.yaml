@@ -49,10 +49,6 @@ nodes:
 controlPlane:
   inlinePatch:
     cluster:
-      aescbcEncryptionSecret: ${aescbcEncryptionKey}
-      aggregatorCA:
-        crt: ${k8sAggregatorCert}
-        key: ${k8sAggregatorCertKey}
       allowSchedulingOnMasters: true
       apiServer:
         admissionControl: []
@@ -61,9 +57,6 @@ controlPlane:
           - cluster-0.${domainName}
         extraArgs:
           feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      ca:
-        crt: ${clusterCert}
-        key: ${clusterCertKey}
       controllerManager:
         extraArgs:
           feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
@@ -71,10 +64,6 @@ controlPlane:
         registries:
           service:
             disabled: true
-      etcd:
-        ca:
-          crt: ${etcdCert}
-          key: ${etcdCertKey}
       extraManifests:
         - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/v0.6.1/deploy/ha-install.yaml
       proxy:
@@ -84,15 +73,8 @@ controlPlane:
       scheduler:
         extraArgs:
           feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      secret: ${clusterSecret}
-      serviceAccount:
-        key: ${k8sServiceAccountKey}
-      token: ${clusterToken}
 
     machine:
-      ca:
-        crt: ${machineCert}
-        key: ${machineCertKey}
       certSANs:
         - ${clusterEndpointIP}
         - cluster-0.${domainName}
@@ -126,4 +108,3 @@ controlPlane:
         disabled: false
         servers:
           - 10.1.1.1
-      token: ${machineToken}
