@@ -22,7 +22,6 @@ spec:
       tag: 3.0.9.1555@sha256:63e06362f8c14829086c908e6e92768bc22568b70095bc21124cdf21f235e785
 
     podAnnotations:
-      configmap.reloader.stakater.com/reload: sonarr-pushover
       secret.reloader.stakater.com/reload: sonarr
 
     podSecurityContext:
@@ -30,12 +29,15 @@ spec:
         - 65539
 
     env:
-      PUSHOVER_APP_URL: &host "sonarr.${INGRESS_DOMAIN}"
-      PUSHOVER_PRIORITY: "-1"
       SONARR__INSTANCE_NAME: Sonarr
       SONARR__PORT: &port 8989
       SONARR__APPLICATION_URL: "https://sonarr.${INGRESS_DOMAIN}"
       SONARR__LOG_LEVEL: info
+      SONARR__API_KEY:
+        valueFrom:
+          secretKeyRef:
+            name: sonarr
+            key: SONARR__API_KEY
 
     envFrom:
       - secretRef:
@@ -57,7 +59,7 @@ spec:
             sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/sonarr/nord.css"></head>';
             sub_filter_once on;
         hosts:
-          - host: *host
+          - host: &host "sonarr.${INGRESS_DOMAIN}"
             paths:
               - path: /
         tls:
@@ -74,14 +76,6 @@ spec:
         server: "${NAS_ADDRESS}"
         path: /volume1/Media
         mountPath: /data/nas-media
-      scripts:
-        enabled: true
-        type: configMap
-        name: sonarr-pushover
-        subPath: pushover-notify.sh
-        mountPath: /scripts/pushover-notify.sh
-        defaultMode: 0775
-        readOnly: true
 
     resources:
       requests:
