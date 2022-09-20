@@ -18,8 +18,8 @@ spec:
 
   values:
     image:
-      repository: ghcr.io/home-assistant/home-assistant
-      tag: 2022.9.5
+      repository: ghcr.io/onedr0p/home-assistant
+      tag: 2022.9.5@sha256:d2ebf11e3996f61af58939ee0ab5027580cfba53703b4cf7dfe5a767e2bef86d
 
     env:
       TZ: "${TIMEZONE}"
@@ -32,9 +32,20 @@ spec:
       main:
         type: LoadBalancer
         loadBalancerIP: "${LB_HASS}"
+        externalTrafficPolicy: Local
         ports:
           http:
             port: *port
+          mdns-tcp:
+            enabled: true
+            port: 5353
+            protocol: TCP
+            targetPort: 5353
+          mdns-udp:
+            enabled: true
+            port: 5353
+            protocol: UDP
+            targetPort: 5353
 
     nameOverride: "home-assistant"
 
@@ -44,14 +55,14 @@ spec:
           - "home.${INGRESS_DOMAIN}"
 
     podSecurityContext:
-      # runAsUser: 568
-      # runAsGroup: 100
-      # fsGroup: 568
+      runAsUser: 568
+      runAsGroup: 100
+      fsGroup: 568
       supplementalGroups:
         - 34
         - 100
         - 568
-      # fsGroupChangePolicy: "OnRootMismatch"
+      fsGroupChangePolicy: "OnRootMismatch"
 
     podAnnotations:
       # k8s.v1.cni.cncf.io/networks: hass-iot-dhcp
@@ -66,7 +77,6 @@ spec:
         enabled: false
 
     hostNetwork: true
-    # -- Defaults to "ClusterFirst" if hostNetwork is false and "ClusterFirstWithHostNet" if hostNetwork is true.
     dnsPolicy: ClusterFirstWithHostNet
 
     ingress:
