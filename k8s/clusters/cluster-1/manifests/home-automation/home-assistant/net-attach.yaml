@@ -2,7 +2,7 @@
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: hass-iot-dhcp
+  name: hass-iot-static
   namespace: home-automation
 spec:
   config: '{
@@ -11,6 +11,21 @@ spec:
       "master": "eth1.100",
       "mode": "bridge",
       "ipam": {
-        "type": "dhcp"
+        "type": "static",
+        "addresses": [
+           {
+             "address": "10.10.100.10/24"
+           }
+         ]
       }
-    }'
+    }'  
+  
+# '{
+#     "cniVersion": "0.3.1",
+#     "type": "macvlan",
+#     "master": "eth1.100",
+#     "mode": "bridge",
+#     "ipam": {
+#       "type": "dhcp"
+#     }
+#   }'
