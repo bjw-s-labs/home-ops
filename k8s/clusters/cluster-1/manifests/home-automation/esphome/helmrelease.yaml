@@ -31,6 +31,9 @@ spec:
 
     service:
       main:
+        type: LoadBalancer
+        loadBalancerIP: "${LB_ESPHOME}"
+        externalTrafficPolicy: Local
         ports:
           http:
             port: *port
