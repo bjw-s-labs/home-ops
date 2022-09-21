@@ -29,7 +29,7 @@ spec:
             - weight: 1
               preference:
                 matchExpressions:
-                  - key: "node-role.kubernetes.io/master"
+                  - key: "node-role.kubernetes.io/control-plane"
                     operator: In
                     values: [""]
 
@@ -37,11 +37,11 @@ spec:
       annotations:
         configmap.reloader.stakater.com/reload: "nfd-worker-conf"
 
-      tolerations:
-        - effect: "NoExecute"
-          operator: "Exists"
-        - effect: "NoSchedule"
-          operator: "Exists"
+      # tolerations:
+      #   - effect: "NoExecute"
+      #     operator: "Exists"
+      #   - effect: "NoSchedule"
+      #     operator: "Exists"
 
       config:
         core:
