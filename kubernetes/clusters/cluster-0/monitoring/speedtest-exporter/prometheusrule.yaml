@@ -45,7 +45,7 @@ spec:
             summary: SpeedTest high ping latency.
           expr: |
             avg_over_time(speedtest_ping_latency_milliseconds{job=~".*speedtest-exporter.*"}[4h])
-              > 15
+              > 20
           for: 0m
           labels:
             severity: warning
