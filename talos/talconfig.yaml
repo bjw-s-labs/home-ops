@@ -2,7 +2,7 @@ clusterName: cluster-1
 talosVersion: v1.2.3
 kubernetesVersion: v1.25.1
 endpoint: https://cluster-1.${secret_domain}:6443
-domain: cluster-1.${secret_domain}
+# domain: cluster-1.${secret_domain}
 allowSchedulingOnMasters: false
 cniConfig:
   name: none
@@ -12,7 +12,7 @@ clusterSvcNets:
   - ${svc_cidr}
 nodes:
   - hostname: cp1.cluster-1.${secret_domain}
-    # ipAddress: cp1.cluster-1.${secret_domain}
+    ipAddress: cp1.cluster-1.${secret_domain}
     controlPlane: true
     installDiskSelector:
       size: '<= 200GB'
@@ -25,7 +25,7 @@ nodes:
         mtu: 1500
 
   - hostname: cp2.cluster-1.${secret_domain}
-    # ipAddress: cp2.cluster-1.${secret_domain}
+    ipAddress: cp2.cluster-1.${secret_domain}
     controlPlane: true
     installDiskSelector:
       size: '<= 200GB'
@@ -38,7 +38,7 @@ nodes:
         mtu: 1500
 
   - hostname: cp3.cluster-1.${secret_domain}
-    # ipAddress: cp3.cluster-1.${secret_domain}
+    ipAddress: cp3.cluster-1.${secret_domain}
     controlPlane: true
     installDiskSelector:
       size: '<= 200GB'
@@ -51,7 +51,7 @@ nodes:
         mtu: 1500
 
   - hostname: work1.cluster-1.${secret_domain}
-    # ipAddress: work1.cluster-1.${secret_domain}
+    ipAddress: work1.cluster-1.${secret_domain}
     controlPlane: false
     installDiskSelector:
       size: '<= 200GB'
@@ -81,7 +81,7 @@ nodes:
                     routeMetric: 4096
 
   - hostname: work2.cluster-1.${secret_domain}
-    # ipAddress: work2.cluster-1.${secret_domain}
+    ipAddress: work2.cluster-1.${secret_domain}
     controlPlane: false
     installDiskSelector:
       size: '<= 200GB'
@@ -111,7 +111,7 @@ nodes:
                     routeMetric: 4096
 
   - hostname: work3.cluster-1.${secret_domain}
-    # ipAddress: work3.cluster-1.${secret_domain}
+    ipAddress: work3.cluster-1.${secret_domain}
     controlPlane: false
     installDiskSelector:
       size: '<= 200GB'
@@ -141,7 +141,7 @@ nodes:
                     routeMetric: 4096
 
   - hostname: work4.cluster-1.${secret_domain}
-    # ipAddress: work4.cluster-1.${secret_domain}
+    ipAddress: work4.cluster-1.${secret_domain}
     controlPlane: false
     installDiskSelector:
       size: '<= 200GB'
@@ -187,6 +187,11 @@ controlPlane:
       path: /machine/install/extraKernelArgs
       value:
         - talos.logging.kernel=udp://10.200.1.51:6050/
+    - op: add
+      path: /cluster/coreDNS
+      value:
+        # renovate: docker-image
+        image: docker.io/coredns/coredns:1.10.0
   inlinePatch:
     cluster:
       apiServer:
