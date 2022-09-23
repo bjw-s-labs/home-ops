@@ -1,0 +1,74 @@
+---
+- name: Install klipper dependencies
+  become: true
+  ansible.builtin.package:
+    name:
+      - virtualenv
+      - python-dev
+      - libffi-dev
+      - build-essential
+      - libncurses-dev
+      - libusb-dev
+      - avrdude
+      - gcc-avr
+      - binutils-avr
+      - avr-libc
+      - stm32flash
+      - dfu-util
+      - libnewlib-arm-none-eabi
+      - gcc-arm-none-eabi
+      - binutils-arm-none-eabi
+      - libusb-1.0-0
+      - git
+    state: present
+
+- name: Check if klipper.service exists
+  ansible.builtin.stat:
+    path: /etc/systemd/system/klipper.service
+  register: var_klipperservice
+
+- name: Stop klipper.service if service exists
+  ansible.builtin.systemd:
+    name: klipper.service
+    state: stopped
+  become: true
+  changed_when: false
+  when: var_klipperservice.stat.exists
+
+- name: git checkout klipper
+  ansible.builtin.git:
+    repo: 'https://github.com/Klipper3d/klipper.git'
+    dest: "{{klipper_install_path}}"
+    version: "{{klipper_version}}"
+  register: var_klipper_git
+
+- name: Update klipper virtualenv
+  when: var_klipper_git.changed
+  block:
+    - name: Remove existing virtualenv
+      ansible.builtin.file:
+        path: "{{klipper_venv_path}}"
+        state: absent
+
+    - name: Install klipper virtualenv
+      ansible.builtin.pip:
+        virtualenv: "{{klipper_venv_path}}"
+        virtualenv_python: python2
+        requirements: "{{klipper_install_path}}/scripts/klippy-requirements.txt"
+
+- name: Create klipper systemd file
+  ansible.builtin.template:
+    src: templates/klipper/klipper.service.j2
+    dest: /etc/systemd/system/klipper.service
+    mode: 0644
+    force: true
+  become: true
+
+- name: Restart klipper
+  become: true
+  ansible.builtin.systemd:
+    name: klipper.service
+    state: restarted
+    enabled: true
+    daemon_reload: true
+  changed_when: false

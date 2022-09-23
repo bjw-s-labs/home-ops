@@ -8,15 +8,20 @@
     - name: Gathering facts
       ansible.builtin.gather_facts:
       become: true
+      tags:
+        - always
 
     - name: Load domains file
       community.sops.load_vars:
         file: ../../domains.sops.yaml
         name: domains
+      tags:
+        - always
 
     - name: Mount read-write
       ansible.builtin.command: /usr/local/bin/rw
-      tags: always
+      tags:
+        - always
       changed_when: false
 
   tasks:
@@ -45,5 +50,6 @@
       always:
         - name: Mount read-only
           ansible.builtin.command: /usr/local/bin/ro
-          tags: always
+          tags:
+            - always
           changed_when: false

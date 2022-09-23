@@ -1,0 +1,3 @@
+---
+- name: Ensure klipper is {{ (klipper_state | lower) }}
+  ansible.builtin.include_tasks: "{{ (klipper_state | lower) | default('installed') }}.yml"
