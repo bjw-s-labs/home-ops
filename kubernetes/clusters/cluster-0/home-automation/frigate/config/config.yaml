@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://frigate.bjw-s.dev/api/config/schema
+---
 mqtt:
   host: mosquitto.home-automation
   port: 1883
@@ -22,10 +22,14 @@ objects:
     person:
       min_area: 5000
       max_area: 100000
-      threshold: 0.5
+      threshold: 0.7
 
 # Global ffmpeg configuration
 ffmpeg:
+  global_args:
+    - -hide_banner
+    - -loglevel
+    - warning
   hwaccel_args:
     - -hwaccel
     - vaapi
@@ -33,6 +37,32 @@ ffmpeg:
     - /dev/dri/renderD128
     - -hwaccel_output_format
     - yuv420p
+  output_args:
+    record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c:v copy -ar 44100 -c:a aac
+    rtmp: -c:v copy -f flv -ar 44100 -c:a aac
+
+# Global rtmp configuration
+rtmp:
+  enabled: true
+
+# Global snapshots configuration
+snapshots:
+  enabled: true
+  timestamp: false
+  bounding_box: true
+  retain:
+    default: 7
+
+# Global record configuration
+record:
+  enabled: true
+  retain:
+    days: 3
+    mode: all
+  events:
+    retain:
+      default: 7
+      mode: active_objects
 
 # Specify camera's
 cameras:
@@ -48,37 +78,19 @@ cameras:
           roles:
             - detect
 
-    # Enable rtmp stream for camera
-    rtmp:
-      enabled: True
-
     # Camera-specific detection configuration
     detect:
-      width: 720
-      height: 576
-      fps: 15
+      width: 960
+      height: 720
+      fps: 10
 
     # Camera-specific recording configuration
     record:
-      enabled: True
-      retain:
-        days: 3
-        mode: all
       events:
-        objects:
-          - person
         retain:
           default: 14
 
     # Camera-specific snapshots configuration
     snapshots:
-      enabled: True
-      timestamp: True
       retain:
-        # Required: Default retention days (default: shown below)
         default: 14
-
-    # Camera-specific objects configuration
-    objects:
-      track:
-        - person
