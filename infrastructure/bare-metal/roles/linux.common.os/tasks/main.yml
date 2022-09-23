@@ -12,3 +12,6 @@
     user: "{{ ansible_user }}"
     key: "{{ item }}"
   loop: "{{ ssh_authorized_keys | default([]) }}"
+
+- name: Update packages
+  ansible.builtin.import_tasks: packages.yml

@@ -1,13 +1,21 @@
 ---
 - hosts:
-    - room_assistant
+    - klipper
   gather_facts: false
   any_errors_fatal: true
+  become: false
 
   pre_tasks:
     - name: Gathering facts
       ansible.builtin.gather_facts:
       become: true
+      tags:
+        - always
+
+    - name: Load domains file
+      community.sops.load_vars:
+        file: ../../domains.sops.yaml
+        name: domains
       tags:
         - always
 
@@ -19,9 +27,16 @@
         - common
         - os
 
-    - name: "role: room_assistant.apps"
+    - name: "role: klipper.os"
       ansible.builtin.import_role:
-        name: room_assistant.apps
+        name: klipper.os
       tags:
-        - room_assistant
+        - klipper
+        - os
+
+    - name: "role: klipper.apps"
+      ansible.builtin.import_role:
+        name: klipper.apps
+      tags:
+        - klipper
         - apps

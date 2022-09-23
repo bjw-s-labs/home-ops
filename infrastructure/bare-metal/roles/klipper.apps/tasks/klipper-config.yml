@@ -1,0 +1,19 @@
+---
+- name: Manage repository folder
+  ansible.builtin.file:
+    path: "{{klipper_config_repo_destination}}"
+    state: directory
+    mode: 0775
+
+- name: Checkout {{klipper_config_repo}}
+  ansible.builtin.git:
+    repo: "{{klipper_config_repo}}"
+    dest: "{{klipper_config_repo_destination}}"
+    accept_newhostkey: true
+
+- name: Symlink configuration folder
+  ansible.builtin.file:
+    state: link
+    force: true
+    src: "{{klipper_config_repo_destination}}/{{klipper_config_repo_subfolder | default ('')}}"
+    dest: "{{klipper_config_folder}}"

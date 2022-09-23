@@ -1,0 +1,67 @@
+---
+- name: Install moonraker dependencies
+  become: true
+  ansible.builtin.package:
+    name:
+      - python3-virtualenv
+      - python-dev
+      - libopenjp2-7
+      - python3-libgpiod
+      - curl
+      - libssl-dev
+      - liblmdb-dev
+      - libsodium-dev
+      - zlib1g-dev
+      - libjpeg-dev
+    state: present
+
+- name: Check if moonraker.service exists
+  ansible.builtin.stat:
+    path: /etc/systemd/system/moonraker.service
+  register: var_moonrakerservice
+
+- name: Stop moonraker.service if service exists
+  ansible.builtin.systemd:
+    name: moonraker.service
+    state: stopped
+  become: true
+  changed_when: false
+  when: var_moonrakerservice.stat.exists
+
+- name: git checkout moonraker
+  ansible.builtin.git:
+    repo: 'https://github.com/Arksine/moonraker.git'
+    dest: "{{moonraker_install_path}}"
+    version: "{{moonraker_version}}"
+  register: var_moonraker_git
+
+- name: Update moonraker virtualenv
+  when: var_moonraker_git.changed
+  block:
+    - name: Remove existing virtualenv
+      ansible.builtin.file:
+        path: "{{moonraker_venv_path}}"
+        state: absent
+
+    - name: Install moonraker-env
+      ansible.builtin.pip:
+        virtualenv: "{{moonraker_venv_path}}"
+        virtualenv_python: python3
+        requirements: "{{moonraker_install_path}}/scripts/moonraker-requirements.txt"
+
+- name: Create moonraker systemd file
+  ansible.builtin.template:
+    src: templates/moonraker/moonraker.service.j2
+    dest: /etc/systemd/system/moonraker.service
+    mode: 0644
+    force: true
+  become: true
+
+- name: Restart moonraker
+  become: true
+  ansible.builtin.systemd:
+    name: moonraker.service
+    state: restarted
+    enabled: true
+    daemon_reload: true
+  changed_when: false

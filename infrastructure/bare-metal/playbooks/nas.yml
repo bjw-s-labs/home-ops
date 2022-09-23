@@ -9,11 +9,15 @@
     - name: Gathering facts
       ansible.builtin.gather_facts:
       become: true
+      tags:
+        - always
 
     - name: Load domains file
       community.sops.load_vars:
         file: ../../domains.sops.yaml
         name: domains
+      tags:
+        - always
 
   roles:
     - nas.apps

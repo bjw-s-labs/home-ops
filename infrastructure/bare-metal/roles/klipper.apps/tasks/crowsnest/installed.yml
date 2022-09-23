@@ -1,0 +1,38 @@
+---
+- name: Check if crowsnest.service exists
+  ansible.builtin.stat:
+    path: /etc/systemd/system/crowsnest.service
+  register: var_crowsestservice
+
+- name: Stop crowsnest.service if service exists
+  ansible.builtin.systemd:
+    name: crowsnest.service
+    state: stopped
+  become: true
+  changed_when: false
+  when: var_crowsestservice.stat.exists
+
+- name: git checkout crowsnest
+  ansible.builtin.git:
+    repo: 'https://github.com/mainsail-crew/crowsnest.git'
+    dest: "{{crowsnest_install_path}}"
+    version: "{{crowsnest_version}}"
+  register: var_crowsnest_git
+
+- name: Install crowsnest
+  environment:
+    UNATTENDED: "true"
+  community.general.make:
+    chdir: "{{crowsnest_install_path}}"
+    target: install
+  when:
+    - var_crowsnest_git.changed
+
+- name: Restart crowsnest
+  become: true
+  ansible.builtin.systemd:
+    name: crowsnest.service
+    state: restarted
+    enabled: true
+    daemon_reload: true
+  changed_when: false

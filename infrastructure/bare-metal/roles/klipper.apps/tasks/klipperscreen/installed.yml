@@ -1,0 +1,76 @@
+---
+- name: Install KlipperScreen dependencies
+  become: true
+  ansible.builtin.package:
+    name:
+      - xinit
+      - xinput
+      - x11-xserver-utils
+      - xdotool
+      - xserver-xorg-video-fbturbo
+      - python3-virtualenv
+      - virtualenv
+      - python3-distutils
+      - libgirepository1.0-dev
+      - gcc
+      - libcairo2-dev
+      - pkg-config
+      - python3-dev
+      - gir1.2-gtk-3.0
+      - librsvg2-common
+      - libopenjp2-7
+      - libatlas-base-dev
+      - wireless-tools
+      - android-tools-adb
+    state: present
+
+- name: Check if KlipperScreen.service exists
+  ansible.builtin.stat:
+    path: /etc/systemd/system/KlipperScreen.service
+  register: var_klipperscreenservice
+
+- name: Stop KlipperScreen.service if service exists
+  ansible.builtin.systemd:
+    name: KlipperScreen.service
+    state: stopped
+  become: true
+  changed_when: false
+  when: var_klipperscreenservice.stat.exists
+
+- name: git checkout KlipperScreen
+  ansible.builtin.git:
+    repo: 'https://github.com/jordanruthe/KlipperScreen.git'
+    dest: "{{klipperscreen_install_path}}"
+    version: "{{klipperscreen_version}}"
+  register: var_klipperscreen_git
+
+- name: Update KlipperScreen virtualenv
+  when: var_klipperscreen_git.changed
+  block:
+    - name: Remove existing virtualenv
+      ansible.builtin.file:
+        path: "{{klipperscreen_venv_path}}"
+        state: absent
+
+    - name: Install KlipperScreen virtualenv
+      ansible.builtin.pip:
+        virtualenv: "{{klipperscreen_venv_path}}"
+        virtualenv_python: python3
+        requirements: "{{klipperscreen_install_path}}/scripts/KlipperScreen-requirements.txt"
+
+- name: Create KlipperScreen systemd file
+  ansible.builtin.template:
+    src: templates/klipperscreen/KlipperScreen.service.j2
+    dest: /etc/systemd/system/KlipperScreen.service
+    mode: 0644
+    force: true
+  become: true
+
+- name: Restart KlipperScreen
+  become: true
+  ansible.builtin.systemd:
+    name: KlipperScreen.service
+    state: restarted
+    enabled: true
+    daemon_reload: true
+  changed_when: false
