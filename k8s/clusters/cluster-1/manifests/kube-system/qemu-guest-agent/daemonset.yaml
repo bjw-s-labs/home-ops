@@ -27,7 +27,7 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: spec.nodeName
-          image: ghcr.io/danmanners/qemu-guest-agent:fedora-36
+          image: qemu-guest-agent-image
           imagePullPolicy: IfNotPresent
           resources: {}
           securityContext:
@@ -42,6 +42,17 @@ spec:
       schedulerName: default-scheduler
       securityContext: {}
       affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: kubernetes.io/arch
+                      operator: In
+                      values:
+                        - arm64
+                topologyKey: kubernetes.io/hostname
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
@@ -57,7 +68,7 @@ spec:
                       - linux
       priorityClassName: system-node-critical
       tolerations:
-        - operator: Exists
+      - operator: Exists
       terminationGracePeriodSeconds: 30
       volumes:
         - name: host-qemu-guest-agent
