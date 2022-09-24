@@ -48,8 +48,9 @@ resource "vyos_config_block_tree" "interface-wireguard" {
 
     merge(flatten([
       for peer, peer_config in var.config.zones.wg_trusted.peers : {
-        "peer ${peer} allowed-ips" = "${cidrhost(var.networks.wg_trusted, peer_config.ipv4_hostid)}/32"
-        "peer ${peer} public-key"  = "${peer_config.public_key}"
+        "peer ${peer} allowed-ips"          = "${cidrhost(var.networks.wg_trusted, peer_config.ipv4_hostid)}/32"
+        "peer ${peer} public-key"           = "${peer_config.public_key}"
+        "peer ${peer} persistent-keepalive" = "15"
       }
     ])...),
   )
