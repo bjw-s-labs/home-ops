@@ -76,8 +76,11 @@ spec:
       startup:
         enabled: false
 
-    # hostNetwork: true
-    # dnsPolicy: ClusterFirstWithHostNet
+    dnsPolicy: ClusterFirstWithHostNet
+    dnsConfig:
+      options:
+        - name: ndots
+          value: "1"
 
     ingress:
       main:
