@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: qemu-guest-agent
-  namespace: kube-system
+  namespace: qemu-guest-agent
   labels:
     app: qemu-guest-agent
 spec:
@@ -68,7 +68,7 @@ spec:
                       - linux
       priorityClassName: system-node-critical
       tolerations:
-      - operator: Exists
+        - operator: Exists
       terminationGracePeriodSeconds: 30
       volumes:
         - name: host-qemu-guest-agent
