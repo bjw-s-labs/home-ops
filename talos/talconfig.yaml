@@ -151,8 +151,49 @@ nodes:
             dhcpOptions:
               routeMetric: 4096
 
-
-
+  - hostname: work5.cluster-1.${secret_domain}
+    ipAddress: work5.cluster-1.${secret_domain}
+    controlPlane: false
+    installDiskSelector:
+      size: '<= 200GB'
+    nameservers:
+      - 10.255.253.1
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+        mtu: 9000
+      - interface: eth1
+        dhcp: false
+        mtu: 9000
+        vlans:
+          - vlanId: 2
+            dhcp: true
+            mtu: 1500
+            dhcpOptions:
+              routeMetric: 2048
+          - vlanId: 100
+            dhcp: true
+            mtu: 1500
+            dhcpOptions:
+              routeMetric: 4096
+    configPatches:
+      - op: add
+        path: /machine/install/extensions
+        value:
+          - image: ghcr.io/siderolabs/nvidia-open-gpu-kernel-modules:515.65.01-v1.2.3
+          - image: ghcr.io/siderolabs/nvidia-container-toolkit:515.65.01-v1.10.0
+      - op: add
+        path: /machine/kernel
+        value:
+          modules:
+            - name: nvidia
+            - name: nvidia_uvm
+            - name: nvidia_drm
+            - name: nvidia_modeset
+      - op: add
+        path: /machine/sysctls
+        value:
+          net.core.bpf_jit_harden: 1
 
 controlPlane:
   configPatches:
