@@ -1,28 +1,6 @@
 ---
-- name: Install KlipperScreen dependencies
-  become: true
-  ansible.builtin.package:
-    name:
-      - xinit
-      - xinput
-      - x11-xserver-utils
-      - xdotool
-      - xserver-xorg-video-fbturbo
-      - python3-virtualenv
-      - virtualenv
-      - python3-distutils
-      - libgirepository1.0-dev
-      - gcc
-      - libcairo2-dev
-      - pkg-config
-      - python3-dev
-      - gir1.2-gtk-3.0
-      - librsvg2-common
-      - libopenjp2-7
-      - libatlas-base-dev
-      - wireless-tools
-      - android-tools-adb
-    state: present
+- name: Ensure KlipperScreen dependencies are installed
+  ansible.builtin.import_tasks: "dependencies.yml"
 
 - name: Check if KlipperScreen.service exists
   ansible.builtin.stat:
@@ -57,6 +35,29 @@
         virtualenv: "{{klipperscreen_venv_path}}"
         virtualenv_python: python3
         requirements: "{{klipperscreen_install_path}}/scripts/KlipperScreen-requirements.txt"
+
+- name: Ensure group "adbusers" exists
+  become: true
+  ansible.builtin.group:
+    name: adbusers
+    system: true
+    state: present
+
+- name: Add user to adbusers group
+  become: true
+  ansible.builtin.user:
+    name: "{{ansible_user}}"
+    groups: "adbusers"
+    append: true
+
+- name: Add Android udev rules
+  become: true
+  ansible.builtin.template:
+    src: KlipperScreen/51-android.rules.j2
+    dest: /etc/udev/rules.d/51-android.rules
+    mode: '0644'
+  notify:
+    - reload udev
 
 - name: Create KlipperScreen systemd file
   ansible.builtin.template:

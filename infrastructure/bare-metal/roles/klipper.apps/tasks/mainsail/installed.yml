@@ -1,10 +1,6 @@
 ---
-- name: Install mainsail dependencies
-  become: true
-  ansible.builtin.package:
-    name:
-      - nginx
-    state: present
+- name: Ensure mainsail dependencies are installed
+  ansible.builtin.import_tasks: "dependencies.yml"
 
 - name: Check if nginx.service exists
   ansible.builtin.stat:
@@ -22,33 +18,25 @@
 - name: Copy mainsail site configuration
   ansible.builtin.template:
     src: mainsail/mainsail.j2
-    dest: /etc/nginx/sites-available/mainsail
+    dest: /etc/nginx/conf.d/mainsail.conf
     force: true
   become: true
 
-- name: Make sure default site is disabled
-  become: true
-  ansible.builtin.file:
-    path: /etc/nginx/sites-enabled/default
-    state: absent
-
-- name: Enable mainsail site
-  become: true
-  ansible.builtin.file:
-    src: /etc/nginx/sites-available/mainsail
-    dest: /etc/nginx/sites-enabled/mainsail
-    state: link
-
 - name: Ensure {{mainsail_install_path}} exists
+  become: true
   ansible.builtin.file:
     path: "{{mainsail_install_path}}"
     state: directory
+    owner: "{{ mainsail_nginx_user }}"
+    mode: 0755
 
 - name: Download and extract mainsail httpdocs
+  become: true
   ansible.builtin.unarchive:
     remote_src: yes
     src: https://github.com/mainsail-crew/mainsail/releases/{{mainsail_version}}/download/mainsail.zip
     dest: "{{mainsail_install_path}}"
+    owner: "{{ mainsail_nginx_user }}"
 
 - name: Restart nginx
   become: true

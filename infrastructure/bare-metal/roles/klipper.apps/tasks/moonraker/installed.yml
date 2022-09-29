@@ -1,19 +1,6 @@
 ---
-- name: Install moonraker dependencies
-  become: true
-  ansible.builtin.package:
-    name:
-      - python3-virtualenv
-      - python-dev
-      - libopenjp2-7
-      - python3-libgpiod
-      - curl
-      - libssl-dev
-      - liblmdb-dev
-      - libsodium-dev
-      - zlib1g-dev
-      - libjpeg-dev
-    state: present
+- name: Ensure moonraker dependencies are installed
+  ansible.builtin.import_tasks: "dependencies.yml"
 
 - name: Check if moonraker.service exists
   ansible.builtin.stat:
@@ -48,6 +35,45 @@
         virtualenv: "{{moonraker_venv_path}}"
         virtualenv_python: python3
         requirements: "{{moonraker_install_path}}/scripts/moonraker-requirements.txt"
+
+- name: Ensure group "moonraker-admin" exists
+  become: true
+  ansible.builtin.group:
+    name: moonraker-admin
+    state: present
+  register: moonraker_admin_group
+
+- name: Detect polkit version if any
+  ansible.builtin.shell:
+    cmd: set -o pipefail && pkaction --version  2>&1 | grep -Po "(\d+\.?\d*)"
+  register: polkit_check
+  check_mode: false
+  changed_when: false
+  failed_when: polkit_check.rc != 0 and polkit_check.rc != 127
+
+- name: Create polkit legacy rules file
+  become: true
+  ansible.builtin.template:
+    src: templates/moonraker/10-moonraker.pkla.j2
+    dest: /etc/polkit-1/localauthority/50-local.d/10-moonraker.pkla
+    mode: 0644
+    force: true
+  when:
+    - polkit_check.rc != 127
+    - (polkit_check.stdout | trim) == "0.105"
+
+- name: Create polkit non-legacy rules file
+  become: true
+  vars:
+    moonraker_admin_gid: moonraker_admin_group.gid
+  ansible.builtin.template:
+    src: templates/moonraker/moonraker.rules.j2
+    dest: /etc/polkit-1/rules.d/moonraker.rules
+    mode: 0644
+    force: true
+  when:
+    - polkit_check.rc != 127
+    - (polkit_check.stdout | trim) != "0.105"
 
 - name: Create moonraker systemd file
   ansible.builtin.template:
