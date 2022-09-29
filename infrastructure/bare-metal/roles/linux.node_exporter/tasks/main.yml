@@ -17,6 +17,7 @@
       or node_exporter_version not in node_exporter_version_check.stdout
 
 - name: Move node-exporter binary into place
+  become: true
   ansible.builtin.copy:
     src: "/tmp/node_exporter-{{ node_exporter_version[1:] }}.linux-{{ node_exporter_arch }}/node_exporter"
     dest: /usr/local/bin/node-exporter
@@ -28,11 +29,20 @@
       or node_exporter_version not in node_exporter_version_check.stdout
   notify: Restart node-exporter
 
-- name: node-exporter configuration
-  block:
-    - name: Create node-exporter systemd file
-      ansible.builtin.template:
-        src: node-exporter.service.j2
-        dest: /etc/systemd/system/node-exporter.service
-        mode: 0644
+- name: Permit traffic in default zone for node-exporter service
+  become: true
+  ansible.posix.firewalld:
+    port: 9100/tcp
+    permanent: yes
+    state: enabled
+    immediate: true
+  when:
+    - ansible_distribution == 'Fedora'
+
+- name: Create node-exporter systemd file
+  become: true
+  ansible.builtin.template:
+    src: node-exporter.service.j2
+    dest: /etc/systemd/system/node-exporter.service
+    mode: 0644
   notify: Restart node-exporter

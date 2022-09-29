@@ -23,6 +23,7 @@
     - /etc/nginx/sites-enabled/mainsail
 
 - name: Remove mainsail installation
+  become: true
   ansible.builtin.file:
     path: "{{mainsail_install_path}}"
     state: absent
