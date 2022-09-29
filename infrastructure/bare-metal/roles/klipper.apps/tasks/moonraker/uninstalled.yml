@@ -23,6 +23,24 @@
     path: "{{moonraker_venv_path}}"
     state: absent
 
+- name: Ensure group "moonraker-admin" is absent
+  become: true
+  ansible.builtin.group:
+    name: moonraker-admin
+    state: absent
+
+- name: Remove polkit legacy rules file
+  become: true
+  ansible.builtin.file:
+    path: /etc/polkit-1/localauthority/50-local.d/10-moonraker.pkla
+    state: absent
+
+- name: Remove polkit non-legacy rules file
+  become: true
+  ansible.builtin.file:
+    path: /etc/polkit-1/rules.d/moonraker.rules
+    state: absent
+
 - name: Remove moonraker systemd unit
   ansible.builtin.file:
     path: /etc/systemd/system/moonraker.service

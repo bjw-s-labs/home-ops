@@ -1,26 +1,6 @@
 ---
-- name: Install klipper dependencies
-  become: true
-  ansible.builtin.package:
-    name:
-      - virtualenv
-      - python-dev
-      - libffi-dev
-      - build-essential
-      - libncurses-dev
-      - libusb-dev
-      - avrdude
-      - gcc-avr
-      - binutils-avr
-      - avr-libc
-      - stm32flash
-      - dfu-util
-      - libnewlib-arm-none-eabi
-      - gcc-arm-none-eabi
-      - binutils-arm-none-eabi
-      - libusb-1.0-0
-      - git
-    state: present
+- name: Ensure klipper dependencies are installed
+  ansible.builtin.import_tasks: "dependencies.yml"
 
 - name: Check if klipper.service exists
   ansible.builtin.stat:
@@ -53,8 +33,21 @@
     - name: Install klipper virtualenv
       ansible.builtin.pip:
         virtualenv: "{{klipper_venv_path}}"
-        virtualenv_python: python2
+        virtualenv_python: python3
         requirements: "{{klipper_install_path}}/scripts/klippy-requirements.txt"
+
+- name: Determine available groups
+  getent:
+    database: group
+
+- name: Add user to dialout group
+  become: true
+  ansible.builtin.user:
+    name: "{{ansible_user}}"
+    groups: "dialout"
+    append: true
+  when:
+    - "'dialout' in ansible_facts.getent_group"
 
 - name: Create klipper systemd file
   ansible.builtin.template:

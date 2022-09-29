@@ -23,3 +23,11 @@
   ansible.builtin.pacman:
     update_cache: yes
     upgrade: yes
+
+- name: Upgrade all packages on Fedora machines
+  become: true
+  when:
+    - ansible_distribution == 'Fedora'
+  ansible.builtin.dnf:
+    update_cache: yes
+    state: latest

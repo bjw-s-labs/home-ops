@@ -1,7 +1,7 @@
 ---
 # Manage applications
-# - ansible.builtin.import_role:
-#     name: linux.node_exporter
+- ansible.builtin.import_role:
+    name: linux.node_exporter
 
 - name: Manage klipper_config folder
   ansible.builtin.file:
@@ -18,13 +18,7 @@
     path: "{{klipper_gcode_folder}}"
     state: directory
 
-- name: Get klipper config from git
-  ansible.builtin.include_tasks: klipper-config.yml
-  when:
-    - klipper_config_repo is defined
-    - klipper_config_repo != None
-    - klipper_config_repo | length > 0
-
+- ansible.builtin.include_tasks: klipper-config.yml
 - ansible.builtin.import_tasks: klipper/main.yml
 - ansible.builtin.import_tasks: moonraker/main.yml
 - ansible.builtin.import_tasks: mainsail/main.yml

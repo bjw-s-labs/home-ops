@@ -1,3 +1,4 @@
+{{ ansible_managed | comment }}
 [Unit]
 Description=API Server for Klipper
 Requires=network-online.target
@@ -8,6 +9,7 @@ WantedBy=multi-user.target
 
 [Service]
 Type=simple
+SupplementaryGroups=moonraker-admin
 User={{ansible_user}}
 RemainAfterExit=yes
 WorkingDirectory={{moonraker_install_path}}
