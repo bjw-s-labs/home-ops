@@ -8,7 +8,7 @@ metadata:
     k10.kasten.io/backup: "true"
     app.kubernetes.io/name: &name unifi-protect-backup
     app.kubernetes.io/instance: *name
-    snapshot.home.arpa/enabled: "true"
+    # snapshot.home.arpa/enabled: "true"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -17,4 +17,4 @@ spec:
     requests:
       storage: 1G
 
-  storageClassName: ceph-block
+  storageClassName: ceph-block-external
