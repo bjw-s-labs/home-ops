@@ -1,5 +1,6 @@
 clusterName: cluster-1
 talosVersion: v1.2.3
+# talosVersion: v1.3.0-alpha.0
 kubernetesVersion: v1.25.2
 endpoint: https://cluster-1.${secret_domain}:6443
 # domain: cluster-1.${secret_domain}
@@ -187,6 +188,8 @@ nodes:
         value:
           modules:
             - name: nvidia
+              parameters:
+                -NVreg_OpenRmEnableUnsupportedGpus=1
             - name: nvidia_uvm
             - name: nvidia_drm
             - name: nvidia_modeset
