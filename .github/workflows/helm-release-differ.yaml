@@ -1,5 +1,5 @@
 ---
-name: Helm Release Differ
+name: "Helm Release Differ"
 
 on: # yamllint disable-line rule:truthy
   pull_request:
@@ -11,6 +11,7 @@ on: # yamllint disable-line rule:truthy
 env:
   # Currently no way to detect automatically
   DEFAULT_BRANCH: main
+  BOT_USERNAME: "rosey-bot[bot]"
 
 jobs:
   detect-file-changes:
@@ -20,7 +21,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: dorny/paths-filter@v2
+      - name: Filter Helm Releases
+        uses: dorny/paths-filter@v2
         id: filter
         with:
           list-files: json
@@ -45,8 +47,8 @@ jobs:
         uses: tibdex/github-app-token@v1
         id: generate-token
         with:
-          app_id: ${{ secrets.DCPLAYA_APP_ID }}
-          private_key: ${{ secrets.DCPLAYA_APP_PRIVATE_KEY }}
+          app_id: ${{ secrets.BOT_APP_ID }}
+          private_key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
 
       - name: Checkout default branch
         uses: actions/checkout@v3
@@ -57,7 +59,7 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v3
         with:
-          version: v3.6.3
+          version: latest
 
       - name: Helm Release Differ
         id: diff
@@ -74,8 +76,8 @@ jobs:
         id: find-comment
         with:
           issue-number: "${{ github.event.pull_request.number }}"
-          comment-author: "dcplaya[bot]"
-          body-includes: helmrelease.yaml
+          comment-author: "${{ env.BOT_USERNAME }}"
+          body-includes: "${{ matrix.file }}"
 
       - name: Create or update comment
         uses: peter-evans/create-or-update-comment@v2
