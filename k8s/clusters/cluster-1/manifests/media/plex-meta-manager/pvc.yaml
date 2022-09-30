@@ -7,11 +7,14 @@ metadata:
     app.kubernetes.io/name: &name plex-media-manager
     app.kubernetes.io/instance: *name
     # snapshot.home.arpa/enabled: "true"
-  name: plex-media-manager-v1
+  name: plex-media-manager
   namespace: media
 spec:
   accessModes:
   - ReadWriteOnce
+
   resources:
     requests:
       storage: 128Mi
+
+  storageClassName: ceph-block-external
