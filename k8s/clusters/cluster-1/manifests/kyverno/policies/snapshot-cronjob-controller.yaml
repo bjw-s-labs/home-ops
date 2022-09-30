@@ -82,11 +82,6 @@ spec:
                 ttlSecondsAfterFinished: 86400
                 template:
                   spec:
-                    podSecurityContext:
-                      # runAsUser: 34
-                      supplementalGroups:
-                        - 34
-                        - 100
                     automountServiceAccountToken: false
                     restartPolicy: OnFailure
                     # Stagger jobs to run randomly within X seconds to avoid bringing down all apps at once
