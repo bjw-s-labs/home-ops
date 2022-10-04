@@ -5,7 +5,7 @@ metadata:
   name: kubelet-csr-approver
   namespace: kube-system
 spec:
-  interval: 15m
+  interval: 30m
   chart:
     spec:
       chart: kubelet-csr-approver
@@ -14,7 +14,7 @@ spec:
         kind: HelmRepository
         name: postfinance
         namespace: flux-system
-      interval: 15m
+      interval: 30m
   values:
     providerRegex: |
       ^k(master|worker)\d\d?$

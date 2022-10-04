@@ -5,7 +5,7 @@ metadata:
   name: blackbox-exporter
   namespace: monitoring
 spec:
-  interval: 15m
+  interval: 30m
   chart:
     spec:
       chart: prometheus-blackbox-exporter
@@ -14,7 +14,7 @@ spec:
         kind: HelmRepository
         name: prometheus-community
         namespace: flux-system
-      interval: 15m
+      interval: 30m
   values:
     fullnameOverride: blackbox-exporter
 
