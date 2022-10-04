@@ -47,64 +47,65 @@ nodes:
               - 10.1.3.143/24
 
 controlPlane:
-  inlinePatch:
-    cluster:
-      allowSchedulingOnMasters: true
-      apiServer:
-        admissionControl: []
+  patches:
+    - |-
+      cluster:
+        allowSchedulingOnMasters: true
+        apiServer:
+          admissionControl: []
+          certSANs:
+            - ${clusterEndpointIP}
+            - cluster-0.${domainName}
+          extraArgs:
+            feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+        controllerManager:
+          extraArgs:
+            feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+        discovery:
+          registries:
+            service:
+              disabled: true
+        extraManifests:
+          - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/v0.6.2/deploy/ha-install.yaml
+        proxy:
+          disabled: true
+          extraArgs:
+            feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+        scheduler:
+          extraArgs:
+            feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+
+      machine:
         certSANs:
           - ${clusterEndpointIP}
           - cluster-0.${domainName}
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      controllerManager:
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      discovery:
-        registries:
-          service:
-            disabled: true
-      extraManifests:
-        - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/v0.6.2/deploy/ha-install.yaml
-      proxy:
-        disabled: true
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      scheduler:
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-
-    machine:
-      certSANs:
-        - ${clusterEndpointIP}
-        - cluster-0.${domainName}
-      files:
-        - content: |
-            [plugins."io.containerd.grpc.v1.cri"]
-              enable_unprivileged_ports = true
-              enable_unprivileged_icmp = true
-          path: /var/cri/conf.d/allow-unpriv-ports.toml
-          op: create
-      kubelet:
-        extraArgs:
-          feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
-          rotate-server-certificates: "true"
-      install:
-        extraKernelArgs:
-          - "talos.logging.kernel=udp://vector.${ingressDomain}:6050/"
-      logging:
-        destinations:
-          - endpoint: "udp://vector.${ingressDomain}:6051/"
-            format: json_lines
-      network:
-        extraHostEntries:
-          - ip: ${clusterEndpointIP}
-            aliases:
-              - cluster-0.${domainName}
-      sysctls:
-        fs.inotify.max_user_watches: "1048576"
-        fs.inotify.max_user_instances: "8192"
-      time:
-        disabled: false
-        servers:
-          - 10.1.1.1
+        files:
+          - content: |
+              [plugins."io.containerd.grpc.v1.cri"]
+                enable_unprivileged_ports = true
+                enable_unprivileged_icmp = true
+            path: /var/cri/conf.d/allow-unpriv-ports.toml
+            op: create
+        kubelet:
+          extraArgs:
+            feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+            rotate-server-certificates: "true"
+        install:
+          extraKernelArgs:
+            - "talos.logging.kernel=udp://vector.${ingressDomain}:6050/"
+        logging:
+          destinations:
+            - endpoint: "udp://vector.${ingressDomain}:6051/"
+              format: json_lines
+        network:
+          extraHostEntries:
+            - ip: ${clusterEndpointIP}
+              aliases:
+                - cluster-0.${domainName}
+        sysctls:
+          fs.inotify.max_user_watches: "1048576"
+          fs.inotify.max_user_instances: "8192"
+        time:
+          disabled: false
+          servers:
+            - 10.1.1.1
