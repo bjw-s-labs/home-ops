@@ -53,6 +53,11 @@ spec:
           http:
             port: *port
 
+    hostAliases:
+      - ip: "10.200.1.50"
+        hostnames:
+          - "autoscan.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+
     metrics:
       enabled: true
       serviceMonitor:
