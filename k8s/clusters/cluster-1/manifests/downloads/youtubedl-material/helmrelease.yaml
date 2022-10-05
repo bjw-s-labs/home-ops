@@ -23,9 +23,9 @@ spec:
       pullPolicy: IfNotPresent
 
     podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 100
-      fsGroup: 568
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
       supplementalGroups:
         - 34
         - 100
@@ -33,8 +33,8 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
-      GID: 100
-      UID: 568
+      GID: 1000
+      UID: 1000
       YOUTUBEDL_INSTANCE_NAME: YouTubeDL-Material
       YOUTUBEDL__PORT: &port 17442
       YOUTUBEDL__APPLICATION_URL: &host "youtubedl.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
