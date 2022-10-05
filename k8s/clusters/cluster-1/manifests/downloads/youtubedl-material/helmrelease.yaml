@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: youtubedl-material
+  name: youtubedl
   namespace: downloads
 spec:
   interval: 15m
@@ -39,7 +39,7 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: youtubedl-material-config
+        existingClaim: youtubedl-config
       nfs-nas-media:
         enabled: true
         existingClaim: downloads-nfs-share-pvc
