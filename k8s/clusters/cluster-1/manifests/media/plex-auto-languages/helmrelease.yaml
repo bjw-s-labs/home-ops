@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: &app plex-auto-languages
+  name: &app plex-auto-lang
   namespace: media
 spec:
   interval: 5m
@@ -25,7 +25,7 @@ spec:
   values:
     global:
       nameOverride: *app
-    fullnameOverride: plex-auto-languages
+    fullnameOverride: plex-auto-lang
     image:
       repository: remirigal/plex-auto-languages
       tag: "v1.2.0"
@@ -92,7 +92,7 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: plex-auto-languages-config
+        existingClaim: plex-auto-lang-config
 
     ingress:
       main:
