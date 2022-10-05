@@ -22,6 +22,15 @@ spec:
       tag: "nightly"
       pullPolicy: IfNotPresent
 
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 100
+      fsGroup: 568
+      supplementalGroups:
+        - 34
+        - 100
+      fsGroupChangePolicy: "OnRootMismatch"
+
     env:
       TZ: "${TIMEZONE}"
       GID: 100
