@@ -76,15 +76,16 @@ spec:
           inputs:
             - talos_kernel_logs
           source: |-
-            .__host = replace(.__host, "10.1.1.31", "delta")
+            .__host = replace!(.__host, "10.1.1.31", "delta")
             .__host = replace(.__host, "10.1.1.32", "enigma")
             .__host = replace(.__host, "10.1.1.33", "felix")
+
         talos_service_logs_xform:
           type: remap
           inputs:
             - talos_service_logs
           source: |-
-            .__host = replace(.__host, "10.1.1.31", "delta")
+            .__host = replace!(.__host, "10.1.1.31", "delta")
             .__host = replace(.__host, "10.1.1.32", "enigma")
             .__host = replace(.__host, "10.1.1.33", "felix")
 
@@ -98,7 +99,7 @@ spec:
           encoding:
             codec: json
           batch:
-            max_bytes: 400000
+            max_bytes: 2049000
           out_of_order_action: rewrite_timestamp
           remove_label_fields: true
           remove_timestamp: true
@@ -178,13 +179,14 @@ spec:
             except_fields:
               - __host
           batch:
-            max_bytes: 400000
+            max_bytes: 524288
           out_of_order_action: rewrite_timestamp
           labels:
             hostname: >-
               {{`{{ __host }}`}}
             service: >-
               {{`{{ "talos-service" }}`}}
+            namespace: "talos:service"
 
     podMonitor:
       enabled: true
