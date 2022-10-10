@@ -188,6 +188,14 @@ spec:
               {{`{{ "talos-service" }}`}}
             namespace: "talos:service"
 
+    extraVolumeMounts:
+      - name: geoip
+        mountPath: /geoip
+    extraVolumes:
+      - name: geoip
+        persistentVolumeClaim:
+          claimName: vector-geoipupdate-config
+
     podMonitor:
       enabled: true
       jobLabel: vector-aggregator
