@@ -28,8 +28,10 @@ resource "minio_iam_policy" "rw_policy" {
                 "s3:*"
             ],
             "Resource": [
+                "arn:aws:s3:::${minio_s3_bucket.bucket.bucket}",
                 "arn:aws:s3:::${minio_s3_bucket.bucket.bucket}/*"
-            ]
+            ],
+            "Sid": ""
         }
     ]
 }
