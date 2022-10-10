@@ -76,9 +76,6 @@ spec:
           inputs:
             - talos_kernel_logs
           source: |-
-            .__host, .err = replace(.__host, "10.1.1.21", "anvil")
-            .__host = replace(.__host, "10.1.1.22", "blitz")
-            .__host = replace(.__host, "10.1.1.23", "cannon")
             .__host = replace(.__host, "10.1.1.31", "delta")
             .__host = replace(.__host, "10.1.1.32", "enigma")
             .__host = replace(.__host, "10.1.1.33", "felix")
@@ -87,9 +84,6 @@ spec:
           inputs:
             - talos_service_logs
           source: |-
-            .__host, .err = replace(.__host, "10.1.1.21", "anvil")
-            .__host = replace(.__host, "10.1.1.22", "blitz")
-            .__host = replace(.__host, "10.1.1.23", "cannon")
             .__host = replace(.__host, "10.1.1.31", "delta")
             .__host = replace(.__host, "10.1.1.32", "enigma")
             .__host = replace(.__host, "10.1.1.33", "felix")
@@ -100,7 +94,7 @@ spec:
           type: loki
           inputs:
             - kubernetes_logs
-          endpoint: http://loki-gateway.monitoring:3100
+          endpoint: http://loki-gateway.monitoring:80
           encoding:
             codec: json
           batch:
@@ -128,7 +122,7 @@ spec:
           type: loki
           inputs:
             - vyos_logs
-          endpoint: http://loki-gateway.monitoring:3100
+          endpoint: http://loki-gateway.monitoring:80
           encoding:
             codec: json
           batch:
@@ -144,7 +138,7 @@ spec:
           type: loki
           inputs:
             - journal_logs
-          endpoint: http://loki-gateway.monitoring:3100
+          endpoint: http://loki-gateway.monitoring:80
           encoding:
             codec: json
           batch:
@@ -160,7 +154,7 @@ spec:
           type: loki
           inputs:
             - talos_kernel_logs_xform
-          endpoint: http://loki-gateway.monitoring:3100
+          endpoint: http://loki-gateway.monitoring:80
           encoding:
             codec: json
             except_fields:
@@ -178,7 +172,7 @@ spec:
           type: loki
           inputs:
             - talos_service_logs_xform
-          endpoint: http://loki-gateway.monitoring:3100
+          endpoint: http://loki-gateway.monitoring:80
           encoding:
             codec: json
             except_fields:
