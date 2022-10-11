@@ -48,25 +48,17 @@ spec:
       main:
         enabled: true
         annotations:
-          external-dns.alpha.kubernetes.io/target: ingress.${PERSONAL_DOMAIN}
           external-dns.home.arpa/enabled: "true"
           nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-          nginx.ingress.kubernetes.io/configuration-snippet: |
-            location = / {
-              if ($http_x_plex_device = ""){
-                return 301 $scheme://$host/web/index.html;
-              }
-            }
         ingressClassName: nginx
         hosts:
-          - host: &host plex.${PERSONAL_DOMAIN}
+          - host: &host plex.${INGRESS_DOMAIN}
             paths:
               - path: /
                 pathType: Prefix
         tls:
           - hosts:
               - *host
-            secretName: tls.plex
 
     persistence:
       config:

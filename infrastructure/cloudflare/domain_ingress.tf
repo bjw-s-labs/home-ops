@@ -30,3 +30,14 @@ resource "cloudflare_page_rule" "cf_domain_ingress_navidrome_bypass_cache" {
     disable_performance = true
   }
 }
+
+resource "cloudflare_page_rule" "cf_domain_ingress_plex_bypass_cache" {
+  zone_id = module.cf_domain_ingress.zone_id
+  target  = format("plex.%s/*", module.cf_domain_ingress.zone)
+  status  = "active"
+
+  actions {
+    cache_level         = "bypass"
+    disable_performance = true
+  }
+}
