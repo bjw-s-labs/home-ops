@@ -12,7 +12,7 @@ resource "vyos_config_block_tree" "firewall_group_address-group" {
   configs = merge(
     merge(flatten([
       for host_group, host_group_config in local.host_groups_with_addresses : {
-        "${host_group} address" = length(host_group_config.addresses) > 1 ? jsonencode(host_group_config.addresses) : host_group_config.addresses[0]
+        "${host_group} address" = length(host_group_config.addresses) > 1 ? jsonencode(sort(host_group_config.addresses)) : host_group_config.addresses[0]
       }
     ])...),
 
@@ -30,7 +30,7 @@ resource "vyos_config_block_tree" "firewall_group_port-group" {
   configs = merge(
     merge(flatten([
       for port_group in var.config.firewall.port_groups : {
-        "${port_group.name} port" = length(port_group.ports) > 1 ? jsonencode(port_group.ports) : port_group.ports[0]
+        "${port_group.name} port" = length(port_group.ports) > 1 ? jsonencode(sort(port_group.ports)) : port_group.ports[0]
       }
     ])...),
   )
@@ -48,7 +48,7 @@ resource "vyos_config_block_tree" "firewall_group_network-group" {
     # From config
     merge(flatten([
       for network_group in var.config.firewall.network_groups : {
-        "${network_group.name} network" = length(network_group.networks) > 1 ? jsonencode(network_group.networks) : network_group.networks[0]
+        "${network_group.name} network" = length(network_group.networks) > 1 ? jsonencode(sort(network_group.networks)) : network_group.networks[0]
       }
     ])...),
   )
@@ -93,5 +93,32 @@ resource "vyos_config_block_tree" "firewall_name" {
   depends_on = [
     vyos_config_block_tree.firewall_group_address-group,
     vyos_config_block_tree.firewall_group_port-group
+  ]
+}
+
+resource "vyos_config_block_tree" "firewall_zone" {
+  path = "firewall zone"
+
+  configs = merge(
+    merge([
+      for zone, zone_config in var.config.zones : {
+        "${zone} default-action" = "drop"
+        "${zone} description"    = lookup(zone_config, "description", null)
+        "${zone} local-zone"     = (lookup(zone_config, "local_zone", false)) == true ? "" : null
+        "${zone} interface"      = lookup(zone_config, "interface", null)
+      }
+    ]...),
+
+    merge(flatten([
+      for zone in keys(var.config.zones) : [
+        for firewall_policy in local.firewall_policies : {
+          "${zone} from ${firewall_policy.zoneFrom} firewall name" = firewall_policy.name
+        } if firewall_policy.zoneTo == zone
+      ]
+    ])...),
+  )
+
+  depends_on = [
+    vyos_config_block_tree.firewall_name
   ]
 }

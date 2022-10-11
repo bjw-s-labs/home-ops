@@ -2,7 +2,7 @@ resource "remote_file" "container-adguard-home-dummyhosts" {
   provider    = remote
   path        = "/config/adguard-home/hosts"
   content     = ""
-  permissions = "0644"
+  permissions = "0775"
   owner       = "0"   # root
   group       = "104" # vyattacfg
 }
