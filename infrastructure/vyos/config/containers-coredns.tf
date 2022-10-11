@@ -5,7 +5,7 @@ resource "remote_file" "container-coredns-corefile" {
     pathexpand("${path.module}/../files/coredns/Corefile.tftpl"),
     { domains = var.domains }
   )
-  permissions = "0644"
+  permissions = "0775"
   owner       = "0"   # root
   group       = "104" # vyattacfg
 }
@@ -21,7 +21,7 @@ resource "remote_file" "container-coredns-hosts" {
       networks     = var.networks
     }
   )
-  permissions = "0644"
+  permissions = "0775"
   owner       = "0"   # root
   group       = "104" # vyattacfg
 }

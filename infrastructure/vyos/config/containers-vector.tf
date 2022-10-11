@@ -5,7 +5,7 @@ resource "remote_file" "container-vector-agent-config" {
     pathexpand("${path.module}/../files/vector-agent/vector.yaml.tftpl"),
     { address_book = var.address_book }
   )
-  permissions = "0644"
+  permissions = "0775"
   owner       = "0"   # root
   group       = "104" # vyattacfg
 }
