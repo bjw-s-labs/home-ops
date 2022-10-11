@@ -5,7 +5,7 @@ resource "remote_file" "container-haproxy-config" {
     pathexpand("${path.module}/../files/haproxy/haproxy.cfg.tftpl"),
     { domains = var.domains }
   )
-  permissions = "0644"
+  permissions = "0775"
   owner       = "0"   # root
   group       = "104" # vyattacfg
 }
