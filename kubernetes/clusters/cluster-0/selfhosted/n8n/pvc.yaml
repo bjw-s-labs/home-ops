@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: n8n-config
+  namespace: selfhosted
+  labels:
+    snapshot.home.arpa/enabled: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 1Gi
+
+  storageClassName: ceph-block
