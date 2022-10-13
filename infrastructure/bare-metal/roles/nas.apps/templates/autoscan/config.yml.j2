@@ -1,0 +1,27 @@
+---
+triggers:
+  inotify:
+    - priority: 0
+
+      # filter with regular expressions
+      include:
+        - '\.(mkv|.mp4)$'
+        - '\.(jpg)$'
+
+      paths:
+        - path: /mnt/volume1/Media
+
+targets:
+  plex:
+    - url: https://plex.bjw-s.dev
+      token: {{ secrets.autoscan.plex_token }} # Plex API Token
+      rewrite:
+        - from: /mnt/volume1/Media/ # local file system
+          to: /storage/media/ # path accessible by the Plex docker container (if applicable)
+
+  jellyfin:
+    - url: https://jellyfin.bjw-s.dev
+      token: {{ secrets.autoscan.jellyfin_token }} # Jellyfin API Token
+      rewrite:
+        - from: /mnt/volume1/Media/ # local file system
+          to: /storage/media/ # path accessible by the Jellyfin docker container (if applicable)
