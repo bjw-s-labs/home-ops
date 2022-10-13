@@ -319,6 +319,11 @@ module "esphome-config" {
   has_projects = false
   is_template  = false
 
+  plaintext_secrets = {
+    "BJWS_APP_ID"          = data.sops_file.github_secrets.data["apps.bjws_bot.app_id"]
+    "BJWS_APP_PRIVATE_KEY" = data.sops_file.github_secrets.data["apps.bjws_bot.private_key"]
+  }
+
   issue_labels_merge_with_github_labels = false
   issue_labels = concat(
     [],
