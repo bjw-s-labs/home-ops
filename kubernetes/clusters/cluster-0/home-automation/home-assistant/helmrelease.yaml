@@ -59,6 +59,15 @@ spec:
         enabled: true
         existingClaim: home-assistant-data
 
+      deploy-key:
+        enabled: true
+        type: secret
+        name: home-assistant-deploykey
+        defaultMode: 256
+        subPath:
+          - path: id_rsa
+            mountPath: /root/.ssh/id_rsa
+
     probes:
       liveness:
         enabled: false
