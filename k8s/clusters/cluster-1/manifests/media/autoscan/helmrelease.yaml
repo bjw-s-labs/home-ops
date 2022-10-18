@@ -48,6 +48,12 @@ spec:
           http:
             port: 3030
 
+    hostAliases:
+      - ip: "10.200.1.50"
+        hostnames:
+          - "plex.${INGRESS_DOMAIN}"
+          - "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+
     probes:
       liveness:
         enabled: true
