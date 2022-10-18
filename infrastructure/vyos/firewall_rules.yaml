@@ -116,6 +116,15 @@ accept_mqtt_from_mqtt_clients:
     port: 1883
     address-group: k8s_mqtt
 
+accept_mqtt_from_esp:
+  action: accept
+  protocol: tcp
+  source:
+    address-group: esp
+  destination:
+    port: 1883
+    address-group: k8s_mqtt
+
 accept_k8s_nodes:
   action: accept
   protocol: tcp
