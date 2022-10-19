@@ -1,5 +1,4 @@
 locals {
-  switch_core_1_old_name   = "Switch - Core 1 (Old)"
   switch_core_1_name       = "Switch - Core 1"
   switch_core_2_name       = "Switch - Core 2"
   switch_media_name        = "Switch - Media"
@@ -9,51 +8,6 @@ locals {
   ap_garage_name           = "AP - Garage"
 }
 
-resource "unifi_device" "switch_core_1_old" {
-  mac  = "e0:63:da:5c:f3:3d"
-  name = local.switch_core_1_old_name
-  site = unifi_site.default.name
-
-  port_override {
-    number          = 1
-    name            = "EdgeRouter"
-    port_profile_id = data.unifi_port_profile.all.id
-  }
-  port_override {
-    number          = 2
-    name            = local.switch_core_2_name
-    port_profile_id = data.unifi_port_profile.all.id
-  }
-  port_override {
-    number          = 3
-    port_profile_id = data.unifi_port_profile.iot.id
-  }
-  port_override {
-    number          = 4
-    port_profile_id = data.unifi_port_profile.all.id
-  }
-  port_override {
-    number          = 5
-    name            = local.switch_media_name
-    port_profile_id = data.unifi_port_profile.all.id
-  }
-  port_override {
-    number          = 6
-    name            = unifi_device.ap_hallway.name
-    port_profile_id = data.unifi_port_profile.all.id
-  }
-  port_override {
-    number          = 7
-    name            = "Zigbee Adapter"
-    port_profile_id = data.unifi_port_profile.iot.id
-  }
-  port_override {
-    number          = 8
-    name            = "Hue Bridge"
-    port_profile_id = data.unifi_port_profile.disabled.id
-  }
-}
-
 resource "unifi_device" "switch_core_1" {
   mac  = "70:a7:41:f3:c8:92"
   name = local.switch_core_1_name
@@ -61,15 +15,18 @@ resource "unifi_device" "switch_core_1" {
 
   port_override {
     number          = 1
+    name            = unifi_device.ap_hallway.name
     port_profile_id = data.unifi_port_profile.all.id
   }
   port_override {
     number          = 2
+    name            = local.switch_media_name
     port_profile_id = data.unifi_port_profile.all.id
   }
   port_override {
     number          = 3
-    port_profile_id = data.unifi_port_profile.all.id
+    name            = "Zigbee Adapter"
+    port_profile_id = data.unifi_port_profile.iot.id
   }
   port_override {
     number          = 4
@@ -117,10 +74,12 @@ resource "unifi_device" "switch_core_1" {
   }
   port_override {
     number          = 15
+    name            = local.switch_core_2_name
     port_profile_id = data.unifi_port_profile.all.id
   }
   port_override {
     number          = 16
+    name            = "EdgeRouter"
     port_profile_id = data.unifi_port_profile.all.id
   }
 }
@@ -132,7 +91,7 @@ resource "unifi_device" "switch_core_2" {
 
   port_override {
     number          = 1
-    name            = local.switch_core_1_old_name
+    name            = local.switch_core_1_name
     port_profile_id = data.unifi_port_profile.all.id
   }
   port_override {
@@ -213,7 +172,7 @@ resource "unifi_device" "switch_media" {
 
   port_override {
     number          = 1
-    name            = local.switch_core_1_old_name
+    name            = local.switch_core_1_name
     port_profile_id = data.unifi_port_profile.all.id
   }
   port_override {
