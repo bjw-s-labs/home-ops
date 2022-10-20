@@ -65,6 +65,8 @@ module "pmb" {
   topics      = ["kubernetes", "docker", "backups", "sidecar"]
   visibility  = "public"
 
+  archived = true
+
   auto_init              = true
   allow_merge_commit     = false
   allow_squash_merge     = true
@@ -180,10 +182,10 @@ module "container-images" {
   source  = "mineiros-io/repository/github"
   version = "0.17.0"
 
-  name         = "container-images"
-  description  = "Kubernetes tailored container images for various applications"
-  topics       = ["kubernetes", "docker", "containers"]
-  visibility   = "public"
+  name        = "container-images"
+  description = "Kubernetes tailored container images for various applications"
+  topics      = ["kubernetes", "docker", "containers"]
+  visibility  = "public"
 
   auto_init              = true
   allow_merge_commit     = false
@@ -212,10 +214,10 @@ module "helm-charts-actions" {
   source  = "mineiros-io/repository/github"
   version = "0.17.0"
 
-  name         = "helm-charts-actions"
-  description  = "A collection of GitHub actions to use with helm-charts repo"
-  topics       = ["helm", "github-actions"]
-  visibility   = "public"
+  name        = "helm-charts-actions"
+  description = "A collection of GitHub actions to use with helm-charts repo"
+  topics      = ["helm", "github-actions"]
+  visibility  = "public"
 
   auto_init              = true
   allow_merge_commit     = false
@@ -244,10 +246,10 @@ module "gh-workflows" {
   source  = "mineiros-io/repository/github"
   version = "0.17.0"
 
-  name         = "gh-workflows"
-  description  = "A collection of reusable GitHub workflows"
-  topics       = ["ci", "github", "workflows"]
-  visibility   = "public"
+  name        = "gh-workflows"
+  description = "A collection of reusable GitHub workflows"
+  topics      = ["ci", "github", "workflows"]
+  visibility  = "public"
 
   auto_init              = true
   allow_merge_commit     = false
@@ -276,10 +278,10 @@ module "klipper-config" {
   source  = "mineiros-io/repository/github"
   version = "0.17.0"
 
-  name         = "klipper-config"
-  description  = "My Klipper configurations"
-  topics       = ["3dprinter", "klipper"]
-  visibility   = "public"
+  name        = "klipper-config"
+  description = "My Klipper configurations"
+  topics      = ["3dprinter", "klipper"]
+  visibility  = "public"
 
   auto_init              = true
   allow_merge_commit     = false
@@ -303,10 +305,10 @@ module "esphome-config" {
   source  = "mineiros-io/repository/github"
   version = "0.17.0"
 
-  name         = "esphome-config"
-  description  = "My ESPHome configs."
-  topics       = ["esphome", "esphome-devices", "esphome-config", "home-assistant"]
-  visibility   = "public"
+  name        = "esphome-config"
+  description = "My ESPHome configs."
+  topics      = ["esphome", "esphome-devices", "esphome-config", "home-assistant"]
+  visibility  = "public"
 
   auto_init              = true
   allow_merge_commit     = false
