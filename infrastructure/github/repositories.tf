@@ -1,6 +1,6 @@
 module "home-ops" {
   source  = "mineiros-io/repository/github"
-  version = "0.16.2"
+  version = "0.17.0"
 
   name         = "home-ops"
   description  = "My home or for-home infrastructure written as code, adhering to GitOps practices"
@@ -58,7 +58,7 @@ module "home-ops" {
 
 module "pmb" {
   source  = "mineiros-io/repository/github"
-  version = "0.16.2"
+  version = "0.17.0"
 
   name        = "pmb"
   description = "Poor Man's Backup"
@@ -90,7 +90,7 @@ module "pmb" {
 
 module "renovate-config" {
   source  = "mineiros-io/repository/github"
-  version = "0.16.2"
+  version = "0.17.0"
 
   name        = "renovate-config"
   description = "Renovate configuration presets"
@@ -122,7 +122,7 @@ module "renovate-config" {
 
 module "helm-charts" {
   source  = "mineiros-io/repository/github"
-  version = "0.16.2"
+  version = "0.17.0"
 
   name         = "helm-charts"
   description  = "A collection of Helm charts"
@@ -178,7 +178,7 @@ module "helm-charts" {
 
 module "container-images" {
   source  = "mineiros-io/repository/github"
-  version = "0.16.2"
+  version = "0.17.0"
 
   name         = "container-images"
   description  = "Kubernetes tailored container images for various applications"
@@ -210,7 +210,7 @@ module "container-images" {
 
 module "helm-charts-actions" {
   source  = "mineiros-io/repository/github"
-  version = "0.16.2"
+  version = "0.17.0"
 
   name         = "helm-charts-actions"
   description  = "A collection of GitHub actions to use with helm-charts repo"
@@ -242,7 +242,7 @@ module "helm-charts-actions" {
 
 module "gh-workflows" {
   source  = "mineiros-io/repository/github"
-  version = "0.16.2"
+  version = "0.17.0"
 
   name         = "gh-workflows"
   description  = "A collection of reusable GitHub workflows"
@@ -274,7 +274,7 @@ module "gh-workflows" {
 
 module "klipper-config" {
   source  = "mineiros-io/repository/github"
-  version = "0.16.2"
+  version = "0.17.0"
 
   name         = "klipper-config"
   description  = "My Klipper configurations"
@@ -301,7 +301,7 @@ module "klipper-config" {
 
 module "esphome-config" {
   source  = "mineiros-io/repository/github"
-  version = "0.16.2"
+  version = "0.17.0"
 
   name         = "esphome-config"
   description  = "My ESPHome configs."
