@@ -1,15 +1,15 @@
 terraform {
   required_providers {
     minio = {
-      source = "aminueza/minio"
+      source  = "aminueza/minio"
       version = "1.7.1"
     }
   }
 }
 
 resource "minio_s3_bucket" "bucket" {
-  bucket   = var.bucket_name
-  acl      = "private"
+  bucket = var.bucket_name
+  acl    = "private"
 }
 
 resource "minio_iam_user" "user" {
@@ -18,7 +18,7 @@ resource "minio_iam_user" "user" {
 }
 
 resource "minio_iam_policy" "rw_policy" {
-  policy   = <<EOF
+  policy = <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
