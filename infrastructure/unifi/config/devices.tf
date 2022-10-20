@@ -30,7 +30,8 @@ resource "unifi_device" "switch_core_1" {
   }
   port_override {
     number          = 4
-    port_profile_id = data.unifi_port_profile.all.id
+    name            = "TBD"
+    port_profile_id = data.unifi_port_profile.iot.id
   }
   port_override {
     number          = 5
