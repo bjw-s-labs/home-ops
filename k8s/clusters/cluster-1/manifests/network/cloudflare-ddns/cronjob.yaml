@@ -3,53 +3,40 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   namespace: network
-  name: cloudflare-ddns
+  name: &app cloudflare-ddns
 spec:
-  schedule: "0/30 * * * *"
+  schedule: "@hourly"
   failedJobsHistoryLimit: 1
   successfulJobsHistoryLimit: 3
   concurrencyPolicy: Forbid
   jobTemplate:
-    metadata:
-      annotations:
-        botkube.io/disable: "true"
     spec:
+      ttlSecondsAfterFinished: 3600
       template:
-        metadata:
-          annotations:
-            botkube.io/disable: "true"
         spec:
+          automountServiceAccountToken: false
           restartPolicy: Never
           containers:
-            - name: cloudflare-ddns
-              image: ghcr.io/onedr0p/kubernetes-kubectl:1.25.3
-              imagePullPolicy: IfNotPresent
-              env:
-                - name: TZ
-                  value: "${TIMEZONE}"
-              workingDir: /scripts
+            - name: *app
+              image: ghcr.io/onedr0p/kubernetes-kubectl:1.25.3@sha256:e1f54416c4f8779f748ba4a8d7d48d489b584e8963ee8b84310e19d6e2f0430e
+              envFrom:
+                - secretRef:
+                    name: *app
               command:
                 - "/bin/bash"
-                - "/scripts/cloudflare-ddns.sh"
+                - &scriptPath "/app/cloudflare-ddns.sh"
               volumeMounts:
-                - name: cloudflare-ddns
-                  mountPath: /scripts/cloudflare-ddns.sh
-                  subPath: cloudflare-ddns.sh
-                  readOnly: true
-                - name: data
-                  mountPath: /scripts/ddns_data.json
-                  subPath: ddns_data.json
+                - name: *app
+                  mountPath: *scriptPath
+                  subPath: &scriptName cloudflare-ddns.sh
                   readOnly: true
           volumes:
-            - name: cloudflare-ddns
+            - name: *app
               projected:
                 defaultMode: 0775
                 sources:
                   - configMap:
-                      name: cloudflare-ddns
+                      name: *app
                       items:
-                        - key: cloudflare-ddns.sh
-                          path: cloudflare-ddns.sh
-            - name: data
-              secret:
-                secretName: cloudflare-ddns-data
+                        - key: *scriptName
+                          path: *scriptName

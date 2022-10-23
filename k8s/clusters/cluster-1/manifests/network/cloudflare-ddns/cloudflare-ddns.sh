@@ -1,58 +1,39 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set -o nounset
 set -o errexit
 
-IP4=$(curl -s https://ipv4.icanhazip.com/)
-
-sleep 60000
-
-for domain in $(jq -r '.[] | @base64' ./ddns_data.json ); do
-    _jq() {
-        echo "${domain}" | base64 --decode | jq -r "$1"
-    }
-
-    TOKEN=$(_jq '.token')
-    ZONE=$(_jq '.zone')
-    RECORD=$(_jq '.record')
-
-    zone_details=$(
-        curl -s -X GET \
-            "https://api.cloudflare.com/client/v4/zones?name=${ZONE}" \
-            -H "Authorization: Bearer ${TOKEN}" \
-            -H "Content-Type: application/json"
-    )
-
-    if echo "${zone_details}" | grep -q '\"success\":false'; then
-        printf "%s - Yikes - Getting details for zone '%s' has failed\n" "$(date -u)" "${ZONE}"
-        exit 1
-    fi
-    zone_identifier=$(echo "$zone_details" | jq -c -r '.result[0].id')
-
-    record4=$(
-        curl -s -X GET \
-            "https://api.cloudflare.com/client/v4/zones/${zone_identifier}/dns_records?name=${RECORD}&type=A" \
-            -H "Authorization: Bearer ${TOKEN}" \
-            -H "Content-Type: application/json"
-    )
-    old_ip4=$(echo "${record4}" | sed -n 's/.*"content":"\([^"]*\).*/\1/p')
-    if [ "${IP4}" = "${old_ip4}" ]; then
-        printf "%s - Success - IP Address '%s' has not changed for '%s' in zone '%s'\n" "$(date -u)" "${IP4}" "${RECORD}" "${ZONE}"
-        continue
-    fi
-
-    record4_identifier=$(echo "${record4}" | sed -n 's/.*"id":"\([^"]*\).*/\1/p')
-    update4=$(
-        curl -s -X PUT \
-            "https://api.cloudflare.com/client/v4/zones/${zone_identifier}/dns_records/${record4_identifier}" \
-            -H "Authorization: Bearer ${TOKEN}" \
-            -H "Content-Type: application/json" \
-            --data "{\"id\":\"${zone_identifier}\",\"type\":\"A\",\"proxied\":true,\"name\":\"${RECORD}\",\"content\":\"${IP4}\"}"
-    )
-
-    if echo "${update4}" | grep -q '\"success\":false'; then
-        printf "%s - Yikes - Updating IP Address '%s' has failed for '%s' in zone '%s'\n" "$(date -u)" "${IP4}" "${RECORD}" "${ZONE}"
-        exit 1
-    else
-        printf "%s - Success - IP Address '%s' has been updated for '%s' in zone '%s'\n" "$(date -u)" "${IP4}" "${RECORD}" "${ZONE}"
-    fi
-done
+current_ipv4="$(curl -s https://ipv4.icanhazip.com/)"
+zone_id=$(curl -s -X GET \
+    "https://api.cloudflare.com/client/v4/zones?name=${CLOUDFLARE_RECORD_NAME#*.}&status=active" \
+    -H "X-Auth-Email: ${CLOUDFLARE_EMAIL}" \
+    -H "X-Auth-Key: ${CLOUDFLARE_APIKEY}" \
+    -H "Content-Type: application/json" \
+        | jq --raw-output ".result[0] | .id"
+)
+record_ipv4=$(curl -s -X GET \
+    "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records?name=${CLOUDFLARE_RECORD_NAME}&type=A" \
+    -H "X-Auth-Email: ${CLOUDFLARE_EMAIL}" \
+    -H "X-Auth-Key: ${CLOUDFLARE_APIKEY}" \
+    -H "Content-Type: application/json" \
+)
+old_ip4=$(echo "$record_ipv4" | jq --raw-output '.result[0] | .content')
+if [[ "${current_ipv4}" == "${old_ip4}" ]]; then
+    printf "%s - IP Address '%s' has not changed" "$(date -u)" "${current_ipv4}"
+    exit 0
+fi
+record_ipv4_identifier="$(echo "$record_ipv4" | jq --raw-output '.result[0] | .id')"
+update_ipv4=$(curl -s -X PUT \
+    "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records/${record_ipv4_identifier}" \
+    -H "X-Auth-Email: ${CLOUDFLARE_EMAIL}" \
+    -H "X-Auth-Key: ${CLOUDFLARE_APIKEY}" \
+    -H "Content-Type: application/json" \
+    --data "{\"id\":\"${zone_id}\",\"type\":\"A\",\"proxied\":true,\"name\":\"${CLOUDFLARE_RECORD_NAME}\",\"content\":\"${current_ipv4}\"}" \
+)
+if [[ "$(echo "$update_ipv4" | jq --raw-output '.success')" == "true" ]]; then
+    printf "%s - Success - IP Address '%s' has been updated" "$(date -u)" "${current_ipv4}"
+    exit 0
+else
+    printf "%s - Yikes - Updating IP Address '%s' has failed" "$(date -u)" "${current_ipv4}"
+    exit 1
+fi
