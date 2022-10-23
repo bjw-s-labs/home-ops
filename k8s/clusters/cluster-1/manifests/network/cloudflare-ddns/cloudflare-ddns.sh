@@ -28,7 +28,7 @@ update_ipv4=$(curl -s -X PUT \
     -H "X-Auth-Email: ${CLOUDFLARE_EMAIL}" \
     -H "X-Auth-Key: ${CLOUDFLARE_APIKEY}" \
     -H "Content-Type: application/json" \
-    --data "{\"id\":\"${zone_id}\",\"type\":\"A\",\"proxied\":true,\"name\":\"${CLOUDFLARE_RECORD_NAME}\",\"content\":\"${current_ipv4}\"}" \
+    --data "{\"id\":\"${zone_id}\",\"type\":\"A\",\"proxied\":false,\"name\":\"${CLOUDFLARE_RECORD_NAME}\",\"content\":\"${current_ipv4}\"}" \
 )
 if [[ "$(echo "$update_ipv4" | jq --raw-output '.success')" == "true" ]]; then
     printf "%s - Success - IP Address '%s' has been updated" "$(date -u)" "${current_ipv4}"
