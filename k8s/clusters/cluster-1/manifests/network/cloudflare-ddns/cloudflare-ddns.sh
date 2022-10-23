@@ -4,6 +4,8 @@ set -o errexit
 
 IP4=$(curl -s https://ipv4.icanhazip.com/)
 
+sleep 60000
+
 for domain in $(jq -r '.[] | @base64' ./ddns_data.json ); do
     _jq() {
         echo "${domain}" | base64 --decode | jq -r "$1"
