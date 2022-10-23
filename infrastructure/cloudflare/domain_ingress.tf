@@ -1,6 +1,7 @@
 module "cf_domain_ingress" {
-  source = "./cf_domain"
-  domain = data.sops_file.cloudflare_secrets.data["cloudflare_zones.ingress"]
+  source     = "./cf_domain"
+  domain     = data.sops_file.cloudflare_secrets.data["cloudflare_zones.ingress"]
+  account_id = cloudflare_account.bjw_s.id
 }
 
 resource "cloudflare_filter" "cf_domain_ingress_github_flux_webhook" {
@@ -21,9 +22,10 @@ resource "cloudflare_firewall_rule" "cf_domain_ingress_github_flux_webhook" {
 }
 
 resource "cloudflare_page_rule" "cf_domain_ingress_navidrome_bypass_cache" {
-  zone_id = module.cf_domain_ingress.zone_id
-  target  = format("navidrome.%s/*", module.cf_domain_ingress.zone)
-  status  = "active"
+  zone_id  = module.cf_domain_ingress.zone_id
+  target   = format("navidrome.%s/*", module.cf_domain_ingress.zone)
+  status   = "active"
+  priority = 2
 
   actions {
     cache_level         = "bypass"
@@ -32,9 +34,10 @@ resource "cloudflare_page_rule" "cf_domain_ingress_navidrome_bypass_cache" {
 }
 
 resource "cloudflare_page_rule" "cf_domain_ingress_plex_bypass_cache" {
-  zone_id = module.cf_domain_ingress.zone_id
-  target  = format("plex.%s/*", module.cf_domain_ingress.zone)
-  status  = "active"
+  zone_id  = module.cf_domain_ingress.zone_id
+  target   = format("plex.%s/*", module.cf_domain_ingress.zone)
+  status   = "active"
+  priority = 1
 
   actions {
     cache_level         = "bypass"
