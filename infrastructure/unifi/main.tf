@@ -9,7 +9,7 @@ terraform {
   required_providers {
     unifi = {
       source  = "paultyng/unifi"
-      version = "0.38.0"
+      version = "0.38.1"
     }
     sops = {
       source  = "carlpett/sops"
