@@ -7,7 +7,6 @@
       matchDatasources: ["docker", "helm"],
       group: { commitMessageTopic: "{{{groupName}}} group" },
       separateMinorPatch: true,
-      stabilityDays: 2,
     },
     {
       matchDatasources: ["helm", "docker"],
@@ -19,16 +18,6 @@
       groupName: "cilium",
       additionalBranchPrefix: "",
       separateMinorPatch: true,
-      stabilityDays: 2,
-    },
-    {
-      description: "External Snapshotter image and kustomization",
-      groupName: "External Snapshotter",
-      matchPackagePatterns: ["external-snapshotter", "snapshot-controller"],
-      matchDatasources: ["docker", "github-releases"],
-      group: { commitMessageTopic: "{{{groupName}}} group" },
-      separateMinorPatch: true,
-      stabilityDays: 2,
     },
     {
       description: "Thanos image and chart - versions do not match",
@@ -38,7 +27,6 @@
       matchUpdateTypes: ["minor", "patch"],
       group: { commitMessageTopic: "{{{groupName}}} group" },
       separateMinorPatch: false,
-      stabilityDays: 2,
     },
     {
       description: "Vector image and chart - versions do not match",
@@ -48,7 +36,6 @@
       matchUpdateTypes: ["minor", "patch"],
       group: { commitMessageTopic: "{{{groupName}}} group" },
       separateMinorPatch: false,
-      stabilityDays: 2,
     },
   ],
 }
