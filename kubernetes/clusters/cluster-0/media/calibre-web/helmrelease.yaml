@@ -30,6 +30,9 @@ spec:
 
     enableServiceLinks: false
 
+    env:
+      CACHE_DIR: /cache
+
     service:
       main:
         ports:
@@ -74,6 +77,10 @@ spec:
         path: /volume1/Media
         server: ${NAS_ADDRESS}
         type: nfs
+      cache:
+        enabled: true
+        type: emptyDir
+        mountPath: /cache
 
     resources:
       requests:
