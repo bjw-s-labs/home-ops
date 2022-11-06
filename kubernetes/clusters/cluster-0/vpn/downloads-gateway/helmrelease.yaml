@@ -35,6 +35,10 @@ spec:
             value: "off"
           - name: DOT
             value: "off"
+          - name: HEALTH_TARGET_ADDRESS
+            value: "1.1.1.1"
+          - name: HEALTH_VPN_DURATION_INITIAL
+            value: 30s
 
         envFrom:
           - secretRef:
@@ -79,5 +83,5 @@ spec:
       gatewayDefault: false
       gatewayLabel: setGateway
       image:
-        repository: ghcr.io/k8s-at-home/gateway-admision-controller
-        tag: v3.6.0
+        repository: ghcr.io/angelnu/gateway-admision-controller
+        tag: v3.7.0@sha256:985eb60fd0017f657d5e66707f7e9b3f764f3337a87a379d26cd15e950bd79ad
