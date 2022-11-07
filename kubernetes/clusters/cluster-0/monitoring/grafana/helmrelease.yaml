@@ -19,11 +19,6 @@ spec:
   values:
     replicas: 1
 
-    admin:
-      existingSecret: grafana-secrets
-      passwordKey: adminPass
-      userKey: adminUser
-
     dashboardProviders:
       dashboardproviders.yaml:
         apiVersion: 1
@@ -78,31 +73,29 @@ spec:
       GF_SECURITY_COOKIE_SAMESITE: grafana
       GF_SERVER_ROOT_URL: "https://grafana.${INGRESS_DOMAIN}"
 
+    envFromSecret: grafana-secrets
+
     grafana.ini:
       analytics:
         check_for_updates: false
       auth:
-        signout_redirect_url: "https://auth.${INGRESS_DOMAIN}/logout"
-        oauth_auto_login: false
+        oauth_auto_login: true
       auth.basic:
         enabled: false
       auth.generic_oauth:
         enabled: true
-        name: Authelia
-        client_id: "${SECRET_GRAFANA_OAUTH_CLIENT_ID}"
-        client_secret: "${SECRET_GRAFANA_OAUTH_CLIENT_SECRET}"
-        scopes: "openid profile email groups"
-        empty_scopes: false
-        auth_url: "https://auth.${INGRESS_DOMAIN}/api/oidc/authorization"
-        token_url: "https://auth.${INGRESS_DOMAIN}/api/oidc/token"
-        api_url: "https://auth.${INGRESS_DOMAIN}/api/oidc/userinfo"
-        login_attribute_path: preferred_username
-        groups_attribute_path: groups
-        name_attribute_path: name
+        name: Auth0
+        scopes: "openid profile email"
+        client_id: # Set by env vars
+        client_secret: # Set by env vars
+        auth_url: # Set by env vars
+        token_url: # Set by env vars
+        api_url: # Set by env vars
         use_pkce: true
+
       auth.generic_oauth.group_mapping:
         role_attribute_path: |
-          contains(groups[*], 'admins') && 'Admin'
+          contains("https://bjw-s/groups"[*], 'grafana-admin') && 'Admin' || contains("https://bjw-s/groups"[*], 'grafana-viewer') && 'Viewer'"
         org_id: 1
       grafana_net:
         url: https://grafana.net
@@ -143,6 +136,7 @@ spec:
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: grafana
+      secret.reloader.stakater.com/reload: grafana-secrets
 
     rbac:
       pspEnabled: false

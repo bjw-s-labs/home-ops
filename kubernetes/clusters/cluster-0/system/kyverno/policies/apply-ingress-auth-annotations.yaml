@@ -9,7 +9,7 @@ metadata:
     policies.kyverno.io/description: >-
       This policy creates auth annotations on ingresses. When
       the `auth.home.arpa/enabled` annotation is `true` it
-      applies the nginx auth annotations for use with Authelia.
+      applies the nginx auth annotations for use with Auth0.
 spec:
   mutateExistingOnPolicyUpdate: true
   generateExistingOnPolicyUpdate: true
@@ -25,8 +25,6 @@ spec:
         patchStrategicMerge:
           metadata:
             annotations:
-              +(nginx.ingress.kubernetes.io/auth-method): GET
-              +(nginx.ingress.kubernetes.io/auth-url): http://authelia.security.svc.cluster.local:9091/api/verify
-              +(nginx.ingress.kubernetes.io/auth-signin): https://auth.${INGRESS_DOMAIN}?rm=$request_method
-              +(nginx.ingress.kubernetes.io/auth-response-headers): Remote-User,Remote-Name,Remote-Groups,Remote-Email
-              +(nginx.ingress.kubernetes.io/auth-snippet): proxy_set_header X-Forwarded-Method $request_method;
+              +(nginx.ingress.kubernetes.io/auth-url): https://auth.${INGRESS_DOMAIN}/oauth2/auth?allowed_groups=admins
+              +(nginx.ingress.kubernetes.io/auth-signin): https://auth.${INGRESS_DOMAIN}/oauth2/start?rd=$scheme://$best_http_host$request_uri
+              +(nginx.ingress.kubernetes.io/auth-response-headers): "x-auth-request-email, x-auth-request-groups"
