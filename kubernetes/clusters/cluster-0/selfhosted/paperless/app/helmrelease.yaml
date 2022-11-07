@@ -27,6 +27,7 @@ spec:
       PAPERLESS_CONSUMER_RECURSIVE: "true"
       PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
       PAPERLESS_ENABLE_HTTP_REMOTE_USER: "true"
+      PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME: HTTP_X_AUTH_REQUEST_EMAIL
       PAPERLESS_OCR_LANGUAGES: nld
       PAPERLESS_OCR_LANGUAGE: nld
       PAPERLESS_PORT: 8000
@@ -52,6 +53,7 @@ spec:
         ingressClassName: "nginx"
         annotations:
           auth.home.arpa/enabled: "true"
+          nginx.ingress.kubernetes.io/auth-url: https://auth.${INGRESS_DOMAIN}/oauth2/auth?allowed_groups=paperless
         hosts:
           - host: &host "paperless.${INGRESS_DOMAIN}"
             paths:

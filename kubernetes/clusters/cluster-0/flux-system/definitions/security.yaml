@@ -13,12 +13,12 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: security-glauth
+  name: security-oauth2-proxy-redis
   namespace: flux-system
   labels:
     component.cluster-0/part-of: definitions
 spec:
-  path: "./kubernetes/clusters/cluster-0/security/glauth"
+  path: "./kubernetes/clusters/cluster-0/security/oauth2-proxy/redis"
   prune: true
   dependsOn:
     - name: security-namespace
@@ -26,27 +26,13 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: security-authelia-redis
+  name: security-oauth2-proxy
   namespace: flux-system
   labels:
     component.cluster-0/part-of: definitions
 spec:
-  path: "./kubernetes/clusters/cluster-0/security/authelia/redis"
+  path: "./kubernetes/clusters/cluster-0/security/oauth2-proxy/app"
   prune: true
   dependsOn:
     - name: security-namespace
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: security-authelia
-  namespace: flux-system
-  labels:
-    component.cluster-0/part-of: definitions
-spec:
-  path: "./kubernetes/clusters/cluster-0/security/authelia/app"
-  prune: true
-  dependsOn:
-    - name: security-namespace
-    - name: security-glauth
-    - name: security-authelia-redis
+    - name: security-oauth2-proxy-redis
