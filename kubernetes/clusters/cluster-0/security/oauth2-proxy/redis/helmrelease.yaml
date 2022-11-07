@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: authelia-redis
+  name: oauth2-proxy-redis
   namespace: security
 spec:
   interval: 30m
@@ -31,7 +31,7 @@ spec:
 
     envFrom:
       - secretRef:
-          name: authelia-redis
+          name: oauth2-proxy-redis
 
     service:
       main:
