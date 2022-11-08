@@ -2,7 +2,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: home-ops-tf-unifi
+  name: home-ops-tf-github
   namespace: infrastructure
 spec:
   interval: 30m
@@ -11,12 +11,12 @@ spec:
   url: https://github.com/bjw-s/home-ops.git
   ignore: |
     /*
-    !/infrastructure/terraform/unifi
+    !/infrastructure/terraform/github
 ---
 apiVersion: infra.contrib.fluxcd.io/v1alpha1
 kind: Terraform
 metadata:
-  name: unifi
+  name: github
   namespace: infrastructure
 spec:
   interval: 30m
@@ -25,10 +25,10 @@ spec:
     disable: true
   cliConfigSecretRef:
     name: tfe-cli-config
-  path: "./infrastructure/terraform/unifi"
+  path: "./infrastructure/terraform/github"
   sourceRef:
     kind: GitRepository
-    name: home-ops-tf-unifi
+    name: home-ops-tf-github
     namespace: infrastructure
   runnerPodTemplate:
     spec:
