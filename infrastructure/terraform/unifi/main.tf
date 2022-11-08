@@ -31,6 +31,10 @@ data "sops_external" "domains" {
   input_type = "yaml"
 }
 
+data "http" "bjws_common_networks" {
+  url = "https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/_shared/networks.yaml"
+}
+
 module "config" {
   source = "./modules/config"
 
