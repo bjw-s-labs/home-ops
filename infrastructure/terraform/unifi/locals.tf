@@ -1,4 +1,4 @@
 locals {
   domains  = yamldecode(nonsensitive(data.sops_external.domains.raw))
-  networks = yamldecode(file(pathexpand("${path.module}/../../networks.yaml")))
+  networks       = yamldecode(chomp(data.http.bjws_common_networks.response_body))
 }
