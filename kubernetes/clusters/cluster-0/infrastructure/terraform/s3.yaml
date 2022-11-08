@@ -2,18 +2,18 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: OCIRepository
 metadata:
-  name: oci-terraform-unifi
+  name: oci-terraform-s3
   namespace: infrastructure
 spec:
   interval: 1m
-  url: oci://ghcr.io/bjw-s/terraform-unifi
+  url: oci://ghcr.io/bjw-s/terraform-s3
   ref:
     tag: main
 ---
 apiVersion: infra.contrib.fluxcd.io/v1alpha1
 kind: Terraform
 metadata:
-  name: unifi
+  name: s3
   namespace: infrastructure
 spec:
   interval: 30m
@@ -22,10 +22,10 @@ spec:
     disable: true
   cliConfigSecretRef:
     name: tfe-cli-config
-  path: "./infrastructure/terraform/unifi"
+  path: "./infrastructure/terraform/s3"
   sourceRef:
     kind: OCIRepository
-    name: oci-terraform-unifi
+    name: oci-terraform-s3
     namespace: infrastructure
   runnerPodTemplate:
     spec:
