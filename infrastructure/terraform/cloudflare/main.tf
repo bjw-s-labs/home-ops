@@ -23,7 +23,12 @@ data "sops_file" "cloudflare_secrets" {
 }
 
 data "http" "bjws_common_domains" {
-  url = "${local.cloudflare_secrets.s3.server}/bjws-common/domains.yaml"
+  url = "https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/_shared/domains.sops.yaml"
+}
+
+data "sops_external" "domains" {
+  source     = data.http.bjws_common_domains.response_body
+  input_type = "yaml"
 }
 
 # Obtain current home IP address

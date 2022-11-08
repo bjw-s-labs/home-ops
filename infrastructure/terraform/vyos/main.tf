@@ -28,15 +28,20 @@ data "sops_file" "vyos_secrets" {
 }
 
 data "http" "bjws_common_domains" {
-  url = "${local.vyos_secrets.s3.server}/bjws-common/domains.yaml"
+  url = "https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/_shared/domains.sops.yaml"
 }
 
-data "http" "bjws_common_address_book" {
-  url = "${local.vyos_secrets.s3.server}/bjws-common/address_book.yaml"
+data "sops_external" "domains" {
+  source     = data.http.bjws_common_domains.response_body
+  input_type = "yaml"
+}
+
+data "sops_file" "address_book" {
+  source_file = "address_book.sops.yaml"
 }
 
 data "http" "bjws_common_networks" {
-  url = "${local.vyos_secrets.s3.server}/bjws-common/networks.yaml"
+  url = "https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/_shared/networks.yaml"
 }
 
 module "config" {
