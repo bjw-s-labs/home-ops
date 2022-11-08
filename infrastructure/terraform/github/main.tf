@@ -19,5 +19,5 @@ terraform {
 }
 
 data "sops_file" "github_secrets" {
-  source_file = "secret.sops.yaml"
+  source_file = "github_secrets.sops.yaml"
 }

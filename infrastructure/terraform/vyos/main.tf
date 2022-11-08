@@ -24,26 +24,30 @@ terraform {
 }
 
 data "sops_file" "vyos_secrets" {
-  source_file = "secret.sops.yaml"
+  source_file = "vyos_secrets.sops.yaml"
 }
 
-data "sops_file" "domains" {
-  source_file = pathexpand("${path.module}/../../domains.sops.yaml")
+data "http" "bjws_common_domains" {
+  url = "${local.vyos_secrets.s3.server}/bjws-common/domains.yaml"
 }
 
-data "sops_file" "address_book" {
-  source_file = pathexpand("${path.module}/../../address_book.sops.yaml")
+data "http" "bjws_common_address_book" {
+  url = "${local.vyos_secrets.s3.server}/bjws-common/address_book.yaml"
+}
+
+data "http" "bjws_common_networks" {
+  url = "${local.vyos_secrets.s3.server}/bjws-common/networks.yaml"
 }
 
 module "config" {
-  source = "./config"
+  source = "./modules/config"
 
   config         = local.config
   networks       = local.networks
   domains        = local.domains
   address_book   = local.address_book
   firewall_rules = local.firewall_rules
-  secrets        = sensitive(yamldecode(nonsensitive(data.sops_file.vyos_secrets.raw)))
+  secrets        = local.vyos_secrets
 
   providers = {
     vyos   = vyos.vyos
