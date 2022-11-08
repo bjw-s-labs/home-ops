@@ -16,9 +16,5 @@ terraform {
 }
 
 data "sops_file" "s3_secrets" {
-  source_file = "secret.sops.yaml"
-}
-
-data "sops_file" "domains" {
-  source_file = pathexpand("${path.module}/../../domains.sops.yaml")
+  source_file = "s3_secrets.sops.yaml"
 }

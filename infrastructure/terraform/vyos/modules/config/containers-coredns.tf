@@ -2,7 +2,7 @@ resource "remote_file" "container-coredns-corefile" {
   provider = remote
   path     = "/config/coredns/Corefile"
   content = templatefile(
-    pathexpand("${path.module}/../files/coredns/Corefile.tftpl"),
+    pathexpand("${path.root}/files/coredns/Corefile.tftpl"),
     { domains = var.domains }
   )
   permissions = "0775"
@@ -14,7 +14,7 @@ resource "remote_file" "container-coredns-hosts" {
   provider = remote
   path     = "/config/coredns/hosts"
   content = templatefile(
-    pathexpand("${path.module}/../files/coredns/hosts.tftpl"),
+    pathexpand("${path.root}/files/coredns/hosts.tftpl"),
     {
       address_book = var.address_book,
       config       = var.config

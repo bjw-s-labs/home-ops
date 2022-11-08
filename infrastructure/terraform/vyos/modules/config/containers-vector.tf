@@ -2,7 +2,7 @@ resource "remote_file" "container-vector-agent-config" {
   provider = remote
   path     = "/config/vector-agent/vector.yaml"
   content = templatefile(
-    pathexpand("${path.module}/../files/vector-agent/vector.yaml.tftpl"),
+    pathexpand("${path.root}/files/vector-agent/vector.yaml.tftpl"),
     { address_book = var.address_book }
   )
   permissions = "0775"

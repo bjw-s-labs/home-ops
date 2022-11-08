@@ -19,11 +19,11 @@ terraform {
 }
 
 data "sops_file" "cloudflare_secrets" {
-  source_file = "secret.sops.yaml"
+  source_file = "cloudflare_secrets.sops.yaml"
 }
 
-data "sops_file" "domains" {
-  source_file = pathexpand("${path.module}/../../domains.sops.yaml")
+data "http" "bjws_common_domains" {
+  url = "${local.cloudflare_secrets.s3.server}/bjws-common/domains.yaml"
 }
 
 # Obtain current home IP address
