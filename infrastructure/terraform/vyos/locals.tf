@@ -11,11 +11,11 @@ locals {
     )
   )
 
-  domains        = yamldecode(chomp(data.http.bjws_common_domains.response_body))
+  domains        = yamldecode(nonsensitive(data.sops_external.domains.raw))
   networks       = yamldecode(chomp(data.http.bjws_common_networks.response_body))
-  address_book   = yamldecode(chomp(data.http.bjws_common_address_book.response_body))
+  address_book   = yamldecode(nonsensitive(data.sops_file.address_book.raw))
   firewall_rules = yamldecode(file(pathexpand("${path.module}/firewall_rules.yaml")))
 
-  config = local._config.config
+  config       = local._config.config
   vyos_secrets = sensitive(yamldecode(nonsensitive(data.sops_file.vyos_secrets.raw)))
 }
