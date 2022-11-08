@@ -211,6 +211,8 @@ spec:
     service:
       enabled: true
       type: LoadBalancer
+      annotations:
+        coredns.io/hostname: "vector.${INGRESS_DOMAIN}"
 
   postRenderers:
     - kustomize:
