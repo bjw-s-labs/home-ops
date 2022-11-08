@@ -1,4 +1,18 @@
 ---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: home-ops-tf-cloudflare
+  namespace: infrastructure
+spec:
+  interval: 30m
+  ref:
+    branch: main
+  url: https://github.com/bjw-s/home-ops.git
+  ignore: |
+    /*
+    !/infrastructure/terraform/cloudflare
+---
 apiVersion: infra.contrib.fluxcd.io/v1alpha1
 kind: Terraform
 metadata:
@@ -14,8 +28,8 @@ spec:
   path: "./infrastructure/terraform/cloudflare"
   sourceRef:
     kind: GitRepository
-    name: home-ops
-    namespace: flux-system
+    name: home-ops-tf-cloudflare
+    namespace: infrastructure
   runnerPodTemplate:
     spec:
       volumeMounts:
