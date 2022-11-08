@@ -1,17 +1,14 @@
 ---
-apiVersion: source.toolkit.fluxcd.io/v1beta1
-kind: GitRepository
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
 metadata:
-  name: home-ops-tf-cloudflare
+  name: oci-terraform-cloudflare
   namespace: infrastructure
 spec:
-  interval: 30m
+  interval: 1m
+  url: oci://ghcr.io/bjw-s/terraform-cloudflare
   ref:
-    branch: main
-  url: https://github.com/bjw-s/home-ops.git
-  ignore: |
-    /*
-    !/infrastructure/terraform/cloudflare
+    tag: main
 ---
 apiVersion: infra.contrib.fluxcd.io/v1alpha1
 kind: Terraform
@@ -27,8 +24,8 @@ spec:
     name: tfe-cli-config
   path: "./infrastructure/terraform/cloudflare"
   sourceRef:
-    kind: GitRepository
-    name: home-ops-tf-cloudflare
+    kind: OCIRepository
+    name: oci-terraform-cloudflare
     namespace: infrastructure
   runnerPodTemplate:
     spec:
