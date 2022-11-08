@@ -19,23 +19,18 @@ terraform {
 }
 
 data "sops_file" "unifi_secrets" {
-  source_file = "secret.sops.yaml"
+  source_file = "unifi_secrets.sops.yaml"
 }
 
 data "sops_file" "domains" {
   source_file = pathexpand("${path.module}/../../domains.sops.yaml")
 }
 
-data "sops_file" "address_book" {
-  source_file = pathexpand("${path.module}/../../address_book.sops.yaml")
-}
-
 module "config" {
-  source = "./config"
+  source = "./modules/config"
 
   networks     = local.networks
   domains      = local.domains
-  address_book = local.address_book
   secrets      = sensitive(yamldecode(nonsensitive(data.sops_file.unifi_secrets.raw)))
 
   providers = {

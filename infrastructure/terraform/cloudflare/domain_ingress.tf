@@ -1,5 +1,5 @@
 module "cf_domain_ingress" {
-  source     = "./cf_domain"
+  source     = "./modules/cf_domain"
   domain     = local.domains["ingress"]
   account_id = cloudflare_account.bjw_s.id
   dns_entries = [

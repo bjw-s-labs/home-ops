@@ -2,7 +2,7 @@ resource "remote_file" "container-haproxy-config" {
   provider = remote
   path     = "/config/haproxy/haproxy.cfg"
   content = templatefile(
-    pathexpand("${path.module}/../files/haproxy/haproxy.cfg.tftpl"),
+    pathexpand("${path.root}/files/haproxy/haproxy.cfg.tftpl"),
     { domains = var.domains }
   )
   permissions = "0775"
