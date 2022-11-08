@@ -1,0 +1,66 @@
+---
+name: "Terraform: Build OCI artifacts"
+
+on: # yamllint disable-line rule:truthy
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "infrastructure/terraform/**"
+
+jobs:
+  generate-build-matrix:
+    name: Generate matrix for building images
+    runs-on: ubuntu-22.04
+    outputs:
+      projects: ${{ steps.reduce.outputs.projects }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          list-files: json
+          filters: |
+            addedOrModified:
+              - 'infrastructure/terraform/**'
+
+      - id: reduce
+        run: |
+          PATHS='${{ steps.filter.outputs.addedOrModified_files }}'
+          PROJECTS=$(echo $PATHS | jq --raw-output -c 'map(. |= sub("infrastructure/terraform/"; "") | split("/")[0]) | unique')
+          echo "projects=${PROJECTS}" >> $GITHUB_OUTPUT
+
+  publish:
+    runs-on: ubuntu-22.04
+    needs:
+      - generate-build-matrix
+    strategy:
+      matrix:
+        project: ${{ fromJson(needs.generate-build-matrix.outputs.projects) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Flux
+        uses: fluxcd/flux2/action@main
+
+      - name: Publish OCI
+        run: |
+          flux push artifact oci://ghcr.io/bjw-s/terraform-${{matrix.project}}:$(git rev-parse --short HEAD) \
+              --path="./infrastructure/terraform/${{matrix.project}}" \
+              --source="$(git config --get remote.origin.url)" \
+              --revision="$(git branch --show-current)/$(git rev-parse HEAD)"
+      - name: Tag OCI
+        run: |
+          flux tag artifact oci://ghcr.io/bjw-s/terraform-${{matrix.project}}:$(git rev-parse --short HEAD) \
+              --tag main
