@@ -18,24 +18,20 @@
   }
 }
 
-(local_hosts_without_fallthrough) {
-  hosts /config/hosts {
-    ttl 1
-    reload 5s
-  }
-}
-
 (k8s_gateway) {
   forward . 10.45.0.3:53
+}
+
+(forward_upstream) {
+  forward . tls://1.1.1.1 tls://1.0.0.1 {
+    tls_servername cloudflare-dns.com
+  }
 }
 
 . {
   import common
   import local_hosts
-
-  forward . tls://1.1.1.1 tls://1.0.0.1 {
-    tls_servername cloudflare-dns.com
-  }
+  import forward_upstream
 
   health {
     lameduck 5s
@@ -62,5 +58,6 @@ ${sensitive(domains.personal)} {
 
 ${sensitive(domains.hardware)} {
   import common
-  import local_hosts_without_fallthrough
+  import local_hosts
+  import forward_upstream
 }
