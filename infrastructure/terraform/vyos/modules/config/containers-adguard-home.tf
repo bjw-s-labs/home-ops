@@ -7,24 +7,33 @@ resource "remote_file" "container-adguard-home-dummyhosts" {
   group       = "104" # vyattacfg
 }
 
-resource "vyos_config_block_tree" "container-adguard-home" {
+resource "vyos_config" "container-adguard-home" {
   path = "container name adguard-home"
-
-  configs = {
+  value = jsonencode({
     "image" = "${var.config.containers.adguard-home.image}"
-
-    "network services address" = "${cidrhost(var.networks.services, 6)}"
-
-    "volume hosts destination"   = "/etc/hosts"
-    "volume hosts source"        = "/config/adguard-home/hosts"
-    "volume config destination"  = "/opt/adguardhome/conf"
-    "volume config source"       = "/config/adguard-home/conf"
-    "volume workdir destination" = "/opt/adguardhome/work"
-    "volume workdir source"      = "/config/adguard-home/work"
-  }
+    "network" = {
+      "services" = {
+        "address" = "${cidrhost(var.networks.services, 6)}"
+      }
+    }
+    "volume" = {
+      "hosts" = {
+        "source"      = "/config/adguard-home/hosts"
+        "destination" = "/etc/hosts"
+      }
+      "config" = {
+        "source"      = "/config/adguard-home/conf"
+        "destination" = "/opt/adguardhome/conf"
+      }
+      "workdir" = {
+        "source"      = "/config/adguard-home/work"
+        "destination" = "/opt/adguardhome/work"
+      }
+    }
+  })
 
   depends_on = [
-    vyos_config_block_tree.container_network-services,
+    vyos_config.container_network-services,
     remote_file.container-adguard-home-dummyhosts
   ]
 }

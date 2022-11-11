@@ -10,20 +10,25 @@ resource "remote_file" "container-haproxy-config" {
   group       = "104" # vyattacfg
 }
 
-resource "vyos_config_block_tree" "container-haproxy-k8s-api" {
+resource "vyos_config" "container-haproxy-k8s-api" {
   path = "container name haproxy-k8s-api"
-
-  configs = {
+  value = jsonencode({
     "image" = "${var.config.containers.haproxy.image}"
-
-    "network services address" = "${cidrhost(var.networks.services, 2)}"
-
-    "volume config destination" = "/usr/local/etc/haproxy/haproxy.cfg"
-    "volume config source"      = "/config/haproxy/haproxy.cfg"
-  }
+    "network" = {
+      "services" = {
+        "address" = "${cidrhost(var.networks.services, 2)}"
+      }
+    }
+    "volume" = {
+      "config" = {
+        "source"      = "/config/haproxy/haproxy.cfg"
+        "destination" = "/usr/local/etc/haproxy/haproxy.cfg"
+      }
+    }
+  })
 
   depends_on = [
-    vyos_config_block_tree.container_network-services,
+    vyos_config.container_network-services,
     remote_file.container-haproxy-config
   ]
 }
