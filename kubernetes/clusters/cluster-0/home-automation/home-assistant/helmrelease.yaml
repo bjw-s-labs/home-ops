@@ -25,11 +25,6 @@ spec:
       secret.reloader.stakater.com/reload: home-assistant-secrets
       k8s.v1.cni.cncf.io/networks: macvlan-static-iot-hass
 
-    dnsConfig:
-      options:
-        - name: ndots
-          value: "1"
-
     envFrom:
       - secretRef:
           name: home-assistant-secrets
