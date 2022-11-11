@@ -1,7 +1,6 @@
-resource "vyos_config_block_tree" "container_network-services" {
+resource "vyos_config" "container_network-services" {
   path = "container network services"
-
-  configs = {
+  value = jsonencode({
     "prefix" = "${var.networks.services}"
-  }
+  })
 }
