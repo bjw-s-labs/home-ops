@@ -26,21 +26,26 @@ resource "remote_file" "container-coredns-hosts" {
   group       = "104" # vyattacfg
 }
 
-resource "vyos_config_block_tree" "container-coredns" {
+resource "vyos_config" "container-coredns" {
   path = "container name vyos-coredns"
-
-  configs = {
+  value = jsonencode({
     "cap-add" = "net-bind-service"
     "image"   = "${var.config.containers.coredns.image}"
-
-    "network services address" = "${cidrhost(var.networks.services, 3)}"
-
-    "volume config destination" = "/config"
-    "volume config source"      = "/config/coredns"
-  }
+    "network" = {
+      "services" = {
+        "address" = "${cidrhost(var.networks.services, 3)}"
+      }
+    }
+    "volume" = {
+      "config" = {
+        "source"      = "/config/coredns"
+        "destination" = "/config"
+      }
+    }
+  })
 
   depends_on = [
-    vyos_config_block_tree.container_network-services,
+    vyos_config.container_network-services,
     remote_file.container-coredns-corefile,
     remote_file.container-coredns-hosts
   ]

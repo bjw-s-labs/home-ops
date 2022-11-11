@@ -1,8 +1,8 @@
 terraform {
   required_providers {
     vyos = {
-      source  = "Foltik/vyos"
-      version = "0.3.3"
+      source  = "TGNThump/vyos"
+      version = "1.0.0"
     }
 
     remote = {

@@ -1,8 +1,8 @@
 provider "vyos" {
   alias = "vyos"
 
-  url = "https://${local.config.fqdn}:${local.config.api.port}"
-  key = data.sops_file.vyos_secrets.data["api.key"]
+  endpoint = "https://${local.config.fqdn}:${local.config.api.port}"
+  api_key  = data.sops_file.vyos_secrets.data["api.key"]
 }
 
 provider "remote" {
