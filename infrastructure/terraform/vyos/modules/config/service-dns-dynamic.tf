@@ -5,7 +5,7 @@ resource "vyos_config" "service-dns-dynamic" {
       "interface" = {
         "eth0" = {
           "service" = merge([
-            for domain in ["family", "personal", "ingress"] : {
+            for domain in ["family", "personal", "ingress", "hardware"] : {
               "${domain}" = {
                 "host-name" = "ipv4.${var.domains[domain]}"
                 "server"    = "api.cloudflare.com/client/v4"
