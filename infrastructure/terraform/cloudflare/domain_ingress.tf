@@ -21,7 +21,7 @@ module "cf_domain_ingress" {
     # Generic settings
     {
       name  = "_dmarc"
-      value = "v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s"
+      value = "v=DMARC1; p=none; rua=mailto:postmaster@${local.domains["ingress"]}; ruf=mailto:postmaster@${local.domains["ingress"]}; fo=1;"
       type  = "TXT"
     },
     # Fastmail settings
