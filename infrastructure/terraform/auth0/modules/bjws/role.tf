@@ -22,3 +22,8 @@ resource "auth0_role" "paperless" {
   name        = "paperless"
   description = "Paperless access"
 }
+
+resource "auth0_role" "miniflux" {
+  name        = "miniflux"
+  description = "Miniflux access"
+}
