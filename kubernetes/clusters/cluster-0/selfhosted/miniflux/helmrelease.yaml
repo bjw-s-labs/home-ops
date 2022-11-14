@@ -25,28 +25,31 @@ spec:
       secret.reloader.stakater.com/reload: miniflux
 
     env:
-      CREATE_ADMIN: "1"
+      CREATE_ADMIN: "0"
       DATABASE_URL:
         valueFrom:
           secretKeyRef:
             name: miniflux
             key: DATABASE_URL
-      ADMIN_USERNAME:
-        valueFrom:
-          secretKeyRef:
-            name: miniflux
-            key: ADMIN_USERNAME
-      ADMIN_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: miniflux
-            key: ADMIN_PASSWORD
       POLLING_SCHEDULER: "entry_frequency"
       POLLING_FREQUENCY: "15"
       RUN_MIGRATIONS: "1"
-      OAUTH2_CLIENT_ID: miniflux
-      OAUTH2_CLIENT_SECRET: "${SECRET_MINIFLUX_OAUTH_CLIENT_SECRET}"
-      OAUTH2_OIDC_DISCOVERY_ENDPOINT: "https://auth.${INGRESS_DOMAIN}"
+      OAUTH2_USER_CREATION: "1"
+      OAUTH2_CLIENT_ID:
+        valueFrom:
+          secretKeyRef:
+            name: miniflux
+            key: OAUTH2_CLIENT_ID
+      OAUTH2_CLIENT_SECRET:
+        valueFrom:
+          secretKeyRef:
+            name: miniflux
+            key: OAUTH2_CLIENT_SECRET
+      OAUTH2_OIDC_DISCOVERY_ENDPOINT:
+        valueFrom:
+          secretKeyRef:
+            name: miniflux
+            key: OAUTH2_OIDC_DISCOVERY_ENDPOINT
       OAUTH2_PROVIDER: oidc
       OAUTH2_REDIRECT_URL: "https://miniflux.${INGRESS_DOMAIN}/oauth2/oidc/callback"
 
