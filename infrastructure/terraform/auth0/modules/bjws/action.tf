@@ -18,11 +18,35 @@ resource "auth0_action" "add_roles" {
   }
 }
 
+resource "auth0_action" "verify_app_access" {
+  name    = "verify-app-access"
+  runtime = "node16"
+  code    = <<-EOT
+        exports.onExecutePostLogin = async (event, api) => {
+          // Miniflux does not support OIDC authorization, only authentication
+          if (event.client.name === "${auth0_client.miniflux.name}" && !event.authorization.roles.includes("miniflux")) {
+            api.access.deny(`Access to $${event.client.name} is not allowed.`);
+          }
+        };
+    EOT
+  deploy  = true
+
+  supported_triggers {
+    id      = "post-login"
+    version = "v3"
+  }
+}
+
 resource "auth0_trigger_binding" "login_flow" {
   trigger = "post-login"
 
   actions {
+    display_name = "verify-app-access"
+    id           = auth0_action.verify_app_access.id
+  }
+
+  actions {
     display_name = "add-roles"
-    id           = "a5335507-86e1-4e56-9e73-d138f2bb4999"
+    id           = auth0_action.add_roles.id
   }
 }
