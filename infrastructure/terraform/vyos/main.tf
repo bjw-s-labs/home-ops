@@ -11,15 +11,17 @@ terraform {
       source  = "TGNThump/vyos"
       version = "1.0.0"
     }
-
     sops = {
       source  = "carlpett/sops"
       version = "0.7.1"
     }
-
     remote = {
       source  = "tenstad/remote"
       version = "0.1.1"
+    }
+    http = {
+      source  = "hashicorp/http"
+      version = "3.2.0"
     }
   }
 }
