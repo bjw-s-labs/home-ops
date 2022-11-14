@@ -2,11 +2,18 @@
 clusterName: cluster-0
 
 talosVersion: v1.2.6
-kubernetesVersion: 1.24.6
+kubernetesVersion: 1.25.3
 endpoint: "https://cluster-0.${domainName}:6443"
 
 cniConfig:
   name: none
+
+additionalApiServerCertSans:
+  - ${clusterEndpointIP}
+
+additionalMachineCertSans:
+  - ${clusterEndpointIP}
+  - cluster-0.${domainName}
 
 nodes:
   - hostname: delta.${domainName}
@@ -52,10 +59,14 @@ controlPlane:
       cluster:
         allowSchedulingOnMasters: true
         apiServer:
-          certSANs:
-            - ${clusterEndpointIP}
           extraArgs:
             feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+            oidc-client-id: ${oidcClientId}
+            oidc-groups-claim: https://bjw-s/groups
+            oidc-groups-prefix: 'oidc:'
+            oidc-issuer-url: ${oidcIssuerURL}
+            oidc-username-claim: email
+            oidc-username-prefix: 'oidc:'
         controllerManager:
           extraArgs:
             feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
@@ -70,11 +81,10 @@ controlPlane:
         scheduler:
           extraArgs:
             feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+        extraManifests:
+          - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-0/rbac/oidc.yaml
 
       machine:
-        certSANs:
-          - ${clusterEndpointIP}
-          - cluster-0.${domainName}
         files:
           - content: |
               [plugins."io.containerd.grpc.v1.cri"]
