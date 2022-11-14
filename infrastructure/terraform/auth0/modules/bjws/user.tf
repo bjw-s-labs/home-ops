@@ -12,6 +12,7 @@ resource "auth0_user" "bernd" {
     auth0_role.grafana_admin.id,
     auth0_role.calibre_web.id,
     auth0_role.paperless.id,
+    auth0_role.miniflux.id,
   ]
 
   blocked        = false

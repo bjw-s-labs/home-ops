@@ -4,7 +4,8 @@ resource "auth0_connection" "username_password_authentication" {
   strategy             = "auth0"
 
   enabled_clients = [
-    auth0_client.default.id
+    auth0_client.default.id,
+    auth0_client.miniflux.id
   ]
 
   metadata = {}
