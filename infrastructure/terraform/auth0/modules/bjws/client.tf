@@ -5,9 +5,10 @@ resource "auth0_client" "default" {
   allowed_logout_urls = []
   allowed_origins     = []
   callbacks = [
-    "https://auth.${var.domains["ingress"]}/oauth2/callback",        # oauth2-proxy
-    "https://grafana.${var.domains["ingress"]}/login/generic_oauth", # Grafana
-    "http://localhost:8000"                                          # kubectl oidc-login
+    "https://auth.${var.domains["ingress"]}/oauth2/callback",          # oauth2-proxy
+    "https://grafana.${var.domains["ingress"]}/login/generic_oauth",   # Grafana
+    "http://localhost:8000",                                           # kubectl oidc-login
+    "https://miniflux.${var.domains["ingress"]}/oauth2/oidc/callback", # Miniflux
   ]
 
   client_aliases       = []
