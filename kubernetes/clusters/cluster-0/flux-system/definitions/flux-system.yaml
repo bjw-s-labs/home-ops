@@ -83,3 +83,17 @@ spec:
   interval: 5m
   path: "../kubernetes/clusters/cluster-0/flux-system/add-ons"
   prune: false
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: flux-weave-gitops
+  namespace: flux-system
+  labels:
+    component.cluster-0/part-of: definitions
+spec:
+  dependsOn:
+    - name: flux
+  interval: 5m
+  path: "../kubernetes/clusters/cluster-0/flux-system/weave-gitops"
+  prune: false
