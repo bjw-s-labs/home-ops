@@ -3,7 +3,7 @@ resource "fly_machine" "machine" {
   app      = fly_app.app.name
   region   = each.value
 
-  name  = "${fly_app.app.name}-${each.value}"
+  name = "${fly_app.app.name}-${each.value}"
   # renovate: docker-image
   image = "ghcr.io/bjw-s/gatus:4.3.2"
 
@@ -11,8 +11,8 @@ resource "fly_machine" "machine" {
   memorymb = 256
 
   env = {
-    GATUS_CONFIG_FILE_URL = "https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/terraform/fly/modules/gatus/config/config.yaml"
-    BJWS_DOMAIN_INGRESS = "${var.domains["ingress"]}"
+    GATUS_CONFIG_BASE64 = base64encode(yamlencode(local.gatus_config)),
+    TINI_SUBREAPER = "true"
   }
 
   services = [
