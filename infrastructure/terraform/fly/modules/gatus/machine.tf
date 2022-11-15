@@ -5,10 +5,15 @@ resource "fly_machine" "machine" {
 
   name  = "${fly_app.app.name}-${each.value}"
   # renovate: docker-image
-  image = "louislam/uptime-kuma:1.18.5"
+  image = "ghcr.io/bjw-s/gatus:4.3.2"
 
   cpus     = 1
   memorymb = 256
+
+  env = {
+    GATUS_CONFIG_FILE_URL = "https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/terraform/fly/modules/gatus/config/config.yaml"
+    BJWS_DOMAIN_INGRESS = "${var.domains["ingress"]}"
+  }
 
   services = [
     {
@@ -23,20 +28,12 @@ resource "fly_machine" "machine" {
         }
       ]
       "protocol" : "tcp",
-      "internal_port" : 3001
+      "internal_port" : 8080
     },
-  ]
-
-  mounts = [
-    {
-      path   = "/app/data"
-      volume = fly_volume.data[each.value].id
-    }
   ]
 
   depends_on = [
     fly_app.app,
-    fly_volume.data,
     fly_ip.ipv4
   ]
 }
