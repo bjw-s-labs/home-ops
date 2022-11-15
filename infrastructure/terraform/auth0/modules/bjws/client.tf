@@ -8,6 +8,7 @@ resource "auth0_client" "default" {
     "https://auth.${var.domains["ingress"]}/oauth2/callback",          # oauth2-proxy
     "https://grafana.${var.domains["ingress"]}/login/generic_oauth",   # Grafana
     "http://localhost:8000",                                           # kubectl oidc-login
+    "https://bjw-s-gatus.fly.dev/authorization-code/callback",         # Gatus
   ]
 
   client_aliases       = []
