@@ -42,16 +42,6 @@ provider "fly" {
   internaltunnelregion = "ams"
 }
 
-module "uptime-kuma" {
-  providers = {
-    fly = fly
-  }
-  source = "./modules/uptime-kuma"
-
-  secrets = local.fly_secrets
-  regions = ["ams"]
-}
-
 module "gatus" {
   providers = {
     fly = fly
