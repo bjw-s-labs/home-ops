@@ -26,14 +26,14 @@ data "sops_file" "fly_secrets" {
   source_file = "fly_secrets.sops.yaml"
 }
 
-# data "http" "bjws_common_domains" {
-#   url = "https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/_shared/domains.sops.yaml"
-# }
+data "http" "bjws_common_domains" {
+  url = "https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/_shared/domains.sops.yaml"
+}
 
-# data "sops_external" "domains" {
-#   source     = data.http.bjws_common_domains.response_body
-#   input_type = "yaml"
-# }
+data "sops_external" "domains" {
+  source     = data.http.bjws_common_domains.response_body
+  input_type = "yaml"
+}
 
 provider "fly" {
   fly_api_token = local.fly_secrets["fly_api_token"]
@@ -49,5 +49,16 @@ module "uptime-kuma" {
   source = "./modules/uptime-kuma"
 
   secrets = local.fly_secrets
+  regions = ["ams"]
+}
+
+module "gatus" {
+  providers = {
+    fly = fly
+  }
+  source = "./modules/gatus"
+
+  secrets = local.fly_secrets
+  domains = local.domains
   regions = ["ams"]
 }
