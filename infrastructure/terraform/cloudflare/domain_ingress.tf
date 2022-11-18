@@ -93,6 +93,21 @@ module "cf_domain_ingress" {
       value = "v=spf1 include:mailgun.org ~all"
       type  = "TXT"
     },
+    # Fly.io settings
+    {
+      id      = "fly_status_challenge"
+      name    = "_acme-challenge.status"
+      value   = "status.${local.domains["ingress"]}.53w1ox.flydns.net."
+      type    = "CNAME"
+      proxied = false
+    },
+    {
+      id      = "fly_status_app"
+      name    = "status"
+      value   = "bjw-s-gatus.fly.dev"
+      type    = "CNAME"
+      proxied = true
+    },
   ]
 }
 
