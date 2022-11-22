@@ -62,7 +62,8 @@ data:
     #   apikey: OMDB_API_KEY
 
     radarr:
-      url: https://radarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+      # url: https://radarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+      url: http://radarr.downloads:7878
       token: ${RADARR_API_KEY}
       add_missing: false
       root_folder_path: /mnt/unionfs/Media/Movies
@@ -74,7 +75,8 @@ data:
       search: true
 
     sonarr:
-      url: https://sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+      # url: https://sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+      url: http://sonarr.downloads:8989
       token: ${SONARR_API_KEY}
       add_missing: true
       add_existing: true
