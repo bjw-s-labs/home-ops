@@ -5,10 +5,11 @@ resource "auth0_client" "default" {
   allowed_logout_urls = []
   allowed_origins     = []
   callbacks = [
-    "https://auth.${var.domains["ingress"]}/oauth2/callback",          # oauth2-proxy
-    "https://grafana.${var.domains["ingress"]}/login/generic_oauth",   # Grafana
-    "http://localhost:8000",                                           # kubectl oidc-login
-    "https://bjw-s-gatus.fly.dev/authorization-code/callback",         # Gatus
+    "https://auth.${var.domains["ingress"]}/oauth2/callback",               # oauth2-proxy
+    "https://grafana.${var.domains["ingress"]}/login/generic_oauth",        # Grafana
+    "http://localhost:8000",                                                # kubectl oidc-login
+    "https://status.${var.domains["ingress"]}/authorization-code/callback", # Gatus
+    "https://kubenav.io/oidc.html",                                         # Kubenav
   ]
 
   client_aliases       = []
