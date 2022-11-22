@@ -10,7 +10,7 @@ locals {
     "security" : {
       "oidc" : {
         "issuer-url" : var.secrets.gatus.oidc.issuer_url
-        "redirect-url" : "https://${data.fly_app.app.hostname }/authorization-code/callback"
+        "redirect-url" : "https://status.${var.domains["ingress"]}/authorization-code/callback"
         "client-id" : var.secrets.gatus.oidc.client_id
         "client-secret" : var.secrets.gatus.oidc.client_secret
         "scopes" : ["openid"]
