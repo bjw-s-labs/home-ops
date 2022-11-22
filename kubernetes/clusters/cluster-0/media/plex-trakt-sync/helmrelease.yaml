@@ -23,6 +23,19 @@ spec:
     args:
       - watch
 
+    enableServiceLinks: false
+
+    env:
+      PLEX_BASEURL: http://plex.media.svc.cluster.local:32400
+      PLEX_LOCALURL: http://plex.media.svc.cluster.local:32400
+      PLEX_TOKEN:
+        valueFrom:
+          secretKeyRef:
+            name: plex-tract-sync
+            key: PLEX_TOKEN
+      PLEX_USERNAME: bjw_s
+      TRAKT_USERNAME: bjw-s
+
     service:
       main:
         enabled: false
@@ -46,6 +59,7 @@ spec:
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "plex-tract-sync-config-yaml"
+      secret.reloader.stakater.com/reload: "plex-tract-sync"
 
     probes:
       liveness:
