@@ -1,0 +1,103 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pmm-config
+  namespace: media
+data:
+  config.yml: |
+    libraries:
+      Movies:
+        metadata_path:
+          - file: config/movies.yaml
+      TV - Shows:
+        metadata_path:
+          - file: config/tv.yaml
+    settings:
+      cache: true
+      cache_expiration: 60
+      asset_directory: config/assets
+      asset_folders: true
+      asset_depth: 0
+      create_asset_folders: false
+      dimensional_asset_rename: false
+      download_url_assets: false
+      show_missing_season_assets: false
+      sync_mode: append
+      minimum_items: 1
+      default_collection_order:
+      delete_below_minimum: true
+      delete_not_scheduled: false
+      run_again_delay: 2
+      missing_only_released: false
+      only_filter_missing: false
+      show_unmanaged: true
+      show_filtered: false
+      show_options: false
+      show_missing: true
+      show_missing_assets: true
+      save_missing: true
+      tvdb_language: eng
+      ignore_ids:
+      ignore_imdb_ids:
+      playlist_sync_to_user: all
+      verify_ssl: true
+
+    plex:
+      url: https://plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+      token: ${PLEX_TOKEN}
+      timeout: 60
+      clean_bundles: false
+      empty_trash: false
+      optimize: false
+
+    tmdb:
+      apikey: ${TMDB_API_KEY}
+      language: en
+
+    tautulli:
+      url: https://tautulli.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+      apikey: ${TAUTULLI_API_KEY}
+
+    # omdb:
+    #   apikey: OMDB_API_KEY
+
+    radarr:
+      # url: https://radarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+      url: http://radarr.downloads:7878
+      token: ${RADARR_API_KEY}
+      add_missing: false
+      root_folder_path: /mnt/unionfs/Media/Movies
+      monitor: true
+      availability: announced
+      quality_profile: Any
+      tag: pmm
+      add_existing: false
+      search: true
+
+    sonarr:
+      # url: https://sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+      url: http://sonarr.downloads:8989
+      token: ${SONARR_API_KEY}
+      add_missing: true
+      add_existing: true
+      root_folder_path: /mnt/unionfs/Media/TV/TV Shows
+      monitor: all
+      quality_profile: Any
+      language_profile: English
+      series_type: standard
+      season_folder: true
+      tag: pmm
+      search: true
+      cutoff_search: false
+
+    trakt:
+      client_id: ${TRAKT_ID}
+      client_secret: ${TRAKT_SECRET}
+      pin: ${TRAKT_PIN}
+      authorization:
+          access_token: 
+          token_type: Bearer
+          expires_in: 7889237
+          refresh_token: 
+          scope: public
+          created_at: 1642462048
