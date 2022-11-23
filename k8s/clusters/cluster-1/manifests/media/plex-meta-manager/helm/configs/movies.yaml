@@ -1,24 +1,17 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: pmm-movie-config
-  namespace: media
-data:
-  movies.yaml: |
-    collections:
-      Trakt Popular:
-        trakt_popular: 200
-        collection_order: custom
-        sync_mode: sync
-        sort_title: Traktpopular
-        summary: The most popular movies for all time.
-        radarr_add_missing: true
-        radarr_search: true
-        radarr_monitor: true
-      Tautulli Most Popular Movies:
-        sync_mode: sync
-        collection_order: custom
-        tautulli_watched:
-          list_days: 180
-          list_size: 10
-          list_minimum: 1
+collections:
+  Trakt Popular:
+    trakt_popular: 200
+    collection_order: custom
+    sync_mode: sync
+    sort_title: Traktpopular
+    summary: The most popular movies for all time.
+    radarr_add_missing: true
+    radarr_search: true
+    radarr_monitor: true
+  Tautulli Most Popular Movies:
+    sync_mode: sync
+    collection_order: custom
+    tautulli_watched:
+      list_days: 180
+      list_size: 10
+      list_minimum: 1
