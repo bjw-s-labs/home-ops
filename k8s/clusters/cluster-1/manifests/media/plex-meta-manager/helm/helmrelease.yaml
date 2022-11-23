@@ -105,6 +105,27 @@ spec:
       config:
         enabled: true
         existingClaim: plex-meta-manager
+      pmm-config:
+        enabled: true
+        type: configMap
+        name: pmm-config
+        subPath: config.yaml
+        mountPath: /config/config.yml
+        readOnly: true
+      pmm-tv:
+        enabled: true
+        type: configMap
+        name: pmm-tv
+        subPath: tv.yaml
+        mountPath: config/tv.yaml
+        readOnly: true
+      pmm-movies:
+        enabled: true
+        type: configMap
+        name: pmm-movies
+        subPath: movies.yaml
+        mountPath: config/movies.yaml
+        readOnly: true
 
 #     ingress:
 #       main:
