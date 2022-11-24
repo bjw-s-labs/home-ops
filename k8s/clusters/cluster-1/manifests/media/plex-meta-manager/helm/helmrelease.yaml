@@ -41,6 +41,7 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
+      PMM_CONFIG: /config/yaml/config.yml
       PMM_TIME: "06:00, 18:00"
       # Runs PMM immediately. Used to test
       PMM_RUN: true
@@ -110,22 +111,22 @@ spec:
         type: configMap
         name: pmm-config
         subPath: config.yaml
-        mountPath: /config/config.yml
-        readOnly: false
+        mountPath: /config/yaml/config.yml
+        readOnly: true
       pmm-tv:
         enabled: true
         type: configMap
         name: pmm-tv
         subPath: tv.yaml
-        mountPath: config/tv.yaml
-        readOnly: false
+        mountPath: config/yaml/tv.yaml
+        readOnly: true
       pmm-movies:
         enabled: true
         type: configMap
         name: pmm-movies
         subPath: movies.yaml
-        mountPath: config/movies.yaml
-        readOnly: false
+        mountPath: config/yaml/movies.yaml
+        readOnly: true
 
 #     ingress:
 #       main:
