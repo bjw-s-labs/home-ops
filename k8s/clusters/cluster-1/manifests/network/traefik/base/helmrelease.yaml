@@ -39,10 +39,17 @@ spec:
     logs:
       general:
         format: json
-        level: DEBUG
+        # level: DEBUG
+        level: INFO
       access:
         enabled: true
         format: json
+        fields:
+          defaultMode: keep
+          names:
+            ClientUsername: keep
+          headers:
+            defaultMode: keep
 
     ingressClass:
       enabled: true
