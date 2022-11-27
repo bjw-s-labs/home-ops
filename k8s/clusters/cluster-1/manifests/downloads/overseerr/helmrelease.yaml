@@ -31,6 +31,14 @@ spec:
     #     - 100
     #   fsGroupChangePolicy: "OnRootMismatch"
 
+    hostAliases:
+      - ip: "10.200.1.50"
+        hostnames:
+          - "sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - "sonarr-4k.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - "radarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - "radarr-4k.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+
     env:
       TZ: "${TIMEZONE}"
       OVERSEERR__INSTANCE_NAME: Overseer
