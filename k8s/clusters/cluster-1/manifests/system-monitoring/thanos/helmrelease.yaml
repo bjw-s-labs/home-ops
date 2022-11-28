@@ -15,19 +15,25 @@ spec:
         name: bitnami-charts
         namespace: flux-system
       interval: 5m
+  upgrade:
+    remediation:
+      retries: 5
+  dependsOn:
+    - name: kube-prometheus-stack
+      namespace: system-monitoring
   values:
     query:
       enabled: true
-      replicaLabels:
-        - replica
-
+      replicaCount: 3
+      podAntiAffinityPreset: hard
+      replicaLabel:
+        - __replica__
       dnsDiscovery:
-        sidecarsService: prometheus-thanos-discovery
-        sidecarsNamespace: system-monitoring
-
+        sidecarsService: kube-prometheus-stack-thanos-discovery
+        sidecarsNamespace: monitoring
       ingress:
         enabled: true
-        hostname: "thanos-cluster.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+        hostname: &host "thanos-query.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
         ingressClassName: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
@@ -35,29 +41,20 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
         tls: true
-
-    existingObjstoreSecret: thanos-objstore-secret
+        extraTls:
+          - hosts:
+              - *host
 
     queryFrontend:
       enabled: false
-
     bucketweb:
-      enabled: true
-
+      enabled: false
     compactor:
-      enabled: true
-      persistence:
-        enabled: false
-
+      enabled: false
     storegateway:
-      enabled: true
-      persistence:
-        enabled: true
-        size: 5Gi
-
+      enabled: false
     ruler:
       enabled: false
-
     metrics:
       enabled: true
       serviceMonitor:
