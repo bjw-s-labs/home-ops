@@ -4,10 +4,3 @@
 # services not available through the VyOS CLI system can be placed here.
 
 rm /var/lib/cni/networks/services/10.5.*
-
-if [ -L "/dev/disk/by-id/usb-SSK_SSK_Storage_DD5641988391B-0:0-part1" ]
-then
-  mkdir -p "/mnt/usb-ssd"
-  chown vyos:users "/mnt/usb-ssd"
-  mount "/dev/disk/by-id/usb-SSK_SSK_Storage_DD5641988391B-0:0-part1" "/mnt/usb-ssd"
-fi
