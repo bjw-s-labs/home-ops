@@ -20,6 +20,20 @@ parameters:
   csi.storage.k8s.io/fstype: ext4
 reclaimPolicy: Delete
 allowVolumeExpansion: true
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-bucket-external
+  labels:
+    aws-s3: object
+provisioner: rook-ceph.ceph.rook.io/bucket
+parameters:
+  # Required for access to existing buckets but is omitted when provisioning new buckets
+  objectStoreName: default
+  objectStoreNamespace: rook-ceph-external
+  bucketName: ceph-bucket
+reclaimPolicy: Delete
 # ---
 # apiVersion: storage.k8s.io/v1
 # kind: StorageClass
