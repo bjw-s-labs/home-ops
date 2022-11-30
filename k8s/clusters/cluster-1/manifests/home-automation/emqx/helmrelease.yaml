@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: emqx
-      version: 5.0.3
+      version: 5.0.11
       sourceRef:
         kind: HelmRepository
         name: emqx-charts
@@ -144,3 +144,12 @@ spec:
       kind: Secret
       name: emqx-config
       valuesKey: user_6_password
+
+    - targetPath: emqxConfig.EMQX_AUTH__USER__7__USERNAME
+      kind: Secret
+      name: emqx-config
+      valuesKey: user_7_username
+    - targetPath: emqxConfig.EMQX_AUTH__USER__7__PASSWORD
+      kind: Secret
+      name: emqx-config
+      valuesKey: user_7_password
