@@ -1,0 +1,43 @@
+---
+- block:
+    - name: "{{ package_name }} | Create tempdir"
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: dwnld
+        path: /tmp
+      register: tempfolder_dwnld
+
+    - name: "{{ package_name }} | Download"
+      ansible.builtin.get_url:
+        url: "{{ parsed_url }}"
+        dest: "{{ tempfolder_dwnld.path }}"
+      when:
+        - tempfolder_dwnld.path is defined
+        - package_format == 'raw'
+
+    - name: "{{ package_name }} | Download and extract"
+      ansible.builtin.unarchive:
+        remote_src: true
+        src: "{{ parsed_url }}"
+        dest: "{{ tempfolder_dwnld.path }}"
+        extra_opts: "{{ package_unpack_opts | default([]) }}"
+      when:
+        - tempfolder_dwnld.path is defined
+        - package_format == 'archive'
+
+    - name: "{{ package_name }} | Copy binary to install path"
+      ansible.builtin.copy:
+        src: "{{ tempfolder_dwnld.path }}/{{ parsed_source }}"
+        remote_src: true
+        dest: "{{ install_path }}/{{ package_name }}"
+        mode: "{{ package_mode | default('0755') }}"
+      when:
+        - tempfolder_dwnld.path is defined
+
+  always:
+    - name: "{{ package_name }} | Remove tempdir"
+      ansible.builtin.file:
+        path: "{{ tempfolder_dwnld.path }}"
+        state: absent
+      when: tempfolder_dwnld.path is defined
+      ignore_errors: true

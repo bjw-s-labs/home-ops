@@ -1,0 +1,35 @@
+---
+os: "{{ (ansible_os_family == 'Darwin') | ternary('darwin', 'linux') }}"
+arch: |-
+  {%- if ansible_architecture == "armv6l" -%}
+    armv6
+  {%- elif ansible_architecture == "armv7l" -%}
+    armv7
+  {%- elif ansible_architecture == "arm64" -%}
+    arm64
+  {%- elif ansible_architecture == "aarch64" -%}
+    arm64
+  {%- else -%}
+    amd64
+  {%- endif -%}
+
+url: |-
+  {%- if package_type == "github_release" -%}
+    https://github.com/{{ package_repository }}/releases/download/{{ package_version }}/{{ package_asset }}
+  {%- elif package_type == "http" -%}
+    {{ package_url }}
+  {%- endif -%}
+parsed_url: |-
+  {{
+    url
+      | replace("$version", package_version)
+      | replace("$os", os)
+      | replace("$arch", arch)
+  }}
+parsed_source: |-
+  {{-
+    (package_source | default(package_name))
+      | replace("$version", package_version)
+      | replace("$os", os)
+      | replace("$arch", arch)
+  }}

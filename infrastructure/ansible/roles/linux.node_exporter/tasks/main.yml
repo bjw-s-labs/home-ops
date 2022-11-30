@@ -5,39 +5,25 @@
   changed_when: false
   register: node_exporter_version_check
 
-- name: Download and unarchive node-exporter into temporary location
-  ansible.builtin.unarchive:
-    src: "{{ node_exporter_download_url }}"
-    dest: /tmp
-    remote_src: true
-    mode: 0755
-  when:
-    - not ansible_check_mode
-    - node_exporter_version_check.stdout is not defined
-      or node_exporter_version not in node_exporter_version_check.stdout
-
-- name: Move node-exporter binary into place
+- name: Download node-exporter
+  ansible.builtin.import_role:
+    name: common.download_package
   become: true
-  ansible.builtin.copy:
-    src: "/tmp/node_exporter-{{ node_exporter_version[1:] }}.linux-{{ node_exporter_arch }}/node_exporter"
-    dest: /usr/local/bin/node-exporter
-    mode: 0755
-    remote_src: true
   when:
-    - not ansible_check_mode
     - node_exporter_version_check.stdout is not defined
-      or node_exporter_version not in node_exporter_version_check.stdout
+      or node_exporter_version_clean not in node_exporter_version_check.stdout
+  vars:
+    install_path: "/usr/local/bin"
+    package_name: node-exporter
+    package_version: "{{ node_exporter_version }}"
+    package_type: github_release
+    package_repository: prometheus/node_exporter
+    package_asset: node_exporter-{{ node_exporter_version_clean }}.linux-{{ arch }}.tar.gz
+    package_format: archive
+    package_source: "node_exporter"
+    package_unpack_opts:
+      - --strip-components=1
   notify: Restart node-exporter
-
-- name: Permit traffic in default zone for node-exporter service
-  become: true
-  ansible.posix.firewalld:
-    port: 9100/tcp
-    permanent: yes
-    state: enabled
-    immediate: true
-  when:
-    - ansible_distribution == 'Fedora'
 
 - name: Create node-exporter systemd file
   become: true

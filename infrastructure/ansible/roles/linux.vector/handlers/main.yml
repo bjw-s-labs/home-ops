@@ -1,7 +1,10 @@
 ---
 - name: Restart vector
+  become: true
   ansible.builtin.systemd:
     name: vector.service
     state: restarted
     enabled: true
     daemon_reload: true
+  when:
+    - not ansible_check_mode
