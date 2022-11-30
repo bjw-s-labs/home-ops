@@ -1,26 +1,9 @@
 ---
 # Manage applications
 - ansible.builtin.import_role:
+    name: linux.vector
+
+- ansible.builtin.import_role:
     name: linux.node_exporter
 
-- name: Manage klipper_config folder
-  ansible.builtin.file:
-    path: "{{klipper_config_folder}}"
-    state: directory
-
-- name: Manage klipper_logs folder
-  ansible.builtin.file:
-    path: "{{klipper_logs_folder}}"
-    state: directory
-
-- name: Manage gcode_files folder
-  ansible.builtin.file:
-    path: "{{klipper_gcode_folder}}"
-    state: directory
-
-- ansible.builtin.include_tasks: klipper-config.yml
-- ansible.builtin.import_tasks: klipper/main.yml
-- ansible.builtin.import_tasks: moonraker/main.yml
-- ansible.builtin.import_tasks: mainsail/main.yml
-- ansible.builtin.import_tasks: crowsnest/main.yml
-- ansible.builtin.import_tasks: klipperscreen/main.yml
+- ansible.builtin.import_tasks: klipper-config.yml
