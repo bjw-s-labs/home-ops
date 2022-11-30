@@ -1,0 +1,45 @@
+---
+- name: Check current vector version
+  ansible.builtin.command: "/usr/local/bin/vector --version"
+  failed_when: false
+  changed_when: false
+  register: vector_version_check
+
+- name: Download Vector
+  ansible.builtin.import_role:
+    name: common.download_package
+  become: true
+  when:
+    - vector_version_check.stdout is not defined
+      or vector_version_clean not in vector_version_check.stdout
+  vars:
+    install_path: "/usr/local/bin"
+    package_name: vector
+    package_version: "{{ vector_version }}"
+    package_type: github_release
+    package_repository: vectordotdev/vector
+    package_asset: "{{ vector_asset }}"
+    package_format: archive
+    package_source: "bin/vector"
+    package_unpack_opts:
+      - --strip-components=2
+  notify: Restart vector
+
+- name: Vector configuration
+  become: true
+  block:
+    - name: Manage vector config directory
+      ansible.builtin.file:
+        path: /etc/vector
+        state: directory
+    - name: Copy vector config
+      ansible.builtin.template:
+        src: vector.yaml.j2
+        dest: /etc/vector/vector.yaml
+        mode: 0755
+    - name: Create vector systemd file
+      ansible.builtin.template:
+        src: vector.service.j2
+        dest: /etc/systemd/system/vector.service
+        mode: 0644
+  notify: Restart vector

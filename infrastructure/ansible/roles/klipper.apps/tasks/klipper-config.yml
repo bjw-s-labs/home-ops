@@ -9,16 +9,17 @@
 
     - name: Checkout {{klipper_config_repo}}
       ansible.builtin.git:
-        repo: "{{klipper_config_repo}}"
-        dest: "{{klipper_config_repo_destination}}"
+        repo: "{{ klipper_config_repo }}"
+        dest: "{{ klipper_config_repo_destination }}"
         accept_newhostkey: true
+      ignore_errors: true
 
     - name: Symlink configuration folder
       ansible.builtin.file:
         state: link
         force: true
-        src: "{{klipper_config_repo_destination}}/{{klipper_config_repo_subfolder | default ('')}}"
-        dest: "{{klipper_config_folder}}"
+        src: "{{ klipper_config_repo_destination}}/{{klipper_config_repo_subfolder | default ('') }}"
+        dest: "{{ klipper_config_folder }}"
   when:
     - klipper_config_repo is defined
     - klipper_config_repo != None
@@ -26,16 +27,16 @@
 
 - name: Check if moonraker secrets exist
   ansible.builtin.stat:
-    path: "{{moonraker_secrets_file}}"
+    path: "{{ moonraker_secrets_file }}"
   register: var_moonrakersecrets
 
 - name: Create moonraker secrets file
   ansible.builtin.copy:
-    dest: "{{moonraker_secrets_file}}"
+    dest: "{{ moonraker_secrets_file }}"
     content: |
       [mqtt_credentials]
-      username: {{moonraker_mqtt_username}}
-      password: {{moonraker_mqtt_password}}
+      username: {{ moonraker_mqtt_username }}
+      password: {{ moonraker_mqtt_password }}
     mode: 0600
   when:
     - not var_moonrakersecrets.stat.exists

@@ -1,16 +1,4 @@
 ---
 # renovate: datasource=github-releases depName=prometheus/node_exporter
 node_exporter_version: "v1.4.0"
-node_exporter_download_url: https://github.com/prometheus/node_exporter/releases/download/{{ node_exporter_version }}/node_exporter-{{ node_exporter_version[1:] }}.linux-{{ node_exporter_arch }}.tar.gz
-node_exporter_arch: |-
-  {%- if ansible_architecture == "armv6l" -%}
-    armv6
-  {%- elif ansible_architecture == "armv7l" -%}
-    armv7
-  {%- elif ansible_architecture == "arm64" -%}
-    arm64
-  {%- elif ansible_architecture == "aarch64" -%}
-    arm64
-  {%- else -%}
-    amd64
-  {%- endif -%}
+node_exporter_version_clean: "{{ node_exporter_version[1:] }}"

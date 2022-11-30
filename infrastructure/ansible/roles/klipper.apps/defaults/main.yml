@@ -1,33 +1,4 @@
 ---
-klipper_state: installed
-klipper_version: HEAD
-klipper_install_path: /home/{{ansible_user}}/klipper
-klipper_venv_path: /home/{{ansible_user}}/klippy-env
-klipper_config_folder: /home/{{ansible_user}}/klipper_config
-klipper_logs_folder: /home/{{ansible_user}}/klipper_logs
-klipper_gcode_folder: /home/{{ansible_user}}/gcode_files
-
-klipper_config_repo:
-klipper_config_repo_destination: /home/{{ansible_user}}/git/klipper_config
-klipper_config_repo_subfolder:
-
-moonraker_state: installed
-moonraker_version: HEAD
-moonraker_install_path: /home/{{ansible_user}}/moonraker
-moonraker_venv_path: /home/{{ansible_user}}/moonraker-env
-moonraker_secrets_file: /home/{{ansible_user}}/moonraker_secrets.ini
-
-mainsail_state: installed
-mainsail_version: latest
-mainsail_install_path: /srv/http/mainsail
-mainsail_nginx_user: www-data
-
-crowsnest_state: installed
-crowsnest_version: HEAD
-crowsnest_install_path: /home/{{ansible_user}}/crowsnest
-
-klipperscreen_state: installed
-klipperscreen_version: HEAD
-klipperscreen_install_path: /home/{{ansible_user}}/KlipperScreen
-klipperscreen_venv_path: /home/{{ansible_user}}/.KlipperScreen-env
-klipperscreen_startup_path: "{{klipperscreen_install_path}}/scripts/KlipperScreen-start.sh"
+klipper_config_folder: "{{ moonraker_data_folder }}/config"
+moonraker_data_folder: /home/{{ansible_user}}/printer_data
+moonraker_secrets_file: "{{ moonraker_data_folder }}/moonraker.secrets"
