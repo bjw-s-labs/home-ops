@@ -1,4 +1,7 @@
 ---
+# override the minimum age to 5 minutes:
+minimum-age: 5m
+
 triggers:
   inotify:
     - priority: 0
@@ -7,9 +10,11 @@ triggers:
       include:
         - '\.(mkv|mp4)$'
         - '\.(jpg)$'
-
+      exclude:
+        - ^/mnt/volume1/Media/Downloads
+        - ^/storage/media/Downloads
       paths:
-        - path: /mnt/volume1/Media
+        - path: /mnt/volume1/Media/Library
 
 targets:
   plex:
