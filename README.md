@@ -153,12 +153,18 @@ https://docs.oracle.com/cd/E53394_01/html/E54801/gayrd.html#scrolltoc
 `-n` is for dry run
 
 ```
+sudo lsblk -o name,model,serial
+ls /dev/by-id | grep $serial_from_above
+DEV_DEVICE1 = $output_from_above
+
 zpool status
 zpool add Media mirror $DEV_DEVICE1 $DEV_DEVICE2 -n
 
 sudo reboot
 sudo zpool import Media
 sudo reboot
+
+sudo zpool set quota=$NEW_SIZE $POOL
 ```
 
 # Upgrade Talos OS
