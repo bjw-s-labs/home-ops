@@ -19,12 +19,12 @@ spec:
 
           initContainers:
             - name: render-config
-              image: ghcr.io/onedr0p/recyclarr:3.0.0@sha256:15ac3b69ea9fe66ab2b03f5f3daff36d188a6f2f81a894f64707079ef76989aa
+              image: ghcr.io/onedr0p/alpine:3.17.0
               command:
                 - "/bin/bash"
                 - -c
               args:
-                - "envsubst < /config/recyclarr.yaml > /shared/recyclarr.yaml"
+                - "envsubst < /config/recyclarr.yml > /shared/recyclarr.yml"
               env:
                 - name: RADARR_API_KEY
                   valueFrom:
@@ -44,37 +44,29 @@ spec:
 
           containers:
             - name: recyclarr-sonarr
-              image: ghcr.io/onedr0p/recyclarr:3.0.0@sha256:15ac3b69ea9fe66ab2b03f5f3daff36d188a6f2f81a894f64707079ef76989aa
+              image: ghcr.io/recyclarr/recyclarr:3.0.0
               imagePullPolicy: IfNotPresent
               command:
-                - /app/recyclarr
+                - /app/recyclarr/recyclarr
               args:
                 - sonarr
-                - --app-data
-                - /tmp/recyclarr
-                - --config
-                - /config/recyclarr.yaml
               volumeMounts:
                 - name: shared
-                  mountPath: /config/recyclarr.yaml
-                  subPath: recyclarr.yaml
+                  mountPath: /config/recyclarr.yml
+                  subPath: recyclarr.yml
                   readOnly: true
 
             - name: recyclarr-radarr
-              image: ghcr.io/onedr0p/recyclarr:3.0.0@sha256:15ac3b69ea9fe66ab2b03f5f3daff36d188a6f2f81a894f64707079ef76989aa
+              image: ghcr.io/recyclarr/recyclarr:3.0.0
               imagePullPolicy: IfNotPresent
               command:
                 - /app/recyclarr
               args:
                 - radarr
-                - --app-data
-                - /tmp/recyclarr
-                - --config
-                - /config/recyclarr.yaml
               volumeMounts:
                 - name: shared
-                  mountPath: /config/recyclarr.yaml
-                  subPath: recyclarr.yaml
+                  mountPath: /config/recyclarr.yml
+                  subPath: recyclarr.yml
                   readOnly: true
 
           restartPolicy: OnFailure
