@@ -1,0 +1,85 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/JJGadgets/flux2-schemas/main/helmrelease-helm-v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  labels:
+    app.kubernetes.io/instance: audiobookshelf
+    app.kubernetes.io/name: audiobookshelf
+  name: audiobookshelf
+  namespace: media
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 30m
+  values:
+    image:
+      repository: ghcr.io/advplyr/audiobookshelf
+      tag: 2.2.8
+
+    env:
+      AUDIOBOOKSHELF_UID: &UID 568
+      AUDIOBOOKSHELF_GID: &GID 568
+      PORT: &PORT 8080
+
+    ingress:
+      main:
+        enabled: true
+        annotations:
+          external-dns.home.arpa/enabled: "true"
+        ingressClassName: nginx
+        hosts:
+          - host: &host audiobookshelf.${INGRESS_DOMAIN}
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: audiobookshelf-config
+        subPath: config
+        mountPath: /config
+      metadata:
+        enabled: true
+        existingClaim: audiobookshelf-metadata
+        subPath: metadata
+        mountPath: /metadata
+      nfs-nas-media:
+        enabled: true
+        mountPath: /storage/media
+        path: /volume1/Media
+        server: ${NAS_ADDRESS}
+        type: nfs
+      cache:
+        enabled: true
+        type: emptyDir
+        mountPath: /.npm
+
+    podSecurityContext:
+      runAsUser: *UID
+      runAsGroup: *GID
+      fsGroup: *GID
+      fsGroupChangePolicy: "OnRootMismatch"
+      supplementalGroups:
+        - 65539
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 128M
+
+    service:
+      main:
+        ports:
+          http:
+            port: *PORT
