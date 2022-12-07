@@ -1,0 +1,161 @@
+data_dir: /vector-data-dir
+
+api:
+  enabled: true
+  address: 0.0.0.0:8686
+
+enrichment_tables:
+  geoip_table:
+    type: geoip
+    path: /geoip/GeoLite2-City.mmdb
+
+# Sources
+sources:
+  kubernetes_source:
+    address: 0.0.0.0:6000
+    type: vector
+    version: "2"
+
+  vyos_logs:
+    address: 0.0.0.0:6001
+    type: vector
+    version: "2"
+
+  journald_source:
+    type: vector
+    address: 0.0.0.0:6002
+    version: "2"
+
+  vector_metrics:
+    type: internal_metrics
+
+  talos_kernel_logs:
+    address: 0.0.0.0:6050
+    type: socket
+    mode: udp
+    max_length: 102400
+    decoding:
+      codec: json
+    host_key: __host
+
+  talos_service_logs:
+    address: 0.0.0.0:6051
+    type: socket
+    mode: udp
+    max_length: 102400
+    decoding:
+      codec: json
+    host_key: __host
+
+# Transformations
+transforms:
+  talos_kernel_logs_xform:
+    type: remap
+    inputs:
+      - talos_kernel_logs
+    source: |-
+      .__host = replace!(.__host, "10.1.1.31", "delta")
+      .__host = replace(.__host, "10.1.1.32", "enigma")
+      .__host = replace(.__host, "10.1.1.33", "felix")
+
+  talos_service_logs_xform:
+    type: remap
+    inputs:
+      - talos_service_logs
+    source: |-
+      .__host = replace!(.__host, "10.1.1.31", "delta")
+      .__host = replace(.__host, "10.1.1.32", "enigma")
+      .__host = replace(.__host, "10.1.1.33", "felix")
+
+  kubernetes_remap:
+    type: remap
+    inputs:
+      - kubernetes_source
+    source: |
+      # Standardize 'app' index
+      .custom_app_name = .pod_labels."app.kubernetes.io/name" || .pod_labels.app || .pod_labels."k8s-app" || "unknown"
+
+# Sinks
+sinks:
+  loki_kubernetes:
+    type: loki
+    inputs:
+      - kubernetes_source
+    endpoint: http://loki-gateway.monitoring.svc.cluster.local:80
+    encoding:
+      codec: json
+    batch:
+      max_bytes: 2049000
+    out_of_order_action: rewrite_timestamp
+    remove_label_fields: true
+    remove_timestamp: true
+    labels:
+      k8s_app: '{{ custom_app_name }}'
+      k8s_container: '{{ kubernetes.container_name }}'
+      k8s_filename: '{{ kubernetes.file }}'
+      k8s_instance: '{{ kubernetes.pod_labels."app.kubernetes.io/instance" }}'
+      k8s_namespace: '{{ kubernetes.pod_namespace }}'
+      k8s_node: '{{ kubernetes.pod_node_name }}'
+      k8s_pod: '{{ kubernetes.pod_name }}'
+
+  loki_vyos:
+    type: loki
+    inputs:
+      - vyos_logs
+    endpoint: http://loki-gateway.monitoring.svc.cluster.local:80
+    encoding:
+      codec: json
+    batch:
+      max_bytes: 400000
+    out_of_order_action: rewrite_timestamp
+    labels:
+      hostname: '{{ host }}'
+      syslog_identifier: '{{SYSLOG_IDENTIFIER }}'
+
+  loki_journal:
+    type: loki
+    inputs:
+      - journald_source
+    endpoint: http://loki-gateway.monitoring.svc.cluster.local:80
+    encoding:
+      codec: json
+    batch:
+      max_bytes: 2049000
+    out_of_order_action: accept
+    remove_label_fields: true
+    remove_timestamp: true
+    labels:
+      hostname: '{{ host }}'
+
+  talos_kernel:
+    type: loki
+    inputs:
+      - talos_kernel_logs_xform
+    endpoint: http://loki-gateway.monitoring.svc.cluster.local:80
+    encoding:
+      codec: json
+      except_fields:
+        - __host
+    batch:
+      max_bytes: 1048576
+    out_of_order_action: rewrite_timestamp
+    labels:
+      hostname: '{{ __host }}'
+      service: '{{ facility }}'
+
+  talos_service:
+    type: loki
+    inputs:
+      - talos_service_logs_xform
+    endpoint: http://loki-gateway.monitoring.svc.cluster.local:80
+    encoding:
+      codec: json
+      except_fields:
+        - __host
+    batch:
+      max_bytes: 524288
+    out_of_order_action: rewrite_timestamp
+    labels:
+      hostname: '{{ __host }}'
+      service: "talos-service"
+      namespace: "talos:service"
