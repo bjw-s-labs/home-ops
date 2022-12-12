@@ -24,7 +24,6 @@ locals {
         "method": "POST"
         "body": "token=${var.secrets.gatus.pushover.token}&user=${var.secrets.gatus.pushover.user_key}&title=[ALERT_TRIGGERED_OR_RESOLVED]:+[ENDPOINT_GROUP]+-+[ENDPOINT_NAME]&message=[ALERT_DESCRIPTION]"
         "default-alert": {
-          "enabled": true
           "description": "Healthcheck failed"
           "failure-threshold": 2
           "success-threshold": 2
