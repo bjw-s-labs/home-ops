@@ -18,5 +18,5 @@ variable "secrets" {
 
 variable "regions" {
   description = "Fly regions to deploy machines in"
-  type = list(string)
+  type        = list(string)
 }

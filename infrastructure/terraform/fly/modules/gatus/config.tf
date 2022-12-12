@@ -18,17 +18,16 @@ locals {
       }
     }
 
-    "alerting": {
-      "custom": {
-        "url": "https://api.pushover.net/1/messages.json"
-        "method": "POST"
-        "body": "token=${var.secrets.gatus.pushover.token}&user=${var.secrets.gatus.pushover.user_key}&title=[ALERT_TRIGGERED_OR_RESOLVED]:+[ENDPOINT_GROUP]+-+[ENDPOINT_NAME]&message=[ALERT_DESCRIPTION]"
-        "default-alert": {
-          "enabled": true
-          "description": "Healthcheck failed"
-          "failure-threshold": 2
-          "success-threshold": 2
-          "send-on-resolved": true
+    "alerting" : {
+      "custom" : {
+        "url" : "https://api.pushover.net/1/messages.json"
+        "method" : "POST"
+        "body" : "token=${var.secrets.gatus.pushover.token}&user=${var.secrets.gatus.pushover.user_key}&title=[ALERT_TRIGGERED_OR_RESOLVED]:+[ENDPOINT_GROUP]+-+[ENDPOINT_NAME]&message=[ALERT_DESCRIPTION]"
+        "default-alert" : {
+          "description" : "Healthcheck failed"
+          "failure-threshold" : 2
+          "success-threshold" : 2
+          "send-on-resolved" : true
         }
       }
     }
@@ -42,8 +41,8 @@ locals {
         "conditions" : [
           "[CONNECTED] == true"
         ],
-        "alerts": [
-          {"type": "custom"}
+        "alerts" : [
+          { "type" : "custom" }
         ]
       },
 
@@ -56,8 +55,8 @@ locals {
           "[CONNECTED] == true",
           "[STATUS] == 200"
         ],
-        "alerts": [
-          {"type": "custom"}
+        "alerts" : [
+          { "type" : "custom" }
         ]
       },
       {
@@ -69,8 +68,8 @@ locals {
           "[CONNECTED] == true",
           "[STATUS] == 200"
         ],
-        "alerts": [
-          {"type": "custom"}
+        "alerts" : [
+          { "type" : "custom" }
         ]
       },
       {
@@ -82,8 +81,8 @@ locals {
           "[CONNECTED] == true",
           "[STATUS] == 200"
         ],
-        "alerts": [
-          {"type": "custom"}
+        "alerts" : [
+          { "type" : "custom" }
         ]
       },
     ]
