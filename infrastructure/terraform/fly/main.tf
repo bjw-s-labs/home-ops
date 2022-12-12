@@ -36,9 +36,9 @@ data "sops_external" "domains" {
 }
 
 provider "fly" {
-  fly_api_token = local.fly_secrets["fly_api_token"]
-  useinternaltunnel = true
-  internaltunnelorg = "personal"
+  fly_api_token        = local.fly_secrets["fly_api_token"]
+  useinternaltunnel    = true
+  internaltunnelorg    = "personal"
   internaltunnelregion = "ams"
 }
 

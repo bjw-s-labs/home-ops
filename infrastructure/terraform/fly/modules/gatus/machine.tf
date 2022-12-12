@@ -12,7 +12,7 @@ resource "fly_machine" "machine" {
 
   env = {
     GATUS_CONFIG_BASE64 = base64encode(yamlencode(local.gatus_config)),
-    TINI_SUBREAPER = "true"
+    TINI_SUBREAPER      = "true"
   }
 
   services = [
