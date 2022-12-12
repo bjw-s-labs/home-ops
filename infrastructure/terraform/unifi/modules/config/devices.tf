@@ -25,12 +25,12 @@ resource "unifi_device" "switch_core_1" {
   }
   port_override {
     number          = 3
-    name            = "Zigbee Adapter"
+    name            = "hallway_zigbee_adapter"
     port_profile_id = data.unifi_port_profile.iot.id
   }
   port_override {
     number          = 4
-    name            = "TBD"
+    name            = "hallway_tado_bridge"
     port_profile_id = data.unifi_port_profile.iot.id
   }
   port_override {
@@ -80,7 +80,7 @@ resource "unifi_device" "switch_core_1" {
   }
   port_override {
     number          = 16
-    name            = "EdgeRouter"
+    name            = "vyos_router"
     port_profile_id = data.unifi_port_profile.all.id
   }
 }
@@ -112,7 +112,8 @@ resource "unifi_device" "switch_core_2" {
   }
   port_override {
     number          = 5
-    port_profile_id = data.unifi_port_profile.all.id
+    name            = "attic_office_hue_bridge"
+    port_profile_id = data.unifi_port_profile.iot.id
   }
   port_override {
     number          = 6
