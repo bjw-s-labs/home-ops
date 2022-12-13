@@ -1,0 +1,91 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: calibre-web
+  namespace: media
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 30m
+  values:
+    image:
+      repository: ghcr.io/bjw-s/calibre-web
+      tag: 0.6.19@sha256:fb7a26a0674ce8a08c7d7731d5621cc738134bf50bf0bda9b8c8e24280ba9c88
+
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: "OnRootMismatch"
+      supplementalGroups:
+        - 65539
+
+    enableServiceLinks: false
+
+    env:
+      CACHE_DIR: /cache
+
+    service:
+      main:
+        ports:
+          http:
+            port: 8083
+
+    ingress:
+      main:
+        enabled: true
+        annotations:
+          auth.home.arpa/enabled: "true"
+          nginx.ingress.kubernetes.io/auth-url: https://auth.${INGRESS_DOMAIN}/oauth2/auth?allowed_groups=calibre-web
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_set_header Accept-Encoding "";
+            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/calibreweb/nord.css"></head>';
+            sub_filter_once on;
+        ingressClassName: nginx
+        hosts:
+          - host: &host calibre-web.${INGRESS_DOMAIN}
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+      kobo:
+        enabled: true
+        ingressClassName: nginx
+        hosts:
+          - host: &host_kobo calibre-kobo.${INGRESS_DOMAIN}
+            paths:
+              - path: /kobo/
+        tls:
+          - hosts:
+              - *host_kobo
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: calibre-web-config
+      media:
+        enabled: true
+        mountPath: /data/nas-media
+        path: /volume1/Media
+        server: ${NAS_ADDRESS}
+        type: nfs
+      cache:
+        enabled: true
+        type: emptyDir
+        mountPath: /cache
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 249M
+      limits:
+        memory: 299M

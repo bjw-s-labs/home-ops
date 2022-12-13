@@ -1,0 +1,10 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  # Pre Flux-Kustomizations
+  - ./namespace.yaml
+  # Standard Resources
+  - ./add-ons
+  # Flux-Kustomizations
+  - ./weave-gitops/ks.yaml

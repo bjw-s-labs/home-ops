@@ -1,0 +1,57 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: bonob
+  namespace: media
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    image:
+      repository: docker.io/simojenki/bonob
+      tag: v0.6.2
+
+    env:
+      BNB_PORT: 4534
+      BNB_SONOS_AUTO_REGISTER: true
+      BNB_SONOS_DEVICE_DISCOVERY: true
+      BNB_SONOS_SEED_HOST: 10.1.3.61
+      BNB_SONOS_SERVICE_ID: 246
+      BNB_SONOS_SERVICE_NAME: Navidrome
+      BNB_SUBSONIC_URL: https://navidrome.${INGRESS_DOMAIN}
+      BNB_URL: https://bonob.${INGRESS_DOMAIN}
+
+    service:
+      main:
+        ports:
+          http:
+            port: 4534
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: nginx
+        hosts:
+          - host: &host bonob.${INGRESS_DOMAIN}
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 127M
+      limits:
+        memory: 188M

@@ -1,0 +1,81 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  labels:
+    app.kubernetes.io/instance: navidrome
+    app.kubernetes.io/name: navidrome
+  name: navidrome
+  namespace: media
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 30m
+  values:
+    image:
+      repository: docker.io/deluan/navidrome
+      tag: 0.48.0
+
+    env:
+      ND_DATAFOLDER: /data
+      ND_ENABLESTARRATING: "false"
+      ND_LASTFM_ENABLED: "false"
+      ND_LOGLEVEL: info
+      ND_MUSICFOLDER: /music
+      ND_SCANSCHEDULE: "@every 1h"
+
+    ingress:
+      main:
+        enabled: true
+        annotations:
+          external-dns.home.arpa/enabled: "true"
+        ingressClassName: nginx
+        hosts:
+          - host: &host navidrome.${INGRESS_DOMAIN}
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: navidrome-config
+        mountPath: /data
+      music-kids:
+        enabled: true
+        mountPath: /music/kids
+        path: /volume1/Media/Library/Kids/Music
+        server: ${NAS_ADDRESS}
+        type: nfs
+      music-main:
+        enabled: true
+        mountPath: /music/main
+        path: /volume1/Media/Library/Main/Music
+        server: ${NAS_ADDRESS}
+        type: nfs
+
+    podSecurityContext:
+      supplementalGroups:
+        - 65539
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 145M
+      limits:
+        memory: 215M
+
+    service:
+      main:
+        ports:
+          http:
+            port: 4533
