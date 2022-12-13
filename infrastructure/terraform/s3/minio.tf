@@ -21,3 +21,11 @@ module "minio_bucket_postgresql" {
     minio = minio.nas
   }
 }
+
+module "minio_bucket_volsync" {
+  source      = "./modules/minio_bucket"
+  bucket_name = "volsync"
+  providers = {
+    minio = minio.nas
+  }
+}
