@@ -1,0 +1,81 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: onepassword-connect
+  namespace: security
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controller:
+      annotations:
+        reloader.stakater.com/auto: "true"
+
+    image:
+      repository: docker.io/1password/connect-api
+      tag: 1.5.7
+
+    env:
+      OP_BUS_PORT: "11220"
+      OP_BUS_PEERS: "localhost:11221"
+      OP_HTTP_PORT: &port 8080
+      OP_SESSION:
+        valueFrom:
+          secretKeyRef:
+            name: onepassword-connect-secret
+            key: onepassword-credentials.json
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+
+    probes:
+      liveness:
+        enabled: true
+        custom: true
+        spec:
+          httpGet:
+            path: /heartbeat
+            port: *port
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          failureThreshold: 3
+      readiness:
+        enabled: true
+        custom: true
+        spec:
+          httpGet:
+            path: /health
+            port: *port
+          initialDelaySeconds: 15
+      startup:
+        enabled: false
+
+    podSecurityContext:
+      runAsUser: 999
+      runAsGroup: 999
+
+    persistence:
+      shared:
+        enabled: true
+        type: emptyDir
+        mountPath: /home/opuser/.op/data
+
+    resources:
+      requests:
+        cpu: 5m
+        memory: 10Mi
+      limits:
+        memory: 100Mi
