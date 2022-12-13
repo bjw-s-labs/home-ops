@@ -1,0 +1,50 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: oauth2-proxy-redis
+  namespace: security
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controller:
+      strategy: RollingUpdate
+
+    image:
+      repository: docker.io/library/redis
+      tag: 7.0.6
+
+    command: ["redis-server", "--requirepass", "$(REDIS_PASSWORD)"]
+
+    env:
+      REDIS_REPLICATION_MODE: master
+
+    envFrom:
+      - secretRef:
+          name: oauth2-proxy-redis
+
+    service:
+      main:
+        ports:
+          http:
+            enabled: false
+          redis:
+            enabled: true
+            port: 6379
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 64M
+      limits:
+        memory: 128M

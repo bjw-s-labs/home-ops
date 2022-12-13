@@ -1,0 +1,71 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: n8n
+  namespace: selfhosted
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    image:
+      repository: docker.io/n8nio/n8n
+      tag: 0.207.0
+
+    podAnnotations:
+      secret.reloader.stakater.com/reload: n8n-secrets
+
+    env:
+      GENERIC_TIMEZONE: "Europe/Amsterdam"
+      N8N_PROTOCOL: "https"
+      N8N_PORT: &port 443
+      N8N_HOST: "n8n.${INGRESS_DOMAIN}"
+      N8N_LOG_LEVEL: info
+      N8N_LOG_OUTPUT: console
+
+    envFrom:
+      - secretRef:
+          name: n8n-secrets
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          auth.home.arpa/enabled: "true"
+          external-dns.home.arpa/enabled: "true"
+        hosts:
+          - host: &host "n8n.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: n8n-config
+        mountPath: /home/node/.n8n
+
+    resources:
+      requests:
+        cpu: 20m
+        memory: 128M
+      limits:
+        memory: 512M

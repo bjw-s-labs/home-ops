@@ -1,0 +1,69 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: zigbee2mqtt
+  namespace: home-automation
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    image:
+      repository: docker.io/koenkk/zigbee2mqtt
+      tag: 1.28.4
+
+    env:
+      ZIGBEE2MQTT_DATA: /data
+
+    service:
+      main:
+        ports:
+          http:
+            port: 8080
+          metrics:
+            enabled: true
+            port: 9000
+
+    serviceMonitor:
+      main:
+        enabled: true
+        endpoints:
+          - port: metrics
+            scheme: http
+            path: /metrics
+            interval: 1m
+            scrapeTimeout: 10s
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        hosts:
+          - host: &host "zigbee2mqtt.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      data:
+        enabled: true
+        mountPath: "/data"
+        existingClaim: zigbee2mqtt-data
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 127M
+      limits:
+        memory: 1364M
