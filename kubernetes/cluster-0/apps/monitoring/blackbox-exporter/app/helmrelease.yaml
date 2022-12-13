@@ -1,0 +1,143 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: blackbox-exporter
+  namespace: monitoring
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: prometheus-blackbox-exporter
+      version: 7.1.3
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+      interval: 30m
+  values:
+    fullnameOverride: blackbox-exporter
+
+    image:
+      repository: quay.io/prometheus/blackbox-exporter
+
+    config:
+      modules:
+        http_2xx:
+          prober: http
+          timeout: 5s
+          http:
+            valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+            follow_redirects: true
+            preferred_ip_protocol: "ip4"
+        icmp:
+          prober: icmp
+          timeout: 30s
+          icmp:
+            preferred_ip_protocol: "ip4"
+
+    ingress:
+      enabled: true
+      className: nginx
+      hosts:
+        - host: &host "blackbox-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - hosts:
+            - *host
+
+    prometheusRule:
+      enabled: true
+      additionalLabels:
+        app: prometheus-operator
+        release: prometheus
+      rules:
+        - alert: BlackboxSslCertificateWillExpireSoon
+          expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 3
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            description: |-
+              The SSL certificate for {{"{{ $labels.target }}"}} will expire in less than 3 days
+        - alert: BlackboxSslCertificateExpired
+          expr: probe_ssl_earliest_cert_expiry - time() <= 0
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            description: |-
+              The SSL certificate for {{"{{ $labels.target }}"}} has expired
+        - alert: BlackboxProbeFailed
+          expr: probe_success == 0
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            description: |-
+              The host {{"{{ $labels.target }}"}} is currently unreachable
+
+    pspEnabled: false
+
+    securityContext:
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        add: ["NET_RAW"]
+
+    serviceMonitor:
+      enabled: true
+      defaults:
+        labels:
+          release: prometheus
+        interval: 2m
+        scrapeTimeout: 30s
+      targets:
+        # 3D Printer controller
+        - module: http_2xx
+          name: horus-http
+          url: "http://horus.${HARDWARE_DOMAIN}"
+        - module: icmp
+          name: horus-icmp
+          url: horus.${HARDWARE_DOMAIN}
+
+        # PiKVM
+        - module: http_2xx
+          name: pikvm-http
+          url: "https://pikvm.${HARDWARE_DOMAIN}"
+        - module: icmp
+          name: pikvm-icmp
+          url: diego.${HARDWARE_DOMAIN}
+
+        # Robot vacuums
+        - module: icmp
+          name: valetudo-living-room-icmp
+          url: livingroom-vacuum.${HARDWARE_DOMAIN}
+        - module: http_2xx
+          name: valetudo-living-room-http
+          url: "http://livingroom-vacuum.${HARDWARE_DOMAIN}"
+        - module: icmp
+          name: valetudo-upstairs-icmp
+          url: upstairs-vacuum.${HARDWARE_DOMAIN}
+        - module: http_2xx
+          name: valetudo-upstairs-http
+          url: "http://upstairs-vacuum.${HARDWARE_DOMAIN}"
+
+        # Wallmount tablets
+        - module: http_2xx
+          name: hallway-tablet-http
+          url: "http://hallway-tablet.${HARDWARE_DOMAIN}:2323"
+        - module: icmp
+          name: hallway-tablet-icmp
+          url: hallway-tablet.${HARDWARE_DOMAIN}
+
+        # Other devices
+        - module: icmp
+          name: zigbee-controller-icmp
+          url: hallway-zigbee-adapter.${HARDWARE_DOMAIN}
+
+        - module: icmp
+          name: nas-icmp
+          url: nas.${HARDWARE_DOMAIN}

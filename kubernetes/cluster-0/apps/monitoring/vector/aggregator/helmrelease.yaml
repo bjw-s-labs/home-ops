@@ -1,0 +1,64 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  labels:
+    app.kubernetes.io/instance: vector-aggregator
+    app.kubernetes.io/name: vector-aggregator
+  name: vector-aggregator
+  namespace: monitoring
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 30m
+  values:
+    controller:
+      strategy: RollingUpdate
+      annotations:
+        reloader.stakater.com/auto: "true"
+    image:
+      repository: docker.io/timberio/vector
+      tag: 0.26.0-debian
+
+    args: ["--config", "/etc/vector/vector.yaml"]
+
+    service:
+      main:
+        type: LoadBalancer
+        loadBalancerIP: "${SVC_VECTOR_AGGREGATOR_ADDR}"
+        annotations:
+          coredns.io/hostname: "vector.${INGRESS_DOMAIN}"
+        externalTrafficPolicy: Local
+        ports:
+          http:
+            port: 8686
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: vector-aggregator-configmap
+        subPath: vector.yaml
+        mountPath: /etc/vector/vector.yaml
+        readOnly: true
+      data:
+        enabled: true
+        type: emptyDir
+        mountPath: /vector-data-dir
+      geoip:
+        enabled: true
+        existingClaim: vector-geoipupdate-config
+
+    resources:
+      requests:
+        cpu: 35m
+        memory: 381M
+      limits:
+        memory: 726M

@@ -1,0 +1,96 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: paperless
+  namespace: selfhosted
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    image:
+      repository: ghcr.io/paperless-ngx/paperless-ngx
+      tag: 1.10.2
+
+    env:
+      COMPOSE_PROJECT_NAME: paperless
+      PAPERLESS_CONSUMER_POLLING: "60"
+      PAPERLESS_CONSUMER_RECURSIVE: "true"
+      PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
+      PAPERLESS_ENABLE_HTTP_REMOTE_USER: "true"
+      PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME: HTTP_X_AUTH_REQUEST_EMAIL
+      PAPERLESS_OCR_LANGUAGES: nld
+      PAPERLESS_OCR_LANGUAGE: nld
+      PAPERLESS_PORT: 8000
+      PAPERLESS_REDIS: redis://paperless-redis.selfhosted.svc.cluster.local:6379
+      PAPERLESS_TASK_WORKERS: 2
+      PAPERLESS_TIME_ZONE: "Europe/Amsterdam"
+      PAPERLESS_URL: https://paperless.${INGRESS_DOMAIN}
+      USERMAP_GID: 65543
+
+    envFrom:
+      - secretRef:
+          name: paperless-secrets
+
+    service:
+      main:
+        ports:
+          http:
+            port: 8000
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          auth.home.arpa/enabled: "true"
+          nginx.ingress.kubernetes.io/auth-url: https://auth.${INGRESS_DOMAIN}/oauth2/auth?allowed_groups=paperless
+        hosts:
+          - host: &host "paperless.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      data:
+        enabled: true
+        mountPath: /usr/src/paperless/data
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Docs/paperless/data
+      media:
+        enabled: true
+        mountPath: /usr/src/paperless/media
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Docs/paperless/media
+      consume:
+        enabled: true
+        mountPath: /usr/src/paperless/consume
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Docs/paperless/incoming
+      export:
+        enabled: true
+        mountPath: /usr/src/paperless/export
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Docs/paperless/export
+
+    resources:
+      requests:
+        cpu: 23m
+        memory: 2975M
+      limits:
+        memory: 6572M

@@ -1,0 +1,16 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  # Pre Flux-Kustomizations
+  - ./namespace.yaml
+  - ./secret-registry.sops.yaml
+  # Flux-Kustomizations
+  - ./cdn/ks.yaml
+  - ./excalidraw/ks.yaml
+  - ./miniflux/ks.yaml
+  - ./n8n/ks.yaml
+  - ./obsidian-couchdb/ks.yaml
+  - ./paperless/ks.yaml
+  - ./radicale/ks.yaml
+  - ./theme-park/ks.yaml

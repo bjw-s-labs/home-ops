@@ -1,0 +1,80 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: sonarr
+  namespace: downloads
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    image:
+      repository: ghcr.io/onedr0p/sonarr-develop
+      tag: 4.0.0.281@sha256:add6e9e50783af3719cb9ad2855e039718d742edd36d2ba096673a9113aa7229
+
+    podAnnotations:
+      secret.reloader.stakater.com/reload: sonarr
+
+    podSecurityContext:
+      supplementalGroups:
+        - 65539
+
+    env:
+      SONARR__INSTANCE_NAME: Sonarr
+      SONARR__PORT: &port 8989
+      SONARR__APPLICATION_URL: "https://sonarr.${INGRESS_DOMAIN}"
+      SONARR__LOG_LEVEL: info
+      SONARR__API_KEY:
+        valueFrom:
+          secretKeyRef:
+            name: sonarr
+            key: SONARR__API_KEY
+
+    envFrom:
+      - secretRef:
+          name: sonarr
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        hosts:
+          - host: &host "sonarr.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: sonarr-config
+      media:
+        enabled: true
+        type: nfs
+        server: "${NAS_ADDRESS}"
+        path: /volume1/Media
+        mountPath: /data/nas-media
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 268M
+      limits:
+        memory: 2357M

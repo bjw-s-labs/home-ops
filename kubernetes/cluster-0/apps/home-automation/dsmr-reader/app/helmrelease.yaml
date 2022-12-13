@@ -1,0 +1,95 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: dsmr-reader
+  namespace: home-automation
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    image:
+      repository: xirixiz/dsmr-reader-docker
+      tag: amd64-5.9.0-2022.11.03
+
+    podAnnotations:
+      secret.reloader.stakater.com/reload: dsmr-reader-secrets
+
+    enableServiceLinks: false
+
+    env:
+      DJANGO_TIME_ZONE: "Europe/Amsterdam"
+      DJANGO_DATABASE_USER:
+        valueFrom:
+          secretKeyRef:
+            name: dsmr-reader-secrets
+            key: POSTGRES_USER
+      DJANGO_DATABASE_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: dsmr-reader-secrets
+            key: POSTGRES_PASSWORD
+      DJANGO_DATABASE_HOST:
+        valueFrom:
+          secretKeyRef:
+            name: dsmr-reader-secrets
+            key: POSTGRES_HOST
+      DJANGO_DATABASE_PORT: "5432"
+      DJANGO_DATABASE_NAME:
+        valueFrom:
+          secretKeyRef:
+            name: dsmr-reader-secrets
+            key: POSTGRES_DB
+
+      DSMRREADER_REMOTE_DATALOGGER_INPUT_METHOD: ipv4
+      DSMRREADER_REMOTE_DATALOGGER_NETWORK_PORT: "8088"
+      DSMRREADER_REMOTE_DATALOGGER_NETWORK_HOST:
+        valueFrom:
+          secretKeyRef:
+            name: dsmr-reader-secrets
+            key: DATALOGGER_NETWORK_HOST
+
+      DSMRREADER_ADMIN_USER:
+        valueFrom:
+          secretKeyRef:
+            name: dsmr-reader-secrets
+            key: DSMRREADER_ADMIN_USER
+      DSMRREADER_ADMIN_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: dsmr-reader-secrets
+            key: DSMRREADER_ADMIN_PASSWORD
+
+    service:
+      main:
+        ports:
+          http:
+            port: 80
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        hosts:
+          - host: &host "dsmr-reader.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    resources:
+      requests:
+        cpu: 49m
+        memory: 298M
+      limits:
+        memory: 595M
