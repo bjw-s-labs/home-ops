@@ -23,7 +23,7 @@ spec:
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "obsidian-couchdb-config"
-      secret.reloader.stakater.com/reload: "obsidian-couchdb"
+      secret.reloader.stakater.com/reload: "obsidian-couchdb-secrets"
 
     initContainers:
       init-config:
@@ -42,12 +42,12 @@ spec:
       COUCHDB_USER:
         valueFrom:
           secretKeyRef:
-            name: obsidian-couchdb
+            name: obsidian-couchdb-secrets
             key: couchdb-user
       COUCHDB_PASSWORD:
         valueFrom:
           secretKeyRef:
-            name: obsidian-couchdb
+            name: obsidian-couchdb-secrets
             key: couchdb-password
 
     service:
