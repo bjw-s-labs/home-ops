@@ -55,7 +55,7 @@ spec:
           storage:
             s3:
               s3: null
-              insecure: true
+              insecure: false
               s3forcepathstyle: true
           ring:
             kvstore:
@@ -137,9 +137,11 @@ spec:
         storageClass: ceph-block-external
     monitoring:
       selfMonitoring:
-        enabled: true
+        enabled: false
         grafanaAgent:
           installOperator: false
+        lokiCanary:
+          enabled: false
   valuesFrom:
     - targetPath: loki.structuredConfig.common.storage.s3.bucketnames
       kind: ConfigMap
