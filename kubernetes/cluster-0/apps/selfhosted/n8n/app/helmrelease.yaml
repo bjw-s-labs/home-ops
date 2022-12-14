@@ -31,10 +31,11 @@ spec:
       N8N_HOST: "n8n.${INGRESS_DOMAIN}"
       N8N_LOG_LEVEL: info
       N8N_LOG_OUTPUT: console
-
-    envFrom:
-      - secretRef:
-          name: n8n-secrets
+      N8N_ENCRYPTION_KEY:
+        valueFrom:
+          secretKeyRef:
+            name: n8n-secrets
+            key: N8N_ENCRYPTION_KEY
 
     service:
       main:
