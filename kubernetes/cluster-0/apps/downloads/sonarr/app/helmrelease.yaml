@@ -22,7 +22,7 @@ spec:
       tag: 4.0.0.286@sha256:da514219612266f0618845b71200512a63ba96cf32f8fea4cbb12804e2869e8a
 
     podAnnotations:
-      secret.reloader.stakater.com/reload: sonarr
+      secret.reloader.stakater.com/reload: sonarr-secrets
 
     podSecurityContext:
       supplementalGroups:
@@ -36,12 +36,8 @@ spec:
       SONARR__API_KEY:
         valueFrom:
           secretKeyRef:
-            name: sonarr
-            key: SONARR__API_KEY
-
-    envFrom:
-      - secretRef:
-          name: sonarr
+            name: sonarr-secrets
+            key: SONARR_API_KEY
 
     service:
       main:
