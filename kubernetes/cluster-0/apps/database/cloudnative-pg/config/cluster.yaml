@@ -12,7 +12,7 @@ spec:
     size: 50Gi
     storageClass: ceph-block
   superuserSecret:
-    name: postgres-superuser
+    name: cloudnative-pg-postgres-superuser
   monitoring:
     enablePodMonitor: true
   backup:
@@ -26,8 +26,8 @@ spec:
       serverName: postgres-v1
       s3Credentials:
         accessKeyId:
-          name: postgres-minio
-          key: MINIO_ACCESS_KEY
+          name: cloudnative-pg-postgres-s3
+          key: S3_ACCESS_KEY
         secretAccessKey:
-          name: postgres-minio
-          key: MINIO_SECRET_KEY
+          name: cloudnative-pg-postgres-s3
+          key: S3_SECRET_KEY
