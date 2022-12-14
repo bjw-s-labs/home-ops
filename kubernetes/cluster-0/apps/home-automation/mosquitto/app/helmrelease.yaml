@@ -8,24 +8,36 @@ spec:
   interval: 30m
   chart:
     spec:
-      chart: mosquitto
-      version: 4.8.2
+      chart: app-template
+      version: 1.2.0
+      interval: 30m
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home
+        name: bjw-s
         namespace: flux-system
-      interval: 30m
 
   values:
     podAnnotations:
-      secret.reloader.stakater.com/reload: mosquitto-config
+      configmap.reloader.stakater.com/reload: mosquitto-config
+      secret.reloader.stakater.com/reload: mosquitto-secrets
 
     image:
       repository: eclipse-mosquitto
       tag: 2.0.15
 
-    auth:
-      enabled: true
+    initContainers:
+      copy-config:
+        image: eclipse-mosquitto:2.0.15
+        command:
+          - "/bin/sh"
+          - -c
+        args:
+          - cp /data/mosquitto_secrets/* /data/external_config/ && mosquitto_passwd -U /data/external_config/mosquitto_pwd
+        volumeMounts:
+          - name: mosquitto-secrets
+            mountPath: /data/mosquitto_secrets
+          - name: external-config
+            mountPath: /data/external_config
 
     service:
       main:
@@ -34,17 +46,32 @@ spec:
         annotations:
           coredns.io/hostname: "mqtt.${INGRESS_DOMAIN}"
         externalTrafficPolicy: Local
+        ports:
+          http:
+            enabled: false
+          mqtt:
+            enabled: true
+            port: 1883
 
     persistence:
       data:
         enabled: true
         existingClaim: mosquitto-data
-      configinc:
+      mosquitto-config:
         enabled: true
-        type: custom
-        volumeSpec:
-          secret:
-            secretName: mosquitto-config
+        type: configMap
+        name: mosquitto-config
+        mountPath: /mosquitto/config/mosquitto.conf
+        subPath: mosquitto.conf
+      mosquitto-secrets:
+        enabled: true
+        type: secret
+        name: mosquitto-secrets
+        mountPath: "-"
+      external-config:
+        enabled: true
+        type: emptyDir
+        mountPath: /mosquitto/external_config
 
     resources:
       requests:
