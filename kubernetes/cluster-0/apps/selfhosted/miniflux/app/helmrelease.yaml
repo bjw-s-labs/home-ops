@@ -22,14 +22,14 @@ spec:
       tag: 2.0.41
 
     podAnnotations:
-      secret.reloader.stakater.com/reload: miniflux
+      secret.reloader.stakater.com/reload: miniflux-secrets
 
     env:
       CREATE_ADMIN: "0"
       DATABASE_URL:
         valueFrom:
           secretKeyRef:
-            name: miniflux
+            name: miniflux-secrets
             key: DATABASE_URL
       POLLING_SCHEDULER: "entry_frequency"
       POLLING_FREQUENCY: "15"
@@ -38,17 +38,17 @@ spec:
       OAUTH2_CLIENT_ID:
         valueFrom:
           secretKeyRef:
-            name: miniflux
+            name: miniflux-secrets
             key: OAUTH2_CLIENT_ID
       OAUTH2_CLIENT_SECRET:
         valueFrom:
           secretKeyRef:
-            name: miniflux
+            name: miniflux-secrets
             key: OAUTH2_CLIENT_SECRET
       OAUTH2_OIDC_DISCOVERY_ENDPOINT:
         valueFrom:
           secretKeyRef:
-            name: miniflux
+            name: miniflux-secrets
             key: OAUTH2_OIDC_DISCOVERY_ENDPOINT
       OAUTH2_PROVIDER: oidc
       OAUTH2_REDIRECT_URL: "https://miniflux.${INGRESS_DOMAIN}/oauth2/oidc/callback"
