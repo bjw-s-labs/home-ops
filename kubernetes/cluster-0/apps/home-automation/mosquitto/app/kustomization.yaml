@@ -4,8 +4,14 @@ kind: Kustomization
 namespace: home-automation
 resources:
   - ./helmrelease.yaml
+  - ./externalsecret.yaml
   - ./pvc.yaml
-  - ./secret.sops.yaml
 commonLabels:
   app.kubernetes.io/name: mosquitto
   app.kubernetes.io/instance: mosquitto
+configMapGenerator:
+  - name: mosquitto-config
+    files:
+      - config/mosquitto.conf
+generatorOptions:
+  disableNameSuffixHash: true
