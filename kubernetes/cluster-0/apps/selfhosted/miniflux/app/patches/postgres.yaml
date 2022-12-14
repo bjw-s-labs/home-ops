@@ -13,22 +13,25 @@ spec:
           - name: POSTGRES_HOST
             valueFrom:
               secretKeyRef:
-                name: miniflux
+                name: miniflux-secrets
                 key: POSTGRES_HOST
           - name: POSTGRES_DB
-            value: miniflux
+            valueFrom:
+              secretKeyRef:
+                name: miniflux-secrets
+                key: POSTGRES_DB
           - name: POSTGRES_SUPER_PASS
             valueFrom:
               secretKeyRef:
-                name: postgres-superuser
-                key: password
+                name: miniflux-secrets
+                key: POSTGRES_SUPER_PASS
           - name: POSTGRES_USER
             valueFrom:
               secretKeyRef:
-                name: miniflux
+                name: miniflux-secrets
                 key: POSTGRES_USER
           - name: POSTGRES_PASS
             valueFrom:
               secretKeyRef:
-                name: miniflux
-                key: POSTGRES_PASS
+                name: miniflux-secrets
+                key: POSTGRES_PASSWORD

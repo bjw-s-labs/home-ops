@@ -32,12 +32,12 @@ spec:
                 - name: POSTGRES_USER
                   valueFrom:
                     secretKeyRef:
-                      name: postgres-superuser
+                      name: cloudnative-pg-postgres-superuser
                       key: username
                 - name: POSTGRES_PASSWORD
                   valueFrom:
                     secretKeyRef:
-                      name: postgres-superuser
+                      name: cloudnative-pg-postgres-superuser
                       key: password
                 - name: POSTGRES_DB
                   value: "dsmr-reader,home-assistant,miniflux"

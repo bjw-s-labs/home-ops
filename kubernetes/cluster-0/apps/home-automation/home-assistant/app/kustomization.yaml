@@ -5,10 +5,9 @@ namespace: home-automation
 resources:
   - ./pvc.yaml
   - ./replicationsource.yaml
+  - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./networkattachmentdefinition.yaml
-  - ./secret-deploykey.sops.yaml
-  - ./secret-home-assistant.sops.yaml
 patchesStrategicMerge:
   - patches/postgres.yaml
 commonLabels:
