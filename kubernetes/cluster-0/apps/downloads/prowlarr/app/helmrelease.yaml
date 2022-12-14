@@ -23,6 +23,7 @@ spec:
 
     podAnnotations:
       setGateway: "true"
+      secret.reloader.stakater.com/reload: prowlarr-secrets
 
     podSecurityContext:
       runAsUser: 568
@@ -35,10 +36,11 @@ spec:
       PROWLARR__PORT: &port 9696
       PROWLARR__LOG_LEVEL: info
       PROWLARR__ANALYTICS_ENABLED: "False"
-
-    envFrom:
-      - secretRef:
-          name: prowlarr
+      PROWLARR__API_KEY:
+        valueFrom:
+          secretKeyRef:
+            name: prowlarr-secrets
+            key: PROWLARR_API_KEY
 
     hostname: prowlarr
 
