@@ -21,6 +21,9 @@ spec:
       repository: ghcr.io/paperless-ngx/paperless-ngx
       tag: 1.10.2
 
+    podAnnotations:
+      secret.reloader.stakater.com/reload: paperless-secrets
+
     env:
       COMPOSE_PROJECT_NAME: paperless
       PAPERLESS_CONSUMER_POLLING: "60"
@@ -36,10 +39,21 @@ spec:
       PAPERLESS_TIME_ZONE: "Europe/Amsterdam"
       PAPERLESS_URL: https://paperless.${INGRESS_DOMAIN}
       USERMAP_GID: 65543
-
-    envFrom:
-      - secretRef:
-          name: paperless-secrets
+      PAPERLESS_ADMIN_USER:
+        valueFrom:
+          secretKeyRef:
+            name: paperless-secrets
+            key: PAPERLESS_ADMIN_USER
+      PAPERLESS_ADMIN_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: paperless-secrets
+            key: PAPERLESS_ADMIN_PASSWORD
+      PAPERLESS_SECRET_KEY:
+        valueFrom:
+          secretKeyRef:
+            name: paperless-secrets
+            key: PAPERLESS_SECRET_KEY
 
     service:
       main:
