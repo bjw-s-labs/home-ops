@@ -5,16 +5,17 @@ metadata:
   name: downloads-gateway
   namespace: vpn
 spec:
+  interval: 30m
   chart:
     spec:
       chart: pod-gateway
+      version: 6.0.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home
+        name: angelnu
         namespace: flux-system
-      version: 5.6.2
-  interval: 30m
+
   values:
     image:
       repository: ghcr.io/angelnu/pod-gateway
@@ -22,11 +23,17 @@ spec:
 
     DNS: 172.16.1.1
 
-    additionalContainers:
-      gluetun:
-        image: qmcgaw/gluetun:v3.32.0@sha256:70e2b9fe66941d6de31419c3207b525293f2e6a92a3788869bb337a17e0e5ec8
-
+    addons:
+      vpn:
+        enabled: true
+        type: gluetun
+        image:
+          # TODO: Replace with ghcr.io/qdm12/gluetun when a versioned tag is available
+          repository: docker.io/qmcgaw/gluetun
+          tag: v3.32.0@sha256:70e2b9fe66941d6de31419c3207b525293f2e6a92a3788869bb337a17e0e5ec8
         env:
+          - name: VPN_SERVICE_PROVIDER
+            value: mullvad
           - name: VPN_TYPE
             value: wireguard
           - name: VPN_INTERFACE
@@ -35,21 +42,25 @@ spec:
             value: "off"
           - name: DOT
             value: "off"
-          - name: HEALTH_TARGET_ADDRESS
-            value: "1.1.1.1"
-          - name: HEALTH_VPN_DURATION_INITIAL
-            value: 30s
-
-        envFrom:
-          - secretRef:
-              name: downloads-gateway-vpnconfig
-
+          - name: SERVER_CITIES
+            value: Zurich
+          - name: SERVER_HOSTNAMES
+            value: ch2-wireguard
+          - name: WIREGUARD_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: downloads-gateway-vpnconfig
+                key: WIREGUARD_PRIVATE_KEY
+          - name: WIREGUARD_ADDRESSES
+            valueFrom:
+              secretKeyRef:
+                name: downloads-gateway-vpnconfig
+                key: WIREGUARD_ADDRESSES
         securityContext:
           capabilities:
             add:
               - NET_ADMIN
 
-    addons:
       netshoot:
         enabled: true
 
