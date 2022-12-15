@@ -10,6 +10,7 @@ resource "auth0_client" "default" {
     "http://localhost:8000",                                                # kubectl oidc-login
     "https://status.${var.domains["ingress"]}/authorization-code/callback", # Gatus
     "https://kubenav.io/oidc.html",                                         # Kubenav
+    "https://gitops.${var.domains["ingress"]}/oauth2/callback",             # Weave-Gitops
   ]
 
   client_aliases       = []
