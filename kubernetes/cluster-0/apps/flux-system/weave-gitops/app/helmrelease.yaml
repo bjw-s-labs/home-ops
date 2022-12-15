@@ -15,10 +15,16 @@ spec:
         kind: HelmRepository
         name: weave-gitops
   values:
+    podAnnotations:
+      secret.reloader.stakater.com/reload: cluster-user-auth
+
+    logLevel: info
+
     adminUser:
       create: true
-      username: admin
-      # passwordHash: from valuesFrom
+      createSecret: false
+    oidcSecret:
+      create: false
 
     ingress:
       enabled: true
@@ -31,9 +37,3 @@ spec:
       tls:
         - hosts:
             - *host
-
-  valuesFrom:
-    - kind: Secret
-      name: weave-gitops
-      valuesKey: adminPassword
-      targetPath: adminUser.passwordHash
