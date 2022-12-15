@@ -31,7 +31,7 @@ spec:
       PLEX_TOKEN:
         valueFrom:
           secretKeyRef:
-            name: plex-trakt-sync
+            name: plex-trakt-sync-secrets
             key: PLEX_TOKEN
       PLEX_USERNAME: bjw_s
       TRAKT_USERNAME: bjw-s
@@ -59,7 +59,7 @@ spec:
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "plex-tract-sync-config-yaml"
-      secret.reloader.stakater.com/reload: "plex-trakt-sync"
+      secret.reloader.stakater.com/reload: "plex-trakt-sync-secrets"
 
     probes:
       liveness:
