@@ -41,6 +41,18 @@ spec:
           http:
             port: *port
 
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        hosts:
+          - host: &host "1pwconnect.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
     probes:
       liveness:
         enabled: true
