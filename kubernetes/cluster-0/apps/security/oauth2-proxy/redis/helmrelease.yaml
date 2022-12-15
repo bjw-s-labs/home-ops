@@ -24,6 +24,9 @@ spec:
       repository: docker.io/library/redis
       tag: 7.0.6
 
+    podAnnotations:
+      secret.reloader.stakater.com/reload: oauth2-proxy-redis-secrets
+
     command: ["redis-server", "--requirepass", "$(REDIS_PASSWORD)"]
 
     env:
@@ -31,7 +34,7 @@ spec:
 
     envFrom:
       - secretRef:
-          name: oauth2-proxy-redis
+          name: oauth2-proxy-redis-secrets
 
     service:
       main:

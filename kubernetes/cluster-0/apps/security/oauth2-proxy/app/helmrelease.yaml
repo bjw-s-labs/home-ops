@@ -21,6 +21,9 @@ spec:
       replicas: 3
       strategy: RollingUpdate
 
+    podAnnotations:
+      secret.reloader.stakater.com/reload: oauth2-proxy-secrets
+
     image:
       repository: quay.io/oauth2-proxy/oauth2-proxy
       tag: v7.2.1
@@ -33,7 +36,7 @@ spec:
       OAUTH2_PROXY_COOKIE_SECRET:
         valueFrom:
           secretKeyRef:
-            name: oauth2-proxy
+            name: oauth2-proxy-secrets
             key: cookie-secret
       OAUTH2_PROXY_COOKIE_SECURE: true
       OAUTH2_PROXY_EMAIL_DOMAINS: "*"
@@ -43,17 +46,17 @@ spec:
       OAUTH2_PROXY_OIDC_ISSUER_URL:
         valueFrom:
           secretKeyRef:
-            name: oauth2-proxy
+            name: oauth2-proxy-secrets
             key: oidc-issuer-url
       OAUTH2_PROXY_CLIENT_ID:
         valueFrom:
           secretKeyRef:
-            name: oauth2-proxy
+            name: oauth2-proxy-secrets
             key: client-id
       OAUTH2_PROXY_CLIENT_SECRET:
         valueFrom:
           secretKeyRef:
-            name: oauth2-proxy
+            name: oauth2-proxy-secrets
             key: client-secret
       OAUTH2_PROXY_OIDC_GROUPS_CLAIM: https://bjw-s/groups
 
@@ -62,8 +65,8 @@ spec:
       OAUTH2_PROXY_REDIS_PASSWORD:
         valueFrom:
           secretKeyRef:
-            name: oauth2-proxy-redis
-            key: REDIS_PASSWORD
+            name: oauth2-proxy-secrets
+            key: redis-password
 
       OAUTH2_PROXY_PASS_AUTHORIZATION_HEADER: true
       OAUTH2_PROXY_PASS_ACCESS_TOKEN: true
