@@ -42,8 +42,7 @@ resource "auth0_connection" "username_password_authentication" {
     waad_common_endpoint           = false
 
     mfa {
-      active                 = true
-      return_enroll_settings = true
+      active                 = false
     }
 
     password_complexity_options {
