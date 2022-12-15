@@ -22,6 +22,7 @@ spec:
 
     adminUser:
       create: true
+      username: &admin_user admin
 
     networkPolicy:
       create: false
@@ -31,11 +32,17 @@ spec:
 
     rbac:
       create: true
-      impersonationResourceNames: ["admin"]
+      impersonationResourceNames:
+        - *admin_user
       additionalRules:
-        - apiGroups: ["infra.contrib.fluxcd.io"]
-          resources: ["terraforms"]
-          verbs: ["get", "list", "patch"]
+        - apiGroups:
+            - "infra.contrib.fluxcd.io"
+          resources:
+            - "terraforms"
+          verbs:
+            - "get"
+            - "list"
+            - "patch"
 
     ingress:
       enabled: true
