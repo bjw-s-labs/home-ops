@@ -2,19 +2,19 @@
 apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
-  name: esphome-restic
-  namespace: home-automation
+  name: plex-trakt-sync-restic
+  namespace: media
 spec:
   secretStoreRef:
     kind: ClusterSecretStore
     name: onepassword-connect
   target:
-    name: esphome-restic-secret
+    name: plex-trakt-sync-restic-secret
     creationPolicy: Owner
     template:
       engineVersion: v2
       data:
-        RESTIC_REPOSITORY: '{{ .REPOSITORY_TEMPLATE }}/esphome'
+        RESTIC_REPOSITORY: '{{ .REPOSITORY_TEMPLATE }}/plex-trakt-sync'
         RESTIC_PASSWORD: '{{ .RESTIC_PASSWORD }}'
         AWS_ACCESS_KEY_ID: '{{ .AWS_ACCESS_KEY_ID }}'
         AWS_SECRET_ACCESS_KEY: '{{ .AWS_SECRET_ACCESS_KEY }}'
@@ -25,15 +25,15 @@ spec:
 apiVersion: volsync.backube/v1alpha1
 kind: ReplicationSource
 metadata:
-  name: esphome
-  namespace: home-automation
+  name: plex-trakt-sync
+  namespace: media
 spec:
-  sourcePVC: esphome-config
+  sourcePVC: plex-trakt-sync-config
   trigger:
     schedule: "0 */12 * * *"
   restic:
     copyMethod: Snapshot
     pruneIntervalDays: 14
-    repository: esphome-restic-secret
+    repository: plex-trakt-sync-restic-secret
     retain:
       daily: 14
