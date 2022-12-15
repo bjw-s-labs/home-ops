@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     minio = {
-      source  = "aminueza/minio"
+      source = "aminueza/minio"
     }
   }
 }
@@ -12,8 +12,9 @@ resource "minio_s3_bucket" "bucket" {
 }
 
 resource "minio_iam_user" "user" {
-  name          = var.bucket_name
+  name          = var.user_name != null ? var.user_name : var.bucket_name
   force_destroy = true
+  secret        = var.user_secret != null ? var.user_secret : null
 }
 
 resource "minio_iam_policy" "rw_policy" {

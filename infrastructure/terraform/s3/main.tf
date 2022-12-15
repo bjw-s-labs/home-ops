@@ -12,6 +12,10 @@ terraform {
       source  = "carlpett/sops"
       version = "0.7.1"
     }
+    onepassword = {
+      source = "1Password/onepassword"
+      version = "1.1.4"
+    }
   }
 }
 
