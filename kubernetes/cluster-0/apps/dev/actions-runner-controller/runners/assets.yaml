@@ -12,6 +12,8 @@ spec:
       dockerdWithinRunnerContainer: true
       ephemeral: true
       repository: bjw-s/assets
+      labels:
+        - self-hosted
       securityContext:
         supplementalGroups:
           - 65542
@@ -22,11 +24,6 @@ spec:
         - name: cache-volume
           persistentVolumeClaim:
             claimName: actions-runner-controller-cache
-      resources:
-        requests:
-          memory: 256Mi
-        limits:
-          memory: 384Mi
 ---
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: HorizontalRunnerAutoscaler

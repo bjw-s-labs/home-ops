@@ -2,7 +2,7 @@
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: RunnerDeployment
 metadata:
-  name: runner-container-images-private
+  name: runner-home-ops
   namespace: dev
 spec:
   template:
@@ -11,7 +11,9 @@ spec:
       imagePullPolicy: Always
       dockerdWithinRunnerContainer: true
       ephemeral: true
-      repository: bjw-s/container-images-private
+      repository: bjw-s/home-ops
+      labels:
+        - self-hosted
       securityContext:
         supplementalGroups:
           - 65542
@@ -22,20 +24,15 @@ spec:
         - name: cache-volume
           persistentVolumeClaim:
             claimName: actions-runner-controller-cache
-      resources:
-        requests:
-          memory: 256Mi
-        limits:
-          memory: 384Mi
 ---
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: HorizontalRunnerAutoscaler
 metadata:
-  name: container-images-private-autoscaler
+  name: home-ops-autoscaler
   namespace: dev
 spec:
   scaleTargetRef:
-    name: runner-container-images-private
+    name: runner-home-ops
   scaleUpTriggers:
     - githubEvent:
         checkRun:
@@ -48,4 +45,4 @@ spec:
   metrics:
     - type: TotalNumberOfQueuedAndInProgressWorkflowRuns
       repositoryNames:
-        - bjw-s/container-images-private
+        - bjw-s/home-ops
