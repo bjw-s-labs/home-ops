@@ -16,7 +16,7 @@ metadata:
   name: s3
   namespace: infrastructure
 spec:
-  interval: 30m
+  interval: 1h
   approvePlan: "auto"
   backendConfig:
     disable: true
@@ -29,6 +29,14 @@ spec:
     namespace: infrastructure
   runnerPodTemplate:
     spec:
+      env:
+        - name: OP_CONNECT_HOST
+          value: http://onepassword-connect.security.svc.cluster.local:8080
+        - name: OP_CONNECT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: tf-controller-secrets
+              key: OP_CONNECT_TOKEN
       volumeMounts:
         - name: tf-controller-sops-key
           mountPath: /home/runner/.config/sops/age/keys.txt
