@@ -21,6 +21,11 @@ spec:
     image:
       repository: quay.io/prometheus/blackbox-exporter
 
+    podSecurityContext:
+      sysctls:
+        - name: net.ipv4.ping_group_range
+          value: "0 2147483647"
+
     config:
       modules:
         http_2xx:
