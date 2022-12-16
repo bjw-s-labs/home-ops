@@ -29,11 +29,21 @@ spec:
       supplementalGroups:
         - 65539
 
+    command:
+      - ./openbooks
+
+    args:
+      - server
+      - --dir
+      - /books
+      - --port
+      - &port "8080"
+
     service:
       main:
         ports:
           http:
-            port: 80
+            port: *port
 
     ingress:
       main:
