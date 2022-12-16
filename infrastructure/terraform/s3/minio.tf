@@ -8,7 +8,13 @@ data "onepassword_item" "minio" {
 }
 
 locals {
-  minio_users = data.onepassword_item.minio.section[index(data.onepassword_item.minio.section.*.label, "Other users")].field
+  minio_admin_user = data.onepassword_item.minio.username
+  minio_admin_password = data.onepassword_item.minio.password
+  minio_other_user_data = merge([
+    for field in data.onepassword_item.minio.section[index(data.onepassword_item.minio.section.*.label, "Other users")].field : {
+      (field.label): field.value
+    }
+  ]...)
 }
 
 module "minio_bucket_thanos" {
@@ -17,8 +23,8 @@ module "minio_bucket_thanos" {
   providers = {
     minio = minio.nas
   }
-  user_name   = local.minio_users[index(local.minio_users.*.label, "thanos_access_key")].value
-  user_secret = local.minio_users[index(local.minio_users.*.label, "thanos_secret_key")].value
+  user_name   = local.minio_other_user_data.thanos_access_key
+  user_secret = local.minio_other_user_data.thanos_secret_key
 }
 
 module "minio_bucket_loki" {
@@ -27,8 +33,8 @@ module "minio_bucket_loki" {
   providers = {
     minio = minio.nas
   }
-  user_name   = local.minio_users[index(local.minio_users.*.label, "loki_access_key")].value
-  user_secret = local.minio_users[index(local.minio_users.*.label, "loki_secret_key")].value
+  user_name   = local.minio_other_user_data.loki_access_key
+  user_secret = local.minio_other_user_data.loki_secret_key
 }
 
 module "minio_bucket_postgresql" {
@@ -37,8 +43,8 @@ module "minio_bucket_postgresql" {
   providers = {
     minio = minio.nas
   }
-  user_name   = local.minio_users[index(local.minio_users.*.label, "postgresql_access_key")].value
-  user_secret = local.minio_users[index(local.minio_users.*.label, "postgresql_secret_key")].value
+  user_name   = local.minio_other_user_data.postgresql_access_key
+  user_secret = local.minio_other_user_data.postgresql_secret_key
 }
 
 module "minio_bucket_volsync" {
@@ -47,6 +53,6 @@ module "minio_bucket_volsync" {
   providers = {
     minio = minio.nas
   }
-  user_name   = local.minio_users[index(local.minio_users.*.label, "volsync_access_key")].value
-  user_secret = local.minio_users[index(local.minio_users.*.label, "volsync_secret_key")].value
+  user_name   = local.minio_other_user_data.volsync_access_key
+  user_secret = local.minio_other_user_data.volsync_secret_key
 }
