@@ -123,12 +123,26 @@ spec:
         subPath: tv.yaml
         mountPath: config/tv.yaml
         readOnly: false
+      pmm-tv-overlay:
+        enabled: true
+        type: configMap
+        name: pmm-tv-overlay
+        subPath: tv_overlay.yaml
+        mountPath: config/tv_overlay.yaml
+        readOnly: false
       pmm-movies:
         enabled: true
         type: configMap
         name: pmm-movies
         subPath: movies.yaml
         mountPath: config/movies.yaml
+        readOnly: false
+      pmm-movies-overlay:
+        enabled: true
+        type: configMap
+        name: pmm-movies-overlay
+        subPath: movies_overlay.yaml
+        mountPath: config/movies_overlay.yaml
         readOnly: false
 
     resources:

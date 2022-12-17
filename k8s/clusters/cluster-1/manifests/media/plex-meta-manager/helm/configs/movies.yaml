@@ -1,3 +1,13 @@
+templates:
+  Holiday:
+    summary: "Christmas is coming, countdown the nights with a collection of Christmas movies to get you into the festive mood."
+    tmdb_keyword: <<keyword>>
+    delete_not_scheduled: true
+    run_again: false
+    visible_home: true
+    visible_shared: true
+    sync_mode: sync
+
 collections:
   Trakt Popular:
     trakt_popular: 200
@@ -15,3 +25,9 @@ collections:
       list_days: 180
       list_size: 10
       list_minimum: 1
+
+  Christmas Movies:
+    schedule: range(11/25-12/31)
+    sort_title: '!AB'
+    template: { name: Holiday, keyword: "207317, 65" }
+    collection_order: title.asc
