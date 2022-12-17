@@ -28,7 +28,10 @@ spec:
     fullnameOverride: plex-meta-manager
     image:
       repository: meisnate12/plex-meta-manager
-      tag: "v1.18.0"
+      # tag: "v1.18.0"
+      # pullPolicy: IfNotPresent
+      tag: nightly
+      pullPolicy: Always
 
     # podSecurityContext:
     #   runAsUser: 568
@@ -127,32 +130,6 @@ spec:
         subPath: movies.yaml
         mountPath: config/movies.yaml
         readOnly: false
-
-#     ingress:
-#       main:
-#         enabled: false
-#         ingressClassName: "traefik"
-#         annotations:
-#           cert-manager.io/cluster-issuer: letsencrypt-production
-#           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-#           traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
-#           external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
-#           external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
-#           external-dns/is-public: "true"
-#           # external-dns.alpha.kubernetes.io/target: ${CLOUDFLARE_TUNNEL_ID}.cfargotunnel.com
-#           # external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-#         hosts:
-#           - host: &host-cluster "plex-auto-languages.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-#             paths:
-#               - path: /
-#           - host: &host "plex-auto-languages.${INGRESS_DOMAIN}"
-#             paths:
-#               - path: /
-#         tls:
-#           - secretName: tls.plex-auto-languages
-#             hosts:
-#               - *host-cluster
-#               - *host
 
     resources:
       requests:
