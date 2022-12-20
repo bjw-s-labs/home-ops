@@ -11,10 +11,6 @@ terraform {
       source  = "fly-apps/fly"
       version = "0.0.20"
     }
-    sops = {
-      source  = "carlpett/sops"
-      version = "0.7.1"
-    }
     http = {
       source  = "hashicorp/http"
       version = "3.2.1"
@@ -22,23 +18,47 @@ terraform {
   }
 }
 
-data "sops_file" "fly_secrets" {
-  source_file = "fly_secrets.sops.yaml"
+module "onepassword_item_fly" {
+  source = "github.com/bjw-s/terraform-1password-item?ref=main"
+  vault  = "Services"
+  item   = "Fly"
+}
+
+module "onepassword_item_pushover" {
+  source = "github.com/bjw-s/terraform-1password-item?ref=main"
+  vault  = "Services"
+  item   = "Pushover"
+}
+
+module "onepassword_item_auth0" {
+  source = "github.com/bjw-s/terraform-1password-item?ref=main"
+  vault  = "Automation"
+  item   = "auth0"
 }
 
 provider "fly" {
-  fly_api_token        = local.fly_secrets["fly_api_token"]
+  fly_api_token        = module.onepassword_item_fly.fields.access_token_terraform
   useinternaltunnel    = true
   internaltunnelorg    = "personal"
   internaltunnelregion = "ams"
 }
 
 module "gatus" {
-  providers = {
-    fly = fly
-  }
   source = "./modules/gatus"
 
-  secrets = local.fly_secrets
+  secrets = {
+    gatus = {
+      oidc = {
+        issuer_url    = "${module.onepassword_item_auth0.fields.bjws_domain}/"
+        client_id     = module.onepassword_item_auth0.fields.generic_client_id
+        client_secret = module.onepassword_item_auth0.fields.generic_client_secret
+        subjects      = ["auth0|6368b8d31f04433c4715bff6"]
+      },
+      pushover = {
+        token    = module.onepassword_item_pushover.fields.gatus_token
+        user_key = module.onepassword_item_pushover.fields.userkey_bernd
+      }
+    }
+  }
   regions = ["ams"]
 }
