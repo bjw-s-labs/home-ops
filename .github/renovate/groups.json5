@@ -1,6 +1,17 @@
 {
   packageRules: [
     {
+      description: "1Password Connect images",
+      matchDatasources: ["docker"],
+      matchPackageNames: [
+        "docker.io/1password/connect-sync",
+        "docker.io/1password/connect-api",
+      ],
+      groupName: "1password-connect",
+      additionalBranchPrefix: "",
+      separateMinorPatch: true,
+    },
+    {
       description: "Rook-Ceph image and chart",
       groupName: "Rook Ceph",
       matchPackagePatterns: ["rook.ceph"],
@@ -9,6 +20,7 @@
       separateMinorPatch: true,
     },
     {
+      description: "Cilium image and chart",
       matchDatasources: ["helm", "docker"],
       matchPackageNames: [
         "quay.io/cilium/cilium",
