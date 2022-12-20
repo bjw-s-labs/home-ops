@@ -42,7 +42,7 @@ resource "auth0_connection" "username_password_authentication" {
     waad_common_endpoint           = false
 
     mfa {
-      active                 = false
+      active = false
     }
 
     password_complexity_options {
