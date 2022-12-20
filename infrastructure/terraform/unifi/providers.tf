@@ -1,7 +1,7 @@
 provider "unifi" {
-  alias = "unifi"
+  alias = "home"
 
-  username = data.sops_file.unifi_secrets.data["unifi.username"]
-  password = data.sops_file.unifi_secrets.data["unifi.password"]
-  api_url  = data.sops_file.unifi_secrets.data["unifi.url"]
+  username = module.onepassword_item_unifi_controller.fields.username
+  password = module.onepassword_item_unifi_controller.fields.password
+  api_url  = "https://unifi.bjw-s.dev"
 }
