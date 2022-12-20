@@ -11,13 +11,23 @@ terraform {
       source  = "integrations/github"
       version = "5.12.0"
     }
-    sops = {
-      source  = "carlpett/sops"
-      version = "0.7.1"
-    }
   }
 }
 
-data "sops_file" "github_secrets" {
-  source_file = "github_secrets.sops.yaml"
+module "onepassword_item_github" {
+  source = "github.com/bjw-s/terraform-1password-item?ref=main"
+  vault  = "Services"
+  item   = "Github"
+}
+
+module "onepassword_item_github_bjws_bot" {
+  source = "github.com/bjw-s/terraform-1password-item?ref=main"
+  vault  = "Automation"
+  item   = "github-bjws-bot"
+}
+
+module "onepassword_item_flux" {
+  source = "github.com/bjw-s/terraform-1password-item?ref=main"
+  vault  = "Automation"
+  item   = "flux"
 }

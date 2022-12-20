@@ -19,10 +19,10 @@ module "home-ops" {
   has_projects = false
   is_template  = false
 
-  plaintext_secrets = {
-    "BJWS_APP_ID"          = data.sops_file.github_secrets.data["apps.bjws_bot.app_id"]
-    "BJWS_APP_PRIVATE_KEY" = data.sops_file.github_secrets.data["apps.bjws_bot.private_key"]
-  }
+  plaintext_secrets = merge(
+    {},
+    local.bjws_bot_secrets
+  )
 
   issue_labels_merge_with_github_labels = false
   issue_labels = concat(
@@ -48,10 +48,10 @@ module "home-ops" {
   webhooks = [
     {
       events       = ["push"]
-      url          = data.sops_file.github_secrets.data["home_ops.webhook.url"]
+      url          = module.onepassword_item_flux.fields.github_webhook_url
       active       = true
       content_type = "json"
-      secret       = data.sops_file.github_secrets.data["home_ops.webhook.secret"]
+      secret       = module.onepassword_item_flux.fields.github_webhook_token
     }
   ]
 }
@@ -78,10 +78,10 @@ module "pmb" {
   has_projects = false
   is_template  = false
 
-  plaintext_secrets = {
-    "BJWS_APP_ID"          = data.sops_file.github_secrets.data["apps.bjws_bot.app_id"]
-    "BJWS_APP_PRIVATE_KEY" = data.sops_file.github_secrets.data["apps.bjws_bot.private_key"]
-  }
+  plaintext_secrets = merge(
+    {},
+    local.bjws_bot_secrets
+  )
 
   issue_labels_merge_with_github_labels = false
   issue_labels = concat(
@@ -110,10 +110,10 @@ module "renovate-config" {
   has_projects = false
   is_template  = false
 
-  plaintext_secrets = {
-    "BJWS_APP_ID"          = data.sops_file.github_secrets.data["apps.bjws_bot.app_id"]
-    "BJWS_APP_PRIVATE_KEY" = data.sops_file.github_secrets.data["apps.bjws_bot.private_key"]
-  }
+  plaintext_secrets = merge(
+    {},
+    local.bjws_bot_secrets
+  )
 
   issue_labels_merge_with_github_labels = false
   issue_labels = concat(
@@ -143,10 +143,10 @@ module "helm-charts" {
   has_projects = false
   is_template  = false
 
-  plaintext_secrets = {
-    "BJWS_APP_ID"          = data.sops_file.github_secrets.data["apps.bjws_bot.app_id"]
-    "BJWS_APP_PRIVATE_KEY" = data.sops_file.github_secrets.data["apps.bjws_bot.private_key"]
-  }
+  plaintext_secrets = merge(
+    {},
+    local.bjws_bot_secrets
+  )
 
   issue_labels_merge_with_github_labels = false
   issue_labels = concat(
@@ -198,10 +198,10 @@ module "container-images" {
   has_projects = false
   is_template  = false
 
-  plaintext_secrets = {
-    "BJWS_APP_ID"          = data.sops_file.github_secrets.data["apps.bjws_bot.app_id"]
-    "BJWS_APP_PRIVATE_KEY" = data.sops_file.github_secrets.data["apps.bjws_bot.private_key"]
-  }
+  plaintext_secrets = merge(
+    {},
+    local.bjws_bot_secrets
+  )
 
   issue_labels_merge_with_github_labels = false
   issue_labels = concat(
@@ -230,10 +230,10 @@ module "helm-charts-actions" {
   has_projects = false
   is_template  = false
 
-  plaintext_secrets = {
-    "BJWS_APP_ID"          = data.sops_file.github_secrets.data["apps.bjws_bot.app_id"]
-    "BJWS_APP_PRIVATE_KEY" = data.sops_file.github_secrets.data["apps.bjws_bot.private_key"]
-  }
+  plaintext_secrets = merge(
+    {},
+    local.bjws_bot_secrets
+  )
 
   issue_labels_merge_with_github_labels = false
   issue_labels = concat(
@@ -262,10 +262,10 @@ module "gh-workflows" {
   has_projects = false
   is_template  = false
 
-  plaintext_secrets = {
-    "BJWS_APP_ID"          = data.sops_file.github_secrets.data["apps.bjws_bot.app_id"]
-    "BJWS_APP_PRIVATE_KEY" = data.sops_file.github_secrets.data["apps.bjws_bot.private_key"]
-  }
+  plaintext_secrets = merge(
+    {},
+    local.bjws_bot_secrets
+  )
 
   issue_labels_merge_with_github_labels = false
   issue_labels = concat(
@@ -321,10 +321,10 @@ module "esphome-config" {
   has_projects = false
   is_template  = false
 
-  plaintext_secrets = {
-    "BJWS_APP_ID"          = data.sops_file.github_secrets.data["apps.bjws_bot.app_id"]
-    "BJWS_APP_PRIVATE_KEY" = data.sops_file.github_secrets.data["apps.bjws_bot.private_key"]
-  }
+  plaintext_secrets = merge(
+    {},
+    local.bjws_bot_secrets
+  )
 
   issue_labels_merge_with_github_labels = false
   issue_labels = concat(
@@ -353,10 +353,10 @@ module "terraform-1password-item" {
   has_projects = false
   is_template  = false
 
-  plaintext_secrets = {
-    "BJWS_APP_ID"          = data.sops_file.github_secrets.data["apps.bjws_bot.app_id"]
-    "BJWS_APP_PRIVATE_KEY" = data.sops_file.github_secrets.data["apps.bjws_bot.private_key"]
-  }
+  plaintext_secrets = merge(
+    {},
+    local.bjws_bot_secrets
+  )
 
   issue_labels_merge_with_github_labels = false
   issue_labels = concat(
