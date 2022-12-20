@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     unifi = {
-      source  = "paultyng/unifi"
+      source = "paultyng/unifi"
     }
   }
 }

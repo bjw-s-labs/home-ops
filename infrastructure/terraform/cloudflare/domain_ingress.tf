@@ -114,7 +114,7 @@ module "cf_domain_ingress" {
 resource "cloudflare_filter" "cf_domain_ingress_github_flux_webhook" {
   zone_id     = module.cf_domain_ingress.zone_id
   description = "Allow GitHub flux API"
-  expression = "(ip.geoip.asnum eq 36459 and http.host eq \"flux-receiver-cluster-0.bjw-s.dev\")"
+  expression  = "(ip.geoip.asnum eq 36459 and http.host eq \"flux-receiver-cluster-0.bjw-s.dev\")"
 }
 
 resource "cloudflare_firewall_rule" "cf_domain_ingress_github_flux_webhook" {
