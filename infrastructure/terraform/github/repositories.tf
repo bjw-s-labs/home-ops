@@ -332,3 +332,35 @@ module "esphome-config" {
     local.default_issue_labels
   )
 }
+
+module "terraform-1password-item" {
+  source  = "mineiros-io/repository/github"
+  version = "0.18.0"
+
+  name        = "terraform-1password-item"
+  description = "Terraform Module that collects all fields for a 1Password Item."
+  topics      = ["terraform", "1password"]
+  visibility  = "public"
+
+  auto_init              = true
+  allow_merge_commit     = false
+  allow_squash_merge     = true
+  allow_auto_merge       = true
+  delete_branch_on_merge = true
+
+  has_issues   = true
+  has_wiki     = false
+  has_projects = false
+  is_template  = false
+
+  plaintext_secrets = {
+    "BJWS_APP_ID"          = data.sops_file.github_secrets.data["apps.bjws_bot.app_id"]
+    "BJWS_APP_PRIVATE_KEY" = data.sops_file.github_secrets.data["apps.bjws_bot.private_key"]
+  }
+
+  issue_labels_merge_with_github_labels = false
+  issue_labels = concat(
+    [],
+    local.default_issue_labels
+  )
+}
