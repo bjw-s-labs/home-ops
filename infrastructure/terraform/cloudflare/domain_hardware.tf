@@ -10,7 +10,7 @@ module "cf_domain_hardware" {
     # Generic settings
     {
       name  = "_dmarc"
-            value = "v=DMARC1; p=none; rua=mailto:postmaster@bjw-s.tech; ruf=mailto:postmaster@bjw-s.tech; fo=1;"
+      value = "v=DMARC1; p=none; rua=mailto:postmaster@bjw-s.tech; ruf=mailto:postmaster@bjw-s.tech; fo=1;"
       type  = "TXT"
     },
     # Fastmail settings
