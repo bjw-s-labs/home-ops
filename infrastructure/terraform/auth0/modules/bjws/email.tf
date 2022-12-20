@@ -8,6 +8,6 @@ resource "auth0_email" "mailgun_provider" {
     domain    = "mg.bjw-s.dev"
     region    = "eu"
     smtp_port = 0
-    api_key = var.secrets["mailgun"]["api_key"]
+    api_key   = var.secrets["mailgun"]["api_key"]
   }
 }
