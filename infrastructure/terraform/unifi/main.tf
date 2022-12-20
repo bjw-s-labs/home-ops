@@ -11,10 +11,6 @@ terraform {
       source  = "paultyng/unifi"
       version = "0.38.2"
     }
-    sops = {
-      source  = "carlpett/sops"
-      version = "0.7.1"
-    }
     http = {
       source  = "hashicorp/http"
       version = "3.2.1"
@@ -22,21 +18,22 @@ terraform {
   }
 }
 
-data "sops_file" "unifi_secrets" {
-  source_file = "unifi_secrets.sops.yaml"
-}
-
 data "http" "bjws_common_networks" {
   url = "https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/_shared/networks.yaml"
+}
+
+module "onepassword_item_unifi_controller" {
+  source = "github.com/bjw-s/terraform-1password-item?ref=main"
+  vault  = "Services"
+  item   = "Unifi Controller"
 }
 
 module "config" {
   source = "./modules/config"
 
   networks = local.networks
-  secrets  = sensitive(yamldecode(nonsensitive(data.sops_file.unifi_secrets.raw)))
 
   providers = {
-    unifi = unifi.unifi
+    unifi = unifi.home
   }
 }
