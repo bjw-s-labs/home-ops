@@ -32,7 +32,7 @@ spec:
       OAUTH2_PROXY_HTTP_ADDRESS: 0.0.0.0:4180
       OAUTH2_PROXY_METRICS_ADDRESS: 0.0.0.0:44180
 
-      OAUTH2_PROXY_COOKIE_DOMAINS: ${INGRESS_DOMAIN}
+      OAUTH2_PROXY_COOKIE_DOMAINS: bjw-s.dev
       OAUTH2_PROXY_COOKIE_SECRET:
         valueFrom:
           secretKeyRef:
@@ -75,7 +75,7 @@ spec:
       OAUTH2_PROXY_SET_AUTHORIZATION-HEADER: true
       OAUTH2_PROXY_SET_XAUTHREQUEST: true
       OAUTH2_PROXY_REVERSE_PROXY: true
-      OAUTH2_PROXY_WHITELIST_DOMAINS: .${INGRESS_DOMAIN}
+      OAUTH2_PROXY_WHITELIST_DOMAINS: .bjw-s.dev
 
     service:
       main:
@@ -91,7 +91,7 @@ spec:
         enabled: true
         ingressClassName: "nginx"
         hosts:
-          - host: &host "auth.${INGRESS_DOMAIN}"
+          - host: &host "auth.bjw-s.dev"
             paths:
               - path: /oauth2
                 pathType: Prefix

@@ -3,7 +3,7 @@ clusterName: cluster-0
 
 talosVersion: v1.3.0
 kubernetesVersion: 1.25.3
-endpoint: "https://cluster-0.${domainName}:6443"
+endpoint: "https://cluster-0.bjw-s.tech:6443"
 
 cniConfig:
   name: none
@@ -13,10 +13,10 @@ additionalApiServerCertSans:
 
 additionalMachineCertSans:
   - ${clusterEndpointIP}
-  - cluster-0.${domainName}
+  - cluster-0.bjw-s.tech
 
 nodes:
-  - hostname: delta.${domainName}
+  - hostname: delta.bjw-s.tech
     ipAddress: 10.1.1.31
     controlPlane: true
     installDisk: /dev/sda
@@ -28,7 +28,7 @@ nodes:
             dhcp: false
             addresses:
               - 10.1.3.141/24
-  - hostname: enigma.${domainName}
+  - hostname: enigma.bjw-s.tech
     ipAddress: 10.1.1.32
     controlPlane: true
     installDisk: /dev/sda
@@ -40,7 +40,7 @@ nodes:
             dhcp: false
             addresses:
               - 10.1.3.142/24
-  - hostname: felix.${domainName}
+  - hostname: felix.bjw-s.tech
     ipAddress: 10.1.1.33
     controlPlane: true
     installDisk: /dev/sda
@@ -98,16 +98,16 @@ controlPlane:
             rotate-server-certificates: "true"
         install:
           extraKernelArgs:
-            - "talos.logging.kernel=udp://vector.${ingressDomain}:6050/"
+            - "talos.logging.kernel=udp://vector.bjw-s.dev:6050/"
         logging:
           destinations:
-            - endpoint: "udp://vector.${ingressDomain}:6051/"
+            - endpoint: "udp://vector.bjw-s.dev:6051/"
               format: json_lines
         network:
           extraHostEntries:
             - ip: ${clusterEndpointIP}
               aliases:
-                - cluster-0.${domainName}
+                - cluster-0.bjw-s.tech
         sysctls:
           fs.inotify.max_user_watches: "1048576"
           fs.inotify.max_user_instances: "8192"

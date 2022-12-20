@@ -31,7 +31,7 @@ spec:
     env:
       SONARR__INSTANCE_NAME: Sonarr
       SONARR__PORT: &port 8989
-      SONARR__APPLICATION_URL: "https://sonarr.${INGRESS_DOMAIN}"
+      SONARR__APPLICATION_URL: "https://sonarr.bjw-s.dev"
       SONARR__LOG_LEVEL: info
       SONARR__API_KEY:
         valueFrom:
@@ -50,7 +50,7 @@ spec:
         enabled: true
         ingressClassName: "nginx"
         hosts:
-          - host: &host "sonarr.${INGRESS_DOMAIN}"
+          - host: &host "sonarr.bjw-s.dev"
             paths:
               - path: /
         tls:

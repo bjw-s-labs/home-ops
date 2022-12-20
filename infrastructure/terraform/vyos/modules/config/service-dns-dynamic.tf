@@ -1,23 +1,55 @@
-resource "vyos_config" "service-dns-dynamic" {
-  path = "service dns dynamic"
+resource "vyos_config" "service-dns-dynamic-personal" {
+  path = "service dns dynamic interface eth0 service personal"
   value = jsonencode(
     {
-      "interface" = {
-        "eth0" = {
-          "service" = merge([
-            for domain in ["family", "personal", "ingress", "hardware"] : {
-              "${domain}" = {
-                "host-name" = "ipv4.${var.domains[domain]}"
-                "server"    = "api.cloudflare.com/client/v4"
-                "protocol"  = "cloudflare"
-                "zone"      = "${var.domains[domain]}"
-                "login"     = "${var.secrets.cloudflare.login}"
-                "password"  = "${var.secrets.cloudflare.key}"
-              }
-            }
-          ]...)
-        }
-      }
+      "host-name" = "ipv4.bjws.nl"
+      "server"    = "api.cloudflare.com/client/v4"
+      "protocol"  = "cloudflare"
+      "zone"      = "bjws.nl"
+      "login"     = "${var.secrets.cloudflare.login}"
+      "password"  = "${var.secrets.cloudflare.key}"
+    }
+  )
+}
+
+resource "vyos_config" "service-dns-dynamic-family" {
+  path = "service dns dynamic interface eth0 service family"
+  value = jsonencode(
+    {
+      "host-name" = "ipv4.schorgers.nl"
+      "server"    = "api.cloudflare.com/client/v4"
+      "protocol"  = "cloudflare"
+      "zone"      = "schorgers.nl"
+      "login"     = "${var.secrets.cloudflare.login}"
+      "password"  = "${var.secrets.cloudflare.key}"
+    }
+  )
+}
+
+resource "vyos_config" "service-dns-dynamic-ingress" {
+  path = "service dns dynamic interface eth0 service ingress"
+  value = jsonencode(
+    {
+      "host-name" = "ipv4.bjw-s.dev"
+      "server"    = "api.cloudflare.com/client/v4"
+      "protocol"  = "cloudflare"
+      "zone"      = "bjw-s.dev"
+      "login"     = "${var.secrets.cloudflare.login}"
+      "password"  = "${var.secrets.cloudflare.key}"
+    }
+  )
+}
+
+resource "vyos_config" "service-dns-dynamic-hardware" {
+  path = "service dns dynamic interface eth0 service hardware"
+  value = jsonencode(
+    {
+      "host-name" = "ipv4.bjw-s.tech"
+      "server"    = "api.cloudflare.com/client/v4"
+      "protocol"  = "cloudflare"
+      "zone"      = "bjw-s.tech"
+      "login"     = "${var.secrets.cloudflare.login}"
+      "password"  = "${var.secrets.cloudflare.key}"
     }
   )
 }

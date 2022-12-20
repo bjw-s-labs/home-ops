@@ -37,7 +37,7 @@ spec:
       PAPERLESS_REDIS: redis://paperless-redis.selfhosted.svc.cluster.local:6379
       PAPERLESS_TASK_WORKERS: 2
       PAPERLESS_TIME_ZONE: "Europe/Amsterdam"
-      PAPERLESS_URL: https://paperless.${INGRESS_DOMAIN}
+      PAPERLESS_URL: https://paperless.bjw-s.dev
       USERMAP_GID: 65543
       PAPERLESS_ADMIN_USER:
         valueFrom:
@@ -67,9 +67,9 @@ spec:
         ingressClassName: "nginx"
         annotations:
           auth.home.arpa/enabled: "true"
-          nginx.ingress.kubernetes.io/auth-url: https://auth.${INGRESS_DOMAIN}/oauth2/auth?allowed_groups=paperless
+          nginx.ingress.kubernetes.io/auth-url: https://auth.bjw-s.dev/oauth2/auth?allowed_groups=paperless
         hosts:
-          - host: &host "paperless.${INGRESS_DOMAIN}"
+          - host: &host "paperless.bjw-s.dev"
             paths:
               - path: /
         tls:

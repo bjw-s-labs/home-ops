@@ -130,7 +130,7 @@ spec:
         ingressClassName: nginx
         pathType: Prefix
         hosts:
-          - &host_prometheus prometheus-${CLUSTER_NAME}.${INGRESS_DOMAIN}
+          - &host_prometheus prometheus-${CLUSTER_NAME}.bjw-s.dev
         tls:
           - hosts:
               - *host_prometheus
@@ -143,8 +143,8 @@ spec:
             honor_timestamps: true
             static_configs:
               - targets:
-                  - "diego.${HARDWARE_DOMAIN}:9100"
-                  - "horus.${HARDWARE_DOMAIN}:9100"
+                  - "diego.bjw-s.tech:9100"
+                  - "horus.bjw-s.tech:9100"
         enableAdminAPI: true
         externalLabels:
           cluster: ${CLUSTER_NAME}
@@ -269,7 +269,7 @@ spec:
         ingressClassName: nginx
         pathType: Prefix
         hosts:
-          - &host_alertmanager alertmanager-${CLUSTER_NAME}.${INGRESS_DOMAIN}
+          - &host_alertmanager alertmanager-${CLUSTER_NAME}.bjw-s.dev
         tls:
           - hosts:
               - *host_alertmanager

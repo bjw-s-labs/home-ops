@@ -51,7 +51,7 @@ spec:
             name: miniflux-secrets
             key: OAUTH2_OIDC_DISCOVERY_ENDPOINT
       OAUTH2_PROVIDER: oidc
-      OAUTH2_REDIRECT_URL: "https://miniflux.${INGRESS_DOMAIN}/oauth2/oidc/callback"
+      OAUTH2_REDIRECT_URL: "https://miniflux.bjw-s.dev/oauth2/oidc/callback"
 
     service:
       main:
@@ -66,7 +66,7 @@ spec:
         annotations:
           external-dns.home.arpa/enabled: "true"
         hosts:
-          - host: &host "miniflux.${INGRESS_DOMAIN}"
+          - host: &host "miniflux.bjw-s.dev"
             paths:
               - path: /
         tls:

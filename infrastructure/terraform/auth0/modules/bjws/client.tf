@@ -5,12 +5,12 @@ resource "auth0_client" "default" {
   allowed_logout_urls = []
   allowed_origins     = []
   callbacks = [
-    "https://auth.${var.domains["ingress"]}/oauth2/callback",               # oauth2-proxy
-    "https://grafana.${var.domains["ingress"]}/login/generic_oauth",        # Grafana
+    "https://auth.bjw-s.dev/oauth2/callback",               # oauth2-proxy
+    "https://grafana.bjw-s.dev/login/generic_oauth",        # Grafana
     "http://localhost:8000",                                                # kubectl oidc-login
-    "https://status.${var.domains["ingress"]}/authorization-code/callback", # Gatus
+    "https://status.bjw-s.dev/authorization-code/callback", # Gatus
     "https://kubenav.io/oidc.html",                                         # Kubenav
-    "https://gitops.${var.domains["ingress"]}/oauth2/callback",             # Weave-Gitops
+    "https://gitops.bjw-s.dev/oauth2/callback",             # Weave-Gitops
   ]
 
   client_aliases       = []
@@ -53,7 +53,7 @@ resource "auth0_client" "miniflux" {
   allowed_logout_urls = []
   allowed_origins     = []
   callbacks = [
-    "https://miniflux.${var.domains["ingress"]}/oauth2/oidc/callback"
+    "https://miniflux.bjw-s.dev/oauth2/oidc/callback"
   ]
 
   client_aliases       = []

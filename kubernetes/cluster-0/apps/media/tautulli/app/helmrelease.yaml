@@ -32,10 +32,10 @@ spec:
         annotations:
           nginx.ingress.kubernetes.io/configuration-snippet: |
             proxy_set_header Accept-Encoding "";
-            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/tautulli/nord.css"></head>';
+            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.bjw-s.dev/css/base/tautulli/nord.css"></head>';
             sub_filter_once on;
         hosts:
-          - host: &host tautulli.${INGRESS_DOMAIN}
+          - host: &host tautulli.bjw-s.dev
             paths:
               - path: /
                 pathType: Prefix

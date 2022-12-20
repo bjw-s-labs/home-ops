@@ -10,7 +10,7 @@ locals {
     "security" : {
       "oidc" : {
         "issuer-url" : var.secrets.gatus.oidc.issuer_url
-        "redirect-url" : "https://status.${var.domains["ingress"]}/authorization-code/callback"
+        "redirect-url" : "https://status.bjw-s.dev/authorization-code/callback"
         "client-id" : var.secrets.gatus.oidc.client_id
         "client-secret" : var.secrets.gatus.oidc.client_secret
         "scopes" : ["openid"]
@@ -36,7 +36,7 @@ locals {
       {
         "name" : "home internet reachability"
         "group" : "core"
-        "url" : "tcp://ipv4.${var.domains.ingress}:443"
+        "url" : "tcp://ipv4.bjw-s.dev:443"
         "interval" : "30s"
         "conditions" : [
           "[CONNECTED] == true"
@@ -49,7 +49,7 @@ locals {
       {
         "name" : "home assistant"
         "group" : "services"
-        "url" : "https://domo.${var.domains.ingress}"
+        "url" : "https://domo.bjw-s.dev"
         "interval" : "5m"
         "conditions" : [
           "[CONNECTED] == true",
@@ -62,7 +62,7 @@ locals {
       {
         "name" : "plex"
         "group" : "services"
-        "url" : "https://plex.${var.domains.ingress}/web/index.html"
+        "url" : "https://plex.bjw-s.dev/web/index.html"
         "interval" : "5m"
         "conditions" : [
           "[CONNECTED] == true",
@@ -75,7 +75,7 @@ locals {
       {
         "name" : "navidrome"
         "group" : "services"
-        "url" : "https://navidrome.${var.domains.ingress}/app"
+        "url" : "https://navidrome.bjw-s.dev/app"
         "interval" : "5m"
         "conditions" : [
           "[CONNECTED] == true",

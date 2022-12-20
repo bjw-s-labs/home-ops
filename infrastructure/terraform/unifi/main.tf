@@ -26,15 +26,6 @@ data "sops_file" "unifi_secrets" {
   source_file = "unifi_secrets.sops.yaml"
 }
 
-data "http" "bjws_common_domains" {
-  url = "https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/_shared/domains.sops.yaml"
-}
-
-data "sops_external" "domains" {
-  source     = data.http.bjws_common_domains.response_body
-  input_type = "yaml"
-}
-
 data "http" "bjws_common_networks" {
   url = "https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/_shared/networks.yaml"
 }
@@ -43,7 +34,6 @@ module "config" {
   source = "./modules/config"
 
   networks = local.networks
-  domains  = local.domains
   secrets  = sensitive(yamldecode(nonsensitive(data.sops_file.unifi_secrets.raw)))
 
   providers = {

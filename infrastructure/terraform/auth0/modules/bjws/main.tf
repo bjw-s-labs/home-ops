@@ -6,11 +6,6 @@ terraform {
   }
 }
 
-variable "domains" {
-  description = "managed domains"
-  type        = any
-}
-
 variable "secrets" {
   description = "secrets"
   type        = any

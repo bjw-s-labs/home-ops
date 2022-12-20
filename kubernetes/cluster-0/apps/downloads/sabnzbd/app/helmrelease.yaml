@@ -40,7 +40,7 @@ spec:
         sabnzbd.downloads.svc,
         sabnzbd.downloads.svc.cluster,
         sabnzbd.downloads.svc.cluster.local,
-        sabnzbd.${INGRESS_DOMAIN}
+        sabnzbd.bjw-s.dev
       SABNZBD__API_KEY:
         valueFrom:
           secretKeyRef:
@@ -65,10 +65,10 @@ spec:
         annotations:
           nginx.ingress.kubernetes.io/configuration-snippet: |
             proxy_set_header Accept-Encoding "";
-            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/sabnzbd/nord.css"></head>';
+            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.bjw-s.dev/css/base/sabnzbd/nord.css"></head>';
             sub_filter_once on;
         hosts:
-          - host: &host "sabnzbd.${INGRESS_DOMAIN}"
+          - host: &host "sabnzbd.bjw-s.dev"
             paths:
               - path: /
         tls:
