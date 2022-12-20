@@ -9,7 +9,7 @@ terraform {
   required_providers {
     auth0 = {
       source  = "auth0/auth0"
-      version = "0.40.1"
+      version = "0.41.0"
     }
     sops = {
       source  = "carlpett/sops"
