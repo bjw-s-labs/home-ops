@@ -45,7 +45,7 @@ spec:
       enabled: true
       className: nginx
       hosts:
-        - host: &host "blackbox-${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+        - host: &host "blackbox-${CLUSTER_NAME}.bjw-s.dev"
           paths:
             - path: /
               pathType: Prefix
@@ -103,46 +103,46 @@ spec:
         # 3D Printer controller
         - module: http_2xx
           name: horus-http
-          url: "http://horus.${HARDWARE_DOMAIN}"
+          url: "http://horus.bjw-s.tech"
         - module: icmp
           name: horus-icmp
-          url: horus.${HARDWARE_DOMAIN}
+          url: horus.bjw-s.tech
 
         # PiKVM
         - module: http_2xx
           name: pikvm-http
-          url: "https://pikvm.${HARDWARE_DOMAIN}"
+          url: "https://pikvm.bjw-s.tech"
         - module: icmp
           name: pikvm-icmp
-          url: diego.${HARDWARE_DOMAIN}
+          url: diego.bjw-s.tech
 
         # Robot vacuums
         - module: icmp
           name: valetudo-living-room-icmp
-          url: livingroom-vacuum.${HARDWARE_DOMAIN}
+          url: livingroom-vacuum.bjw-s.tech
         - module: http_2xx
           name: valetudo-living-room-http
-          url: "http://livingroom-vacuum.${HARDWARE_DOMAIN}"
+          url: "http://livingroom-vacuum.bjw-s.tech"
         - module: icmp
           name: valetudo-upstairs-icmp
-          url: upstairs-vacuum.${HARDWARE_DOMAIN}
+          url: upstairs-vacuum.bjw-s.tech
         - module: http_2xx
           name: valetudo-upstairs-http
-          url: "http://upstairs-vacuum.${HARDWARE_DOMAIN}"
+          url: "http://upstairs-vacuum.bjw-s.tech"
 
         # Wallmount tablets
         - module: http_2xx
           name: hallway-tablet-http
-          url: "http://hallway-tablet.${HARDWARE_DOMAIN}:2323"
+          url: "http://hallway-tablet.bjw-s.tech:2323"
         - module: icmp
           name: hallway-tablet-icmp
-          url: hallway-tablet.${HARDWARE_DOMAIN}
+          url: hallway-tablet.bjw-s.tech
 
         # Other devices
         - module: icmp
           name: zigbee-controller-icmp
-          url: hallway-zigbee-adapter.${HARDWARE_DOMAIN}
+          url: hallway-zigbee-adapter.bjw-s.tech
 
         - module: icmp
           name: nas-icmp
-          url: nas.${HARDWARE_DOMAIN}
+          url: nas.bjw-s.tech

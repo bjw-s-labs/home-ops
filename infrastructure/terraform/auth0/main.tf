@@ -26,18 +26,8 @@ data "sops_file" "auth0_secrets" {
   source_file = "auth0_secrets.sops.yaml"
 }
 
-data "http" "bjws_common_domains" {
-  url = "https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/_shared/domains.sops.yaml"
-}
-
-data "sops_external" "domains" {
-  source     = data.http.bjws_common_domains.response_body
-  input_type = "yaml"
-}
-
 module "bjws" {
   source = "./modules/bjws"
 
-  domains = local.domains
   secrets = local.auth0_secrets
 }

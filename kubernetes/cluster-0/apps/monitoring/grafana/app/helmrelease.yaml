@@ -71,7 +71,7 @@ spec:
       GF_PATHS_PROVISIONING: /etc/grafana/provisioning
       GF_SECURITY_ALLOW_EMBEDDING: true
       GF_SECURITY_COOKIE_SAMESITE: grafana
-      GF_SERVER_ROOT_URL: "https://grafana.${INGRESS_DOMAIN}"
+      GF_SERVER_ROOT_URL: "https://grafana.bjw-s.dev"
 
     envFromSecret: grafana-secrets
 
@@ -107,7 +107,7 @@ spec:
         plugins: /var/lib/grafana/plugins
         provisioning: /etc/grafana/provisioning
       server:
-        root_url: https://grafana.${INGRESS_DOMAIN}
+        root_url: https://grafana.bjw-s.dev
 
     imageRenderer:
       enabled: true
@@ -116,7 +116,7 @@ spec:
       enabled: true
       ingressClassName: nginx
       hosts:
-        - &host grafana.${INGRESS_DOMAIN}
+        - &host grafana.bjw-s.dev
       tls:
         - hosts:
             - *host

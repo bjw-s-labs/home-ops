@@ -11,13 +11,6 @@
       tags:
         - always
 
-    - name: Load domains file
-      community.sops.load_vars:
-        file: ../../_shared/domains.sops.yaml
-        name: domains
-      tags:
-        - always
-
     - name: Mount read-write
       ansible.builtin.command: /usr/local/bin/rw
       tags:
