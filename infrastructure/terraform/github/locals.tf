@@ -18,4 +18,9 @@ locals {
     { name = "wontfix", color = "ffffff", description = "This will not be worked on" },
     { name = "do-not-merge", color = "ee0701", description = "Marks PR that is not (yet) in a mergeable state" }
   ]
+
+  bjws_bot_secrets = {
+    "BJWS_APP_ID"          = module.onepassword_item_github_bjws_bot.fields.github_app_id
+    "BJWS_APP_PRIVATE_KEY" = module.onepassword_item_github_bjws_bot.fields.github_app_private_key
+  }
 }
