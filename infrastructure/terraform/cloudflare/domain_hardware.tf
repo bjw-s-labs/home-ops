@@ -1,6 +1,6 @@
 module "cf_domain_hardware" {
   source     = "./modules/cf_domain"
-  domain     = local.domains["hardware"]
+  domain     = "bjw-s.tech"
   account_id = cloudflare_account.bjw_s.id
   dns_entries = [
     {
@@ -10,7 +10,7 @@ module "cf_domain_hardware" {
     # Generic settings
     {
       name  = "_dmarc"
-            value = "v=DMARC1; p=none; rua=mailto:postmaster@${local.domains["hardware"]}; ruf=mailto:postmaster@${local.domains["hardware"]}; fo=1;"
+            value = "v=DMARC1; p=none; rua=mailto:postmaster@bjw-s.tech; ruf=mailto:postmaster@bjw-s.tech; fo=1;"
       type  = "TXT"
     },
     # Fastmail settings
@@ -31,21 +31,21 @@ module "cf_domain_hardware" {
     {
       id      = "fastmail_dkim_1"
       name    = "fm1._domainkey"
-      value   = "fm1.${local.domains["hardware"]}.dkim.fmhosted.com"
+      value   = "fm1.bjw-s.tech.dkim.fmhosted.com"
       type    = "CNAME"
       proxied = false
     },
     {
       id      = "fastmail_dkim_2"
       name    = "fm2._domainkey"
-      value   = "fm2.${local.domains["hardware"]}.dkim.fmhosted.com"
+      value   = "fm2.bjw-s.tech.dkim.fmhosted.com"
       type    = "CNAME"
       proxied = false
     },
     {
       id      = "fastmail_dkim_3"
       name    = "fm3._domainkey"
-      value   = "fm3.${local.domains["hardware"]}.dkim.fmhosted.com"
+      value   = "fm3.bjw-s.tech.dkim.fmhosted.com"
       type    = "CNAME"
       proxied = false
     },

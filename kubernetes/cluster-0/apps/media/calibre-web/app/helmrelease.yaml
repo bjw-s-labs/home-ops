@@ -44,14 +44,14 @@ spec:
         enabled: true
         annotations:
           auth.home.arpa/enabled: "true"
-          nginx.ingress.kubernetes.io/auth-url: https://auth.${INGRESS_DOMAIN}/oauth2/auth?allowed_groups=calibre-web
+          nginx.ingress.kubernetes.io/auth-url: https://auth.bjw-s.dev/oauth2/auth?allowed_groups=calibre-web
           nginx.ingress.kubernetes.io/configuration-snippet: |
             proxy_set_header Accept-Encoding "";
-            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/calibreweb/nord.css"></head>';
+            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.bjw-s.dev/css/base/calibreweb/nord.css"></head>';
             sub_filter_once on;
         ingressClassName: nginx
         hosts:
-          - host: &host calibre-web.${INGRESS_DOMAIN}
+          - host: &host calibre-web.bjw-s.dev
             paths:
               - path: /
         tls:
@@ -61,7 +61,7 @@ spec:
         enabled: true
         ingressClassName: nginx
         hosts:
-          - host: &host_kobo calibre-kobo.${INGRESS_DOMAIN}
+          - host: &host_kobo calibre-kobo.bjw-s.dev
             paths:
               - path: /kobo/
         tls:

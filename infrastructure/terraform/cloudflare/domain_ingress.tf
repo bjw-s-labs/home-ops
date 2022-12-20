@@ -1,6 +1,6 @@
 module "cf_domain_ingress" {
   source     = "./modules/cf_domain"
-  domain     = local.domains["ingress"]
+  domain     = "bjw-s.dev"
   account_id = cloudflare_account.bjw_s.id
   dns_entries = [
     {
@@ -9,19 +9,19 @@ module "cf_domain_ingress" {
     },
     {
       name  = "ingress"
-      value = "ipv4.${local.domains["ingress"]}"
+      value = "ipv4.bjw-s.dev"
       type  = "CNAME"
     },
     {
       name    = "vpn"
-      value   = "ipv4.${local.domains["ingress"]}"
+      value   = "ipv4.bjw-s.dev"
       type    = "CNAME"
       proxied = false
     },
     # Generic settings
     {
       name  = "_dmarc"
-      value = "v=DMARC1; p=none; rua=mailto:postmaster@${local.domains["ingress"]}; ruf=mailto:postmaster@${local.domains["ingress"]}; fo=1;"
+      value = "v=DMARC1; p=none; rua=mailto:postmaster@bjw-s.dev; ruf=mailto:postmaster@bjw-s.dev; fo=1;"
       type  = "TXT"
     },
     # Fastmail settings
@@ -42,21 +42,21 @@ module "cf_domain_ingress" {
     {
       id      = "fastmail_dkim_1"
       name    = "fm1._domainkey"
-      value   = "fm1.${local.domains["ingress"]}.dkim.fmhosted.com"
+      value   = "fm1.bjw-s.dev.dkim.fmhosted.com"
       type    = "CNAME"
       proxied = false
     },
     {
       id      = "fastmail_dkim_2"
       name    = "fm2._domainkey"
-      value   = "fm2.${local.domains["ingress"]}.dkim.fmhosted.com"
+      value   = "fm2.bjw-s.dev.dkim.fmhosted.com"
       type    = "CNAME"
       proxied = false
     },
     {
       id      = "fastmail_dkim_3"
       name    = "fm3._domainkey"
-      value   = "fm3.${local.domains["ingress"]}.dkim.fmhosted.com"
+      value   = "fm3.bjw-s.dev.dkim.fmhosted.com"
       type    = "CNAME"
       proxied = false
     },
@@ -97,7 +97,7 @@ module "cf_domain_ingress" {
     {
       id      = "fly_status_challenge"
       name    = "_acme-challenge.status"
-      value   = "status.${local.domains["ingress"]}.53w1ox.flydns.net."
+      value   = "status.bjw-s.dev.53w1ox.flydns.net."
       type    = "CNAME"
       proxied = false
     },
@@ -114,10 +114,7 @@ module "cf_domain_ingress" {
 resource "cloudflare_filter" "cf_domain_ingress_github_flux_webhook" {
   zone_id     = module.cf_domain_ingress.zone_id
   description = "Allow GitHub flux API"
-  expression = format(
-    "(ip.geoip.asnum eq 36459 and http.host eq \"flux-receiver-cluster-0.%s\")",
-    local.domains["ingress"]
-  )
+  expression = "(ip.geoip.asnum eq 36459 and http.host eq \"flux-receiver-cluster-0.bjw-s.dev\")"
 }
 
 resource "cloudflare_firewall_rule" "cf_domain_ingress_github_flux_webhook" {

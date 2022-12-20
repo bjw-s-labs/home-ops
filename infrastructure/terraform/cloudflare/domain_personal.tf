@@ -1,6 +1,6 @@
 module "cf_domain_personal" {
   source     = "./modules/cf_domain"
-  domain     = local.domains["personal"]
+  domain     = "bjws.nl"
   account_id = cloudflare_account.bjw_s.id
   dns_entries = [
     {
@@ -10,7 +10,7 @@ module "cf_domain_personal" {
     # Generic settings
     {
       name  = "_dmarc"
-      value = "v=DMARC1; p=none; rua=mailto:postmaster@${local.domains["personal"]}; ruf=mailto:postmaster@${local.domains["personal"]}; fo=1;"
+      value = "v=DMARC1; p=none; rua=mailto:postmaster@bjws.nl; ruf=mailto:postmaster@bjws.nl; fo=1;"
       type  = "TXT"
     },
     # Fastmail settings
@@ -31,21 +31,21 @@ module "cf_domain_personal" {
     {
       id      = "fastmail_dkim_1"
       name    = "fm1._domainkey"
-      value   = "fm1.${local.domains["personal"]}.dkim.fmhosted.com"
+      value   = "fm1.bjws.nl.dkim.fmhosted.com"
       type    = "CNAME"
       proxied = false
     },
     {
       id      = "fastmail_dkim_2"
       name    = "fm2._domainkey"
-      value   = "fm2.${local.domains["personal"]}.dkim.fmhosted.com"
+      value   = "fm2.bjws.nl.dkim.fmhosted.com"
       type    = "CNAME"
       proxied = false
     },
     {
       id      = "fastmail_dkim_3"
       name    = "fm3._domainkey"
-      value   = "fm3.${local.domains["personal"]}.dkim.fmhosted.com"
+      value   = "fm3.bjws.nl.dkim.fmhosted.com"
       type    = "CNAME"
       proxied = false
     },

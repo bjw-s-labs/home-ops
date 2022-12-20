@@ -70,10 +70,10 @@ spec:
             proxy_hide_header "content-security-policy";
             proxy_hide_header "X-Frame-Options";
             proxy_set_header Accept-Encoding "";
-            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${INGRESS_DOMAIN}/css/base/qbittorrent/nord.css"></head>';
+            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.bjw-s.dev/css/base/qbittorrent/nord.css"></head>';
             sub_filter_once on;
         hosts:
-          - host: &host "qbittorrent.${INGRESS_DOMAIN}"
+          - host: &host "qbittorrent.bjw-s.dev"
             paths:
               - path: /
         tls:

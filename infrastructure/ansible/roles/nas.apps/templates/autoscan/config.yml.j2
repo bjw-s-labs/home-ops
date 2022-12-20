@@ -18,14 +18,14 @@ triggers:
 
 targets:
   plex:
-    - url: https://plex.{{ domains.ingress }}
+    - url: https://plex.bjw-s.dev
       token: {{ secrets.autoscan.plex_token }} # Plex API Token
       rewrite:
         - from: /mnt/volume1/Media/ # local file system
           to: /storage/media/ # path accessible by the Plex docker container (if applicable)
 
   jellyfin:
-    - url: https://jellyfin.{{ domains.ingress }}
+    - url: https://jellyfin.bjw-s.dev
       token: {{ secrets.autoscan.jellyfin_token }} # Jellyfin API Token
       rewrite:
         - from: /mnt/volume1/Media/ # local file system
