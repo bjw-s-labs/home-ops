@@ -5,11 +5,11 @@ variable "bucket_name" {
 variable "user_name" {
   type      = string
   sensitive = false
-  default = null
+  default   = null
 }
 
 variable "user_secret" {
   type      = string
   sensitive = true
-  default = null
+  default   = null
 }

@@ -5,7 +5,7 @@ locals {
         merge(
           host,
           {
-            "hostname" = "${hostname}"
+            "hostname"  = "${hostname}"
             "remote_as" = neighbor_group.remote_as
           }
         )

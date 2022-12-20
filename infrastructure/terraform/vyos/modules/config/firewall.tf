@@ -82,7 +82,7 @@ resource "vyos_config" "firewall_group_address-group" {
           # Terraform can't handle different types for the true and false result expressions
           "${host_group}" = merge(
             length(host_group_config.addresses) > 1 ? {
-              "address" =  sort(host_group_config.addresses)
+              "address" = sort(host_group_config.addresses)
             } : {},
             length(host_group_config.addresses) == 1 ? {
               "address" = host_group_config.addresses[0]
@@ -163,8 +163,8 @@ resource "vyos_config" "firewall_name" {
       for policy in local.firewall_policies : {
         "${policy.zoneFrom}-${policy.zoneTo}" = merge(
           {
-            "description"        = "${policy.description}"
-            "default-action"     = "${policy.defaultAction}"
+            "description"    = "${policy.description}"
+            "default-action" = "${policy.defaultAction}"
           },
           policy.defaultLog != true ? {} : {
             "enable-default-log" = {}
@@ -176,42 +176,42 @@ resource "vyos_config" "firewall_name" {
                 "${rule.index}" = merge(
                   {
                     "description" = rule.description
-                    "action" = rule.action
+                    "action"      = rule.action
                   },
                   rule.log == false ? {} :
-                    { "log" = "enable" },
+                  { "log" = "enable" },
                   rule.protocol == null ? {} :
-                    { "protocol" = tostring(rule.protocol) },
+                  { "protocol" = tostring(rule.protocol) },
                   rule.state == null ? {} : {
                     "state" = merge(
                       lookup(rule.state, "established", false) == false ? {} :
-                        { "established" = "enable"},
+                      { "established" = "enable" },
                       lookup(rule.state, "related", false) == false ? {} :
-                        { "related" = "enable"},
+                      { "related" = "enable" },
                       lookup(rule.state, "invalid", false) == false ? {} :
-                        { "invalid" = "enable"},
+                      { "invalid" = "enable" },
                     )
                   },
                   rule.source == null ? {} : {
                     "source" = merge(
-                      lookup(rule.source, "port", null) != null ? { "port" = tostring(rule.source.port)} : {},
+                      lookup(rule.source, "port", null) != null ? { "port" = tostring(rule.source.port) } : {},
                       (lookup(rule.source, "address-group", null) == null && lookup(rule.source, "network-group", null) == null) ? {} :
                       {
                         "group" = merge(
-                          lookup(rule.source, "address-group", null) != null ? { "address-group" = rule.source.address-group} : {},
-                          lookup(rule.source, "network-group", null) != null ? { "network-group" = rule.source.network-group} : {},
+                          lookup(rule.source, "address-group", null) != null ? { "address-group" = rule.source.address-group } : {},
+                          lookup(rule.source, "network-group", null) != null ? { "network-group" = rule.source.network-group } : {},
                         )
                       }
                     )
                   },
                   rule.destination == null ? {} : {
                     "destination" = merge(
-                      lookup(rule.destination, "port", null) != null ? { "port" = tostring(rule.destination.port)} : {},
+                      lookup(rule.destination, "port", null) != null ? { "port" = tostring(rule.destination.port) } : {},
                       (lookup(rule.destination, "address-group", null) == null && lookup(rule.destination, "network-group", null) == null) ? {} :
                       {
                         "group" = merge(
-                          lookup(rule.destination, "address-group", null) != null ? { "address-group" = rule.destination.address-group} : {},
-                          lookup(rule.destination, "network-group", null) != null ? { "network-group" = rule.destination.network-group} : {},
+                          lookup(rule.destination, "address-group", null) != null ? { "address-group" = rule.destination.address-group } : {},
+                          lookup(rule.destination, "network-group", null) != null ? { "network-group" = rule.destination.network-group } : {},
                         )
                       }
                     )
@@ -240,11 +240,11 @@ resource "vyos_config" "firewall_zone" {
           "${zone}" = merge(
             { "default-action" = "drop" },
             lookup(zone_config, "description", null) == null ? {} :
-              { "description" = zone_config.description},
+            { "description" = zone_config.description },
             lookup(zone_config, "local_zone", false) == false ? {} :
-              { "local-zone" = {} },
+            { "local-zone" = {} },
             lookup(zone_config, "interface", null) == null ? {} :
-              { "interface" = zone_config.interface},
+            { "interface" = zone_config.interface },
             {
               "from" = merge([
                 for firewall_policy in local.firewall_policies : {
