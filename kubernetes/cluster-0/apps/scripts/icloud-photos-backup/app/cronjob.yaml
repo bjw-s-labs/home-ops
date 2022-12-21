@@ -52,7 +52,7 @@ spec:
                 - --smtp-password
                 - "$(SMTP_PASSWORD)"
                 - --notification-email
-                - ${EMAIL_1}
+                - "$(NOTIFICATION_EMAIL)"
               env:
                 - name: ICLOUD_USERNAME
                   valueFrom:
@@ -79,6 +79,11 @@ spec:
                     secretKeyRef:
                       name: icloud-photos-backup-secrets
                       key: smtp_password
+                - name: NOTIFICATION_EMAIL
+                  valueFrom:
+                    secretKeyRef:
+                      name: icloud-photos-backup-secrets
+                      key: bernd_icloud_user
 
               volumeMounts:
                 - mountPath: /cookies
@@ -116,7 +121,7 @@ spec:
                 - --smtp-password
                 - "$(SMTP_PASSWORD)"
                 - --notification-email
-                - ${EMAIL_1}
+                - "$(NOTIFICATION_EMAIL)"
               env:
                 - name: ICLOUD_USERNAME
                   valueFrom:
@@ -143,6 +148,11 @@ spec:
                     secretKeyRef:
                       name: icloud-photos-backup-secrets
                       key: smtp_password
+                - name: NOTIFICATION_EMAIL
+                  valueFrom:
+                    secretKeyRef:
+                      name: icloud-photos-backup-secrets
+                      key: bernd_icloud_user
 
               volumeMounts:
                 - mountPath: /cookies
