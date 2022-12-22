@@ -39,6 +39,23 @@ spec:
         ports:
           http:
             port: 8686
+          kubernetes-logs:
+            enabled: true
+            port: 6000
+          vyos-logs:
+            enabled: true
+            port: 6001
+          journald-logs:
+            enabled: true
+            port: 6002
+          talos-kernel:
+            enabled: true
+            port: 6050
+            protocol: UDP
+          talos-service:
+            enabled: true
+            port: 6051
+            protocol: UDP
 
     persistence:
       config:
@@ -56,9 +73,9 @@ spec:
         enabled: true
         existingClaim: vector-geoipupdate-config
 
-    resources:
-      requests:
-        cpu: 35m
-        memory: 381M
-      limits:
-        memory: 726M
+    # resources:
+    #   requests:
+    #     cpu: 35m
+    #     memory: 381M
+    #   limits:
+    #     memory: 726M
