@@ -10,39 +10,61 @@ on: # yamllint disable-line rule:truthy
       - "infrastructure/terraform/**"
 
 jobs:
-  generate-build-matrix:
+  changed-files:
     name: Generate matrix for building images
     runs-on: ubuntu-22.04
     outputs:
-      projects: ${{ steps.reduce.outputs.projects }}
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-          list-files: json
-          filters: |
-            addedOrModified:
-              - 'infrastructure/terraform/**'
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
 
-      - id: reduce
+      - name: Setup Tools
         run: |
-          PATHS='${{ steps.filter.outputs.addedOrModified_files }}'
-          PROJECTS=$(echo $PATHS | jq --raw-output -c 'map(. |= sub("infrastructure/terraform/"; "") | split("/")[0]) | unique')
-          echo "projects=${PROJECTS}" >> $GITHUB_OUTPUT
+          brew install jo
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35.1.0
+        with:
+          dir_names: true
+          dir_names_max_depth: 3
+          json: true
+          files: |
+            infrastructure/terraform/**
+
+      - name: List all changed files
+        run: |
+          echo '${{ steps.changed-files.outputs.all_changed_files }}'
+
+      - name: Store changed projects
+        id: set-matrix
+        run: |
+          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" == "[]" ]]; then
+            echo "matrix={\"project\":$(find infrastructure/terraform -type d -mindepth 1 -maxdepth 1 | jo -a)}" >> "${GITHUB_OUTPUT}"
+          else
+            echo "matrix={\"project\":${{ steps.changed-files.outputs.all_changed_files }}}" >> "${GITHUB_OUTPUT}"
+          fi
 
   publish:
     runs-on: ubuntu-22.04
     needs:
-      - generate-build-matrix
+      - changed-files
     strategy:
-      matrix:
-        project: ${{ fromJson(needs.generate-build-matrix.outputs.projects) }}
+      matrix: ${{ fromJSON(needs.changed-files.outputs.matrix) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Setup Tools
+        run: |
+          brew install fluxcd/tap/flux
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -51,16 +73,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Flux
-        uses: fluxcd/flux2/action@main
-
       - name: Publish OCI
         run: |
-          flux push artifact oci://ghcr.io/bjw-s/terraform-${{matrix.project}}:$(git rev-parse --short HEAD) \
-              --path="./infrastructure/terraform/${{matrix.project}}" \
-              --source="$(git config --get remote.origin.url)" \
-              --revision="$(git branch --show-current)/$(git rev-parse HEAD)"
+          flux push artifact oci://ghcr.io/bjw-s/terraform-$(basename ${{ matrix.project }}):$(git rev-parse --short HEAD) \
+            --path="./${{ matrix.project }}" \
+            --source="$(git config --get remote.origin.url)" \
+            --revision="$(git branch --show-current)/$(git rev-parse HEAD)"
+
       - name: Tag OCI
         run: |
-          flux tag artifact oci://ghcr.io/bjw-s/terraform-${{matrix.project}}:$(git rev-parse --short HEAD) \
-              --tag main
+          flux tag artifact oci://ghcr.io/bjw-s/terraform-$(basename ${{ matrix.project }}):$(git rev-parse --short HEAD) \
+            --tag main
