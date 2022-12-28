@@ -23,7 +23,8 @@ metadata:
     substitution.flux.home.arpa/enabled: "true"
 spec:
   dependsOn:
-    - name: cluster-apps-snapshot-controller
+    - name: rook-ceph-snapshot-controller-base
+    - name: rook-ceph-snapshot-controller-config
   path: "./k8s/clusters/cluster-1/manifests/volsync/volsync"
   prune: true
   sourceRef:
@@ -48,7 +49,8 @@ metadata:
     substitution.flux.home.arpa/enabled: "true"
 spec:
   dependsOn:
-    - name: cluster-apps-snapshot-controller
+    - name: rook-ceph-snapshot-controller-base
+    - name: rook-ceph-snapshot-controller-config
   path: "./k8s/clusters/cluster-1/manifests/volsync/snapscheduler"
   prune: true
   sourceRef:
