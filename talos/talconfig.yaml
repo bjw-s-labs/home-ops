@@ -1,7 +1,7 @@
 clusterName: cluster-1
-talosVersion: v1.2.3
+talosVersion: v1.3.0
 # talosVersion: v1.3.0-alpha.0
-kubernetesVersion: v1.25.2
+kubernetesVersion: v1.25.4
 endpoint: https://cluster-1.${secret_domain}:6443
 # domain: cluster-1.${secret_domain}
 allowSchedulingOnMasters: false
@@ -181,8 +181,8 @@ nodes:
       - op: add
         path: /machine/install/extensions
         value:
-          - image: ghcr.io/siderolabs/nvidia-open-gpu-kernel-modules:515.65.01-v1.2.3
-          - image: ghcr.io/siderolabs/nvidia-container-toolkit:515.65.01-v1.10.0
+          - image: ghcr.io/siderolabs/nvidia-container-toolkit:515.65.01-v1.11.0
+          # - image: ghcr.io/siderolabs/nvidia-open-gpu-kernel-modules:515.65.01-v1.3.0
       - op: add
         path: /machine/kernel
         value:
