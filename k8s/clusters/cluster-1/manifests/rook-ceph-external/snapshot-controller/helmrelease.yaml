@@ -29,6 +29,11 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    image:
+      repository: registry.k8s.io/sig-storage/snapshot-controller
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: "v6.2.0"
     replicaCount: 1
     volumeSnapshotClasses:
       - name: csi-rbdplugin-snapclass
