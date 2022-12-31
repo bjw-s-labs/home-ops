@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/replicationsource_v1alpha1.json
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationDestination
+metadata:
+  name: node-red
+  namespace: home-automation
+spec:
+  destinationPVC: node-red-config
+  trigger:
+    manual: restore-once
+  restic:
+    copyMethod: Direct
+    repository: node-red-restic
+    cacheCapacity: 5Gi
+    volumeSnapshotClassName: csi-rbdplugin-snapclass
+    storageClassName: ceph-block-external

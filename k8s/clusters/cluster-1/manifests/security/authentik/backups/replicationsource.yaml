@@ -9,7 +9,7 @@ spec:
   sourcePVC: data-authentik-postgresql-0
   trigger:
     manual: initial
-    schedule: "0 0 * * *"
+    schedule: "0 */2 * * *"
   restic:
     copyMethod: Snapshot
     pruneIntervalDays: 10
@@ -31,7 +31,7 @@ spec:
   sourcePVC: redis-data-authentik-redis-master-0
   trigger:
     manual: initial
-    schedule: "0 0 * * *"
+    schedule: "0 */2 * * *"
   restic:
     copyMethod: Snapshot
     pruneIntervalDays: 10
