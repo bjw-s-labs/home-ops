@@ -42,6 +42,10 @@ module "bjws" {
         email    = module.onepassword_item_auth0.fields.user_bernd_email
         password = module.onepassword_item_auth0.fields.user_bernd_password
       }
+      manyie = {
+        email    = module.onepassword_item_auth0.fields.user_manyie_email
+        password = module.onepassword_item_auth0.fields.user_manyie_password
+      }
     }
     mailgun = {
       api_key = module.onepassword_item_mailgun.fields.auth0_smtp_password
