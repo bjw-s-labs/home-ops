@@ -1,8 +1,8 @@
 ---
 clusterName: cluster-0
 
-talosVersion: v1.3.0
-kubernetesVersion: 1.25.3
+talosVersion: v1.3.1
+kubernetesVersion: 1.26.0
 endpoint: "https://cluster-0.bjw-s.tech:6443"
 
 cniConfig:
@@ -87,10 +87,11 @@ controlPlane:
       machine:
         files:
           - content: |
-              [plugins."io.containerd.grpc.v1.cri"]
-                enable_unprivileged_ports = true
-                enable_unprivileged_icmp = true
-            path: /var/cri/conf.d/allow-unpriv-ports.toml
+              [plugins]
+                [plugins."io.containerd.grpc.v1.cri"]
+                  enable_unprivileged_ports = true
+                  enable_unprivileged_icmp = true
+            path: /etc/cri/conf.d/20-customization.part
             op: create
         kubelet:
           extraArgs:
