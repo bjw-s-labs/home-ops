@@ -30,16 +30,6 @@ spec:
         - 109
         - 65539
 
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - key: feature.node.kubernetes.io/custom-intel-gpu
-                  operator: In
-                  values:
-                    - "true"
-
     env:
       DOTNET_SYSTEM_IO_DISABLEFILELOCKING: "true"
 
@@ -78,6 +68,9 @@ spec:
       transcode:
         enabled: true
         type: emptyDir
+
+    nodeSelector:
+      intel.feature.node.kubernetes.io/gpu: "true"
 
     resources:
       requests:
