@@ -33,6 +33,16 @@
       separateMinorPatch: true,
     },
     {
+      "description": "External Snapshotter charts",
+      "groupName": "External Snapshotter",
+      "matchPackageNames": ["snapshot-controller", "snapshot-validation-webhook"],
+      "matchDatasources": ["helm"],
+      "group": {
+        "commitMessageTopic": "{{{groupName}}} group"
+      },
+      "separateMinorPatch": true
+    },
+    {
       description: "Thanos image and chart - versions do not match",
       groupName: "Thanos",
       matchDatasources: ["docker", "github-releases", "helm"],
