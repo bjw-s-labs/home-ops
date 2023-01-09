@@ -20,16 +20,6 @@ spec:
       repository: ghcr.io/onedr0p/plex
       tag: 1.30.0.6486-629d58034@sha256:b3e3a2a305443f243643553161cff639f3dcc74349595884ac9c77cf6bb24068
 
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - key: feature.node.kubernetes.io/custom-intel-gpu
-                  operator: In
-                  values:
-                    - "true"
-
     service:
       main:
         type: LoadBalancer
@@ -78,6 +68,9 @@ spec:
         - 44
         - 109
         - 65539
+
+    nodeSelector:
+      intel.feature.node.kubernetes.io/gpu: "true"
 
     resources:
       requests:
