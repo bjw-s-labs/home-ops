@@ -199,16 +199,16 @@ spec:
                 user_key: "{{ .Values.alertmanager.secrets.pushover_api_userkey }}"
                 send_resolved: true
                 priority: |-
-                  {{`
+                  {{- `
                     {{ if eq .Status "firing" }}1{{ else }}0{{ end }}
                   `}}
                 url_title: View in Alert Manager
                 title: |-
-                  {{`
+                  {{- `
                     [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
                   `}}
                 message: |-
-                  {{`
+                  {{- `
                     {{- range .Alerts }}
                       {{- if ne .Labels.severity "" }}
                         <b>Severity:</b> <i>{{ .Labels.severity }}</i>
