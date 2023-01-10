@@ -1,90 +1,78 @@
 ---
-name: "Docs: Publish to GitHub Pages"
+name: "Docs: Release to GitHub pages"
 
-on: # yamllint disable-line rule:truthy
+on:
   workflow_dispatch:
   push:
     branches:
-      - "docs-*"
       - main
     paths:
-      - ".github/workflows/docs-publish.yaml"
-      - "mkdocs.yaml"
+      - ".github/workflows/docs-release.yaml"
       - "docs/**"
 
-env:
-  BOT_USERNAME: "bjw-s[bot]"
-
 jobs:
-  markdownlint:
-    name: Markdownlint
-    runs-on: ubuntu-20.04
-
+  release-docs:
+    name: Release documentation
+    runs-on: ubuntu-22.04
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
-
-      - name: markdownlint-cli
-        uses: nosborn/github-action-markdown-cli@v3.2.0
-        with:
-          files: "README.md docs/**"
-          config_file: ".github/markdownlint.config.yaml"
-
-  markdown-link-check:
-    name: Markdown link check
-    runs-on: ubuntu-20.04
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
-
-      - uses: gaurav-nelson/github-action-markdown-link-check@v1
-        with:
-          config-file: ".github/markdown-link-check_config.json"
-          file-path: "./README.md"
-
-  deploy:
-    name: Deploy to GitHub Pages
-    if: github.event.pull_request.head.repo.fork == false
-    runs-on: ubuntu-20.04
-    needs:
-      - markdownlint
-      - markdown-link-check
-
-    steps:
-      - name: Get bjw-s-bot token
+      - name: Get GitHub API token
         id: get-app-token
         uses: getsentry/action-github-app-token@v2
         with:
           app_id: ${{ secrets.BJWS_APP_ID }}
           private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
 
-      - name: Checkout
+      - name: Checkout main branch
         uses: actions/checkout@v3
         with:
           token: ${{ steps.get-app-token.outputs.token }}
+          fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Create binaries folder
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/bin"
+          echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
+
+      - name: Setup mdBook
+        uses: peaceiris/actions-mdbook@v1.2.0
+
+      - name: Download mdbook-admonish
+        uses: robinraju/release-downloader@v1.7
         with:
-          python-version: 3.x
+          repository: tommilligan/mdbook-admonish
+          fileName: "*-unknown-linux-gnu.tar.gz"
+          latest: true
 
-      - name: Configure Git
-        run: |
-          git config user.name "${{ env.BOT_USERNAME }}"
-          git config user.email "${{ env.BOT_USERNAME }}@users.noreply.github.com"
+      - name: Download mdbook-open-on-gh
+        uses: robinraju/release-downloader@v1.7
+        with:
+          repository: badboy/mdbook-open-on-gh
+          fileName: "*-unknown-linux-gnu.tar.gz"
+          latest: true
 
-      - name: Set up mkdocs
+      - name: Extract plug-ins
         run: |
-          pip install \
-            mkdocs>=1.1 \
-            mkdocs-macros-plugin >=0.5 \
-            mkdocs-material >=1.0 \
-            mkdocs-minify-plugin>=0.3 \
-            mkdocs-redirects>=1.0
+          for f in *.tar.gz; do tar xvf "$GITHUB_WORKSPACE/$f" -C bin/; done
 
-      - name: Deploy documentation
+      - name: Download mdbook-linkcheck
         run: |
-          mkdocs gh-deploy --config-file ./mkdocs.yaml --force
+          cd /tmp
+          curl -L https://github.com/Michael-F-Bryan/mdbook-linkcheck/releases/latest/download/mdbook-linkcheck.x86_64-unknown-linux-gnu.zip -o mdbook-linkcheck.zip
+          unzip "$_"
+          chmod +x mdbook-linkcheck
+          mv mdbook-linkcheck "$GITHUB_WORKSPACE/bin/"
+
+      - name: Build docs
+        working-directory: docs
+        run: mdbook build
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3.9.1
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          github_token: ${{ steps.get-app-token.outputs.token }}
+          publish_dir: ./docs/book/html
+          user_name: 'bjw-s-bot[bot]'
+          user_email: 'bjw-s-bot <87358111+bjw-s-bot[bot]@users.noreply.github.com>'
