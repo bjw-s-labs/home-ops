@@ -1,13 +1,11 @@
 # Storage
 
-{% import 'links.jinja2' as links %}
-
 Storage in my cluster is handled in a number of ways.
-The in-cluster storage is provided by a {{ links.external('rook-ceph') }} cluster that is running on a number of my nodes.
+The in-cluster storage is provided by a [rook](https://github.com/rook/rook) Ceph cluster that is running on a number of my nodes.
 
 ## rook-ceph block storage
 
-The bulk of my cluster storage relies on my `CephBlockPool` ({{ links.repoUrl('link', 'blob/main/cluster/core/rook-ceph/storage/cephblockpool.yaml') }}). This ensures that my data is replicated across my storage nodes.
+The bulk of my cluster storage relies on [my `CephBlockPool`](https://github.com/bjw-s/home-ops/tree/main/kubernetes/cluster-0/apps/rook-ceph/rook-ceph/cluster]). This ensures that my data is replicated across my storage nodes.
 
 ## NFS storage
 
