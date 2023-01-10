@@ -25,3 +25,5 @@
   - [🚀 Ansible](automation/ansible/index.md)
 
 # Notes and ramblings
+
+- [How to...](notes-ramblings/howto/index.md)
