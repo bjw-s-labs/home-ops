@@ -27,3 +27,4 @@
 # Notes and ramblings
 
 - [How to...](notes-ramblings/howto/index.md)
+  - [Run a Pod in a VLAN](notes-ramblings/howto/pod-multihome.md)
