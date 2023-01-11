@@ -62,6 +62,11 @@ spec:
         mountPath: /mnt/unionfs
         readOnly: false
 
+      rclone-remote:
+        enabled: False
+        mountPath: /mnt/remote
+        mountPropagation: Bidirectional
+
       # backup:
       #   enabled: true
       #   type: custom
@@ -112,8 +117,8 @@ spec:
                   --poll-interval=1m \
                   --dir-cache-time=168h \
                   --timeout=10m \
-                  --drive-chunk-size=64M \
-                  --umask=002"
+                  --drive-chunk-size=64M" # \
+                  # --umask=002"
         volumeMounts:
         - mountPath: "/config/.rclone.conf"
           name: rclone-config
