@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://github.com/bjw-s/home-ops/blob/main/docs/assets/images/logo.jpg?raw=true" align="left" width="144px" height="144px"/>
+<img src="https://github.com/bjw-s/bjw-s/blob/main/_assets/images/logo.jpg?raw=true" align="left" width="144px" height="144px"/>
 
 ## My Home Operations repository
 
@@ -15,15 +15,21 @@ _... managed by Flux, Renovate and GitHub Actions_ :robot:
 [![Renovate](https://img.shields.io/github/actions/workflow/status/bjw-s/home-ops/schedule-renovate.yaml?branch=main&label=&logo=renovatebot&style=for-the-badge&color=blue)](https://github.com/bjw-s/home-ops/actions/workflows/schedule-renovate.yaml)
 
 </div>
-</br>
+<br><br>
 
-:wave: Welcome to my Home Operations repository. This is a mono repository for my home infrastructure and Kubernetes cluster. I try to adhere to Infrastructure as Code (IaC) and GitOps practices using the tools like [Ansible](https://www.ansible.com/), [Terraform](https://www.terraform.io/), [Kubernetes](https://kubernetes.io/), [Flux](https://github.com/fluxcd/flux2), [Renovate](https://github.com/renovatebot/renovate) and [GitHub Actions](https://github.com/features/actions).
+👋 Welcome to my Home Operations repository. This is a mono repository for my home infrastructure and Kubernetes cluster. I try to adhere to Infrastructure as Code (IaC) and GitOps practices using the tools like [Ansible](https://www.ansible.com/), [Terraform](https://www.terraform.io/), [Kubernetes](https://kubernetes.io/), [Flux](https://github.com/fluxcd/flux2), [Renovate](https://github.com/renovatebot/renovate) and [GitHub Actions](https://github.com/features/actions).
 
 ---
 
 ### 📖 Docs
 
 The documentation that goes along with this repo can be found [over here](https://bjw-s.github.io/home-ops/).
+
+---
+
+### 🔎 Support
+
+If you like this project, please consider supporting my work through my [GitHub sponsorship page](https://github.com/sponsors/bjw-s?frequency=one-time).
 
 ---
 
