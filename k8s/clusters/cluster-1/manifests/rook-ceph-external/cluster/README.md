@@ -46,3 +46,19 @@ Place each key into a text file
 sudo ceph dashboard set-rgw-api-access-key -i access-key
 sudo ceph dashboard set-rgw-api-secret-key -i secret-key
 ```
+
+
+## Create erasure coded pools
+More commands and options listed
+https://pve.proxmox.com/pve-docs/pveceph.1.html
+
+```
+pveceph pool create ssd-erasure-coded-backups --application cephfs --erasure-coding k=4,m=2,,device-class=ssd,failure-domain=osd,profile=ssd-erasure-coded
+```
+
+## NFS-Genesha
+
+On All Nodes
+```
+sudo apt install nfs-ganesha nfs-ganesha-ceph nfs-ganesha-vfs
+```
