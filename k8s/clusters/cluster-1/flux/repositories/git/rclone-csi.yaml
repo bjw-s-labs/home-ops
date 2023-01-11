@@ -1,0 +1,18 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: rclone-csi
+  namespace: flux-system
+spec:
+  interval: 30m
+  # renovate: datasource=github-releases
+  url: https://github.com/wunderio/csi-rclone.git
+  ref:
+    # renovate: datasource=github-releases
+    tag: v1.2.0
+  ignore: |
+    # exclude all
+    /*
+    # include deploy crds dir
+    !/deploy/kubernetes/1.19
