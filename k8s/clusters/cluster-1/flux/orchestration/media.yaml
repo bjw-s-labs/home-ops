@@ -147,3 +147,20 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
+
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: media-rclone-mergerfs
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: media-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-1/manifests/media/rclone-mergerfs"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops

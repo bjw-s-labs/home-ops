@@ -1,0 +1,128 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: rclone-mergerfs
+  namespace: media
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+      interval: 15m
+  values:
+    image: ubuntu:23.04
+
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      supplementalGroups:
+        - 34 # backup
+        - 44 # videro
+        - 109 # render
+        - 100 # users
+        - 1000
+      fsGroupChangePolicy: "OnRootMismatch"
+
+    env:
+      TZ: "${TIMEZONE}"
+
+    service:
+      main:
+        enabled: false
+
+    ingress:
+      main:
+        enabled: false
+
+    persistence:
+      config:
+        enabled: false
+        # existingClaim: plex-config
+
+      # merged-media:
+      #   enabled: false
+      #   type: emptyDir
+      #   # medium: Memory
+
+      nfs-nas-media:
+        enabled: true
+        existingClaim: media-nfs-share-pvc
+        mountPath: /mnt/unionfs
+        readOnly: false
+
+      # backup:
+      #   enabled: true
+      #   type: custom
+      #   volumeSpec:
+      #     nfs:
+      #       server: "${NAS_ADDRESS}"
+      #       path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/plex
+      #   mountPath: /config/Backups
+
+    probes:
+      liveness:
+        enabled: false
+      readiness:
+        enabled: false
+
+      startup:
+        enabled: false
+
+    additionalContainers:
+      - name: rclone
+        image: mumiehub/rclone-mount
+        # command: ["/bin/sh","-c"]
+        # args:
+        #   - >
+        #     apt-get update &&
+        #     apt-get install -y gdisk &&
+        #     echo "Go to sleep now!" &&
+        #     sleep 6000000000000000000000000000000000000
+        env:
+        - name: RemotePath
+          value: "google:"
+        - name: MountPoint
+          value: "/mnt/remote"
+        - name: ConfigDir
+          value:
+        - name: ConfigName
+          value: rclone.conf
+        - name: MountCommands
+          value: "--allow-other \
+                  --allow-non-empty \
+                  --rc \
+                  --rc-addr=localhost:5572 \
+                  --fast-list \
+                  --drive-skip-gdocs \
+                  --vfs-read-chunk-size=64M \
+                  --vfs-read-chunk-size-limit=2048M \
+                  --buffer-size=64M \
+                  --poll-interval=1m \
+                  --dir-cache-time=168h \
+                  --timeout=10m \
+                  --drive-chunk-size=64M \
+                  --umask=002"
+        volumeMounts:
+        - mountPath: "/config/.rclone.conf"
+          name: rclone-config
+          readOnly: true
+        # - mountPath: /mountedPVC
+        #   name: pvc
+        #   readOnly: false
+        securityContext:
+          privileged: true
+            
+  volumes:
+  - name: rclone-config
+    secret:
+      secretName: rclone.conf
+  # - name: pvc
+  #   persistentVolumeClaim:
+  #     claimName: plex-config
