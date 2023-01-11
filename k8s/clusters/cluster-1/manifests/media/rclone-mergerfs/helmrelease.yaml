@@ -46,10 +46,13 @@ spec:
         enabled: false
         # existingClaim: plex-config
 
-      # merged-media:
-      #   enabled: false
-      #   type: emptyDir
-      #   # medium: Memory
+      rclone-config:
+        enabled: true
+        type: secret
+        name: rclone-config
+        defaultMode: 0550
+        mountPath: /shared/rclone/rclone.conf
+        readOnly: true
 
       nfs-nas-media:
         enabled: true
@@ -118,11 +121,3 @@ spec:
         #   readOnly: false
         securityContext:
           privileged: true
-            
-  volumes:
-  - name: rclone-config
-    secret:
-      secretName: rclone.conf
-  # - name: pvc
-  #   persistentVolumeClaim:
-  #     claimName: plex-config
