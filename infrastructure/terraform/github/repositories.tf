@@ -1,6 +1,5 @@
 module "home-ops" {
-  source  = "mineiros-io/repository/github"
-  version = "0.18.0"
+  source = "github.com/bjw-s/terraform-github-repository.git?ref=main"
 
   name         = "home-ops"
   description  = "My home or for-home infrastructure written as code, adhering to GitOps practices"
@@ -54,11 +53,14 @@ module "home-ops" {
       secret       = module.onepassword_item_flux.fields.github_webhook_token
     }
   ]
+
+  security_and_analysis = {
+    advanced_security = "enabled"
+  }
 }
 
 module "pmb" {
-  source  = "mineiros-io/repository/github"
-  version = "0.18.0"
+  source = "github.com/bjw-s/terraform-github-repository.git?ref=main"
 
   name        = "pmb"
   description = "Poor Man's Backup"
@@ -88,11 +90,14 @@ module "pmb" {
     [],
     local.default_issue_labels
   )
+
+  security_and_analysis = {
+    advanced_security = "enabled"
+  }
 }
 
 module "renovate-config" {
-  source  = "mineiros-io/repository/github"
-  version = "0.18.0"
+  source = "github.com/bjw-s/terraform-github-repository.git?ref=main"
 
   name        = "renovate-config"
   description = "Renovate configuration presets"
@@ -120,11 +125,14 @@ module "renovate-config" {
     [],
     local.default_issue_labels
   )
+
+  security_and_analysis = {
+    advanced_security = "enabled"
+  }
 }
 
 module "helm-charts" {
-  source  = "mineiros-io/repository/github"
-  version = "0.18.0"
+  source = "github.com/bjw-s/terraform-github-repository.git?ref=main"
 
   name         = "helm-charts"
   description  = "A collection of Helm charts"
@@ -176,11 +184,14 @@ module "helm-charts" {
     branch     = "gh-pages"
     path       = "/"
   }
+
+  security_and_analysis = {
+    advanced_security = "enabled"
+  }
 }
 
 module "container-images" {
-  source  = "mineiros-io/repository/github"
-  version = "0.18.0"
+  source = "github.com/bjw-s/terraform-github-repository.git?ref=main"
 
   name        = "container-images"
   description = "Kubernetes tailored container images for various applications"
@@ -208,11 +219,14 @@ module "container-images" {
     [],
     local.default_issue_labels
   )
+
+  security_and_analysis = {
+    advanced_security = "enabled"
+  }
 }
 
 module "helm-charts-actions" {
-  source  = "mineiros-io/repository/github"
-  version = "0.18.0"
+  source = "github.com/bjw-s/terraform-github-repository.git?ref=main"
 
   name        = "helm-charts-actions"
   description = "A collection of GitHub actions to use with helm-charts repo"
@@ -240,11 +254,14 @@ module "helm-charts-actions" {
     [],
     local.default_issue_labels
   )
+
+  security_and_analysis = {
+    advanced_security = "enabled"
+  }
 }
 
 module "gh-workflows" {
-  source  = "mineiros-io/repository/github"
-  version = "0.18.0"
+  source = "github.com/bjw-s/terraform-github-repository.git?ref=main"
 
   name        = "gh-workflows"
   description = "A collection of reusable GitHub workflows"
@@ -272,11 +289,14 @@ module "gh-workflows" {
     [],
     local.default_issue_labels
   )
+
+  security_and_analysis = {
+    advanced_security = "enabled"
+  }
 }
 
 module "klipper-config" {
-  source  = "mineiros-io/repository/github"
-  version = "0.18.0"
+  source = "github.com/bjw-s/terraform-github-repository.git?ref=main"
 
   name        = "klipper-config"
   description = "My Klipper configurations"
@@ -299,11 +319,14 @@ module "klipper-config" {
     [],
     local.default_issue_labels
   )
+
+  security_and_analysis = {
+    advanced_security = "enabled"
+  }
 }
 
 module "esphome-config" {
-  source  = "mineiros-io/repository/github"
-  version = "0.18.0"
+  source = "github.com/bjw-s/terraform-github-repository.git?ref=main"
 
   name        = "esphome-config"
   description = "My ESPHome configs."
@@ -331,11 +354,14 @@ module "esphome-config" {
     [],
     local.default_issue_labels
   )
+
+  security_and_analysis = {
+    advanced_security = "enabled"
+  }
 }
 
 module "terraform-1password-item" {
-  source  = "mineiros-io/repository/github"
-  version = "0.18.0"
+  source = "github.com/bjw-s/terraform-github-repository.git?ref=main"
 
   name        = "terraform-1password-item"
   description = "Terraform Module that collects all fields for a 1Password Item."
@@ -363,4 +389,8 @@ module "terraform-1password-item" {
     [],
     local.default_issue_labels
   )
+
+  security_and_analysis = {
+    advanced_security = "enabled"
+  }
 }
