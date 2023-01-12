@@ -7,11 +7,13 @@ metadata:
 spec:
   template:
     spec:
-      image: summerwind/actions-runner-dind:v2.293.0-ubuntu-20.04-933b0c7@sha256:b9efbd77aac56a2ebd92e936afe9a7bb884057c575b2c2db53676b5d86a1cc5d
-      imagePullPolicy: Always
-      dockerdWithinRunnerContainer: true
+      image: ghcr.io/actions/actions-runner-controller/actions-runner:v2.299.1-ubuntu-20.04
+      dockerdWithinRunnerContainer: false
       ephemeral: true
       repository: bjw-s/home-ops
+      containers:
+        - name: docker
+          image: docker:23.0.0-beta.1-dind
       labels:
         - self-hosted
       volumeMounts:
