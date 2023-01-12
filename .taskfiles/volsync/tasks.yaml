@@ -2,12 +2,12 @@
 version: "3"
 
 x-task-vars: &task-vars
-  RSRC: '{{.rsrc}}'
-  CONTROLLER: '{{.controller}}'
-  NAMESPACE: '{{.namespace}}'
-  CLAIM: '{{.claim}}'
-  TS: '{{.ts}}'
-  KUSTOMIZATION: '{{.kustomization}}'
+  rsrc: '{{.rsrc}}'
+  controller: '{{.controller}}'
+  namespace: '{{.namespace}}'
+  claim: '{{.claim}}'
+  ts: '{{.ts}}'
+  kustomization: '{{.kustomization}}'
 
 vars:
   destinationTemplate: "{{.PROJECT_DIR}}/.taskfiles/volsync/ReplicationDestination.tmpl.yaml"
@@ -56,7 +56,7 @@ tasks:
         msg: "ReplicationSource '{{.rsrc}}' not found in namespace '{{.namespace}}'"
 
   # To run restore jobs in parallel for all replicationdestinations:
-  #   - kubectl get replicationsources --all-namespaces --no-headers | awk '{print $2, $1}' | xargs --max-procs=4 -l bash -c 'task volsync:restore rsrc=$0 namespace=$1'
+  #   - kubectl get replicationsources --all-namespaces --no-headers | awk '{print $2, $1}' | xargs --max-procs=2 -l bash -c 'task volsync:restore rsrc=$0 namespace=$1'
   #
   restore:
     desc: Trigger a Restic ReplicationSource restore (ex. task volsync:restore rsrc=plex [namespace=default])
@@ -117,7 +117,7 @@ tasks:
       - kubectl -n {{.namespace}} delete job wipe-{{.rsrc}}-{{.claim}}-{{.ts}}
     env: *task-vars
 
-  # Create volsync replicationdestination CR to restore data
+  # Create VolSync replicationdestination CR to restore data
   restore-volsync-job:
     internal: true
     cmds:
