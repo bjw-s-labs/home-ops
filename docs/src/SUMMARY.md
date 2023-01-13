@@ -28,3 +28,4 @@
 
 - [How to...](notes-ramblings/howto/index.md)
   - [Run a Pod in a VLAN](notes-ramblings/howto/pod-multihome.md)
+  - [Run a Service with both TCP and UDP](notes-ramblings/howto/mixed-protocol-service.md)
