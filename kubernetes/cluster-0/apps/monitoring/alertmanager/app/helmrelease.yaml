@@ -9,31 +9,27 @@ spec:
   timeout: 20m
   chart:
     spec:
-      chart: app-template
-      version: 1.2.1
+      chart: alertmanager
+      version: 0.25.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
-        name: bjw-s
+        name: prometheus-community
         namespace: flux-system
   values:
-    image:
-      repository: quay.io/prometheus/alertmanager
-      tag: v0.25.0
+    podAnnotations:
+      reloader.stakater.com/auto: "true"
 
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+    config: ""
 
-    initContainers:
-      render-config:
+    extraInitContainers:
+      - name: render-config
         image: ghcr.io/onedr0p/alpine:3.17.1@sha256:da2846e0398d55a5178448f7cb9ee1eeeeee13830fba40289152798595f78c8a
         command:
           - "/bin/sh"
           - -c
         args:
-          - "envsubst < /data/configfiles/alertmanager.yml > /data/config/alertmanager.yml"
+          - "[ ! -f /etc/alertmanager/alertmanager.yml ] && envsubst < /data/configfiles/alertmanager.yml > /data/config/alertmanager.yml"
         env:
           - name: SECRET_PUSHOVER_API_TOKEN
             valueFrom:
@@ -51,42 +47,36 @@ spec:
           - name: configfiles
             mountPath: /data/configfiles
 
-    service:
-      main:
-        ports:
-          http:
-            port: 9093
-
     ingress:
-      main:
-        enabled: true
-        ingressClassName: "nginx"
-        hosts:
-          - host: &host "alertmanager.bjw-s.dev"
-            paths:
-              - path: /
-        tls:
-          - hosts:
-              - *host
+      enabled: true
+      className: "nginx"
+      hosts:
+        - host: &host "alertmanager.bjw-s.dev"
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+      tls:
+        - hosts:
+            - *host
 
     persistence:
-      config:
-        enabled: true
-        type: emptyDir
+      enabled: true
+      storageClass: "ceph-block"
+      accessModes:
+        - ReadWriteOnce
+      size: 50Mi
+
+    extraVolumeMounts:
+      - name: config
         mountPath: /etc/alertmanager
 
-      configfiles:
-        enabled: true
-        type: configMap
-        name: alertmanager-configmap
-        mountPath: "-"
-
-    volumeClaimTemplates:
-      - name: storage
-        mountPath: /alertmanager
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClass: ceph-block
+    extraVolumes:
+      - name: config
+        emptyDir: {}
+      - name: configfiles
+        configMap:
+          name: alertmanager-configmap
+          defaultMode: 420
 
     resources:
       requests:
