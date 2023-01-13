@@ -130,12 +130,17 @@ spec:
         ingressClassName: nginx
         pathType: Prefix
         hosts:
-          - &host_prometheus prometheus-${CLUSTER_NAME}.bjw-s.dev
+          - &host_prometheus prometheus-cluster-0.bjw-s.dev
         tls:
           - hosts:
               - *host_prometheus
 
       prometheusSpec:
+        alertingEndpoints:
+          - namespace: monitoring
+            name: alertmanager
+            port: 9093
+            apiVersion: v2
         additionalScrapeConfigs:
           - job_name: node-exporter
             scrape_interval: 1m
@@ -147,7 +152,7 @@ spec:
                   - "horus.bjw-s.tech:9100"
         enableAdminAPI: true
         externalLabels:
-          cluster: ${CLUSTER_NAME}
+          cluster: cluster-0
         podMonitorSelectorNilUsesHelmValues: false
         probeSelectorNilUsesHelmValues: false
         replicas: 1
@@ -188,116 +193,4 @@ spec:
     ### Alertmanager values
     ###
     alertmanager:
-      tplConfig: true
-      config:
-        receivers:
-          - name: "null"
-          - name: "pushover"
-            pushover_configs:
-              - html: true
-                token: "{{ .Values.alertmanager.secrets.pushover_api_token }}"
-                user_key: "{{ .Values.alertmanager.secrets.pushover_api_userkey }}"
-                send_resolved: true
-                priority: |-
-                  {{- `
-                    {{ if eq .Status "firing" }}1{{ else }}0{{ end }}
-                  `}}
-                url_title: View in Alert Manager
-                title: |-
-                  {{- `
-                    [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
-                  `}}
-                message: |-
-                  {{- `
-                    {{- range .Alerts }}
-                      {{- if ne .Labels.severity "" }}
-                        <b>Severity:</b> <i>{{ .Labels.severity }}</i>
-                      {{- else }}
-                        <b>Severity:</b> <i>N/A</i>
-                      {{- end }}
-                      {{- if ne .Annotations.description "" }}
-                        <b>Description:</b> <i>{{ .Annotations.description }}</i>
-                      {{- else if ne .Annotations.summary "" }}
-                        <b>Summary:</b> <i>{{ .Annotations.summary }}</i>
-                      {{- else if ne .Annotations.message "" }}
-                        <b>Message:</b> <i>{{ .Annotations.message }}</i>
-                      {{- else }}
-                        <b>Description:</b> <i>N/A</i>
-                      {{- end }}
-                      {{- if gt (len .Labels.SortedPairs) 0 }}
-                        <b>Details:</b>
-                        {{- range .Labels.SortedPairs }}
-                          • <b>{{ .Name }}:</b> <i>{{ .Value }}</i>
-                        {{- end }}
-                      {{- end }}
-                    {{- end }}
-                  `}}
-
-        route:
-          group_by: ["alertname", "job"]
-          group_wait: 30s
-          group_interval: 5m
-          repeat_interval: 6h
-          receiver: "pushover"
-          routes:
-            - receiver: "null"
-              matchers:
-                - alertname =~ "InfoInhibitor|Watchdog"
-            - receiver: "pushover"
-              matchers:
-                - severity = critical
-              continue: true
-
-        inhibit_rules:
-          - source_matchers:
-              - severity = "critical"
-            target_matchers:
-              - severity = "warning"
-            equal: ["alertname", "namespace"]
-
-      alertmanagerSpec:
-        storage:
-          volumeClaimTemplate:
-            spec:
-              storageClassName: ceph-block
-              resources:
-                requests:
-                  storage: 1Gi
-
-        resources:
-          requests:
-            cpu: 11m
-            memory: 50M
-          limits:
-            memory: 99M
-
-      ingress:
-        enabled: true
-        ingressClassName: nginx
-        pathType: Prefix
-        hosts:
-          - &host_alertmanager alertmanager-${CLUSTER_NAME}.bjw-s.dev
-        tls:
-          - hosts:
-              - *host_alertmanager
-
-      prometheus:
-        monitor:
-          enabled: true
-          relabelings:
-            - action: replace
-              regex: (.*)
-              replacement: $1
-              sourceLabels:
-                - __meta_kubernetes_pod_node_name
-              targetLabel: kubernetes_node
-
-  valuesFrom:
-    - kind: Secret
-      name: alertmanager-secrets
-      valuesKey: pushover_api_token
-      targetPath: alertmanager.secrets.pushover_api_token
-    - kind: Secret
-      name: alertmanager-secrets
-      valuesKey: pushover_api_userkey
-      targetPath: alertmanager.secrets.pushover_api_userkey
+      enabled: false

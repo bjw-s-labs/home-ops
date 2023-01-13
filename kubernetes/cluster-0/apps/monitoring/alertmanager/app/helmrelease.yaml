@@ -1,0 +1,96 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: alertmanager
+  namespace: monitoring
+spec:
+  interval: 30m
+  timeout: 20m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.2.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    image:
+      repository: quay.io/prometheus/alertmanager
+      tag: v0.25.0
+
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
+    initContainers:
+      render-config:
+        image: ghcr.io/onedr0p/alpine:3.17.1@sha256:da2846e0398d55a5178448f7cb9ee1eeeeee13830fba40289152798595f78c8a
+        command:
+          - "/bin/sh"
+          - -c
+        args:
+          - "envsubst < /data/configfiles/alertmanager.yml > /data/config/alertmanager.yml"
+        env:
+          - name: SECRET_PUSHOVER_API_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: alertmanager-secret
+                key: pushover_api_token
+          - name: SECRET_PUSHOVER_API_USERKEY
+            valueFrom:
+              secretKeyRef:
+                name: alertmanager-secret
+                key: pushover_api_userkey
+        volumeMounts:
+          - name: config
+            mountPath: /data/config
+          - name: configfiles
+            mountPath: /data/configfiles
+
+    service:
+      main:
+        ports:
+          http:
+            port: 9093
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        hosts:
+          - host: &host "alertmanager.bjw-s.dev"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      config:
+        enabled: true
+        type: emptyDir
+        mountPath: /etc/alertmanager
+
+      configfiles:
+        enabled: true
+        type: configMap
+        name: alertmanager-configmap
+        mountPath: "-"
+
+    volumeClaimTemplates:
+      - name: storage
+        mountPath: /alertmanager
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
+
+    resources:
+      requests:
+        cpu: 11m
+        memory: 50M
+      limits:
+        memory: 99M
