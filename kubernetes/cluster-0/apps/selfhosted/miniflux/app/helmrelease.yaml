@@ -17,41 +17,33 @@ spec:
         namespace: flux-system
 
   values:
+    controller:
+      annotations:
+        reloader.stakater.com/auto: "true"
+
+    initContainers:
+      init-db:
+        image: ghcr.io/onedr0p/postgres-initdb:14.6@sha256:ae3b33db2ebf7b06c0244ecc49711bcc02e89d8cebea5379ed20b59344c48372
+        envFrom:
+          - secretRef:
+              name: miniflux-secret
+
     image:
       repository: miniflux/miniflux
       tag: 2.0.41
 
-    podAnnotations:
-      secret.reloader.stakater.com/reload: miniflux-secrets
-
     env:
       CREATE_ADMIN: "0"
-      DATABASE_URL:
-        valueFrom:
-          secretKeyRef:
-            name: miniflux-secrets
-            key: DATABASE_URL
       POLLING_SCHEDULER: "entry_frequency"
       POLLING_FREQUENCY: "15"
       RUN_MIGRATIONS: "1"
       OAUTH2_USER_CREATION: "1"
-      OAUTH2_CLIENT_ID:
-        valueFrom:
-          secretKeyRef:
-            name: miniflux-secrets
-            key: OAUTH2_CLIENT_ID
-      OAUTH2_CLIENT_SECRET:
-        valueFrom:
-          secretKeyRef:
-            name: miniflux-secrets
-            key: OAUTH2_CLIENT_SECRET
-      OAUTH2_OIDC_DISCOVERY_ENDPOINT:
-        valueFrom:
-          secretKeyRef:
-            name: miniflux-secrets
-            key: OAUTH2_OIDC_DISCOVERY_ENDPOINT
       OAUTH2_PROVIDER: oidc
       OAUTH2_REDIRECT_URL: "https://miniflux.bjw-s.dev/oauth2/oidc/callback"
+
+    envFrom:
+      - secretRef:
+          name: miniflux-secret
 
     service:
       main:
