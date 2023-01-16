@@ -32,7 +32,7 @@ spec:
         ingressClassName: "nginx"
         tls: true
       replicaLabels:
-        - replica
+        - "__replica__" # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.replicaExternalLabelName`
       resources:
         requests:
           cpu: 15m
@@ -88,7 +88,7 @@ spec:
       enabled: true
       alertmanagers:
         - http://kube-prometheus-stack-alertmanager.monitoring:9093
-      clusterName: ${CLUSTER_NAME}
+      clusterName: cluster-0 # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.externalLabels.cluster`
       config: |-
         groups:
           - name: "PrometheusWatcher"
