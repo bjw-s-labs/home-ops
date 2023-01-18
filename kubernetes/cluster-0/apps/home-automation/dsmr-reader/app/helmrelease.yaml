@@ -17,53 +17,32 @@ spec:
         namespace: flux-system
 
   values:
+    controller:
+      annotations:
+        reloader.stakater.com/auto: "true"
+
+    initContainers:
+      init-db:
+        image: ghcr.io/onedr0p/postgres-initdb:14.6@sha256:ae3b33db2ebf7b06c0244ecc49711bcc02e89d8cebea5379ed20b59344c48372
+        envFrom:
+          - secretRef:
+              name: dsmr-reader-secret
+
     image:
       repository: xirixiz/dsmr-reader-docker
       tag: amd64-5.9.0-2022.11.03
-
-    podAnnotations:
-      secret.reloader.stakater.com/reload: dsmr-reader-secrets
 
     enableServiceLinks: false
 
     env:
       DJANGO_TIME_ZONE: "Europe/Amsterdam"
-      DJANGO_DATABASE_USER:
-        valueFrom:
-          secretKeyRef:
-            name: dsmr-reader-secrets
-            key: POSTGRES_USER
-      DJANGO_DATABASE_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: dsmr-reader-secrets
-            key: POSTGRES_PASSWORD
-      DJANGO_DATABASE_HOST:
-        valueFrom:
-          secretKeyRef:
-            name: dsmr-reader-secrets
-            key: POSTGRES_HOST
-      DJANGO_DATABASE_PORT: "5432"
-      DJANGO_DATABASE_NAME:
-        valueFrom:
-          secretKeyRef:
-            name: dsmr-reader-secrets
-            key: POSTGRES_DB
-
       DSMRREADER_REMOTE_DATALOGGER_INPUT_METHOD: ipv4
       DSMRREADER_REMOTE_DATALOGGER_NETWORK_HOST: "10.1.3.45"
       DSMRREADER_REMOTE_DATALOGGER_NETWORK_PORT: "8088"
 
-      DSMRREADER_ADMIN_USER:
-        valueFrom:
-          secretKeyRef:
-            name: dsmr-reader-secrets
-            key: DSMRREADER_ADMIN_USER
-      DSMRREADER_ADMIN_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: dsmr-reader-secrets
-            key: DSMRREADER_ADMIN_PASSWORD
+    envFrom:
+      - secretRef:
+          name: dsmr-reader-secret
 
     service:
       main:
