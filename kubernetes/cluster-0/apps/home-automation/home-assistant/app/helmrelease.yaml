@@ -17,17 +17,27 @@ spec:
         namespace: flux-system
 
   values:
+    initContainers:
+      init-db:
+        image: ghcr.io/onedr0p/postgres-initdb:14.6@sha256:ae3b33db2ebf7b06c0244ecc49711bcc02e89d8cebea5379ed20b59344c48372
+        envFrom:
+          - secretRef:
+              name: home-assistant-secret
+
+    controller:
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
       repository: ghcr.io/home-assistant/home-assistant
       tag: 2023.1.5
 
     podAnnotations:
-      secret.reloader.stakater.com/reload: home-assistant-secrets
       k8s.v1.cni.cncf.io/networks: macvlan-static-iot-hass
 
     envFrom:
       - secretRef:
-          name: home-assistant-secrets
+          name: home-assistant-secret
 
     service:
       main:
@@ -57,10 +67,10 @@ spec:
       deploy-key:
         enabled: true
         type: secret
-        name: home-assistant-deploykey
+        name: home-assistant-secret
         defaultMode: 256
         subPath:
-          - path: id_rsa
+          - path: GH_DEPLOY_KEY
             mountPath: /root/.ssh/id_rsa
 
     probes:
