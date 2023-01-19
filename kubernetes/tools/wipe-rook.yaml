@@ -8,15 +8,21 @@ spec:
   nodeName: delta
   containers:
     - name: disk-wipe
-      image: busybox@sha256:7b3ccabffc97de872a30dfd234fd972a66d247c8cfc69b0550f276481852627c
+      image: ghcr.io/onedr0p/alpine:3.17.0@sha256:8e1eb13c3ca5c038f3bf22a5fe9e354867f97f98a78027c44b7c76fce81fa61d
       securityContext:
         privileged: true
+      resources: {}
+      env:
+        - name: CEPH_DISK
+          value: /dev/nvme0n1
       command:
         [
           "/bin/sh",
           "-c",
-          "blkdiscard /dev/nvme0n1",
-          "dd if=/dev/zero bs=1M count=10000 oflag=direct of=/dev/nvme0n1",
+          "apk add --no-cache sgdisk util-linux parted",
+          "sgdisk --zap-all $CEPH_DISK",
+          "blkdiscard $CEPH_DISK",
+          "partprobe $CEPH_DISK"
         ]
 ---
 apiVersion: v1
@@ -28,15 +34,21 @@ spec:
   nodeName: enigma
   containers:
     - name: disk-wipe
-      image: busybox@sha256:7b3ccabffc97de872a30dfd234fd972a66d247c8cfc69b0550f276481852627c
+      image: ghcr.io/onedr0p/alpine:3.17.0@sha256:8e1eb13c3ca5c038f3bf22a5fe9e354867f97f98a78027c44b7c76fce81fa61d
       securityContext:
         privileged: true
+      resources: {}
+      env:
+        - name: CEPH_DISK
+          value: /dev/nvme0n1
       command:
         [
           "/bin/sh",
           "-c",
-          "blkdiscard /dev/nvme0n1",
-          "dd if=/dev/zero bs=1M count=10000 oflag=direct of=/dev/nvme0n1",
+          "apk add --no-cache sgdisk util-linux parted",
+          "sgdisk --zap-all $CEPH_DISK",
+          "blkdiscard $CEPH_DISK",
+          "partprobe $CEPH_DISK"
         ]
 ---
 apiVersion: v1
@@ -48,13 +60,19 @@ spec:
   nodeName: felix
   containers:
     - name: disk-wipe
-      image: busybox@sha256:7b3ccabffc97de872a30dfd234fd972a66d247c8cfc69b0550f276481852627c
+      image: ghcr.io/onedr0p/alpine:3.17.0@sha256:8e1eb13c3ca5c038f3bf22a5fe9e354867f97f98a78027c44b7c76fce81fa61d
       securityContext:
         privileged: true
+      resources: {}
+      env:
+        - name: CEPH_DISK
+          value: /dev/nvme0n1
       command:
         [
           "/bin/sh",
           "-c",
-          "blkdiscard /dev/nvme0n1",
-          "dd if=/dev/zero bs=1M count=10000 oflag=direct of=/dev/nvme0n1",
+          "apk add --no-cache sgdisk util-linux parted",
+          "sgdisk --zap-all $CEPH_DISK",
+          "blkdiscard $CEPH_DISK",
+          "partprobe $CEPH_DISK"
         ]
