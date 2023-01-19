@@ -1,7 +1,7 @@
 ---
 clusterName: cluster-0
 
-talosVersion: v1.3.1
+talosVersion: v1.3.2
 kubernetesVersion: 1.26.0
 endpoint: "https://cluster-0.bjw-s.tech:6443"
 
@@ -115,7 +115,10 @@ controlPlane:
         time:
           disabled: false
           servers:
-            - 10.1.1.1
+            - 0.nl.pool.ntp.org
+            - 1.nl.pool.ntp.org
+            - 2.nl.pool.ntp.org
+            - 3.nl.pool.ntp.org
 
     - |-
       - op: remove
