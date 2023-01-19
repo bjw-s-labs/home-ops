@@ -31,56 +31,6 @@ spec:
       network:
         provider: host
 
-      resources:
-        mgr:
-          requests:
-            cpu: "125m"
-            memory: "549M"
-          limits:
-            memory: "1219M"
-        mon:
-          requests:
-            cpu: "49m"
-            memory: "477M"
-          limits:
-            memory: "1059M"
-        osd:
-          requests:
-            cpu: "442m"
-            memory: "2678M"
-          limits:
-            memory: "5944M"
-        prepareosd:
-          requests:
-            cpu: "250m"
-            memory: "50Mi"
-          limits:
-            memory: "200Mi"
-        mgr-sidecar:
-          requests:
-            cpu: "49m"
-            memory: "94M"
-          limits:
-            memory: "208M"
-        crashcollector:
-          requests:
-            cpu: "15m"
-            memory: "64M"
-          limits:
-            memory: "64M"
-        logcollector:
-          requests:
-            cpu: "100m"
-            memory: "100M"
-          limits:
-            memory: "1G"
-        cleanup:
-          requests:
-            cpu: "250m"
-            memory: "100M"
-          limits:
-            memory: "1G"
-
       crashCollector:
         disable: false
 
@@ -110,7 +60,7 @@ spec:
         annotations:
           nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
         host:
-          name: &host rook-${CLUSTER_NAME}.bjw-s.dev
+          name: &host rook-cluster-0.bjw-s.dev
           path: "/"
         tls:
           - hosts:
