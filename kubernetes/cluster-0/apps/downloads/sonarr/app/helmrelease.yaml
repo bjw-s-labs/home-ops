@@ -25,6 +25,10 @@ spec:
       secret.reloader.stakater.com/reload: sonarr-secrets
 
     podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: "OnRootMismatch"
       supplementalGroups:
         - 65539
 
