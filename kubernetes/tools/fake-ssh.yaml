@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: delta
+spec:
+  restartPolicy: Never
+  nodeName: delta
+  containers:
+    - name: disk-wipe
+      image: ghcr.io/onedr0p/alpine:3.17.0@sha256:23ca8ffcdfbe16492f0d638b71691985b15b3aa7cc373f366a14ec17275bc584
+      securityContext:
+        privileged: true
+      resources: {}
+      env:
+        - name: CEPH_DISK
+          value: /dev/nvme0n1
+      command:
+        [
+          "/bin/sh",
+          "-c",
+          "sleep infinity"
+        ]
+      volumeMounts:
+        - mountPath: /mnt/host_var
+          name: host-var
+  volumes:
+    - name: host-var
+      hostPath:
+        path: /var
