@@ -61,14 +61,14 @@ tasks:
   restore:
     desc: Trigger a Restic ReplicationSource restore (ex. task volsync:restore rsrc=plex [namespace=default])
     cmds:
-      - task: restore-suspend-app
-        vars: *task-vars
+      # - task: restore-suspend-app
+      #   vars: *task-vars
       - task: restore-wipe-job
         vars: *task-vars
       - task: restore-volsync-job
         vars: *task-vars
-      - task: restore-resume-app
-        vars: *task-vars
+      # - task: restore-resume-app
+      #   vars: *task-vars
     vars:
       rsrc: '{{ or .rsrc (fail "Variable `rsrc` is required") }}'
       namespace: '{{.namespace | default "default"}}'
@@ -86,7 +86,7 @@ tasks:
       controller:
         sh: |
           app=$(kubectl -n {{.namespace}} get persistentvolumeclaim {{.claim}} -o jsonpath="{.metadata.labels.app\.kubernetes\.io/name}")
-          if [[ -z $(kubectl -n {{.namespace}} get persistentvolumeclaim {{.claim}} -o jsonpath="{.metadata.annotations.volume\.kubernetes\.io/storage-provisioner}") ]]; then
+          if [[ -n $(kubectl -n {{.namespace}} get deployment --no-headers -l "app.kubernetes.io/name=$app") ]]; then
             echo "deployments.apps/$app" && exit 0
           fi
           echo "statefulsets.apps/$app"
