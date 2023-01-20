@@ -61,14 +61,14 @@ tasks:
   restore:
     desc: Trigger a Restic ReplicationSource restore (ex. task volsync:restore rsrc=plex [namespace=default])
     cmds:
-      # - task: restore-suspend-app
-      #   vars: *task-vars
+      - task: restore-suspend-app
+        vars: *task-vars
       - task: restore-wipe-job
         vars: *task-vars
       - task: restore-volsync-job
         vars: *task-vars
-      # - task: restore-resume-app
-      #   vars: *task-vars
+      - task: restore-resume-app
+        vars: *task-vars
     vars:
       rsrc: '{{ or .rsrc (fail "Variable `rsrc` is required") }}'
       namespace: '{{.namespace | default "default"}}'
