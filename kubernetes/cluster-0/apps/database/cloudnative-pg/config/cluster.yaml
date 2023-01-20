@@ -13,9 +13,6 @@ spec:
     storageClass: ceph-block
   superuserSecret:
     name: cloudnative-pg-postgres-superuser
-  bootstrap:
-    recovery:
-      source: &active-cluster postgres-v1
   monitoring:
     enablePodMonitor: true
   backup:
@@ -34,18 +31,3 @@ spec:
         secretAccessKey:
           name: cloudnative-pg-postgres-s3
           key: S3_SECRET_KEY
-  externalClusters:
-    - name: *active-cluster
-      barmanObjectStore:
-        wal:
-          compression: bzip2
-          maxParallel: 8
-        destinationPath: s3://postgresql/
-        endpointURL: http://s3.bjw-s.dev
-        s3Credentials:
-          accessKeyId:
-            name: cloudnative-pg-postgres-s3
-            key: S3_ACCESS_KEY
-          secretAccessKey:
-            name: cloudnative-pg-postgres-s3
-            key: S3_SECRET_KEY
