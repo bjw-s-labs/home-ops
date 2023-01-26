@@ -37,8 +37,6 @@ spec:
         client-header-timeout: 120
         client-body-buffer-size: "100M"
         client-body-timeout: 120
-        custom-http-errors: >-
-          403,404,500,501,502,503
         enable-brotli: "true"
         enable-real-ip: "true"
         forwarded-for-header: "CF-Connecting-IP"
@@ -81,21 +79,7 @@ spec:
           memory: 312M
 
     defaultBackend:
-      enabled: true
-      image:
-        repository: ghcr.io/tarampampam/error-pages
-        tag: 2.19.0
-      extraEnvs:
-        - name: TEMPLATE_NAME
-          value: ghost
-        - name: SHOW_DETAILS
-          value: "false"
-      resources:
-        requests:
-          cpu: 15m
-          memory: 64M
-        limits:
-          memory: 64M
+      enabled: false
 
   valuesFrom:
     # Cloudflare Networks
