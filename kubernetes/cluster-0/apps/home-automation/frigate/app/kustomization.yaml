@@ -4,11 +4,10 @@ kind: Kustomization
 namespace: home-automation
 resources:
   - ./helmrelease.yaml
-  - ./pvc.yaml
-  - ./replicationsource.yaml
+  - ./volsync.yaml
   - ./externalsecret.yaml
 configMapGenerator:
-  - name: frigate-config
+  - name: frigate-configmap
     files:
       - config/config.yaml
 generatorOptions:
