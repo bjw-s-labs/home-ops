@@ -4,14 +4,13 @@ kind: Kustomization
 namespace: selfhosted
 resources:
   - ./helmrelease.yaml
-  - ./pvc.yaml
   - ./externalsecret.yaml
-  - ./replicationsource.yaml
+  - ./volsync.yaml
 commonLabels:
   app.kubernetes.io/name: obsidian-couchdb
   app.kubernetes.io/instance: obsidian-couchdb
 configMapGenerator:
-  - name: obsidian-couchdb-config
+  - name: obsidian-couchdb-configmap
     files:
       - config/config.ini
 generatorOptions:
