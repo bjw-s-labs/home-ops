@@ -30,9 +30,24 @@ metadata:
 provisioner: rook-ceph.rbd.csi.ceph.com
 parameters:
   clusterID: rook-ceph-external
-  pool: nvme_ec_crap-data
+
+  # If you want to use erasure coded pool with RBD, you need to create
+  # two pools. one erasure coded and one replicated.
+  # You need to specify the replicated pool here in the `pool` parameter, it is
+  # used for the metadata of the images.
+  # The erasure coded pool must be set as the `dataPool` parameter below.
+  dataPool: nvme_ec_crap-data
+  pool: nvme_ec_crap-metadata
+
   imageFormat: "2"
-  imageFeatures: layering
+
+  # RBD image features, equivalent to OR'd bitfield value: 63
+  # Available for imageFormat: "2". Older releases of CSI RBD
+  # support only the `layering` feature. The Linux kernel (KRBD) supports the
+  # full feature complement as of 5.4
+  imageFeatures: layering,fast-diff,object-map,deep-flatten,exclusive-lock
+  # imageFeatures: layering
+
   csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
   csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph-external
   csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
