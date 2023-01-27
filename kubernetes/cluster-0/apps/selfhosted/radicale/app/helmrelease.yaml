@@ -17,13 +17,14 @@ spec:
         namespace: flux-system
 
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
       repository: tomsquest/docker-radicale
       tag: 3.1.8.0
-
-    podAnnotations:
-      configmap.reloader.stakater.com/reload: "radicale-config"
-      secret.reloader.stakater.com/reload: "radicale-auth"
 
     service:
       main:
@@ -49,20 +50,15 @@ spec:
       config:
         enabled: true
         type: configMap
-        name: radicale-config
+        name: radicale-configmap
         subPath: config.cfg
         mountPath: /config/config
         readOnly: true
 
-      data:
-        enabled: true
-        existingClaim: radicale-data
-        mountPath: /data
-
       auth:
         enabled: true
         type: secret
-        name: radicale-auth
+        name: radicale-secret
         subPath: users
         mountPath: /config/users
         readOnly: true
@@ -73,3 +69,11 @@ spec:
         memory: 79M
       limits:
         memory: 79M
+
+
+    volumeClaimTemplates:
+      - name: data
+        mountPath: /data
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
