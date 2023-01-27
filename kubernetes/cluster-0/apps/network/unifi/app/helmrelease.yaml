@@ -17,6 +17,9 @@ spec:
         namespace: flux-system
 
   values:
+    controller:
+      type: statefulset
+
     image:
       repository: jacobalberty/unifi
       tag: v7.2.95
@@ -81,15 +84,16 @@ spec:
           - hosts:
               - *host
 
-    persistence:
-      data:
-        enabled: true
-        existingClaim: unifi-data
-        mountPath: /unifi
-
     resources:
       requests:
         cpu: 23m
         memory: 1390M
       limits:
         memory: 1390M
+
+    volumeClaimTemplates:
+      - name: data
+        mountPath: /unifi
+        accessMode: ReadWriteOnce
+        size: 2Gi
+        storageClass: ceph-block
