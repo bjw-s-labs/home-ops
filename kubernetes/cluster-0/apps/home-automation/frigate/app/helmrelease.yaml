@@ -17,6 +17,11 @@ spec:
         namespace: flux-system
 
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
       repository: docker.io/blakeblackshear/frigate
       tag: 0.11.1
@@ -26,7 +31,7 @@ spec:
 
     envFrom:
       - secretRef:
-          name: frigate-secrets
+          name: frigate-secret
 
     service:
       main:
@@ -71,13 +76,10 @@ spec:
       config:
         enabled: true
         type: configMap
-        name: frigate-config
+        name: frigate-configmap
         subPath: config.yaml
         mountPath: /config/config.yml
         readOnly: true
-      data:
-        enabled: true
-        existingClaim: frigate-data
       media:
         enabled: true
         type: nfs
@@ -107,10 +109,6 @@ spec:
           - hosts:
               - *host
 
-    podAnnotations:
-      configmap.reloader.stakater.com/reload: "frigate-config"
-      secret.reloader.stakater.com/reload: "frigate-secrets"
-
     securityContext:
       privileged: true
 
@@ -126,3 +124,10 @@ spec:
       limits:
         gpu.intel.com/i915: 1
         memory: 886M
+
+    volumeClaimTemplates:
+      - name: data
+        mountPath: /data
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
