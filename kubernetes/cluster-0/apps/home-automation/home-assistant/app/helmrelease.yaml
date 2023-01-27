@@ -19,12 +19,14 @@ spec:
   values:
     initContainers:
       init-db:
-        image: ghcr.io/onedr0p/postgres-initdb:14.6@sha256:ae3b33db2ebf7b06c0244ecc49711bcc02e89d8cebea5379ed20b59344c48372
+        image: ghcr.io/onedr0p/postgres-initdb:14.6
+        imagePullPolicy: IfNotPresent
         envFrom:
           - secretRef:
               name: home-assistant-secret
 
     controller:
+      type: statefulset
       annotations:
         reloader.stakater.com/auto: "true"
 
@@ -60,10 +62,6 @@ spec:
               - *host
 
     persistence:
-      config:
-        enabled: true
-        existingClaim: home-assistant-data
-
       deploy-key:
         enabled: true
         type: secret
@@ -87,3 +85,10 @@ spec:
         memory: 411M
       limits:
         memory: 4417M
+
+    volumeClaimTemplates:
+      - name: config
+        mountPath: /config
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
