@@ -17,13 +17,14 @@ spec:
         namespace: flux-system
 
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
       repository: docker.io/library/couchdb
       tag: 3.3.1
-
-    podAnnotations:
-      configmap.reloader.stakater.com/reload: "obsidian-couchdb-config"
-      secret.reloader.stakater.com/reload: "obsidian-couchdb-secrets"
 
     initContainers:
       init-config:
@@ -42,12 +43,12 @@ spec:
       COUCHDB_USER:
         valueFrom:
           secretKeyRef:
-            name: obsidian-couchdb-secrets
+            name: obsidian-couchdb-secret
             key: couchdb-user
       COUCHDB_PASSWORD:
         valueFrom:
           secretKeyRef:
-            name: obsidian-couchdb-secrets
+            name: obsidian-couchdb-secret
             key: couchdb-password
 
     service:
@@ -74,7 +75,7 @@ spec:
       config:
         enabled: true
         type: configMap
-        name: obsidian-couchdb-config
+        name: obsidian-couchdb-configmap
         mountPath: "-"
 
       config-storage:
@@ -82,14 +83,16 @@ spec:
         type: emptyDir
         mountPath: /opt/couchdb/etc/default.d
 
-      data:
-        enabled: true
-        existingClaim: obsidian-couchdb
-        mountPath: /opt/couchdb/data
-
     resources:
       requests:
         cpu: 23m
         memory: 79M
       limits:
         memory: 79M
+
+    volumeClaimTemplates:
+      - name: data
+        mountPath: /opt/couchdb/data
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
