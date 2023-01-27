@@ -5,13 +5,12 @@ namespace: home-automation
 resources:
   - ./helmrelease.yaml
   - ./externalsecret.yaml
-  - ./pvc.yaml
-  - ./replicationsource.yaml
+  - ./volsync.yaml
 commonLabels:
   app.kubernetes.io/name: mosquitto
   app.kubernetes.io/instance: mosquitto
 configMapGenerator:
-  - name: mosquitto-config
+  - name: mosquitto-configmap
     files:
       - config/mosquitto.conf
 generatorOptions:
