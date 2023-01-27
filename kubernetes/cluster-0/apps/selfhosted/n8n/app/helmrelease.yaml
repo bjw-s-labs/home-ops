@@ -17,12 +17,14 @@ spec:
         namespace: flux-system
 
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
       repository: docker.io/n8nio/n8n
       tag: 0.213.0
-
-    podAnnotations:
-      secret.reloader.stakater.com/reload: n8n-secrets
 
     env:
       GENERIC_TIMEZONE: "Europe/Amsterdam"
@@ -34,7 +36,7 @@ spec:
       N8N_ENCRYPTION_KEY:
         valueFrom:
           secretKeyRef:
-            name: n8n-secrets
+            name: n8n-secret
             key: N8N_ENCRYPTION_KEY
 
     service:
@@ -58,15 +60,16 @@ spec:
           - hosts:
               - *host
 
-    persistence:
-      config:
-        enabled: true
-        existingClaim: n8n-config
-        mountPath: /home/node/.n8n
-
     resources:
       requests:
         cpu: 20m
         memory: 128M
       limits:
         memory: 512M
+
+    volumeClaimTemplates:
+      - name: config
+        mountPath: /home/node/.n8n
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
