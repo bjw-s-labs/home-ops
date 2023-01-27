@@ -17,9 +17,10 @@ spec:
         namespace: flux-system
 
   values:
-    podAnnotations:
-      configmap.reloader.stakater.com/reload: mosquitto-config
-      secret.reloader.stakater.com/reload: mosquitto-secrets
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
 
     image:
       repository: public.ecr.aws/docker/library/eclipse-mosquitto
@@ -27,15 +28,15 @@ spec:
 
     initContainers:
       copy-config:
-        image: eclipse-mosquitto:2.0.15@sha256:29c92f9144d4e65f7e647694d4b6aa7f0ac6a995bd102251ea05f7edf258ad20
+        image: public.ecr.aws/docker/library/eclipse-mosquitto:2.0.15@sha256:29c92f9144d4e65f7e647694d4b6aa7f0ac6a995bd102251ea05f7edf258ad20
         command:
           - "/bin/sh"
           - -c
         args:
-          - cp /data/mosquitto_secrets/* /data/external_config/ && mosquitto_passwd -U /data/external_config/mosquitto_pwd
+          - cp /data/mosquitto_secret/* /data/external_config/ && mosquitto_passwd -U /data/external_config/mosquitto_pwd
         volumeMounts:
-          - name: mosquitto-secrets
-            mountPath: /data/mosquitto_secrets
+          - name: mosquitto-secret
+            mountPath: /data/mosquitto_secret
           - name: external-config
             mountPath: /data/external_config
 
@@ -54,19 +55,16 @@ spec:
             port: 1883
 
     persistence:
-      data:
-        enabled: true
-        existingClaim: mosquitto-data
       mosquitto-config:
         enabled: true
         type: configMap
-        name: mosquitto-config
+        name: mosquitto-configmap
         mountPath: /mosquitto/config/mosquitto.conf
         subPath: mosquitto.conf
-      mosquitto-secrets:
+      mosquitto-secret:
         enabled: true
         type: secret
-        name: mosquitto-secrets
+        name: mosquitto-secret
         mountPath: "-"
       external-config:
         enabled: true
@@ -79,3 +77,10 @@ spec:
         memory: 64M
       limits:
         memory: 124M
+
+    volumeClaimTemplates:
+      - name: data
+        mountPath: /data
+        accessMode: ReadWriteOnce
+        size: 512Mi
+        storageClass: ceph-block
