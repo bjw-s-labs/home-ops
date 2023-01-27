@@ -17,6 +17,11 @@ spec:
         namespace: flux-system
 
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
       repository: docker.io/koenkk/zigbee2mqtt
       tag: 1.29.2
@@ -55,15 +60,16 @@ spec:
           - hosts:
               - *host
 
-    persistence:
-      data:
-        enabled: true
-        mountPath: "/data"
-        existingClaim: zigbee2mqtt-data
-
     resources:
       requests:
         cpu: 15m
         memory: 127M
       limits:
         memory: 1364M
+
+    volumeClaimTemplates:
+      - name: data
+        mountPath: /data
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
