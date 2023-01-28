@@ -19,23 +19,22 @@ spec:
       storage: 400Gi
 
   storageClassName: ceph-block-external
-# ---
-# apiVersion: v1
-# kind: PersistentVolumeClaim
-# metadata:
-#   name: plex-config-nvme
-#   namespace: media
-#   labels:
-#     app.kubernetes.io/name: &name plex
-#     app.kubernetes.io/instance: *name
-#     snapshot.home.arpa/enabled: "true"
-# spec:
-#   accessModes:
-#     - ReadWriteOnce
-# 
-#   resources:
-#     requests:
-#       storage: 400Gi
-# 
-#   storageClassName: ceph-block-external-nvme
-# 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: plex-config-nvme
+  namespace: media
+  labels:
+    app.kubernetes.io/name: &name plex
+    app.kubernetes.io/instance: *name
+    snapshot.home.arpa/enabled: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 400Gi
+
+  storageClassName: ceph-block-external-nvme
