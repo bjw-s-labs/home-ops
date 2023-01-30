@@ -3,6 +3,8 @@
 ## Create Ceph client keyrings
 Create these on the PVE servers and import them
 
+ I used https://pve.proxmox.com/wiki/User:Grin/Ceph_Object_Gateway to get the commands. Modifying them as needed
+
 nfs-ganesha client permissions
 ```
 caps mds = "allow rw"
@@ -321,4 +323,25 @@ sudo systemctl start nfs-ganesha
 
 ```
 sudo mount -v -t nfs -o nfsvers=4.1,proto=tcp $NFS_SERVER:$Pseudo_VALUE_IN_CONFIG $MOUNT
- ```
+```
+
+
+
+
+### Source Info
+
+Below is where I pieced together this info needed
+
+- http://images.45drives.com/ceph/cephfs/nfs-ganesha-ceph.conf
+- https://bugzilla.redhat.com/show_bug.cgi?id=1486112
+- https://docs.ceph.com/en/latest/man/8/rados/
+- https://forum.proxmox.com/threads/ha-nfs-service-for-kvm-vms-on-a-proxmox-cluster-with-ceph.80967/
+- https://github.com/nfs-ganesha/nfs-ganesha/blob/next/src/config_samples/ceph.conf
+- https://github.com/nfs-ganesha/nfs-ganesha
+- https://pve.proxmox.com/wiki/User:Grin/Ceph_Object_Gateway
+- https://docs.ceph.com/en/latest/cephfs/nfs/
+- https://documentation.suse.com/ses/5.5/html/ses-all/cha-ceph-nfsganesha.html
+- http://mykb.mife.ca/post/ceph-ganesha/
+- https://manpages.ubuntu.com/manpages/jammy/man8/ganesha-rados-grace.8.html
+- Ganesha's libre.chat IRC channel #ganesha
+
