@@ -315,3 +315,10 @@ This will create the objects that it needs to function. There will be an object 
 sudo systemctl enable nfs-ganesha
 sudo systemctl start nfs-ganesha
 ```
+
+
+## Mount on remote client
+
+```
+sudo mount -v -t nfs -o nfsvers=4.1,proto=tcp $NFS_SERVER:$Pseudo_VALUE_IN_CONFIG $MOUNT
+ ```
