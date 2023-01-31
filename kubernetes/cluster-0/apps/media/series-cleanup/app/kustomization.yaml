@@ -5,10 +5,10 @@ namespace: media
 resources:
   - ./pvc.yaml
   - ./externalsecret.yaml
-  - ./cronjob.yaml
-  - ./replicationsource.yaml
+  - ./helmrelease.yaml
+  - ./volsync.yaml
 configMapGenerator:
-  - name: series-cleanup-config
+  - name: series-cleanup-configmap
     files:
       - config/settings.json
 generatorOptions:
