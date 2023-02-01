@@ -16,12 +16,29 @@ spec:
         namespace: flux-system
       interval: 30m
   values:
+    crds:
+      install: true
+
     replicaCount: 3
 
     updateStrategy:
       type: RollingUpdate
       rollingUpdate:
         maxSurge: 1
+
+    grafana:
+      enabled: true
+    serviceMonitor:
+      enabled: true
+    backgroundController:
+      serviceMonitor:
+        enabled: true
+    cleanupController:
+      serviceMonitor:
+        enabled: true
+    reportsController:
+      serviceMonitor:
+        enabled: true
 
     resources:
       requests:
