@@ -1,4 +1,10 @@
 ---
+# yaml-language-server: $schema=https://frigate.bjw-s.dev/api/config/schema
+logger:
+  default: info
+  # logs:
+  #   frigate.record: debug
+
 mqtt:
   host: mosquitto.home-automation
   port: 1883
@@ -14,19 +20,6 @@ detectors:
     type: edgetpu
     device: usb
 
-birdseye:
-  enabled: False
-
-# Global objects configuration
-objects:
-  track:
-    - person
-  filters:
-    person:
-      min_area: 5000
-      max_area: 100000
-      threshold: 0.7
-
 # Global ffmpeg configuration
 ffmpeg:
   global_args:
@@ -40,13 +33,11 @@ ffmpeg:
     - /dev/dri/renderD128
     - -hwaccel_output_format
     - yuv420p
+  # https://github.com/blakeblackshear/frigate/issues/3296
   output_args:
-    record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c:v copy -ar 44100 -c:a aac
-    rtmp: -c:v copy -f flv -ar 44100 -c:a aac
-
-# Global rtmp configuration
-rtmp:
-  enabled: true
+    record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -map 0:v:0 -map 0:a:0 -c copy
+    # record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c:v copy -ar 44100 -c:a aac
+    # rtmp: -c:v copy -f flv -ar 44100 -c:a aac
 
 # Global snapshots configuration
 snapshots:
@@ -54,7 +45,7 @@ snapshots:
   timestamp: false
   bounding_box: true
   retain:
-    default: 7
+    default: 14
 
 # Global record configuration
 record:
@@ -64,36 +55,36 @@ record:
     mode: all
   events:
     retain:
-      default: 7
+      default: 14
       mode: active_objects
 
+# Global objects configuration
+objects:
+  track:
+    - person
+  filters:
+    person:
+      min_area: 5000
+      max_area: 100000
+      threshold: 0.7
+
 # Specify camera's
+go2rtc:
+  streams:
+    frigate_doorbell_lq: rtsp://{FRIGATE_CAMERA_DOORBELL_USER}:{FRIGATE_CAMERA_DOORBELL_PASSWORD}@{FRIGATE_CAMERA_DOORBELL_HOST}:554/cam/realmonitor?channel=1&subtype=1
+    frigate_doorbell_hq: rtsp://{FRIGATE_CAMERA_DOORBELL_USER}:{FRIGATE_CAMERA_DOORBELL_PASSWORD}@{FRIGATE_CAMERA_DOORBELL_HOST}:554/cam/realmonitor?channel=1&subtype=0
+
 cameras:
   doorbell:
-    # Camera-specific ffmpeg configuration
     ffmpeg:
       inputs:
-        - path: "rtsp://{FRIGATE_CAMERA_DOORBELL_USER}:{FRIGATE_CAMERA_DOORBELL_PASSWORD}@{FRIGATE_CAMERA_DOORBELL_HOST}:554/cam/realmonitor?channel=1&subtype=0"
-          roles:
-            - rtmp
-            - record
-        - path: "rtsp://{FRIGATE_CAMERA_DOORBELL_USER}:{FRIGATE_CAMERA_DOORBELL_PASSWORD}@{FRIGATE_CAMERA_DOORBELL_HOST}:554/cam/realmonitor?channel=1&subtype=1"
+        - path: rtsp://localhost:8554/frigate_doorbell_lq
           roles:
             - detect
-
-    # Camera-specific detection configuration
+        - path: rtsp://localhost:8554/frigate_doorbell_hq
+          roles:
+            - record
     detect:
-      width: 960
-      height: 720
-      fps: 10
-
-    # Camera-specific recording configuration
-    record:
-      events:
-        retain:
-          default: 14
-
-    # Camera-specific snapshots configuration
-    snapshots:
-      retain:
-        default: 14
+      width: 720
+      height: 576
+      fps: 15
