@@ -23,8 +23,8 @@ spec:
         reloader.stakater.com/auto: "true"
 
     image:
-      repository: docker.io/blakeblackshear/frigate
-      tag: 0.11.1
+      repository: ghcr.io/blakeblackshear/frigate
+      tag: 0.12.0-beta7
 
     env:
       LIBVA_DRIVER_NAME: i965
@@ -38,6 +38,9 @@ spec:
         ports:
           http:
             port: &port 5000
+          rtsp:
+            enabled: true
+            port: 8554
 
     probes:
       liveness: &probe
