@@ -8,126 +8,33 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: app-template
-      version: 1.2.1
+      chart: kube-rclone
+      version: 0.1.0
       sourceRef:
         kind: HelmRepository
-        name: bjw-s
+        name: simplyzee-charts
         namespace: flux-system
       interval: 15m
   values:
     image: 
-      repository: ubuntu
-      tag: "23.04"
+      repository: quay.io/simplyzee/kube-rclone
+      tag: "v1.53.1"
 
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      supplementalGroups:
-        - 34 # backup
-        - 44 # videro
-        - 109 # render
-        - 100 # users
-        - 1000
-      fsGroupChangePolicy: "OnRootMismatch"
-
-    env:
-      TZ: "${TIMEZONE}"
-
-    service:
-      main:
-        enabled: false
-
-    ingress:
-      main:
-        enabled: false
-
-    persistence:
-      config:
-        enabled: false
-        # existingClaim: plex-config
-
-      rclone-config:
-        enabled: true
-        type: secret
-        name: rclone-config
-        defaultMode: 0550
-        mountPath: /shared/rclone/rclone.conf
-        readOnly: true
-
-      nfs-nas-media:
-        enabled: true
-        existingClaim: media-nfs-share-pvc
-        mountPath: /mnt/unionfs
-        readOnly: false
-
-      rclone-remote:
-        enabled: true
-        existingClaim: rclone-google
-        # mountPath: /mnt/remote
-        # mountPropagation: Bidirectional
-
-      # backup:
-      #   enabled: true
-      #   type: custom
-      #   volumeSpec:
-      #     nfs:
-      #       server: "${NAS_ADDRESS}"
-      #       path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/plex
-      #   mountPath: /config/Backups
-
-    probes:
-      liveness:
-        enabled: false
-      readiness:
-        enabled: false
-
-      startup:
-        enabled: false
-
-    # additionalContainers:
-    #   - name: rclone
-    #     image: mumiehub/rclone-mount
-    #     # command: ["/bin/sh","-c"]
-    #     # args:
-    #     #   - >
-    #     #     apt-get update &&
-    #     #     apt-get install -y gdisk &&
-    #     #     echo "Go to sleep now!" &&
-    #     #     sleep 6000000000000000000000000000000000000
-    #     env:
-    #     - name: RemotePath
-    #       value: "google:"
-    #     - name: MountPoint
-    #       value: "/mnt/remote"
-    #     - name: ConfigDir
-    #       value:
-    #     - name: ConfigName
-    #       value: rclone.conf
-    #     - name: MountCommands
-    #       value: "--allow-other \
-    #               --allow-non-empty \
-    #               --rc \
-    #               --rc-addr=localhost:5572 \
-    #               --fast-list \
-    #               --drive-skip-gdocs \
-    #               --vfs-read-chunk-size=64M \
-    #               --vfs-read-chunk-size-limit=2048M \
-    #               --buffer-size=64M \
-    #               --poll-interval=1m \
-    #               --dir-cache-time=168h \
-    #               --timeout=10m \
-    #               --drive-chunk-size=64M" # \
-    #               # --umask=002"
-    #     volumeMounts:
-    #     - mountPath: "/config/.rclone.conf"
-    #       name: rclone-config
-    #       readOnly: true
-    #     # - mountPath: /mountedPVC
-    #     #   name: pvc
-    #     #   readOnly: false
-    #     securityContext:
-    #       privileged: true
-    #       capabilities:
-    #         add: ["SYS_ADMIN"]
+    rclone:
+      remote: google
+      # Path for remote
+      path: "/"
+      readOnly: true
+      # additional arguments for customising rclone
+      # mount options can be found here - https://rclone.org/commands/rclone_mount/#options
+      # additionalArgs:
+        # - --buffer-size=1G
+        # - --dir-cache-time=72h
+        # - --drive-chunk-size=256M
+        # - --fast-list
+        # - --log-level=INFO
+        # - --vfs-read-chunk-size=128M
+        # - --vfs-read-chunk-size-limit=off
+        # - --drive-acknowledge-abuse=true
+    
+    

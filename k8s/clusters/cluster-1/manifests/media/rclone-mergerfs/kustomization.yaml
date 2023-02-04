@@ -4,11 +4,15 @@ kind: Kustomization
 namespace: media
 resources:
   - ./secret.sops.yaml
-  # - ./helmrelease.yaml
+  - ./helmrelease.yaml
   - ./pvc.yaml
-secretGenerator:
-  - name: rclone-config
+configMapGenerator:
+  - name: kube-rclone-configmap
     files:
-      - rclone.conf=configs/rclone.conf.encrypted
-    options:
-      disableNameSuffixHash: true
+      - configs/rclone.conf.encrypted
+# secretGenerator:
+#   - name: rclone-config
+#     files:
+#       - rclone.conf=configs/rclone.conf.encrypted
+#     options:
+#       disableNameSuffixHash: true
