@@ -5,6 +5,9 @@ logger:
   # logs:
   #   frigate.record: debug
 
+birdseye:
+  enabled: false
+
 mqtt:
   host: mosquitto.home-automation
   port: 1883
@@ -22,22 +25,7 @@ detectors:
 
 # Global ffmpeg configuration
 ffmpeg:
-  global_args:
-    - -hide_banner
-    - -loglevel
-    - warning
-  hwaccel_args:
-    - -hwaccel
-    - vaapi
-    - -hwaccel_device
-    - /dev/dri/renderD128
-    - -hwaccel_output_format
-    - yuv420p
-  # https://github.com/blakeblackshear/frigate/issues/3296
-  output_args:
-    record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -map 0:v:0 -map 0:a:0 -c copy
-    # record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c:v copy -ar 44100 -c:a aac
-    # rtmp: -c:v copy -f flv -ar 44100 -c:a aac
+  hwaccel_args: preset-intel-qsv-h264
 
 # Global snapshots configuration
 snapshots:
@@ -71,19 +59,25 @@ objects:
 # Specify camera's
 go2rtc:
   streams:
-    frigate_doorbell_lq: rtsp://{FRIGATE_CAMERA_DOORBELL_USER}:{FRIGATE_CAMERA_DOORBELL_PASSWORD}@{FRIGATE_CAMERA_DOORBELL_HOST}:554/cam/realmonitor?channel=1&subtype=1
-    frigate_doorbell_hq: rtsp://{FRIGATE_CAMERA_DOORBELL_USER}:{FRIGATE_CAMERA_DOORBELL_PASSWORD}@{FRIGATE_CAMERA_DOORBELL_HOST}:554/cam/realmonitor?channel=1&subtype=0
+    doorbell_main:
+      - rtsp://{FRIGATE_CAMERA_DOORBELL_USER}:{FRIGATE_CAMERA_DOORBELL_PASSWORD}@{FRIGATE_CAMERA_DOORBELL_HOST}:554#backchannel=0
+    doorbell_substream:
+      - rtsp://{FRIGATE_CAMERA_DOORBELL_USER}:{FRIGATE_CAMERA_DOORBELL_PASSWORD}@{FRIGATE_CAMERA_DOORBELL_HOST}:554/cam/realmonitor?channel=1&subtype=1&authbasic=64#backchannel=0
 
 cameras:
   doorbell:
     ffmpeg:
+      output_args:
+        record: preset-record-generic-audio-copy
       inputs:
-        - path: rtsp://localhost:8554/frigate_doorbell_lq
-          roles:
-            - detect
-        - path: rtsp://localhost:8554/frigate_doorbell_hq
+        - path: rtsp://127.0.0.1:8554/doorbell_main?video=copy&audio=aac
+          input_args: preset-rtsp-restream
           roles:
             - record
+        - path: rtsp://127.0.0.1:8554/doorbell_substream?video=copy
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
     detect:
       width: 720
       height: 576
