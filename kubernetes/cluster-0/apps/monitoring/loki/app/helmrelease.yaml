@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: loki
-      version: 4.5.0
+      version: 4.4.2
       sourceRef:
         kind: HelmRepository
         name: grafana
@@ -103,6 +103,15 @@ spec:
     gateway:
       enabled: true
       replicas: 3
+      affinity: |
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- include "loki.gatewaySelectorLabels" . | nindent 12 }}
+                topologyKey: kubernetes.io/hostname
       ingress:
         enabled: true
         ingressClassName: "nginx"
@@ -117,17 +126,46 @@ spec:
 
     write:
       replicas: 3
+      affinity: |
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- include "loki.writeSelectorLabels" . | nindent 12 }}
+                topologyKey: kubernetes.io/hostname
       persistence:
         size: 10Gi
         storageClass: ceph-block
 
     read:
+      replicas: 3
+      affinity: |
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- include "loki.readSelectorLabels" . | nindent 12 }}
+                topologyKey: kubernetes.io/hostname
+
       persistence:
         size: 10Gi
         storageClass: ceph-block
 
     backend:
       replicas: 3
+      affinity: |
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- include "loki.backendSelectorLabels" . | nindent 12 }}
+                topologyKey: kubernetes.io/hostname
       extraVolumeMounts:
         - name: rules
           mountPath: /rules
