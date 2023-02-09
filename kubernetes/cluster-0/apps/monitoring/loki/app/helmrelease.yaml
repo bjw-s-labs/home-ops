@@ -69,7 +69,7 @@ spec:
             type: local
             local:
               directory: /rules
-          rule_path: /tmp/scratch
+          rule_path: /rules
           ring:
             kvstore:
               store: memberlist
@@ -123,6 +123,12 @@ spec:
 
     read:
       replicas: 1
+      extraVolumeMounts:
+        - name: rules
+          mountPath: /rules
+      extraVolumes:
+        - name: rules
+          emptyDir: {}
       persistence:
         size: 10Gi
         storageClass: ceph-block
@@ -132,13 +138,8 @@ spec:
       extraVolumeMounts:
         - name: rules
           mountPath: /rules
-        - name: scratch
-          mountPath: /tmp/scratch
       extraVolumes:
         - name: rules
-          configMap:
-            name: loki-alerting-rules
-        - name: scratch
           emptyDir: {}
       persistence:
         size: 10Gi
