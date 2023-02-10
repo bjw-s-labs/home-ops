@@ -29,7 +29,10 @@ spec:
 
     extraArgs:
       - --cloudflare-proxied
-      - --annotation-filter=external-dns.home.arpa/enabled in (true)
+      - --annotation-filter=external-dns.alpha.kubernetes.io/target
+
+    podAnnotations:
+      secret.reloader.stakater.com/reload: externaldns-secrets
 
     policy: sync
     provider: cloudflare
