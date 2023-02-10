@@ -17,12 +17,14 @@ spec:
         namespace: flux-system
 
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
       repository: ghcr.io/onedr0p/sabnzbd
       tag: 3.7.2@sha256:482afd4eb1d4167a23a1283cc5b08b442f37e384fe499c30aec0340007be8167
-
-    podAnnotations:
-      secret.reloader.stakater.com/reload: sabnzbd-secrets
 
     podSecurityContext:
       runAsUser: 568
@@ -44,12 +46,12 @@ spec:
       SABNZBD__API_KEY:
         valueFrom:
           secretKeyRef:
-            name: sabnzbd-secrets
+            name: sabnzbd-secret
             key: api_key
       SABNZBD__NZB_KEY:
         valueFrom:
           secretKeyRef:
-            name: sabnzbd-secrets
+            name: sabnzbd-secret
             key: nzb_key
 
     service:
@@ -93,3 +95,10 @@ spec:
         memory: "2048M"
       # limits:
       #   memory: "4096M"
+
+    volumeClaimTemplates:
+      - name: config
+        mountPath: /config
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
