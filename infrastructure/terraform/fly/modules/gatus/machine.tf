@@ -5,7 +5,7 @@ resource "fly_machine" "machine" {
 
   name = "${fly_app.app.name}-${each.value}"
   # renovate: docker-image
-  image = "ghcr.io/bjw-s/gatus:5.1.1"
+  image = "ghcr.io/bjw-s/gatus:5.3.0"
 
   cpus     = 1
   memorymb = 256
