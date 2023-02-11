@@ -1,9 +1,9 @@
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
-metadata:
-  name: rclone-mergerfs
-  namespace: media
+# metadata:
+#   name: rclone-mergerfs
+#   namespace: media
 spec:
   interval: 5m
   chart:
@@ -26,7 +26,7 @@ spec:
       pullPolicy: IfNotPresent
 
     rclone:
-      remote: google
+      remote: "google:"
       # Path for remote
       path: "/"
       readOnly: true
