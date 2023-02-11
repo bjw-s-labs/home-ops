@@ -16,9 +16,14 @@ spec:
         namespace: flux-system
       interval: 15m
   values:
-    image: 
-      repository: quay.io/simplyzee/kube-rclone
-      tag: "v1.53.1"
+    images:
+      initContainer:
+        repository: busybox
+        tag: latest
+      container:
+        repository: quay.io/simplyzee/kube-rclone
+        tag: "v1.53.1"
+      pullPolicy: IfNotPresent
 
     rclone:
       remote: google
