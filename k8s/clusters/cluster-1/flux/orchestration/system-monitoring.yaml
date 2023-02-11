@@ -12,22 +12,22 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-monitoring-kube-prom-stack
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-monitoring-namespace
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-1/manifests/system-monitoring/kube-prometheus-stack"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-monitoring-kube-prom-stack
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-monitoring-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-1/manifests/system-monitoring/kube-prometheus-stack"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
 # ---
 # apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 # kind: Kustomization
@@ -61,23 +61,23 @@ spec:
 #   sourceRef:
 #     kind: GitRepository
 #     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-monitoring-grafana
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-monitoring-namespace
-#     - name: system-monitoring-kube-prom-stack
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-1/manifests/system-monitoring/grafana"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-monitoring-grafana
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-monitoring-namespace
+    - name: system-monitoring-kube-prom-stack
+  interval: 5m
+  path: "./k8s/clusters/cluster-1/manifests/system-monitoring/grafana"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
 # ---
 # apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 # kind: Kustomization
@@ -113,23 +113,23 @@ spec:
 #   sourceRef:
 #     kind: GitRepository
 #     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-monitoring-loki
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-monitoring-namespace
-#     - name: system-monitoring-kube-prom-stack
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-1/manifests/system-monitoring/loki"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-monitoring-loki
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-monitoring-namespace
+    - name: system-monitoring-kube-prom-stack
+  interval: 5m
+  path: "./k8s/clusters/cluster-1/manifests/system-monitoring/loki"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
 # ---
 # apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 # kind: Kustomization
