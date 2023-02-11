@@ -24,7 +24,8 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
-    fullnameOverride: prometheus
+    # fullnameOverride: prometheus
+    cleanPrometheusOperatorObjectNames: true
     alertmanager:
       config:
         global:
@@ -227,7 +228,7 @@ spec:
 #      thanosServiceMonitor:
 #        enabled: true
       prometheusSpec:
-        replicas: 1
+        replicas: 3
         replicaExternalLabelName: "replica"
         ruleSelectorNilUsesHelmValues: false
         serviceMonitorSelectorNilUsesHelmValues: false
@@ -239,7 +240,8 @@ spec:
         storageSpec:
           volumeClaimTemplate:
             spec:
-              storageClassName: "ceph-block-external"
+              # storageClassName: "ceph-block-external"
+              storageClass: local-path
               resources:
                 requests:
                   storage: 20Gi
