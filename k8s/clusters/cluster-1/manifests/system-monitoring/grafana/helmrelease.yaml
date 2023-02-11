@@ -149,19 +149,20 @@ spec:
     datasources:
       datasources.yaml:
         apiVersion: 1
+        # list of datasources that should be deleted from the database
         deleteDatasources:
           - name: Loki
             orgId: 1
         datasources:
           - name: Prometheus
             type: prometheus
-            url: http://thanos-query.system-monitoring:9090/
             access: proxy
+            url: http://prometheus-operated:9090/
             isDefault: true
           - name: Loki
             type: loki
             access: proxy
-            url: http://loki-gateway.system-monitoring:80
+            url: http://loki-gateway:3100
 
     dashboards:
       default:
@@ -268,43 +269,43 @@ spec:
           revision: 4
           datasource: Prometheus
 
-      thanos:
-        bucket-replicate:
-          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/bucket-replicate.json
-          datasource: Prometheus
-        compact:
-          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/compact.json
-          datasource: Prometheus
-        overview:
-          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/overview.json
-          datasource: Prometheus
-        query:
-          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/query.json
-          datasource: Prometheus
-        query-frontend:
-          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/query-frontend.json
-          datasource: Prometheus
-        receive:
-          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/receive.json
-          datasource: Prometheus
-        rule:
-          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/rule.json
-          datasource: Prometheus
-        sidecar:
-          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/sidecar.json
-          datasource: Prometheus
-        store:
-          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/store.json
-          datasource: Prometheus
+#       thanos:
+#         bucket-replicate:
+#           url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/bucket-replicate.json
+#           datasource: Prometheus
+#         compact:
+#           url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/compact.json
+#           datasource: Prometheus
+#         overview:
+#           url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/overview.json
+#           datasource: Prometheus
+#         query:
+#           url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/query.json
+#           datasource: Prometheus
+#         query-frontend:
+#           url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/query-frontend.json
+#           datasource: Prometheus
+#         receive:
+#           url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/receive.json
+#           datasource: Prometheus
+#         rule:
+#           url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/rule.json
+#           datasource: Prometheus
+#         sidecar:
+#           url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/sidecar.json
+#           datasource: Prometheus
+#         store:
+#           url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/store.json
+#           datasource: Prometheus
 
     sidecar:
       dashboards:
         enabled: true
         searchNamespace: ALL
-        folderAnnotation: grafana_folder
-        provider:
-          allowUiUpdates: true
-          disableDelete: false
+        # folderAnnotation: grafana_folder
+        # provider:
+        #   allowUiUpdates: true
+        #   disableDelete: false
       datasources:
         enabled: true
         searchNamespace: ALL
