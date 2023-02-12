@@ -9,7 +9,7 @@ terraform {
   required_providers {
     vyos = {
       source  = "TGNThump/vyos"
-      version = "1.1.0"
+      version = "2.0.0"
     }
     sops = {
       source  = "carlpett/sops"
