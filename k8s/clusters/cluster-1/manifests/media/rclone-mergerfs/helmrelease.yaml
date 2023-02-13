@@ -31,6 +31,9 @@ spec:
         - 100 # users
         - 1000
       fsGroupChangePolicy: "OnRootMismatch"
+      capabilities:
+        add:
+          - SYS_ADMIN
 
     env:
       TZ: "${TIMEZONE}"
@@ -61,6 +64,13 @@ spec:
         readOnly: true
         name: rclone-secret
         subPath: configData
+  
+      fuse:
+        enabled: true
+        type: hostPath
+        hostPath: /dev/fuse
+        # hostPathType: Directory
+        mountPath: /dev/fuse
 
     resources:
       requests:
