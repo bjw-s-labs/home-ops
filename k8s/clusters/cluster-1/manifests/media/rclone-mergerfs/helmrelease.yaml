@@ -4,8 +4,8 @@ kind: HelmRelease
 metadata:
   name: rclone-mount
   namespace: media
-  # annotations:
-  #   container.apparmor.security.beta.kubernetes.io/rclone-mount: 
+  annotations:
+    container.apparmor.security.beta.kubernetes.io/rclone-mount: unconfined
 spec:
   interval: 5m
   chart:
