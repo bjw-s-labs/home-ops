@@ -6,17 +6,17 @@ resources:
   - ./secret.sops.yaml
   - ./helmrelease.yaml
   - ./pvc.yaml
-configMapGenerator:
-  - name: kube-rclone-configmap
-    files:
-      - configs/rclone.conf.encrypted
-generatorOptions:
-  disableNameSuffixHash: true
-  annotations:
-    kustomize.toolkit.fluxcd.io/substitute: enabled
-commonLabels:
-  app.kubernetes.io/name: kube-rclone
-  app.kubernetes.io/instance: kube-rclone
+# configMapGenerator:
+#   - name: kube-rclone-configmap
+#     files:
+#       - configs/rclone.conf.encrypted
+# generatorOptions:
+#   disableNameSuffixHash: true
+#   annotations:
+#     kustomize.toolkit.fluxcd.io/substitute: enabled
+# commonLabels:
+#   app.kubernetes.io/name: kube-rclone
+#   app.kubernetes.io/instance: kube-rclone
 # secretGenerator:
 #   - name: rclone-config
 #     files:

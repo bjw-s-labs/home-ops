@@ -2,44 +2,129 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: rclone-mergerfs
+  name: rclone-mount
   namespace: media
 spec:
   interval: 5m
   chart:
     spec:
-      chart: kube-rclone
-      version: 0.1.0
+      chart: app-template
+      version: 1.3.1
       sourceRef:
         kind: HelmRepository
-        name: simplyzee-charts
+        name: bjw-s
         namespace: flux-system
       interval: 15m
-  # values:
-  #   images:
-  #     initContainer:
-  #       repository: busybox
-  #       tag: latest
-  #     container:
-  #       repository: quay.io/simplyzee/kube-rclone
-  #       tag: "v1.53.1"
-  #     pullPolicy: IfNotPresent
+  values:
+    image:
+      repository: mumiehub/rclone-mount
+      tag: latest
 
-  #   rclone:
-  #     remote: "google:"
-  #     # Path for remote
-  #     path: "/"
-  #     readOnly: true
-  #     # additional arguments for customising rclone
-  #     # mount options can be found here - https://rclone.org/commands/rclone_mount/#options
-  #     # additionalArgs:
-  #       # - --buffer-size=1G
-  #       # - --dir-cache-time=72h
-  #       # - --drive-chunk-size=256M
-  #       # - --fast-list
-  #       # - --log-level=INFO
-  #       # - --vfs-read-chunk-size=128M
-  #       # - --vfs-read-chunk-size-limit=off
-  #       # - --drive-acknowledge-abuse=true
-    
-    
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      supplementalGroups:
+        - 34 # backup
+        - 44 # videro
+        - 109 # render
+        - 100 # users
+        - 1000
+      fsGroupChangePolicy: "OnRootMismatch"
+
+    env:
+      TZ: "${TIMEZONE}"
+      RemotePath: "google:"
+      MountCommands: "--allow-other --allow-non-empty"
+
+    service:
+      main:
+        enabled: false
+
+    ingress:
+      main:
+        enabled: false
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns/is-public: "true"
+          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
+
+    persistence:
+      config:
+        enabled: true
+        type: secret
+        mountPath: /config/rclone.conf
+        readOnly: true
+        name: rclone-secret
+        subPath: configData
+
+    resources:
+      requests:
+        # cpu: 35m
+        memory: 1Gi
+      limits:
+        memory: 5Gi
+
+    # affinity:
+    #   nodeAffinity:
+    #     requiredDuringSchedulingIgnoredDuringExecution:
+    #       nodeSelectorTerms:
+            # - matchExpressions:
+            #     - key: feature.node.kubernetes.io/custom-intel-gpu
+            #       operator: In
+            #       values:
+            #         - "true"
+
+    probes:
+      # -- Liveness probe configuration
+      # @default -- See below
+      liveness:
+        # -- Enable the liveness probe
+        enabled: false
+        # -- Set this to `true` if you wish to specify your own livenessProbe
+        custom: false
+        # -- The spec field contains the values for the default livenessProbe.
+        # If you selected `custom: true`, this field holds the definition of the livenessProbe.
+        # @default -- See below
+        spec:
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+
+      # -- Redainess probe configuration
+      # @default -- See below
+      readiness:
+        # -- Enable the readiness probe
+        enabled: false
+        # -- Set this to `true` if you wish to specify your own readinessProbe
+        custom: false
+        # -- The spec field contains the values for the default readinessProbe.
+        # If you selected `custom: true`, this field holds the definition of the readinessProbe.
+        # @default -- See below
+        spec:
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+
+      # -- Startup probe configuration
+      # @default -- See below
+      startup:
+        # -- Enable the startup probe
+        enabled: false
+        # -- Set this to `true` if you wish to specify your own startupProbe
+        custom: false
+        # -- The spec field contains the values for the default startupProbe.
+        # If you selected `custom: true`, this field holds the definition of the startupProbe.
+        # @default -- See below
+        spec:
+          initialDelaySeconds: 0
+          timeoutSeconds: 1
+          ## This means it has a maximum of 5*30=150 seconds to start up before it fails
+          periodSeconds: 5
+          failureThreshold: 30
