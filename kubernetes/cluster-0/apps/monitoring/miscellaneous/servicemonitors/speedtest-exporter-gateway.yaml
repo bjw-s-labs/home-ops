@@ -1,0 +1,60 @@
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: speedtest-exporter-gateway
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: speedtest-exporter-gateway
+    app.kubernetes.io/instance: speedtest-exporter-gateway
+    jobLabel: speedtest-exporter
+subsets:
+  - addresses:
+      - ip: 10.5.0.8
+    ports:
+      - name: metrics
+        port: 9798
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: speedtest-exporter-gateway
+  namespace: monitoring
+  annotations:
+    prometheus.io/scrape: "true"
+  labels:
+    app.kubernetes.io/name: speedtest-exporter-gateway
+    app.kubernetes.io/instance: speedtest-exporter-gateway
+    jobLabel: speedtest-exporter
+spec:
+  type: ExternalName
+  externalName: gateway.bjw-s.tech.
+  ports:
+    - name: metrics
+      port: &port 9798
+      protocol: TCP
+      targetPort: *port
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/servicemonitor_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: speedtest-exporter-gateway
+  namespace: monitoring
+  labels: &labels
+    app.kubernetes.io/name: speedtest-exporter-gateway
+    app.kubernetes.io/instance: speedtest-exporter-gateway
+    jobLabel: speedtest-exporter
+spec:
+  namespaceSelector:
+    matchNames: ["monitoring"]
+  selector:
+    matchLabels:
+      <<: *labels
+  jobLabel: jobLabel
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 60m
+      scrapeTimeout: 60s
+      honorLabels: true
