@@ -4,6 +4,8 @@ kind: HelmRelease
 metadata:
   name: rclone-mount
   namespace: media
+  # annotations:
+  #   container.apparmor.security.beta.kubernetes.io/rclone-mount: 
 spec:
   interval: 5m
   chart:
@@ -21,15 +23,15 @@ spec:
       tag: latest
 
     podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      supplementalGroups:
-        - 34 # backup
-        - 44 # videro
-        - 109 # render
-        - 100 # users
-        - 1000
+      # runAsUser: 568
+      # runAsGroup: 568
+      # fsGroup: 568
+      # supplementalGroups:
+      #   - 34 # backup
+      #   - 44 # videro
+      #   - 109 # render
+      #   - 100 # users
+      #   - 1000
       fsGroupChangePolicy: "OnRootMismatch"
       privileged: true
       capabilities:
