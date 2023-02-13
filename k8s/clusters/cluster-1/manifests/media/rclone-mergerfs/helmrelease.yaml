@@ -4,8 +4,6 @@ kind: HelmRelease
 metadata:
   name: rclone-mount
   namespace: media
-  annotations:
-    container.apparmor.security.beta.kubernetes.io/rclone-mount: unconfined
 spec:
   interval: 5m
   chart:
@@ -21,6 +19,14 @@ spec:
     image:
       repository: mumiehub/rclone-mount
       tag: latest
+
+    controller:
+      enabled: true
+      # Valid options are deployment, daemonset, statefulset or cronjob
+      type: deployment
+      # -- Set annotations on the deployment/statefulset/daemonset/cronjob
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/rclone-mount: unconfined
 
     podSecurityContext:
       # runAsUser: 568
