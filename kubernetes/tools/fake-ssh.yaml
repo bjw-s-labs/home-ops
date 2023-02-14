@@ -2,19 +2,28 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: delta
+  name: fake-ssh
 spec:
   restartPolicy: Never
-  nodeName: delta
+  nodeName: felix
   containers:
-    - name: disk-wipe
+    - name: fake-ssh
       image: ghcr.io/onedr0p/alpine:3.17.2@sha256:022108430d7b563b86731c2ab9e5f1f07a8e2520024314c446117e20729dba47
       securityContext:
         privileged: true
       resources: {}
       env:
-        - name: CEPH_DISK
-          value: /dev/nvme0n1
+        - name: CRICTL_VERSION
+          value: v1.26.0
+        - name: CONTAINER_RUNTIME_ENDPOINT
+          value: unix:///run/containerd/containerd.sock
+        - name: IMAGE_SERVICE_ENDPOINT
+          value: unix:///run/containerd/containerd.sock
+      lifecycle:
+        postStart:
+          exec:
+            command:
+              - "wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$CRICTL_VERSION/crictl-$CRICTL_VERSION-linux-amd64.tar.gz && tar zxvf crictl-$CRICTL_VERSION-linux-amd64.tar.gz -C /usr/local/bin"
       command:
         [
           "/bin/sh",
@@ -22,9 +31,15 @@ spec:
           "sleep infinity"
         ]
       volumeMounts:
-        - mountPath: /mnt/host_var
-          name: host-var
+        - name: containerd
+          mountPath: /run/containerd/containerd.sock
+        - name: hostroot
+          mountPath: /mnt/hostroot
   volumes:
-    - name: host-var
+    - name: containerd
       hostPath:
-        path: /var
+        path: /run/containerd/containerd.sock
+        type: Socket
+    - name: hostroot
+      hostPath:
+        path: /
