@@ -1,0 +1,78 @@
+[service]
+  log_level = "debug"
+  log_path = ""
+  cache_enable = true
+  cache_size = 4096
+
+[network.0]
+  cidrs = ["${networks.lan}"]
+  name = "LAN"
+
+[network.1]
+  cidrs = ["${networks.servers}"]
+  name = "Servers"
+
+[network.2]
+  cidrs = ["${networks.trusted}"]
+  name = "Trusted"
+
+[network.3]
+  cidrs = ["${networks.iot}"]
+  name = "IoT"
+
+[network.4]
+  cidrs = ["${networks.video}"]
+  name = "Video"
+
+[network.5]
+  cidrs = ["${networks.wg_trusted}"]
+  name = "Wireguard"
+
+[upstream.0]
+  bootstrap_ip = ""
+  endpoint = "${address_book.services.vyos_coredns.ipv4_addr}"
+  name = "CoreDNS"
+  timeout = 5000
+  type = "legacy"
+
+[upstream.1]
+  bootstrap_ip = ""
+  endpoint = "2cd9hkrgsl0.dns.controld.com"
+  name = "Control D - Servers"
+  timeout = 5000
+  type = "doq"
+
+[upstream.2]
+  bootstrap_ip = ""
+  endpoint = "p0v2we5jvf.dns.controld.com"
+  name = "Control D - Trusted"
+  timeout = 5000
+  type = "doq"
+
+[upstream.3]
+  bootstrap_ip = ""
+  endpoint = "1v2zpnrmn07.dns.controld.com"
+  name = "Control D - IoT"
+  timeout = 5000
+  type = "doq"
+
+[listener.0]
+  ip = "${address_book.services.vyos_ctrld.ipv4_addr}"
+  port = 53
+  restricted = true
+
+[listener.0.policy]
+  name = "Listener 0 policy"
+  networks = [
+    {"network.0" = ["upstream.1"]},
+    {"network.1" = ["upstream.1"]},
+    {"network.2" = ["upstream.2"]},
+    {"network.3" = ["upstream.3"]},
+    {"network.4" = ["upstream.0"]},
+    {"network.5" = ["upstream.2"]},
+  ]
+  rules = [
+    {"unifi" = ["upstream.0"]},
+    {"*.bjw-s.tech" = ["upstream.0"]},
+    {"*.bjw-s.dev" = ["upstream.0"]},
+  ]

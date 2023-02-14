@@ -11,6 +11,7 @@ resource "vyos_config" "container-udp-broadcast-relay-sonos" {
       "CFG_MULTICAST" = { "value" = "239.255.255.250" }
       "SEPARATOR"     = { "value" = ";" }
     }
+    "restart" = "on-failure"
   })
 }
 
@@ -27,5 +28,6 @@ resource "vyos_config" "container-udp-broadcast-relay-mdns" {
       "CFG_MULTICAST" = { "value" = "224.0.0.251" }
       "SEPARATOR"     = { "value" = ";" }
     }
+    "restart" = "on-failure"
   })
 }

@@ -23,6 +23,7 @@ resource "vyos_config" "container-vector-agent" {
       "VECTOR_CONFIG"       = { "value" = "/etc/vector/vector.yaml" }
       "VECTOR_WATCH_CONFIG" = { "value" = "true" }
     }
+    "restart" = "on-failure"
     "volume" = {
       "config" = {
         "source"      = "/config/vector-agent/vector.yaml"

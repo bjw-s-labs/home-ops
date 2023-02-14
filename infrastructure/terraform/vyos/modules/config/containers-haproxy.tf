@@ -18,6 +18,7 @@ resource "vyos_config" "container-haproxy-k8s-api" {
         "address" = "${cidrhost(var.networks.services, 2)}"
       }
     }
+    "restart" = "on-failure"
     "volume" = {
       "config" = {
         "source"      = "/config/haproxy/haproxy.cfg"

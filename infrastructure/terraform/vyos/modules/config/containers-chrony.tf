@@ -7,5 +7,6 @@ resource "vyos_config" "container-chrony" {
         "address" = "${cidrhost(var.networks.services, 5)}"
       }
     }
+    "restart" = "on-failure"
   })
 }
