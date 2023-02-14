@@ -131,24 +131,6 @@ accept_k8s_nodes:
   source:
     address-group: k8s_nodes
 
-accept_unifi_inform:
-  action: accept
-  protocol: tcp
-  source:
-    address-group: unifi_devices
-  destination:
-    port: 8080,8443
-    address-group: k8s_unifi
-
-accept_unifi_stun:
-  action: accept
-  protocol: udp
-  source:
-    address-group: unifi_devices
-  destination:
-    port: 3478
-    address-group: k8s_unifi
-
 accept_prometheus_from_k8s_nodes:
   action: accept
   protocol: tcp

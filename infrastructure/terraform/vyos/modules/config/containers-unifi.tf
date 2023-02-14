@@ -15,6 +15,7 @@ resource "vyos_config" "container-unifi" {
       "UNIFI_STDOUT" = { "value" = "true" }
       "TZ"           = { "value" = "Europe/Amsterdam" }
     }
+    "restart" = "on-failure"
     "volume" = {
       "data" = {
         "source"      = "/config/unifi/data"
