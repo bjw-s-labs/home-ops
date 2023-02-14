@@ -398,8 +398,6 @@ hosts:
 # (Virtual) Services
 # -------------------
 services:
-    k8s_unifi:
-        ipv4_addr: 10.45.0.4
     k8s_ingress:
         ipv4_addr: 10.45.0.1
     k8s_vector_aggregator:
@@ -418,12 +416,14 @@ services:
         ipv4_addr: 10.5.0.5
     vyos_adguard_home:
         ipv4_addr: 10.5.0.6
+    vyos_unifi:
+        ipv4_addr: 10.5.0.10
 # -----------------------
 # Manual static mappings
 # -----------------------
 static_mappings:
     - hostname: unifi
-      service: k8s_unifi
+      service: vyos_unifi
     - hostname: cluster-0.bjw-s.tech
       service: k8s_api
     - hostname: ntp.bjw-s.dev
