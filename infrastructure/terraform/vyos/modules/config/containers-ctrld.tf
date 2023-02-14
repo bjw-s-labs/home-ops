@@ -1,10 +1,10 @@
 resource "remote_file" "container-ctrld-config" {
-  provider    = remote
-  path        = "/config/ctrld/ctrld.toml"
+  provider = remote
+  path     = "/config/ctrld/ctrld.toml"
   content = templatefile(
     pathexpand("${path.root}/files/ctrld/ctrld.toml.tftpl"),
     {
-      networks = var.networks
+      networks     = var.networks
       address_book = var.address_book
     }
   )
@@ -17,8 +17,11 @@ resource "vyos_config" "container-ctrld" {
   path = "container name ctrld"
   value = jsonencode({
     "cap-add" = "net-bind-service"
-    "image" = "${var.config.containers.ctrld.image}"
-    "memory" = "512"
+    "image"   = "${var.config.containers.ctrld.image}"
+    "memory"  = "512"
+    "environment" = {
+      "TZ" = { "value" = "Europe/Amsterdam" }
+    }
     "network" = {
       "services" = {
         "address" = "${cidrhost(var.networks.services, 9)}"
