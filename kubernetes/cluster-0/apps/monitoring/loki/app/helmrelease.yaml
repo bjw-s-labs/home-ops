@@ -101,7 +101,16 @@ spec:
         secret.reloader.stakater.com/reload: loki-secret
 
     gateway:
-      replicas: 1
+      replicas: 3
+      affinity: |
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- include "loki.gatewaySelectorLabels" . | nindent 12 }}
+                topologyKey: kubernetes.io/hostname
       enabled: true
       ingress:
         enabled: true
@@ -116,13 +125,31 @@ spec:
               - *host
 
     write:
-      replicas: 1
+      replicas: 3
+      affinity: |
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- include "loki.writeSelectorLabels" . | nindent 12 }}
+                topologyKey: kubernetes.io/hostname
       persistence:
         size: 10Gi
         storageClass: ceph-block
 
     read:
-      replicas: 1
+      replicas: 3
+      affinity: |
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- include "loki.readSelectorLabels" . | nindent 12 }}
+                topologyKey: kubernetes.io/hostname
       extraVolumeMounts:
         - name: rules
           mountPath: /rules
@@ -134,7 +161,16 @@ spec:
         storageClass: ceph-block
 
     backend:
-      replicas: 1
+      replicas: 3
+      affinity: |
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- include "loki.backendSelectorLabels" . | nindent 12 }}
+                topologyKey: kubernetes.io/hostname
       extraVolumeMounts:
         - name: rules
           mountPath: /rules
