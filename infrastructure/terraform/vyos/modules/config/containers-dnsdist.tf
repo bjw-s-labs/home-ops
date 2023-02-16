@@ -24,7 +24,7 @@ resource "vyos_config" "container-dnsdist" {
     }
     "network" = {
       "services" = {
-        "address" = "${cidrhost(var.networks.services, 6)}"
+        "address" = "${cidrhost(var.networks.services, 4)}"
       }
     }
     "restart" = "on-failure"
