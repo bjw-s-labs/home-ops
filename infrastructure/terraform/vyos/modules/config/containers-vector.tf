@@ -16,7 +16,7 @@ resource "vyos_config" "container-vector-agent" {
     "image" = "${var.config.containers.vector.image}"
     "network" = {
       "services" = {
-        "address" = "${cidrhost(var.networks.services, 4)}"
+        "address" = "${cidrhost(var.networks.services, 9)}"
       }
     }
     "environment" = {
