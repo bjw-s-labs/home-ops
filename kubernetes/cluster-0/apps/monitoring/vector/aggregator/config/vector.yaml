@@ -75,6 +75,20 @@ transforms:
       # Standardize 'app' index
       .custom_app_name = .pod_labels."app.kubernetes.io/name" || .pod_labels.app || .pod_labels."k8s-app" || "unknown"
 
+  vyos_route:
+    type: route
+    inputs: ["vyos_logs"]
+    route:
+      from_wan: .message.RULE.from_zone == "wan"
+
+  vyos_geoip:
+    type: remap
+    inputs: ["vyos_route.from_wan"]
+    source: |
+      .geoip = get_enrichment_table_record!("geoip_table", {
+          "ip": .message.SRC
+        })
+
 # Sinks
 sinks:
   loki_kubernetes:
@@ -101,7 +115,8 @@ sinks:
   loki_vyos:
     type: loki
     inputs:
-      - vyos_logs
+      - vyos_geoip
+      - vyos_route._unmatched
     endpoint: http://loki-gateway.monitoring.svc.cluster.local:80
     encoding:
       codec: json
