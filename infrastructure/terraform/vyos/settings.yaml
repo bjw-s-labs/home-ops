@@ -484,6 +484,12 @@ config:
         interface: lan
         destinationAddress: "!${address_book.services.vyos_chronyd.ipv4_addr}"
         address: "${address_book.services.vyos_chronyd.ipv4_addr}"
+      - description: Force NTP for Servers
+        port: 123
+        protocol: udp
+        interface: servers
+        destinationAddress: "!${address_book.services.vyos_chronyd.ipv4_addr}"
+        address: "${address_book.services.vyos_chronyd.ipv4_addr}"
       - description: Force NTP for Trusted
         port: 123
         protocol: udp
