@@ -16,3 +16,13 @@ resource "remote_file" "scripts-preconfig-bootup" {
   owner       = "0"
   group       = "104"
 }
+
+resource "remote_file" "scripts-custom-config-backup" {
+  provider = remote
+  path     = "/config/scripts/custom-config-backup.sh"
+  content = file(
+  pathexpand("${path.root}/scripts/custom-config-backup.sh"))
+  permissions = "0775"
+  owner       = "0"
+  group       = "104"
+}

@@ -3,4 +3,8 @@
 # Any modifications required to work around unfixed bugs or use
 # services not available through the VyOS CLI system can be placed here.
 
+# Clean dangling container network files
 rm /var/lib/cni/networks/services/10.5.*
+
+# Mount USB Backup Drive
+mount -t vfat -o rw,uid=1002,gid=104 /dev/disk/by-id/usb-SanDisk_Cruzer_Fit_4C530001300912115421-0:0-part2 /media/usb-backup

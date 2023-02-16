@@ -2,7 +2,7 @@ resource "vyos_config" "container-unifi" {
   path = "container name unifi"
   value = jsonencode({
     "image" = "${var.config.containers.unifi.image}"
-    "memory" = "1024"
+    "memory" = "0"
     "network" = {
       "services" = {
         "address" = "${cidrhost(var.networks.services, 10)}"
