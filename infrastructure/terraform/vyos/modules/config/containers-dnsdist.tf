@@ -1,8 +1,8 @@
-resource "remote_file" "container-ctrld-config" {
+resource "remote_file" "container-dnsdist-config" {
   provider = remote
-  path     = "/config/ctrld/ctrld.toml"
+  path     = "/config/dnsdist/dnsdist.conf"
   content = templatefile(
-    pathexpand("${path.root}/files/ctrld/ctrld.toml.tftpl"),
+    pathexpand("${path.root}/files/dnsdist/dnsdist.conf.tftpl"),
     {
       networks     = var.networks
       address_book = var.address_book
@@ -13,35 +13,31 @@ resource "remote_file" "container-ctrld-config" {
   group       = "104" # vyattacfg
 }
 
-resource "vyos_config" "container-ctrld" {
-  path = "container name ctrld"
+resource "vyos_config" "container-dnsdist" {
+  path = "container name dnsdist"
   value = jsonencode({
     "cap-add" = "net-bind-service"
-    "image"   = "${var.config.containers.ctrld.image}"
+    "image"   = "${var.config.containers.dnsdist.image}"
     "memory"  = "512"
     "environment" = {
       "TZ" = { "value" = "Europe/Amsterdam" }
     }
     "network" = {
       "services" = {
-        "address" = "${cidrhost(var.networks.services, 9)}"
+        "address" = "${cidrhost(var.networks.services, 6)}"
       }
     }
     "restart" = "on-failure"
     "volume" = {
       "config" = {
-        "source"      = "/config/ctrld/ctrld.toml"
-        "destination" = "/config/ctrld.toml"
-      }
-      "logs" = {
-        "source"      = "/dev/log"
-        "destination" = "/dev/log"
+        "destination" = "/etc/dnsdist/dnsdist.conf"
+        "source"      = "/config/dnsdist/dnsdist.conf"
       }
     }
   })
 
   depends_on = [
     vyos_config.container_network-services,
-    remote_file.container-ctrld-config
+    remote_file.container-dnsdist-config
   ]
 }
