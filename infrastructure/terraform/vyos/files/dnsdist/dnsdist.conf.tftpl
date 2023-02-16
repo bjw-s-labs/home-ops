@@ -1,0 +1,90 @@
+-- udp/tcp dns listening
+setLocal("0.0.0.0:53", {})
+
+-- Local CoreDNS
+newServer({
+  address = "10.5.0.3",
+  pool = "coredns"
+})
+
+-- ControlD - Servers
+newServer({
+  address = "76.76.2.22:443",
+  tls = "openssl",
+  subjectName = "dns.controld.com",
+  dohPath = "/2cd9hkrgsl0",
+  validateCertificates = true,
+  checkInterval = 10,
+  checkTimeout = 2000,
+  pool = "controld_servers"
+})
+
+-- ControlD - Trusted
+newServer({
+  address = "76.76.2.22:443",
+  tls = "openssl",
+  subjectName = "dns.controld.com",
+  dohPath = "/p0v2we5jvf",
+  validateCertificates = true,
+  checkInterval = 10,
+  checkTimeout = 2000,
+  pool = "controld_trusted"
+})
+
+-- ControlD - IoT
+newServer({
+  address = "76.76.2.22:443",
+  tls = "openssl",
+  subjectName = "dns.controld.com",
+  dohPath = "/1v2zpnrmn07",
+  validateCertificates = true,
+  checkInterval = 10,
+  checkTimeout = 2000,
+  pool = "controld_iot"
+})
+
+-- CloudFlare DNS over TLS
+newServer({
+  address = "1.1.1.1:853",
+  tls = "openssl",
+  subjectName = "cloudflare-dns.com",
+  validateCertificates = true,
+  checkInterval = 10,
+  checkTimeout = 2000,
+  pool = "cloudflare"
+})
+newServer({
+  address = "1.0.0.1:853",
+  tls = "openssl",
+  subjectName = "cloudflare-dns.com",
+  validateCertificates = true,
+  checkInterval = 10,
+  checkTimeout = 2000,
+  pool = "cloudflare"
+})
+
+-- Enable caching
+pc = newPacketCache(10000, {
+  maxTTL = 86400,
+  minTTL = 0,
+  temporaryFailureTTL = 60,
+  staleTTL = 60,
+  dontAge = false
+})
+getPool(""):setCache(pc)
+
+-- Request logging, uncomment to log DNS requests/responses to stdout
+-- addAction(AllRule(), LogAction("", false, false, true, false, false))
+-- addResponseAction(AllRule(), LogResponseAction("", false, true, false, false))
+
+-- Routing rules
+addAction('unifi', PoolAction('coredns'))
+addAction('bjw-s.dev', PoolAction('coredns'))
+addAction('bjw-s.tech', PoolAction('coredns'))
+
+addAction("${networks.lan}", PoolAction("controld_servers"))        -- lan
+addAction("${networks.servers}", PoolAction("controld_servers"))    -- servers vlan
+addAction("${networks.trusted}", PoolAction("controld_trusted"))    -- trusted vlan
+addAction("${networks.iot}", PoolAction("controld_iot"))            -- iot vlan
+addAction("${networks.wg_trusted}", PoolAction("controld_trusted")) -- wg_trusted vlan
+addAction("${networks.guest}", PoolAction("cloudflare"))            -- guest vlan
