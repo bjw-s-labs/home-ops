@@ -129,7 +129,7 @@ config:
     lan:
       interface: eth1
       dhcp:
-        name_server: ${address_book.services.vyos_ctrld.ipv4_addr}
+        name_server: ${address_book.services.vyos_dnsdist.ipv4_addr}
       firewall:
         default:
           default: drop
@@ -167,7 +167,7 @@ config:
       interface: eth1.10
       dhcp:
         domain_name: bjw-s.tech
-        name_server: ${address_book.services.vyos_ctrld.ipv4_addr}
+        name_server: ${address_book.services.vyos_dnsdist.ipv4_addr}
       firewall:
         default:
           default: drop
@@ -236,7 +236,7 @@ config:
       interface: eth1.20
       dhcp:
         domain_name: bjw-s.tech
-        name_server: ${address_book.services.vyos_ctrld.ipv4_addr}
+        name_server: ${address_book.services.vyos_dnsdist.ipv4_addr}
       firewall:
         default:
           default: drop
@@ -285,7 +285,7 @@ config:
     guest:
       interface: eth1.30
       dhcp:
-        name_server: "1.1.1.1"
+        name_server: ${address_book.services.vyos_dnsdist.ipv4_addr}
       firewall:
         default:
           default: drop
@@ -298,7 +298,7 @@ config:
       interface: eth1.40
       dhcp:
         domain_name: bjw-s.tech
-        name_server: ${address_book.services.vyos_ctrld.ipv4_addr}
+        name_server: ${address_book.services.vyos_dnsdist.ipv4_addr}
       firewall:
         default:
           default: drop
@@ -355,7 +355,7 @@ config:
       interface: eth1.50
       dhcp:
         domain_name: bjw-s.tech
-        name_server: ${address_book.services.vyos_ctrld.ipv4_addr}
+        name_server: ${address_book.services.vyos_dnsdist.ipv4_addr}
       firewall:
         default:
           default: drop
@@ -470,14 +470,14 @@ config:
         port: 53
         protocol: tcp_udp
         interface: iot
-        destinationAddress: "!${address_book.services.vyos_ctrld.ipv4_addr}"
-        address: ${address_book.services.vyos_ctrld.ipv4_addr}
+        destinationAddress: "!${address_book.services.vyos_dnsdist.ipv4_addr}"
+        address: ${address_book.services.vyos_dnsdist.ipv4_addr}
       - description: Force DNS for Video
         port: 53
         protocol: tcp_udp
         interface: video
-        destinationAddress: "!${address_book.services.vyos_ctrld.ipv4_addr}"
-        address: ${address_book.services.vyos_ctrld.ipv4_addr}
+        destinationAddress: "!${address_book.services.vyos_dnsdist.ipv4_addr}"
+        address: ${address_book.services.vyos_dnsdist.ipv4_addr}
       - description: Force NTP for LAN
         port: 123
         protocol: udp
@@ -536,10 +536,6 @@ config:
       # renovate: docker-image
       image: ghcr.io/onedr0p/udp-broadcast-relay-redux:1.0.27
 
-    adguard-home:
-      # renovate: docker-image
-      image: docker.io/adguard/adguardhome:v0.107.23
-
     haproxy:
       # renovate: docker-image
       image: docker.io/library/haproxy:2.7.3
@@ -564,6 +560,6 @@ config:
       # renovate: docker-image
       image: ghcr.io/jacobalberty/unifi-docker:v7.3.83
 
-    ctrld:
+    dnsdist:
       # renovate: docker-image
-      image: ghcr.io/bjw-s/ctrld:1.1.0
+      image: docker.io/powerdns/dnsdist-17:1.7.3
