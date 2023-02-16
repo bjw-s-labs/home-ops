@@ -50,6 +50,7 @@ spec:
       sinks:
         kubernetes_sink:
           type: vector
+          compression: true
           inputs:
             - kubernetes_logs
           address: "vector-aggregator.monitoring:6000"
@@ -57,6 +58,7 @@ spec:
 
         talos_kernel_sink:
           type: vector
+          compression: true
           inputs:
             - talos_kernel_logs
           address: "vector-aggregator.monitoring:6050"
@@ -64,6 +66,7 @@ spec:
 
         talos_service_sink:
           type: vector
+          compression: true
           inputs:
             - talos_service_logs
           address: "vector-aggregator.monitoring:6051"
