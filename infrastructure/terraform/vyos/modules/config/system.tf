@@ -25,3 +25,17 @@ resource "vyos_config" "system-time_zone" {
     var.config.time_zone
   )
 }
+
+resource "vyos_config" "system-task_scheduler" {
+  path = "system task-scheduler"
+  value = jsonencode({
+    "task" = {
+      "backup-config" = {
+        "crontab-spec" = "30 0 * * *"
+        "executable" = {
+          "path" = "/config/scripts/custom-config-backup.sh"
+        }
+      }
+    }
+  })
+}
