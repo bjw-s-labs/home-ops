@@ -8,13 +8,17 @@
   local
 
   prometheus :9153
+
+  health {
+    lameduck 5s
+  }
 }
 
 (local_hosts) {
   hosts /config/hosts {
     ttl 1
     reload 5s
-    fallthrough
+    fallthrough bjw-s.dev
   }
 }
 
@@ -22,20 +26,9 @@
   forward . 10.45.0.3:53
 }
 
-(forward_upstream) {
-  forward . tls://1.1.1.1 tls://1.0.0.1 {
-    tls_servername cloudflare-dns.com
-  }
-}
-
-. {
+unifi {
   import common
   import local_hosts
-  import forward_upstream
-
-  health {
-    lameduck 5s
-  }
 }
 
 bjw-s.dev {
@@ -47,5 +40,4 @@ bjw-s.dev {
 bjw-s.tech {
   import common
   import local_hosts
-  import forward_upstream
 }
