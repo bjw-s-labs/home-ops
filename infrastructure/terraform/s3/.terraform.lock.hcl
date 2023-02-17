@@ -54,14 +54,13 @@ provider "registry.terraform.io/aminueza/minio" {
 }
 
 provider "registry.terraform.io/backblaze/b2" {
-  version     = "0.8.1"
-  constraints = "0.8.1"
+  version     = "0.8.2"
+  constraints = "0.8.2"
   hashes = [
-    "h1:kaQ0+b6ngY15mR4RAtwklqLJ9wip35GtyAdY8Oya3S8=",
-    "zh:2f4ffb6cbc1bdae18a71a9b9b2b3563c2109a31b409077bf32e0bdc5c1980605",
-    "zh:87395bf0c2951770b9a764b55ccf2ac630d064219c09d6b4fad8ab0c81d6bbe9",
-    "zh:c2cf5f8f349f6484ab19d3b43d9952d299ef6128a9c0b0c81c3d87c0a9bbbd97",
-    "zh:f080728e857503e2dbda3f56f2b3154aae99ef0f0ef9d81163018e59c1313e1b",
+    "h1:FtKD/xBsmJ2400v+Lj4R7JwbcDC0IJUmUEpbockEV6M=",
+    "h1:LnE1QzZxsBSKu9asJDewRMgDjH1gbS6aRxjsu+z/jvA=",
+    "h1:Ryb2pEPkJNubOc3xn009yQHUAHWwva0/m3m1Qy+4524=",
+    "h1:UIenP2gkoKgqkLW1SOHvYkMZK7UCYZL6hFz9enWad1A=",
   ]
 }
 
