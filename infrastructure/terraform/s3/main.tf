@@ -8,5 +8,10 @@ terraform {
       source  = "aminueza/minio"
       version = "1.11.0"
     }
+
+    garage = {
+      source  = "prologin/garage"
+      version = "0.0.1"
+    }
   }
 }
