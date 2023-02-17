@@ -2,10 +2,7 @@ resource "vyos_config" "service-ntp" {
   path = "service ntp"
   value = jsonencode({
     "server" = {
-      "0.nl.pool.ntp.org" = {}
-      "1.nl.pool.ntp.org" = {}
-      "2.nl.pool.ntp.org" = {}
-      "3.nl.pool.ntp.org" = {}
+      "nl.pool.ntp.org" = {}
     }
     "allow-client" = {
       "address" = [
