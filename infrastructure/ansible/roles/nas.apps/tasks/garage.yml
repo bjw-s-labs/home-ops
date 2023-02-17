@@ -1,0 +1,48 @@
+---
+- name: "Garage : Fetch secrets from 1Password"
+  onepassword.connect.item_info:
+    vault: Automation
+    item: garage
+  no_log: true
+  register: op_item_garage
+
+- name: "Garage : Data folder"
+  ansible.builtin.file:
+    path: "{{ apps.garage.data_folder }}"
+    state: directory
+    mode: '0755'
+
+- name: "Garage : Meta folder"
+  ansible.builtin.file:
+    path: "{{ apps.garage.meta_folder }}"
+    state: directory
+    mode: '0755'
+
+- name: "Garage : Manage image"
+  community.docker.docker_image:
+    source: pull
+    name: "{{ apps.garage.image }}"
+
+- name: "Garage : Manage configuration"
+  become: true
+  ansible.builtin.template:
+    src: garage/garage.toml.j2
+    dest: "{{ apps.garage.config_folder }}/garage.toml"
+    mode: 0644
+  register: var_garage_config
+
+- name: "Garage : Manage container"
+  community.docker.docker_container:
+    name: "garage"
+    image: "{{ apps.garage.image }}"
+    state: started
+    restart: "{{ var_garage_config.changed }}"
+    volumes:
+      - "{{ apps.garage.meta_folder }}:/var/lib/garage/meta"
+      - "{{ apps.garage.data_folder }}:/var/lib/garage/data"
+      - "{{ apps.garage.config_folder }}/garage.toml:/etc/garage.toml"
+    env:
+      TZ: "Europe/Amsterdam"
+    published_ports:
+      - 3910:3910
+      - 3911:3911
