@@ -443,11 +443,19 @@ config:
             rules:
               - accept_established: null
               - accept_related: null
+              - accept_dns: null
               - accept_k8s_api: null
               - drop_invalid: null
           - zones:
-              - wan
               - guest
+            default: drop
+            rules:
+              - accept_established: null
+              - accept_related: null
+              - accept_dns: null
+              - drop_invalid: null
+          - zones:
+              - wan
             default: drop
             rules:
               - accept_established: null
@@ -482,38 +490,38 @@ config:
         port: 123
         protocol: udp
         interface: lan
-        destinationAddress: "!${address_book.services.vyos_chronyd.ipv4_addr}"
-        address: "${address_book.services.vyos_chronyd.ipv4_addr}"
+        destinationAddress: "!${cidrhost(networks.lan, 1)}"
+        address: "${cidrhost(networks.lan, 1)}"
       - description: Force NTP for Servers
         port: 123
         protocol: udp
         interface: servers
-        destinationAddress: "!${address_book.services.vyos_chronyd.ipv4_addr}"
-        address: "${address_book.services.vyos_chronyd.ipv4_addr}"
+        destinationAddress: "!${cidrhost(networks.servers, 1)}"
+        address: "${cidrhost(networks.servers, 1)}"
       - description: Force NTP for Trusted
         port: 123
         protocol: udp
         interface: trusted
-        destinationAddress: "!${address_book.services.vyos_chronyd.ipv4_addr}"
-        address: "${address_book.services.vyos_chronyd.ipv4_addr}"
+        destinationAddress: "!${cidrhost(networks.trusted, 1)}"
+        address: "${cidrhost(networks.trusted, 1)}"
       - description: Force NTP for IoT
         port: 123
         protocol: udp
         interface: iot
-        destinationAddress: "!${address_book.services.vyos_chronyd.ipv4_addr}"
-        address: "${address_book.services.vyos_chronyd.ipv4_addr}"
+        destinationAddress: "!${cidrhost(networks.iot, 1)}"
+        address: "${cidrhost(networks.iot, 1)}"
       - description: Force NTP for Video
         port: 123
         protocol: udp
         interface: video
-        destinationAddress: "!${address_book.services.vyos_chronyd.ipv4_addr}"
-        address: "${address_book.services.vyos_chronyd.ipv4_addr}"
+        destinationAddress: "!${cidrhost(networks.video, 1)}"
+        address: "${cidrhost(networks.video, 1)}"
       - description: Force NTP for Wireguard Trusted
         port: 123
         protocol: udp
         interface: wg_trusted
-        destinationAddress: "!${address_book.services.vyos_chronyd.ipv4_addr}"
-        address: "${address_book.services.vyos_chronyd.ipv4_addr}"
+        destinationAddress: "!${cidrhost(networks.wg_trusted, 1)}"
+        address: "${cidrhost(networks.wg_trusted, 1)}"
 
   firewall:
     network_groups:
