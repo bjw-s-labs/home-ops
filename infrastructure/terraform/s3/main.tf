@@ -4,11 +4,6 @@ terraform {
       source  = "Backblaze/b2"
       version = "0.8.2"
     }
-    minio = {
-      source  = "aminueza/minio"
-      version = "1.11.0"
-    }
-
     garage = {
       source  = "prologin/garage"
       version = "0.0.1"
