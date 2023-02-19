@@ -107,10 +107,11 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
         hosts:
-          - "alert-manager.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          -  &host-alert "alert-manager.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
         tls:
-          - hosts:
-              - "alert-manager.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - secretName: tls.alertmanager
+            hosts:
+              - *host-alert
       alertmanagerSpec:
         storage:
           volumeClaimTemplate:
@@ -231,17 +232,21 @@ spec:
       ingress:
         enabled: true
         pathType: Prefix
+        path: /
         ingressClassName: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns/is-public: "false"
           external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
         hosts:
-          - "prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - &host-prometheus "prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
         tls:
-          - hosts:
-              - "prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - secretName: tls.prometheus
+            hosts:
+              - *host-prometheus
 #      thanosService:
 #        enabled: true
 #      thanosServiceMonitor:
