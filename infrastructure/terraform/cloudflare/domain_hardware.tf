@@ -72,7 +72,7 @@ module "cf_domain_hardware" {
     },
     {
       id    = "mailgun_dkim_1"
-      name  = "s1._domainkey"
+      name  = "s1._domainkey.mg"
       value = "k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqQppZfQxBBxP3YU0WY14uo+s/pNomR6XP/OBy7Q5MXdd/bHf5/q/THXhVhek2DDMa2BiqTaaXbx0vR18YAKpU96mA0l1ot7dyX0G4nSOST7UO0EvqUxZLzPAl+eYhCGAlJWeZqWTzMqWpjNA2xYbqOOA5wFZ9L3BtC4VNJl8hnIRcGogLOUp7+q8u3D8hsPsAN5Hf6v8SaBRXoLn/r+CUwOqjEFoaRhH/37C5EnWWQ0zWbRQa4jv1meJBpoTnfN7jpAPTQddCBFPBap1UCVfXxEk7EtVYBwx+rAhz9nO4BvzYcE2Z5r1r7QcND/0oeCivAjT1Wt3oxb5VvHm38OJrwIDAQAB"
       type  = "TXT"
     },
