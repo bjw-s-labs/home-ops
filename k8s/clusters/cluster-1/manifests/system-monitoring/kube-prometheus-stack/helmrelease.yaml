@@ -195,30 +195,30 @@ spec:
             etcd:
               enabled: true
 
-    additionalScrapeConfigs:
-            - job_name: ceph-exporter
-              scrape_interval: 1m
-              scrape_timeout: 10s
-              honor_timestamps: true
-              static_configs:
-                - targets:
-                    - "pve01.ceph.${INGRESS_DOMAIN}:9283"
-                    - "pve02.ceph.${INGRESS_DOMAIN}:9283"
-            - job_name: coredns
-              scrape_interval: 1m
-              scrape_timeout: 10s
-              honor_timestamps: true
-              static_configs:
-                - targets:
-                    - "vyos.${INGRESS_DOMAIN}:9153"
-            - job_name: node-exporter
-              scrape_interval: 1m
-              scrape_timeout: 10s
-              honor_timestamps: true
-              static_configs:
-                - targets:
-                    - "nas00.${INGRESS_DOMAIN}:9100"
-                    - "pve01.server.${INGRESS_DOMAIN}:9100"
+    extraScrapeConfigs:
+      - job_name: ceph-exporter
+        scrape_interval: 1m
+        scrape_timeout: 10s
+        honor_timestamps: true
+        static_configs:
+          - targets:
+              - "pve01.ceph.${INGRESS_DOMAIN}:9283"
+              - "pve02.ceph.${INGRESS_DOMAIN}:9283"
+      - job_name: coredns
+        scrape_interval: 1m
+        scrape_timeout: 10s
+        honor_timestamps: true
+        static_configs:
+          - targets:
+              - "vyos.${INGRESS_DOMAIN}:9153"
+      - job_name: node-exporter
+        scrape_interval: 1m
+        scrape_timeout: 10s
+        honor_timestamps: true
+        static_configs:
+          - targets:
+              - "nas00.${INGRESS_DOMAIN}:9100"
+              - "pve01.server.${INGRESS_DOMAIN}:9100"
                     
     prometheusOperator:
       prometheusConfigReloader:
