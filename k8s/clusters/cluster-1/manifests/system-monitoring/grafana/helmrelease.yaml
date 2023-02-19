@@ -159,6 +159,17 @@ spec:
             access: proxy
             url: http://prometheus-operated:9090/
             isDefault: true
+          - name: InfluxDB
+            type: influxdb
+            access: proxy
+            url: http://influxdb-influxdb2:8086
+            jsonData:
+              version: Flux
+              organization: homelab
+              defaultBucket: monitoring
+              tlsSkipVerify: true
+            secureJsonData:
+              token: ${INFLUXDB_ADMIN_TOKEN}
           - name: Loki
             type: loki
             access: proxy
