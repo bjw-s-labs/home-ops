@@ -22,37 +22,6 @@ provider "registry.terraform.io/1password/onepassword" {
   ]
 }
 
-provider "registry.terraform.io/aminueza/minio" {
-  version     = "1.11.0"
-  constraints = "1.11.0"
-  hashes = [
-    "h1:1Fwmd13/d3EtLAcJEKflKw10Wnb3FbhU+2oiEZDdnaw=",
-    "h1:8ZGKlgHlSxFQuGWJmMj0UHHu6mVEfWYOJHYhhf1aEUQ=",
-    "h1:FPrSTY/xvl4uwQZ42JKFNrE3msBscsrQZS1yC2GPmkQ=",
-    "h1:LBpGxBHl5ee5RwkGtQx0b61jbclNBpO7ST5EUR9Zhwc=",
-    "h1:Mj+PAwXjFe4K7uC813GwndUUCHB2OR3tWk6wvPYHeUU=",
-    "h1:SizdtxMX4ZOLpkNo78K8kW45jkRHrNLv9yaLfEJG65o=",
-    "h1:YVgupezL4FbGEvh6MOjZdFeO7LzugfZWpJzoJK1j/BY=",
-    "h1:aIm8jTufhhmjGuMJIyK1kpntXmAiE3690WE+3Hzz8Lg=",
-    "h1:eBDyAz+5GuCe3WAqeHyYiWYmoKInONZhICy7DfaEl2U=",
-    "h1:hP+jqD7z0dNJjhlGM/PQDASLRMBNz/fhATNos1mPIgk=",
-    "h1:n6R3PeWK2ZXWy10CG1oWohH+C2c3BUHm8EqFUc7882I=",
-    "h1:oDvb/ze+lS1h36/tORBSNZHSU2f1JIHSGVTUwkIQdAU=",
-    "zh:37250f13993305ad5ee83469e04365d928cb71609537fa6633af5c7f62df2598",
-    "zh:413eba83066f418869f0f0ca979cdb33366e9a13ab096099bebe55e4fe45c428",
-    "zh:41ee9eeec0226677ad66dfff3dbcb51e5197a7d4526c4b85228672965233d723",
-    "zh:443c46847fa90c418dedbf53e1b739e01b8e3d7d3a0be253c12e86bddeba7edd",
-    "zh:46b121b9ad5937950380491140786a714ca174f360529fd631ada99a04c0d3ec",
-    "zh:57bea84a1f951db29d4495f704d15347fcbfa8acaf296c3208c03e2a6dcf2b4a",
-    "zh:6e3b053540a41c4a4400a54258dc7136bdad0214ce054c3798c4c01998f4f0cb",
-    "zh:8700b16b6d56b624c7bb5c774eb8012517ab77796d5bdb42c43440566865ec6d",
-    "zh:8dc993f5d55108049e829bbe2861d205887fd90b368dc65e707c5ece1af0ed53",
-    "zh:972bc9d437953712e0f1f333c63610ef738cd9f6516b46fb5cb00d61fc6a7faf",
-    "zh:a4a4ec3cf1c4283259c87f8d674350d228cc41bedaecb59887432b09f5b49d13",
-    "zh:fde8fd7134ee73a7a85d750a6bcb52a92b71efd29e728cedf9d4e51453637075",
-  ]
-}
-
 provider "registry.terraform.io/backblaze/b2" {
   version     = "0.8.2"
   constraints = "0.8.2"
@@ -61,6 +30,10 @@ provider "registry.terraform.io/backblaze/b2" {
     "h1:LnE1QzZxsBSKu9asJDewRMgDjH1gbS6aRxjsu+z/jvA=",
     "h1:Ryb2pEPkJNubOc3xn009yQHUAHWwva0/m3m1Qy+4524=",
     "h1:UIenP2gkoKgqkLW1SOHvYkMZK7UCYZL6hFz9enWad1A=",
+    "zh:1a7b7fed52e86ef888b52b26b2089309addb3885aa8ce85094ff3b13e01f9a37",
+    "zh:363468f9802e7f8002c800854f170229be8af5b0adc3d51c66607b391f3fa631",
+    "zh:38fd51a65e073ae0b90ff88c22646f788c3ddd2294d84d746c4068201722d317",
+    "zh:5ad1fd8c8ec12113bd85044717acf206b5d0e264b85988a519d12290b0cd9d13",
   ]
 }
 
