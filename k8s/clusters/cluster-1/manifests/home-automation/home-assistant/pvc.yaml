@@ -5,7 +5,6 @@ metadata:
   name: home-assistant-config
   namespace: home-automation
   labels:
-    k10.kasten.io/backup: "true"
     app.kubernetes.io/name: &name home-assistant
     app.kubernetes.io/instance: *name
     snapshot.home.arpa/enabled: "true"
@@ -15,6 +14,6 @@ spec:
 
   resources:
     requests:
-      storage: 1Gi
+      storage: 10Gi
 
   storageClassName: ceph-block-external
