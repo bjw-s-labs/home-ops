@@ -47,18 +47,12 @@ spec:
       GF_SECURITY_ALLOW_EMBEDDING: true
       # Variables for Authentik Login
       GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
-      # GF_AUTH_GENERIC_OAUTH_NAME: "authentik"
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID: ${AUTHENTIK_GRAFANA_CLIENT_ID}
       GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: ${AUTHENTIK_GRAFANA_CLIENT_SECRET}
       GF_AUTH_GENERIC_OAUTH_SCOPES: 'openid profile email'
       GF_AUTH_GENERIC_OAUTH_AUTH_URL: "https://auth.${INGRESS_DOMAIN}/application/o/authorize/"
       GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "https://auth.${INGRESS_DOMAIN}/application/o/token/"
       GF_AUTH_GENERIC_OAUTH_API_URL: "https://auth.${INGRESS_DOMAIN}/application/o/userinfo/"
-      # GF_AUTH_SIGNOUT_REDIRECT_URL: "https://auth.${INGRESS_DOMAIN}/application/o/grafana/end-session/"
-      # Optionally enable auto-login (bypasses Grafana login screen)
-      # GF_AUTH_OAUTH_AUTO_LOGIN: "true"
-      # Optionally map user groups to Grafana roles
-      # GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups[*], 'Grafana Admins') && 'Admin' || contains(groups[*], 'Grafana Editors') && 'Editor' || 'Viewer'"
 
     admin:
       existingSecret: grafana-secrets
@@ -203,11 +197,13 @@ spec:
             orgId: 1
         datasources:
           - name: Prometheus
+            uid: prometheus
             type: prometheus
             access: proxy
             url: http://prometheus-operated:9090/
             isDefault: true
           - name: InfluxDB
+            uid: influxdb
             type: influxdb
             access: proxy
             url: http://influxdb-influxdb2:80
@@ -219,10 +215,12 @@ spec:
             secureJsonData:
               token: ${INFLUXDB_ADMIN_TOKEN}
           - name: Loki
+            uid: loki
             type: loki
             access: proxy
             url: http://loki-gateway:3100
           - name: Alertmanager
+            uid: alertmanager
             type: alertmanager
             access: proxy
             url: http://kube-prometheus-stack-alertmanager:9093
