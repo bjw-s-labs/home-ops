@@ -1,0 +1,60 @@
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: garage-nas
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: garage-nas
+    app.kubernetes.io/instance: garage-nas
+    jobLabel: garage
+subsets:
+  - addresses:
+      - ip: 10.1.1.11
+    ports:
+      - name: metrics
+        port: 3911
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: garage-nas
+  namespace: monitoring
+  annotations:
+    prometheus.io/scrape: "true"
+  labels:
+    app.kubernetes.io/name: garage-nas
+    app.kubernetes.io/instance: garage-nas
+    jobLabel: garage
+spec:
+  type: ExternalName
+  externalName: nas.bjw-s.tech.
+  ports:
+    - name: metrics
+      port: &port 3911
+      protocol: TCP
+      targetPort: *port
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/servicemonitor_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: garage-nas
+  namespace: monitoring
+  labels: &labels
+    app.kubernetes.io/name: garage-nas
+    app.kubernetes.io/instance: garage-nas
+    jobLabel: garage
+spec:
+  namespaceSelector:
+    matchNames: ["monitoring"]
+  selector:
+    matchLabels:
+      <<: *labels
+  jobLabel: jobLabel
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 1m
+      scrapeTimeout: 10s
+      honorLabels: true
