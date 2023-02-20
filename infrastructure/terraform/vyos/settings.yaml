@@ -32,9 +32,6 @@ config:
         default:
           default: drop
           rules:
-            - accept_established: null
-            - accept_related: null
-            - drop_invalid: null
             - accept_ntp: null
             - accept_dhcp: null
         fromZones:
@@ -42,9 +39,6 @@ config:
               - lan
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_ssh: null
               - accept_ntp: null
               - accept_dhcp: null
@@ -53,9 +47,6 @@ config:
               - wg_trusted
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_icmp: null
               - accept_ssh: null
               - accept_ntp: null
@@ -69,9 +60,6 @@ config:
               - iot
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_ssh: null
               - accept_ntp: null
               - accept_dhcp: null
@@ -83,9 +71,6 @@ config:
               - servers
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_icmp: null
               - accept_ntp: null
               - accept_dhcp: null
@@ -96,17 +81,11 @@ config:
               - wan
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_wireguard: null
           - zones:
               - guest
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_dhcp: null
 
     wan:
@@ -115,10 +94,7 @@ config:
         default:
           default: accept
           defaultLog: false
-          rules:
-            - accept_established: null
-            - accept_related: null
-            - drop_invalid: null
+          rules: []
         fromZones:
           - zones:
               - video
@@ -133,10 +109,7 @@ config:
       firewall:
         default:
           default: drop
-          rules:
-            - accept_established: null
-            - accept_related: null
-            - drop_invalid: null
+          rules: []
 
         fromZones:
           - zones:
@@ -144,18 +117,12 @@ config:
               - wg_trusted
             default: accept
             defaultLog: false
-            rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
+            rules: []
           - zones:
               - servers
             default: drop
             defaultLog: false
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_icmp: null
 
     rescue:
@@ -171,10 +138,7 @@ config:
       firewall:
         default:
           default: drop
-          rules:
-            - accept_established: null
-            - accept_related: null
-            - drop_invalid: null
+          rules: []
 
         fromZones:
           - zones:
@@ -184,32 +148,21 @@ config:
             default: accept
             defaultLog: false
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_icmp: null
           - zones:
               - wan
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_ingress_from_cloudflare: null
           - zones:
               - lan
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_icmp: null
           - zones:
               - iot
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
               - accept_nas_smb_from_scanners: null
               - accept_plex_from_plex_clients: null
               - accept_jellyfin_from_jellyfin_clients: null
@@ -220,14 +173,10 @@ config:
               - accept_k8s_ingress_from_wall_displays: null
               - accept_k8s_ingress_from_allowed_devices: null
               - accept_vector_journald_from_allowed_devices: null
-              - drop_invalid: null
           - zones:
               - local
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_bgp: null
               - accept_k8s_api: null
               - accept_dns: null
@@ -240,18 +189,12 @@ config:
       firewall:
         default:
           default: drop
-          rules:
-            - accept_established: null
-            - accept_related: null
-            - drop_invalid: null
+          rules: []
         fromZones:
           - zones:
               - local
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_igmp: null
               - accept_mdns: null
               - accept_discovery_from_sonos_players: null
@@ -259,17 +202,11 @@ config:
               - wg_trusted
             default: accept
             defaultLog: false
-            rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
+            rules: []
           - zones:
               - iot
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_udp_from_sonos_players_to_sonos_controllers: null
               - accept_tcp_from_sonos_players_to_sonos_controllers: null
           - zones:
@@ -277,9 +214,6 @@ config:
             default: drop
             defaultLog: false
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_icmp: null
 
     guest:
@@ -289,10 +223,7 @@ config:
       firewall:
         default:
           default: drop
-          rules:
-            - accept_established: null
-            - accept_related: null
-            - drop_invalid: null
+          rules: []
 
     iot:
       interface: eth1.40
@@ -302,10 +233,7 @@ config:
       firewall:
         default:
           default: drop
-          rules:
-            - accept_established: null
-            - accept_related: null
-            - drop_invalid: null
+          rules: []
         fromZones:
           - zones:
               - trusted
@@ -313,9 +241,6 @@ config:
             default: accept
             defaultLog: false
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_icmp: null
               - accept_app_control_from_sonos_controllers_tcp: null
               - accept_app_control_from_sonos_controllers_udp: null
@@ -323,9 +248,6 @@ config:
               - servers
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_icmp: null
               - accept_p1reader_from_k8s_nodes: null
               - accept_adb_from_k8s_nodes: null
@@ -335,9 +257,6 @@ config:
               - local
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_igmp: null
               - accept_mdns: null
               - accept_discovery_from_sonos_controllers: null
@@ -345,9 +264,6 @@ config:
               - guest
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_tcp_printer_from_allowed_devices: null
               - accept_udp_printer_from_allowed_devices: null
 
@@ -359,10 +275,7 @@ config:
       firewall:
         default:
           default: drop
-          rules:
-            - accept_established: null
-            - accept_related: null
-            - drop_invalid: null
+          rules: []
         fromZones:
           - zones:
               - trusted
@@ -370,17 +283,11 @@ config:
             default: accept
             defaultLog: false
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_icmp: null
           - zones:
               - servers
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_icmp: null
               - accept_k8s_nodes: null
 
@@ -401,28 +308,14 @@ config:
       firewall:
         default:
           default: drop
-          rules:
-            - accept_established: null
-            - accept_related: null
-            - drop_invalid: null
-
+          rules: []
         fromZones:
           - zones:
               - local
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
               - accept_igmp: null
               - accept_mdns: null
-          - zones:
-              - iot
-            default: drop
-            rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
 
     services:
       description: VyOS services zone
@@ -432,35 +325,23 @@ config:
           default: accept
           defaultLog: false
           rules:
-            - accept_established: null
-            - accept_related: null
             - accept_dns: null
-            - drop_invalid: null
         fromZones:
           - zones:
               - servers
             default: accept
             rules:
-              - accept_established: null
-              - accept_related: null
               - accept_dns: null
               - accept_k8s_api: null
-              - drop_invalid: null
           - zones:
               - guest
             default: drop
             rules:
-              - accept_established: null
-              - accept_related: null
               - accept_dns: null
-              - drop_invalid: null
           - zones:
               - wan
             default: drop
-            rules:
-              - accept_established: null
-              - accept_related: null
-              - drop_invalid: null
+            rules: []
 
   nat:
     destination:
