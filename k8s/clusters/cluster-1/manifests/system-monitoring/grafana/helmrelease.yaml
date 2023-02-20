@@ -27,6 +27,18 @@ spec:
       repository: grafana/grafana
 
     env:
+      GF_ANALYTICS_CHECK_FOR_UPDATES: false
+
+      GF_GRAFANA_NET_URL: https://grafana.net
+      GF_LOG_MODE: console
+      GF_PATHS_DATA: /var/lib/grafana/data
+      GF_PATHS_LOGS: /var/log/grafana
+      GF_PATHS_PLUGINS: /var/lib/grafana/plugins
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: natel-discrete-panel,pr0ps-trackmap-panel,panodata-map-panel
+      GF_SECURITY_COOKIE_SAMESITE: grafana
+      GF_SERVER_ROOT_URL: https://grafana.cluster-1.${INGRESS_DOMAIN}
+
       GF_EXPLORE_ENABLED: true
       GF_PANELS_DISABLE_SANITIZE_HTML: true
       GF_LOG_FILTERS: rendering:debug
@@ -35,18 +47,18 @@ spec:
       GF_SECURITY_ALLOW_EMBEDDING: true
       # Variables for Authentik Login
       GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
-      GF_AUTH_GENERIC_OAUTH_NAME: "authentik"
+      # GF_AUTH_GENERIC_OAUTH_NAME: "authentik"
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID: ${AUTHENTIK_GRAFANA_CLIENT_ID}
       GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: ${AUTHENTIK_GRAFANA_CLIENT_SECRET}
       GF_AUTH_GENERIC_OAUTH_SCOPES: 'openid profile email'
       GF_AUTH_GENERIC_OAUTH_AUTH_URL: "https://auth.${INGRESS_DOMAIN}/application/o/authorize/"
       GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "https://auth.${INGRESS_DOMAIN}/application/o/token/"
       GF_AUTH_GENERIC_OAUTH_API_URL: "https://auth.${INGRESS_DOMAIN}/application/o/userinfo/"
-      GF_AUTH_SIGNOUT_REDIRECT_URL: "https://auth.${INGRESS_DOMAIN}/application/o/grafana/end-session/"
+      # GF_AUTH_SIGNOUT_REDIRECT_URL: "https://auth.${INGRESS_DOMAIN}/application/o/grafana/end-session/"
       # Optionally enable auto-login (bypasses Grafana login screen)
-      GF_AUTH_OAUTH_AUTO_LOGIN: "true"
+      # GF_AUTH_OAUTH_AUTO_LOGIN: "true"
       # Optionally map user groups to Grafana roles
-      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups[*], 'Grafana Admins') && 'Admin' || contains(groups[*], 'Grafana Editors') && 'Editor' || 'Viewer'"
+      # GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups[*], 'Grafana Admins') && 'Admin' || contains(groups[*], 'Grafana Editors') && 'Editor' || 'Viewer'"
 
     admin:
       existingSecret: grafana-secrets
@@ -67,9 +79,34 @@ spec:
         mode: console
       grafana_net:
         url: https://grafana.net
+      auth:
+        signout_redirect_url: "https://auth.${INGRESS_DOMAIN}/application/o/grafana/end-session/"
+        oauth_auto_login: false
+      auth.generic_oauth:
+        enabled: true
+        name: Authentik
+        client_id: # Set by env vars
+        client_secret: # Set by env vars secret
+        auth_url: # Set by env vars
+        token_url: # Set by env vars
+        api_url: # Set by env vars
+        scopes: "openid profile email groups"
+        empty_scopes: false
+        login_attribute_path: preferred_username
+        groups_attribute_path: groups
+        name_attribute_path: name
+        use_pkce: true
+      auth.generic_oauth.group_mapping:
+        role_attribute_path: |
+          contains(groups[*], 'admins') && 'Admin' || contains(groups[*], 'people') && 'Viewer'
+        org_id: 1
       auth.basic:
         disable_login_form: false
-
+      auth.anonymous:
+        enabled: true
+        org_name: HomeOps
+        org_id: 1
+        org_role: Viewer
     dashboardProviders:
       dashboardproviders.yaml:
         apiVersion: 1
@@ -145,6 +182,15 @@ spec:
             allowUiUpdates: true
             options:
               path: /var/lib/grafana/dashboards/thanos
+          - name: "kubernetes"
+            orgId: 1
+            folder: "kubernetes"
+            type: file
+            updateIntervalSeconds: 10
+            disableDeletion: false
+            allowUiUpdates: true
+            options:
+              path: /var/lib/grafana/dashboards/kubernetes
 
     datasources:
       datasources.yaml:
@@ -152,6 +198,8 @@ spec:
         # list of datasources that should be deleted from the database
         deleteDatasources:
           - name: Loki
+            orgId: 1
+          - name: Alertmanager
             orgId: 1
         datasources:
           - name: Prometheus
@@ -162,7 +210,7 @@ spec:
           - name: InfluxDB
             type: influxdb
             access: proxy
-            url: http://influxdb-influxdb2:8086
+            url: http://influxdb-influxdb2:80
             jsonData:
               version: Flux
               organization: homelab
@@ -174,16 +222,20 @@ spec:
             type: loki
             access: proxy
             url: http://loki-gateway:3100
+          - name: Alertmanager
+            type: alertmanager
+            access: proxy
+            url: http://kube-prometheus-stack-alertmanager:9093
+            jsonData:
+              implementation: prometheus
 
     dashboards:
       default:
         node-exporter-full:
           url: https://grafana.com/api/dashboards/1860/revisions/22/download
           datasource: Prometheus
-        # Ref: https://grafana.com/grafana/dashboards/13502
-        minio:
-          gnetId: 13502
-          revision: 10
+        cert-manager:
+          url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/cert-manager/dashboards/cert-manager.json
           datasource: Prometheus
 
       flux:
@@ -283,6 +335,26 @@ spec:
         speedtest:
           gnetId: 13665
           revision: 4
+          datasource: Prometheus
+
+      kubernetes:
+        kubernetes-api-server:
+          url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-api-server.json
+          datasource: Prometheus
+        kubernetes-coredns:
+          url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json
+          datasource: Prometheus
+        kubernetes-global:
+          url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json
+          datasource: Prometheus
+        kubernetes-namespaces:
+          url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json
+          datasource: Prometheus
+        kubernetes-nodes:
+          url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json
+          datasource: Prometheus
+        kubernetes-pods:
+          url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json
           datasource: Prometheus
 
 #       thanos:
