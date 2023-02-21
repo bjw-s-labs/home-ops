@@ -61,9 +61,11 @@ spec:
               - *host
       kobo:
         enabled: true
+        annotations:
+          nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
         ingressClassName: nginx
         hosts:
-          - host: &host_kobo calibre-kobo.bjw-s.dev
+          - host: &host_kobo calibre-web.bjw-s.dev
             paths:
               - path: /kobo/
         tls:
