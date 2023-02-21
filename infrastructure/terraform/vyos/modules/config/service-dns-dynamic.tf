@@ -6,8 +6,8 @@ resource "vyos_config" "service-dns-dynamic-personal" {
       "server"    = "api.cloudflare.com/client/v4"
       "protocol"  = "cloudflare"
       "zone"      = "bjws.nl"
-      "login"     = "${var.secrets.cloudflare.login}"
-      "password"  = "${var.secrets.cloudflare.key}"
+      "login"     = "${var.secrets.cloudflare_dyndns_login}"
+      "password"  = "${var.secrets.cloudflare_dyndns_token}"
     }
   )
 }
@@ -20,8 +20,8 @@ resource "vyos_config" "service-dns-dynamic-family" {
       "server"    = "api.cloudflare.com/client/v4"
       "protocol"  = "cloudflare"
       "zone"      = "schorgers.nl"
-      "login"     = "${var.secrets.cloudflare.login}"
-      "password"  = "${var.secrets.cloudflare.key}"
+      "login"     = "${var.secrets.cloudflare_dyndns_login}"
+      "password"  = "${var.secrets.cloudflare_dyndns_token}"
     }
   )
 }
@@ -34,8 +34,8 @@ resource "vyos_config" "service-dns-dynamic-ingress" {
       "server"    = "api.cloudflare.com/client/v4"
       "protocol"  = "cloudflare"
       "zone"      = "bjw-s.dev"
-      "login"     = "${var.secrets.cloudflare.login}"
-      "password"  = "${var.secrets.cloudflare.key}"
+      "login"     = "${var.secrets.cloudflare_dyndns_login}"
+      "password"  = "${var.secrets.cloudflare_dyndns_token}"
     }
   )
 }
@@ -48,8 +48,8 @@ resource "vyos_config" "service-dns-dynamic-hardware" {
       "server"    = "api.cloudflare.com/client/v4"
       "protocol"  = "cloudflare"
       "zone"      = "bjw-s.tech"
-      "login"     = "${var.secrets.cloudflare.login}"
-      "password"  = "${var.secrets.cloudflare.key}"
+      "login"     = "${var.secrets.cloudflare_dyndns_login}"
+      "password"  = "${var.secrets.cloudflare_dyndns_token}"
     }
   )
 }

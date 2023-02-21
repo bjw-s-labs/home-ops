@@ -53,7 +53,7 @@ resource "vyos_config" "interface-wireguard" {
     "address"     = "${cidrhost(var.networks.wg_trusted, 1)}/24"
     "description" = "WIREGUARD"
     "port"        = tostring(var.config.zones.wg_trusted.port)
-    "private-key" = "${var.config.zones.wg_trusted.private_key}"
+    "private-key" = var.secrets.wireguard_private_key
     "peer" = merge([
       for peer, peer_config in var.config.zones.wg_trusted.peers : {
         "${peer}" = {

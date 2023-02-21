@@ -5,7 +5,6 @@ locals {
       {
         address_book = local.address_book
         networks     = local.networks
-        secrets      = yamldecode(nonsensitive(data.sops_file.vyos_secrets.raw))
       }
     )
   )
@@ -15,5 +14,4 @@ locals {
   firewall_rules = yamldecode(file(pathexpand("${path.module}/firewall_rules.yaml")))
 
   config       = local._config.config
-  vyos_secrets = sensitive(yamldecode(nonsensitive(data.sops_file.vyos_secrets.raw)))
 }
