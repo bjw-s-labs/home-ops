@@ -1,28 +1,6 @@
 ---
 config:
-  hostname: "gateway"
   domain_name: "bjw-s.tech"
-  fqdn: "gateway.bjw-s.tech"
-  upstream_name_server: "1.1.1.1"
-  time_zone: "Europe/Amsterdam"
-
-  api:
-    listen_address: "0.0.0.0"
-    port: 8443
-    keys:
-      terraform: ${secrets.api.key}
-
-  ssh:
-    user: ${secrets.ssh.user}
-    port: 22
-    disable_password_login: true
-    keys:
-      - name: personal
-        type: ssh-ed25519
-        key: ${secrets.ssh.keys.personal}
-      - name: ios
-        type: ssh-ed25519
-        key: ${secrets.ssh.keys.ios}
 
   zones:
     local:
@@ -294,7 +272,6 @@ config:
     wg_trusted:
       interface: wg01
       port: 51820
-      private_key: ${secrets.wireguard.private_key}
       peers:
         ipad-bernd:
           ipv4_hostid: 4
@@ -342,119 +319,3 @@ config:
               - wan
             default: drop
             rules: []
-
-  nat:
-    destination:
-      - description: HTTPS
-        protocol: tcp
-        interface: wan
-        port: 443
-        address: ${address_book.services.k8s_ingress.ipv4_addr}
-      - description: HTTP
-        protocol: tcp
-        interface: wan
-        port: 80
-        address: ${address_book.services.k8s_ingress.ipv4_addr}
-      - description: Force DNS for IoT
-        port: 53
-        protocol: tcp_udp
-        interface: iot
-        destinationAddress: "!${address_book.services.vyos_dnsdist.ipv4_addr}"
-        address: ${address_book.services.vyos_dnsdist.ipv4_addr}
-      - description: Force DNS for Video
-        port: 53
-        protocol: tcp_udp
-        interface: video
-        destinationAddress: "!${address_book.services.vyos_dnsdist.ipv4_addr}"
-        address: ${address_book.services.vyos_dnsdist.ipv4_addr}
-      - description: Force NTP for LAN
-        port: 123
-        protocol: udp
-        interface: lan
-        destinationAddress: "!${cidrhost(networks.lan, 1)}"
-        address: "${cidrhost(networks.lan, 1)}"
-      - description: Force NTP for Servers
-        port: 123
-        protocol: udp
-        interface: servers
-        destinationAddress: "!${cidrhost(networks.servers, 1)}"
-        address: "${cidrhost(networks.servers, 1)}"
-      - description: Force NTP for Trusted
-        port: 123
-        protocol: udp
-        interface: trusted
-        destinationAddress: "!${cidrhost(networks.trusted, 1)}"
-        address: "${cidrhost(networks.trusted, 1)}"
-      - description: Force NTP for IoT
-        port: 123
-        protocol: udp
-        interface: iot
-        destinationAddress: "!${cidrhost(networks.iot, 1)}"
-        address: "${cidrhost(networks.iot, 1)}"
-      - description: Force NTP for Video
-        port: 123
-        protocol: udp
-        interface: video
-        destinationAddress: "!${cidrhost(networks.video, 1)}"
-        address: "${cidrhost(networks.video, 1)}"
-      - description: Force NTP for Wireguard Trusted
-        port: 123
-        protocol: udp
-        interface: wg_trusted
-        destinationAddress: "!${cidrhost(networks.wg_trusted, 1)}"
-        address: "${cidrhost(networks.wg_trusted, 1)}"
-
-  firewall:
-    network_groups:
-      - name: k8s_services
-        networks:
-          - 10.45.0.0/16
-
-    port_groups:
-      - name: wireguard
-        ports:
-          - 51820
-
-  bgp:
-    local_as: 64512
-    router_id: ${cidrhost(networks.lan, 1)}
-    neighbor_groups:
-      - group: k8s_nodes
-        remote_as: 64512
-
-  containers:
-    coredns:
-      # renovate: docker-image
-      image: ghcr.io/k8s-at-home/coredns:v1.9.3
-
-    udp-broadcast-relay:
-      # renovate: docker-image
-      image: ghcr.io/onedr0p/udp-broadcast-relay-redux:1.0.27
-
-    haproxy:
-      # renovate: docker-image
-      image: docker.io/library/haproxy:2.7.3
-
-    vector:
-      # renovate: docker-image
-      image: docker.io/timberio/vector:0.27.0-debian
-
-    chrony:
-      # renovate: docker-image
-      image: docker.io/simonrupf/chronyd:0.4.2
-
-    node-exporter:
-      # renovate: docker-image
-      image: quay.io/prometheus/node-exporter:v1.5.0
-
-    speedtest-exporter:
-      # renovate: docker-image
-      image: ghcr.io/miguelndecarvalho/speedtest-exporter:v3.5.3
-
-    unifi:
-      # renovate: docker-image
-      image: ghcr.io/jacobalberty/unifi-docker:v7.3.83
-
-    dnsdist:
-      # renovate: docker-image
-      image: docker.io/powerdns/dnsdist-17:1.7.3
