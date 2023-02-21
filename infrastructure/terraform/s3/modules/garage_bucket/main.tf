@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     garage = {
-      source = "prologin/garage"
+      source = "terraform-registry.bjw-s.dev/bjw-s/garage"
     }
   }
 }
