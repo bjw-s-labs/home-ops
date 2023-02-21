@@ -26,8 +26,16 @@ terraform {
   }
 }
 
-data "sops_file" "vyos_secrets" {
-  source_file = "vyos_secrets.sops.yaml"
+module "onepassword_item_vyos" {
+  source = "github.com/bjw-s/terraform-1password-item?ref=main"
+  vault  = "Automation"
+  item   = "vyos"
+}
+
+module "onepassword_item_cloudflare" {
+  source = "github.com/bjw-s/terraform-1password-item?ref=main"
+  vault  = "Services"
+  item   = "Cloudflare"
 }
 
 data "http" "bjws_common_networks" {
@@ -41,7 +49,13 @@ module "config" {
   networks       = local.networks
   address_book   = local.address_book
   firewall_rules = local.firewall_rules
-  secrets        = local.vyos_secrets
+  secrets = {
+    cloudflare_dyndns_login = module.onepassword_item_cloudflare.fields.username
+    cloudflare_dyndns_token = module.onepassword_item_cloudflare.fields.api-key
+    terraform_api_key       = module.onepassword_item_vyos.fields.api_key
+    vyos_password           = module.onepassword_item_vyos.fields.password
+    wireguard_private_key   = module.onepassword_item_vyos.fields.wireguard_private_key
+  }
 
   providers = {
     vyos   = vyos.vyos

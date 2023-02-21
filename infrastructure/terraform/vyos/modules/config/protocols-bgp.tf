@@ -1,43 +1,40 @@
-locals {
-  bgp_neighbors = flatten([
-    for neighbor_group in var.config.bgp.neighbor_groups : [
-      for hostname, host in var.address_book.hosts : [
-        merge(
-          host,
-          {
-            "hostname"  = "${hostname}"
-            "remote_as" = neighbor_group.remote_as
-          }
-        )
-      ] if contains(lookup(host, "groups", []), neighbor_group.group)
-    ]
-  ]...)
-}
-
 resource "vyos_config" "protocols-bgp" {
   path = "protocols bgp"
-  value = jsonencode(merge(
+  value = jsonencode(
     {
       # main setup
-      "system-as" = tostring(var.config.bgp.local_as)
-      "parameters" = {
-        "router-id" = var.config.bgp.router_id
+      system-as = "64512"
+      parameters = {
+        router-id = "10.1.0.1"
       }
-    },
-    # Optionally add neighbors for any address book entries
-    length(local.bgp_neighbors) == 0 ? {} : {
-      "neighbor" = merge([
-        for host in local.bgp_neighbors :
-        {
-          "${cidrhost(var.networks[host.network], host.ipv4_hostid)}" = {
-            "remote-as"   = tostring(host.remote_as)
-            "description" = host.hostname
-            "address-family" = {
-              "ipv4-unicast" = {}
-            }
+
+      # Neighbors
+      neighbor = {
+        # Kubernetes nodes
+        cidrhost(var.networks[var.address_book.hosts.delta.network], var.address_book.hosts.delta.ipv4_hostid) = {
+          address-family = {
+            ipv4-unicast = {}
           }
+          description = "delta"
+          remote-as   = "64512"
         }
-      ]...)
+
+        cidrhost(var.networks[var.address_book.hosts.enigma.network], var.address_book.hosts.enigma.ipv4_hostid) = {
+          address-family = {
+            ipv4-unicast = {}
+          }
+          description = "enigma"
+          remote-as   = "64512"
+        }
+
+        cidrhost(var.networks[var.address_book.hosts.felix.network], var.address_book.hosts.felix.ipv4_hostid) = {
+          address-family = {
+            ipv4-unicast = {}
+          }
+          description = "felix"
+          remote-as   = "64512"
+        }
+      }
     }
-  ))
+  )
 }

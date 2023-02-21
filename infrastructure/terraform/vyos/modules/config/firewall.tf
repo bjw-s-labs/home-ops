@@ -120,46 +120,26 @@ resource "vyos_config" "firewall" {
           ])...
         )
 
-        port-group = merge(
-          flatten([
-            for port_group in var.config.firewall.port_groups : {
-              # This is a bit of a hack because VyOS reports a string if there is only a single value
-              # Terraform can't handle different types for the true and false result expressions
-              "${port_group.name}" = merge(
-                length(port_group.ports) > 1 ? {
-                  "port" = sort(port_group.ports)
-                } : {},
-                length(port_group.ports) == 1 ? {
-                  "port" = tostring(port_group.ports[0])
-                } : {}
-              )
-            }
-          ])...
-        )
+        port-group = {
+          wireguard = {
+            port = "51820"
+          }
+        }
 
         network-group = merge(
+          # Cloudflare IPv4
           {
-            # Cloudflare IPv4
             "cloudflare-ipv4" = {
               "network" = jsondecode(data.http.cloudflare_ips.response_body).result.ipv4_cidrs
             }
           },
 
-          # From config
-          flatten([
-            for network_group in var.config.firewall.network_groups : {
-              # This is a bit of a hack because VyOS reports a string if there is only a single value
-              # Terraform can't handle different types for the true and false result expressions
-              "${network_group.name}" = merge(
-                length(network_group.networks) > 1 ? {
-                  "network" = sort(network_group.networks)
-                } : {},
-                length(network_group.networks) == 1 ? {
-                  "network" = network_group.networks[0]
-                } : {}
-              )
+          # Other
+          {
+            k8s_services = {
+              network = "10.45.0.0/16"
             }
-          ])...
+          }
         )
       }
     },
