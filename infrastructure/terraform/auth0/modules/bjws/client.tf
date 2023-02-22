@@ -9,7 +9,7 @@ resource "auth0_client" "default" {
     "https://grafana.bjw-s.dev/login/generic_oauth",        # Grafana
     "http://localhost:8000",                                # kubectl oidc-login
     "https://status.bjw-s.dev/authorization-code/callback", # Gatus
-    "https://kubenav.io/oidc.html",                         # Kubenav
+    "https://kubenav.io/auth/oidc.html",                    # Kubenav
     "https://gitops.bjw-s.dev/oauth2/callback",             # Weave-Gitops
   ]
 
