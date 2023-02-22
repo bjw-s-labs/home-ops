@@ -23,14 +23,13 @@ provider "registry.terraform.io/1password/onepassword" {
 }
 
 provider "registry.terraform.io/backblaze/b2" {
-  version     = "0.8.2"
-  constraints = "0.8.2"
+  version     = "0.8.3"
+  constraints = "0.8.3"
   hashes = [
-    "h1:UIenP2gkoKgqkLW1SOHvYkMZK7UCYZL6hFz9enWad1A=",
-    "zh:1a7b7fed52e86ef888b52b26b2089309addb3885aa8ce85094ff3b13e01f9a37",
-    "zh:363468f9802e7f8002c800854f170229be8af5b0adc3d51c66607b391f3fa631",
-    "zh:38fd51a65e073ae0b90ff88c22646f788c3ddd2294d84d746c4068201722d317",
-    "zh:5ad1fd8c8ec12113bd85044717acf206b5d0e264b85988a519d12290b0cd9d13",
+    "h1:6VxRJggqHreWHF1iZ16W//h5Dfncggm/Tp589IAH93U=",
+    "h1:91lZkqBMVAUYHzehdXKwoegY8yQ07YMgjTnFhqhtK/0=",
+    "h1:9sU2fs7amU5YbOMOCO76UGsUfx4EcyXTz51R7Bxo6Ec=",
+    "h1:Qpm8FIhukuzf59pwiea16tgqHkWcBTwn907f8FY5YFo=",
   ]
 }
 
