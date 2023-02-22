@@ -21,7 +21,7 @@ spec:
 
   values:
     controller:
-      replicas: 2
+      replicas: 1
       strategy: RollingUpdate
       annotations:
         reloader.stakater.com/auto: "true"
@@ -56,14 +56,6 @@ spec:
       cache:
         enabled: true
         type: emptyDir
-
-    topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: DoNotSchedule
-        labelSelector:
-          matchLabels:
-            app.kubernetes.io/name: immich-machine-learning
 
     resources:
       requests:
