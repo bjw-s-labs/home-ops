@@ -10,7 +10,6 @@
 
 - [🔧 Hardware](overview/hardware.md)
 - [🌐 Network]()
-  - [DNS]()
 - [☁️ Cloud services](overview/cloud-services.md)
 
 # Home Ops
