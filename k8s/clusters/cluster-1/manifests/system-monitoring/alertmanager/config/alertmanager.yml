@@ -5,7 +5,7 @@ receivers:
   - name: 'null'
   - name: 'discord'
     slack_configs:
-      - api_url: "${SECRET_ALERT_MANAGER_DISCORD_WEBHOOK}"
+      - api_url: "${ALERT_MANAGER_DISCORD_WEBHOOK}"
         channel: '#prometheus'
         send_resolved: true
         title: |-
@@ -20,7 +20,7 @@ receivers:
           {{ end }}
   - name: 'discord-ceph'
     slack_configs:
-      - api_url: "${SECRET_ALERT_MANAGER_DISCORD_CEPH_WEBHOOK}"
+      - api_url: "${ALERT_MANAGER_DISCORD_WEBHOOK_CEPH}"
         channel: '#storage'
         send_resolved: true
         title: |-
