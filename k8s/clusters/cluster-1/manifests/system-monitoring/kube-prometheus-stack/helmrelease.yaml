@@ -113,6 +113,8 @@ spec:
             hosts:
               - *host-alert
       alertmanagerSpec:
+        replicas: 3
+        podAntiAffinity: hard
         storage:
           volumeClaimTemplate:
             spec:
