@@ -30,17 +30,17 @@ spec:
           - -c
         args:
           - "[ ! -f /etc/alertmanager/alertmanager.yml ] && envsubst < /data/configfiles/alertmanager.yml > /data/config/alertmanager.yml"
-        env:
-          - name: SECRET_PUSHOVER_API_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: alertmanager-secret
-                key: pushover_api_token
-          - name: SECRET_PUSHOVER_API_USERKEY
-            valueFrom:
-              secretKeyRef:
-                name: alertmanager-secret
-                key: pushover_api_userkey
+        # env:
+        #   - name: SECRET_PUSHOVER_API_TOKEN
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: alertmanager-secret
+        #         key: pushover_api_token
+        #   - name: SECRET_PUSHOVER_API_USERKEY
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: alertmanager-secret
+        #         key: pushover_api_userkey
         volumeMounts:
           - name: config
             mountPath: /data/config
