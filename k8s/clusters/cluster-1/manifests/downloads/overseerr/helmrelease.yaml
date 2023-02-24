@@ -22,14 +22,14 @@ spec:
       tag: 1.32.5
       pullPolicy: IfNotPresent
 
-    # podSecurityContext:
-    #   runAsUser: 568
-    #   runAsGroup: 100
-    #   fsGroup: 568
+    podSecurityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
     #   supplementalGroups:
     #     - 34
     #     - 100
-    #   fsGroupChangePolicy: "OnRootMismatch"
+      fsGroupChangePolicy: "OnRootMismatch"
 
     hostAliases:
       - ip: "10.200.1.50"
