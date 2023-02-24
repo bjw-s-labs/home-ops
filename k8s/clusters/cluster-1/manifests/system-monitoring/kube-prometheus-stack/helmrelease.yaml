@@ -277,6 +277,12 @@ spec:
             static_configs:
               - targets:
                   - "vyos.${INGRESS_DOMAIN}:9273"
+          - job_name: 'speedtest-exporter'
+            scrape_interval: 30m
+            scrape_timeout: 1m
+            static_configs:
+              - targets:
+                - "speedtest-exporter:9798"
 #        thanos:
 #          image: quay.io/thanos/thanos:v0.26.0
 #          version: v0.22.0
