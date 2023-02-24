@@ -22,36 +22,35 @@ spec:
 
     config: ""
 
-    # extraInitContainers:
-    #   - name: render-config
-    #     image: ghcr.io/onedr0p/alpine:3.17.2@sha256:6d6a07c8c747e58846bb3125d4e14bb64cdea6287faef647ba072740892517f1
-    #     command:
-    #       - "/bin/sh"
-    #       - -c
-    #     args:
-    #       - "[ ! -f /etc/alertmanager/alertmanager.yml ] && envsubst < /data/configfiles/alertmanager.yml > /data/config/alertmanager.yml"
-    #     env:
-    #       - name: SECRET_PUSHOVER_API_TOKEN
-    #         valueFrom:
-    #           secretKeyRef:
-    #             name: alertmanager-secret
-    #             key: pushover_api_token
-    #       - name: SECRET_PUSHOVER_API_USERKEY
-    #         valueFrom:
-    #           secretKeyRef:
-    #             name: alertmanager-secret
-    #             key: pushover_api_userkey
-    #     volumeMounts:
-    #       - name: config
-    #         mountPath: /data/config
-    #       - name: configfiles
-    #         mountPath: /data/configfiles
+    extraInitContainers:
+      - name: render-config
+        image: ghcr.io/onedr0p/alpine:3.17.2@sha256:6d6a07c8c747e58846bb3125d4e14bb64cdea6287faef647ba072740892517f1
+        command:
+          - "/bin/sh"
+          - -c
+        args:
+          - "[ ! -f /etc/alertmanager/alertmanager.yml ] && envsubst < /data/configfiles/alertmanager.yml > /data/config/alertmanager.yml"
+        env:
+          - name: SECRET_PUSHOVER_API_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: alertmanager-secret
+                key: pushover_api_token
+          - name: SECRET_PUSHOVER_API_USERKEY
+            valueFrom:
+              secretKeyRef:
+                name: alertmanager-secret
+                key: pushover_api_userkey
+        volumeMounts:
+          - name: config
+            mountPath: /data/config
+          - name: configfiles
+            mountPath: /data/configfiles
 
     ingress:
       enabled: true
       className: "traefik"
       annotations:
-        kubernetes.io/ingress.class: traefik
         cert-manager.io/cluster-issuer: letsencrypt-production
         external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
