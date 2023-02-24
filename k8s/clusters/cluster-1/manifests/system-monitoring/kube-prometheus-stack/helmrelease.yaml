@@ -26,102 +26,8 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
-    # fullnameOverride: prometheus
     cleanPrometheusOperatorObjectNames: true
-    alertmanager:
-      config:
-        global:
-          slack_api_url: "${ALERT_MANAGER_DISCORD_WEBHOOK}"
-          resolve_timeout: 5m
-        receivers:
-          - name: 'null'
-          - name: 'discord'
-            slack_configs:
-              - url: "${SECRET_ALERT_MANAGER_DISCORD_WEBHOOK}"
-                send_resolved: true
-                title: |-
-                  [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ if ne .CommonAnnotations.summary ""}}{{ .CommonAnnotations.summary }} {{ else if ne .CommonAnnotations.message ""}}{{ .CommonAnnotations.message }} {{ else if ne .CommonAnnotations.description ""}}{{ .CommonAnnotations.description }} {{ else }}{{ .CommonLabels.alertname }}{{ end }}
-                text: >-
-                  {{ range .Alerts -}}
-                    *Alert:* {{ .Annotations.title }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
 
-                  {{ if ne .Annotations.summary ""}}*Summary:* {{ .Annotations.summary }} {{ else if ne .Annotations.message ""}}*Message:* {{ .Annotations.message }} {{ else if ne .Annotations.description ""}}*Description:* {{ .Annotations.description }}{{ end }}
-
-                  *Details:*
-                    {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
-                    {{ end }}
-                  {{ end }}
-          - name: 'discord-ceph'
-            slack_configs:
-              - url: "${SECRET_ALERT_MANAGER_DISCORD_CEPH_WEBHOOK}"
-                send_resolved: true
-                title: |-
-                  [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ if ne .CommonAnnotations.summary ""}}{{ .CommonAnnotations.summary }} {{ else if ne .CommonAnnotations.message ""}}{{ .CommonAnnotations.message }} {{ else if ne .CommonAnnotations.description ""}}{{ .CommonAnnotations.description }} {{ else }}{{ .CommonLabels.alertname }}{{ end }}
-                text: >-
-                  {{ range .Alerts -}}
-                    *Alert:* {{ .Annotations.title }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
-
-                  {{ if ne .Annotations.summary ""}}*Summary:* {{ .Annotations.summary }} {{ else if ne .Annotations.message ""}}*Message:* {{ .Annotations.message }} {{ else if ne .Annotations.description ""}}*Description:* {{ .Annotations.description }}{{ end }}
-
-                  *Details:*
-                    {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
-                    {{ end }}
-                  {{ end }}
-        route:
-          group_by: ["alertname", "job"]
-          group_wait: 30s
-          group_interval: 5m
-          repeat_interval: 6h
-          receiver: "discord"
-          routes:
-            - receiver: "null"
-              match:
-                alertname: KubeCPUOvercommit
-            - receiver: "null"
-              match:
-                alertname: PrometheusRuleFailures
-            - receiver: "null"
-              match:
-                alertname: Watchdog
-            - receiver: "discord"
-              match_re:
-                severity: critical
-              continue: true
-            - receiver: "discord-ceph"
-              match_re:
-                ceph: ceph
-              continue: true
-        inhibit_rules:
-          - source_match:
-              severity: "critical"
-            target_match:
-              severity: "warning"
-            equal: ["alertname", "namespace"]
-      ingress:
-        enabled: true
-        pathType: Prefix
-        ingressClassName: "traefik"
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
-          traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
-        hosts:
-          -  &host-alert "alert-manager.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-        tls:
-          - secretName: tls.alertmanager
-            hosts:
-              - *host-alert
-      alertmanagerSpec:
-        replicas: 3
-        podAntiAffinity: hard
-        storage:
-          volumeClaimTemplate:
-            spec:
-              storageClassName: "rook-ceph-block-external"
-              resources:
-                requests:
-                  storage: 1Gi
     kubeApiServer:
       enabled: true
 
@@ -246,6 +152,11 @@ spec:
               resources:
                 requests:
                   storage: 20Gi
+        alertingEndpoints:
+          - namespace: monitoring
+            name: alertmanager
+            port: 9093
+            apiVersion: v2
         additionalScrapeConfigs:
           - job_name: ceph-exporter
             scrape_interval: 1m
