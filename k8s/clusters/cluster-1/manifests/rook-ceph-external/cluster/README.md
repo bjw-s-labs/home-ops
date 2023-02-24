@@ -1,4 +1,5 @@
 Make sure prometheus endpoint is enabled in proxmox via 
+
 ```bash
 ceph mgr module enable prometheus
 ```
@@ -25,6 +26,9 @@ Then run this on a single node
 ceph mgr module enable dashboard
 ceph dashboard set-rgw-api-ssl-verify False
 ```
+
+Destory and recreate the managers from the PVE UI!
+
 It takes a bit to get everything started.
 Run to check for services
 ```
