@@ -83,6 +83,12 @@ spec:
         type: emptyDir
         mountPath: /opt/couchdb/etc/default.d
 
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: "OnRootMismatch"
+
     resources:
       requests:
         cpu: 63m

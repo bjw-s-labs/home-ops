@@ -49,6 +49,12 @@ spec:
           - hosts:
               - *host
 
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: "OnRootMismatch"
+
     resources:
       requests:
         cpu: 20m
