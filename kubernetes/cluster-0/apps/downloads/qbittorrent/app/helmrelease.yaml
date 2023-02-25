@@ -17,13 +17,16 @@ spec:
         namespace: flux-system
 
   values:
+    controller:
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
       repository: ghcr.io/onedr0p/qbittorrent
       tag: 4.5.1@sha256:e6c264e6afe298a95b97aaf827b7f8b4f6d3e2706a55d0dd88fc9b5161a70074
 
     podAnnotations:
       setGateway: "true"
-      configmap.reloader.stakater.com/reload: "qbittorrent-config"
 
     podSecurityContext:
       runAsUser: 568
@@ -95,7 +98,7 @@ spec:
       configfiles:
         enabled: true
         type: configMap
-        name: qbittorrent-config
+        name: qbittorrent-configmap
         mountPath: "-"
 
       data:

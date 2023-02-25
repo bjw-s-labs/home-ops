@@ -17,12 +17,13 @@ spec:
         namespace: flux-system
 
   values:
+    controller:
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
       repository: ghcr.io/onedr0p/sonarr-develop
       tag: 4.0.0.391@sha256:dbf5513327d9c9c0bb9af284e7cdc7e8db8325b1239505669a3141416c4c52e1
-
-    podAnnotations:
-      secret.reloader.stakater.com/reload: sonarr-secrets
 
     podSecurityContext:
       runAsUser: 568
@@ -40,7 +41,7 @@ spec:
       SONARR__API_KEY:
         valueFrom:
           secretKeyRef:
-            name: sonarr-secrets
+            name: sonarr-secret
             key: api_key
 
     service:

@@ -5,12 +5,12 @@ namespace: downloads
 resources:
   - ./helmrelease.yaml
   - ./pvc.yaml
-  - ./replicationsource.yaml
+  - ./volsync.yaml
 commonLabels:
   app.kubernetes.io/name: qbittorrent
   app.kubernetes.io/instance: qbittorrent
 configMapGenerator:
-  - name: qbittorrent-config
+  - name: qbittorrent-configmap
     files:
       - config/categories.json
       - config/qBittorrent.conf
