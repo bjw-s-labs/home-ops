@@ -26,6 +26,9 @@ spec:
       repository: docker.io/n8nio/n8n
       tag: 0.217.1
 
+    command:
+      - n8n
+
     env:
       GENERIC_TIMEZONE: "Europe/Amsterdam"
       N8N_PROTOCOL: "https"
@@ -61,6 +64,12 @@ spec:
         tls:
           - hosts:
               - *host
+
+    podSecurityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+      fsGroupChangePolicy: "OnRootMismatch"
 
     resources:
       requests:
