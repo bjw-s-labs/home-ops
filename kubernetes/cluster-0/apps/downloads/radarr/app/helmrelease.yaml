@@ -17,12 +17,13 @@ spec:
         namespace: flux-system
 
   values:
+    controller:
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
       repository: ghcr.io/onedr0p/radarr-develop
       tag: 4.4.2.6956@sha256:f7b154a592d65d18170a329ff630b9447fd538158ec95bce8ce9a8d77e1d4941
-
-    podAnnotations:
-      secret.reloader.stakater.com/reload: radarr-secrets
 
     podSecurityContext:
       runAsUser: 568
@@ -40,7 +41,7 @@ spec:
       RADARR__API_KEY:
         valueFrom:
           secretKeyRef:
-            name: radarr-secrets
+            name: radarr-secret
             key: api_key
 
     service:
