@@ -16,6 +16,11 @@ spec:
         namespace: flux-system
   interval: 30m
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
       repository: ghcr.io/onedr0p/plex
       tag: 1.31.0.6654-02189b09f@sha256:e008f8822f31a5648ea5b28289ca82388e9111db4418a2662d7fb52ab9e61712
@@ -46,9 +51,6 @@ spec:
               - *host
 
     persistence:
-      config:
-        enabled: true
-        existingClaim: plex-config
       nfs-nas-media:
         enabled: true
         mountPath: /storage/media
@@ -80,3 +82,10 @@ spec:
       limits:
         gpu.intel.com/i915: 1
         memory: 12G
+
+    volumeClaimTemplates:
+      - name: config
+        mountPath: /config
+        accessMode: ReadWriteOnce
+        size: 20Gi
+        storageClass: ceph-block
