@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: node-feature-discovery
-      version: 0.12.1
+      version: 0.11.2
       sourceRef:
         kind: HelmRepository
         name: kubernetes-sigs-nfd-charts
@@ -75,3 +75,9 @@ spec:
               matchOn:
                 - usbId:
                     vendor: ["1a6e", "18d1"]
+
+            - name: "nvidia-gpu"
+              matchOn:
+                - pciId:
+                    class: ["0300"]
+                    vendor: ["8086"]
