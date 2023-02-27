@@ -1,299 +1,289 @@
 clusterName: cluster-1
-talosVersion: v1.3.1
+talosVersion: v1.3.5
 kubernetesVersion: v1.25.4
 endpoint: https://cluster-1.${secret_domain}:6443
 # domain: cluster-1.${secret_domain}
 allowSchedulingOnMasters: false
 cniConfig:
-  name: none
-clusterPodNets: 
-  - ${pod_cidr}
-clusterSvcNets: 
-  - ${svc_cidr}
+    name: none
+clusterPodNets:
+    - ${pod_cidr}
+clusterSvcNets:
+    - ${svc_cidr}
 nodes:
-  - hostname: cp1.cluster-1.${secret_domain}
-    ipAddress: cp1.cluster-1.${secret_domain}
-    controlPlane: true
-    installDiskSelector:
-      size: '<= 200GB'
-    nameservers:
-      - 10.255.253.1
-    networkInterfaces:
-      - interface: eth0
-        dhcp: true
-        mtu: 9000
-
-  - hostname: cp2.cluster-1.${secret_domain}
-    ipAddress: cp2.cluster-1.${secret_domain}
-    controlPlane: true
-    installDiskSelector:
-      size: '<= 200GB'
-    nameservers:
-      - 10.255.253.1
-    networkInterfaces:
-      - interface: eth0
-        dhcp: true
-        mtu: 9000
-
-  - hostname: cp3.cluster-1.${secret_domain}
-    ipAddress: cp3.cluster-1.${secret_domain}
-    controlPlane: true
-    installDiskSelector:
-      size: '<= 200GB'
-    nameservers:
-      - 10.255.253.1
-    networkInterfaces:
-      - interface: eth0
-        dhcp: true
-        mtu: 9000
-
-  - hostname: work1.cluster-1.${secret_domain}
-    ipAddress: work1.cluster-1.${secret_domain}
-    controlPlane: false
-    installDiskSelector:
-      size: '<= 200GB'
-    nameservers:
-      - 10.255.253.1
-    networkInterfaces:
-      - interface: eth0
-        dhcp: true
-        mtu: 9000
-      - interface: eth1
-        dhcp: false
-        mtu: 9000
-        vlans:
-          - vlanId: 2
-            dhcp: true
-            mtu: 1500
-            dhcpOptions:
-              routeMetric: 2048
-          - vlanId: 100
-            dhcp: true
-            mtu: 1500
-            dhcpOptions:
-              routeMetric: 4096
-
-  - hostname: work2.cluster-1.${secret_domain}
-    ipAddress: work2.cluster-1.${secret_domain}
-    controlPlane: false
-    installDiskSelector:
-      size: '<= 200GB'
-    nameservers:
-      - 10.255.253.1
-    networkInterfaces:
-      - interface: eth0
-        dhcp: true
-        mtu: 9000
-      - interface: eth1
-        dhcp: false
-        mtu: 9000
-        vlans:
-          - vlanId: 2
-            dhcp: true
-            mtu: 1500
-            dhcpOptions:
-              routeMetric: 2048
-          - vlanId: 100
-            dhcp: true
-            mtu: 1500
-            dhcpOptions:
-              routeMetric: 4096
-
-  - hostname: work3.cluster-1.${secret_domain}
-    ipAddress: work3.cluster-1.${secret_domain}
-    controlPlane: false
-    installDiskSelector:
-      size: '<= 200GB'
-    nameservers:
-      - 10.255.253.1
-    networkInterfaces:
-      - interface: eth0
-        dhcp: true
-        mtu: 9000
-      - interface: eth1
-        dhcp: false
-        mtu: 9000
-        vlans:
-          - vlanId: 2
-            dhcp: true
-            mtu: 1500
-            dhcpOptions:
-              routeMetric: 2048
-          - vlanId: 100
-            dhcp: true
-            mtu: 1500
-            dhcpOptions:
-              routeMetric: 4096
-
-  - hostname: work4.cluster-1.${secret_domain}
-    ipAddress: work4.cluster-1.${secret_domain}
-    controlPlane: false
-    installDiskSelector:
-      size: '<= 200GB'
-    nameservers:
-      - 10.255.253.1
-    networkInterfaces:
-      - interface: eth0
-        dhcp: true
-        mtu: 9000
-      - interface: eth1
-        dhcp: false
-        mtu: 9000
-        vlans:
-          - vlanId: 2
-            dhcp: true
-            mtu: 1500
-            dhcpOptions:
-              routeMetric: 2048
-          - vlanId: 100
-            dhcp: true
-            mtu: 1500
-            dhcpOptions:
-              routeMetric: 4096
-
-  - hostname: work5.cluster-1.${secret_domain}
-    ipAddress: work5.cluster-1.${secret_domain}
-    controlPlane: false
-    installDiskSelector:
-      size: '<= 200GB'
-    nameservers:
-      - 10.255.253.1
-    networkInterfaces:
-      - interface: eth0
-        dhcp: true
-        mtu: 9000
-      - interface: eth1
-        dhcp: false
-        mtu: 9000
-        vlans:
-          - vlanId: 2
-            dhcp: true
-            mtu: 1500
-            dhcpOptions:
-              routeMetric: 2048
-          - vlanId: 100
-            dhcp: true
-            mtu: 1500
-            dhcpOptions:
-              routeMetric: 4096
-    configPatches:
-      - op: add
-        path: /machine/install/extensions
-        value:
-          - image: ghcr.io/siderolabs/nvidia-container-toolkit:515.65.01-v1.11.0
-          # - image: ghcr.io/siderolabs/nvidia-open-gpu-kernel-modules:515.65.01-v1.3.0
-      - op: add
-        path: /machine/kernel
-        value:
-          modules:
-            - name: nvidia
-              parameters:
-                - NVreg_OpenRmEnableUnsupportedGpus=1
-            - name: nvidia_uvm
-            - name: nvidia_drm
-            - name: nvidia_modeset
-      - op: add
-        path: /machine/sysctls
-        value:
-          net.core.bpf_jit_harden: 1
-
+    - hostname: cp1.cluster-1.${secret_domain}
+      ipAddress: cp1.cluster-1.${secret_domain}
+      controlPlane: true
+      installDiskSelector:
+        size: <= 200GB
+      nameservers:
+        - 10.255.253.1
+      networkInterfaces:
+        - interface: eth0
+          dhcp: true
+          mtu: 9000
+    - hostname: cp2.cluster-1.${secret_domain}
+      ipAddress: cp2.cluster-1.${secret_domain}
+      controlPlane: true
+      installDiskSelector:
+        size: <= 200GB
+      nameservers:
+        - 10.255.253.1
+      networkInterfaces:
+        - interface: eth0
+          dhcp: true
+          mtu: 9000
+    - hostname: cp3.cluster-1.${secret_domain}
+      ipAddress: cp3.cluster-1.${secret_domain}
+      controlPlane: true
+      installDiskSelector:
+        size: <= 200GB
+      nameservers:
+        - 10.255.253.1
+      networkInterfaces:
+        - interface: eth0
+          dhcp: true
+          mtu: 9000
+    - hostname: work1.cluster-1.${secret_domain}
+      ipAddress: work1.cluster-1.${secret_domain}
+      controlPlane: false
+      installDiskSelector:
+        size: <= 200GB
+      nameservers:
+        - 10.255.253.1
+      networkInterfaces:
+        - interface: eth0
+          dhcp: true
+          mtu: 9000
+        - interface: eth1
+          dhcp: false
+          mtu: 9000
+          vlans:
+            - vlanId: 2
+              dhcp: true
+              mtu: 1500
+              dhcpOptions:
+                routeMetric: 2048
+            - vlanId: 100
+              dhcp: true
+              mtu: 1500
+              dhcpOptions:
+                routeMetric: 4096
+    - hostname: work2.cluster-1.${secret_domain}
+      ipAddress: work2.cluster-1.${secret_domain}
+      controlPlane: false
+      installDiskSelector:
+        size: <= 200GB
+      nameservers:
+        - 10.255.253.1
+      networkInterfaces:
+        - interface: eth0
+          dhcp: true
+          mtu: 9000
+        - interface: eth1
+          dhcp: false
+          mtu: 9000
+          vlans:
+            - vlanId: 2
+              dhcp: true
+              mtu: 1500
+              dhcpOptions:
+                routeMetric: 2048
+            - vlanId: 100
+              dhcp: true
+              mtu: 1500
+              dhcpOptions:
+                routeMetric: 4096
+    - hostname: work3.cluster-1.${secret_domain}
+      ipAddress: work3.cluster-1.${secret_domain}
+      controlPlane: false
+      installDiskSelector:
+        size: <= 200GB
+      nameservers:
+        - 10.255.253.1
+      networkInterfaces:
+        - interface: eth0
+          dhcp: true
+          mtu: 9000
+        - interface: eth1
+          dhcp: false
+          mtu: 9000
+          vlans:
+            - vlanId: 2
+              dhcp: true
+              mtu: 1500
+              dhcpOptions:
+                routeMetric: 2048
+            - vlanId: 100
+              dhcp: true
+              mtu: 1500
+              dhcpOptions:
+                routeMetric: 4096
+    - hostname: work4.cluster-1.${secret_domain}
+      ipAddress: work4.cluster-1.${secret_domain}
+      controlPlane: false
+      installDiskSelector:
+        size: <= 200GB
+      nameservers:
+        - 10.255.253.1
+      networkInterfaces:
+        - interface: eth0
+          dhcp: true
+          mtu: 9000
+        - interface: eth1
+          dhcp: false
+          mtu: 9000
+          vlans:
+            - vlanId: 2
+              dhcp: true
+              mtu: 1500
+              dhcpOptions:
+                routeMetric: 2048
+            - vlanId: 100
+              dhcp: true
+              mtu: 1500
+              dhcpOptions:
+                routeMetric: 4096
+    - hostname: work5.cluster-1.${secret_domain}
+      ipAddress: work5.cluster-1.${secret_domain}
+      controlPlane: false
+      installDiskSelector:
+        size: <= 200GB
+      nameservers:
+        - 10.255.253.1
+      networkInterfaces:
+        - interface: eth0
+          dhcp: true
+          mtu: 9000
+        - interface: eth1
+          dhcp: false
+          mtu: 9000
+          vlans:
+            - vlanId: 2
+              dhcp: true
+              mtu: 1500
+              dhcpOptions:
+                routeMetric: 2048
+            - vlanId: 100
+              dhcp: true
+              mtu: 1500
+              dhcpOptions:
+                routeMetric: 4096
+      configPatches:
+        - op: add
+          path: /machine/install/extensions
+          value:
+            - image: ghcr.io/siderolabs/nvidia-open-gpu-kernel-modules:515.65.01-v1.3.5
+            - image: ghcr.io/siderolabs/nvidia-container-toolkit:525.89.02-v1.12.0
+        - op: add
+          path: /machine/kernel
+          value:
+            modules:
+                - name: nvidia
+                  parameters:
+                    - NVreg_OpenRmEnableUnsupportedGpus=1
+                - name: nvidia_uvm
+                - name: nvidia_drm
+                - name: nvidia_modeset
+        - op: add
+          path: /machine/sysctls
+          value:
+            net.core.bpf_jit_harden: 1
 controlPlane:
-  configPatches:
-    - op: add
-      path: /machine/network/disableSearchDomain
-      value: true
-    - op: add
-      path: /machine/kubelet/extraArgs
-      value:
-        rotate-server-certificates: "true"
-        feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,MixedProtocolLBService=true,EphemeralContainers=true,ServerSideApply=true
-    - op: add
-      path: /machine/install/extraKernelArgs
-      value:
-        - talos.logging.kernel=udp://10.200.1.51:6050/
-    - op: add
-      path: /cluster/coreDNS
-      value:
-        # renovate: docker-image
-        image: docker.io/coredns/coredns:1.10.0
-  inlinePatch:
-    cluster:
-      apiServer:
-        disablePodSecurityPolicy: true
-        admissionControl: []
-        certSANs:
-          - cluster-1.${secret_domain}
-          - 10.200.1.1
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      controllerManager:
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      proxy:
-        disabled: true
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      scheduler:
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      discovery:
-        enabled: true
-        registries:
-          kubernetes: {}
-          service:
-            disabled: true
-      etcd:
-        extraArgs:
-          election-timeout: "5000"
-        subnet: 10.200.1.0/24
-      extraManifests:
-        - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/ha-install.yaml
-        - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-
-    machine:
-      certSANs:
-        - cluster-1.${secret_domain}
-        - 10.200.1.1
-      kubelet:
-        nodeIP:
-          validSubnets:
-            - 10.200.1.0/24
-        extraArgs:
-          feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true,EphemeralContainers=true,ServerSideApply=true
-          rotate-server-certificates: "true"
-      sysctls:
-        fs.inotify.max_user_watches: "1048576"
-        fs.inotify.max_user_instances: "8192"
-      time:
-        disabled: false
-        servers:
-          - 10.255.253.1
-
+    configPatches:
+        - op: add
+          path: /machine/network/disableSearchDomain
+          value: true
+        - op: add
+          path: /machine/kubelet/extraArgs
+          value:
+            rotate-server-certificates: "true"
+            feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,MixedProtocolLBService=true,EphemeralContainers=true,ServerSideApply=true
+        - op: add
+          path: /machine/install/extraKernelArgs
+          value:
+            - talos.logging.kernel=udp://10.200.1.51:6050/
+        - op: add
+          path: /cluster/coreDNS
+          value:
+            # renovate: docker-image
+            image: docker.io/coredns/coredns:1.10.0
+    inlinePatch:
+        cluster:
+            apiServer:
+                disablePodSecurityPolicy: true
+                admissionControl: []
+                certSANs:
+                    - cluster-1.${secret_domain}
+                    - 10.200.1.1
+                extraArgs:
+                    feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+            controllerManager:
+                extraArgs:
+                    feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+            proxy:
+                disabled: true
+                extraArgs:
+                    feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+            scheduler:
+                extraArgs:
+                    feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+            discovery:
+                enabled: true
+                registries:
+                    kubernetes: {}
+                    service:
+                        disabled: true
+            etcd:
+                extraArgs:
+                    election-timeout: "5000"
+                subnet: 10.200.1.0/24
+            extraManifests:
+                - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/ha-install.yaml
+                - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+        machine:
+            certSANs:
+                - cluster-1.${secret_domain}
+                - 10.200.1.1
+            kubelet:
+                nodeIP:
+                    validSubnets:
+                        - 10.200.1.0/24
+                extraArgs:
+                    feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true,EphemeralContainers=true,ServerSideApply=true
+                    rotate-server-certificates: "true"
+            sysctls:
+                fs.inotify.max_user_watches: "1048576"
+                fs.inotify.max_user_instances: "8192"
+            time:
+                disabled: false
+                servers:
+                    - 10.255.253.1
 worker:
-  configPatches:
-    - op: add
-      path: /machine/install/diskSelector
-      value: 
-        size: '<= 200GB'
-    - op: add
-      path: /machine/kubelet/extraArgs
-      value:
-        rotate-server-certificates: "true"
-        feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,MixedProtocolLBService=true,EphemeralContainers=true,ServerSideApply=true
-  inlinePatch:
-    cluster:
-      extraManifests:
-        - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/ha-install.yaml
-        - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-    machine:
-      certSANs:
-        - cluster-1.${secret_domain}
-        - 10.200.1.1
-      time:
-        disabled: false
-        servers:
-          - 10.255.253.1
-      kubelet:
-        nodeIP:
-          validSubnets:
-            - 10.200.1.0/24
+    configPatches:
+        - op: add
+          path: /machine/install/diskSelector
+          value:
+            size: <= 200GB
+        - op: add
+          path: /machine/kubelet/extraArgs
+          value:
+            rotate-server-certificates: "true"
+            feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,MixedProtocolLBService=true,EphemeralContainers=true,ServerSideApply=true
+    inlinePatch:
+        cluster:
+            extraManifests:
+                - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/ha-install.yaml
+                - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+        machine:
+            certSANs:
+                - cluster-1.${secret_domain}
+                - 10.200.1.1
+            time:
+                disabled: false
+                servers:
+                    - 10.255.253.1
+            kubelet:
+                nodeIP:
+                    validSubnets:
+                        - 10.200.1.0/24
