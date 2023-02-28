@@ -7,7 +7,8 @@ sources:
 sinks:
   vector_sink:
     type: vector
+    address: "{{ vector_aggregator_addr }}:{{ vector_aggregator_port }}"
+    compression: true
+    version: "2"
     inputs:
       - journal_logs
-    address: "{{ vector_aggregator_addr }}:{{ vector_aggregator_port }}"
-    version: "2"
