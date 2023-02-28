@@ -16,17 +16,13 @@ spec:
         namespace: flux-system
       interval: 5m
 
-  # install:
-  #   crds: CreateReplace
-  # upgrade:
-  #   crds: CreateReplace
-
   values:
     image:
       repository: nvcr.io/nvidia/k8s-device-plugin
       tag: v0.12.0
 
     runtimeClassName: nvidia
+
     gfd:
       enabled: false
       nameOverride: gpu-feature-discovery
