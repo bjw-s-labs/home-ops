@@ -18,10 +18,20 @@ spec:
   values:
     image:
       repository: nvcr.io/nvidia/k8s-device-plugin
-      tag: v0.12.0
+      tag: v0.13.0
 
     runtimeClassName: nvidia
     gfd:
       enabled: true
       nameOverride: gpu-feature-discovery
       namespaceOverride: ""
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: feature.node.kubernetes.io/pci-0300_10de.present
+              operator: In
+              values:
+              - "true"
