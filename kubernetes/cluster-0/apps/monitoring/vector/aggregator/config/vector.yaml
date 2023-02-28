@@ -90,11 +90,11 @@ sinks:
 
   loki_journal:
     type: loki
-    inputs:
-      - journald_source
-    endpoint: http://loki-gateway.monitoring.svc.cluster.local
+    endpoint: http://loki-gateway.monitoring.svc.cluster.local.
     encoding:
       codec: json
+    inputs:
+      - journald_source
     batch:
       max_bytes: 2049000
     out_of_order_action: accept
