@@ -20,8 +20,8 @@ spec:
   interval: 30m
   values:
     controller:
-      replicas: 2
-      strategy: RollingUpdate
+      replicas: 1
+      strategy: Recreate
       annotations:
         reloader.stakater.com/auto: "true"
 
@@ -44,20 +44,13 @@ spec:
           kubernetes-logs:
             enabled: true
             port: 6000
-          vyos-logs:
+          vyos-syslog:
             enabled: true
             port: 6001
+            nodePort: 30007
           journald-logs:
             enabled: true
             port: 6002
-          talos-kernel:
-            enabled: true
-            port: 6050
-            protocol: UDP
-          talos-service:
-            enabled: true
-            port: 6051
-            protocol: UDP
 
     persistence:
       config:
