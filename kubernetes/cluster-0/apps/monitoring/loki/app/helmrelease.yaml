@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: loki
-      version: 4.7.0
+      version: 4.6.2
       sourceRef:
         kind: HelmRepository
         name: grafana
@@ -34,10 +34,10 @@ spec:
           reject_old_samples_max_age: 168h
           max_cache_freshness_per_query: 10m
           split_queries_by_interval: 15m
-          per_stream_rate_limit: 64M
-          per_stream_rate_limit_burst: 128M
-          ingestion_rate_mb: 64
-          ingestion_burst_size_mb: 128
+          per_stream_rate_limit: 32M
+          per_stream_rate_limit_burst: 64M
+          ingestion_rate_mb: 32
+          ingestion_burst_size_mb: 64
           shard_streams:
             enabled: true
 
@@ -66,7 +66,7 @@ spec:
         ruler:
           enable_api: true
           enable_alertmanager_v2: true
-          alertmanager_url: http://kube-prometheus-stack-alertmanager:9093
+          alertmanager_url: http://kube-prometheus-stack-alertmanager.monitoring.svc.cluster.local:9093
           storage:
             type: local
             local:
@@ -117,6 +117,9 @@ spec:
       ingress:
         enabled: true
         ingressClassName: "nginx"
+        annotations:
+          nginx.ingress.kubernetes.io/whitelist-source-range: |
+            10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
         hosts:
           - host: &host "loki-cluster-0.bjw-s.dev"
             paths:
@@ -138,7 +141,7 @@ spec:
                     {{- include "loki.writeSelectorLabels" . | nindent 12 }}
                 topologyKey: kubernetes.io/hostname
       persistence:
-        size: 10Gi
+        size: 20Gi
         storageClass: ceph-block
 
     read:
@@ -159,7 +162,7 @@ spec:
         - name: rules
           emptyDir: {}
       persistence:
-        size: 10Gi
+        size: 20Gi
         storageClass: ceph-block
 
     backend:
@@ -180,7 +183,7 @@ spec:
         - name: rules
           emptyDir: {}
       persistence:
-        size: 10Gi
+        size: 20Gi
         storageClass: ceph-block
 
     monitoring:
@@ -192,29 +195,25 @@ spec:
         enabled: false
         grafanaAgent:
           installOperator: false
-        lokiCanary:
-          enabled: false
+      lokiCanary:
+        enabled: false
     test:
       enabled: false
 
   valuesFrom:
-    - kind: Secret
-      name: loki-secret
-      valuesKey: S3_BUCKET_NAME
-      targetPath: loki.structuredConfig.common.storage.s3.bucketnames
-    - kind: Secret
-      name: loki-secret
-      valuesKey: S3_BUCKET_HOST
-      targetPath: loki.structuredConfig.common.storage.s3.endpoint
-    - kind: Secret
-      name: loki-secret
-      valuesKey: S3_BUCKET_REGION
-      targetPath: loki.structuredConfig.common.storage.s3.region
-    - kind: Secret
-      name: loki-secret
-      valuesKey: S3_ACCESS_KEY
-      targetPath: loki.structuredConfig.common.storage.s3.access_key_id
-    - kind: Secret
-      name: loki-secret
-      valuesKey: S3_SECRET_KEY
-      targetPath: loki.structuredConfig.common.storage.s3.secret_access_key
+    - targetPath: loki.structuredConfig.common.storage.s3.bucketnames
+      kind: ConfigMap
+      name: loki-bucket-v1
+      valuesKey: BUCKET_NAME
+    - targetPath: loki.structuredConfig.common.storage.s3.endpoint
+      kind: ConfigMap
+      name: loki-bucket-v1
+      valuesKey: BUCKET_HOST
+    - targetPath: loki.structuredConfig.common.storage.s3.access_key_id
+      kind: Secret
+      name: loki-bucket-v1
+      valuesKey: AWS_ACCESS_KEY_ID
+    - targetPath: loki.structuredConfig.common.storage.s3.secret_access_key
+      kind: Secret
+      name: loki-bucket-v1
+      valuesKey: AWS_SECRET_ACCESS_KEY
