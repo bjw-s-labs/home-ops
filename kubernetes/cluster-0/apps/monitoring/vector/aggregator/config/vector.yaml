@@ -26,8 +26,8 @@ sources:
     address: 0.0.0.0:6002
     version: "2"
 
-  vector_metrics:
-    type: internal_metrics
+  # vector_metrics:
+  #   type: internal_metrics
 
   talos_kernel_logs:
     address: 0.0.0.0:6050
@@ -94,8 +94,8 @@ sinks:
   loki_kubernetes:
     type: loki
     inputs:
-      - kubernetes_source
-    endpoint: http://loki-gateway.monitoring.svc.cluster.local:80
+      - kubernetes_remap
+    endpoint: http://loki-gateway.monitoring.svc.cluster.local
     encoding:
       codec: json
     batch:
@@ -117,11 +117,11 @@ sinks:
     inputs:
       - vyos_geoip
       - vyos_route._unmatched
-    endpoint: http://loki-gateway.monitoring.svc.cluster.local:80
+    endpoint: http://loki-gateway.monitoring.svc.cluster.local
     encoding:
       codec: json
     batch:
-      max_bytes: 400000
+      max_bytes: 2049000
     out_of_order_action: rewrite_timestamp
     labels:
       hostname: '{{ host }}'
@@ -131,7 +131,7 @@ sinks:
     type: loki
     inputs:
       - journald_source
-    endpoint: http://loki-gateway.monitoring.svc.cluster.local:80
+    endpoint: http://loki-gateway.monitoring.svc.cluster.local
     encoding:
       codec: json
     batch:
@@ -146,7 +146,7 @@ sinks:
     type: loki
     inputs:
       - talos_kernel_logs_xform
-    endpoint: http://loki-gateway.monitoring.svc.cluster.local:80
+    endpoint: http://loki-gateway.monitoring.svc.cluster.local
     encoding:
       codec: json
       except_fields:
@@ -162,7 +162,7 @@ sinks:
     type: loki
     inputs:
       - talos_service_logs_xform
-    endpoint: http://loki-gateway.monitoring.svc.cluster.local:80
+    endpoint: http://loki-gateway.monitoring.svc.cluster.local
     encoding:
       codec: json
       except_fields:
