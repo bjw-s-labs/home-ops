@@ -39,10 +39,23 @@ spec:
       UP_INFLUXDB_DISABLE: true
       UP_PROMETHEUS_DISABLE: false
       UP_PROMETHEUS_NAMESPACE: "unifipoller"
-    metrics:
-      enabled: true
-      serviceMonitor:
-        interval: 1m
-        scrapeTimeout: 2m # Unifi API only polls at 2m intervals
-      prometheusRule:
+    service:
+      main:
+        ports:
+          http:
+            port: 9130
+    serviceMonitor:
+      main:
         enabled: true
+        endpoints:
+          - port: http
+            scheme: http
+            path: /metrics
+            interval: 2m # Unifi API only polls at 2m intervals
+            scrapeTimeout: 5s
+    resources:
+      requests:
+        cpu: 10m
+        memory: 100Mi
+      limits:
+        memory: 500Mi
