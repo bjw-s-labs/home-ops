@@ -153,11 +153,12 @@ resource "unifi_device" "switch_core_2" {
   }
   port_override {
     number          = 14
-    port_profile_id = data.unifi_port_profile.all.id
+    name            = "diego"
+    port_profile_id = data.unifi_port_profile.servers.id
   }
   port_override {
     number          = 15
-    name            = "diego"
+    name            = "nas"
     port_profile_id = data.unifi_port_profile.servers.id
   }
   port_override {
