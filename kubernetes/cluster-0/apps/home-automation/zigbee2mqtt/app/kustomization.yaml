@@ -4,7 +4,6 @@ kind: Kustomization
 namespace: home-automation
 resources:
   - ./helmrelease.yaml
-  - ./prometheusrule.yaml
   - ./externalsecret.yaml
   - ./volsync.yaml
 commonLabels:
@@ -12,4 +11,3 @@ commonLabels:
   app.kubernetes.io/instance: zigbee2mqtt
 patchesStrategicMerge:
   - patches/env.yaml
-  - patches/exporter.yaml
