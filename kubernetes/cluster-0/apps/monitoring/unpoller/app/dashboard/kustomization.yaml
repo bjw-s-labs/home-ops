@@ -1,0 +1,23 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+configMapGenerator:
+  # Ref: https://grafana.com/grafana/dashboards/11315
+  - name: unpoller-clients-dashboard
+    files:
+      - unpoller-clients-dashboard.json=clients.json
+  # Ref: https://grafana.com/grafana/dashboards/11314
+  - name: unpoller-uap-dashboard
+    files:
+      - unpoller-uap-dashboard.json=uap.json
+  # Ref: https://grafana.com/grafana/dashboards/11312
+  - name: unpoller-usw-dashboard
+    files:
+      - unpoller-usw-dashboard.json=usw.json
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
+  labels:
+    grafana_dashboard: "true"
+    grafana_folder: unpoller
