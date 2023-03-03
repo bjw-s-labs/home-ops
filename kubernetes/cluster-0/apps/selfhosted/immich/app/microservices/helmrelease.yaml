@@ -21,7 +21,7 @@ spec:
 
   values:
     controller:
-      replicas: 1
+      replicas: 2
       strategy: RollingUpdate
       annotations:
         reloader.stakater.com/auto: "true"
@@ -58,3 +58,11 @@ spec:
         memory: 100Mi
       # limits:
       #   memory: 500Mi
+
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: immich-microservices
