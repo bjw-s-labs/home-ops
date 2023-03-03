@@ -80,7 +80,6 @@ resource "unifi_device" "switch_core_1" {
   }
   port_override {
     number          = 16
-    name            = "vyos_router"
     port_profile_id = data.unifi_port_profile.all.id
   }
 }
@@ -135,6 +134,7 @@ resource "unifi_device" "switch_core_2" {
   }
   port_override {
     number          = 10
+    name            = "vyos_router"
     port_profile_id = data.unifi_port_profile.all.id
   }
   port_override {
