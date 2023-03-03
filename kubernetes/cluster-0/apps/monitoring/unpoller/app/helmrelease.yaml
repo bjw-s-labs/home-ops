@@ -1,0 +1,57 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: unpoller
+  namespace: monitoring
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.3.2
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    image:
+      repository: ghcr.io/unpoller/unpoller
+      tag: v2.7.11
+
+    env:
+      UP_UNIFI_DEFAULT_ROLE: home-ops
+      UP_UNIFI_DEFAULT_URL: https://unifi:8443
+      UP_UNIFI_DEFAULT_VERIFY_SSL: false
+      UP_UNIFI_DEFAULT_USER: unifipoller
+      UP_UNIFI_DEFAULT_PASS:
+        valueFrom:
+          secretKeyRef:
+            name: unpoller-secret
+            key: unifipoller_password
+      UP_INFLUXDB_DISABLE: true
+
+    service:
+      main:
+        ports:
+          http:
+            port: 9130
+
+    serviceMonitor:
+      main:
+        enabled: true
+        endpoints:
+          - port: http
+            scheme: http
+            path: /metrics
+            interval: 2m # Unifi API only polls at 2m intervals
+            scrapeTimeout: 5s
+
+    resources:
+      requests:
+        cpu: 10m
+        memory: 100Mi
+      limits:
+        memory: 500Mi
