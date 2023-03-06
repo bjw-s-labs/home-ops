@@ -61,9 +61,9 @@ spec:
       #   - 1000
       fsGroupChangePolicy: "OnRootMismatch"
       privileged: true
-      capabilities:
-        add:
-          - SYS_ADMIN
+      # capabilities:
+      #   add:
+      #     - SYS_ADMIN
 
     env:
       TZ: "${TIMEZONE}"
@@ -98,7 +98,7 @@ spec:
         subPath: configData
   
       fuse:
-        enabled: true
+        enabled: false
         type: hostPath
         hostPath: /dev/fuse
         # hostPathType: Directory
