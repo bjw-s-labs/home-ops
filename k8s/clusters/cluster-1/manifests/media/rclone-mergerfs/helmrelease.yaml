@@ -29,25 +29,6 @@ spec:
       enabled: true
       # Valid options are deployment, daemonset, statefulset or cronjob
       type: deployment
-      # -- Set annotations on the deployment/statefulset/daemonset/cronjob
-      # annotations:
-      #   container.apparmor.security.beta.kubernetes.io/rclone-mount: unconfined
-
-    # podSecurityContext:
-    #   # runAsUser: 568
-    #   # runAsGroup: 568
-    #   # fsGroup: 568
-    #   # supplementalGroups:
-    #   #   - 34 # backup
-    #   #   - 44 # videro
-    #   #   - 109 # render
-    #   #   - 100 # users
-    #   #   - 1000
-    #   fsGroupChangePolicy: "OnRootMismatch"
-    #   privileged: true
-    #   capabilities:
-    #     add:
-    #       - SYS_ADMIN
 
     securityContext:
       # runAsUser: 568
@@ -96,13 +77,6 @@ spec:
         readOnly: true
         name: rclone-secret
         subPath: configData
-  
-      fuse:
-        enabled: false
-        type: hostPath
-        hostPath: /dev/fuse
-        # hostPathType: Directory
-        mountPath: /dev/fuse
 
     resources:
       requests:
@@ -121,52 +95,53 @@ spec:
             #       values:
             #         - "true"
 
-    probes:
-      # -- Liveness probe configuration
-      # @default -- See below
-      liveness:
-        # -- Enable the liveness probe
-        enabled: false
-        # -- Set this to `true` if you wish to specify your own livenessProbe
-        custom: false
-        # -- The spec field contains the values for the default livenessProbe.
-        # If you selected `custom: true`, this field holds the definition of the livenessProbe.
-        # @default -- See below
-        spec:
-          initialDelaySeconds: 0
-          periodSeconds: 10
-          timeoutSeconds: 1
-          failureThreshold: 3
-
-      # -- Redainess probe configuration
-      # @default -- See below
-      readiness:
-        # -- Enable the readiness probe
-        enabled: false
-        # -- Set this to `true` if you wish to specify your own readinessProbe
-        custom: false
-        # -- The spec field contains the values for the default readinessProbe.
-        # If you selected `custom: true`, this field holds the definition of the readinessProbe.
-        # @default -- See below
-        spec:
-          initialDelaySeconds: 0
-          periodSeconds: 10
-          timeoutSeconds: 1
-          failureThreshold: 3
-
-      # -- Startup probe configuration
-      # @default -- See below
-      startup:
-        # -- Enable the startup probe
-        enabled: false
-        # -- Set this to `true` if you wish to specify your own startupProbe
-        custom: false
-        # -- The spec field contains the values for the default startupProbe.
-        # If you selected `custom: true`, this field holds the definition of the startupProbe.
-        # @default -- See below
-        spec:
-          initialDelaySeconds: 0
-          timeoutSeconds: 1
-          ## This means it has a maximum of 5*30=150 seconds to start up before it fails
-          periodSeconds: 5
-          failureThreshold: 30
+#     probes:
+#       # -- Liveness probe configuration
+#       # @default -- See below
+#       liveness:
+#         # -- Enable the liveness probe
+#         enabled: false
+#         # -- Set this to `true` if you wish to specify your own livenessProbe
+#         custom: false
+#         # -- The spec field contains the values for the default livenessProbe.
+#         # If you selected `custom: true`, this field holds the definition of the livenessProbe.
+#         # @default -- See below
+#         spec:
+#           initialDelaySeconds: 0
+#           periodSeconds: 10
+#           timeoutSeconds: 1
+#           failureThreshold: 3
+# 
+#       # -- Redainess probe configuration
+#       # @default -- See below
+#       readiness:
+#         # -- Enable the readiness probe
+#         enabled: false
+#         # -- Set this to `true` if you wish to specify your own readinessProbe
+#         custom: false
+#         # -- The spec field contains the values for the default readinessProbe.
+#         # If you selected `custom: true`, this field holds the definition of the readinessProbe.
+#         # @default -- See below
+#         spec:
+#           initialDelaySeconds: 0
+#           periodSeconds: 10
+#           timeoutSeconds: 1
+#           failureThreshold: 3
+# 
+#       # -- Startup probe configuration
+#       # @default -- See below
+#       startup:
+#         # -- Enable the startup probe
+#         enabled: false
+#         # -- Set this to `true` if you wish to specify your own startupProbe
+#         custom: false
+#         # -- The spec field contains the values for the default startupProbe.
+#         # If you selected `custom: true`, this field holds the definition of the startupProbe.
+#         # @default -- See below
+#         spec:
+#           initialDelaySeconds: 0
+#           timeoutSeconds: 1
+#           ## This means it has a maximum of 5*30=150 seconds to start up before it fails
+#           periodSeconds: 5
+#           failureThreshold: 30
+# 
