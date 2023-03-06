@@ -23,7 +23,7 @@ spec:
     # -- Override the command(s) for the default container
     command: [sleep]
     # -- Override the args for the default container
-    args: [99999999999]
+    args: ["999999999"]
 
     controller:
       enabled: true
@@ -33,7 +33,23 @@ spec:
       # annotations:
       #   container.apparmor.security.beta.kubernetes.io/rclone-mount: unconfined
 
-    podSecurityContext:
+    # podSecurityContext:
+    #   # runAsUser: 568
+    #   # runAsGroup: 568
+    #   # fsGroup: 568
+    #   # supplementalGroups:
+    #   #   - 34 # backup
+    #   #   - 44 # videro
+    #   #   - 109 # render
+    #   #   - 100 # users
+    #   #   - 1000
+    #   fsGroupChangePolicy: "OnRootMismatch"
+    #   privileged: true
+    #   capabilities:
+    #     add:
+    #       - SYS_ADMIN
+
+    securityContext:
       # runAsUser: 568
       # runAsGroup: 568
       # fsGroup: 568
