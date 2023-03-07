@@ -101,7 +101,7 @@ spec:
       shared-remote:
         enabled: true
         type: emptyDir
-        mountPath: /mnt/remotes/google
+        mountPath: /mnt/remotes
 
     ingress:
       main:
@@ -168,7 +168,6 @@ spec:
           - name: MountCommands
             value: "--allow-other \
                     --allow-non-empty \
-                    --fast-list \
                     --drive-skip-gdocs \
                     --vfs-read-chunk-size=64M \
                     --vfs-read-chunk-size-limit=2048M \
@@ -186,7 +185,7 @@ spec:
             readOnly: true
             subPath: configData
           - name: shared-remote
-            mountPath: /mnt/remotes/google
+            mountPath: /mnt/remotes
 
 
 
