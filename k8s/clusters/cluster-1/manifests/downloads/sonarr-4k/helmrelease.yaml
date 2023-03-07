@@ -91,6 +91,13 @@ spec:
             server: "${NAS_ADDRESS}"
             path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/sonarr-4k
         mountPath: /config/Backups
+      rclone-config:
+        enabled: true
+        type: secret
+        name: rclone-secret
+        subPath: configData
+        mountPath: /config/rclone.conf
+        readOnly: true
 
     ingress:
       main:
@@ -154,6 +161,9 @@ spec:
             value: "google:"
           - name: MountCommands
             value: "--allow-other --allow-non-empty"
+        volumeMounts:
+          - name: rclone-config
+            mountPath: /config/rclone.conf
 
 
 
