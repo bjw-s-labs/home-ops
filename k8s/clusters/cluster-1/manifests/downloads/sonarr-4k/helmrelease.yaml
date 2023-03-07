@@ -98,6 +98,10 @@ spec:
         subPath: configData
         mountPath: /config/rclone.conf
         readOnly: true
+      shared-remote:
+        enabled: true
+        type: emtpyDir
+        mountPath: /mnt/remotes/google
 
     ingress:
       main:
@@ -166,6 +170,8 @@ spec:
             mountPath: /config/rclone.conf
             readOnly: true
             subPath: configData
+          - name: remote
+            mountPath: /mnt/remotes/google
 
 
 
