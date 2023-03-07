@@ -126,83 +126,111 @@ spec:
 
 
     sidecars:
-      rclone:
-        apiVersion: helm.toolkit.fluxcd.io/v2beta1
-        kind: HelmRelease
-        metadata:
-          name: rclone-mount
-          namespace: downloads
-        spec:
-          interval: 5m
-          chart:
-            spec:
-              chart: app-template
-              version: 1.3.2
-              sourceRef:
-                kind: HelmRepository
-                name: bjw-s
-                namespace: flux-system
-              interval: 15m
-          values:
-            image:
-              repository: mumiehub/rclone-mount
-              tag: latest
-        
-            controller:
-              enabled: true
-              # Valid options are deployment, daemonset, statefulset or cronjob
-              type: deployment
-        
-            securityContext:
-              # runAsUser: 568
-              # runAsGroup: 568
-              # fsGroup: 568
-              # supplementalGroups:
-              #   - 34 # backup
-              #   - 44 # videro
-              #   - 109 # render
-              #   - 100 # users
-              #   - 1000
-              fsGroupChangePolicy: "OnRootMismatch"
-              privileged: true
-              # capabilities:
-              #   add:
-              #     - SYS_ADMIN
-        
-            env:
-              TZ: "${TIMEZONE}"
-              # Inside the /config folder
-              ConfigName: "rclone.conf"
-              RemotePath: "google:"
-              MountCommands: "--allow-other --allow-non-empty"
-        
-            service:
-              main:
-                enabled: false
-        
-            ingress:
-              main:
-                enabled: false
-                ingressClassName: "traefik"
-                annotations:
-                  cert-manager.io/cluster-issuer: letsencrypt-production
-                  external-dns/is-public: "true"
-                  external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
-                  external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
-                  traefik.ingress.kubernetes.io/router.entrypoints: websecure
-                  traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
-        
-            persistence:
-              config:
-                enabled: true
-                type: secret
-                mountPath: /config/rclone.conf
-                readOnly: true
-                name: rclone-secret
-                subPath: configData
-        
-            resources:
-              requests:
-                memory: 1Gi
-              limits:
-                memory: 5Gi
+      - rclone:
+          image:
+            repository: mumiehub/rclone-mount
+            tag: latest            
+          securityContext:
+            # runAsUser: 568
+            # runAsGroup: 568
+            # fsGroup: 568
+            # supplementalGroups:
+            #   - 34 # backup
+            #   - 44 # videro
+            #   - 109 # render
+            #   - 100 # users
+            #   - 1000
+            fsGroupChangePolicy: "OnRootMismatch"
+            privileged: true
+            # capabilities:
+            #   add:
+            #     - SYS_ADMIN
+          env:
+            TZ: "${TIMEZONE}"
+            # Inside the /config folder
+            ConfigName: "rclone.conf"
+            RemotePath: "google:"
+            MountCommands: "--allow-other --allow-non-empty"
+
+
+
+
+#         apiVersion: helm.toolkit.fluxcd.io/v2beta1
+#         kind: HelmRelease
+#         metadata:
+#           name: rclone-mount
+#           namespace: downloads
+#         spec:
+#           interval: 5m
+#           chart:
+#             spec:
+#               chart: app-template
+#               version: 1.3.2
+#               sourceRef:
+#                 kind: HelmRepository
+#                 name: bjw-s
+#                 namespace: flux-system
+#               interval: 15m
+#           values:
+#             image:
+#               repository: mumiehub/rclone-mount
+#               tag: latest
+#         
+#             controller:
+#               enabled: true
+#               # Valid options are deployment, daemonset, statefulset or cronjob
+#               type: deployment
+#         
+#             securityContext:
+#               # runAsUser: 568
+#               # runAsGroup: 568
+#               # fsGroup: 568
+#               # supplementalGroups:
+#               #   - 34 # backup
+#               #   - 44 # videro
+#               #   - 109 # render
+#               #   - 100 # users
+#               #   - 1000
+#               fsGroupChangePolicy: "OnRootMismatch"
+#               privileged: true
+#               # capabilities:
+#               #   add:
+#               #     - SYS_ADMIN
+#         
+#             env:
+#               TZ: "${TIMEZONE}"
+#               # Inside the /config folder
+#               ConfigName: "rclone.conf"
+#               RemotePath: "google:"
+#               MountCommands: "--allow-other --allow-non-empty"
+#         
+#             service:
+#               main:
+#                 enabled: false
+#         
+#             ingress:
+#               main:
+#                 enabled: false
+#                 ingressClassName: "traefik"
+#                 annotations:
+#                   cert-manager.io/cluster-issuer: letsencrypt-production
+#                   external-dns/is-public: "true"
+#                   external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+#                   external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+#                   traefik.ingress.kubernetes.io/router.entrypoints: websecure
+#                   traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
+#         
+#             persistence:
+#               config:
+#                 enabled: true
+#                 type: secret
+#                 mountPath: /config/rclone.conf
+#                 readOnly: true
+#                 name: rclone-secret
+#                 subPath: configData
+#         
+#             resources:
+#               requests:
+#                 memory: 1Gi
+#               limits:
+#                 memory: 5Gi
