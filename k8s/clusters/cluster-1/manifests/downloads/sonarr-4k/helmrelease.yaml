@@ -126,31 +126,32 @@ spec:
 
 
     sidecars:
-      - rclone:
-          image:
-            repository: mumiehub/rclone-mount
-            tag: latest            
-          securityContext:
-            # runAsUser: 568
-            # runAsGroup: 568
-            # fsGroup: 568
-            # supplementalGroups:
-            #   - 34 # backup
-            #   - 44 # videro
-            #   - 109 # render
-            #   - 100 # users
-            #   - 1000
-            fsGroupChangePolicy: "OnRootMismatch"
-            privileged: true
-            # capabilities:
-            #   add:
-            #     - SYS_ADMIN
-          env:
-            TZ: "${TIMEZONE}"
-            # Inside the /config folder
-            ConfigName: "rclone.conf"
-            RemotePath: "google:"
-            MountCommands: "--allow-other --allow-non-empty"
+      rclone-mount:
+        name: rclone-mount
+        image:
+          repository: mumiehub/rclone-mount
+          tag: latest            
+        securityContext:
+          # runAsUser: 568
+          # runAsGroup: 568
+          # fsGroup: 568
+          # supplementalGroups:
+          #   - 34 # backup
+          #   - 44 # videro
+          #   - 109 # render
+          #   - 100 # users
+          #   - 1000
+          fsGroupChangePolicy: "OnRootMismatch"
+          privileged: true
+          # capabilities:
+          #   add:
+          #     - SYS_ADMIN
+        env:
+          TZ: "${TIMEZONE}"
+          # Inside the /config folder
+          ConfigName: "rclone.conf"
+          RemotePath: "google:"
+          MountCommands: "--allow-other --allow-non-empty"
 
 
 
