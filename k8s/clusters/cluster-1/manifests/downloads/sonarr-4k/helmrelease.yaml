@@ -128,9 +128,7 @@ spec:
     sidecars:
       rclone-mount:
         name: rclone-mount
-        image:
-          repository: mumiehub/rclone-mount
-          tag: latest            
+        image: mumiehub/rclone-mount:latest       
         securityContext:
           # runAsUser: 568
           # runAsGroup: 568
@@ -147,11 +145,15 @@ spec:
           #   add:
           #     - SYS_ADMIN
         env:
-          TZ: "${TIMEZONE}"
+          - name: TZ
+            value: "${TIMEZONE}"
           # Inside the /config folder
-          ConfigName: "rclone.conf"
-          RemotePath: "google:"
-          MountCommands: "--allow-other --allow-non-empty"
+          - name: ConfigName
+            value: "rclone.conf"
+          - name: RemotePath
+            value: "google:"
+          - name: MountCommands
+            value: "--allow-other --allow-non-empty"
 
 
 
