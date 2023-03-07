@@ -168,7 +168,6 @@ spec:
           - name: MountCommands
             value: "--allow-other \
                     --allow-non-empty \
-                    --user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36 \
                     --fast-list \
                     --drive-skip-gdocs \
                     --vfs-read-chunk-size=64M \
@@ -179,6 +178,8 @@ spec:
                     --timeout=10m \
                     --drive-chunk-size=64M \
                     --umask=002"
+                    # User Agent spaces makes rclone mount think its multiple mount commands and not a long string. Removing it for now
+                    # --user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36 \
         volumeMounts:
           - name: rclone-config
             mountPath: /config/rclone.conf
