@@ -62,7 +62,16 @@ pveceph pool create ssd-erasure-coded-backups --application cephfs --erasure-cod
 
 ## NFS-Genesha
 
-On All Nodes
+Ganesha is running as a client on each node as a container
+
+
+## RadosGW / S3
+
+For sub-domain based buckets
 ```
-sudo apt install nfs-ganesha nfs-ganesha-ceph nfs-ganesha-vfs
+radosgw-admin zonegroup get --rgw-zonegroup=default > default.json
+vim default.json # add your s3.domain.tld endpoint to the hostnames list
+radosgw-admin zonegroup set --infile default.json
 ```
+Then ->
+On all hosts: systemctl restart ceph-radosgw@radosgw.$(hostname)

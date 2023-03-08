@@ -1,0 +1,38 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: multus
+  namespace: network
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: multus
+      version: 4.0.0
+      sourceRef:
+        kind: HelmRepository
+        name: angelnu
+        namespace: flux-system
+      interval: 30m
+  values:
+    # tolerations:
+    #   - key: "nuc"
+    #     operator: "Equal"
+    #     value: "true"
+    #     effect: "NoSchedule"
+
+    image:
+      repository: ghcr.io/k8snetworkplumbingwg/multus-cni
+      tag: v3.9.3
+
+    cni:
+      image:
+        repository: ghcr.io/angelnu/cni-plugins
+        tag: 1.2.0
+
+      paths:
+        config: /etc/cni/net.d
+        bin: /opt/cni/bin
+
+      version: "0.3.1"
