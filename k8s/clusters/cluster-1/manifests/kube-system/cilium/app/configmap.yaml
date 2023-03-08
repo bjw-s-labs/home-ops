@@ -8,10 +8,11 @@ data:
   config.yaml: |
     peers:
       - peer-address: ${GATEWAY_MANAGEMENT}
-        peer-asn: 64512
-        my-asn: 64512
+        peer-asn: 64513
+        my-asn: 64513
     address-pools:
       - name: default
         protocol: bgp
+        avoid-buggy-ips: true
         addresses:
           - ${NETWORK_BGP_SVC_CIDR}
