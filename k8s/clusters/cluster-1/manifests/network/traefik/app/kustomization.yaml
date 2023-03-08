@@ -1,7 +1,9 @@
 ---
-# yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./secret.sops.yaml
   - helmrelease.yaml
+labels:
+  - pairs:
+      app.kubernetes.io/name: traefik
+      app.kubernetes.io/instance: traefik
