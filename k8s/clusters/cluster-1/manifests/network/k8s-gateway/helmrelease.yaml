@@ -28,7 +28,7 @@ spec:
     keepHistory: false
   values:
     controller:
-      replicas: 2
+      replicas: 3
       strategy: RollingUpdate
     image:
       repository: quay.io/oriedge/k8s_gateway
@@ -37,7 +37,7 @@ spec:
     service:
       main:
         type: LoadBalancer
-        externalIPs: ["${LB_K8S_GATEWAY}"]
+        loadBalancerIP: ["${LB_K8S_GATEWAY}"]
         externalTrafficPolicy: Local
         ports:
           http:
