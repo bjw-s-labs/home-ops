@@ -109,7 +109,7 @@ spec:
         volumeSpec:
           nfs:
             server: "${NAS_ADDRESS}"
-            path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/sonarr-4k
+            path: /Media
         mountPath: /mnt/remotes/nas00-media
 
     ingress:
@@ -188,8 +188,9 @@ spec:
       mergerfs:
         name: mergerfs
         image: ghcr.io/hotio/mergerfs:release-2.34.1
-        # command: ["printenv"]
-        args: ["-o allow_other", "/mnt/remotes/google", "/mnt/remotes/nas00-media", "/mnt/remotes/merged"]
+        command: ["sleep"]
+        args: ["999999999999"]
+        # args: ["-o allow_other", "/mnt/remotes/google", "/mnt/remotes/nas00-media", "/mnt/remotes/merged"]
         securityContext:
           runAsUser: 0
           fsGroupChangePolicy: "OnRootMismatch"
