@@ -111,6 +111,7 @@ spec:
             server: "${NAS_ADDRESS}"
             path: /Media
         mountPath: /mnt/remotes/nas00-media
+        # mountPropagation: HostToContainer
 
     ingress:
       main:
@@ -199,10 +200,8 @@ spec:
           - name: TZ
             value: "${TIMEZONE}"
         volumeMounts:
-          # - name: nas00-media
-          #   mountPath: /
-          #   readOnly: true
-          #   subPath: configData
+          - name: nas00-media
+            mountPath: /mnt/remotes/nas00-media
           - name: shared-remote
             mountPath: /mnt/remotes
             mountPropagation: Bidirectional
