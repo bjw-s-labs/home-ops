@@ -1,0 +1,74 @@
+kvmd:
+  gpio:
+    drivers:
+      ez:
+        type: ezcoo
+        protocol: 2
+        device: /dev/ttyUSB0
+      reboot:
+        type: cmd
+        cmd: [/usr/bin/sudo, reboot]
+      restart_service:
+        type: cmd
+        cmd: [/usr/bin/sudo, systemctl, restart, kvmd]
+    scheme:
+      ch0_led:
+        driver: ez
+        pin: 0
+        mode: input
+      ch1_led:
+        driver: ez
+        pin: 1
+        mode: input
+      ch2_led:
+        driver: ez
+        pin: 2
+        mode: input
+      ch3_led:
+        driver: ez
+        pin: 3
+        mode: input
+      pikvm_led:
+        pin: 0
+        mode: input
+      ch0_button:
+        driver: ez
+        pin: 0
+        mode: output
+        switch: false
+      ch1_button:
+        driver: ez
+        pin: 1
+        mode: output
+        switch: false
+      ch2_button:
+        driver: ez
+        pin: 2
+        mode: output
+        switch: false
+      ch3_button:
+        driver: ez
+        pin: 3
+        mode: output
+        switch: false
+      reboot_button:
+        driver: reboot
+        pin: 0
+        mode: output
+        switch: false
+      restart_service_button:
+        driver: restart_service
+        pin: 0
+        mode: output
+        switch: false
+    view:
+      table:
+        - ["#delta", ch0_led, "ch0_button | Control"]
+        - ["#enigma", ch1_led, "ch1_button | Control"]
+        - ["#felix", ch2_led, "ch2_button | Control"]
+        - ["#gateway", ch3_led, "ch3_button | Control"]
+        - [
+            "#PiKVM",
+            "pikvm_led|green",
+            "restart_service_button|confirm|Service",
+          ]
