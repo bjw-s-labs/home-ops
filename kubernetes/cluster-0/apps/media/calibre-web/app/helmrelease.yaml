@@ -16,6 +16,9 @@ spec:
         namespace: flux-system
   interval: 30m
   values:
+    controller:
+      type: statefulset
+
     image:
       repository: ghcr.io/bjw-s/calibre-web
       tag: 0.6.19@sha256:de8c82486c01b5b210b66ab696b0f02095179c234af330897bbb1b8650a67dfe
@@ -73,9 +76,6 @@ spec:
               - *host_kobo
 
     persistence:
-      config:
-        enabled: true
-        existingClaim: calibre-web-config
       media:
         enabled: true
         mountPath: /data/nas-media
@@ -93,3 +93,10 @@ spec:
         memory: 273M
       limits:
         memory: 328M
+
+    volumeClaimTemplates:
+      - name: config
+        mountPath: /config
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
