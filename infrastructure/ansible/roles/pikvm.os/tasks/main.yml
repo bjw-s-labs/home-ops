@@ -21,3 +21,10 @@
     dest: /etc/kvmd/tc358743-edid.hex
     mode: 0644
   notify: Restart kvmd
+
+- name: Load kvmd override file
+  ansible.builtin.template:
+    src: kvmd_override.yaml.j2
+    dest: /etc/kvmd/override.yaml
+    mode: 0644
+  notify: Restart kvmd
