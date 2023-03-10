@@ -13,7 +13,7 @@ spec:
       containers:
         - name: unlock
           image: docker.io/restic/restic:0.14.0
-          args: ["unlock"]
+          args: ["unlock", "--remove-all"]
           envFrom:
             - secretRef:
                 name: "${rsrc}-restic-secret"
