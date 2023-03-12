@@ -23,14 +23,13 @@ spec:
       pullPolicy: IfNotPresent
 
     podSecurityContext:
-      # runAsUser: 568
-      runAsUser: 0
+      runAsUser: 568
       runAsGroup: 100
       fsGroup: 568
       supplementalGroups:
         - 34
         - 100
-      # fsGroupChangePolicy: "OnRootMismatch"
+      fsGroupChangePolicy: "OnRootMismatch"
 
     env:
       TZ: "${TIMEZONE}"
