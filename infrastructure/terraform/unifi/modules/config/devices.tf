@@ -157,15 +157,17 @@ resource "unifi_device" "switch_core_2" {
     port_profile_id = data.unifi_port_profile.all.id
   }
   port_override {
-    number          = 15
-    name            = "nas"
-    port_profile_id = data.unifi_port_profile.servers.id
+    number              = 15
+    name                = "nas"
+    port_profile_id     = data.unifi_port_profile.servers.id
+    op_mode             = "aggregate"
+    aggregate_num_ports = 2
   }
-  port_override {
-    number          = 16
-    name            = "nas"
-    port_profile_id = data.unifi_port_profile.servers.id
-  }
+  # port_override {
+  #   number          = 16
+  #   name            = "nas"
+  #   port_profile_id = data.unifi_port_profile.servers.id
+  # }
 }
 
 resource "unifi_device" "switch_media" {
