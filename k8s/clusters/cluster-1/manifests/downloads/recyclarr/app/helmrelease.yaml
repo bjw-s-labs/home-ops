@@ -52,13 +52,16 @@ spec:
       runAsGroup: 568
       fsGroup: 568
       fsGroupChangePolicy: OnRootMismatch
-    volumeClaimTemplates:
-      - name: config
-        mountPath: /config
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClassName: ceph-block-external-nvme
+    # volumeClaimTemplates:
+    #   - name: config
+    #     mountPath: /config
+    #     accessMode: ReadWriteOnce
+    #     size: 1Gi
+    #     storageClassName: ceph-block-external-nvme
     persistence:
+      config:
+        enabled: true
+        existingClaim: recyclarr-config
       config-file:
         enabled: true
         type: configMap
