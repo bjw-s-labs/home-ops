@@ -166,6 +166,7 @@ spec:
               - targets:
                   - "pve01.ceph.${INGRESS_DOMAIN}:9283"
                   - "pve02.ceph.${INGRESS_DOMAIN}:9283"
+                  - "pve03.ceph.${INGRESS_DOMAIN}:9283"
           - job_name: coredns
             scrape_interval: 1m
             scrape_timeout: 10s
@@ -198,6 +199,7 @@ spec:
               - targets:
                 - pve01.server.${INGRESS_DOMAIN}  # Proxmox VE node.
                 - pve02.server.${INGRESS_DOMAIN}  # Proxmox VE node.
+                - pve03.server.${INGRESS_DOMAIN}  # Proxmox VE node.
             metrics_path: /pve
             params:
               module: [default]
