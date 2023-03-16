@@ -117,6 +117,9 @@ spec:
                     {{- include "loki.gatewaySelectorLabels" . | nindent 12 }}
                 topologyKey: kubernetes.io/hostname
       enabled: true
+      image:
+        registry: ghcr.io
+        repository: nginxinc/nginx-unprivileged
       ingress:
         enabled: true
         ingressClassName: "nginx"
