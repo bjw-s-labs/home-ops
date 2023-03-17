@@ -18,14 +18,19 @@ spec:
 
   values:
     image:
-      repository: docker.io/jmalloc/echo-server
-      tag: 0.3.5
+      repository: ghcr.io/mendhak/http-https-echo
+      tag: "29"
+
+    env:
+      HTTP_PORT: &port 8080
+      LOG_WITHOUT_NEWLINE: "true"
+      LOG_IGNORE_PATH: "/healthz"
 
     service:
       main:
         ports:
           http:
-            port: 8080
+            port: *port
 
     ingress:
       main:
