@@ -6,32 +6,15 @@ mountName="Merged Media"
 
 umount_merge() {
   echo "Unmounting ${mountName}..."
-  umount ${mountPoint}
-}
-
-catch_kill() {
-  echo "Caught SIGKILL signal!"
-  umount_merge
+  trap - SIGINT SIGTERM # clear the trap
+  /bin/fusermount -uz ${mountPoint}
   kill -KILL "$pid" 2>/dev/null
+  kill -- -$$ # Sends SIGTERM to child/sub processes
 }
 
-catch_term() {
-  echo "Caught SIGTERM signal!"
-  umount_merge
-  kill -TERM "$pid" 2>/dev/null
-}
-
-catch_quit() {
-  echo "Caught SIGTERM signal!"
-  umount_merge
-  kill -QUIT "$pid" 2>/dev/null
-}
-
-catch_ctrlc() {
-  echo "Caught ctrl+c!"
-  umount_merge
-  kill -KILL "$pid" 2>/dev/null
-}
+trap unmount_merge SIGTERM
+trap unmount_merge SIGKILL
+trap unmount_merge SIGQUIT
 
 sleep 15
 
@@ -58,11 +41,6 @@ if [[ -f "$anchor" ]]; then
 else
   echo "$(date "+%d.%m.%Y %T") INFO: Mount Failed!, ${mountName} mergerfs mount NOT created."
 fi
-
-trap catch_term SIGTERM
-trap catch_kill SIGKILL
-trap catch_quit SIGQUIT
-trap catch_ctrlc INT
 
 echo "Script is running! waiting for signals."
 
