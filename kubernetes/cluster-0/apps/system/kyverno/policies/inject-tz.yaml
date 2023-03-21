@@ -20,6 +20,11 @@ spec:
           - resources:
               kinds:
                 - Pod
+      exclude:
+        any:
+          - resources:
+              annotations:
+                kyverno-no-tz: "true"
       mutate:
         patchStrategicMerge:
           spec:
