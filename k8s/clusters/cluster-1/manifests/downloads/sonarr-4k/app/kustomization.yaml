@@ -6,6 +6,14 @@ resources:
   - ./secret.sops.yaml
   - ./pvc.yaml
   - ./helmrelease.yaml
+configMapGenerator:
+  - name: mergerfs-script
+    files:
+      - mergerfs-script.sh=../../mergerfs-script/mergerfs-script.sh
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
 labels:
   - pairs:
       app.kubernetes.io/name: sonarr-4k
