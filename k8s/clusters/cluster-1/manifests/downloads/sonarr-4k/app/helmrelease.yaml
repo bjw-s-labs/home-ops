@@ -198,8 +198,8 @@ spec:
         # command: ["/usr/local/bin/mergerfs"]
         # command: ["/usr/local/bin/mergerfs --help"]
         # args: ["/usr=RO" ,"/mnt/merged"]
-        command: ["/bin/bash"]
-        args: ["sleep", "90000"]
+        command: ["/bin/sh"]
+        args: ["-c", "/usr/local/bin/mergerfs -o category.create=lfs -o async_read=false -o cache.files=full -o dropcacheonclose=true -o use_ino -o minfreespace=0 -o xattr=nosys -o statfs=full -o statfs_ignore=ro -o allow_other -o umask=002 -o noatime mnt/remotes/nas00-media/Plex/Local-Media=RW:/mnt/remotes/google=NC /mnt/merged"]
         # args: ["-oallow_other", "/mnt/remotes/nas00-media/Plex/Local-Media=RW:/mnt/remotes/google=NC" ,"/mnt/merged"]
           # - "-o category.create=lfs"
           # - "-o async_read=false"
@@ -223,12 +223,12 @@ spec:
           - name: TZ
             value: "${TIMEZONE}"
         volumeMounts:
-        #   - name: nas00-media
-        #     mountPath: /mnt/remotes/nas00-media
-        #     # mountPropagation: Bidirectional
-        #   - name: shared-remote
-        #     mountPath: /mnt/remotes
-        #     # mountPropagation: Bidirectional
+          - name: nas00-media
+            mountPath: /mnt/remotes/nas00-media
+            # mountPropagation: Bidirectional
+          - name: shared-remote
+            mountPath: /mnt/remotes
+            # mountPropagation: Bidirectional
           - name: shared-merged
             mountPath: /mnt/merged
             mountPropagation: Bidirectional
