@@ -20,16 +20,8 @@ spec:
     - name: immich-typesense
 
   values:
-    initContainers:
-      init-db:
-        image: ghcr.io/onedr0p/postgres-initdb:14.7@sha256:9a82796ecc291a42ba3e2e4813a9c086fe7674160b9df18aeaec265b09e4a3f6
-        imagePullPolicy: IfNotPresent
-        envFrom:
-          - secretRef:
-              name: immich-secret
-
     controller:
-      replicas: 2
+      replicas: 1
       strategy: RollingUpdate
       annotations:
         reloader.stakater.com/auto: "true"
@@ -41,6 +33,28 @@ spec:
     command: /bin/sh
     args:
       - ./start-server.sh
+
+    env:
+      DB_HOSTNAME:
+        valueFrom:
+          secretKeyRef:
+            name: database-immich-user
+            key: HOST
+      DB_USERNAME:
+        valueFrom:
+          secretKeyRef:
+            name: database-immich-user
+            key: LOGIN
+      DB_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: database-immich-user
+            key: PASSWORD
+      DB_DATABASE_NAME:
+        valueFrom:
+          secretKeyRef:
+            name: database-immich-user
+            key: DATABASE_NAME
 
     envFrom:
       - secretRef:
