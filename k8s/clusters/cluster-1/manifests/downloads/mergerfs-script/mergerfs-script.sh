@@ -1,5 +1,7 @@
 #!/bin/sh
 
+sleep 60
+
 /usr/local/bin/mergerfs \
   -o category.create=lfs \
   -o async_read=false \
