@@ -1,7 +1,7 @@
 ---
 clusterName: cluster-0
 
-talosVersion: v1.3.5
+talosVersion: v1.3.6
 kubernetesVersion: 1.26.1
 endpoint: "https://cluster-0.bjw-s.tech:6443"
 
@@ -62,30 +62,14 @@ controlPlane:
       cluster:
         allowSchedulingOnMasters: true
         apiServer:
-          extraArgs:
-            feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-            oidc-client-id: ${oidcClientId}
-            oidc-groups-claim: https://bjw-s/groups
-            oidc-groups-prefix: 'oidc:'
-            oidc-issuer-url: ${oidcIssuerURL}
-            oidc-username-claim: email
-            oidc-username-prefix: 'oidc:'
         controllerManager:
-          extraArgs:
-            feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
         discovery:
           registries:
             service:
               disabled: true
         proxy:
           disabled: true
-          extraArgs:
-            feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
         scheduler:
-          extraArgs:
-            feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-        extraManifests:
-          - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-0/rbac/oidc.yaml
 
       machine:
         files:
@@ -98,7 +82,7 @@ controlPlane:
             op: create
         kubelet:
           extraArgs:
-            feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+            feature-gates: GracefulNodeShutdown=true
             rotate-server-certificates: "true"
         install:
           extraKernelArgs:
