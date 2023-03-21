@@ -1,0 +1,24 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zalando-postgres-pod-configmap
+  namespace: database
+data:
+  ALLOW_NOSSL: "true"
+
+  # Configure S3 backups
+  USE_WALG_BACKUP: "true"
+  USE_WALG_RESTORE: "true"
+  BACKUP_SCHEDULE: '0 5 * * *'
+  WAL_BUCKET_SCOPE_PREFIX: ""
+  WAL_BUCKET_SCOPE_SUFFIX: ""
+  WALG_DISABLE_S3_SSE: "true"
+  BACKUP_NUM_TO_RETAIN: "14"
+  CLONE_USE_WALG_RESTORE: "true"
+  AWS_S3_FORCE_PATH_STYLE: "true"
+  AWS_ENDPOINT: http://s3.bjw-s.dev
+  AWS_REGION: us-east-1
+  WAL_S3_BUCKET: zalando-postgres
+  # AWS_ACCESS_KEY_ID: <configured in externalSecret>
+  # AWS_SECRET_ACCESS_KEY: <configured in externalSecret>
