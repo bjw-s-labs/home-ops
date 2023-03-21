@@ -108,6 +108,11 @@ spec:
         type: emptyDir
         mountPath: /mnt/merged
         mountPropagation: HostToContainer
+      mergerfs-script:
+        enabled: true
+        type: configmap
+        name: mergerfs
+        mountPath: /mergerfs
       nas00-media:
         enabled: true
         type: custom
@@ -149,6 +154,26 @@ spec:
       limits:
         memory: "1500M"
 
+    configMaps:
+      mergerfs:
+        enabled: true
+        # -- configMap data content. Helm template enabled.
+        data: |
+            /usr/local/bin/mergerfs \
+              -o category.create=lfs \
+              -o async_read=false \
+              -o cache.files=full \
+              -o dropcacheonclose=true \
+              -o use_ino \
+              -o minfreespace=0 \
+              -o xattr=nosys \
+              -o statfs=full \
+              -o statfs_ignore=ro \
+              -o allow_other \
+              -o umask=002 \
+              -o noatime \
+              /mnt/remotes/nas00-media/Plex/Local-Media=RW:/mnt/remotes/google=NC \
+              /mnt/merged            
 
     sidecars:
       rclone-mount:
@@ -195,22 +220,23 @@ spec:
         image: ghcr.io/hotio/mergerfs:release-2.34.1
         command: ["/bin/sh", "-c"]
         args:
-          - >
-            /usr/local/bin/mergerfs
-              -o category.create=lfs
-              -o async_read=false
-              -o cache.files=full
-              -o dropcacheonclose=true
-              -o use_ino
-              -o minfreespace=0
-              -o xattr=nosys
-              -o statfs=full
-              -o statfs_ignore=ro
-              -o allow_other
-              -o umask=002
-              -o noatime
-              /mnt/remotes/nas00-media/Plex/Local-Media=RW:/mnt/remotes/google=NC
-              /mnt/merged
+          - sleep 9000000000
+          # - >
+          #   /usr/local/bin/mergerfs
+          #     -o category.create=lfs
+          #     -o async_read=false
+          #     -o cache.files=full
+          #     -o dropcacheonclose=true
+          #     -o use_ino
+          #     -o minfreespace=0
+          #     -o xattr=nosys
+          #     -o statfs=full
+          #     -o statfs_ignore=ro
+          #     -o allow_other
+          #     -o umask=002
+          #     -o noatime
+          #     /mnt/remotes/nas00-media/Plex/Local-Media=RW:/mnt/remotes/google=NC
+          #     /mnt/merged
         securityContext:
           runAsUser: 0
           fsGroupChangePolicy: "OnRootMismatch"
@@ -228,5 +254,7 @@ spec:
           - name: shared-merged
             mountPath: /mnt/merged
             mountPropagation: Bidirectional
+          - name: mergerfs-script
+            mountPath: /mergerfs
 
 
