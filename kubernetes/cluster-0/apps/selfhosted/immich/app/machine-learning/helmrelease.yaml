@@ -63,3 +63,11 @@ spec:
         memory: 250Mi
       # limits:
       #   memory: 1000Mi
+
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: immich-machine-learning
