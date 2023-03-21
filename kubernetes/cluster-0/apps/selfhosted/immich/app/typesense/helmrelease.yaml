@@ -28,6 +28,28 @@ spec:
       repository: docker.io/typesense/typesense
       tag: 0.24.0
 
+    env:
+      DB_HOSTNAME:
+        valueFrom:
+          secretKeyRef:
+            name: database-immich-user
+            key: HOST
+      DB_USERNAME:
+        valueFrom:
+          secretKeyRef:
+            name: database-immich-user
+            key: LOGIN
+      DB_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: database-immich-user
+            key: PASSWORD
+      DB_DATABASE_NAME:
+        valueFrom:
+          secretKeyRef:
+            name: database-immich-user
+            key: DATABASE_NAME
+
     envFrom:
       - secretRef:
           name: immich-secret
