@@ -46,4 +46,4 @@ echo "Script is running! waiting for signals."
 
 pid=$$
 
-sleep infinity & wait
+wait & sleep infinity
