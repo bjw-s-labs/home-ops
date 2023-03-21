@@ -1,0 +1,82 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: epic-free-games
+  namespace: selfhosted
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.3.2
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
+    image:
+      repository: ghcr.io/claabs/epicgames-freegames-node
+      tag: latest@sha256:72b1705318b8c65657a0221c5b51a6b341068d57cb6c7ed03375888603c64042
+
+    env:
+      CRON_SCHEDULE: "15 17 * * *"
+      RUN_ON_STARTUP: "true"
+      BASE_URL: "https://epic.bjw-s.dev"
+      TZ: Europe/Amsterdam
+
+    envFrom:
+      - secretRef:
+          name: epic-free-games-secret
+
+    service:
+      main:
+        ports:
+          http:
+            port: 3000
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+        hosts:
+          - host: &host epic.bjw-s.dev
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    podAnnotations:
+      kyverno-no-tz: "true"
+
+    probes:
+      startup:
+        enabled: false
+      readiness:
+        enabled: false
+      liveness:
+        enabled: false
+
+    resources:
+      requests:
+        cpu: 20m
+        memory: 256M
+      limits:
+        memory: 1024M
+
+    volumeClaimTemplates:
+      - name: config
+        mountPath: /usr/app/config
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
