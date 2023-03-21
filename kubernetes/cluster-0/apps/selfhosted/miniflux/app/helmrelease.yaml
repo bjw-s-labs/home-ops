@@ -21,19 +21,17 @@ spec:
       annotations:
         reloader.stakater.com/auto: "true"
 
-    initContainers:
-      init-db:
-        image: ghcr.io/onedr0p/postgres-initdb:14.7@sha256:9a82796ecc291a42ba3e2e4813a9c086fe7674160b9df18aeaec265b09e4a3f6
-        envFrom:
-          - secretRef:
-              name: miniflux-secret
-
     image:
       repository: ghcr.io/miniflux/miniflux
       tag: 2.0.43
 
     env:
       CREATE_ADMIN: "0"
+      DATABASE_URL:
+        valueFrom:
+          secretKeyRef:
+            name: database-miniflux-user
+            key: POSTGRES_URL
       POLLING_SCHEDULER: "entry_frequency"
       POLLING_FREQUENCY: "15"
       RUN_MIGRATIONS: "1"
