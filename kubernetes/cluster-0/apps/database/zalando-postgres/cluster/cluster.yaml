@@ -1,0 +1,20 @@
+---
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: postgres
+  namespace: database
+spec:
+  env:
+    - name: ALLOW_NOSSL
+      value: "true"
+  teamId: "bjw-s"
+  volume:
+    size: 30Gi
+  numberOfInstances: 3
+  users:
+    postgres: # database owner
+      - superuser
+      - createdb
+  postgresql:
+    version: "15"

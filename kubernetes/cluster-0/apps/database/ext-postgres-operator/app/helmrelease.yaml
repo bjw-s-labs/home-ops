@@ -1,0 +1,30 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: ext-postgres-operator
+  namespace: database
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: ext-postgres-operator
+      version: 1.2.3
+      sourceRef:
+        kind: HelmRepository
+        name: ext-postgres-operator
+        namespace: flux-system
+      interval: 5m
+
+  values:
+    podAnnotations:
+      reloader.stakater.com/auto: "true"
+
+    existingSecret: ext-postgres-operator-secret
+
+    resources:
+      requests:
+        cpu: 5m
+        memory: 32M
+      limits:
+        memory: 100M

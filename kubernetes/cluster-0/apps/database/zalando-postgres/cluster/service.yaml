@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-ext
+  namespace: database
+  annotations:
+    coredns.io/hostname: "postgres-zalando.bjw-s.dev"
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  loadBalancerIP: 10.45.0.24  # "${SVC_POSTGRES_ADDR}"
+  ports:
+    - name: postgres
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    application: spilo
+    cluster-name: postgres
+    spilo-role: master
