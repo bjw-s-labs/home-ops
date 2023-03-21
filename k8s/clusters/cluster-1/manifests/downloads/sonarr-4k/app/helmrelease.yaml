@@ -193,13 +193,31 @@ spec:
       mergerfs:
         name: mergerfs
         image: ghcr.io/hotio/mergerfs:release-2.34.1
+        command: ["/bin/sh", "-c"]
+        args:
+          - >
+            /usr/local/bin/mergerfs 
+              -o category.create=lfs \
+              -o async_read=false \
+              -o cache.files=full \
+              -o dropcacheonclose=true \
+              -o use_ino \
+              -o minfreespace=0 \
+              -o xattr=nosys \
+              -o statfs=full \
+              -o statfs_ignore=ro \
+              -o allow_other \
+              -o umask=002 \
+              -o noatime \
+              /mnt/remotes/nas00-media/Plex/Local-Media=RW:/mnt/remotes/google=NC \
+              /mnt/merged
         # command: ["sleep"]
         # args: ["999999999999"]
         # command: ["/usr/local/bin/mergerfs"]
         # command: ["/usr/local/bin/mergerfs --help"]
         # args: ["/usr=RO" ,"/mnt/merged"]
-        command: ["/bin/sh"]
-        args: ["-c", "/usr/local/bin/mergerfs -o category.create=lfs -o async_read=false -o cache.files=full -o dropcacheonclose=true -o use_ino -o minfreespace=0 -o xattr=nosys -o statfs=full -o statfs_ignore=ro -o allow_other -o umask=002 -o noatime mnt/remotes/nas00-media/Plex/Local-Media=RW:/mnt/remotes/google=NC /mnt/merged"]
+        # command: ["/bin/sh"]
+        # args: ["-c", "/usr/local/bin/mergerfs -o category.create=lfs -o async_read=false -o cache.files=full -o dropcacheonclose=true -o use_ino -o minfreespace=0 -o xattr=nosys -o statfs=full -o statfs_ignore=ro -o allow_other -o umask=002 -o noatime mnt/remotes/nas00-media/Plex/Local-Media=RW:/mnt/remotes/google=NC /mnt/merged"]
         # args: ["-oallow_other", "/mnt/remotes/nas00-media/Plex/Local-Media=RW:/mnt/remotes/google=NC" ,"/mnt/merged"]
           # - "-o category.create=lfs"
           # - "-o async_read=false"
