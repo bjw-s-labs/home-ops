@@ -21,13 +21,6 @@ spec:
       annotations:
         reloader.stakater.com/auto: "true"
 
-    initContainers:
-      init-db:
-        image: ghcr.io/onedr0p/postgres-initdb:14.7@sha256:9a82796ecc291a42ba3e2e4813a9c086fe7674160b9df18aeaec265b09e4a3f6
-        envFrom:
-          - secretRef:
-              name: dsmr-reader-secret
-
     image:
       repository: ghcr.io/xirixiz/dsmr-reader-docker
       tag: 5.10.3-2023.03.01
@@ -39,6 +32,28 @@ spec:
       DSMRREADER_REMOTE_DATALOGGER_INPUT_METHOD: ipv4
       DSMRREADER_REMOTE_DATALOGGER_NETWORK_HOST: "10.1.3.45"
       DSMRREADER_REMOTE_DATALOGGER_NETWORK_PORT: "8088"
+
+      DJANGO_DATABASE_HOST:
+        valueFrom:
+          secretKeyRef:
+            name: database-dsmr-reader-user
+            key: HOST
+      DJANGO_DATABASE_PORT: "5432"
+      DJANGO_DATABASE_USER:
+        valueFrom:
+          secretKeyRef:
+            name: database-dsmr-reader-user
+            key: LOGIN
+      DJANGO_DATABASE_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: database-dsmr-reader-user
+            key: PASSWORD
+      DJANGO_DATABASE_NAME:
+        valueFrom:
+          secretKeyRef:
+            name: database-dsmr-reader-user
+            key: DATABASE_NAME
 
     envFrom:
       - secretRef:
