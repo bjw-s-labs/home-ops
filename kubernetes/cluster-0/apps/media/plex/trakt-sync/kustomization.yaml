@@ -4,14 +4,13 @@ kind: Kustomization
 namespace: media
 resources:
   - ./helmrelease.yaml
-  - ./pvc.yaml
   - ./externalsecret.yaml
-  - ./replicationsource.yaml
+  - ./volsync.yaml
 commonLabels:
   app.kubernetes.io/name: plex-trakt-sync
   app.kubernetes.io/instance: plex-trakt-sync
 configMapGenerator:
-  - name: plex-tract-sync-config-yaml
+  - name: plex-tract-sync-configmap
     files:
       - ./config/config.yml
 generatorOptions:
