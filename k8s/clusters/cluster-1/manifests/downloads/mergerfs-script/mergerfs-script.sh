@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-anchor="/mnt/merged/gdrive.anchor"
-mountPoint="/mnt/merged"
+anchor="/mnt/unionfs/gdrive.anchor"
+mountPoint="/mnt/unionfs"
 mountName="Merged Media"
 
 unmount_merge() {
@@ -9,7 +9,6 @@ unmount_merge() {
   trap - SIGINT SIGTERM # clear the trap
   /bin/fusermount -uz ${mountPoint}
   kill -KILL "$pid"
-  # kill -- -$$ # Sends SIGTERM to child/sub processes
 }
 
 trap unmount_merge SIGTERM
@@ -46,5 +45,5 @@ echo "Script is running! waiting for signals."
 
 sleep infinity &
 pid=$!
-echo $pid
+
 wait $pid
