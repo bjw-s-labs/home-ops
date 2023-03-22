@@ -79,7 +79,7 @@ spec:
         enabled: true
         existingClaim: sonarr-4k-config
       nfs-nas-media:
-        enabled: true
+        enabled: false
         existingClaim: downloads-nfs-share-pvc
         mountPath: /mnt/unionfs
         readOnly: false
@@ -106,7 +106,7 @@ spec:
       shared-merged:
         enabled: true
         type: emptyDir
-        mountPath: /mnt/merged
+        mountPath: /mnt/unionfs
         mountPropagation: HostToContainer
       mergerfs-script:
         enabled: true
@@ -199,10 +199,6 @@ spec:
         name: mergerfs
         image: ghcr.io/hotio/mergerfs:release-2.34.1
         command: ["/scripts/mergerfs/mergerfs-script.sh"]
-        # command: ["/bin/sh","-c"]
-        # args:
-        #   - >
-        #     /scripts/mergerfs/mergerfs-script.sh
         securityContext:
           runAsUser: 0
           fsGroupChangePolicy: "OnRootMismatch"
