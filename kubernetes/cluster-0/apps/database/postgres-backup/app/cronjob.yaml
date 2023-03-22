@@ -21,30 +21,6 @@ spec:
               - 65541
 
           containers:
-            - name: postgres-backup
-              image: docker.io/prodrigestivill/postgres-backup-local:15@sha256:9a08323f39ff6cf0244b1462686d56a0911f8e41a23febf07b59840eacee9361
-              imagePullPolicy: IfNotPresent
-              command:
-                - "/backup.sh"
-              env:
-                - name: POSTGRES_HOST
-                  value: postgres-v15-ro.database.svc.cluster.local
-                - name: POSTGRES_USER
-                  valueFrom:
-                    secretKeyRef:
-                      name: cloudnative-pg-postgres-superuser
-                      key: username
-                - name: POSTGRES_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: cloudnative-pg-postgres-superuser
-                      key: password
-                - name: POSTGRES_DB
-                  value: "home-assistant"
-              volumeMounts:
-                - name: nas-backups
-                  mountPath: /backups
-
             - name: zalando-postgres-backup
               image: docker.io/prodrigestivill/postgres-backup-local:15@sha256:9a08323f39ff6cf0244b1462686d56a0911f8e41a23febf07b59840eacee9361
               imagePullPolicy: IfNotPresent
@@ -66,7 +42,7 @@ spec:
                       name: postgres.postgres.credentials.postgresql.acid.zalan.do
                       key: password
                 - name: POSTGRES_DB
-                  value: "dsmr-reader,immich,miniflux"
+                  value: "dsmr-reader,home-assistant,immich,miniflux"
               volumeMounts:
                 - name: nas-backups
                   mountPath: /backups
