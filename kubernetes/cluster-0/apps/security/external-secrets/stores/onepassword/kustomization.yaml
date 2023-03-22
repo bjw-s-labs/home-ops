@@ -6,5 +6,8 @@ resources:
   - ./secret.sops.yaml
   - ./helmrelease.yaml
   - ./clustersecretstore.yaml
-patchesStrategicMerge:
-  - ./patches/sync.yaml
+labels:
+  - pairs:
+      app.kubernetes.io/name: stores
+      app.kubernetes.io/instance: onepassword
+      app.kubernetes.io/part-of: external-secrets
