@@ -8,8 +8,8 @@ umount_merge() {
   echo "Unmounting ${mountName}..."
   trap - SIGINT SIGTERM # clear the trap
   /bin/fusermount -uz ${mountPoint}
-  kill -KILL "$pid" 2>/dev/null
-  kill -- -$$ # Sends SIGTERM to child/sub processes
+  kill -KILL "$pid"
+  # kill -- -$$ # Sends SIGTERM to child/sub processes
 }
 
 trap unmount_merge SIGTERM
@@ -44,6 +44,6 @@ fi
 
 echo "Script is running! waiting for signals."
 
-pid=$$
-
-wait & sleep infinity
+sleep infinity &
+pid=$!
+wait $pid
