@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
 
-anchor="/mnt/unionfs/gdrive.anchor"
-mountPoint="/mnt/unionfs"
-mountName="Merged Media"
+MERGERFS_ANCHOR="${VARIABLE:=/mnt/unionfs/gdrive.anchor}"
+MERGERFS_MOUNTPOINT="${VARIABLE:=/mnt/unionfs}"
+MERGERFS_MOUNTNAME="${VARIABLE:=Merged Media}"
 
 unmount_merge() {
-  echo "Unmounting ${mountName}..."
+  echo "Unmounting ${MERGERFS_MOUNTNAME}..."
   trap - SIGINT SIGTERM # clear the trap
-  /bin/fusermount -uz ${mountPoint}
+  /bin/fusermount -uz "${MERGERFS_MOUNTPOINT}"
   kill -KILL "$pid"
 }
 
 trap unmount_merge SIGTERM
-trap unmount_merge SIGKILL
 trap unmount_merge SIGQUIT
 
 sleep 15
@@ -31,14 +30,14 @@ sleep 15
   -o umask=002 \
   -o noatime \
   /mnt/remotes/nas00-media/Plex/Local-Media=RW:/mnt/remotes/google=NC \
-  ${mountPoint}
+  "${MERGERFS_MOUNTPOINT}"
 
 # check if mergerfs mount successful
-echo "$(date "+%d.%m.%Y %T") INFO: Checking if ${mountName} mergerfs mount created."
-if [[ -f "$anchor" ]]; then
-	echo "$(date "+%d.%m.%Y %T") INFO: Check successful, ${mountName} mergerfs mount created."
+echo "$(date "+%d.%m.%Y %T") INFO: Checking if ${MERGERFS_MOUNTNAME} mergerfs mount created."
+if [[ -f "$MERGERFS_ANCHOR" ]]; then
+	echo "$(date "+%d.%m.%Y %T") INFO: Check successful, ${MERGERFS_MOUNTNAME} mergerfs mount created."
 else
-  echo "$(date "+%d.%m.%Y %T") INFO: Mount Failed!, ${mountName} mergerfs mount NOT created."
+  echo "$(date "+%d.%m.%Y %T") INFO: Mount Failed!, ${MERGERFS_MOUNTNAME} mergerfs mount NOT created."
 fi
 
 echo "Script is running! waiting for signals."
