@@ -4,7 +4,7 @@ anchor="/mnt/merged/gdrive.anchor"
 mountPoint="/mnt/merged"
 mountName="Merged Media"
 
-umount_merge() {
+unmount_merge() {
   echo "Unmounting ${mountName}..."
   trap - SIGINT SIGTERM # clear the trap
   /bin/fusermount -uz ${mountPoint}
