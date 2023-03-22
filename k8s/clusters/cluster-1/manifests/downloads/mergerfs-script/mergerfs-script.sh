@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-MERGERFS_ANCHOR="${VARIABLE:=/mnt/unionfs/gdrive.anchor}"
-MERGERFS_MOUNTPOINT="${VARIABLE:=/mnt/unionfs}"
-MERGERFS_MOUNTNAME="${VARIABLE:=Merged Media}"
+MERGERFS_ANCHOR="${MERGERFS_ANCHOR:=/mnt/unionfs/gdrive.anchor}"
+MERGERFS_MOUNTPOINT="${MERGERFS_MOUNTPOINT:=/mnt/unionfs}"
+MERGERFS_MOUNTNAME="${MERGERFS_MOUNTNAME:=Merged Media}"
 
 unmount_merge() {
   echo "Unmounting ${MERGERFS_MOUNTNAME}..."
