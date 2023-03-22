@@ -44,9 +44,7 @@ fi
 
 echo "Script is running! waiting for signals."
 
-sleep 60
-unmount_merge
-
 sleep infinity &
 pid=$!
+echo $pid
 wait $pid
