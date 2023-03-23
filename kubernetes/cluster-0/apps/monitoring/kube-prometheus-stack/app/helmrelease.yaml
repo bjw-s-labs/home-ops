@@ -25,6 +25,9 @@ spec:
     ###
     ### Component values
     ###
+    alertmanager:
+      enabled: false
+
     kubeApiServer:
       enabled: true
 
@@ -71,6 +74,9 @@ spec:
         limits:
           memory: 153M
 
+    nodeExporter:
+      enabled: false
+
     grafana:
       enabled: false
       forceDeployDashboards: true
@@ -79,9 +85,6 @@ spec:
           multicluster:
             etcd:
               enabled: true
-
-    nodeExporter:
-      enabled: false
 
     ###
     ### Prometheus operator values
@@ -217,9 +220,3 @@ spec:
 
       thanosServiceMonitor:
         enabled: true
-
-    ###
-    ### Alertmanager values
-    ###
-    alertmanager:
-      enabled: false
