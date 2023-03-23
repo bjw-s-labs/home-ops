@@ -70,7 +70,7 @@ spec:
         enabled: true
         existingClaim: sonarr-config-nvme
       nfs-nas-media:
-        enabled: true
+        enabled: false
         existingClaim: downloads-nfs-share-pvc
         mountPath: /mnt/unionfs
         readOnly: false
@@ -82,6 +82,37 @@ spec:
             server: "${NAS_ADDRESS}"
             path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/sonarr
         mountPath: /config/Backups
+      rclone-config:
+        enabled: true
+        type: secret
+        name: rclone-secret
+        subPath: configData
+        mountPath: /config/rclone.conf
+        readOnly: true
+      shared-remote:
+        enabled: true
+        type: emptyDir
+        mountPath: /mnt/remotes
+        mountPropagation: HostToContainer
+      shared-merged:
+        enabled: true
+        type: emptyDir
+        mountPath: /mnt/unionfs
+        mountPropagation: HostToContainer
+      mergerfs-script:
+        enabled: true
+        type: configMap
+        name: mergerfs-script
+        mountPath: /scripts/mergerfs
+        defaultMode: 0777
+      nas00-media:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /Media
+        mountPath: /mnt/remotes/nas00-media
 
     ingress:
       main:
@@ -125,3 +156,66 @@ spec:
                   values:
                     - plex
             topologyKey: kubernetes.io/hostname
+
+    sidecars:
+      rclone-mount:
+        name: rclone-mount
+        image: mumiehub/rclone-mount:latest       
+        securityContext:
+          runAsUser: 0
+          fsGroupChangePolicy: "OnRootMismatch"
+          privileged: true
+        env:
+          - name: TZ
+            value: "${TIMEZONE}"
+          # Inside the /config folder
+          - name: ConfigName
+            value: "rclone.conf"
+          - name: RemotePath
+            value: "google:"
+          - name: MountPoint
+            value: "/mnt/remotes/google"
+          - name: MountCommands
+            value: "--allow-other \
+                    --allow-non-empty \
+                    --drive-skip-gdocs \
+                    --vfs-read-chunk-size=64M \
+                    --vfs-read-chunk-size-limit=2048M \
+                    --buffer-size=64M \
+                    --poll-interval=1m \
+                    --dir-cache-time=168h \
+                    --timeout=10m \
+                    --drive-chunk-size=64M \
+                    --umask=002"
+                    # User Agent spaces makes rclone mount think its multiple mount commands and not a long string. Removing it for now
+                    # --user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36 \
+        volumeMounts:
+          - name: rclone-config
+            mountPath: /config/rclone.conf
+            readOnly: true
+            subPath: configData
+          - name: shared-remote
+            mountPath: /mnt/remotes
+            mountPropagation: Bidirectional
+      mergerfs:
+        name: mergerfs
+        image: ghcr.io/hotio/mergerfs:release-2.34.1
+        command: ["/scripts/mergerfs/mergerfs-script.sh"]
+        securityContext:
+          runAsUser: 0
+          fsGroupChangePolicy: "OnRootMismatch"
+          privileged: true
+        env:
+          - name: TZ
+            value: "${TIMEZONE}"
+        volumeMounts:
+          - name: nas00-media
+            mountPath: /mnt/remotes/nas00-media
+          - name: shared-remote
+            mountPath: /mnt/remotes
+            mountPropagation: HostToContainer
+          - name: shared-merged
+            mountPath: /mnt/unionfs
+            mountPropagation: Bidirectional
+          - name: mergerfs-script
+            mountPath: /scripts/mergerfs
