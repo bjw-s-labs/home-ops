@@ -26,13 +26,6 @@ spec:
       dnsDiscovery:
         sidecarsService: kube-prometheus-stack-thanos-discovery
         sidecarsNamespace: monitoring
-      ingress:
-        enabled: true
-        hostname: "thanos-cluster-0.bjw-s.dev"
-        ingressClassName: "nginx"
-        annotations:
-          nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
-        tls: true
       replicaLabels:
         - "__replica__" # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.replicaExternalLabelName`
       resources:
@@ -43,7 +36,14 @@ spec:
         #   memory: 99M
 
     queryFrontend:
-      enabled: false
+      enabled: true
+      ingress:
+        enabled: true
+        hostname: "thanos.bjw-s.dev"
+        ingressClassName: "nginx"
+        annotations:
+          nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+        tls: true
 
     bucketweb:
       enabled: true
