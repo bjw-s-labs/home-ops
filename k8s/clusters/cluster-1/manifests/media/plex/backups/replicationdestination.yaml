@@ -6,10 +6,10 @@ metadata:
   name: plex
   namespace: media
 spec:
-  destinationPVC: plex-config-nvme
   trigger:
     manual: restore-once
   restic:
+    destinationPVC: plex-config-nvme
     copyMethod: Direct
     repository: plex-restic
     cacheCapacity: 5Gi

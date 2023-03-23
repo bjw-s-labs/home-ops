@@ -6,10 +6,10 @@ metadata:
   name: airsonic
   namespace: media
 spec:
-  destinationPVC: airsonic-config
   trigger:
     manual: restore-once
   restic:
+    destinationPVC: airsonic-config
     copyMethod: Direct
     repository: airsonic-restic
     cacheCapacity: 5Gi

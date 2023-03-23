@@ -6,10 +6,10 @@ metadata:
   name: plex-meta-manager
   namespace: media
 spec:
-  destinationPVC: plex-meta-manager-config
   trigger:
     manual: restore-once
   restic:
+    destinationPVC: plex-meta-manager-config
     copyMethod: Direct
     repository: plex-meta-manager-restic
     cacheCapacity: 5Gi

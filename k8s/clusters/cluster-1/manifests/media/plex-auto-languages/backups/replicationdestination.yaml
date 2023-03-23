@@ -6,10 +6,10 @@ metadata:
   name: plex-auto-languages
   namespace: media
 spec:
-  destinationPVC: plex-auto-lang-config-config
   trigger:
     manual: restore-once
   restic:
+    destinationPVC: plex-auto-lang-config-config
     copyMethod: Direct
     repository: plex-auto-lang-restic
     cacheCapacity: 5Gi

@@ -6,10 +6,10 @@ metadata:
   name: autoscan
   namespace: media
 spec:
-  destinationPVC: autoscan-config
   trigger:
     manual: restore-once
   restic:
+    destinationPVC: autoscan-config
     copyMethod: Direct
     repository: autoscan-restic
     cacheCapacity: 5Gi
