@@ -12,72 +12,72 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: media-plex
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: media-namespace
-  interval: 5m
-  path: "./k8s/clusters/cluster-1/manifests/media/plex"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: media-tautulli
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: media-namespace
-    - name: media-plex
-  interval: 5m
-  path: "./k8s/clusters/cluster-1/manifests/media/tautulli"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: media-autoscan
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: media-namespace
-    - name: media-plex
-  interval: 5m
-  path: "./k8s/clusters/cluster-1/manifests/media/autoscan"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: media-airsonic
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: media-namespace
-  interval: 5m
-  path: "./k8s/clusters/cluster-1/manifests/media/airsonic"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: media-plex
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: media-namespace
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-1/manifests/media/plex"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: home-ops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: media-tautulli
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: media-namespace
+#     - name: media-plex
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-1/manifests/media/tautulli"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: home-ops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: media-autoscan
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: media-namespace
+#     - name: media-plex
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-1/manifests/media/autoscan"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: home-ops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: media-airsonic
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: media-namespace
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-1/manifests/media/airsonic"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: home-ops
 # ---
 # apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 # kind: Kustomization
@@ -110,40 +110,40 @@ spec:
 #   sourceRef:
 #     kind: GitRepository
 #     name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: media-plex-meta-manager
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: media-namespace
-    - name: media-plex
-    - name: media-tautulli
-    - name: cluster-workloads-sonarr
-    - name: cluster-workloads-radarr
-  interval: 5m
-  path: "./k8s/clusters/cluster-1/manifests/media/plex-meta-manager"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: media-plex-auto-languages
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: media-namespace
-    - name: media-plex
-  interval: 5m
-  path: "./k8s/clusters/cluster-1/manifests/media/plex-auto-languages"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: media-plex-meta-manager
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: media-namespace
+#     - name: media-plex
+#     - name: media-tautulli
+#     - name: cluster-workloads-sonarr
+#     - name: cluster-workloads-radarr
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-1/manifests/media/plex-meta-manager"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: home-ops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: media-plex-auto-languages
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: media-namespace
+#     - name: media-plex
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-1/manifests/media/plex-auto-languages"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: home-ops

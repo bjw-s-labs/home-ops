@@ -5,5 +5,7 @@ kind: Kustomization
 resources:
   - pvc.yaml
   - helmrelease.yaml
-  - ./backups/secret.sops.yaml
-  - ./backups/replicationsource.yaml
+labels:
+  - pairs:
+      app.kubernetes.io/name: plex-auto-languages
+      app.kubernetes.io/instance: plex-auto-languages

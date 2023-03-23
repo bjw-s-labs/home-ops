@@ -6,8 +6,6 @@ namespace: media
 resources:
   - pvc.yaml
   - helmrelease.yaml
-  - ./backups/secret.sops.yaml
-  - ./backups/replicationsource.yaml
 configMapGenerator:
   - name: pmm-config
     files:
@@ -31,3 +29,7 @@ generatorOptions:
 commonLabels:
   app.kubernetes.io/name: plex-meta-manager
   app.kubernetes.io/instance: plex-meta-manager
+labels:
+  - pairs:
+      app.kubernetes.io/name: plex-meta-manager
+      app.kubernetes.io/instance: plex-meta-manager

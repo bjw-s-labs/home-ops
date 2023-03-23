@@ -4,7 +4,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ./pvc.yaml
-  - ./secret-autoscan-config.sops.yaml
   - ./helmrelease.yaml
-  - ./backups/secret.sops.yaml
-  - ./backups/replicationsource.yaml
+labels:
+  - pairs:
+      app.kubernetes.io/name: tautulli
+      app.kubernetes.io/instance: tautulli

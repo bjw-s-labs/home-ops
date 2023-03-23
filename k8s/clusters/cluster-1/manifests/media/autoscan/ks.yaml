@@ -1,0 +1,41 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/kustomization_v1beta2.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cluster-workloads-autoscan
+  namespace: flux-system
+spec:
+  path: ./k8s/clusters/cluster-1/manifests/media/autoscan/app
+  prune: true
+#   dependsOn:
+#     - name: network-namespace
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+      kind: HelmRelease
+      name: autoscan
+      namespace: media
+  interval: 30m
+  retryInterval: 1m
+  timeout: 3m
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/kustomization_v1beta2.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cluster-workloads-autoscan-volsync
+  namespace: flux-system
+spec:
+  path: ./k8s/clusters/cluster-1/manifests/media/autoscan/backups
+  prune: true
+#   dependsOn:
+#     - name: network-namespace
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+  interval: 30m
+  retryInterval: 1m
+  timeout: 3m
