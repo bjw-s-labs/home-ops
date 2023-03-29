@@ -2,35 +2,31 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: cluster-apps-bonob-main
+  name: cluster-apps-gonic-main
   namespace: flux-system
   labels:
     substitution.flux.home.arpa/enabled: "true"
 spec:
   interval: 10m
-  path: "./kubernetes/cluster-0/apps/media/bonob/main"
+  path: "./kubernetes/cluster-0/apps/media/gonic/main"
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-ops-kubernetes
   wait: true
-  dependsOn:
-    - name: cluster-apps-gonic-main
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: cluster-apps-bonob-kids
+  name: cluster-apps-gonic-kids
   namespace: flux-system
   labels:
     substitution.flux.home.arpa/enabled: "true"
 spec:
   interval: 10m
-  path: "./kubernetes/cluster-0/apps/media/bonob/kids"
+  path: "./kubernetes/cluster-0/apps/media/gonic/kids"
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-ops-kubernetes
   wait: true
-  dependsOn:
-    - name: cluster-apps-gonic-kids
