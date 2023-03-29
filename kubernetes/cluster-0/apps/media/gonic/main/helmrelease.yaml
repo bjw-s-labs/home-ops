@@ -2,10 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  labels:
-    app.kubernetes.io/instance: navidrome
-    app.kubernetes.io/name: navidrome
-  name: navidrome
+  name: gonic-main
   namespace: media
 spec:
   chart:
@@ -19,17 +16,26 @@ spec:
         namespace: flux-system
   interval: 30m
   values:
+    controller:
+      type: statefulset
+
     image:
-      repository: docker.io/deluan/navidrome
-      tag: 0.49.3
+      repository: ghcr.io/sentriz/gonic
+      tag: v0.15.2
 
     env:
-      ND_DATAFOLDER: /data
-      ND_ENABLESTARRATING: "false"
-      ND_LASTFM_ENABLED: "false"
-      ND_LOGLEVEL: info
-      ND_MUSICFOLDER: /music
-      ND_SCANSCHEDULE: "@every 1h"
+      GONIC_LISTEN_ADDR: 0.0.0.0:4747
+      GONIC_CACHE_PATH: /cache
+      GONIC_JUKEBOX_ENABLED: "false"
+      GONIC_MUSIC_PATH: /music/main
+      GONIC_SCAN_AT_START_ENABLED: "true"
+      GONIC_SCAN_WATCHER_ENABLED: "true"
+
+    service:
+      main:
+        ports:
+          http:
+            port: 4747
 
     ingress:
       main:
@@ -38,7 +44,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: ingress.bjw-s.dev
         ingressClassName: nginx
         hosts:
-          - host: &host navidrome.bjw-s.dev
+          - host: &host gonic-main.bjw-s.dev
             paths:
               - path: /
         tls:
@@ -46,16 +52,10 @@ spec:
               - *host
 
     persistence:
-      config:
+      cache:
         enabled: true
-        existingClaim: navidrome-config
-        mountPath: /data
-      music-kids:
-        enabled: true
-        mountPath: /music/kids
-        path: /volume1/Media/Library/Kids/Music
-        server: nas.bjw-s.tech
-        type: nfs
+        type: emptyDir
+
       music-main:
         enabled: true
         mountPath: /music/main
@@ -71,11 +71,12 @@ spec:
       requests:
         cpu: 15m
         memory: 184M
-      limits:
-        memory: 221M
+      # limits:
+      #   memory: 221M
 
-    service:
-      main:
-        ports:
-          http:
-            port: 4533
+    volumeClaimTemplates:
+      - name: data
+        mountPath: /data
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block

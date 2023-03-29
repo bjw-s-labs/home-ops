@@ -1,0 +1,82 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: gonic-kids
+  namespace: media
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 1.3.2
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 30m
+  values:
+    controller:
+      type: statefulset
+
+    image:
+      repository: ghcr.io/sentriz/gonic
+      tag: v0.15.2
+
+    env:
+      GONIC_LISTEN_ADDR: 0.0.0.0:4747
+      GONIC_CACHE_PATH: /cache
+      GONIC_JUKEBOX_ENABLED: "false"
+      GONIC_MUSIC_PATH: /music/kids
+      GONIC_SCAN_AT_START_ENABLED: "true"
+      GONIC_SCAN_WATCHER_ENABLED: "true"
+
+    service:
+      main:
+        ports:
+          http:
+            port: 4747
+
+    ingress:
+      main:
+        enabled: true
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress.bjw-s.dev
+        ingressClassName: nginx
+        hosts:
+          - host: &host gonic-kids.bjw-s.dev
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      cache:
+        enabled: true
+        type: emptyDir
+
+      music-kids:
+        enabled: true
+        mountPath: /music/kids
+        path: /volume1/Media/Library/Kids/Music
+        server: nas.bjw-s.tech
+        type: nfs
+
+    podSecurityContext:
+      supplementalGroups:
+        - 65539
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 184M
+      # limits:
+      #   memory: 221M
+
+    volumeClaimTemplates:
+      - name: data
+        mountPath: /data
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
