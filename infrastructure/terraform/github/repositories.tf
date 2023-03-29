@@ -460,3 +460,68 @@ module "kobomail" {
     local.default_issue_labels
   )
 }
+
+module "asdf_talosctl" {
+  source  = "mineiros-io/repository/github"
+  version = "0.18.0"
+
+  name        = "asdf-talosctl"
+  description = "talosctl plugin for the asdf version manager"
+  topics      = ["asdf", "talos", "talosctl"]
+  visibility  = "public"
+
+  auto_init              = true
+  allow_merge_commit     = false
+  allow_squash_merge     = true
+  allow_auto_merge       = true
+  delete_branch_on_merge = true
+
+  has_issues   = true
+  has_wiki     = false
+  has_projects = false
+  is_template  = false
+
+  plaintext_secrets = merge(
+    {},
+    local.bjws_bot_secrets
+  )
+
+  issue_labels_merge_with_github_labels = false
+  issue_labels = concat(
+    [],
+    local.default_issue_labels
+  )
+}
+
+
+module "asdf_talhelper" {
+  source  = "mineiros-io/repository/github"
+  version = "0.18.0"
+
+  name        = "asdf-talhelper"
+  description = "talhelper email attachment downloader for Kobo devices"
+  topics      = ["asdf", "talos", "talhelper"]
+  visibility  = "public"
+
+  auto_init              = true
+  allow_merge_commit     = false
+  allow_squash_merge     = true
+  allow_auto_merge       = true
+  delete_branch_on_merge = true
+
+  has_issues   = true
+  has_wiki     = false
+  has_projects = false
+  is_template  = false
+
+  plaintext_secrets = merge(
+    {},
+    local.bjws_bot_secrets
+  )
+
+  issue_labels_merge_with_github_labels = false
+  issue_labels = concat(
+    [],
+    local.default_issue_labels
+  )
+}
