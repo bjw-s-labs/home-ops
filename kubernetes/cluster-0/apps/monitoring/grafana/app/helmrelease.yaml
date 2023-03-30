@@ -31,9 +31,17 @@ spec:
               path: /var/lib/grafana/dashboards/default
             orgId: 1
             type: file
+          - name: node-exporter
+            disableDeletion: false
+            editable: true
+            folder: "node-exporter"
+            options:
+              path: /var/lib/grafana/dashboards/node-exporter
+            orgId: 1
+            type: file
 
     dashboards:
-      default:
+      node-exporter:
         # Ref: https://grafana.com/grafana/dashboards/1860-node-exporter-full/
         node-exporter:
           gnetId: 1860
@@ -165,7 +173,12 @@ spec:
       dashboards:
         enabled: true
         labelValue: ""
+        label: grafana_dashboard
+        folderAnnotation: grafana_folder
         searchNamespace: ALL
+        provider:
+          disableDelete: true
+          foldersFromFilesStructure: true
       datasources:
         enabled: true
         labelValue: ""
