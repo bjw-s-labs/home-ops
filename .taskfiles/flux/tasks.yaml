@@ -7,7 +7,7 @@ tasks:
     cmds:
       - |
         kubectl get gitrepositories --all-namespaces --no-headers | awk '{print $1, $2}' \
-          | xargs --max-procs=4 -l bash -c \
+          | xargs -P 4 -L 1 bash -c \
             'kubectl -n $0 annotate gitrepository/$1 reconcile.fluxcd.io/requestedAt=$(date +%s) --field-manager=flux-client-side-apply --overwrite'
 
   ks-sync:
@@ -15,7 +15,7 @@ tasks:
     cmds:
       - |
         kubectl get kustomization --all-namespaces --no-headers | awk '{print $1, $2}' \
-          | xargs --max-procs=4 -l bash -c \
+          | xargs -P 4 -L 1 bash -c \
             'kubectl -n $0 annotate kustomization/$1 reconcile.fluxcd.io/requestedAt="$(date +%s)" --field-manager=flux-client-side-apply --overwrite'
 
   hr-sync:
@@ -23,7 +23,7 @@ tasks:
     cmds:
       - |
         kubectl get helmreleases --all-namespaces --no-headers | awk '{print $1, $2}' \
-          | xargs --max-procs=4 -l bash -c \
+          | xargs -P 4 -L 1 bash -c \
             'kubectl -n $0 annotate helmrelease/$1 reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite'
 
   tf-sync:
@@ -31,17 +31,17 @@ tasks:
     cmds:
       - |
         kubectl get terraforms --all-namespaces --no-headers | awk '{print $1, $2}' \
-          | xargs --max-procs=4 -l bash -c \
+          | xargs -P 4 -L 1 bash -c \
             'kubectl -n $0 annotate terraform/$1 reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite'
   hr-suspend:
     desc: Suspend all Flux HelmReleases
     cmds:
       - |
         flux get helmrelease --all-namespaces --no-header | awk '{print $1, $2}' \
-          | xargs -l bash -c 'flux -n $0 suspend helmrelease $1'
+          | xargs -L 1 bash -c 'flux -n $0 suspend helmrelease $1'
   hr-resume:
     desc: Resume all Flux HelmReleases
     cmds:
       - |
         flux get helmrelease --all-namespaces --no-header | awk '{print $1, $2}' \
-          | xargs -l bash -c 'flux -n $0 resume helmrelease $1'
+          | xargs -L 1 bash -c 'flux -n $0 resume helmrelease $1'
