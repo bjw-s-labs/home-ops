@@ -2,7 +2,12 @@ variable "bucket_name" {
   type = string
 }
 
-variable "owner_access_id" {
+variable "is_public" {
+  type = bool
+  default = false
+}
+
+variable "owner_access_key" {
   type      = string
   sensitive = false
   default   = null
