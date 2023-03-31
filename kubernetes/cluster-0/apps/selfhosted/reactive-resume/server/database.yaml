@@ -1,0 +1,19 @@
+---
+apiVersion: db.movetokube.com/v1alpha1
+kind: Postgres
+metadata:
+  name: reactive-resume-db
+  namespace: selfhosted
+spec:
+  database: reactive-resume
+---
+apiVersion: db.movetokube.com/v1alpha1
+kind: PostgresUser
+metadata:
+  name: reactive-resume-user
+  namespace: selfhosted
+spec:
+  role: reactive-resume
+  database: reactive-resume-db
+  secretName: database
+  privileges: OWNER
