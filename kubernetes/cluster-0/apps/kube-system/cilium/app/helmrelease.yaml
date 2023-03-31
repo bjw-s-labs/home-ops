@@ -23,8 +23,8 @@ spec:
         loadbalancerIP: true
       enabled: true
     cluster:
-      id: ${CLUSTER_ID}
-      name: ${CLUSTER_NAME}
+      id: 1
+      name: cluster-0
     containerRuntime:
       integration: containerd
     endpointRoutes:
@@ -53,14 +53,14 @@ spec:
           enabled: true
           className: "nginx"
           hosts:
-            - &host hubble-${CLUSTER_NAME}.bjw-s.dev
+            - &host hubble-cluster-0.bjw-s.dev
           tls:
             - hosts:
                 - *host
         rollOutPods: true
     ipam:
       mode: kubernetes
-    ipv4NativeRoutingCIDR: ${NETWORK_K8S_POD_CIDR}
+    ipv4NativeRoutingCIDR: 10.244.0.0/16
     k8sServiceHost: cluster-0.bjw-s.tech
     k8sServicePort: 6443
     kubeProxyReplacement: strict
