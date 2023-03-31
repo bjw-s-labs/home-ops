@@ -1,0 +1,37 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cluster-apps-reactive-resume-server
+  namespace: flux-system
+  labels:
+    substitution.flux.home.arpa/enabled: "true"
+spec:
+  interval: 10m
+  path: "./kubernetes/cluster-0/apps/selfhosted/reactive-resume/server"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  wait: true
+  dependsOn:
+    - name: cluster-apps-ext-postgres-operator
+    # - name: cluster-apps-external-secrets-stores
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cluster-apps-reactive-resume-client
+  namespace: flux-system
+  labels:
+    substitution.flux.home.arpa/enabled: "true"
+spec:
+  interval: 10m
+  path: "./kubernetes/cluster-0/apps/selfhosted/reactive-resume/client"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  wait: true
+  dependsOn:
+    - name: cluster-apps-reactive-resume-server
