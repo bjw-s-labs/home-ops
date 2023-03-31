@@ -39,14 +39,53 @@ spec:
               path: /var/lib/grafana/dashboards/node-exporter
             orgId: 1
             type: file
+          - name: unpoller
+            disableDeletion: false
+            editable: true
+            folder: "UniFi Poller"
+            options:
+              path: /var/lib/grafana/dashboards/unpoller
+            orgId: 1
+            type: file
 
     dashboards:
+      default:
+        speedtest-exporter-hub:
+          gnetId: 13665
+          revision: 4
+          datasource:
+            - name: "DS_PROMETHEUS"
+              value: Prometheus
+
       node-exporter:
         # Ref: https://grafana.com/grafana/dashboards/1860-node-exporter-full/
         node-exporter:
           gnetId: 1860
           revision: 29
           datasource: Prometheus
+
+      unpoller:
+        # Ref: https://grafana.com/grafana/dashboards/11315
+        clients:
+          gnetId: 11315
+          revision: 9
+          datasource:
+            - name: "DS_PROMETHEUS"
+              value: Prometheus
+        # Ref: https://grafana.com/grafana/dashboards/11312
+        usw:
+          gnetId: 11312
+          revision: 9
+          datasource:
+            - name: "DS_PROMETHEUS"
+              value: Prometheus
+        # Ref: https://grafana.com/grafana/dashboards/11314
+        uap:
+          gnetId: 11314
+          revision: 10
+          datasource:
+            - name: "DS_PROMETHEUS"
+              value: Prometheus
 
     datasources:
       datasources.yaml:
