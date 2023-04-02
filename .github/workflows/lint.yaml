@@ -29,7 +29,7 @@ jobs:
           private_key: ${{ secrets.DCPLAYA_APP_PRIVATE_KEY }}
 
       - name: MegaLinter
-        uses: oxsecurity/megalinter@v6.22.0
+        uses: oxsecurity/megalinter@v6.22.1
         env:
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'workflow_dispatch' }}
           GITHUB_TOKEN: "${{ steps.generate-token.outputs.token }}"
