@@ -46,9 +46,9 @@ spec:
         sabnzbd.downloads.svc.cluster.local,
         sabnzbd.${INGRESS_DOMAIN},
         sabnzbd.${CLUSTER_NAME}.${INGRESS_DOMAIN}
-    # envFrom:
-    #   - secretRef:
-    #       name: sabnzbd-secret
+    envFrom:
+      - secretRef:
+          name: sabnzbd-api-keys
     service:
       main:
         ports:
