@@ -101,6 +101,7 @@ spec:
       fsGroupChangePolicy: OnRootMismatch
       supplementalGroups:
         - 100
+      privileged: true
     # Note: If downloading very large nzbs it might be worth using NFS for your download directory.
     persistence:
       config:
@@ -118,7 +119,7 @@ spec:
             path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/sabnzbd
         mountPath: /config/Backups
       nfs-nas-media:
-        enabled: false
+        enabled: true
         existingClaim: downloads-nfs-share-pvc
         mountPath: /mnt/unionfs
         readOnly: false
@@ -137,8 +138,8 @@ spec:
       shared-merged:
         enabled: true
         type: emptyDir
-        mountPath: /mnt/unionfs
-        mountPropagation: Bidirectional
+        mountPath: /mnt/unionfs-test
+        mountPropagation: HostToContainer
       mergerfs-script:
         enabled: true
         type: configMap
