@@ -109,6 +109,14 @@ spec:
       incomplete:
         enabled: true
         type: emptyDir
+      backup:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/sabnzbd
+        mountPath: /config/Backups
       nfs-nas-media:
         enabled: false
         existingClaim: downloads-nfs-share-pvc
