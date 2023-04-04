@@ -96,12 +96,12 @@ spec:
               - *host
     podSecurityContext:
       runAsUser: 568
-      runAsGroup: 568
+      runAsGroup: 100
       fsGroup: 568
       fsGroupChangePolicy: OnRootMismatch
       supplementalGroups:
-        - 100
-      privileged: true
+        - 568
+      # privileged: true
     # Note: If downloading very large nzbs it might be worth using NFS for your download directory.
     persistence:
       config:
