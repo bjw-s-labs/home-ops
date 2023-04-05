@@ -275,10 +275,12 @@ spec:
             value: "/mnt/remotes/google"
           - name: MountCommands
             value: "--allow-other \
+                    --rc \
+                    --rc-addr=localhost:5572 \
                     --allow-non-empty \
                     --drive-skip-gdocs \
                     --vfs-read-chunk-size=64M \
-                    --vfs-read-chunk-size-limit=2048M \
+                    --vfs-read-chunk-size-limit=512M \
                     --buffer-size=64M \
                     --poll-interval=1m \
                     --dir-cache-time=5m \
