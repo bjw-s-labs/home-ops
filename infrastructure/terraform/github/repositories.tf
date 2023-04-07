@@ -461,6 +461,38 @@ module "kobomail" {
   )
 }
 
+module "asdf_krew" {
+  source  = "mineiros-io/repository/github"
+  version = "0.18.0"
+
+  name        = "asdf-krew"
+  description = "krew plugin for the asdf version manager"
+  topics      = ["asdf", "krew", "kubectl"]
+  visibility  = "public"
+
+  auto_init              = true
+  allow_merge_commit     = false
+  allow_squash_merge     = true
+  allow_auto_merge       = true
+  delete_branch_on_merge = true
+
+  has_issues   = true
+  has_wiki     = false
+  has_projects = false
+  is_template  = false
+
+  plaintext_secrets = merge(
+    {},
+    local.bjws_bot_secrets
+  )
+
+  issue_labels_merge_with_github_labels = false
+  issue_labels = concat(
+    [],
+    local.default_issue_labels
+  )
+}
+
 module "asdf_talosctl" {
   source  = "mineiros-io/repository/github"
   version = "0.18.0"
@@ -502,6 +534,40 @@ module "asdf_talhelper" {
   description = "talhelper plugin for the asdf version manager"
   topics      = ["asdf", "talos", "talhelper"]
   visibility  = "public"
+
+  auto_init              = true
+  allow_merge_commit     = false
+  allow_squash_merge     = true
+  allow_auto_merge       = true
+  delete_branch_on_merge = true
+
+  has_issues   = true
+  has_wiki     = false
+  has_projects = false
+  is_template  = false
+
+  plaintext_secrets = merge(
+    {},
+    local.bjws_bot_secrets
+  )
+
+  issue_labels_merge_with_github_labels = false
+  issue_labels = concat(
+    [],
+    local.default_issue_labels
+  )
+}
+
+module "dotfiles" {
+  source  = "mineiros-io/repository/github"
+  version = "0.18.0"
+
+  name        = "dotfiles"
+  description = "My collection of dotfiles, powered by chezmoi"
+  topics      = ["dotfiles", "macos", "chezmoi"]
+  visibility  = "public"
+
+  archived = false
 
   auto_init              = true
   allow_merge_commit     = false
