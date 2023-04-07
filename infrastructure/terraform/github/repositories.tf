@@ -499,7 +499,7 @@ module "asdf_talhelper" {
   version = "0.18.0"
 
   name        = "asdf-talhelper"
-  description = "talhelper email attachment downloader for Kobo devices"
+  description = "talhelper plugin for the asdf version manager"
   topics      = ["asdf", "talos", "talhelper"]
   visibility  = "public"
 
