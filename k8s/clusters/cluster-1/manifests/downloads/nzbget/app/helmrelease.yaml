@@ -138,6 +138,13 @@ spec:
         image: mumiehub/rclone-mount:latest       
         securityContext:
           runAsUser: 0
+          # fsGroupChangePolicy: "OnRootMismatch"
+          # runAsUser: 568
+          runAsGroup: 100
+          fsGroup: 568
+          supplementalGroups:
+            - 34
+            - 568
           fsGroupChangePolicy: "OnRootMismatch"
           privileged: true
         env:
@@ -180,6 +187,13 @@ spec:
         command: ["/scripts/mergerfs/mergerfs-script.sh"]
         securityContext:
           runAsUser: 0
+          # fsGroupChangePolicy: "OnRootMismatch"
+          # runAsUser: 568
+          runAsGroup: 100
+          fsGroup: 568
+          supplementalGroups:
+            - 34
+            - 568
           fsGroupChangePolicy: "OnRootMismatch"
           privileged: true
         env:
