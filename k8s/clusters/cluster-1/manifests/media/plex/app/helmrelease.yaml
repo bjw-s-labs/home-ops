@@ -118,7 +118,7 @@ spec:
         # medium: Memory
 
       nfs-nas-media:
-        enabled: false
+        enabled: true
         existingClaim: media-nfs-share-pvc
         mountPath: /mnt/unionfs
         readOnly: false
@@ -147,7 +147,7 @@ spec:
       shared-merged:
         enabled: true
         type: emptyDir
-        mountPath: /mnt/unionfs
+        mountPath: /mnt/unionfs-test
         mountPropagation: HostToContainer
       mergerfs-script:
         enabled: true
