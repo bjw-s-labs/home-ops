@@ -7,7 +7,8 @@ MERGERFS_MOUNTNAME="${MERGERFS_MOUNTNAME:=Merged Media}"
 unmount_merge() {
   echo "Unmounting ${MERGERFS_MOUNTNAME}..."
   trap - SIGINT SIGTERM # clear the trap
-  /bin/fusermount -uz "${MERGERFS_MOUNTPOINT}"
+  # /bin/fusermount -uz "${MERGERFS_MOUNTPOINT}"
+  /usr/bin/umount -f -l -v "${MERGERFS_MOUNTPOINT}"
   kill -KILL "$pid"
 }
 
