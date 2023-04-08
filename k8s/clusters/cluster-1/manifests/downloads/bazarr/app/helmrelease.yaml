@@ -180,7 +180,13 @@ spec:
         command: ["/scripts/mergerfs/mergerfs-script.sh"]
         securityContext:
           runAsUser: 0
-          fsGroupChangePolicy: "OnRootMismatch"
+          # fsGroupChangePolicy: "OnRootMismatch"
+          # runAsUser: 568
+          runAsGroup: 100
+          fsGroup: 568
+          supplementalGroups:
+            - 34
+            - 568
           privileged: true
         env:
           - name: TZ
