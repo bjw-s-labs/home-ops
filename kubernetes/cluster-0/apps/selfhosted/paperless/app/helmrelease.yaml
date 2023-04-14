@@ -17,44 +17,20 @@ spec:
         namespace: flux-system
 
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
       repository: ghcr.io/paperless-ngx/paperless-ngx
       tag: 1.13.0
 
-    podAnnotations:
-      secret.reloader.stakater.com/reload: paperless-secrets
-
-    env:
-      COMPOSE_PROJECT_NAME: paperless
-      PAPERLESS_CONSUMER_POLLING: "60"
-      PAPERLESS_CONSUMER_RECURSIVE: "true"
-      PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
-      PAPERLESS_ENABLE_HTTP_REMOTE_USER: "true"
-      PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME: HTTP_X_AUTH_REQUEST_EMAIL
-      PAPERLESS_OCR_LANGUAGES: nld
-      PAPERLESS_OCR_LANGUAGE: nld
-      PAPERLESS_PORT: 8000
-      PAPERLESS_REDIS: redis://paperless-redis.selfhosted.svc.cluster.local:6379
-      PAPERLESS_WEBSERVER_WORKERS: 2
-      PAPERLESS_TASK_WORKERS: 4
-      PAPERLESS_TIME_ZONE: "Europe/Amsterdam"
-      PAPERLESS_URL: https://paperless.bjw-s.dev
-      USERMAP_GID: 65543
-      PAPERLESS_ADMIN_USER:
-        valueFrom:
-          secretKeyRef:
-            name: paperless-secrets
-            key: PAPERLESS_ADMIN_USER
-      PAPERLESS_ADMIN_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: paperless-secrets
-            key: PAPERLESS_ADMIN_PASSWORD
-      PAPERLESS_SECRET_KEY:
-        valueFrom:
-          secretKeyRef:
-            name: paperless-secrets
-            key: PAPERLESS_SECRET_KEY
+    envFrom:
+      - secretRef:
+          name: paperless-secret
+      - configMapRef:
+          name: paperless-configmap
 
     service:
       main:
@@ -80,27 +56,15 @@ spec:
               - *host
 
     persistence:
-      data:
+      nas-consume:
         enabled: true
-        mountPath: /usr/src/paperless/data
-        type: nfs
-        server: "nas.bjw-s.tech"
-        path: /volume1/Docs/paperless/data
-      media:
-        enabled: true
-        mountPath: /usr/src/paperless/media
-        type: nfs
-        server: "nas.bjw-s.tech"
-        path: /volume1/Docs/paperless/media
-      consume:
-        enabled: true
-        mountPath: /usr/src/paperless/consume
+        mountPath: /data/nas/consume
         type: nfs
         server: "nas.bjw-s.tech"
         path: /volume1/Docs/paperless/incoming
-      export:
+      nas-export:
         enabled: true
-        mountPath: /usr/src/paperless/export
+        mountPath: /data/nas/export
         type: nfs
         server: "nas.bjw-s.tech"
         path: /volume1/Docs/paperless/export
@@ -111,3 +75,10 @@ spec:
         memory: 2975M
       limits:
         memory: 6572M
+
+    volumeClaimTemplates:
+      - name: data
+        mountPath: /data/local
+        accessMode: ReadWriteOnce
+        size: 15Gi
+        storageClass: ceph-block
