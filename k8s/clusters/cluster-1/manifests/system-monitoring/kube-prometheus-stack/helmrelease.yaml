@@ -130,10 +130,10 @@ spec:
           - secretName: tls.prometheus
             hosts:
               - *host-prometheus
-#      thanosService:
-#        enabled: true
-#      thanosServiceMonitor:
-#        enabled: true
+      thanosService:
+        enabled: true
+      thanosServiceMonitor:
+        enabled: true
       prometheusSpec:
         replicas: 3
         replicaExternalLabelName: "replica"
@@ -151,7 +151,14 @@ spec:
               storageClass: local-path
               resources:
                 requests:
-                  storage: 20Gi
+                  storage: 10Gi
+        thanos:
+          image: quay.io/thanos/thanos:v0.31.0@sha256:e7d337d6ac2aea3f0f9314ec9830291789e16e2b480b9d353be02d05ce7f2a7e
+          objectStorageConfig:
+            name: thanos-objstore-secret
+            key: objstore.yml
+          # renovate: datasource=docker depName=quay.io/thanos/thanos
+          version: "v0.31.0"
         alertingEndpoints:
           - namespace: system-monitoring
             name: alertmanager
