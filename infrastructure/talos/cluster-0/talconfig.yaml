@@ -2,7 +2,7 @@
 clusterName: cluster-0
 
 talosVersion: v1.4.0
-kubernetesVersion: 1.26.3
+kubernetesVersion: 1.27.1
 endpoint: "https://cluster-0.bjw-s.tech:6443"
 
 cniConfig:
@@ -61,12 +61,6 @@ controlPlane:
     - |-
       cluster:
         allowSchedulingOnMasters: true
-        apiServer:
-        controllerManager:
-        discovery:
-          registries:
-            service:
-              disabled: true
         extraManifests:
             # Install the kubelet cert-approver manifests
             - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-0/integrations/kubelet-csr-approver/kubelet-csr-approver.yaml
@@ -77,41 +71,26 @@ controlPlane:
               - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-0/integrations/cni/cilium.yaml
         proxy:
           disabled: true
-        scheduler:
-
-      machine:
-        files:
-          - content: |
-              [plugins]
-                [plugins."io.containerd.grpc.v1.cri"]
-                  enable_unprivileged_ports = true
-                  enable_unprivileged_icmp = true
-            path: /etc/cri/conf.d/20-customization.part
-            op: create
-        kubelet:
-          extraArgs:
-            feature-gates: GracefulNodeShutdown=true
-            rotate-server-certificates: "true"
-        install:
-          extraKernelArgs:
-            - "talos.logging.kernel=udp://vector.bjw-s.dev:6050/"
-        logging:
-          destinations:
-            - endpoint: "udp://vector.bjw-s.dev:6051/"
-              format: json_lines
-        network:
-          extraHostEntries:
-            - ip: ${clusterEndpointIP}
-              aliases:
-                - cluster-0.bjw-s.tech
-        sysctls:
-          fs.inotify.max_user_watches: "1048576"
-          fs.inotify.max_user_instances: "8192"
-        time:
-          disabled: false
-          servers:
-            - 10.1.1.1
 
     - |-
       - op: remove
         path: /cluster/apiServer/admissionControl
+
+    - |-
+      machine:
+        files:
+          - op: create
+            path: /etc/cri/conf.d/20-customization.part
+            content: |
+              [plugins]
+                [plugins."io.containerd.grpc.v1.cri"]
+                  enable_unprivileged_ports = true
+                  enable_unprivileged_icmp = true
+        kubelet:
+          extraArgs:
+            feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true
+            rotate-server-certificates: "true"
+        time:
+          disabled: false
+          servers:
+            - 10.1.1.1
