@@ -67,6 +67,14 @@ controlPlane:
           registries:
             service:
               disabled: true
+        extraManifests:
+            # Install the kubelet cert-approver manifests
+            - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-0/integrations/kubelet-csr-approver/kubelet-csr-approver.yaml
+        network:
+          cni:
+            name: custom
+            urls:
+              - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-0/integrations/cni/cilium.yaml
         proxy:
           disabled: true
         scheduler:
