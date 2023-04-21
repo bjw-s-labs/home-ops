@@ -22,6 +22,10 @@ spec:
       announce:
         loadbalancerIP: true
       enabled: true
+    cgroup:
+      autoMount:
+        enabled: false
+      hostRoot: /sys/fs/cgroup
     cluster:
       id: 1
       name: cluster-0
@@ -74,4 +78,7 @@ spec:
     rollOutCiliumPods: true
     securityContext:
       privileged: true
+      capabilities:
+        ciliumAgent: "{CHOWN,KILL,NET_ADMIN,NET_RAW,IPC_LOCK,SYS_ADMIN,SYS_RESOURCE,DAC_OVERRIDE,FOWNER,SETGID,SETUID}"
+        cleanCiliumState: "{NET_ADMIN,SYS_ADMIN,SYS_RESOURCE}"
     tunnel: disabled
