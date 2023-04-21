@@ -16,69 +16,38 @@ spec:
       version: 1.13.2
   interval: 30m
 
+  valuesFrom:
+    - kind: ConfigMap
+      name: cilium-values
+
   values:
-    autoDirectNodeRoutes: true
-    bgp:
-      announce:
-        loadbalancerIP: true
-      enabled: true
-    cgroup:
-      autoMount:
-        enabled: false
-      hostRoot: /sys/fs/cgroup
-    cluster:
-      id: 1
-      name: cluster-0
-    containerRuntime:
-      integration: containerd
-    endpointRoutes:
-      enabled: true
     hubble:
-      enabled: true
       metrics:
-        enabled:
-          - dns:query;ignoreAAAA
-          - drop
-          - tcp
-          - flow
-          - port-distribution
-          - icmp
-          - http
+        serviceMonitor:
+          enabled: true
+
       relay:
-        enabled: true
-        rollOutPods: true
-      serviceMonitor:
-        enabled: true
+        prometheus:
+          serviceMonitor:
+            enabled: true
+
       ui:
-        enabled: true
         ingress:
+          enabled: true
           annotations:
             nginx.ingress.kubernetes.io/whitelist-source-range: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
-          enabled: true
           className: "nginx"
           hosts:
             - &host hubble-cluster-0.bjw-s.dev
           tls:
             - hosts:
                 - *host
-        rollOutPods: true
-    ipam:
-      mode: kubernetes
-    ipv4NativeRoutingCIDR: 10.244.0.0/16
-    k8sServiceHost: cluster-0.bjw-s.tech
-    k8sServicePort: 6443
-    kubeProxyReplacement: strict
-    kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
-    loadBalancer:
-      algorithm: maglev
-      mode: dsr
-    localRedirectPolicy: true
+
+    prometheus:
+      serviceMonitor:
+        enabled: true
+
     operator:
-      rollOutPods: true
-    rollOutCiliumPods: true
-    securityContext:
-      privileged: true
-      capabilities:
-        ciliumAgent: "{CHOWN,KILL,NET_ADMIN,NET_RAW,IPC_LOCK,SYS_ADMIN,SYS_RESOURCE,DAC_OVERRIDE,FOWNER,SETGID,SETUID}"
-        cleanCiliumState: "{NET_ADMIN,SYS_ADMIN,SYS_RESOURCE}"
-    tunnel: disabled
+      prometheus:
+        serviceMonitor:
+          enabled: true
