@@ -2,19 +2,19 @@
 apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
-  name: gonic-kids-restic
+  name: navidrome-kids-restic
   namespace: media
 spec:
   secretStoreRef:
     kind: ClusterSecretStore
     name: onepassword-connect
   target:
-    name: gonic-kids-restic-secret
+    name: navidrome-kids-restic-secret
     creationPolicy: Owner
     template:
       engineVersion: v2
       data:
-        RESTIC_REPOSITORY: "{{ .REPOSITORY_TEMPLATE }}/gonic-kids"
+        RESTIC_REPOSITORY: "{{ .REPOSITORY_TEMPLATE }}/navidrome-kids"
         RESTIC_PASSWORD: "{{ .RESTIC_PASSWORD }}"
         AWS_ACCESS_KEY_ID: "{{ .AWS_ACCESS_KEY_ID }}"
         AWS_SECRET_ACCESS_KEY: "{{ .AWS_SECRET_ACCESS_KEY }}"
@@ -25,16 +25,16 @@ spec:
 apiVersion: volsync.backube/v1alpha1
 kind: ReplicationSource
 metadata:
-  name: gonic-kids
+  name: navidrome-kids
   namespace: media
 spec:
-  sourcePVC: data-gonic-kids-0
+  sourcePVC: data-navidrome-kids-0
   trigger:
     schedule: "0 */12 * * *"
   restic:
     copyMethod: Snapshot
     pruneIntervalDays: 14
-    repository: gonic-kids-restic-secret
+    repository: navidrome-kids-restic-secret
     retain:
       daily: 14
     moverSecurityContext:
