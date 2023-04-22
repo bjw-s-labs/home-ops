@@ -16,3 +16,21 @@ spec:
   wait: true
   dependsOn:
     - name: cluster-apps-alertmanager
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cluster-apps-kube-prometheus-stack-addons
+  namespace: flux-system
+  labels:
+    substitution.flux.home.arpa/enabled: "true"
+spec:
+  interval: 10m
+  path: "./kubernetes/cluster-0/apps/monitoring/kube-prometheus-stack/addons"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  wait: true
+  dependsOn:
+    - name: cluster-apps-kube-prometheus-stack
