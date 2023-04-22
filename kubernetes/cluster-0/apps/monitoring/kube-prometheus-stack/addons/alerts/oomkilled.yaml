@@ -1,0 +1,17 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: oom-alert
+spec:
+  groups:
+    - name: oom
+      rules:
+        - alert: OOMKilled
+          annotations:
+            summary: Container {{ $labels.container }} of pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is out of memory
+            message: Container {{ $labels.container }} of pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is out of memory
+            description: Container {{ $labels.container }} of pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is out of memory
+          expr: kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}==1
+          labels:
+            severity: critical
