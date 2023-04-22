@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: gonic-main
+  name: navidrome-kids
   namespace: media
 spec:
   chart:
@@ -20,22 +20,25 @@ spec:
       type: statefulset
 
     image:
-      repository: ghcr.io/sentriz/gonic
-      tag: v0.15.2
+      repository: ghcr.io/navidrome/navidrome
+      tag: 0.49.3
 
     env:
-      GONIC_LISTEN_ADDR: 0.0.0.0:4747
-      GONIC_CACHE_PATH: /cache
-      GONIC_JUKEBOX_ENABLED: "false"
-      GONIC_MUSIC_PATH: /music/main
-      GONIC_SCAN_AT_START_ENABLED: "true"
-      GONIC_SCAN_WATCHER_ENABLED: "true"
+      ND_DATAFOLDER: /data
+      ND_ENABLEDOWNLOADS: "true"
+      ND_ENABLEEXTERNALSERVICES: "false"
+      ND_ENABLESHARING: "false"
+      ND_ENABLESTARRATING: "false"
+      ND_LOGLEVEL: info
+      ND_MUSICFOLDER: /music
+      ND_PORT: &port 4533
+      ND_SCANSCHEDULE: 30m
 
     service:
       main:
         ports:
           http:
-            port: 4747
+            port: *port
 
     ingress:
       main:
@@ -44,7 +47,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: ingress.bjw-s.dev
         ingressClassName: nginx
         hosts:
-          - host: &host gonic-main.bjw-s.dev
+          - host: &host navidrome-kids.bjw-s.dev
             paths:
               - path: /
         tls:
@@ -52,31 +55,27 @@ spec:
               - *host
 
     persistence:
-      cache:
+      music-kids:
         enabled: true
-        type: emptyDir
-
-      music-main:
-        enabled: true
-        mountPath: /music/main
-        path: /volume1/Media/Library/Main/Music
+        mountPath: /music
+        path: /volume1/Media/Library/Kids/Music
         server: nas.bjw-s.tech
         type: nfs
+        readOnly: true
 
     podSecurityContext:
       runAsUser: 1000
       runAsGroup: 1000
       fsGroup: 1000
-      fsGroupChangePolicy: "OnRootMismatch"
       supplementalGroups:
         - 65539
 
     resources:
       requests:
         cpu: 5m
-        memory: 799M
+        memory: 527M
       limits:
-        memory: 799M
+        memory: 527M
 
     volumeClaimTemplates:
       - name: data
