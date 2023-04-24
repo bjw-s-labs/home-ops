@@ -5,9 +5,9 @@ kind: Kustomization
 namespace: network
 resources:
   - secret.sops.yaml
-  - cronjob.yaml
+  - helmrelease.yaml
 configMapGenerator:
-  - name: cloudflare-ddns
+  - name: cloudflare-ddns-configmap
     files:
       - cloudflare-ddns.sh
 generatorOptions:
