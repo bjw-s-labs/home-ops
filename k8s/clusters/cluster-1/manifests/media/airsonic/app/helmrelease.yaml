@@ -15,7 +15,22 @@ spec:
         name: bjw-s
         namespace: flux-system
       interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
     image:
       repository: ghcr.io/airsonic-advanced/airsonic-advanced
       tag: edge-11.0.0-SNAPSHOT.20220625052932
