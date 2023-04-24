@@ -27,6 +27,10 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
     initContainers:
       01-init-config:
         image: public.ecr.aws/docker/library/busybox:latest

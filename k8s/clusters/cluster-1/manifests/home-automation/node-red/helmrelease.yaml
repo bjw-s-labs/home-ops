@@ -15,8 +15,22 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
     # initContainers: #TODO #930
     #   npm-update-modules:
     #     image: node:12-buster-slim@sha256:426f05df1d1feefa841471c0faa22a20db286766bf528993421847f9a3b8efe3

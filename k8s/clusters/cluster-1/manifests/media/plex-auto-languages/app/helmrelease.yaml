@@ -15,14 +15,22 @@ spec:
         name: bjw-s
         namespace: flux-system
       interval: 15m
+  maxHistory: 3
   install:
     createNamespace: true
     remediation:
-      retries: 5
+      retries: 3
   upgrade:
+    cleanupOnFail: true
     remediation:
-      retries: 5
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
     global:
       nameOverride: *app
     fullnameOverride: plex-auto-lang

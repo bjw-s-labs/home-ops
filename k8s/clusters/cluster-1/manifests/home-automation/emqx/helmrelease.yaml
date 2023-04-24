@@ -14,17 +14,22 @@ spec:
         kind: HelmRepository
         name: emqx-charts
         namespace: flux-system
-
+  maxHistory: 3
   install:
     createNamespace: true
     remediation:
-      retries: 5
-
+      retries: 3
   upgrade:
+    cleanupOnFail: true
     remediation:
-      retries: 5
-
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
     image:
       repository: public.ecr.aws/emqx/emqx
     replicaCount: 3

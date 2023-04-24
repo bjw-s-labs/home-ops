@@ -15,8 +15,22 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
     image:
       repository: esphome/esphome
       tag: 2023.4.1
