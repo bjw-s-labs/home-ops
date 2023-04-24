@@ -12,22 +12,48 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: home-automation-emqx
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: home-automation-namespace
-  interval: 5m
-  path: "./k8s/clusters/cluster-1/manifests/home-automation/emqx"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+  postBuild:
+    substitute: {}
+    substituteFrom:
+      - kind: ConfigMap
+        name: global-config
+      - kind: Secret
+        name: global-secrets
+      - kind: ConfigMap
+        name: cluster-config
+      - kind: Secret
+        name: cluster-secrets
+  patches:
+    - patch: |-
+        apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+        kind: Kustomization
+        metadata:
+          name: not-used
+          namespace: not-used
+        spec:
+          decryption:
+            provider: sops
+            secretRef:
+              name: sops-age
+          postBuild:
+            substitute: {}
+            substituteFrom:
+              - kind: ConfigMap
+                name: global-config
+              - kind: Secret
+                name: global-secrets
+              - kind: ConfigMap
+                name: cluster-config
+              - kind: Secret
+                name: cluster-secrets
+      target:
+        kind: Kustomization
+        group: kustomize.toolkit.fluxcd.io
+        version: v1beta2
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
@@ -39,23 +65,6 @@ spec:
     - name: home-automation-namespace
   interval: 5m
   path: "./k8s/clusters/cluster-1/manifests/home-automation/esphome"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: home-automation-frigate
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: home-automation-namespace
-    - name: home-automation-emqx
-  interval: 5m
-  path: "./k8s/clusters/cluster-1/manifests/home-automation/frigate"
   prune: true
   wait: true
   sourceRef:
