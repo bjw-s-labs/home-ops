@@ -108,23 +108,6 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: home-automation-node-red
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: home-automation-namespace
-    - name: home-automation-emqx
-  interval: 5m
-  path: "./k8s/clusters/cluster-1/manifests/home-automation/node-red"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
   name: home-automation-hyperhdr
   namespace: flux-system
 spec:
