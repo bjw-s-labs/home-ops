@@ -23,13 +23,23 @@ spec:
 
     DNS: 172.16.1.1
 
+    service:
+      vpn:
+        enabled: true
+        type: LoadBalancer
+        loadBalancerIP: 10.45.0.11
+        externalTrafficPolicy: Local
+        ports:
+          shadowsocks:
+            enabled: true
+            port: 8388
+
     addons:
       vpn:
         enabled: true
         type: gluetun
         image:
-          # TODO: Replace with ghcr.io/qdm12/gluetun when a versioned tag is available
-          repository: docker.io/qmcgaw/gluetun
+          repository: ghcr.io/qdm12/gluetun
           tag: v3.33.0@sha256:cadc352ebed5988c9fbc750f2759ea703dc7587f969d70342cc5eff05282024b
         env:
           - name: VPN_SERVICE_PROVIDER
@@ -38,6 +48,8 @@ spec:
             value: wireguard
           - name: VPN_INTERFACE
             value: wg0
+          - name: SHADOWSOCKS
+            value: "on"
           - name: FIREWALL
             value: "off"
           - name: DOT
