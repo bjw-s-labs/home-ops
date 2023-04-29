@@ -86,6 +86,8 @@ spec:
         enabled: true
         type: hostPath
         hostPath: /dev/bus/usb
+        hostPathType: Directory
+        mountPath: /dev/bus/usb
       cache:
         enabled: true
         type: emptyDir
@@ -114,19 +116,19 @@ spec:
     securityContext:
       privileged: true
 
+    nodeSelector:
+      node-role.kubernetes.io/worker: "true"
+      google.feature.node.kubernetes.io/coral: "true"
+      # intel.feature.node.kubernetes.io/gpu: "true"
     affinity:
-      nodeAffinity:
+      podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - key: feature.node.kubernetes.io/custom-coral-tpu
+          - labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
                   operator: In
-                  values:
-                    - "true"
-                # - key: feature.node.kubernetes.io/custom-intel-gpu
-                #   operator: In
-                #   values:
-                #     - "true"
+                  values: ["plex"]
+            topologyKey: kubernetes.io/hostname
 
     resources:
       requests:
