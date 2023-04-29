@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://frigate.cluster-1.elcarpenter.com/api/config/schema.json
+
 mqtt:
   # host: "{FRIGATE_MQTT_SERVER}"
   host: 10.200.1.54
@@ -47,39 +49,50 @@ cameras:
           # width: 640
           # height: 360
           # fps: 5
-        dining-room:
-          ffmpeg:
-            inputs:
-              - path: "{FRIGATE_CAMERA_2}"
-                roles:
-                  - detect
-                  - rtmp
-                  - record
-          # width: 640
-          # height: 360
-          # fps: 5
-          zones:
-            zone-kitchen:
-              coordinates: 991,414,1920,289,1920,702,1708,924,1564,1080,1120,1080,1061,1039
-        front-door:
-          ffmpeg:
-            inputs:
-              - path: "{FRIGATE_CAMERA_3}"
-                roles:
-                  - detect
-                  - rtmp
-                  - record
-          # width: 640
-          # height: 360
-          # fps: 5
-        back-door:
-          ffmpeg:
-            inputs:
-              - path: "{FRIGATE_CAMERA_4}"
-                roles:
-                  - detect
-                  - rtmp
-                  - record
-          # width: 640
-          # height: 360
-          # fps: 5
+        # living-room:
+        #   ffmpeg:
+        #     inputs:
+        #       - path: "{FRIGATE_CAMERA_1}"
+        #         roles:
+        #           - detect
+        #           - rtmp
+        #           - record
+        #   # width: 640
+        #   # height: 360
+        #   # fps: 5
+        # dining-room:
+        #   ffmpeg:
+        #     inputs:
+        #       - path: "{FRIGATE_CAMERA_2}"
+        #         roles:
+        #           - detect
+        #           - rtmp
+        #           - record
+        #   # width: 640
+        #   # height: 360
+        #   # fps: 5
+        #   zones:
+        #     zone-kitchen:
+        #       coordinates: 991,414,1920,289,1920,702,1708,924,1564,1080,1120,1080,1061,1039
+        # front-door:
+        #   ffmpeg:
+        #     inputs:
+        #       - path: "{FRIGATE_CAMERA_3}"
+        #         roles:
+        #           - detect
+        #           - rtmp
+        #           - record
+        #   # width: 640
+        #   # height: 360
+        #   # fps: 5
+        # back-door:
+        #   ffmpeg:
+        #     inputs:
+        #       - path: "{FRIGATE_CAMERA_4}"
+        #         roles:
+        #           - detect
+        #           - rtmp
+        #           - record
+        #   # width: 640
+        #   # height: 360
+        #   # fps: 5
