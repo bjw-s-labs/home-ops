@@ -37,22 +37,25 @@ user@pve01: sudo ceph mgr services
     "dashboard": "https://10.200.40.21:8443/",
     "prometheus": "http://10.200.40.21:9283/"
 }
-```
+
+```bash
 For object gateway dashboard to work
 https://docs.ceph.com/en/latest/mgr/dashboard/#enabling-the-object-gateway-management-frontend
 
-```
+```bash
 radosgw-admin user create --uid=dashboard --display-name=dashboard --system
 ```
+
 Record the access & secret keys
 Place each key into a text file
-```
+
+```bash
 sudo ceph dashboard set-rgw-api-access-key -i access-key
 sudo ceph dashboard set-rgw-api-secret-key -i secret-key
 ```
 
-
 ## Create erasure coded pools
+
 More commands and options listed
 https://pve.proxmox.com/pve-docs/pveceph.1.html
 
