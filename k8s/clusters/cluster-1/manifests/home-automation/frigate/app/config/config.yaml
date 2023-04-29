@@ -45,27 +45,29 @@ objects:
 # Uses https://github.com/AlexxIT/go2rtc (v1.2.0)
 go2rtc:
   streams:
-    frigate_server_room_hq: "{FRIGATE_CAMERA_1_HQ}"
-    frigate_server_room_lq: "{FRIGATE_CAMERA_1_LQ}"
+    frigate_server_room_hq: 
+      - "{FRIGATE_CAMERA_1_HQ}"
+    frigate_server_room_lq: 
+      - "{FRIGATE_CAMERA_1_LQ}"
 
 # Specify camera's
 cameras:
-        Server Room:
-          enabled: true
-          ffmpeg:
-            inputs:
-              - path: rtsp://127.0.0.1:8554/frigate_server_room_hq?video=copy&audio=aac
-                input_args: preset-rtsp-restream
-                roles:
-                  - record
-              - path: rtsp://127.0.0.1:8554/frigate_server_room_lq?video=copy
-                input_args: preset-rtsp-restream
-                roles:
-                  - detect
-          detect:
-            width: 704
-            height: 480
-            fps: 30
+  ServerRoom:
+    enabled: True
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/frigate_server_room_hq?video=copy&audio=aac
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/frigate_server_room_lq?video=copy
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+    detect:
+      width: 704
+      height: 480
+      fps: 30
           # width: 640
           # height: 360
           # fps: 5
