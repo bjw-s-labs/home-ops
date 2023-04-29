@@ -16,36 +16,56 @@ detectors:
     type: edgetpu
     device: usb
 
-# Global objects configuration
+snapshots:
+  enabled: true
+  timestamp: false
+  bounding_box: true
+  retain:
+    default: 2
+
+record:
+  enabled: true
+  retain:
+    days: 2
+    mode: all
+  events:
+    retain:
+      default: 2
+      mode: active_objects
+
 objects:
-  track:
-    - person
+  track: ["person"]
   filters:
     person:
       min_area: 5000
       max_area: 100000
-      threshold: 0.5
+      threshold: 0.7
 
-# Global ffmpeg configuration
-# ffmpeg:
-#   hwaccel_args:
-#     - -hwaccel
-#     - vaapi
-#     - -hwaccel_device
-#     - /dev/dri/renderD128
-#     - -hwaccel_output_format
-#     - yuv420p
+# Optional: Restream configuration
+# Uses https://github.com/AlexxIT/go2rtc (v1.2.0)
+go2rtc:
+  streams:
+    frigate_server_room_hq: "{FRIGATE_CAMERA_1_HQ}"
+    frigate_server_room_lq: "{FRIGATE_CAMERA_1_LQ}"
 
 # Specify camera's
 cameras:
         Server Room:
+          enabled: true
           ffmpeg:
             inputs:
-              - path: "{FRIGATE_CAMERA_1}"
+              - path: rtsp://127.0.0.1:8554/frigate_server_room_hq?video=copy&audio=aac
+                input_args: preset-rtsp-restream
+                roles:
+                  - record
+              - path: rtsp://127.0.0.1:8554/frigate_server_room_lq?video=copy
+                input_args: preset-rtsp-restream
                 roles:
                   - detect
-                  - rtmp
-                  - record
+          detect:
+            width: 704
+            height: 480
+            fps: 30
           # width: 640
           # height: 360
           # fps: 5
