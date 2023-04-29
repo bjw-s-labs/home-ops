@@ -38,6 +38,16 @@ spec:
       FRIGATE__APPLICATION_URL: &host "frigate.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       FRIGATE__LOG_LEVEL: info
 
+    podSecurityContext:
+      runAsUser: 997
+      runAsGroup: 100
+      fsGroup: 100
+      supplementalGroups:
+        - 34
+        - 100
+        - 568
+      fsGroupChangePolicy: "OnRootMismatch"
+
     envFrom:
       - secretRef:
           name: frigate-secrets

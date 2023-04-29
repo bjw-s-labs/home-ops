@@ -14,6 +14,11 @@ spec:
     copyMethod: Snapshot
     pruneIntervalDays: 10
     repository: frigate-restic
+    moverSecurityContext:
+      runAsUser: 997
+      runAsGroup: 100
+      fsGroup: 100
+      fsGroupChangePolicy: "OnRootMismatch"
     cacheCapacity: 5Gi
     volumeSnapshotClassName: csi-rbdplugin-snapclass
     storageClassName: ceph-block-external
