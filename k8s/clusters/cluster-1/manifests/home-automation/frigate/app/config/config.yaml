@@ -1,4 +1,12 @@
-# yaml-language-server: $schema=https://frigate.cluster-1.elcarpenter.com/api/config/schema.json
+---
+# yaml-language-server: $schema=https://frigate.cluster-1.elcarpenter.com/api/config/schema
+logger:
+  default: info
+  # logs:
+  #   frigate.record: debug
+
+birdseye:
+  enabled: false
 
 mqtt:
   # host: "{FRIGATE_MQTT_SERVER}"
@@ -16,21 +24,22 @@ detectors:
     type: edgetpu
     device: usb
 
+# Global snapshots configuration
 snapshots:
   enabled: true
   timestamp: false
   bounding_box: true
   retain:
-    default: 2
+    default: 14
 
 record:
   enabled: true
   retain:
-    days: 2
+    days: 3
     mode: all
   events:
     retain:
-      default: 2
+      default: 14
       mode: active_objects
 
 objects:
@@ -45,9 +54,9 @@ objects:
 # Uses https://github.com/AlexxIT/go2rtc (v1.2.0)
 go2rtc:
   streams:
-    server_room_hq:
+    serverroom_hq:
       - rtsp://{FRIGATE_MQTT_USERNAME}:{FRIGATE_MQTT_PASSWORD}@{FRIGATE_CAMERA_1_HOST}:554/cam/realmonitor?channel=1&subtype=0
-    server_room_lq:
+    serverroom_lq:
       - rtsp://{FRIGATE_MQTT_USERNAME}:{FRIGATE_MQTT_PASSWORD}@{FRIGATE_CAMERA_1_HOST}:554/cam/realmonitor?channel=1&subtype=1
 
 # Specify camera's
