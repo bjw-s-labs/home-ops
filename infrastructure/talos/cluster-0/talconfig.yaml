@@ -1,16 +1,19 @@
 ---
-clusterName: cluster-0
+clusterName: ${clusterName}
 
 talosVersion: v1.4.1
-kubernetesVersion: 1.26.3
-endpoint: "https://cluster-0.bjw-s.tech:6443"
+kubernetesVersion: 1.27.1
+endpoint: "https://${clusterName}.bjw-s.tech:6443"
+
+cniConfig:
+  name: none
 
 additionalApiServerCertSans:
   - ${clusterEndpointIP}
 
 additionalMachineCertSans:
   - ${clusterEndpointIP}
-  - cluster-0.bjw-s.tech
+  - ${clusterName}.bjw-s.tech
 
 nodes:
   - hostname: delta.bjw-s.tech
@@ -58,14 +61,6 @@ controlPlane:
     - |-
       cluster:
         allowSchedulingOnMasters: true
-        extraManifests:
-            # Install the kubelet cert-approver manifests
-            - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-0/integrations/kubelet-csr-approver/kubelet-csr-approver.yaml
-        network:
-          cni:
-            name: custom
-            urls:
-              - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-0/integrations/cni/cilium.yaml
         proxy:
           disabled: true
 
@@ -87,6 +82,14 @@ controlPlane:
           extraArgs:
             feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true
             rotate-server-certificates: "true"
+        network:
+          extraHostEntries:
+            - ip: ${clusterEndpointIP}
+              aliases:
+                - ${clusterName}.bjw-s.tech
+        sysctls:
+          fs.inotify.max_user_watches: "1048576"
+          fs.inotify.max_user_instances: "8192"
         time:
           disabled: false
           servers:
