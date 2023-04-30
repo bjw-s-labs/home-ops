@@ -35,7 +35,7 @@ spec:
       TZ: "${TIMEZONE}"
       FRIGATE__INSTANCE_NAME: Frigate
       FRIGATE__PORT: &port 5000
-      FRIGATE__APPLICATION_URL: &host "frigate.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+      FRIGATE__APPLICATION_URL: &host-cluster "frigate.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       FRIGATE__LOG_LEVEL: info
 
     # podSecurityContext:
@@ -114,13 +114,17 @@ spec:
           external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
           external-dns/is-public: "false"
         hosts:
-          - host: *host
+          - host: &host "frigate.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+          - host: *host-cluster
             paths:
               - path: /
         tls:
           - secretName: tls.frigate
             hosts:
               - *host
+              - *host-cluster
 
     probes:
       liveness: &probe
