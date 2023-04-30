@@ -60,6 +60,15 @@ spec:
           rtsp:
             enabled: "true"
             port: 8554
+          api:
+            enabled: "true"
+            port: 1984
+          srtp:
+            enabled: "true"
+            port: 8443
+          webrtc:
+            enabled: "true"
+            port: 8555
 
     persistence:
       config:
@@ -151,15 +160,15 @@ spec:
       # node-role.kubernetes.io/worker: "true"
       google.feature.node.kubernetes.io/coral: "true"
       # intel.feature.node.kubernetes.io/gpu: "true"
-    affinity:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: app.kubernetes.io/name
-                  operator: In
-                  values: ["plex"]
-            topologyKey: kubernetes.io/hostname
+    # affinity:
+    #   podAntiAffinity:
+    #     requiredDuringSchedulingIgnoredDuringExecution:
+    #       - labelSelector:
+    #           matchExpressions:
+    #             - key: app.kubernetes.io/name
+    #               operator: In
+    #               values: ["plex"]
+    #         topologyKey: kubernetes.io/hostname
 
     resources:
       requests:
