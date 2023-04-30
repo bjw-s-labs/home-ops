@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: externaldns
+  name: externaldns-external
   namespace: network
 spec:
   interval: 30m
@@ -17,6 +17,8 @@ spec:
       interval: 30m
 
   values:
+    fullnameOverride: externaldns-external
+
     domainFilters:
       - bjw-s.dev
 
@@ -24,7 +26,7 @@ spec:
       - name: CF_API_TOKEN
         valueFrom:
           secretKeyRef:
-            name: externaldns-secrets
+            name: externaldns-external-secrets
             key: cloudflare_api_token
 
     extraArgs:
@@ -32,7 +34,7 @@ spec:
       - --annotation-filter=external-dns.alpha.kubernetes.io/target
 
     podAnnotations:
-      secret.reloader.stakater.com/reload: externaldns-secrets
+      secret.reloader.stakater.com/reload: externaldns-external-secrets
 
     policy: sync
     provider: cloudflare
