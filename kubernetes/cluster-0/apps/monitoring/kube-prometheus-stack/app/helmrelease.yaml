@@ -143,31 +143,6 @@ spec:
             port: 9093
             apiVersion: v2
         additionalScrapeConfigs:
-          - job_name: coredns
-            scrape_interval: 1m
-            scrape_timeout: 10s
-            honor_timestamps: true
-            static_configs:
-              - targets:
-                  - 10.5.0.3:9153@gateway.bjw-s.tech:9153
-            relabel_configs:
-              - source_labels: [__address__]
-                regex: "(.*)@.*"
-                replacement: $1
-                target_label: __param_target
-              - source_labels: [__address__]
-                regex: "(.*)@.*"
-                replacement: $1
-                target_label: app_ip
-              - source_labels: [__address__]
-                regex: ".*@(.*)"
-                replacement: $1
-                target_label: instance
-              - source_labels: [app_ip]
-                regex: "(.*)"
-                target_label: __address__
-                replacement: $1
-
           - job_name: node-exporter
             scrape_interval: 1m
             scrape_timeout: 10s
