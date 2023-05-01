@@ -34,11 +34,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops-kubernetes
-  healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
-      kind: HelmRelease
-      name: onepassword-connect
-      namespace: security
   wait: true
   dependsOn:
     - name: cluster-apps-external-secrets
