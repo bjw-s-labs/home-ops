@@ -1,32 +1,19 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
   packageRules: [
     {
-      description: "1Password Connect images",
-      groupName: "1password-connect",
+      description: "Immich images",
+      groupName: "Immich",
       matchPackageNames: [
-        "docker.io/1password/connect-sync",
-        "docker.io/1password/connect-api",
-      ],
-      matchDatasources: ["docker"],
-      "group": {
-        "commitMessageTopic": "{{{groupName}}} group"
-      },
-      separateMinorPatch: true,
-    },
-    {
-      "description": "Immich images",
-      "groupName": "Immich",
-      "matchPackageNames": [
         "ghcr.io/immich-app/immich-server",
         "ghcr.io/immich-app/immich-web",
         "ghcr.io/immich-app/immich-machine-learning",
       ],
-      "matchDatasources": ["docker"],
-      "group": {
-        "commitMessageTopic": "{{{groupName}}} group"
+      matchDatasources: ["docker"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
       },
-      "separateMinorPatch": true
+      separateMinorPatch: true,
     },
     {
       description: "Rook-Ceph image and chart",
@@ -34,7 +21,7 @@
       matchPackagePatterns: ["rook.ceph"],
       matchDatasources: ["docker", "helm"],
       group: {
-        commitMessageTopic: "{{{groupName}}} group"
+        commitMessageTopic: "{{{groupName}}} group",
       },
       separateMinorPatch: true,
     },
@@ -48,34 +35,28 @@
       ],
       matchDatasources: ["helm", "docker"],
       group: {
-        commitMessageTopic: "{{{groupName}}} group"
+        commitMessageTopic: "{{{groupName}}} group",
       },
       separateMinorPatch: true,
     },
     {
-      "description": "External Snapshotter charts",
-      "groupName": "External Snapshotter",
-      "matchPackageNames": [
-        "snapshot-controller",
-        "snapshot-validation-webhook"
-      ],
-      "matchDatasources": ["helm"],
-      "group": {
-        "commitMessageTopic": "{{{groupName}}} group"
+      description: "External Snapshotter charts",
+      groupName: "External Snapshotter",
+      matchPackageNames: ["snapshot-controller", "snapshot-validation-webhook"],
+      matchDatasources: ["helm"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
       },
-      "separateMinorPatch": true
+      separateMinorPatch: true,
     },
     {
       description: "Thanos image and chart - versions do not match",
       groupName: "Thanos",
-      matchPackagePatterns: [
-        "quay.io/thanos/thanos",
-        "thanos"
-      ],
+      matchPackagePatterns: ["quay.io/thanos/thanos", "thanos"],
       matchDatasources: ["docker", "github-releases", "helm"],
       matchUpdateTypes: ["minor", "patch"],
       group: {
-        commitMessageTopic: "{{{groupName}}} group"
+        commitMessageTopic: "{{{groupName}}} group",
       },
       separateMinorPatch: false,
     },
@@ -86,7 +67,7 @@
       matchDatasources: ["docker", "github-releases", "helm"],
       matchUpdateTypes: ["minor", "patch"],
       group: {
-        commitMessageTopic: "{{{groupName}}} group"
+        commitMessageTopic: "{{{groupName}}} group",
       },
       separateMinorPatch: false,
     },
