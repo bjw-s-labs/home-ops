@@ -5,8 +5,8 @@ logger:
   # logs:
   #   frigate.record: debug
 
-birdseye:
-  enabled: false
+# birdseye:
+#   enabled: false
 
 mqtt:
   # host: "{FRIGATE_MQTT_SERVER}"
@@ -63,18 +63,18 @@ go2rtc:
 cameras:
   server_room:
     ffmpeg:
-      output_args:
-        record: preset-record-generic-audio-copy
+      # output_args:
+      #   record: preset-record-generic-audio-copy
       inputs:
         - path: rtsp://127.0.0.1:8554/server_room_hq?video=copy&audio=aac
-          input_args: preset-rtsp-restream
+          # input_args: preset-rtsp-restream
           roles:
             - record
         - path: rtsp://127.0.0.1:8554/server_room_lq?video=copy
-          input_args: preset-rtsp-restream
+          # input_args: preset-rtsp-restream
           roles:
             - detect
-    detect:
-      width: 704
-      height: 480
-      fps: 30
+    # detect:
+    #   width: 704
+    #   height: 480
+    #   fps: 30
