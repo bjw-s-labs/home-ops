@@ -17,7 +17,7 @@ spec:
       interval: 30m
 
   values:
-    fullnameOverride: externaldns-external
+    fullnameOverride: &name externaldns-external
 
     domainFilters:
       - bjw-s.dev
@@ -46,3 +46,15 @@ spec:
       - ingress
 
     txtPrefix: "k8s."
+
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              version: v1
+              kind: Deployment
+              name: *name
+            patch: |
+              - op: add
+                path: /spec/template/spec/enableServiceLinks
+                value: false
