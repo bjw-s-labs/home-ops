@@ -68,6 +68,12 @@ spec:
               secretKeyRef:
                 name: downloads-gateway-vpnconfig
                 key: WIREGUARD_ADDRESSES
+        resources:
+          requests:
+            cpu: 5m
+            memory: 64M
+          limits:
+            memory: 64M
         securityContext:
           capabilities:
             add:
@@ -75,6 +81,12 @@ spec:
 
       netshoot:
         enabled: true
+        resources:
+          requests:
+            cpu: 5m
+            memory: 10M
+          limits:
+            memory: 10M
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: downloads-gateway-pod-gateway
