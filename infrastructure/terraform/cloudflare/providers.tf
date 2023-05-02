@@ -1,4 +1,4 @@
 provider "cloudflare" {
-  email   = local.cloudflare_secrets["cloudflare_email"]
-  api_key = local.cloudflare_secrets["cloudflare_api_key"]
+  email   = module.onepassword_item_cloudflare.fields["username"]
+  api_key = module.onepassword_item_cloudflare.fields["api-key"]
 }

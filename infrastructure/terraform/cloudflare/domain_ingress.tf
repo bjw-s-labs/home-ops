@@ -13,7 +13,8 @@ module "cf_domain_ingress" {
       type  = "CNAME"
     },
     {
-      name    = "vpn"
+      id      = "vpn"
+      name    = module.onepassword_item_cloudflare.fields["vpn-subdomain"]
       value   = "ipv4.bjw-s.dev"
       type    = "CNAME"
       proxied = false
