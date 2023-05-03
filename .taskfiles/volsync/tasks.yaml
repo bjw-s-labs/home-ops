@@ -12,7 +12,7 @@ x-task-vars: &task-vars
 vars:
   destinationTemplate: "{{.PROJECT_DIR}}/.taskfiles/volsync/ReplicationDestination.tmpl.yaml"
   wipeJobTemplate: "{{.PROJECT_DIR}}/.taskfiles/volsync/WipeJob.tmpl.yaml"
-  waitForJobScript: "{{.PROJECT_DIR}}/.taskfiles/volsync/wait-for-job.sh"
+  waitForJobScript: "{{.PROJECT_DIR}}/.taskfiles/_scripts/wait-for-k8s-job.sh"
   listJobTemplate: "{{.PROJECT_DIR}}/.taskfiles/volsync/ListJob.tmpl.yaml"
   unlockJobTemplate: "{{.PROJECT_DIR}}/.taskfiles/volsync/UnlockJob.tmpl.yaml"
   ts: '{{now | date "150405"}}'

@@ -1,0 +1,91 @@
+---
+version: "3"
+
+x-task-vars: &task-vars
+  node: "{{.node}}"
+  ceph_disk: "{{.ceph_disk}}"
+  ts: "{{.ts}}"
+  jobName: "{{.jobName}}"
+
+vars:
+  waitForJobScript: "{{.PROJECT_DIR}}/.taskfiles/_scripts/wait-for-k8s-job.sh"
+  ts: '{{now | date "150405"}}'
+
+tasks:
+  wipe-node-delta:
+    desc: Trigger a wipe of Rook-Ceph data on node "delta"
+    cmds:
+      - task: wipe-disk
+        vars:
+          node: "{{.node}}"
+          ceph_disk: "/dev/nvme0n1"
+      - task: wipe-data
+        vars:
+          node: "{{.node}}"
+    vars:
+      node: delta
+
+  wipe-node-enigma:
+    desc: Trigger a wipe of Rook-Ceph data on node "enigma"
+    cmds:
+      - task: wipe-disk
+        vars:
+          node: "{{.node}}"
+          ceph_disk: "/dev/nvme0n1"
+      - task: wipe-data
+        vars:
+          node: "{{.node}}"
+    vars:
+      node: enigma
+
+  wipe-node-felix:
+    desc: Trigger a wipe of Rook-Ceph data on node "felix"
+    cmds:
+      - task: wipe-disk
+        vars:
+          node: "{{.node}}"
+          ceph_disk: "/dev/nvme0n1"
+      - task: wipe-data
+        vars:
+          node: "{{.node}}"
+    vars:
+      node: felix
+
+  wipe-disk:
+    desc: Wipe all remnants of rook-ceph from a given disk (ex. task rook:wipe-disk node=delta ceph_disk="/dev/nvme0n1")
+    silent: true
+    internal: true
+    cmds:
+      - envsubst < <(cat {{.wipeRookDiskJobTemplate}}) | kubectl apply -f -
+      - bash {{.waitForJobScript}} {{.wipeCephDiskJobName}} default
+      - kubectl -n default wait job/{{.wipeCephDiskJobName}} --for condition=complete --timeout=1m
+      - kubectl -n default logs job/{{.wipeCephDiskJobName}} --container list
+      - kubectl -n default delete job {{.wipeCephDiskJobName}}
+    vars:
+      node: '{{ or .node (fail "`node` is required") }}'
+      ceph_disk: '{{ or .ceph_disk (fail "`ceph_disk` is required") }}'
+      jobName: 'wipe-disk-{{- .node -}}-{{- .ceph_disk | replace "/" "-" -}}-{{- .ts -}}'
+      wipeRookDiskJobTemplate: "{{.PROJECT_DIR}}/.taskfiles/rook/WipeDiskJob.tmpl.yaml"
+    env: *task-vars
+    preconditions:
+      - sh: test -f {{.waitForJobScript}}
+      - sh: test -f {{.wipeRookDiskJobTemplate}}
+
+  wipe-data:
+    desc: Wipe all remnants of rook-ceph from a given disk (ex. task rook:wipe-data node=delta)
+    silent: true
+    internal: true
+    cmds:
+      - envsubst < <(cat {{.wipeRookDataJobTemplate}}) | kubectl apply -f -
+      - bash {{.waitForJobScript}} {{.wipeRookDataJobName}} default
+      - kubectl -n default wait job/{{.wipeRookDataJobName}} --for condition=complete --timeout=1m
+      - kubectl -n default logs job/{{.wipeRookDataJobName}} --container list
+      - kubectl -n default delete job {{.wipeRookDataJobName}}
+    vars:
+      node: '{{ or .node (fail "`node` is required") }}'
+      jobName: "wipe-rook-data-{{- .node -}}-{{- .ts -}}"
+      wipeRookDataJobTemplate: "{{.PROJECT_DIR}}/.taskfiles/rook/WipeRookDataJob.tmpl.yaml"
+    env: *task-vars
+    preconditions:
+      - sh: test -f {{.waitForJobScript}}
+      - sh: test -f {{.wipeRookDataJobTemplate}}

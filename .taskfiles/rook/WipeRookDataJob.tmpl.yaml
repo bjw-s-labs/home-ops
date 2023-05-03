@@ -1,0 +1,29 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "${jobName}"
+  namespace: "default"
+spec:
+  ttlSecondsAfterFinished: 3600
+  template:
+    spec:
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      nodeName: ${node}
+      containers:
+        - name: disk-wipe
+          image: ghcr.io/onedr0p/alpine:3.17.3@sha256:999384960b6114496a5e4036e945141c205d064ce23b87326bd3f8d878c5a9d4
+          securityContext:
+            privileged: true
+          resources: {}
+          command: ["/bin/sh", "-c"]
+          args:
+            - rm -rf /mnt/host_var/lib/rook
+          volumeMounts:
+            - mountPath: /mnt/host_var
+              name: host-var
+      volumes:
+        - name: host-var
+          hostPath:
+            path: /var
