@@ -43,7 +43,6 @@ spec:
         enabled: true
         ingressClassName: "nginx"
         annotations:
-          nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
           nginx.ingress.kubernetes.io/auth-url: https://auth.bjw-s.dev/oauth2/auth?allowed_groups=paperless
           nginx.ingress.kubernetes.io/auth-signin: https://auth.bjw-s.dev/oauth2/start?rd=$scheme://$best_http_host$request_uri
           nginx.ingress.kubernetes.io/auth-response-headers: "x-auth-request-email, x-auth-request-groups"
