@@ -8,11 +8,6 @@ module "cf_domain_ingress" {
       value = local.home_ipv4
     },
     {
-      name  = "ingress"
-      value = "ipv4.bjw-s.dev"
-      type  = "CNAME"
-    },
-    {
       id      = "vpn"
       name    = module.onepassword_item_cloudflare.fields["vpn-subdomain"]
       value   = "ipv4.bjw-s.dev"
