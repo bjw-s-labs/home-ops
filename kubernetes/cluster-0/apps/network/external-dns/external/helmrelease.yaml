@@ -30,6 +30,8 @@ spec:
             key: cloudflare_api_token
 
     extraArgs:
+      - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
+      - --crd-source-kind=DNSEndpoint
       - --cloudflare-proxied
       - --annotation-filter=external-dns.alpha.kubernetes.io/target
 
@@ -51,6 +53,7 @@ spec:
 
     sources:
       - ingress
+      - crd
 
     txtPrefix: "k8s."
 
