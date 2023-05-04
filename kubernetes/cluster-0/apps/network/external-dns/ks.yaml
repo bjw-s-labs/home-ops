@@ -2,6 +2,22 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
+  name: cluster-apps-externaldns-shared
+  namespace: flux-system
+  labels:
+    substitution.flux.home.arpa/enabled: "true"
+spec:
+  interval: 10m
+  path: "./kubernetes/cluster-0/apps/network/external-dns/shared"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  wait: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
   name: cluster-apps-externaldns-external
   namespace: flux-system
   labels:
@@ -15,6 +31,7 @@ spec:
     name: home-ops-kubernetes
   wait: true
   dependsOn:
+    - name: cluster-apps-externaldns-shared
     - name: cluster-apps-external-secrets-stores
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
