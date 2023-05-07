@@ -41,6 +41,11 @@ spec:
               volumeMounts:
                 - name: vector-geoipupdate
                   mountPath: /usr/share/GeoIP
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: "OnRootMismatch"
           volumes:
             - name: vector-geoipupdate
               persistentVolumeClaim:
