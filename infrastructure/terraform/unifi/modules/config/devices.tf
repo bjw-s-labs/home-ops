@@ -35,7 +35,8 @@ resource "unifi_device" "switch_core_1" {
   }
   port_override {
     number          = 5
-    port_profile_id = data.unifi_port_profile.all.id
+    name            = "driveway_camera_doorbell"
+    port_profile_id = data.unifi_port_profile.video.id
   }
   port_override {
     number          = 6

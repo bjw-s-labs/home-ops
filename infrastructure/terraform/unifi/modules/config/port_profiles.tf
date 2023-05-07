@@ -18,6 +18,11 @@ data "unifi_port_profile" "iot" {
   site = unifi_site.default.name
 }
 
+data "unifi_port_profile" "video" {
+  name = "Video"
+  site = unifi_site.default.name
+}
+
 resource "unifi_port_profile" "iot_poe_disabled" {
   name = "IoT - PoE disabled"
   site = unifi_site.default.name
