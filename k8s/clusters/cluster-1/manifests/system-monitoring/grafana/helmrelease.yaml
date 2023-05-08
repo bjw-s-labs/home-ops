@@ -77,27 +77,11 @@ spec:
         enabled: true
         allow_sign_up: true
         config_file: /etc/grafana/ldap.toml
-      # auth:
-      #   signout_redirect_url: "https://auth.${INGRESS_DOMAIN}/application/o/grafana/end-session/"
-      #   oauth_auto_login: false
-      # auth.generic_oauth:
-      #   enabled: true
-      #   name: Authentik
-      #   client_id: # Set by env vars
-      #   client_secret: # Set by env vars secret
-      #   auth_url: # Set by env vars
-      #   token_url: # Set by env vars
-      #   api_url: # Set by env vars
-      #   scopes: "openid profile email groups"
-      #   empty_scopes: false
-      #   login_attribute_path: preferred_username
-      #   groups_attribute_path: groups
-      #   name_attribute_path: name
-      #   use_pkce: true
-      # auth.generic_oauth.group_mapping:
-      #   role_attribute_path: |
-      #     contains(groups[*], 'admins') && 'Admin' || contains(groups[*], 'people') && 'Viewer'
-      #   org_id: 1
+      auth:
+        signout_redirect_url: "https://grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}/"
+        oauth_auto_login: false
+      auth.generic_oauth:
+        enabled: false
       auth.basic:
         disable_login_form: false
       auth.anonymous:
