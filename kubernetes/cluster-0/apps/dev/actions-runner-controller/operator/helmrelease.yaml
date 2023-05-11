@@ -8,8 +8,8 @@ spec:
   interval: 30m
   chart:
     spec:
-      chart: actions-runner-controller
-      version: 0.23.2
+      chart: actions-runner-controller-charts/gha-runner-scale-set-controller
+      version: 0.4.0
       sourceRef:
         kind: HelmRepository
         name: actions-runner-controller
@@ -22,51 +22,9 @@ spec:
     crds: CreateReplace
 
   values:
-    image:
-      repository: ghcr.io/actions-runner-controller/actions-runner-controller
-
-    authSecret:
-      create: false
-      name: &auth-secret actions-runner-controller-auth
-
-    podAnnotations:
-      secret.reloader.stakater.com/reload: *auth-secret
-
-    githubWebhookServer:
-      enabled: true
-      syncPeriod: 10m
-      secret:
-        create: false
-        name: &webhook-secret actions-runner-controller-webhook
-      podAnnotations:
-        secret.reloader.stakater.com/reload: *webhook-secret
-      ingress:
-        enabled: true
-        annotations:
-          external-dns.alpha.kubernetes.io/target: ingress.bjw-s.dev
-        ingressClassName: "nginx"
-        hosts:
-          - host: &host "acr-hook.bjw-s.dev"
-            paths:
-              - path: /
-                pathType: Prefix
-        tls:
-          - hosts:
-              - *host
-      resources:
-        requests:
-          memory: 64Mi
-        limits:
-          memory: 96Mi
-
-    metrics:
-      serviceMonitor: true
-      port: 8080
-      proxy:
-        enabled: false
-
-    resources:
-      requests:
-        memory: 64Mi
-      limits:
-        memory: 128Mi
+    fullnameOverride: gha-runner-scale-set-controller
+    # resources:
+    #   requests:
+    #     memory: 64Mi
+    #   limits:
+    #     memory: 128Mi
