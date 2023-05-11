@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: multus
-      version: 4.0.0
+      version: 5.0.1
       sourceRef:
         kind: HelmRepository
         name: angelnu
@@ -18,7 +18,7 @@ spec:
   values:
     image:
       repository: ghcr.io/k8snetworkplumbingwg/multus-cni
-      tag: v3.9.3
+      tag: v4.0.1-thick
 
     cni:
       image:
@@ -29,11 +29,22 @@ spec:
         config: /etc/cni/net.d
         bin: /opt/cni/bin
 
-      version: "0.3.1"
-
     resources:
       requests:
         cpu: 5m
         memory: 29M
       limits:
         memory: 29M
+
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: apps
+              version: v1
+              kind: DaemonSet
+              name: multus
+            patch: |
+              - op: replace
+                path: /spec/template/spec/volumes/5/hostPath/path
+                value: /var/run/netns
