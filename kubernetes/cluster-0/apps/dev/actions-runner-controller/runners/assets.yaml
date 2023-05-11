@@ -1,45 +1,42 @@
 ---
-apiVersion: actions.summerwind.dev/v1alpha1
-kind: RunnerDeployment
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
 metadata:
-  name: runner-assets
+  name: arc-assets
   namespace: dev
 spec:
-  template:
+  interval: 30m
+  chart:
     spec:
-      image: ghcr.io/actions/actions-runner-controller/actions-runner:v2.299.1-ubuntu-20.04@sha256:69e3b023ecdb34313935952c4375a75414db79f177353123c774290028b3bb3a
-      dockerdWithinRunnerContainer: false
-      ephemeral: true
-      repository: bjw-s/assets
-      containers:
-        - name: docker
-          image: docker:23.0.6-dind@sha256:064b3ab5253f812c4fa076b74910435df0c8c7c3e7321330592f2ee50c894619
-      labels:
-        - self-hosted
-      volumeMounts:
-        - name: cache-volume
-          mountPath: /cache
-      volumes:
-        - name: cache-volume
-          persistentVolumeClaim:
-            claimName: actions-runner-controller-cache
----
-apiVersion: actions.summerwind.dev/v1alpha1
-kind: HorizontalRunnerAutoscaler
-metadata:
-  name: assets-autoscaler
-  namespace: dev
-spec:
-  scaleTargetRef:
-    name: runner-assets
-  scaleUpTriggers:
-    - githubEvent:
-        workflowJob: {}
-      amount: 1
-      duration: "1m"
-  minReplicas: 1
-  maxReplicas: 3
-  metrics:
-    - type: TotalNumberOfQueuedAndInProgressWorkflowRuns
-      repositoryNames:
-        - bjw-s/container-assets
+      chart: actions-runner-controller-charts/gha-runner-scale-set
+      version: 0.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: actions-runner-controller
+        namespace: flux-system
+      interval: 30m
+
+  values:
+    runnerScaleSetName: arc-runner-set-assets
+
+    githubConfigUrl: https://github.com/bjw-s/assets
+
+    minRunners: 0
+    maxRunners: 2
+
+    containerMode:
+      type: "dind"
+
+  valuesFrom:
+    - kind: Secret
+      name: actions-runner-controller-auth
+      valuesKey: github_app_id
+      targetPath: githubConfigSecret.github_app_id
+    - kind: Secret
+      name: actions-runner-controller-auth
+      valuesKey: github_app_installation_id
+      targetPath: githubConfigSecret.github_app_installation_id
+    - kind: Secret
+      name: actions-runner-controller-auth
+      valuesKey: github_app_private_key
+      targetPath: githubConfigSecret.github_app_private_key
