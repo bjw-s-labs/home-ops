@@ -27,6 +27,14 @@ spec:
     containerMode:
       type: "dind"
 
+    template:
+      spec:
+        containers:
+          - name: runner
+            image: ghcr.io/bjw-s/github-actions-runner:2.304.0
+            command:
+              - /home/runner/run.sh
+
   valuesFrom:
     - kind: Secret
       name: actions-runner-controller-auth
