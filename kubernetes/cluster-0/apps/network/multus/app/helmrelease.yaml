@@ -36,15 +36,5 @@ spec:
       limits:
         memory: 29M
 
-  postRenderers:
-    - kustomize:
-        patches:
-          - target:
-              group: apps
-              version: v1
-              kind: DaemonSet
-              name: multus
-            patch: |
-              - op: replace
-                path: /spec/template/spec/volumes/5/hostPath/path
-                value: /var/run/netns
+    hostPaths:
+      netns: /var/run/netns
