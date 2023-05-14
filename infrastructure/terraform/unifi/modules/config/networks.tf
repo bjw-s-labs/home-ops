@@ -29,7 +29,7 @@ resource "unifi_network" "trusted" {
   dhcp_relay_enabled  = false
   dhcpd_boot_enabled  = false
   dhcp_v6_dns_auto    = false
-  igmp_snooping       = true
+  igmp_snooping       = false
   ipv6_interface_type = "none"
   ipv6_ra_enable      = false
   network_group       = "LAN"
