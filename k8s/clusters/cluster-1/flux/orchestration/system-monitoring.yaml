@@ -88,58 +88,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-monitoring-vector-aggregator
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-monitoring-namespace
-#     - name: system-monitoring-kube-prom-stack
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-1/manifests/system-monitoring/vector/aggregator"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-monitoring-vector-agent
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-monitoring-namespace
-#     - name: system-monitoring-kube-prom-stack
-#     - name: system-monitoring-vector-aggregator
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-1/manifests/system-monitoring/vector/agent"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: system-monitoring-loki
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: system-monitoring-namespace
-    - name: cluster-workloads-kube-prometheus-stack
-  interval: 5m
-  path: "./k8s/clusters/cluster-1/manifests/system-monitoring/loki"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
@@ -157,23 +105,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-monitoring-speedtest
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-monitoring-namespace
-#     - name: system-monitoring-kube-prom-stack
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-1/manifests/system-monitoring/speedtest"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
