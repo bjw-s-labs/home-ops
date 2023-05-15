@@ -132,7 +132,7 @@ resource "unifi_device" "switch_core_2" {
   port_override {
     number          = 9
     name            = "delta"
-    port_profile_id = unifi_port_profile.k8s_server.id
+    port_profile_id = data.unifi_port_profile.all.id
   }
   port_override {
     number          = 10
@@ -142,7 +142,7 @@ resource "unifi_device" "switch_core_2" {
   port_override {
     number          = 11
     name            = "enigma"
-    port_profile_id = unifi_port_profile.k8s_server.id
+    port_profile_id = data.unifi_port_profile.all.id
   }
   port_override {
     number          = 12
@@ -151,7 +151,7 @@ resource "unifi_device" "switch_core_2" {
   port_override {
     number          = 13
     name            = "felix"
-    port_profile_id = unifi_port_profile.k8s_server.id
+    port_profile_id = data.unifi_port_profile.all.id
   }
   port_override {
     number          = 14
