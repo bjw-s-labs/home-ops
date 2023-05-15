@@ -34,9 +34,9 @@ spec:
     service:
       main:
         type: LoadBalancer
-        loadBalancerIP: 10.45.0.2
         annotations:
           external-dns.alpha.kubernetes.io/hostname: "vector.bjw-s.dev"
+          metallb.universe.tf/loadBalancerIPs: "10.45.0.2"
         externalTrafficPolicy: Local
         ports:
           http:
