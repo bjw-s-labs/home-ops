@@ -24,9 +24,9 @@ spec:
       service:
         enabled: true
         type: LoadBalancer
-        loadBalancerIP: 10.45.0.1
         annotations:
           external-dns.alpha.kubernetes.io/hostname: "ingress.bjw-s.dev"
+          metallb.universe.tf/loadBalancerIPs: "10.45.0.1"
         externalTrafficPolicy: Local
 
       publishService:
