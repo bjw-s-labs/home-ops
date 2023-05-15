@@ -5,69 +5,99 @@ metadata:
   name: vector-agent
   namespace: system-monitoring
 spec:
-  interval: 15m
+  interval: 5m
   chart:
     spec:
-      chart: vector
-      version: 0.21.1
+      chart: app-template
+      version: 1.4.0
       sourceRef:
         kind: HelmRepository
-        name: vector-charts
+        name: bjw-s
         namespace: flux-system
       interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
+    controller:
+      type: daemonset
+      strategy: RollingUpdate
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
-      repository: timberio/vector
+      repository: ghcr.io/onedr0p/vector
       tag: 0.29.1-debian
 
-    role: "Agent"
+    args: ["--config", "/etc/vector/vector.yaml"]
 
-    podAnnotations:
-      configmap.reloader.stakater.com/reload: vector-agent
+    env:
+      PROCFS_ROOT: /host/proc
+      SYSFS_ROOT: /host/sys
+      VECTOR_SELF_NODE_NAME:
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: spec.nodeName
+      VECTOR_SELF_POD_NAME:
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: metadata.name
+      VECTOR_SELF_POD_NAMESPACE:
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: metadata.namespace
 
-    customConfig:
-      data_dir: /vector-data-dir
-
-      api:
-        enabled: false
-
-      # Sources
-      sources:
-        kubernetes_logs:
-          type: kubernetes_logs
-
-        talos_kernel_logs:
-          type: socket
-          mode: udp
-          address: 127.0.0.1:12000
-
-        talos_service_logs:
-          type: socket
-          mode: udp
-          address: 127.0.0.1:12001
-
-      # Sinks
-      sinks:
-        kubernetes_sink:
-          type: vector
-          inputs:
-            - kubernetes_logs
-          address: "vector-aggregator.monitoring:6000"
-          version: "2"
-
-        talos_kernel_sink:
-          type: vector
-          inputs:
-            - talos_kernel_logs
-          address: "vector-aggregator.monitoring:6050"
-          version: "2"
-
-        talos_service_sink:
-          type: vector
-          inputs:
-            - talos_service_logs
-          address: "vector-aggregator.monitoring:6051"
-          version: "2"
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: vector-agent-configmap
+        subPath: vector.yaml
+        mountPath: /etc/vector/vector.yaml
+        readOnly: true
+      data:
+        enabled: true
+        type: emptyDir
+        mountPath: /vector-data-dir
+      var-log:
+        enabled: true
+        type: hostPath
+        hostPath: /var/log
+        hostPathType: Directory
+        mountPath: /var/log
+        readOnly: true
+      var-lib:
+        enabled: true
+        type: hostPath
+        hostPath: /var/lib
+        hostPathType: Directory
+        mountPath: /var/lib
+        readOnly: true
+      procfs:
+        enabled: true
+        type: hostPath
+        hostPath: /proc
+        hostPathType: Directory
+        mountPath: /host/proc
+        readOnly: true
+      sysfs:
+        enabled: true
+        type: hostPath
+        hostPath: /sys
+        hostPathType: Directory
+        mountPath: /host/sys
+        readOnly: true
 
     podMonitor:
       enabled: true
@@ -75,12 +105,20 @@ spec:
     resources:
       requests:
         cpu: 23m
-        memory: 164M
-      limits:
-        memory: 369M
+        memory: 249M
+      # limits:
+      #   memory: 918M
+
+    securityContext:
+      privileged: true
 
     service:
-      enabled: false
+      main:
+        enabled: false
+
+    serviceAccount:
+      create: true
+      name: vector-agent
 
     tolerations:
       - key: node-role.kubernetes.io/master

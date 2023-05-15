@@ -1,0 +1,53 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: vector-geoipupdate
+  namespace: system-monitoring
+spec:
+  schedule: "@daily"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 86400
+      template:
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: Never
+          containers:
+            - name: vector-geoipupdate
+              image: ghcr.io/maxmind/geoipupdate:v5.1.1@sha256:21f3505e3ac624da5842b30c6c4e05df5ff340f4cb09d428185a9f27ad4fd5c2
+              imagePullPolicy: IfNotPresent
+              lifecycle:
+                preStop:
+                  exec:
+                    command:
+                      - /bin/sh
+                      - -c
+                      - rm -rf /usr/share/GeoIP/.geoipupdate.lock
+              env:
+                - name: GEOIPUPDATE_EDITION_IDS
+                  # value: GeoLite2-City
+                  value: "GeoLite2-ASN GeoLite2-City GeoLite2-Country"
+                - name: GEOIPUPDATE_FREQUENCY
+                  value: "0"
+                - name: GEOIPUPDATE_VERBOSE
+                  value: "true"
+              envFrom:
+                - secretRef:
+                    name: vector-geoipupdate
+              volumeMounts:
+                - name: vector-geoipupdate
+                  mountPath: /usr/share/GeoIP
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: "OnRootMismatch"
+          volumes:
+            - name: vector-geoipupdate
+              persistentVolumeClaim:
+                claimName: vector-geoipupdate-config

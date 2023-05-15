@@ -1,0 +1,76 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cluster-workloads-vector-geoipupdate
+  namespace: flux-system
+  labels:
+    substitution.flux.home.arpa/enabled: "true"
+spec:
+  path: ./k8s/clusters/cluster-1/manifests/system-monitoring/vector/geoipupdate
+  prune: true
+  dependsOn:
+    - name: cluster-workloads-external-secrets-stores
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+  wait: true
+  # healthChecks:
+  #   - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+  #     kind: HelmRelease
+  #     name: loki
+  #     namespace: system-monitoring
+  interval: 30m
+  retryInterval: 1m
+  timeout: 3m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cluster-workloads-vector-aggregator
+  namespace: flux-system
+  labels:
+    substitution.flux.home.arpa/enabled: "true"
+spec:
+  path: ./k8s/clusters/cluster-1/manifests/system-monitoring/vector/aggregator
+  prune: true
+  dependsOn:
+    - name: cluster-workloads-loki
+    - name: cluster-workloads-vector-geoipupdate
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+  wait: true
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+      kind: HelmRelease
+      name: vector-aggregator
+      namespace: system-monitoring
+  interval: 30m
+  retryInterval: 1m
+  timeout: 3m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cluster-workloads-vector-agent
+  namespace: flux-system
+  labels:
+    substitution.flux.home.arpa/enabled: "true"
+spec:
+  path: ./k8s/clusters/cluster-1/manifests/system-monitoring/vector/agent
+  prune: true
+  dependsOn:
+    - name: cluster-workloads-vector-aggregator
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+  wait: true
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+      kind: HelmRelease
+      name: vector-agent
+      namespace: system-monitoring
+  interval: 30m
+  retryInterval: 1m
+  timeout: 3m
