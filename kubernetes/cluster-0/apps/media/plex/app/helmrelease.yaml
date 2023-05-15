@@ -29,7 +29,8 @@ spec:
       main:
         type: LoadBalancer
         externalTrafficPolicy: Local
-        loadBalancerIP: 10.45.0.20
+        annotations:
+          metallb.universe.tf/loadBalancerIPs: "10.45.0.20"
         ports:
           http:
             port: 32400
