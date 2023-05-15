@@ -9,11 +9,22 @@ spec:
     {
       "cniVersion": "0.3.1",
       "name": "multus-iot",
-      "type": "macvlan",
-      "mode": "bridge",
-      "master": "eth0.40",
-      "capabilities": { "ips": true },
-      "ipam": {
-        "type": "static"
-      }
+      "plugins": [
+        {
+          "type": "bridge",
+          "bridge": "iot_br0",
+          "capabilities": {
+            "ips": true
+          },
+          "ipam": {
+            "type": "static",
+            "routes": [
+              {
+                "dst": "0.0.0.0/0",
+                "gw": "10.1.3.1"
+              }
+            ]
+          }
+        }
+      ]
     }
