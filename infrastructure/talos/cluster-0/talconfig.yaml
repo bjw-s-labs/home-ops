@@ -84,6 +84,9 @@ controlPlane:
             rotate-server-certificates: "true"
           extraConfig:
             maxPods: 150
+          nodeIP:
+            validSubnets:
+                - 10.1.1.0/24
         network:
           extraHostEntries:
             - ip: ${clusterEndpointIP}
