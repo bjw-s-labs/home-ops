@@ -5,7 +5,9 @@ metadata:
   name: vector-geoipupdate-config
   namespace: system-monitoring
   labels:
-    excluded_from_alerts: "true"
+    app.kubernetes.io/name: &name vector-geoip
+    app.kubernetes.io/instance: *name
+    snapshot.home.arpa/enabled: "true"
 spec:
   accessModes:
     - ReadWriteMany
