@@ -1,0 +1,82 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: scrypted
+  namespace: home-automation
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controller:
+      type: statefulset
+
+    image:
+      repository: ghcr.io/koush/scrypted
+      tag: 18-bullseye-full-v0.12.1
+
+    podAnnotations:
+      k8s.v1.cni.cncf.io/networks: |
+        [{
+          "name":"multus-iot",
+          "namespace": "network",
+          "ips": ["10.1.3.153/24"]
+        }]
+
+    service:
+      main:
+        ports:
+          http:
+            port: 11080
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        hosts:
+          - host: &host "scrypted.bjw-s.dev"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    nodeSelector:
+      intel.feature.node.kubernetes.io/gpu: "true"
+
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: OnRootMismatch
+
+    persistence:
+      cache:
+        enabled: true
+        mountPath: /.npm
+        type: emptyDir
+
+    resources:
+      requests:
+        gpu.intel.com/i915: 1
+        cpu: 10m
+        memory: 250Mi
+      limits:
+        gpu.intel.com/i915: 1
+        memory: 2000Mi
+
+    volumeClaimTemplates:
+      - name: config
+        mountPath: /server/volume
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
