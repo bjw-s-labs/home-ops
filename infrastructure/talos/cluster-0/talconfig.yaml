@@ -66,6 +66,9 @@ controlPlane:
         allowSchedulingOnMasters: true
         proxy:
           disabled: true
+        extraManifests:
+          - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-0/integrations/cni/cilium.yaml
+          - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-0/integrations/kubelet-csr-approver/kubelet-csr-approver.yaml
 
     - |-
       - op: remove
