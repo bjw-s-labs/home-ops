@@ -23,20 +23,13 @@ nodes:
     installDisk: /dev/sda
     networkInterfaces:
       - interface: eth0
-        dhcp: false
+        dhcp: true
         vlans:
-          - vlanId: 10
-            dhcp: true
-            addresses:
-              - 10.1.1.31/24
           - vlanId: 40
-            dhcp: false
-      - interface: iot_br0
-        bridge:
-          interfaces:
-            - eth0.40
-          stp:
-            enabled: true
+            dhcp: true
+            mtu: 1500
+            dhcpOptions:
+              routeMetric: 4096
   - hostname: enigma.bjw-s.tech
     disableSearchDomain: true
     ipAddress: 10.1.1.32
@@ -44,20 +37,13 @@ nodes:
     installDisk: /dev/sda
     networkInterfaces:
       - interface: eth0
-        dhcp: false
+        dhcp: true
         vlans:
-          - vlanId: 10
-            dhcp: true
-            addresses:
-              - 10.1.1.32/24
           - vlanId: 40
-            dhcp: false
-      - interface: iot_br0
-        bridge:
-          interfaces:
-            - eth0.40
-          stp:
-            enabled: true
+            dhcp: true
+            mtu: 1500
+            dhcpOptions:
+              routeMetric: 4096
   - hostname: felix.bjw-s.tech
     disableSearchDomain: true
     ipAddress: 10.1.1.33
@@ -65,20 +51,13 @@ nodes:
     installDisk: /dev/sda
     networkInterfaces:
       - interface: eth0
-        dhcp: false
+        dhcp: true
         vlans:
-          - vlanId: 10
-            dhcp: true
-            addresses:
-              - 10.1.1.33/24
           - vlanId: 40
-            dhcp: false
-      - interface: iot_br0
-        bridge:
-          interfaces:
-            - eth0.40
-          stp:
-            enabled: true
+            dhcp: true
+            mtu: 1500
+            dhcpOptions:
+              routeMetric: 4096
 
 controlPlane:
   patches:
