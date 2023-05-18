@@ -138,6 +138,10 @@ spec:
             path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/home-assistant
         mountPath: /config/backups
         readOnly: false
+      matter-server-data:
+        enabled: true
+        type: emptyDir
+        mountPath: /data
 
     resources:
       requests:
@@ -153,6 +157,9 @@ spec:
         env:
           - name: TZ
             value: "${TIMEZONE}"
+        volumeMounts:
+          - name: matter-server-data
+            mountPath: /data
         command: ["/bin/sh","-c"]
         args:
           - >
