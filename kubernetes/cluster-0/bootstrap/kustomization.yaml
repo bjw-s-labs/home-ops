@@ -2,7 +2,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - github.com/fluxcd/flux2/manifests/install?ref=v0.41.2
+  - github.com/fluxcd/flux2/manifests/install?ref=v2.0.0-rc.3
 patches:
   - patch: |-
       $patch: delete
@@ -14,27 +14,3 @@ patches:
       group: networking.k8s.io
       version: v1
       kind: NetworkPolicy
-  - patch: |-
-      - op: add
-        path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/eventSources/items/properties/kind/enum/-
-        value: Terraform
-    target:
-      kind: CustomResourceDefinition
-      name: alerts.notification.toolkit.fluxcd.io
-  - patch: |-
-      - op: add
-        path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/resources/items/properties/kind/enum/-
-        value: Terraform
-    target:
-      kind: CustomResourceDefinition
-      name: receivers.notification.toolkit.fluxcd.io
-  - patch: |-
-      - op: add
-        path: /rules/-
-        value:
-          apiGroups: ["infra.contrib.fluxcd.io"]
-          resources: ["*"]
-          verbs: ["*"]
-    target:
-      kind: ClusterRole
-      name: crd-controller-flux-system
