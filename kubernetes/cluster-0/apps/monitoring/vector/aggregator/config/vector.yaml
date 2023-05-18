@@ -101,14 +101,12 @@ sinks:
     remove_label_fields: true
     remove_timestamp: true
     labels:
-      hostname: '{{ kubernetes.pod_node_name }}'
-      k8s_app: '{{ custom_app_name }}'
-      k8s_container: '{{ kubernetes.container_name }}'
-      k8s_filename: '{{ kubernetes.file }}'
-      k8s_instance: '{{ kubernetes.pod_labels."app.kubernetes.io/instance" }}'
-      k8s_namespace: '{{ kubernetes.pod_namespace }}'
-      k8s_node: '{{ kubernetes.pod_node_name }}'
-      k8s_pod: '{{ kubernetes.pod_name }}'
+      node: "{{ kubernetes.pod_node_name }}"
+      namespace: "{{ kubernetes.pod_namespace }}"
+      pod: "{{ kubernetes.pod_name }}"
+      app: "{{ custom_app_name }}"
+      instance: '{{ kubernetes.pod_labels."app.kubernetes.io/instance" }}'
+      container: "{{ kubernetes.container_name }}"
 
   loki_vyos:
     type: loki
@@ -120,7 +118,7 @@ sinks:
       codec: json
     out_of_order_action: rewrite_timestamp
     labels:
-      hostname: '{{ host }}'
+      hostname: "{{ host }}"
 
   loki_journal:
     type: loki
@@ -133,4 +131,4 @@ sinks:
     remove_label_fields: true
     remove_timestamp: true
     labels:
-      hostname: '{{ host }}'
+      hostname: "{{ host }}"
