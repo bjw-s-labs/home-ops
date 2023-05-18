@@ -145,3 +145,11 @@ spec:
         memory: 512Mi
       limits:
         memory: 2000Mi
+
+    sidecars:
+      matter-server:
+        name: matter-server
+        image: ghcr.io/dcplaya/matter-server:v3.3.1     
+        env:
+          - name: TZ
+            value: "${TIMEZONE}"
