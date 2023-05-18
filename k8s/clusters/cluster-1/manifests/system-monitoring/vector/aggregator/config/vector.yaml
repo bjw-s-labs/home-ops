@@ -26,6 +26,24 @@ sources:
     address: 0.0.0.0:6002
     version: "2"
 
+  talos_kernel_logs:
+    address: 0.0.0.0:6003
+    type: socket
+    mode: udp
+    max_length: 102400
+    decoding:
+      codec: json
+    host_key: __host
+
+  talos_service_logs:
+    address: 0.0.0.0:6004
+    type: socket
+    mode: udp
+    max_length: 102400
+    decoding:
+      codec: json
+    host_key: __host
+
 # Transformations
 transforms:
   kubernetes_remap:
@@ -115,6 +133,7 @@ sinks:
     inputs:
       - vyos_firewall_wan_route._unmatched
       - vyos_firewall_geoip_remap
+      - vyos_syslog
     endpoint: http://loki-gateway.system-monitoring.svc.cluster.local
     encoding:
       codec: json
@@ -134,3 +153,39 @@ sinks:
     remove_timestamp: true
     labels:
       hostname: '{{ host }}'
+
+  talos_kernel:
+    type: loki
+    inputs:
+      - kernel_hostname_transform
+    endpoint: http://loki-gateway.system-monitoring.svc.cluster.local
+    encoding:
+      codec: json
+      except_fields:
+        - __host
+    batch:
+      max_bytes: 524288
+    out_of_order_action: rewrite_timestamp
+    labels:
+      node: '{{ node }}'
+      facility: '{{ facility }}'
+      cluster: "${CLUSTER_NAME}"
+      namespace: "talos:kernel"
+
+  talos_service:
+    type: loki
+    inputs:
+      - service_hostname_transform
+    endpoint: http://loki-gateway.system-monitoring.svc.cluster.local
+    encoding:
+      codec: json
+      except_fields:
+        - __host
+    batch:
+      max_bytes: 524288
+    out_of_order_action: rewrite_timestamp
+    labels:
+      node: '{{ node }}'
+      talos_service: '{{ "talos-service" }}'
+      cluster: "${CLUSTER_NAME}"
+      namespace: "talos:service"
