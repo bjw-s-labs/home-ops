@@ -15,9 +15,5 @@ spec:
     name: home-ops-kubernetes
   dependsOn:
     - name: cluster-apps-snapshot-controller
-  healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
-      kind: HelmRelease
-      name: volsync
-      namespace: system
+  wait: true
   timeout: 2m
