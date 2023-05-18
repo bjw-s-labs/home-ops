@@ -25,11 +25,31 @@ spec:
       annotations:
         reloader.stakater.com/auto: "true"
 
+    initContainers:
+      01-init-geoip:
+        image: ghcr.io/maxmind/geoipupdate:v5.1.1
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: GEOIPUPDATE_EDITION_IDS
+            value: GeoLite2-City
+          - name: GEOIPUPDATE_FREQUENCY
+            value: "0"
+          - name: GEOIPUPDATE_VERBOSE
+            value: "true"
+        envFrom:
+          - secretRef:
+              name: vector-aggregator-secret
+        volumeMounts:
+          - name: geoip
+            mountPath: /usr/share/GeoIP
+
     image:
       repository: ghcr.io/onedr0p/vector
       tag: 0.29.1-debian
 
-    args: ["--config", "/etc/vector/vector.yaml"]
+    args:
+      - "--config"
+      - "/etc/vector/vector.yaml"
 
     service:
       main:
@@ -65,7 +85,8 @@ spec:
         mountPath: /vector-data-dir
       geoip:
         enabled: true
-        existingClaim: vector-geoipupdate-config
+        type: emptyDir
+        mountPath: /usr/share/GeoIP
 
     # resources:
     #   requests:

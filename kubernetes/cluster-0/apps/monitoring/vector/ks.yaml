@@ -2,22 +2,6 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-vector-geoipupdate
-  namespace: flux-system
-spec:
-  interval: 10m
-  path: "./kubernetes/cluster-0/apps/monitoring/vector/geoipupdate"
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops-kubernetes
-  wait: true
-  dependsOn:
-    - name: cluster-apps-external-secrets-stores
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
   name: cluster-apps-vector-aggregator
   namespace: flux-system
 spec:
@@ -30,7 +14,7 @@ spec:
   wait: true
   dependsOn:
     - name: cluster-apps-loki
-    - name: cluster-apps-vector-geoipupdate
+    - name: cluster-apps-external-secrets-stores
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
