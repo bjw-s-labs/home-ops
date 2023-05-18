@@ -1,11 +1,9 @@
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: cluster-apps-navidrome-main
   namespace: flux-system
-  labels:
-    substitution.flux.home.arpa/enabled: "true"
 spec:
   interval: 10m
   path: "./kubernetes/cluster-0/apps/media/navidrome/main"
@@ -17,13 +15,11 @@ spec:
   dependsOn:
     - name: cluster-apps-rook-ceph-cluster
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: cluster-apps-navidrome-kids
   namespace: flux-system
-  labels:
-    substitution.flux.home.arpa/enabled: "true"
 spec:
   interval: 10m
   path: "./kubernetes/cluster-0/apps/media/navidrome/kids"
