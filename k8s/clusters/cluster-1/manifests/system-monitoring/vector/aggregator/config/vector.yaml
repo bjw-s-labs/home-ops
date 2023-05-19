@@ -185,7 +185,7 @@ sinks:
   talos_kernel:
     type: loki
     inputs:
-      - kernel_hostname_transform
+      - talos_kernel_logs_xform
     endpoint: http://loki-gateway.system-monitoring.svc.cluster.local
     encoding:
       codec: json
@@ -203,7 +203,7 @@ sinks:
   talos_service:
     type: loki
     inputs:
-      - service_hostname_transform
+      - talos_service_logs_xform
     endpoint: http://loki-gateway.system-monitoring.svc.cluster.local
     encoding:
       codec: json
