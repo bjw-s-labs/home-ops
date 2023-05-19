@@ -58,6 +58,7 @@ spec:
       runAsGroup: 568
       fsGroup: 568
       fsGroupChangePolicy: OnRootMismatch
+      supplementalGroups: [44, 109]
 
     persistence:
       cache:
@@ -68,11 +69,11 @@ spec:
     resources:
       requests:
         gpu.intel.com/i915: 1
-        cpu: 10m
-        memory: 250Mi
+        cpu: 136m
+        memory: 916Mi
       limits:
         gpu.intel.com/i915: 1
-        memory: 2000Mi
+        memory: 916Mi
 
     volumeClaimTemplates:
       - name: config
