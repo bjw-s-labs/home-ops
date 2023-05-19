@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/replicationsource_v1alpha1.json
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: matter-server
+  namespace: home-automation
+spec:
+  sourcePVC: matter-server-config
+  trigger:
+    # manual: initial
+    schedule: "55 */2 * * *"
+  restic:
+    copyMethod: Snapshot
+    pruneIntervalDays: 10
+    repository: matter-server-restic
+    moverSecurityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+      fsGroupChangePolicy: "OnRootMismatch"
+    cacheCapacity: 5Gi
+    volumeSnapshotClassName: csi-rbdplugin-snapclass
+    storageClassName: ceph-block-external
+    retain:
+      daily: 10
+      within: 3d

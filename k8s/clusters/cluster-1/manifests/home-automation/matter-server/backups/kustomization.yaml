@@ -1,0 +1,12 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./secret.sops.yaml
+  - ./replicationsource.yaml
+  # - ./replicationdestination.yaml
+labels:
+  - pairs:
+      app.kubernetes.io/name: matter-server-volsync
+      app.kubernetes.io/instance: matter-server-volsync

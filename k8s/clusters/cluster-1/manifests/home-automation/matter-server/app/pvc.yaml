@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: matter-server-config
+  namespace: home-automation
+  labels:
+    k10.kasten.io/backup: "true"
+    app.kubernetes.io/name: &name matter-server
+    app.kubernetes.io/instance: *name
+    snapshot.home.arpa/enabled: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 5Gi
+
+  storageClassName: ceph-block-external

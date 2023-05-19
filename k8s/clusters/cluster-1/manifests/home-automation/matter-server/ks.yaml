@@ -1,0 +1,41 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/kustomization_v1beta2.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cluster-workloads-matter-server
+  namespace: flux-system
+spec:
+  path: ./k8s/clusters/cluster-1/manifests/home-automation/matter-server/app
+  prune: true
+#   dependsOn:
+#     - name: network-namespace
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+      kind: HelmRelease
+      name: matter-server
+      namespace: home-automation
+  interval: 30m
+  retryInterval: 1m
+  timeout: 3m
+---
+yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/kustomization_v1beta2.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cluster-workloads-matter-server-volsync
+  namespace: flux-system
+spec:
+  path: ./k8s/clusters/cluster-1/manifests/home-automation/matter-server/backups
+  prune: true
+#   dependsOn:
+#     - name: network-namespace
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+  interval: 30m
+  retryInterval: 1m
+  timeout: 3m

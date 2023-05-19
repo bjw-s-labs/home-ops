@@ -1,0 +1,12 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: home-automation
+resources:
+  - ./pvc.yaml
+  - ./helmrelease.yaml
+labels:
+  - pairs:
+      app.kubernetes.io/name: matter-server
+      app.kubernetes.io/instance: matter-server
