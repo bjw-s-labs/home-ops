@@ -54,6 +54,34 @@ transforms:
       # Standardize 'app' index
       .custom_app_name = .pod_labels."app.kubernetes.io/name" || .pod_labels.app || .pod_labels."k8s-app" || "unknown"
 
+  # These settings dont make sense for me, keeping for furture change
+  talos_kernel_logs_xform:
+    type: remap
+    inputs:
+      - talos_kernel_logs
+    source: |-
+      .__host, .err = replace(.__host, "10.20.0.20", "cp-0")
+      .__host = replace(.__host, "10.20.0.21", "cp-1")
+      .__host = replace(.__host, "10.20.0.22", "cp-2")
+      .__host = replace(.__host, "10.20.10.20", "node-0")
+      .__host = replace(.__host, "10.20.10.21", "node-1")
+      .__host = replace(.__host, "10.20.10.22", "node-2")
+      .__host = replace(.__host, "10.20.10.23", "node-3")
+
+  # These settings dont make sense for me, keeping for furture change
+  talos_service_logs_xform:
+    type: remap
+    inputs:
+      - talos_service_logs
+    source: |-
+      .__host, .err = replace(.__host, "10.20.0.20", "cp-0")
+      .__host = replace(.__host, "10.20.0.21", "cp-1")
+      .__host = replace(.__host, "10.20.0.22", "cp-2")
+      .__host = replace(.__host, "10.20.10.20", "node-0")
+      .__host = replace(.__host, "10.20.10.21", "node-1")
+      .__host = replace(.__host, "10.20.10.22", "node-2")
+      .__host = replace(.__host, "10.20.10.23", "node-3")
+
   # [63950.153039] [wan-local-default-D]IN=eth4 OUT= MAC=xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx SRC=xxx.xxx.xxx.xxx DST=xxx.xxx.xxx.xxx LEN=40 TOS=0x00 PREC=0x00 TTL=240 ID=60610 PROTO=TCP SPT=53451 DPT=2002 WINDOW=1024 RES=0x00 SYN URGP=0
   vyos_firewall_route:
     type: route
