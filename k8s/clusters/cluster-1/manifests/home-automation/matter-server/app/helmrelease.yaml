@@ -48,9 +48,17 @@ spec:
         type: LoadBalancer
         loadBalancerIP: ${LB_MATTER_SERVER}
         ports:
+          http:
+            enabled: false
           api:
+            enabled: true
+            primary: true
+            protocol: TCP
             port: *port
         externalTrafficPolicy: Local
+
+    podAnnotations:
+      k8s.v1.cni.cncf.io/networks: matter-server-iot-static
 
     ingress:
       main:
