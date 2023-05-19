@@ -9,30 +9,34 @@ spec:
   chart:
     spec:
       chart: multus
-      version: 4.0.0
+      version: 5.0.2
       sourceRef:
         kind: HelmRepository
         name: angelnu
         namespace: flux-system
       interval: 30m
   values:
-    # tolerations:
-    #   - key: "nuc"
-    #     operator: "Equal"
-    #     value: "true"
-    #     effect: "NoSchedule"
-
     image:
       repository: ghcr.io/k8snetworkplumbingwg/multus-cni
-      tag: v3.9.3
+      tag: v4.0.1-thick
 
     cni:
       image:
         repository: ghcr.io/angelnu/cni-plugins
-        tag: 1.2.0
+        tag: 1.3.0
 
       paths:
         config: /etc/cni/net.d
         bin: /opt/cni/bin
 
-      version: "0.3.1"
+      # version: "0.3.1"
+
+    resources:
+      requests:
+        cpu: 5m
+        memory: 29M
+      limits:
+        memory: 29M
+
+    hostPaths:
+      netns: /var/run/netns
