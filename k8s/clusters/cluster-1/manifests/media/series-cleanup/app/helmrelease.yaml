@@ -1,0 +1,64 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: series-cleanup
+  namespace: media
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controller:
+      type: cronjob
+      cronjob:
+        schedule: "10 */6 * * *"
+        ttlSecondsAfterFinished: 86400
+
+    podSecurityContext:
+      runAsUser: 1031
+      runAsGroup: 100
+      fsGroup: 2000
+      fsGroupChangePolicy: "OnRootMismatch"
+      supplementalGroups:
+        - 65539
+
+    restartPolicy: OnFailure
+
+    image:
+      repository: ghcr.io/bjw-s/series-cleanup
+      tag: 3.1.0
+
+    envFrom:
+      - secretRef:
+          name: series-cleanup-secrets
+
+    service:
+      main:
+        enabled: false
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: series-cleanup-data
+      settings:
+        enabled: true
+        type: configMap
+        name: series-cleanup-configmap
+        subPath: settings.json
+        mountPath: /config/settings.json
+        defaultMode: 0775
+        readOnly: true
+      nfs-nas-media:
+        enabled: true
+        existingClaim: media-nfs-share-pvc
+        mountPath: /mnt/unionfs
+        readOnly: false

@@ -1,0 +1,23 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cluster-workloads-series-cleanup
+  namespace: flux-system
+spec:
+  path: "./k8s/clusters/cluster-1/manifests/media/series-cleanup/app"
+  prune: true
+#   dependsOn:
+#     - name: network-namespace
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+  wait: true
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+      kind: HelmRelease
+      name: series-cleanup
+      namespace: media
+  interval: 30m
+  retryInterval: 1m
+  timeout: 3m

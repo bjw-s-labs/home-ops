@@ -1,17 +1,20 @@
 ---
-# yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: media
 resources:
   - ./pvc.yaml
-  - ./secret.sops.yaml
-  - ./cronjob.yaml
+  - ./secrets.sops.yaml
+  - ./helmrelease.yaml
+  # - ./volsync.yaml
 configMapGenerator:
-  - name: series-cleanup-config
+  - name: series-cleanup-configmap
     files:
-      - settings.json
+      - config/settings.json
 generatorOptions:
   disableNameSuffixHash: true
   annotations:
     kustomize.toolkit.fluxcd.io/substitute: disabled
+commonLabels:
+  app.kubernetes.io/name: series-cleanup
+  app.kubernetes.io/instance: series-cleanup
