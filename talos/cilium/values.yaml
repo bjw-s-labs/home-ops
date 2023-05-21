@@ -1,0 +1,64 @@
+---
+cluster:
+  name: "cluster-1"
+  id: "1"
+
+securityContext:
+  capabilities:
+    ciliumAgent:
+      - CHOWN
+      - KILL
+      - NET_ADMIN
+      - NET_RAW
+      - IPC_LOCK
+      - SYS_ADMIN
+      - SYS_RESOURCE
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    cleanCiliumState:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - SYS_RESOURCE
+cgroup:
+  autoMount:
+    enabled: false
+  hostRoot: /sys/fs/cgroup
+
+rollOutCiliumPods: true
+localRedirectPolicy: true
+
+# kubeProxyReplacement enables kube-proxy replacement in Cilium BPF datapath
+kubeProxyReplacement: "strict"
+
+k8sServiceHost: cluster-1.elcarpenter.com
+k8sServicePort: 6443
+
+ipam:
+  # -- Configure IP Address Management mode.
+  # ref: https://docs.cilium.io/en/stable/concepts/networking/ipam/
+  mode: kubernetes
+# autoDirectNodeRoutes enables installation of PodCIDR routes between worker
+# nodes if worker nodes share a common L2 network segment.
+# autoDirectNodeRoutes: true
+
+# nativeRoutingCIDR allows to explicitly specify the CIDR for native routing. This
+# value corresponds to the configured cluster-cidr.
+# nativeRoutingCIDR: 10.1.1.0/24
+
+# Cilium leverages MetalLB's simplified BGP announcement system for service type: LoadBalancer
+bgpControlPlane:
+  enabled: false
+bgp:
+  enabled: false
+  announce:
+    loadbalancerIP: true
+
+hubble:
+  # -- Enable Hubble (true by default).
+  enabled: false
+
+ipv6:
+  # -- Enable IPv6 support.
+  enabled: false

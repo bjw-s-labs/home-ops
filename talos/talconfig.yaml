@@ -5,7 +5,9 @@ endpoint: https://cluster-1.${secret_domain}:6443
 # domain: cluster-1.${secret_domain}
 allowSchedulingOnMasters: false
 cniConfig:
-    name: none
+  name: custom
+  urls:
+    - https://raw.githubusercontent.com/dcplaya/home-ops/main/talos/cilium/quick-install.yaml
 clusterPodNets:
     - ${pod_cidr}
 clusterSvcNets:
@@ -214,6 +216,7 @@ controlPlane:
                 disablePodSecurityPolicy: true
                 admissionControl: []
                 certSANs:
+                    - cluster-1
                     - cluster-1.${secret_domain}
                     - 10.200.1.1
                 extraArgs:
@@ -277,6 +280,7 @@ worker:
                 # - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
         machine:
             certSANs:
+                - cluster-1
                 - cluster-1.${secret_domain}
                 - 10.200.1.1
             time:
