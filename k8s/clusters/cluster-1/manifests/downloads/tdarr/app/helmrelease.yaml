@@ -92,9 +92,13 @@ spec:
         mountPath: /mnt/Media
 
     podSecurityContext:
-      runAsUser: 0
-      runAsGroup: 0
-      fsGroup: 0
+      runAsUser: 568
+      runAsGroup: 100
+      fsGroup: 568
+      supplementalGroups:
+        - 34
+        - 100
+      fsGroupChangePolicy: "OnRootMismatch"
       capabilities:
         add:
           - CHOWN

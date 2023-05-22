@@ -62,15 +62,18 @@ spec:
         enabled: true
         existingClaim: tdarr-cache
     podSecurityContext:
-      runAsUser: 0
-      runAsGroup: 0
-      fsGroup: 0
+      runAsUser: 568
+      runAsGroup: 100
+      fsGroup: 568
+      supplementalGroups:
+        - 34
+        - 100
+        - 44
+        - 226
+      fsGroupChangePolicy: "OnRootMismatch"
       capabilities:
         add:
           - CHOWN
-      supplementalGroups:
-        - 44
-        - 226
     resources:
       requests:
         cpu: 10m
