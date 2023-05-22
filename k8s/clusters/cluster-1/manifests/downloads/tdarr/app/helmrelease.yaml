@@ -82,9 +82,11 @@ spec:
       cache:
         enabled: true
         existingClaim: tdarr-cache
-      media:
+      nfs-nas-media:
         enabled: true
-        existingClaim: media
+        existingClaim: downloads-nfs-share-pvc
+        mountPath: /mnt/unionfs
+        readOnly: false
     podSecurityContext:
       runAsUser: 0
       runAsGroup: 0
