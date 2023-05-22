@@ -1,0 +1,98 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: tdarr
+  namespace: downloads
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    image:
+      repository: ghcr.io/haveagitgat/tdarr_acc
+      tag: 2.00.20.1
+    env:
+      TZ: "${TIMEZONE}"
+      PUID: "568"
+      PGID: "568"
+      ffmpegPath: "/usr/local/bin/ffmpeg"
+      TDARR_INSTANCE_NAME: Tdarr
+      TDARR__PORT: &port 8265
+      TDARR__APPLICATION_URL: &host-cluster "tdarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+      TDARR__LOG_LEVEL: info
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+          server:
+            enabled: true
+            protocol: TCP
+            port: 8266
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+          external-dns/is-public: "false"
+        hosts:
+          - host: *host-cluster
+            paths:
+              - path: /
+          - host: &host "tdarr.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - secretName: tls.tdarr
+            hosts:
+              - *host-cluster
+              - *host
+    persistence:
+      config:
+        enabled: true
+        existingClaim: tdarr-config
+        mountPath: /app/configs
+      data:
+        enabled: true
+        existingClaim: tdarr-data
+        mountPath: /app/server
+      cache:
+        enabled: true
+        existingClaim: tdarr-cache
+      media:
+        enabled: true
+        existingClaim: media
+    podSecurityContext:
+      runAsUser: 0
+      runAsGroup: 0
+      fsGroup: 0
+      capabilities:
+        add:
+          - CHOWN
+    resources:
+      requests:
+        cpu: 10m
+        memory: 250Mi
