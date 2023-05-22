@@ -61,6 +61,8 @@ https://pve.proxmox.com/pve-docs/pveceph.1.html
 
 ```bash
 pveceph pool create ssd-erasure-coded-backups --application cephfs --erasure-coding k=4,m=2,,device-class=ssd,failure-domain=osd,profile=ssd-erasure-coded
+
+pveceph pool create hdd-ec-media --application cephfs --add_storages 1 --erasure-coding k=6,m=3,,device-class=hdd,failure-domain=osd,profile=hdd-ec-media
 ```
 
 ## NFS-Genesha
