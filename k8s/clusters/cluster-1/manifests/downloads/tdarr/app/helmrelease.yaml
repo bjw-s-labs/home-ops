@@ -31,8 +31,8 @@ spec:
       tag: 2.00.20.1
     env:
       TZ: "${TIMEZONE}"
-      PUID: "568"
-      PGID: "568"
+      # PUID: "568"
+      # PGID: "568"
       ffmpegPath: "/usr/local/bin/ffmpeg"
       TDARR_INSTANCE_NAME: Tdarr
       TDARR__PORT: &port 8265
@@ -92,9 +92,9 @@ spec:
         mountPath: /mnt/Media
 
     podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 100
-      fsGroup: 568
+      runAsUser: 0
+      runAsGroup: 0
+      fsGroup: 0
       supplementalGroups:
         - 34
         - 100
