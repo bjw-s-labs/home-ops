@@ -75,7 +75,7 @@ reclaimPolicy: Delete
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: cephfs-ceph-backups
+  name: cephfs-hdd-ec-media
 # Change "rook-ceph" provisioner prefix to match the operator namespace if needed
 provisioner: rook-ceph.cephfs.csi.ceph.com # driver:namespace:operator
 parameters:
@@ -84,13 +84,13 @@ parameters:
   clusterID: rook-ceph-external # namespace:cluster
 
   # CephFS filesystem name into which the volume shall be created
-  fsName: ceph_backups
+  fsName: hdd-ec-media
 
   # Ceph pool into which the volume shall be created
   # Required for provisionVolume: "true"
   # For erasure coded pools, we have to create a replicated pool as the default data pool and an erasure-coded
   # pool as a secondary pool.
-  pool: ssd_ec-data
+  pool: hdd-ec-media-data
 
   # The secrets contain Ceph admin credentials. These are generated automatically by the operator
   # in the same namespace as the cluster.
@@ -107,6 +107,3 @@ parameters:
   # mounter: kernel
 reclaimPolicy: Delete
 allowVolumeExpansion: true
-mountOptions:
-  # uncomment the following line for debugging
-  #- debug
