@@ -82,11 +82,15 @@ spec:
       cache:
         enabled: true
         existingClaim: tdarr-cache
-      nfs-nas-media:
+      nfs-nas-local-media:
         enabled: true
-        existingClaim: downloads-nfs-share-pvc
-        mountPath: /mnt/unionfs
-        readOnly: false
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${NAS_ADDRESS}"
+            path: /mnt/NFS/Media
+        mountPath: /mnt/Media
+
     podSecurityContext:
       runAsUser: 0
       runAsGroup: 0
