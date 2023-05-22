@@ -33,8 +33,8 @@ spec:
       tag: 2.00.20.1
     env:
       TZ: "${TIMEZONE}"
-      PUID: "568"
-      PGID: "568"
+      # PUID: "568"
+      # PGID: "568"
       serverIP: tdarr.downloads.svc.cluster.local
       serverPort: 8266
       ffmpegPath: "/usr/local/bin/ffmpeg"
@@ -62,9 +62,9 @@ spec:
         enabled: true
         existingClaim: tdarr-cache
     podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 100
-      fsGroup: 568
+      runAsUser: 0
+      runAsGroup: 0
+      fsGroup: 0
       supplementalGroups:
         - 34
         - 100
