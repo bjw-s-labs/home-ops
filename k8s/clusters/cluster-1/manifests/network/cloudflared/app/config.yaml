@@ -1,0 +1,26 @@
+---
+tunnel: ${CLOUDFLARE_TUNNEL_ID}
+credentials-file: /etc/cloudflared/cred.json
+originRequest:
+  connectTimeout: 30s
+warp-routing:
+  enabled: false
+
+ingress:
+  - hostname: "*.${SECRET_DOMAIN}"
+    service: https://traefik.network
+    originRequest:
+      originServerName: "ingress.${SECRET_DOMAIN}"
+  - hostname: "*.${SECRET_DOMAIN}"
+    service: https://traefik.network
+    originRequest:
+      originServerName: "ingress.${SECRET_DOMAIN}"
+  # - hostname: "*.${SECRET_DOMAIN}"
+  #   service: https://cilium-ingress.kube-system
+  #   originRequest:
+  #     originServerName: "ingress.${SECRET_DOMAIN}"
+  # - hostname: "*.${SECRET_DOMAIN}"
+  #   service: https://cilium-ingress.kube-system
+  #   originRequest:
+  #     originServerName: "ingress.${SECRET_DOMAIN}"
+  - service: http_status:404

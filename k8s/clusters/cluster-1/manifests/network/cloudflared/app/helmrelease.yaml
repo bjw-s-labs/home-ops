@@ -2,39 +2,86 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: cloudflared
+  name: &app cloudflared
   namespace: network
 spec:
-  interval: 5m
-  releaseName: cloudflared
+  interval: 15m
   chart:
     spec:
-      chart: cloudflared
-      version: 0.1.2
+      chart: app-template
+      version: 1.5.0
       sourceRef:
         kind: HelmRepository
-        name: xunholy-charts
+        name: bjw-s
         namespace: flux-system
-      interval: 5m
+      interval: 15m
+  install:
+    createNamespace: true
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
   values:
+    global:
+      nameOverride: *app
+    controller:
+      replicas: 4
     image:
-      repository: raspbernetes/cloudflared
-      tag: "2022.8.2"
-    cloudflared:
-      # Tunnel ID should be unique per instance of running cloudflared
-      tunnelID: "${CLOUDFLARE_TUNNEL_ID}"
-      # This is a reference to an existing secret containing the credentials;
-      existingSecret: cloudflared-credential
-      # Ingress hosts are directly copied into the configmap;
-      # Read: https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/configuration/configuration-file/ingress
-      ingress:
-        - hostname: api.${CLUSTER_NAME}.${INGRESS_DOMAIN}
-          service: tcp://kubernetes.default.svc.cluster.local:443
-          originRequest:
-            proxyType: socks
-        - hostname: "*.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-          service: https://traefik.network.svc.cluster.local:443
-          originRequest:
-            # noTLSVerify: true
-            originServerName: ${INGRESS_DOMAIN}
-        - service: http_status:404
+      repository: cloudflare/cloudflared
+      tag: 2023.5.0-amd64
+    args:
+      - tunnel
+      - --config
+      - /etc/cloudflared/config.yaml
+      - --metrics
+      - 0.0.0.0:9090
+      - run
+    service:
+      main:
+        nameOverride: metrics
+        ports:
+          http:
+            port: 9090
+    persistence:
+      config:
+        enabled: true
+        type: custom
+        volumeSpec:
+          configMap:
+            name: &config cloudflare-tunnel
+        subPath:
+          - path: config.yaml
+            mountPath: /etc/cloudflared/config.yaml
+            readOnly: true
+      credentials:
+        enabled: true
+        type: custom
+        volumeSpec:
+          secret:
+            secretName: &secret cloudflare-tunnel
+        subPath:
+          - path: cred.json
+            mountPath: /etc/cloudflared/cred.json
+            readOnly: true
+    resources:
+      requests:
+        memory: 64Mi
+        cpu: 10m
+      limits:
+        memory: 128Mi
+    podAnnotations:
+      secret.reloader.stakater.com/reload: *secret
+      configmap.reloader.stakater.com/reload: *config
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - cloudflared
+              topologyKey: kubernetes.io/hostname
