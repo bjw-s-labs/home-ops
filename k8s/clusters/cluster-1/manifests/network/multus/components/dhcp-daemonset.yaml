@@ -1,0 +1,68 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kube-dhcp-ds-amd64
+  namespace: network
+  labels:
+    tier: node
+    app: dhcp
+spec:
+  selector:
+    matchLabels:
+      tier: node
+      app: dhcp
+  template:
+    metadata:
+      labels:
+        tier: node
+        app: dhcp
+    spec:
+      hostNetwork: true
+      nodeSelector:
+        beta.kubernetes.io/arch: amd64
+      tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      # serviceAccountName: dhcp
+      initContainers:
+      - name: clean-up
+        image: busybox
+        command: ["/bin/sh"]
+        args: ["-c", "rm -f /host/run/cni/dhcp.sock"]
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: socketpath
+          mountPath: /host/run/cni
+      containers:
+      - name: kube-dhcp
+        # Based on: https://github.com/k8snetworkplumbingwg/reference-deployment/blob/master/multus-dhcp/Dockerfile
+        image: quay.io/aneeshkp/cni-dhcp-daemon:latest
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "50Mi"
+          limits:
+            cpu: "100m"
+            memory: "50Mi"
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: socketpath
+          mountPath: /host/run/cni
+        - name: procpath
+          mountPath: /host/proc
+        - name: netnspath
+          mountPath: /host/var/run/netns
+          mountPropagation: HostToContainer
+      volumes:
+      - name: socketpath
+        hostPath:
+          path: /run/cni
+      - name: procpath
+        hostPath:
+          path: /proc
+      - name: netnspath
+        hostPath:
+          path: /run/netns
