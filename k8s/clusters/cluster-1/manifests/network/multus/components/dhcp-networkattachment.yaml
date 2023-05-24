@@ -9,20 +9,7 @@ spec:
       "type": "macvlan",
       "master": "eth1.100",
       "mode": "bridge",
-      {
-          "ipam": {
-              "type": "dhcp",
-              "daemonSocketPath": "/run/cni/dhcp.sock",
-              "request": [
-                  {
-                      "skipDefault": false
-                  }
-              ],
-              "provide": [
-                  {
-                      "option": "host-name",
-                      "fromArg": "K8S_POD_NAME"
-                  }
-              ]
-          }
-      }'
+      "ipam": {
+          "type": "dhcp",
+      }
+    }'
