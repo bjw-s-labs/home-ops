@@ -291,3 +291,7 @@ worker:
                 nodeIP:
                     validSubnets:
                         - 10.200.1.0/24
+            sysctls:
+              # For CloudflareD QUIC, sets maximum receive buffer size to roughly 2.5 MB. 
+              # https://github.com/quic-go/quic-go/wiki/UDP-Receive-Buffer-Size
+              net.core.rmem_max: 2500000
