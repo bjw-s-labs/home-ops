@@ -55,7 +55,8 @@ spec:
           mountPath: /host/proc
         - name: netnspath
           mountPath: /host/var/run/netns
-          mountPropagation: HostToContainer
+          # mountPropagation: HostToContainer
+          mountPropagation: Bidirectional
       volumes:
       - name: socketpath
         hostPath:

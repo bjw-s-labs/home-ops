@@ -11,6 +11,12 @@ spec:
       "mode": "bridge",
       "ipam": {
           "type": "dhcp",
+          "daemonSocketPath": "/run/cni/dhcp.sock",
+          "request": [
+              {
+                  "skipDefault": false
+              }
+          ],
           "provide": [
             {
               "option": "12",
