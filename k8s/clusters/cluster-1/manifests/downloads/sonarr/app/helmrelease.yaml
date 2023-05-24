@@ -147,11 +147,15 @@ spec:
           - host: &host "sonarr.${INGRESS_DOMAIN}"
             paths:
               - path: /
+          - host: &host-cftest "sonarr.cftest.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
         tls:
           - secretName: tls.sonarr
             hosts:
               - *host-cluster
               - *host
+              - *host-cftest
 
     resources:
       requests:
