@@ -4,12 +4,33 @@ metadata:
   name: home-automation-iot-dhcp
   namespace: home-automation
 spec:
-  config: '{
+  config: |-
+    {
       "cniVersion": "0.3.1",
-      "type": "macvlan",
-      "master": "eth1.100",
-      "mode": "bridge",
-      "ipam": {
-          "type": "dhcp",
-      }
-    }'
+      "name": "multus-iot-dhcp",
+      "plugins": [
+        {
+          "type": "macvlan",
+          "master": "eth1.100",
+          "mode": "bridge",
+          "capabilities": {
+            "ips": true
+          },
+          "ipam": {
+            "type": "dhcp",
+            "daemonSocketPath": "/run/cni/dhcp.sock",
+            "request": [
+              {
+                "skipDefault": false
+              }
+            ],
+            "provide": [
+              {
+                "option": "host-name",
+                "fromArg": "K8S_POD_NAME"
+              }
+            ]
+          }          
+        }
+      ]
+    }
