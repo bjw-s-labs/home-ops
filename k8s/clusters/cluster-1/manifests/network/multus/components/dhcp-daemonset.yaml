@@ -38,7 +38,14 @@ spec:
       containers:
       - name: kube-dhcp
         # Based on: https://github.com/k8snetworkplumbingwg/reference-deployment/blob/master/multus-dhcp/Dockerfile
-        image: quay.io/aneeshkp/cni-dhcp-daemon:latest
+        # image: quay.io/aneeshkp/cni-dhcp-daemon:latest
+        image: quay.io/k0sproject/cni-node:1.1.1-k0s.1
+        command:
+        - /opt/cni/bin/dhcp
+        args:
+        - daemon
+        - -hostprefix
+        - /host
         resources:
           requests:
             cpu: "100m"
@@ -55,8 +62,7 @@ spec:
           mountPath: /host/proc
         - name: netnspath
           mountPath: /host/var/run/netns
-          # mountPropagation: HostToContainer
-          mountPropagation: Bidirectional
+          mountPropagation: HostToContainer
       volumes:
       - name: socketpath
         hostPath:
