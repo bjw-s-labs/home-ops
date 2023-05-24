@@ -7,6 +7,8 @@ warp-routing:
   enabled: false
 
 ingress:
+- hostname: "cftest.${INGRESS_DOMAIN}"
+  service: hello_world
   - hostname: "*.${INGRESS_DOMAIN}"
     service: https://traefik.network
     originRequest:
