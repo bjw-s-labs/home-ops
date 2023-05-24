@@ -7,20 +7,20 @@ warp-routing:
   enabled: false
 
 ingress:
-  - hostname: "*.${SECRET_DOMAIN}"
+  - hostname: "*.${INGRESS_DOMAIN}"
     service: https://traefik.network
     originRequest:
-      originServerName: "ingress.${SECRET_DOMAIN}"
-  - hostname: "*.${SECRET_DOMAIN}"
+      originServerName: "ingress.${INGRESS_DOMAIN}"
+  - hostname: "*.${INGRESS_DOMAIN}"
     service: https://traefik.network
     originRequest:
-      originServerName: "ingress.${SECRET_DOMAIN}"
-  # - hostname: "*.${SECRET_DOMAIN}"
+      originServerName: "ingress.${INGRESS_DOMAIN}"
+  # - hostname: "*.${INGRESS_DOMAIN}"
   #   service: https://cilium-ingress.kube-system
   #   originRequest:
-  #     originServerName: "ingress.${SECRET_DOMAIN}"
-  # - hostname: "*.${SECRET_DOMAIN}"
+  #     originServerName: "ingress.${INGRESS_DOMAIN}"
+  # - hostname: "*.${INGRESS_DOMAIN}"
   #   service: https://cilium-ingress.kube-system
   #   originRequest:
-  #     originServerName: "ingress.${SECRET_DOMAIN}"
+  #     originServerName: "ingress.${INGRESS_DOMAIN}"
   - service: http_status:404
