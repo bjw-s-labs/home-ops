@@ -21,3 +21,21 @@ spec:
   interval: 30m
   retryInterval: 1m
   timeout: 3m
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/kustomization_v1beta2.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cluster-workloads-multus-components
+  namespace: flux-system
+spec:
+  path: ./k8s/clusters/cluster-1/manifests/network/multus/components
+  prune: true
+#   dependsOn:
+#     - name: network-namespace
+  sourceRef:
+    kind: GitRepository
+    name: home-ops
+  interval: 30m
+  retryInterval: 1m
+  timeout: 3m
