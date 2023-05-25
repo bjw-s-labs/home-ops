@@ -11,22 +11,21 @@ spec:
       "type": "macvlan",
       "master": "eth1.100",
       "mode": "bridge",
-      "capabilities": {
-        "ips": true
-      },
       "ipam": {
-        "type": "dhcp",
-        "daemonSocketPath": "/run/cni/dhcp.sock",
-        "request": [
-          {
-            "skipDefault": false
-          }
-        ],
-        "provide": [
-          {
-            "option": "host-name",
-            "fromArg": "K8S_POD_NAME"
-          }
+          "type": "dhcp",
+          "provide": [
+            {
+              "option": "host-name",
+              "fromArg": "dhcp-host-name"
+            },
+            {
+              "option": "host-name",
+              "fromArg": "K8S_POD_NAME"
+            },
+            {
+              "option": "host-name",
+              "value": "macvlan-default-hostname"
+            }
         ]
       }
     }
