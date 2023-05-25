@@ -11,11 +11,11 @@
   become: true
   when:
     - vector_version_check.stdout is not defined
-      or vector_version_clean not in vector_version_check.stdout
+      or vector_version not in vector_version_check.stdout
   vars:
     install_path: "/usr/local/bin"
     package_name: vector
-    package_version: "{{ vector_version }}"
+    package_version: "v{{ vector_version }}"
     package_type: github_release
     package_repository: vectordotdev/vector
     package_asset: "{{ vector_asset }}"
