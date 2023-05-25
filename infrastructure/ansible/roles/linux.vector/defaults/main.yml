@@ -1,14 +1,13 @@
 ---
 # renovate: datasource=github-releases depName=vectordotdev/vector
 vector_version: "0.30.0"
-vector_version_clean: "{{ vector_version[1:] }}"
 vector_asset: |-
   {%- if ansible_architecture == "armv7l" -%}
-    vector-{{ vector_version_clean }}-armv7-unknown-linux-gnueabihf.tar.gz
+    vector-{{ vector_version }}-armv7-unknown-linux-gnueabihf.tar.gz
   {%- elif ansible_architecture == "arm64" -%}
-    vector-{{ vector_version_clean }}-aarch64-unknown-linux-musl.tar.gz
+    vector-{{ vector_version }}-aarch64-unknown-linux-musl.tar.gz
   {%- elif ansible_architecture == "aarch64" -%}
-    vector-{{ vector_version_clean }}-aarch64-unknown-linux-musl.tar.gz
+    vector-{{ vector_version }}-aarch64-unknown-linux-musl.tar.gz
   {%- else -%}
-    vector-{{ vector_version_clean }}-x86_64-unknown-linux-musl.tar.gz
+    vector-{{ vector_version }}-x86_64-unknown-linux-musl.tar.gz
   {%- endif -%}
