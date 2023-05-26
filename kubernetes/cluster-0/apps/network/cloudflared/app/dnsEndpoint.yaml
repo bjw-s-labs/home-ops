@@ -4,6 +4,8 @@ kind: DNSEndpoint
 metadata:
   name: cloudflared-tunnel
   namespace: network
+  annotations:
+    external-dns.alpha.kubernetes.io/public: "true"
 spec:
   endpoints:
     - dnsName: ingress.bjw-s.dev
