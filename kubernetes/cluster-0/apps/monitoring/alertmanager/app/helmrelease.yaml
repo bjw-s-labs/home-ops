@@ -6,110 +6,60 @@ metadata:
   namespace: monitoring
 spec:
   interval: 30m
-  timeout: 20m
   chart:
     spec:
-      chart: alertmanager
-      version: 0.31.1
+      chart: app-template
+      version: 1.5.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
-        name: prometheus-community
+        name: bjw-s
         namespace: flux-system
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
+      repository: quay.io/prometheus/alertmanager
       tag: main@sha256:94d72f2180b3095123617583f3b919172e91990280dae81beb89886c60210efc
 
     podAnnotations:
       reloader.stakater.com/auto: "true"
 
-    configmapReload:
-      enabled: true
-
-    config:
-      receivers:
-        - name: "null"
-        - name: "pushover"
-          pushover_configs:
-            - html: true
-              token_file: /etc/secrets/pushover_api_token
-              user_key_file: /etc/secrets/pushover_api_userkey
-              send_resolved: true
-              priority: |-
-                {{ if eq .Status "firing" }}1{{ else }}0{{ end }}
-              url_title: View in Alert Manager
-              title: |-
-                [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
-              message: |-
-                {{- range .Alerts }}
-                  {{- if ne .Labels.severity "" }}
-                    <b>Severity:</b> <i>{{ .Labels.severity }}</i>
-                  {{- else }}
-                    <b>Severity:</b> <i>N/A</i>
-                  {{- end }}
-                  {{- if ne .Annotations.description "" }}
-                    <b>Description:</b> <i>{{ .Annotations.description }}</i>
-                  {{- else if ne .Annotations.summary "" }}
-                    <b>Summary:</b> <i>{{ .Annotations.summary }}</i>
-                  {{- else if ne .Annotations.message "" }}
-                    <b>Message:</b> <i>{{ .Annotations.message }}</i>
-                  {{- else }}
-                    <b>Description:</b> <i>N/A</i>
-                  {{- end }}
-                  {{- if gt (len .Labels.SortedPairs) 0 }}
-                    <b>Details:</b>
-                    {{- range .Labels.SortedPairs }}
-                      • <b>{{ .Name }}:</b> <i>{{ .Value }}</i>
-                    {{- end }}
-                  {{- end }}
-                {{- end }}
-
-      route:
-        group_by: ["alertname", "job"]
-        group_wait: 30s
-        group_interval: 5m
-        repeat_interval: 6h
-        receiver: "pushover"
-        routes:
-          - receiver: "null"
-            matchers:
-              - alertname =~ "InfoInhibitor|Watchdog"
-          - receiver: "pushover"
-            matchers:
-              - severity = critical
-            continue: true
-
-      inhibit_rules:
-        - source_matchers:
-            - severity = "critical"
-          target_matchers:
-            - severity = "warning"
-          equal: ["alertname", "namespace"]
-
-    extraSecretMounts:
-      - name: secret-files
-        mountPath: /etc/secrets
-        secretName: alertmanager-secret
-        readOnly: true
+    service:
+      main:
+        ports:
+          http:
+            port: 9093
 
     ingress:
-      enabled: true
-      className: "nginx"
-      hosts:
-        - host: &host "alertmanager.bjw-s.dev"
-          paths:
-            - path: /
-              pathType: ImplementationSpecific
-      tls:
-        - hosts:
-            - *host
+      main:
+        enabled: true
+        ingressClassName: nginx
+        hosts:
+          - host: &host alertmanager.bjw-s.dev
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - hosts:
+              - *host
 
     persistence:
-      enabled: true
-      storageClass: "ceph-block"
-      accessModes:
-        - ReadWriteOnce
-      size: 50Mi
+      config:
+        enabled: true
+        type: configMap
+        name: alertmanager-configmap
+        mountPath: /etc/alertmanager
+        readOnly: true
+      secrets:
+        enabled: true
+        type: secret
+        name: alertmanager-secret
+        mountPath: /etc/secrets
+        readOnly: true
 
     resources:
       requests:
@@ -117,3 +67,10 @@ spec:
         memory: 50M
       limits:
         memory: 99M
+
+    volumeClaimTemplates:
+      - name: storage
+        mountPath: /alertmanager
+        accessMode: ReadWriteOnce
+        size: 50Mi
+        storageClass: ceph-block
