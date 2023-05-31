@@ -96,32 +96,37 @@ module "cf_domain_ingress" {
       type  = "TXT"
     }
   ]
-}
 
-# Allow Flux Webhook to access zone
-resource "cloudflare_filter" "cf_domain_ingress_github_flux_webhook" {
-  zone_id     = module.cf_domain_ingress.zone_id
-  description = "Allow GitHub flux API"
-  expression  = "(ip.geoip.asnum eq 36459 and http.host eq \"flux-receiver-cluster-0.bjw-s.dev\")"
-}
-
-resource "cloudflare_firewall_rule" "cf_domain_ingress_github_flux_webhook" {
-  zone_id     = module.cf_domain_ingress.zone_id
-  description = "Allow GitHub flux API"
-  filter_id   = cloudflare_filter.cf_domain_ingress_github_flux_webhook.id
-  action      = "allow"
-  priority    = 1
-}
-
-# Block Plex notifications (prevents cloudflared container spam)
-resource "cloudflare_filter" "plex_notifications" {
-  zone_id     = module.cf_domain_ingress.zone_id
-  description = "Expression to block Plex notifications"
-  expression  = "(http.host eq \"plex.bjw-s.dev\" and http.request.uri.path contains \"/:/eventsource/notifications\")"
-}
-resource "cloudflare_firewall_rule" "plex_notifications" {
-  zone_id     = module.cf_domain_ingress.zone_id
-  description = "Firewall rule to block Plex notifications"
-  filter_id   = cloudflare_filter.plex_notifications.id
-  action      = "block"
+  waf_custom_rules = [
+    {
+      enabled     = true
+      description = "Allow GitHub flux API"
+      expression  = "(ip.geoip.asnum eq 36459 and http.host eq \"flux-receiver-cluster-0.bjw-s.dev\")"
+      action      = "skip"
+      action_parameters = {
+        ruleset = "current"
+      }
+      logging = {
+        enabled = false
+      }
+    },
+    {
+      enabled     = true
+      description = "Firewall rule to block bots and threats determined by CF"
+      expression  = "(cf.client.bot) or (cf.threat_score gt 14)"
+      action      = "block"
+    },
+    {
+      enabled     = true
+      description = "Firewall rule to block all countries except NL/BE/DE"
+      expression  = "(ip.geoip.country ne \"NL\") and (ip.geoip.country ne \"BE\") and (ip.geoip.country ne \"DE\")"
+      action      = "block"
+    },
+    {
+      enabled     = true
+      description = "Block Plex notifications"
+      expression  = "(http.host eq \"plex.bjw-s.dev\" and http.request.uri.path contains \"/:/eventsource/notifications\")"
+      action      = "block"
+    },
+  ]
 }
