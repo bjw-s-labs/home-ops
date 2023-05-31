@@ -12,7 +12,7 @@
 - name: "Certificates : {{ item.common_name }} : Manage syno-cli container"
   community.docker.docker_container:
     name: "syno-cli_{{ clean_common_name }}"
-    image: "{{ apps.syno_cli.image }}"
+    image: "{{ apps.syno_cli.image_repository }}:{{ apps.syno_cli.image_tag }}"
     state: started
     command: certificates auto
     volumes:
