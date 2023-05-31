@@ -2,6 +2,7 @@ module "cf_domain_hardware" {
   source     = "./modules/cf_domain"
   domain     = "bjw-s.tech"
   account_id = cloudflare_account.bjw_s.id
+
   dns_entries = [
     {
       name  = "ipv4"
@@ -87,6 +88,21 @@ module "cf_domain_hardware" {
       name  = "mg"
       value = "v=spf1 include:mailgun.org ~all"
       type  = "TXT"
+    },
+  ]
+
+  waf_custom_rules = [
+    {
+      enabled     = true
+      description = "Firewall rule to block bots and threats determined by CF"
+      expression  = "(cf.client.bot) or (cf.threat_score gt 14)"
+      action      = "block"
+    },
+    {
+      enabled     = true
+      description = "Firewall rule to block all countries except NL/BE/DE"
+      expression  = "(ip.geoip.country ne \"NL\") and (ip.geoip.country ne \"BE\") and (ip.geoip.country ne \"DE\")"
+      action      = "block"
     },
   ]
 }
