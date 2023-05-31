@@ -11,8 +11,6 @@ metadata:
       This policy removes CPU limits from all Pods.
     pod-policies.kyverno.io/autogen-controllers: none
 spec:
-  mutateExistingOnPolicyUpdate: true
-  generateExistingOnPolicyUpdate: true
   rules:
     - name: delete-containers-cpu-limits
       match:
@@ -21,9 +19,6 @@ spec:
               kinds:
                 - Pod
       mutate:
-        targets:
-          - kind: Pod
-            namespace: "{{ request.object.metadata.namespace }}"
         foreach:
           - list: "request.object.spec.containers"
             patchesJson6902: |-
@@ -41,9 +36,6 @@ spec:
             operator: GreaterThanOrEquals
             value: 1
       mutate:
-        targets:
-          - kind: Pod
-            namespace: "{{ request.object.metadata.namespace }}"
         foreach:
           - list: "request.object.spec.initContainers"
             patchesJson6902: |-
