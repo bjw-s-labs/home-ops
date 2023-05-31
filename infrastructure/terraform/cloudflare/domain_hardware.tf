@@ -10,49 +10,55 @@ module "cf_domain_hardware" {
     # Generic settings
     {
       name  = "_dmarc"
-      value = "v=DMARC1; p=none; rua=mailto:postmaster@bjw-s.tech; ruf=mailto:postmaster@bjw-s.tech; fo=1;"
+      value = "v=DMARC1; p=quarantine;"
       type  = "TXT"
     },
     # Fastmail settings
     {
-      id       = "fastmail_mx_1"
+      id       = "migadu_mx_1"
       name     = "@"
       priority = 10
-      value    = "in1-smtp.messagingengine.com"
+      value    = "aspmx1.migadu.com"
       type     = "MX"
     },
     {
-      id       = "fastmail_mx_2"
+      id       = "migadu_mx_2"
       name     = "@"
       priority = 20
-      value    = "in2-smtp.messagingengine.com"
+      value    = "aspmx2.migadu.com"
       type     = "MX"
     },
     {
-      id      = "fastmail_dkim_1"
-      name    = "fm1._domainkey"
-      value   = "fm1.bjw-s.tech.dkim.fmhosted.com"
+      id      = "migadu_dkim_1"
+      name    = "key1._domainkey"
+      value   = "key1.bjw-s.tech._domainkey.migadu.com."
       type    = "CNAME"
       proxied = false
     },
     {
-      id      = "fastmail_dkim_2"
-      name    = "fm2._domainkey"
-      value   = "fm2.bjw-s.tech.dkim.fmhosted.com"
+      id      = "migadu_dkim_2"
+      name    = "key2._domainkey"
+      value   = "key2.bjw-s.tech._domainkey.migadu.com."
       type    = "CNAME"
       proxied = false
     },
     {
-      id      = "fastmail_dkim_3"
-      name    = "fm3._domainkey"
-      value   = "fm3.bjw-s.tech.dkim.fmhosted.com"
+      id      = "migadu_dkim_3"
+      name    = "key3._domainkey"
+      value   = "key3.bjw-s.tech._domainkey.migadu.com."
       type    = "CNAME"
       proxied = false
     },
     {
-      id    = "fastmail_spf"
+      id    = "migadu_spf"
       name  = "@"
-      value = "v=spf1 include:spf.messagingengine.com ?all"
+      value = "v=spf1 include:spf.migadu.com -all"
+      type  = "TXT"
+    },
+    {
+      id    = "migadu_verification"
+      name  = "@"
+      value = "hosted-email-verify=7qqry92a"
       type  = "TXT"
     },
     # Mailgun settings
