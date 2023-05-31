@@ -36,14 +36,14 @@ jobs:
 
       - name: Write kubeconfig
         id: kubeconfig
-        uses: timheuer/base64-to-file@48657ba25c726c2e3dcf02efa3639fff9b3d587e # renovate: tag=v1.2
+        uses: timheuer/base64-to-file@ca9e30baf83f7f26708fb0059af9a0973fe5f27e # v1.2
         with:
           encodedString: ${{ secrets.KUBECONFIG }}
           fileName: kubeconfig
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@b2d17f51244a144849c6b37a3a6791b98a51d86f # v35.9.2
+        uses: tj-actions/changed-files@3f7b5c900bdbf1b80a825e220413986227b3ff03 # v36.0.10
         with:
           files: |
             kubernetes/**/helmrelease.yaml
