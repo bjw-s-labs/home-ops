@@ -2,12 +2,12 @@
 - name: "node-exporter : Manage image"
   community.docker.docker_image:
     source: pull
-    name: "{{ apps.node_exporter.image }}"
+    name: "{{ apps.node_exporter.image_repository }}:{{ apps.node_exporter.image_tag }}"
 
 - name: "node-exporter : Manage container"
   community.docker.docker_container:
     name: "node-exporter"
-    image: "{{ apps.node_exporter.image }}"
+    image: "{{ apps.node_exporter.image_repository }}:{{ apps.node_exporter.image_tag }}"
     state: started
     volumes:
       - "/proc:/host/proc:ro"

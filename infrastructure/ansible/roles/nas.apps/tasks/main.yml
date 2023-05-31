@@ -10,15 +10,13 @@
     - name: "Certificates : Manage syno-cli image"
       community.docker.docker_image:
         source: pull
-        name: "{{ apps.syno_cli.image }}"
+        name: "{{ apps.syno_cli.image_repository }}:{{ apps.syno_cli.image_tag }}"
 
     - name: "Certificates : Manage certificate"
       include_tasks: certificates.yml
       loop: "{{ certificates }}"
 
 # Manage applications
-- import_tasks: autoscan.yml
-  tags: autoscan
 - import_tasks: minio.yml
   tags: minio
 - import_tasks: node-exporter.yml
