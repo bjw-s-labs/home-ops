@@ -26,6 +26,9 @@ spec:
               annotations:
                 kyverno-no-tz: "true"
       mutate:
+        targets:
+          - kind: Pod
+            namespace: "{{ request.object.metadata.namespace }}"
         patchStrategicMerge:
           spec:
             initContainers:
