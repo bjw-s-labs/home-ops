@@ -12,62 +12,18 @@
   username: "bjw-s-bot[bot]",
   gitAuthor: "bjw-s-bot <87358111+bjw-s-bot[bot]@users.noreply.github.com>",
   repositories: ["bjw-s/home-ops"],
+  ignorePaths: ["archive/**"],
   flux: {
     fileMatch: ["kubernetes/.+\\.ya?ml$"],
-    ignorePaths: ["kubernetes/**/_archive/**"],
   },
   "helm-values": {
     fileMatch: ["kubernetes/.+\\.ya?ml$"],
-    ignorePaths: ["kubernetes/**/_archive/**"],
   },
   kubernetes: {
     fileMatch: ["kubernetes/.+\\.ya?ml$"],
-    ignorePaths: ["kubernetes/**/_archive/**"],
   },
-  regexManagers: [
-    {
-      description: [
-        "Process CRD dependencies - Chart and Github Release are the same version",
-      ],
-      fileMatch: ["kubernetes/.+\\.ya?ml$"],
-      matchStrings: [
-        "# renovate: registryUrl=(?<registryUrl>\\S+) chart=(?<depName>\\S+)\n.*?(?<currentValue>[^-\\s]*)\n",
-      ],
-      datasourceTemplate: "helm",
-    },
-    {
-      description: ["Generic Docker image Regex manager"],
-      fileMatch: ["infrastructure/.+\\.ya?ml$", "infrastructure/.+\\.tf$"],
-      matchStrings: [
-        '# renovate: docker-image( versioning=(?<versioning>.*=?))?\n .*[:|=] "?(?<depName>.*?):(?<currentValue>[^"\n]*=?)"?',
-      ],
-      datasourceTemplate: "docker",
-      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
-    },
-    {
-      description: ["Raw GitHub URL Regex manager"],
-      fileMatch: ["infrastructure/.+\\.ya?ml$", "kubernetes/.+\\.ya?ml$"],
-      matchStrings: [
-        "https:\\/\\/raw.githubusercontent.com\\/(?<depName>[\\w\\d\\-_]+\\/[\\w\\d\\-_]+)\\/(?<currentValue>[\\w\\d\\.\\-_]+)\\/.*",
-      ],
-      datasourceTemplate: "github-releases",
-      versioningTemplate: "semver",
-    },
-  ],
   packageRules: [
     // Custom version schemes
-    {
-      description: "Use custom versioning for dsmr-reader",
-      matchDatasources: ["docker"],
-      matchPackageNames: ["ghcr.io/xirixiz/dsmr-reader-docker"],
-      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<build>\\d+\\.\\d+\\.\\d+)$",
-    },
-    {
-      description: "Use custom versioning for Vector",
-      matchDatasources: ["docker"],
-      matchPackageNames: ["docker.io/timberio/vector"],
-      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$",
-    },
     {
       description: "Use custom versioning for http-https-echo",
       matchDatasources: ["docker"],
@@ -80,18 +36,13 @@
       versioning: "regex:^RELEASE\\.(?<major>\\d+)-(?<minor>\\d+)-(?<patch>\\d+)T.*Z(-(?<compatibility>.*))?$",
       matchPackageNames: ["quay.io/minio/minio"],
     },
-    {
-      description: "Use custom versioning for Scrypted",
-      matchDatasources: ["docker"],
-      versioning: "regex:.*v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
-      matchPackageNames: ["ghcr.io/koush/scrypted"],
-    },
     // Version strategies
     {
       matchDatasources: ["docker"],
       matchPackageNames: [
         "ghcr.io/onedr0p/plex",
         "ghcr.io/onedr0p/qbittorrent",
+        "ghcr.io/xirixiz/dsmr-reader-docker",
       ],
       versioning: "loose",
     },

@@ -10,20 +10,18 @@ certificates:
 
 apps:
   syno_cli:
-    # renovate: docker-image
-    image: ghcr.io/reddec/syno-cli:0.1.2
+    image_repository: ghcr.io/reddec/syno-cli
+    # renovate: datasource=docker depName=ghcr.io/reddec/syno-cli
+    image_tag: "0.1.2"
     data_folder: /volume1/docker/syno_cli
 
-  autoscan:
-    # renovate: docker-image
-    image: cloudb0x/autoscan:1.3.0
-    data_folder: /volume1/docker/autoscan
-
   minio:
-    # renovate: docker-image
-    image: quay.io/minio/minio:RELEASE.2023-05-27T05-56-19Z
+    image_repository: quay.io/minio/minio
+    # renovate: datasource=docker depName=quay.io/minio/minio
+    image_tag: RELEASE.2023-05-27T05-56-19Z
     data_folder: /volume1/docker/minio/data
 
   node_exporter:
-    # renovate: docker-image
-    image: quay.io/prometheus/node-exporter:v1.6.0
+    image_repository: quay.io/prometheus/node-exporter
+    # renovate: datasource=docker depName=quay.io/prometheus/node-exporter
+    image_tag: v1.6.0

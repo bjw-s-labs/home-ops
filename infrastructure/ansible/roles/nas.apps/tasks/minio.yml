@@ -11,17 +11,17 @@
   ansible.builtin.file:
     path: "{{ apps.minio.data_folder }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: "Minio : Manage image"
   community.docker.docker_image:
     source: pull
-    name: "{{ apps.minio.image }}"
+    name: "{{ apps.minio.image_repository }}:{{ apps.minio.image_tag }}"
 
 - name: "Minio : Manage container"
   community.docker.docker_container:
     name: "minio"
-    image: "{{ apps.minio.image }}"
+    image: "{{ apps.minio.image_repository }}:{{ apps.minio.image_tag }}"
     state: started
     # restart: "{{ var_minio_config.changed }}"
     volumes:
