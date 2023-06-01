@@ -8,7 +8,7 @@ x-task-vars: &task-vars
   jobName: "{{.jobName}}"
 
 vars:
-  waitForJobScript: "{{.PROJECT_DIR}}/.taskfiles/_scripts/wait-for-k8s-job.sh"
+  waitForJobScript: "../_scripts/wait-for-k8s-job.sh"
   ts: '{{now | date "150405"}}'
 
 tasks:
@@ -65,7 +65,7 @@ tasks:
       node: '{{ or .node (fail "`node` is required") }}'
       ceph_disk: '{{ or .ceph_disk (fail "`ceph_disk` is required") }}'
       jobName: 'wipe-disk-{{- .node -}}-{{- .ceph_disk | replace "/" "-" -}}-{{- .ts -}}'
-      wipeRookDiskJobTemplate: "{{.PROJECT_DIR}}/.taskfiles/rook/WipeDiskJob.tmpl.yaml"
+      wipeRookDiskJobTemplate: "WipeDiskJob.tmpl.yaml"
     env: *task-vars
     preconditions:
       - sh: test -f {{.waitForJobScript}}
@@ -84,7 +84,7 @@ tasks:
     vars:
       node: '{{ or .node (fail "`node` is required") }}'
       jobName: "wipe-rook-data-{{- .node -}}-{{- .ts -}}"
-      wipeRookDataJobTemplate: "{{.PROJECT_DIR}}/.taskfiles/rook/WipeRookDataJob.tmpl.yaml"
+      wipeRookDataJobTemplate: "WipeRookDataJob.tmpl.yaml"
     env: *task-vars
     preconditions:
       - sh: test -f {{.waitForJobScript}}
