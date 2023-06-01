@@ -100,8 +100,20 @@ module "cf_domain_ingress" {
   waf_custom_rules = [
     {
       enabled     = true
+      description = "Allow Migadu access to Radicale"
+      expression  = "(ip.geoip.country ne \"FR\") and (ip.geoip.asnum eq 36459) and (http.host eq \"flux-receiver-cluster-0.bjw-s.dev\")"
+      action      = "skip"
+      action_parameters = {
+        ruleset = "current"
+      }
+      logging = {
+        enabled = false
+      }
+    },
+    {
+      enabled     = true
       description = "Allow GitHub flux API"
-      expression  = "(ip.geoip.asnum eq 36459 and http.host eq \"flux-receiver-cluster-0.bjw-s.dev\")"
+      expression  = "(ip.geoip.asnum eq 16276 and http.host eq \"radicale.bjw-s.dev\")"
       action      = "skip"
       action_parameters = {
         ruleset = "current"
