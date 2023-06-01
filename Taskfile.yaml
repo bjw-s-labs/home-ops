@@ -1,16 +1,22 @@
 ---
 version: "3"
 
-vars:
-  PROJECT_DIR:
-    sh: "git rev-parse --show-toplevel"
-
 includes:
-  flux: .taskfiles/flux/tasks.yaml
-  k8s: .taskfiles/k8s/tasks.yaml
-  externalsecrets: .taskfiles/externalsecrets/tasks.yaml
-  rook: .taskfiles/rook/tasks.yaml
-  volsync: .taskfiles/volsync/tasks.yaml
+  flux:
+    dir: .taskfiles/flux
+    taskfile: .taskfiles/flux
+  k8s:
+    taskfile: .taskfiles/k8s
+    dir: .taskfiles/k8s
+  externalsecrets:
+    taskfile: .taskfiles/externalsecrets
+    dir: .taskfiles/externalsecrets
+  rook:
+    taskfile: ".taskfiles/rook"
+    dir: .taskfiles/rook
+  volsync:
+    taskfile: ".taskfiles/volsync"
+    dir: .taskfiles/volsync
 
 tasks:
   default:
