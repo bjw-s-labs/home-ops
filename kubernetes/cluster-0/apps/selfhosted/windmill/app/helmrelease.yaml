@@ -1,0 +1,52 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: windmill
+  namespace: selfhosted
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: windmill
+      version: 1.6.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: windmill
+        namespace: flux-system
+
+  values:
+    postgresql:
+      enabled: false
+
+    minio:
+      enabled: false
+
+    windmill:
+      # -- replica for the application app
+      appReplicas: 1
+      # -- replicas for the workers, jobs are executed on the workers
+      workerReplicas: 1
+      # -- replicas for the lsp containers used by the app
+      lspReplicas: 1
+      # -- replicas for the lsp containers used by the app
+      multiplayerReplicas: 1
+      # Set by valuesFrom
+      # databaseUrl:
+
+      baseDomain: &host windmill.bjw-s.dev
+      baseProtocol: https
+
+    ingress:
+      enabled: true
+      className: "nginx"
+      tls:
+        - hosts:
+            - *host
+
+  valuesFrom:
+    - kind: Secret
+      name: database-windmill-user
+      valuesKey: POSTGRES_URL
+      targetPath: windmill.databaseUrl
