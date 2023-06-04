@@ -1,0 +1,36 @@
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumBGPPeeringPolicy
+# comments courtesy of JJGadgets
+# MAKE SURE CRDs ARE INSTALLED IN CLUSTER VIA cilium-config ConfigMap OR Cilium HelmRelease/values.yaml (bgpControlPlane.enabled: true), BEFORE THIS IS APPLIED!
+# "CiliumBGPPeeringPolicy" Custom Resource will replace the old MetalLB BGP's "bgp-config" ConfigMap
+# "CiliumBGPPeeringPolicy" is used with `bgpControlPlane.enabled: true` which uses GoBGP, NOT the old `bgp.enabled: true` which uses MetalLB
+metadata:
+  name: bgp-loadbalancer-ip-main
+  namespace: kube-system
+spec:
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/os: "linux" # match all Linux nodes, change this to match more granularly if more than 1 PeeringPolicy is to be used throughout cluster
+  virtualRouters:
+    - localASN: 64512
+      exportPodCIDR: false
+      serviceSelector: # this replaces address-pools, instead of defining the range of IPs that can be assigned to LoadBalancer services, now services have to match below selectors for their LB IPs to be announced
+        matchExpressions:
+          - {
+              key: thisFakeSelector,
+              operator: NotIn,
+              values: ["will-match-and-announce-all-services"],
+            }
+      neighbors:
+        - peerAddress: "10.1.1.1/32" # unlike bgp-config ConfigMap, peerAddress needs to be in CIDR notation
+          peerASN: 64512
+
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: main-pool
+spec:
+  cidrs:
+    - cidr: 10.45.0.1/24
