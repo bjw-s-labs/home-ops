@@ -1,244 +1,107 @@
 ---
-# -- Enable installation of PodCIDR routes between worker
-# nodes if worker nodes share a common L2 network segment.
-autoDirectNodeRoutes: true
-
-# -- Configure BGP
-bgp:
-  # -- Enable BGP support inside Cilium; embeds a new ConfigMap for BGP inside
-  # cilium-agent and cilium-operator
-  enabled: false
-  announce:
-    # -- Enable allocation and announcement of service LoadBalancer IPs
-    loadbalancerIP: true
-    # -- Enable announcement of node pod CIDR
-    podCIDR: false
-
-# -- Configure cgroup related configuration
-cgroup:
-  autoMount:
-    # -- Enable auto mount of cgroup2 filesystem.
-    # When `autoMount` is enabled, cgroup2 filesystem is mounted at
-    # `cgroup.hostRoot` path on the underlying host and inside the cilium agent pod.
-    # If users disable `autoMount`, it's expected that users have mounted
-    # cgroup2 filesystem at the specified `cgroup.hostRoot` volume, and then the
-    # volume will be mounted inside the cilium agent pod at the same path.
-    enabled: false
-  # -- Configure cgroup root where cgroup2 filesystem is mounted on the host (see also: `cgroup.autoMount`)
-  hostRoot: /sys/fs/cgroup
-
 cluster:
-  # -- Name of the cluster. Only required for Cluster Mesh.
   name: cluster-0
-  # -- (int) Unique ID of the cluster. Must be unique across all connected
-  # clusters and in the range of 1 to 255. Only required for Cluster Mesh,
-  # may be 0 if Cluster Mesh is not used.
   id: 1
 
 cni:
   exclusive: false
 
-# -- Configure container runtime specific integration.
+bgpControlPlane:
+  enabled: true
+# bgp:
+#   enabled: true
+#   announce:
+#     loadbalancerIP: true
+#     podCIDR: false
+
+k8sServiceHost: cluster-0.bjw-s.tech
+k8sServicePort: 6443
+
+rollOutCiliumPods: true
+localRedirectPolicy: true
+
+kubeProxyReplacement: strict
+kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
+
+loadBalancer:
+  algorithm: maglev
+  mode: dsr
+
+bandwidthManager:
+  enabled: true
+  bbr: true
+bpf:
+  masquerade: true
+  tproxy: true
+
+l7Proxy: true
+
+enableCnpStatusUpdates: true
+endpointStatus:
+  enabled: true
+  status: "policy"
+
+ipam:
+  mode: "kubernetes"
+
+ingressController:
+  enabled: false
+  loadbalancerMode: shared
+
+operator:
+  rollOutPods: true
+
+autoDirectNodeRoutes: true
+ipv4NativeRoutingCIDR: 10.244.0.0/16
+tunnel: "disabled"
 containerRuntime:
-  # -- Enables specific integrations for container runtimes.
-  # Supported values:
-  # - containerd
-  # - crio
-  # - docker
-  # - none
-  # - auto (automatically detect the container runtime)
   integration: containerd
 
-endpointRoutes:
-  # -- Enable use of per endpoint routes instead of routing via
-  # the cilium_host interface.
-  enabled: true
-
 hubble:
-  # -- Enable Hubble (true by default).
   enabled: true
+  serviceMonitor:
+    enabled: false
+
   metrics:
-    # -- Configures the list of metrics to collect. If empty or null, metrics
-    # are disabled.
-    # Example:
-    #
-    #   enabled:
-    #   - dns:query;ignoreAAAA
-    #   - drop
-    #   - tcp
-    #   - flow
-    #   - icmp
-    #   - http
-    #
-    # You can specify the list of metrics from the helm CLI:
-    #
-    #   --set metrics.enabled="{dns:query;ignoreAAAA,drop,tcp,flow,icmp,http}"
-    #
     enabled:
-      - dns:query;ignoreAAAA,
+      - dns:query;ignoreAAAA
       - drop
       - tcp
       - flow
-      - http
-      - icmp
       - port-distribution
+      - icmp
+      - http
 
   relay:
-    # -- Enable Hubble Relay (requires hubble.enabled=true)
     enabled: true
-    # -- Roll out Hubble Relay pods automatically when configmap is updated.
     rollOutPods: true
-
-  serviceMonitor:
-    # -- Create ServiceMonitor resources for Prometheus Operator.
-    # This requires the prometheus CRDs to be available.
-    # ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml)
-    enabled: false
 
   ui:
-    # -- Whether to enable the Hubble UI.
     enabled: true
-
-    # -- hubble-ui ingress configuration.
     ingress:
       enabled: false
-
-    # -- Roll out Hubble-ui pods automatically when configmap is updated.
     rollOutPods: true
 
-ipam:
-  # -- Configure IP Address Management mode.
-  # ref: https://docs.cilium.io/en/stable/concepts/networking/ipam/
-  mode: kubernetes
-
-# -- (string) Allows to explicitly specify the IPv4 CIDR for native routing.
-# When specified, Cilium assumes networking for this CIDR is preconfigured and
-# hands traffic destined for that range to the Linux network stack without
-# applying any SNAT.
-# Generally speaking, specifying a native routing CIDR implies that Cilium can
-# depend on the underlying networking stack to route packets to their
-# destination. To offer a concrete example, if Cilium is configured to use
-# direct routing and the Kubernetes CIDR is included in the native routing CIDR,
-# the user must configure the routes to reach pods, either manually or by
-# setting the auto-direct-node-routes flag.
-ipv4NativeRoutingCIDR: 10.244.0.0/16
-
-# -- (string) Kubernetes service host
-k8sServiceHost: cluster-0.bjw-s.tech
-# -- (string) Kubernetes service port
-k8sServicePort: 6443
-
-# -- Configure the kube-proxy replacement in Cilium BPF datapath
-# Valid options are "disabled", "partial", "strict".
-# ref: https://docs.cilium.io/en/stable/gettingstarted/kubeproxy-free/
-kubeProxyReplacement: strict
-
-# -- healthz server bind address for the kube-proxy replacement.
-# To enable set the value to '0.0.0.0:10256' for all ipv4
-# addresses and this '[::]:10256' for all ipv6 addresses.
-# By default it is disabled.
-kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
-
-# -- Configure service load balancing
-loadBalancer:
-  # -- algorithm is the name of the load balancing algorithm for backend
-  # selection e.g. random or maglev
-  algorithm: random
-
-  # -- mode is the operation mode of load balancing for remote backends
-  # e.g. snat, dsr, hybrid
-  mode: snat
-
-# -- Enable Local Redirect Policy.
-localRedirectPolicy: false
-
-operator:
-  # -- Enable the cilium-operator component (required).
-  enabled: true
-
-  # -- Roll out cilium-operator pods automatically when configmap is updated.
-  rollOutPods: true
-
-# -- Roll out cilium agent pods automatically when configmap is updated.
-rollOutCiliumPods: false
-
 securityContext:
-  # -- Run the pod with elevated privileges
-  privileged: false
-
   capabilities:
-    # -- Capabilities for the `cilium-agent` container
     ciliumAgent:
-      # Use to set socket permission
       - CHOWN
-      # Used to terminate envoy child process
       - KILL
-      # Used since cilium modifies routing tables, etc...
       - NET_ADMIN
-      # Used since cilium creates raw sockets, etc...
       - NET_RAW
-      # Used since cilium monitor uses mmap
       - IPC_LOCK
-      # Used in iptables. Consider removing once we are iptables-free
-      # - SYS_MODULE
-      # We need it for now but might not need it for >= 5.11 specially
-      # for the 'SYS_RESOURCE'.
-      # In >= 5.8 there's already BPF and PERMON capabilities
       - SYS_ADMIN
-      # Could be an alternative for the SYS_ADMIN for the RLIMIT_NPROC
       - SYS_RESOURCE
-      # Both PERFMON and BPF requires kernel 5.8, container runtime
-      # cri-o >= v1.22.0 or containerd >= v1.5.0.
-      # If available, SYS_ADMIN can be removed.
-      #- PERFMON
-      #- BPF
-      # Allow discretionary access control (e.g. required for package installation)
       - DAC_OVERRIDE
-      # Allow to set Access Control Lists (ACLs) on arbitrary files (e.g. required for package installation)
       - FOWNER
-      # Allow to execute program that changes GID (e.g. required for package installation)
       - SETGID
-      # Allow to execute program that changes UID (e.g. required for package installation)
       - SETUID
-    # -- Capabilities for the `mount-cgroup` init container
-    mountCgroup:
-      # Only used for 'mount' cgroup
-      - SYS_ADMIN
-      # Used for nsenter
-      - SYS_CHROOT
-      - SYS_PTRACE
-    # -- capabilities for the `apply-sysctl-overwrites` init container
-    applySysctlOverwrites:
-      # Required in order to access host's /etc/sysctl.d dir
-      - SYS_ADMIN
-      # Used for nsenter
-      - SYS_CHROOT
-      - SYS_PTRACE
-    # -- Capabilities for the `clean-cilium-state` init container
     cleanCiliumState:
-      # Most of the capabilities here are the same ones used in the
-      # cilium-agent's container because this container can be used to
-      # uninstall all Cilium resources, and therefore it is likely that
-      # will need the same capabilities.
-      # Used since cilium modifies routing tables, etc...
       - NET_ADMIN
-      # Used in iptables. Consider removing once we are iptables-free
-      # - SYS_MODULE
-      # We need it for now but might not need it for >= 5.11 specially
-      # for the 'SYS_RESOURCE'.
-      # In >= 5.8 there's already BPF and PERMON capabilities
       - SYS_ADMIN
-      # Could be an alternative for the SYS_ADMIN for the RLIMIT_NPROC
       - SYS_RESOURCE
-      # Both PERFMON and BPF requires kernel 5.8, container runtime
-      # cri-o >= v1.22.0 or containerd >= v1.5.0.
-      # If available, SYS_ADMIN can be removed.
-      #- PERFMON
-      #- BPF
 
-# -- Configure the encapsulation configuration for communication between nodes.
-# Possible values:
-#   - disabled
-#   - vxlan (default)
-#   - geneve
-tunnel: "disabled"
+cgroup:
+  autoMount:
+    enabled: false
+  hostRoot: /sys/fs/cgroup
