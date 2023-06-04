@@ -56,6 +56,9 @@ spec:
       name: "${CLUSTER_NAME}"
       id: "${CLUSTER_ID}"
 
+    cni:
+      exclusive: false   # Needed to allow Cillium to work properly with Multus
+
     rollOutCiliumPods: true
     localRedirectPolicy: true
 

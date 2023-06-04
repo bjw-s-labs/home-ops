@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: ubuntu-debug-cp1
+  name: ubuntu-debug
   namespace: kube-system
 spec:
   containers:
   - name: ubuntu
-    image: ubuntu
+    image: ubuntu:22.04
     command: ["/bin/sh","-c"]
     args:
       - >
@@ -47,4 +47,4 @@ spec:
           - key: kubernetes.io/hostname
             operator: In
             values:
-            - cp1
+            - work1
