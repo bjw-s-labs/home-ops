@@ -6,13 +6,14 @@ cluster:
 cni:
   exclusive: false
 
+bgp:
+  enabled: false
+  announce:
+    loadbalancerIP: true
+    podCIDR: false
+
 bgpControlPlane:
   enabled: true
-# bgp:
-#   enabled: true
-#   announce:
-#     loadbalancerIP: true
-#     podCIDR: false
 
 k8sServiceHost: cluster-0.bjw-s.tech
 k8sServicePort: 6443
