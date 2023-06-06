@@ -467,7 +467,7 @@ module "asdf_krew" {
 
   name        = "asdf-krew"
   description = "krew plugin for the asdf version manager"
-  topics      = ["asdf", "krew", "kubectl"]
+  topics      = ["asdf", "krew", "kubectl", "asdf-plugin"]
   visibility  = "public"
 
   auto_init              = true
@@ -499,7 +499,7 @@ module "asdf_talosctl" {
 
   name        = "asdf-talosctl"
   description = "talosctl plugin for the asdf version manager"
-  topics      = ["asdf", "talos", "talosctl"]
+  topics      = ["asdf", "talos", "talosctl", "asdf-plugin"]
   visibility  = "public"
 
   auto_init              = true
@@ -531,7 +531,7 @@ module "asdf_talhelper" {
 
   name        = "asdf-talhelper"
   description = "talhelper plugin for the asdf version manager"
-  topics      = ["asdf", "talos", "talhelper"]
+  topics      = ["asdf", "talos", "talhelper", "asdf-plugin"]
   visibility  = "public"
 
   auto_init              = true
@@ -563,7 +563,7 @@ module "asdf_revive" {
 
   name        = "asdf-revive"
   description = "revive plugin for the asdf version manager"
-  topics      = ["asdf", "golang", "revive"]
+  topics      = ["asdf", "golang", "revive", "asdf-plugin"]
   visibility  = "public"
 
   auto_init              = true
