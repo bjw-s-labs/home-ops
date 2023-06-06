@@ -39,12 +39,22 @@ spec:
 
     initContainers:
       copy-config:
-        image: busybox:latest@sha256:560af6915bfc8d7630e50e212e08242d37b63bd5c1ccf9bd4acccf116e262d5b
+        image: ghcr.io/onedr0p/alpine:3.18.0@sha256:dd504f02473c176a0e68e4550ccaf6f6c0f14e9f64c08a59877f9c6153bf48a9
         command:
           - "/bin/sh"
           - -c
         args:
-          - cp /data/configfiles/* /data/config/
+          - |
+            for f in /data/configfiles/*; do
+              filename=$(basename $f)
+              envsubst < $f > /data/config/$filename;
+            done
+        env:
+          WIREGUARD_PORT:
+            valueFrom:
+              secretKeyRef:
+                name: qbittorrent-secret
+                key: WIREGUARD_PORT
         volumeMounts:
           - name: config
             mountPath: /data/config
