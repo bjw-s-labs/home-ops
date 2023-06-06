@@ -45,7 +45,7 @@ spec:
             tag: v3.34.3@sha256:3b4d498939ef1f9ceac9049a73598acfcda25a9e58010fcd991afed32cd16eac
         env:
           - name: VPN_SERVICE_PROVIDER
-            value: mullvad
+            value: ivpn
           - name: VPN_TYPE
             value: wireguard
           - name: VPN_INTERFACE
@@ -59,7 +59,7 @@ spec:
           - name: SERVER_CITIES
             value: Zurich
           - name: SERVER_HOSTNAMES
-            value: ch5-wireguard
+            value: ch1.wg.ivpn.net
           - name: WIREGUARD_PRIVATE_KEY
             valueFrom:
               secretKeyRef:
@@ -94,15 +94,6 @@ spec:
       configmap.reloader.stakater.com/reload: downloads-gateway-pod-gateway
       secret.reloader.stakater.com/reload: downloads-gateway-vpnconfig
 
-    publicPorts:
-      - IP: 10
-        hostname: qbittorrent
-        ports:
-          - port: 56202
-            type: udp
-          - port: 56202
-            type: tcp
-
     routed_namespaces:
       - downloads
 
@@ -111,7 +102,7 @@ spec:
       VPN_BLOCK_OTHER_TRAFFIC: true
       VPN_INTERFACE: wg0
       VPN_LOCAL_CIDRS: 10.0.0.0/8 192.168.0.0/16
-      VPN_TRAFFIC_PORT: "51820"
+      VPN_TRAFFIC_PORT: "2049"
       VXLAN_ID: 43
       VXLAN_IP_NETWORK: 172.16.1
 
@@ -122,3 +113,8 @@ spec:
       image:
         repository: ghcr.io/angelnu/gateway-admision-controller
         tag: v3.9.0@sha256:4e169da5af107a9c6c784d3e03c89da07fad45f18358ab5b7177662df12d955a
+
+  valuesFrom:
+    - kind: Secret
+      name: downloads-gateway-vpnconfig
+      valuesKey: secret_values
