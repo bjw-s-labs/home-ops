@@ -36,9 +36,10 @@ metadata:
     backup: "false"
 spec:
   accessModes:
-    - ReadWriteMany
-  storageClassName: nfs
+  - ReadWriteMany
   resources:
     requests:
-      storage: 1Mi
+      storage: 500Gi
+  volumeMode: Filesystem
+  # volumeName should be same as PV name
   volumeName: cephfs-hdd-cache
