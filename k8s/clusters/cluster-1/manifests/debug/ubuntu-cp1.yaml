@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: ubuntu-debug
-  namespace: kube-system
+  namespace: downloads
 spec:
   containers:
   - name: ubuntu
@@ -19,9 +19,9 @@ spec:
     - mountPath: /hostRoot
       name: root
       readOnly: true
-    # - mountPath: /mountedPVC
-    #   name: pvc
-    #   readOnly: false
+    - mountPath: /mountedPVC
+      name: pvc
+      readOnly: false
     securityContext:
       privileged: true
     resources:
@@ -36,9 +36,9 @@ spec:
     hostPath:
       path: /
       type: Directory
-  # - name: pvc
-  #   persistentVolumeClaim:
-  #     claimName: plex-config
+  - name: pvc
+    persistentVolumeClaim:
+      claimName: cephfs-hdd-cache
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
