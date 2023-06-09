@@ -1,0 +1,66 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cephfs-hdd-videos
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 200T
+  storageClassName: "cephfs-hdd-ec-media"
+  csi:
+    driver: rook-ceph.cephfs.csi.ceph.com 
+    nodeStageSecretRef:
+      # node stage secret name
+      name: rook-csi-cephfs-node
+      # node stage secret namespace where above secret is created
+      namespace: rook-ceph-external 
+    volumeAttributes:
+      # Required options from storageclass parameters need to be added in volumeAttributes
+      "clusterID": "rook-ceph-external"
+      "fsName": "hdd-ec-media"
+      "pool": "hdd-ec-media-data"
+      "staticVolume": "true"
+      "rootPath": /volumes/_nogroup/videos/c42737b1-3c93-47db-8eff-069cfaaea4a9
+    # volumeHandle can be anything, need not to be same
+    # as PV name or volume name. keeping same for brevity
+    volumeHandle: cephfs-hdd-videos
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cephfs-hdd-videos
+  namespace: media
+  labels:
+    backup: "false"
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: "cephfs-hdd-ec-media"
+  resources:
+    requests:
+      storage: 200T
+  volumeMode: Filesystem
+  # volumeName should be same as PV name
+  volumeName: cephfs-hdd-videos
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cephfs-hdd-videos
+  namespace: downloads
+  labels:
+    backup: "false"
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: "cephfs-hdd-ec-media"
+  resources:
+    requests:
+      storage: 200T
+  volumeMode: Filesystem
+  # volumeName should be same as PV name
+  volumeName: cephfs-hdd-videos
