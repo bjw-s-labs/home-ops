@@ -10,7 +10,7 @@ spec:
     storage: 500Gi
   storageClassName: "cephfs-hdd-ec-media"
   csi:
-    driver: cephfs.csi.ceph.com
+    driver: rook-ceph.cephfs.csi.ceph.com 
     nodeStageSecretRef:
       # node stage secret name
       name: rook-csi-cephfs-node
@@ -20,6 +20,7 @@ spec:
       # Required options from storageclass parameters need to be added in volumeAttributes
       "clusterID": "rook-ceph-external"
       "fsName": "hdd-ec-media"
+      "pool": "hdd-ec-media-data"
       "staticVolume": "true"
       "rootPath": /volumes/_nogroup/cache/455a9dd1-0030-44e6-9a77-7159533e860f
     # volumeHandle can be anything, need not to be same
