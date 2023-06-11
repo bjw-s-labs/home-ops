@@ -260,7 +260,10 @@ controlPlane:
             etcd:
                 extraArgs:
                     election-timeout: "5000"
-                subnet: 10.200.1.0/24
+                advertisedSubnets:
+                  - 10.200.1.0/24
+                listenSubnets:
+                  - 10.200.1.0/24
             extraManifests:
                 - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/ha-install.yaml
                 # - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
