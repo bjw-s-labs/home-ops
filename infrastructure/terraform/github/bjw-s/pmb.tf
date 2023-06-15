@@ -6,7 +6,7 @@ module "pmb" {
   topics      = ["kubernetes", "docker", "backups", "sidecar"]
   visibility  = "public"
 
-  archived = false
+  archived = true
 
   auto_init              = true
   allow_merge_commit     = false
