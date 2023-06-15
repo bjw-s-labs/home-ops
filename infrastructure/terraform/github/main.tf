@@ -31,3 +31,39 @@ module "onepassword_item_flux" {
   vault  = "Automation"
   item   = "flux"
 }
+
+module "bjw-s" {
+  source = "./bjw-s"
+
+  secrets = {
+    bjws_bot_app_id            = module.onepassword_item_github_bjws_bot.fields.github_app_id
+    bjws_bot_private_key       = module.onepassword_item_github_bjws_bot.fields.github_app_private_key
+    flux_github_webhook_url    = module.onepassword_item_flux.fields.github_webhook_url
+    flux_github_webhook_secret = module.onepassword_item_flux.fields.github_webhook_token
+  }
+}
+
+moved {
+  from = module.vyos-config
+  to   = module.bjw-s.module.vyos_config
+}
+
+moved {
+  from = module.terraform-1password-item
+  to   = module.bjw-s.module.terraform_1password_item
+}
+
+moved {
+  from = module.gh-workflows
+  to   = module.bjw-s.module.gh_workflows
+}
+
+moved {
+  from = module.helm-charts
+  to   = module.bjw-s.module.helm_charts
+}
+
+moved {
+  from = module.home-ops
+  to   = module.bjw-s.module.home_ops
+}
