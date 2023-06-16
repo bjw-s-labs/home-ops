@@ -1,5 +1,5 @@
 module "vyos_config" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.0.1"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
 
   name        = "vyos-config"
   description = "My VyOS configuration"

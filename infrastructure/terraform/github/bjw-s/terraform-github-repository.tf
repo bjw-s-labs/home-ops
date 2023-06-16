@@ -1,5 +1,5 @@
 module "terraform_github_repository" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.0.1"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
 
   name        = "terraform-github-repository"
   description = "Terraform Module to create and manage a GitHub repository."
