@@ -1,5 +1,5 @@
 module "kobomail" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.0.1"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
 
   name        = "KoboMail"
   description = "Experimental email attachment downloader for Kobo devices"

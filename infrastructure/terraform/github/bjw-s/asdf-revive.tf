@@ -1,5 +1,5 @@
 module "asdf_revive" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.0.1"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
 
   name        = "asdf-revive"
   description = "revive plugin for the asdf version manager"

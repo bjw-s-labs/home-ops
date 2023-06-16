@@ -1,5 +1,5 @@
 module "asdf_talhelper" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.0.1"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
 
   name        = "asdf-talhelper"
   description = "talhelper plugin for the asdf version manager"

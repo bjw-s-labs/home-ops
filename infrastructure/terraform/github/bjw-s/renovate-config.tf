@@ -1,5 +1,5 @@
 module "renovate_config" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.0.1"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
 
   name        = "renovate-config"
   description = "Renovate configuration presets"
