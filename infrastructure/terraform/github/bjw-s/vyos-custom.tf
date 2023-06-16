@@ -4,7 +4,7 @@ module "vyos-custom" {
   name        = "vyos-custom"
   description = "My custom VyOS build based on vyos-modular"
   topics      = ["vyos", "vyos-modular", "iac"]
-  # visibility  = "public"
+  visibility  = "public"
 
   auto_init              = true
   allow_merge_commit     = false
