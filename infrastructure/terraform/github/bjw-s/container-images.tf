@@ -17,7 +17,9 @@ module "container_images" {
   has_projects = false
 
   plaintext_secrets = merge(
-    {},
+    {
+      "BJWS_DISCORD_WEBHOOK" : var.secrets.discord_ci_webhook_url
+    },
     local.bjws_bot_secrets
   )
 
