@@ -1,5 +1,5 @@
 module "container_images" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.0.1"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
 
   name        = "container-images"
   description = "Kubernetes tailored container images for various applications"

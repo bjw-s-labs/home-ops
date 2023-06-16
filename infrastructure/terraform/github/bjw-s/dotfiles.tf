@@ -1,5 +1,5 @@
 module "dotfiles" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.0.1"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
 
   name        = "dotfiles"
   description = "My collection of dotfiles, powered by chezmoi"

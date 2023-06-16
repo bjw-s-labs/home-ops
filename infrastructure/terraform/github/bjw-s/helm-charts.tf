@@ -1,5 +1,5 @@
 module "helm_charts" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.0.1"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
 
   name         = "helm-charts"
   description  = "A collection of Helm charts"

@@ -1,12 +1,12 @@
 module "vyos-custom" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.0.1"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
 
   name        = "vyos-custom"
   description = "My custom VyOS build based on vyos-modular"
   topics      = ["vyos", "vyos-modular", "iac"]
   # visibility  = "public"
 
-  auto_init          = true
+  auto_init              = true
   allow_merge_commit     = false
   allow_squash_merge     = true
   allow_auto_merge       = true

@@ -1,5 +1,5 @@
 module "helm3_unittest" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.0.1"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
 
   name        = "helm3-unittest"
   description = "Fork of lrills/helm-unittest but for Helm 3"
