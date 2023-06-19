@@ -35,5 +35,9 @@ spec:
     copyMethod: Snapshot
     pruneIntervalDays: 14
     repository: paperless-restic-secret
+    moverSecurityContext:
+      runAsUser: 1000
+      runAsGroup: 65543
+      fsGroup: 65543
     retain:
       daily: 14
