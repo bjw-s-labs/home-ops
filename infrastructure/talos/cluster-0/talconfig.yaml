@@ -101,6 +101,9 @@ controlPlane:
             - ip: ${clusterEndpointIP}
               aliases:
                 - ${clusterName}.bjw-s.tech
+        install:
+          extensions:
+            - image: ghcr.io/siderolabs/i915-ucode:20230310
         sysctls:
           fs.inotify.max_user_watches: "1048576"
           fs.inotify.max_user_instances: "8192"
