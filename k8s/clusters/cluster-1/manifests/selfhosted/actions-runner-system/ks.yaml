@@ -6,8 +6,8 @@ metadata:
   name: cluster-workloads-actions-runner-controller
   namespace: flux-system
 spec:
-  dependsOn:
-    - name: cluster-apps-external-secrets-stores
+  # dependsOn:
+  #   - name: cluster-apps-external-secrets-stores
   path: ./k8s/clusters/cluster-1/manifests/selfhosted/actions-runner-system/app
   prune: true
   sourceRef:
@@ -25,8 +25,8 @@ metadata:
   name: cluster-workloads-actions-runner-controller-runners
   namespace: flux-system
 spec:
-  dependsOn:
-    - name: cluster-apps-actions-runner-controller
+  # dependsOn:
+  #   - name: cluster-apps-actions-runner-controller
   path: ./k8s/clusters/cluster-1/manifests/selfhosted/actions-runner-system/runners
   prune: true
   sourceRef:
