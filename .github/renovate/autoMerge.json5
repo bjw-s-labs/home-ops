@@ -2,13 +2,23 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "packageRules": [
     {
-      "description": "Auto merge container digests",
+      "description": "Auto merge containers",
       "matchDatasources": ["docker"],
       "automerge": true,
       "ignoreTests": true,
       "automergeType": "branch",
-      "matchUpdateTypes": ["digest"],
-      "matchPackagePatterns": ["ghcr.io/bjw-s", "ghcr.io/onedr0p"]
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "matchPackagePatterns": ["ghcr.io/bjw-s", "ghcr.io/onedr0p"],
+      "matchPackageNames": [
+        "esphome",
+        "sabnzbd",
+        "emqx",
+        "sonarr-develop",
+        "radarr-develop",
+        "prowlarr-nightly",
+        "home-assistant",
+        "overseerr"
+      ]
     },
     {
       "description": "Auto merge GitHub Actions",
