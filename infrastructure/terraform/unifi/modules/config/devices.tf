@@ -122,8 +122,7 @@ resource "unifi_device" "switch_core_2" {
   }
   port_override {
     number          = 7
-    name            = "horus"
-    port_profile_id = data.unifi_port_profile.servers.id
+    port_profile_id = data.unifi_port_profile.all.id
   }
   port_override {
     number          = 8

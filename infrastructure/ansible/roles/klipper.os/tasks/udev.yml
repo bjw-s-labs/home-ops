@@ -1,9 +1,0 @@
----
-- name: Add Android udev rules
-  become: true
-  ansible.builtin.template:
-    src: 51-android.rules.j2
-    dest: /etc/udev/rules.d/51-android.rules
-    mode: '0644'
-  notify:
-    - reload udev
