@@ -1,6 +1,24 @@
 ---
-# yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: flux-system
 resources:
   - ./podmonitor.yaml
+  - ./prometheusrule.yaml
+configMapGenerator:
+  - name: flux-cluster-dashboard
+    files:
+      - flux-cluster-dashboard.json=https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/monitoring-config/dashboards/cluster.json
+  - name: flux-control-plane-dashboard
+    files:
+      - flux-control-plane-dashboard.json=https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/monitoring-config/dashboards/control-plane.json
+  - name: flux-logs-dashboard
+    files:
+      - flux-logs-dashboard.json=https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/monitoring-config/dashboards/logs.json
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
+    grafana_folder: Flux
+  labels:
+    grafana_dashboard: "true"

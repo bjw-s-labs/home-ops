@@ -1,0 +1,38 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: manage-flux
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: cluster-repositories
+  interval: 10m0s
+  path: ./manifests/install
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux
+
+  patches:
+    - target:
+        kind: Deployment
+        name: helm-controller
+      patch: |-
+        - op: replace
+          path: /spec/template/spec/containers/0/resources/requests/memory
+          value: 512Mi
+        - op: replace
+          path: /spec/template/spec/containers/0/resources/limits/memory
+          value: 2Gi
+    - target:
+        group: networking.k8s.io
+        version: v1
+        kind: NetworkPolicy
+      patch: |-
+        $patch: delete
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: not-used
