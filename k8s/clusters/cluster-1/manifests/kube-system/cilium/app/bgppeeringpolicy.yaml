@@ -6,12 +6,13 @@ spec:
   nodeSelector:
     matchLabels:
       kubernetes.io/os: "linux"
-  virtualRouters:  # []CiliumBGPVirtualRouter
+  virtualRouters:
     - localASN: 64513
       exportPodCIDR: true
+      # the "NotIn" operator makes all services anounced over BGP
       serviceSelector:
         matchExpressions:
           - {key: allservices, operator: NotIn, values: ['will-be-announced']}
-      neighbors:   # []CiliumBGPNeighbor
-        - peerAddress: "${GATEWAY_MANAGEMENT}/32"
-          peerASN: 645131
+      neighbors:
+        - peerAddress: "10.255.253.2/32"
+          peerASN: 64513
