@@ -22,7 +22,7 @@ spec:
 
     image:
       repository: ghcr.io/koush/scrypted
-      tag: 18-jammy-lite.s6-v0.39.0
+      tag: 18-jammy-full-v0.39.0
 
     podAnnotations:
       k8s.v1.cni.cncf.io/networks: |
@@ -51,6 +51,7 @@ spec:
               - *host
 
     nodeSelector:
+      google.feature.node.kubernetes.io/coral: "true"
       intel.feature.node.kubernetes.io/gpu: "true"
 
     podSecurityContext:
@@ -58,13 +59,32 @@ spec:
       runAsGroup: 568
       fsGroup: 568
       fsGroupChangePolicy: OnRootMismatch
-      supplementalGroups: [44, 109]
+      supplementalGroups:
+        - 44
+        - 109
+        - 65539
 
     persistence:
       cache:
         enabled: true
+        mountPath: /.cache
+        type: emptyDir
+      cache-npm:
+        enabled: true
         mountPath: /.npm
         type: emptyDir
+      recordings:
+        enabled: true
+        type: nfs
+        server: "nas.bjw-s.tech"
+        path: /volume1/Media/IPCams/scrypted
+        mountPath: /recs
+      usb:
+        enabled: true
+        type: hostPath
+        hostPath: /dev/bus/usb
+        hostPathType: Directory
+        mountPath: /dev/bus/usb
 
     resources:
       requests:
@@ -74,6 +94,9 @@ spec:
       limits:
         gpu.intel.com/i915: 1
         memory: 1168Mi
+
+    securityContext:
+      privileged: true
 
     volumeClaimTemplates:
       - name: config
