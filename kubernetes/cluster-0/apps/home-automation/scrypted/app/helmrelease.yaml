@@ -79,21 +79,27 @@ spec:
         server: "nas.bjw-s.tech"
         path: /volume1/Media/IPCams/scrypted
         mountPath: /recs
-      usb:
+      dev-bus-usb:
         enabled: true
         type: hostPath
         hostPath: /dev/bus/usb
         hostPathType: Directory
         mountPath: /dev/bus/usb
+      sys-bus-usb:
+        enabled: true
+        type: hostPath
+        hostPath: /sys/bus/usb
+        hostPathType: Directory
+        mountPath: /sys/bus/usb
 
     resources:
       requests:
         gpu.intel.com/i915: 1
         cpu: 136m
-        memory: 1168Mi
+        memory: 1024Mi
       limits:
         gpu.intel.com/i915: 1
-        memory: 1168Mi
+        memory: 4096Mi
 
     securityContext:
       privileged: true
