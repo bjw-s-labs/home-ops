@@ -54,16 +54,6 @@ spec:
       google.feature.node.kubernetes.io/coral: "true"
       intel.feature.node.kubernetes.io/gpu: "true"
 
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: OnRootMismatch
-      supplementalGroups:
-        - 44
-        - 109
-        - 65539
-
     persistence:
       cache:
         enabled: true
@@ -73,12 +63,6 @@ spec:
         enabled: true
         mountPath: /.npm
         type: emptyDir
-      recordings:
-        enabled: true
-        type: nfs
-        server: "nas.bjw-s.tech"
-        path: /volume1/Media/IPCams/scrypted
-        mountPath: /recs
       dev-bus-usb:
         enabled: true
         type: hostPath
@@ -99,7 +83,7 @@ spec:
         memory: 1024Mi
       limits:
         gpu.intel.com/i915: 1
-        memory: 4096Mi
+        memory: 8192Mi
 
     securityContext:
       privileged: true
@@ -109,4 +93,9 @@ spec:
         mountPath: /server/volume
         accessMode: ReadWriteOnce
         size: 1Gi
+        storageClass: ceph-block
+      - name: recordings
+        mountPath: /recs
+        accessMode: ReadWriteOnce
+        size: 75Gi
         storageClass: ceph-block
