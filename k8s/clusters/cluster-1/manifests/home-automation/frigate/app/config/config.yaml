@@ -47,6 +47,7 @@ objects:
     - person
     - dog
     - car
+    - cat
     - bird
     - bicycle
   filters:
@@ -92,6 +93,13 @@ cameras:
     ffmpeg:
       output_args:
         record: preset-record-generic-audio-copy
+    objects:
+      track:
+        - person
+        - dog
+        - cat
+        - bird
+        - bicycle
       inputs:
         - path: rtsp://127.0.0.1:8554/front_door_hq?video=copy&audio=aac
           input_args: preset-rtsp-restream
