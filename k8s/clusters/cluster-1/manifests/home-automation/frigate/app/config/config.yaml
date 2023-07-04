@@ -58,6 +58,11 @@ go2rtc:
       - rtsp://{FRIGATE_MQTT_USERNAME}:{FRIGATE_MQTT_PASSWORD}@{FRIGATE_CAMERA_1_HOST}:554/cam/realmonitor?channel=1&subtype=0
     server_room_lq:
       - rtsp://{FRIGATE_MQTT_USERNAME}:{FRIGATE_MQTT_PASSWORD}@{FRIGATE_CAMERA_1_HOST}:554/cam/realmonitor?channel=1&subtype=1
+    front_door_hq:
+      - rtsp://{FRIGATE_MQTT_USERNAME}:{FRIGATE_MQTT_PASSWORD}@{FRIGATE_CAMERA_2_HOST}:554/h264Preview_01_main
+    front_door_lq:
+      - rtsp://{FRIGATE_MQTT_USERNAME}:{FRIGATE_MQTT_PASSWORD}@{FRIGATE_CAMERA_2_HOST}:554/h264Preview_01_sub
+
 
 # Specify camera's
 cameras:
@@ -78,3 +83,20 @@ cameras:
       width: 704
       height: 480
       fps: 30
+  front_door:
+    ffmpeg:
+      output_args:
+        record: preset-record-generic-audio-copy
+      inputs:
+        - path: rtsp://127.0.0.1:8554/front_door_hq?video=copy&audio=aac
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/front_door_lq?video=copy
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+    detect:
+      width: 640
+      height: 480
+      fps: 15
