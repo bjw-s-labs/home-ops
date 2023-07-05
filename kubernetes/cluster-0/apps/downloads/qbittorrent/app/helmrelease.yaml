@@ -37,36 +37,16 @@ spec:
       supplementalGroups:
         - 65539
 
-    initContainers:
-      copy-config:
-        image: ghcr.io/onedr0p/alpine:3.18.2@sha256:4b666f73ee079b4feac9527fae3b0e60b0e9883213758bdb28af852c9acb4efe
-        command:
-          - "/bin/sh"
-          - -c
-        args:
-          - |
-            for f in /data/configfiles/*; do
-              filename=$(basename $f)
-              envsubst < $f > /data/config/$filename;
-            done
-        env:
-          WIREGUARD_PORT:
-            valueFrom:
-              secretKeyRef:
-                name: qbittorrent-secret
-                key: WIREGUARD_PORT
-        volumeMounts:
-          - name: config
-            mountPath: /data/config
-          - name: configfiles
-            mountPath: /data/configfiles
-
     env:
       UMASK: "022"
       QBITTORRENT__PORT: &port 8080
-      QBITTORRENT__USE_PROFILE: "true"
+      QBITTORRENT__BT_PORT:
+        valueFrom:
+          secretKeyRef:
+            name: qbittorrent-secret
+            key: WIREGUARD_PORT
 
-    hostname: qbittorrent
+    hostname: qbittorrent-0
 
     service:
       main:
@@ -95,22 +75,6 @@ spec:
               - *host
 
     persistence:
-      config:
-        enabled: true
-        type: emptyDir
-        mountPath: /config/qBittorrent/config
-
-      cache:
-        enabled: true
-        type: emptyDir
-        mountPath: /config/qBittorrent/cache
-
-      configfiles:
-        enabled: true
-        type: configMap
-        name: qbittorrent-configmap
-        mountPath: "-"
-
       media:
         enabled: true
         type: nfs
@@ -125,9 +89,20 @@ spec:
       limits:
         memory: 1222Mi
 
+    sidecars:
+      reannounce:
+        image: ghcr.io/buroa/qbittools:v0.1.1@sha256:9a1362f196337fe0e14224f194ee7120566db664d8f53b1e88f4cfc312eea14c
+        imagePullPolicy: IfNotPresent
+        args:
+          - "reannounce"
+          - "-s"
+          - "localhost"
+          - "-p"
+          - "8080"
+
     volumeClaimTemplates:
-      - name: data
-        mountPath: /config/qBittorrent/data
+      - name: config
+        mountPath: /config
         accessMode: ReadWriteOnce
         size: 1Gi
         storageClass: ceph-block
