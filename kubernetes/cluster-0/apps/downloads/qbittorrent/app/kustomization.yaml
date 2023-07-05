@@ -6,17 +6,8 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./volsync.yaml
-  - ./qbittools-reannounce
   - ./qbittools-tagging
 commonLabels:
   app.kubernetes.io/name: qbittorrent
   app.kubernetes.io/instance: qbittorrent
   app.kubernetes.io/component: app
-configMapGenerator:
-  - name: qbittorrent-configmap
-    files:
-      - config/categories.json
-      - config/qBittorrent.conf
-      - config/watched_folders.json
-generatorOptions:
-  disableNameSuffixHash: true
