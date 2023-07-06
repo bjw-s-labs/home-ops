@@ -51,7 +51,7 @@ spec:
               - *host
 
     nodeSelector:
-      # google.feature.node.kubernetes.io/coral: "true"
+      google.feature.node.kubernetes.io/coral: "true"
       intel.feature.node.kubernetes.io/gpu: "true"
 
     persistence:
@@ -63,18 +63,18 @@ spec:
         enabled: true
         mountPath: /.npm
         type: emptyDir
-      # dev-bus-usb:
-      #   enabled: true
-      #   type: hostPath
-      #   hostPath: /dev/bus/usb
-      #   hostPathType: Directory
-      #   mountPath: /dev/bus/usb
-      # sys-bus-usb:
-      #   enabled: true
-      #   type: hostPath
-      #   hostPath: /sys/bus/usb
-      #   hostPathType: Directory
-      #   mountPath: /sys/bus/usb
+      dev-bus-usb:
+        enabled: true
+        type: hostPath
+        hostPath: /dev/bus/usb
+        hostPathType: Directory
+        mountPath: /dev/bus/usb
+      sys-bus-usb:
+        enabled: true
+        type: hostPath
+        hostPath: /sys/bus/usb
+        hostPathType: Directory
+        mountPath: /sys/bus/usb
 
     resources:
       requests:
@@ -94,8 +94,3 @@ spec:
         accessMode: ReadWriteOnce
         size: 1Gi
         storageClass: ceph-block
-      # - name: recordings
-      #   mountPath: /recs
-      #   accessMode: ReadWriteOnce
-      #   size: 75Gi
-      #   storageClass: ceph-block
