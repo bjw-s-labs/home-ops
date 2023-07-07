@@ -2,8 +2,8 @@
 
 ```bash
 export VOL_NAME=hdd-ec-media
-export SUBVOL_NAME='cache'
-export SUBVOL_SIZE='500000000000'
+export SUBVOL_NAME='backups'
+export SUBVOL_SIZE='5000000000000'
 export SUBVOL_GID=100
 export SUBVOL_UID=568
 export SUBVOL_FOLDER_PERMS=775
