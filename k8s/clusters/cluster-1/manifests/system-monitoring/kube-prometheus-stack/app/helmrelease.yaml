@@ -47,9 +47,13 @@ spec:
     kubeControllerManager:
       enabled: true
       endpoints: &cp
-        - cp1.${CLUSTER_NAME}.${INGRESS_DOMAIN}
-        - cp2.${CLUSTER_NAME}.${INGRESS_DOMAIN}
-        - cp3.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+       # Must be IP addresses 
+       - 10.200.1.109
+       - 10.200.1.108
+       - 10.200.1.111
+        # - cp1.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+        # - cp2.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+        # - cp3.${CLUSTER_NAME}.${INGRESS_DOMAIN}
       serviceMonitor:
         metricRelabelings:
           # Remove duplicate metrics
