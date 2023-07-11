@@ -115,17 +115,6 @@ spec:
     deploymentStrategy:
       type: Recreate
 
-    env:
-      GF_ANALYTICS_CHECK_FOR_UPDATES: false
-      GF_DATE_FORMATS_USE_BROWSER_LOCALE: true
-      GF_EXPLORE_ENABLED: true
-      GF_GRAFANA_NET_URL: https://grafana.net
-      GF_LOG_FILTERS: rendering:debug
-      GF_PANELS_DISABLE_SANITIZE_HTML: true
-      GF_SECURITY_ALLOW_EMBEDDING: true
-      GF_SECURITY_COOKIE_SAMESITE: grafana
-      GF_SERVER_ROOT_URL: "https://grafana.bjw-s.dev"
-
     envFromSecret: grafana-secrets
 
     grafana.ini:
@@ -152,17 +141,28 @@ spec:
         role_attribute_path: |
           contains("https://bjw-s/groups"[*], 'grafana-admin') && 'Admin' || contains("https://bjw-s/groups"[*], 'grafana-viewer') && 'Viewer'
         org_id: 1
+      dashboards:
+        default_home_dashboard_path: /tmp/dashboards/home.json
+      date_formats:
+        use_browser_locale: true
+      explore:
+        enabled: true
       grafana_net:
         url: https://grafana.net
       log:
         mode: console
       news:
         news_feed_enabled: false
+      panels:
+        disable_sanitize_html: true
       paths:
         data: /var/lib/grafana/data
         logs: /var/log/grafana
         plugins: /var/lib/grafana/plugins
         provisioning: /etc/grafana/provisioning
+      security:
+        allow_embedding: true
+        cookie_samesite: grafana
       server:
         root_url: https://grafana.bjw-s.dev
 
