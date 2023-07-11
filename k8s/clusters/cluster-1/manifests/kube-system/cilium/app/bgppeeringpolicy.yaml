@@ -9,8 +9,10 @@ metadata:
   namespace: kube-system
 spec:
   nodeSelector:
-    matchLabels:
-      kubernetes.io/os: "linux" # match all Linux nodes, change this to match more granularly if more than 1 PeeringPolicy is to be used throughout cluster
+    # matchLabels:
+    #   kubernetes.io/os: "linux" # match all Linux nodes, change this to match more granularly if more than 1 PeeringPolicy is to be used throughout cluster
+    matchExpressions:
+      - {key: node-role.kubernetes.io/control-plane, operator: NotIn, values: ['']}
   virtualRouters:
     - localASN: 64512
       exportPodCIDR: true
