@@ -45,7 +45,9 @@ spec:
     service:
       main:
         type: LoadBalancer
-        loadBalancerIP: "${LB_HASS}"
+      annotations:
+        io.cilium/lb-ipam-ips: "${LB_HASS}"
+        # loadBalancerIP: "${LB_HASS}"
         externalTrafficPolicy: Local
         ports:
           http:

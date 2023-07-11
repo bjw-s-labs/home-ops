@@ -32,6 +32,8 @@ spec:
     service:
       enabled: true
       type: LoadBalancer
+      annotations:
+        io.cilium/lb-ipam-ips: "${LB_TRAEFIK}"
       spec:
         loadBalancerIP: "${LB_TRAEFIK}"
         externalTrafficPolicy: Local

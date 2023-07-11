@@ -60,7 +60,8 @@ spec:
         type: LoadBalancer
         annotations:
           traefik.ingress.kubernetes.io/service.serversscheme: https
-        loadBalancerIP: ${LB_HYPERHDR}
+        io.cilium/lb-ipam-ips: "${LB_HYPERHDR}"
+        # loadBalancerIP: ${LB_HYPERHDR}
         ports:
           http:
             port: 8090

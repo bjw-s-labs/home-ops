@@ -55,9 +55,9 @@ spec:
     service:
       main:
         type: LoadBalancer
-        # annotations:
-        #   traefik.ingress.kubernetes.io/service.serversscheme: https
-        loadBalancerIP: ${LB_FRIGATE}
+      annotations:
+        io.cilium/lb-ipam-ips: "${LB_FRIGATE}"
+        # loadBalancerIP: ${LB_FRIGATE}
         ports:
           http:
             port: *port

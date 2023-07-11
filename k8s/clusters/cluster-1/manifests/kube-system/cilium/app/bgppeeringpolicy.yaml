@@ -1,18 +1,23 @@
 apiVersion: "cilium.io/v2alpha1"
 kind: CiliumBGPPeeringPolicy
+# comments courtesy of JJGadgets
+# MAKE SURE CRDs ARE INSTALLED IN CLUSTER VIA cilium-config ConfigMap OR Cilium HelmRelease/values.yaml (bgpControlPlane.enabled: true), BEFORE THIS IS APPLIED!
+# "CiliumBGPPeeringPolicy" Custom Resource will replace the old MetalLB BGP's "bgp-config" ConfigMap
+# "CiliumBGPPeeringPolicy" is used with `bgpControlPlane.enabled: true` which uses GoBGP, NOT the old `bgp.enabled: true` which uses MetalLB
 metadata:
   name: 01-bgp-peering-policy
+  namespace: kube-system
 spec:
   nodeSelector:
     matchLabels:
-      kubernetes.io/os: "linux"
+      kubernetes.io/os: "linux" # match all Linux nodes, change this to match more granularly if more than 1 PeeringPolicy is to be used throughout cluster
   virtualRouters:
     - localASN: 64512
       exportPodCIDR: true
       # the "NotIn" operator makes all services anounced over BGP
       serviceSelector:
         matchExpressions:
-          - {key: allservices, operator: NotIn, values: ['will-be-announced']}
+          - {key: allservices, operator: NotIn, values: ['will-match-and-announce-all-services']}
       neighbors:
         - peerAddress: "10.255.253.1/32"
           peerASN: 64512
@@ -21,7 +26,15 @@ spec:
       # the "NotIn" operator makes all services anounced over BGP
       serviceSelector:
         matchExpressions:
-          - {key: allservices, operator: NotIn, values: ['will-be-announced']}
+          - {key: allservices, operator: NotIn, values: ['will-match-and-announce-all-services']}
       neighbors:
         - peerAddress: "10.255.253.2/32"
           peerASN: 64513
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: main-pool
+spec:
+  cidrs:
+    - cidr: '${NETWORK_BGP_SVC_CIDR}'

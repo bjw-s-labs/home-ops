@@ -36,7 +36,9 @@ spec:
 
     service:
       type: LoadBalancer
-      loadBalancerIP: ${LB_MQTT}
+      annotations:
+        io.cilium/lb-ipam-ips: ${LB_MQTT}
+      # loadBalancerIP: ${LB_MQTT}
       externalTrafficPolicy: Local
 
     ingress:
