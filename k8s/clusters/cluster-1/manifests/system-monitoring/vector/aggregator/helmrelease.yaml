@@ -48,7 +48,8 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/hostname: "vector.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
           metallb.universe.tf/loadBalancerIPs: ${LB_VECTOR}
-        externalTrafficPolicy: Local
+          io.cilium/lb-ipam-ips: "${LB_VECTOR}"
+        externalTrafficPolicy: Cluster
         ports:
           http:
             port: 8686
