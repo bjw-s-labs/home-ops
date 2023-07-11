@@ -58,23 +58,6 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: system-monitoring-alertmanager
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: system-monitoring-namespace
-    - name: cluster-workloads-kube-prometheus-stack
-  interval: 5m
-  path: "./k8s/clusters/cluster-1/manifests/system-monitoring/alertmanager"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
   name: system-monitoring-speedtest-exporter
   namespace: flux-system
 spec:
@@ -83,23 +66,6 @@ spec:
     - name: cluster-workloads-kube-prometheus-stack
   interval: 5m
   path: "./k8s/clusters/cluster-1/manifests/system-monitoring/speedtest-exporter"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: system-monitoring-unifipoller
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: system-monitoring-namespace
-    - name: cluster-workloads-kube-prometheus-stack
-  interval: 5m
-  path: "./k8s/clusters/cluster-1/manifests/system-monitoring/unifi-poller"
   prune: true
   wait: true
   sourceRef:
