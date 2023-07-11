@@ -148,7 +148,6 @@ spec:
         token_url: # Set by env vars
         api_url: # Set by env vars
         use_pkce: true
-
       auth.generic_oauth.group_mapping:
         role_attribute_path: |
           contains("https://bjw-s/groups"[*], 'grafana-admin') && 'Admin' || contains("https://bjw-s/groups"[*], 'grafana-viewer') && 'Viewer'
@@ -157,6 +156,8 @@ spec:
         url: https://grafana.net
       log:
         mode: console
+      news:
+        news_feed_enabled: false
       paths:
         data: /var/lib/grafana/data
         logs: /var/log/grafana
