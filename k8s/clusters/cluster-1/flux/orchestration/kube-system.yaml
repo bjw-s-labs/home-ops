@@ -110,22 +110,22 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: kube-system-metallb
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: cluster-workloads-cilium
-  interval: 5m
-  path: "./k8s/clusters/cluster-1/manifests/kube-system/metallb"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: kube-system-metallb
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: cluster-workloads-cilium
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-1/manifests/kube-system/metallb"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: home-ops
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization

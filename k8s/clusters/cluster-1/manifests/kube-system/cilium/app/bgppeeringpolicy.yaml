@@ -7,6 +7,15 @@ spec:
     matchLabels:
       kubernetes.io/os: "linux"
   virtualRouters:
+    - localASN: 64512
+      exportPodCIDR: true
+      # the "NotIn" operator makes all services anounced over BGP
+      serviceSelector:
+        matchExpressions:
+          - {key: allservices, operator: NotIn, values: ['will-be-announced']}
+      neighbors:
+        - peerAddress: "10.255.253.1/32"
+          peerASN: 64512
     - localASN: 64513
       exportPodCIDR: true
       # the "NotIn" operator makes all services anounced over BGP
