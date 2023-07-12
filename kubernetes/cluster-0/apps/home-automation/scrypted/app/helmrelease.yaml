@@ -22,7 +22,7 @@ spec:
 
     image:
       repository: ghcr.io/koush/scrypted
-      tag: 18-jammy-full-v0.39.0
+      tag: 18-jammy-full-v0.39.6
 
     podAnnotations:
       k8s.v1.cni.cncf.io/networks: |
@@ -75,6 +75,12 @@ spec:
         hostPath: /sys/bus/usb
         hostPathType: Directory
         mountPath: /sys/bus/usb
+      recs:
+        enabled: true
+        mountPath: /recs
+        path: /volume1/Media/IPCams/scrypted
+        server: nas.bjw-s.tech
+        type: nfs
 
     resources:
       requests:
@@ -93,4 +99,9 @@ spec:
         mountPath: /server/volume
         accessMode: ReadWriteOnce
         size: 1Gi
+        storageClass: ceph-block
+      - name: hksv
+        mountPath: /server/volume/plugins/@scrypted/homekit/files/hksv
+        accessMode: ReadWriteOnce
+        size: 30Gi
         storageClass: ceph-block
