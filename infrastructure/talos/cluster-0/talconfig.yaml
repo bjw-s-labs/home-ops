@@ -20,7 +20,12 @@ nodes:
     disableSearchDomain: true
     ipAddress: 10.1.1.31
     controlPlane: true
-    installDisk: /dev/sda
+    installDiskSelector:
+      busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0/
+    machineDisks:
+      - device: /dev/disk/by-id/ata-CT500MX500SSD1_2149E5EC1D9D
+        partitions:
+          - mountpoint: /var/mnt/sata
     networkInterfaces:
       - interface: eth0
         dhcp: true
@@ -30,11 +35,29 @@ nodes:
             dhcp: true
             dhcpOptions:
               routeMetric: 4096
+    patches:
+      - |-
+        machine:
+          kubelet:
+            extraMounts:
+              - destination: /var/mnt/sata
+                type: bind
+                source: /var/mnt/sata
+                options:
+                  - rbind
+                  - rshared
+                  - rw
+
   - hostname: enigma.bjw-s.tech
     disableSearchDomain: true
     ipAddress: 10.1.1.32
     controlPlane: true
-    installDisk: /dev/sda
+    installDiskSelector:
+      busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0/
+    machineDisks:
+      - device: /dev/disk/by-id/ata-CT500MX500SSD1_2149E5EC1D31
+        partitions:
+          - mountpoint: /var/mnt/sata
     networkInterfaces:
       - interface: eth0
         dhcp: true
@@ -44,11 +67,29 @@ nodes:
             dhcp: true
             dhcpOptions:
               routeMetric: 4096
+    patches:
+      - |-
+        machine:
+          kubelet:
+            extraMounts:
+              - destination: /var/mnt/sata
+                type: bind
+                source: /var/mnt/sata
+                options:
+                  - rbind
+                  - rshared
+                  - rw
+
   - hostname: felix.bjw-s.tech
     disableSearchDomain: true
     ipAddress: 10.1.1.33
     controlPlane: true
-    installDisk: /dev/sda
+    installDiskSelector:
+      busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0/
+    machineDisks:
+      - device: /dev/disk/by-id/ata-KINGSTON_SA400S37480G_50026B77825B2170
+        partitions:
+          - mountpoint: /var/mnt/sata
     networkInterfaces:
       - interface: eth0
         dhcp: true
@@ -58,6 +99,18 @@ nodes:
             dhcp: true
             dhcpOptions:
               routeMetric: 4096
+    patches:
+      - |-
+        machine:
+          kubelet:
+            extraMounts:
+              - destination: /var/mnt/sata
+                type: bind
+                source: /var/mnt/sata
+                options:
+                  - rbind
+                  - rshared
+                  - rw
 
 controlPlane:
   patches:
