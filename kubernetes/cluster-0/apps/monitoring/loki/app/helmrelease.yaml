@@ -150,7 +150,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
       persistence:
         size: 20Gi
-        storageClass: ceph-block
+        storageClass: local-hostpath
 
     read:
       replicas: 3
@@ -171,7 +171,7 @@ spec:
           emptyDir: {}
       persistence:
         size: 20Gi
-        storageClass: ceph-block
+        storageClass: local-hostpath
 
     backend:
       replicas: 3
@@ -192,7 +192,7 @@ spec:
           emptyDir: {}
       persistence:
         size: 20Gi
-        storageClass: ceph-block
+        storageClass: local-hostpath
 
     monitoring:
       dashboards:
