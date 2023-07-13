@@ -16,20 +16,20 @@ spec:
         namespace: flux-system
   values:
     csiDriver:
-      name: "local-hostpath.democratic-csi.cluster-0.home.arpa"
+      name: "org.democratic-csi.local-hostpath"
       storageCapacity: true # With storage capacity tracking, the scheduler filters out nodes which do not have enough capacity.
       fsGroupPolicy: File # fsGroupChangePolicy
 
     storageClasses:
-      - name: democratic-csi-local-hostpath
+      - name: local-hostpath
         defaultClass: false
-        reclaimPolicy: Retain
+        reclaimPolicy: Delete
         volumeBindingMode: WaitForFirstConsumer
         # distributed support is not yet ready for expansion
         allowVolumeExpansion: false
 
     volumeSnapshotClasses:
-      - name: democratic-csi-local-hostpath
+      - name: local-hostpath
         deletionPolicy: Delete
 
     controller:
@@ -71,7 +71,7 @@ spec:
     driver:
       config:
         driver: local-hostpath
-        instance_id: cluster-0-local-hostpath
+        instance_id:
         local-hostpath:
           shareBasePath: "/var/mnt/sata/demo-csi-local-path"
           controllerBasePath: "/var/mnt/sata/demo-csi-local-path"
