@@ -1,0 +1,14 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cluster-apps-democratic-csi-local-path
+  namespace: flux-system
+spec:
+  path: "./kubernetes/cluster-0/apps/system/democratic-csi/local-path"
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  interval: 10m
+  prune: true
+  wait: true
