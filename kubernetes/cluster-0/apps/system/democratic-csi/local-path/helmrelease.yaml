@@ -36,6 +36,8 @@ spec:
       enabled: true
       strategy: node
       externalProvisioner:
+        enabled: true
+        image: registry.k8s.io/sig-storage/csi-provisioner:v3.5.0
         extraArgs:
           - --leader-election=false
           - --node-deployment=true
