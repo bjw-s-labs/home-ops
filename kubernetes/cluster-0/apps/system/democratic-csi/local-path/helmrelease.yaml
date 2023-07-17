@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: democratic-csi
-      version: 0.13.7
+      version: 0.14.0
       sourceRef:
         name: democratic-csi
         kind: HelmRepository
@@ -17,6 +17,7 @@ spec:
   values:
     csiDriver:
       name: "org.democratic-csi.local-hostpath"
+      attachRequired: false
       storageCapacity: true # With storage capacity tracking, the scheduler filters out nodes which do not have enough capacity.
       fsGroupPolicy: File # fsGroupChangePolicy
 
@@ -37,9 +38,10 @@ spec:
     controller:
       enabled: true
       strategy: node
+      externalAttacher:
+        enabled: false
       externalProvisioner:
         enabled: true
-        image: registry.k8s.io/sig-storage/csi-provisioner:v3.5.0
         extraArgs:
           - --leader-election=false
           - --node-deployment=true
@@ -48,11 +50,8 @@ spec:
           - --strict-topology=true
           - --enable-capacity=true
           - --capacity-ownerref-level=1
-
-      # distributed support is not yet ready
       externalResizer:
         enabled: false
-
       externalSnapshotter:
         enabled: true
         extraArgs:
