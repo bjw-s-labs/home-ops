@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: ingress-nginx
+  name: ingress-nginx-internal
 spec:
   interval: 30m
   chart:
@@ -25,14 +25,15 @@ spec:
         enabled: true
         type: LoadBalancer
         annotations:
-          external-dns.alpha.kubernetes.io/hostname: "ingress.bjw-s.dev"
-          io.cilium/lb-ipam-ips: "10.45.0.1"
+          external-dns.alpha.kubernetes.io/hostname: "ingress-int.bjw-s.dev"
+          io.cilium/lb-ipam-ips: "10.45.0.3"
         externalTrafficPolicy: Cluster
 
       publishService:
         enabled: true
 
       ingressClassResource:
+        name: internal-nginx
         default: true
 
       config:

@@ -31,10 +31,9 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "nginx"
+        ingressClassName: "external-nginx"
         annotations:
-          external-dns.alpha.kubernetes.io/public: "true"
-          external-dns.alpha.kubernetes.io/target: ingress.bjw-s.dev
+          external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         hosts:
           - host: &host "draw.bjw-s.dev"
             paths:
