@@ -4,10 +4,8 @@ kind: DNSEndpoint
 metadata:
   name: cloudflared-tunnel
   namespace: network
-  annotations:
-    external-dns.alpha.kubernetes.io/public: "true"
 spec:
   endpoints:
-    - dnsName: ingress.bjw-s.dev
+    - dnsName: ingress-ext.bjw-s.dev
       recordType: CNAME
       targets: ["434202da-ea90-49ed-aa80-9569325dce52.cfargotunnel.com"]
