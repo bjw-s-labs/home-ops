@@ -1,11 +1,11 @@
 ---
 ingress:
   - hostname: "bjw-s.dev"
-    service: https://ingress-nginx-external-controller.network.svc.cluster.local:443
+    service: https://nginx-external.network.svc.cluster.local:443
     originRequest:
       originServerName: ingress-ext.bjw-s.dev
   - hostname: "*.bjw-s.dev"
-    service: https://ingress-nginx-external-controller.network.svc.cluster.local:443
+    service: https://nginx-external.network.svc.cluster.local:443
     originRequest:
       originServerName: ingress-ext.bjw-s.dev
   - service: http_status:404
