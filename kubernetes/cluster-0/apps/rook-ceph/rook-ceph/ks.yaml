@@ -12,6 +12,8 @@ spec:
     kind: GitRepository
     name: home-ops-kubernetes
   wait: true
+  dependsOn:
+    - name: cluster-apps-csi-addons-controller-manager
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -41,6 +43,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops-kubernetes
-  wait: true
+  wait: false
   dependsOn:
     - name: cluster-apps-rook-ceph-cluster
