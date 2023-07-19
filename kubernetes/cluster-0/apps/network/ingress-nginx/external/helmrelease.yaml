@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: ingress-nginx-external
+  name: nginx-external
 spec:
   interval: 30m
   chart:
@@ -15,6 +15,8 @@ spec:
         namespace: flux-system
       interval: 30m
   values:
+    fullnameOverride: nginx-external
+
     controller:
       replicaCount: 3
 
