@@ -14,15 +14,15 @@ spec:
     matchExpressions:
       - {key: node-role.kubernetes.io/control-plane, operator: NotIn, values: ['']}
   virtualRouters:
-    - localASN: 64512
-      exportPodCIDR: true
+    # - localASN: 64512
+    #   exportPodCIDR: true
       # the "NotIn" operator makes all services anounced over BGP
-      serviceSelector:
-        matchExpressions:
-          - {key: allservices, operator: NotIn, values: ['will-match-and-announce-all-services']}
-      neighbors:
-        - peerAddress: "10.255.253.1/32"
-          peerASN: 64512
+    #   serviceSelector:
+    #     matchExpressions:
+    #       - {key: allservices, operator: NotIn, values: ['will-match-and-announce-all-services']}
+    #   neighbors:
+    #     - peerAddress: "10.255.253.1/32"
+    #       peerASN: 64512
     - localASN: 64513
       exportPodCIDR: true
       # the "NotIn" operator makes all services anounced over BGP
