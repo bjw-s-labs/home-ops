@@ -1,0 +1,20 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: security
+resources:
+  - ./externalsecret.yaml
+  - ./pvc.yaml
+  - ./helmrelease.yaml
+  - ./volsync.yaml
+commonLabels:
+  app.kubernetes.io/name: authelia
+  app.kubernetes.io/instance: authelia
+configMapGenerator:
+  - name: authelia-configmap
+    files:
+      - configuration.yaml=./config/configuration.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
