@@ -1,0 +1,175 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: authelia
+  namespace: security
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    controller:
+      replicas: 1
+      strategy: Recreate
+      annotations:
+        reloader.stakater.com/auto: "true"
+
+    image:
+      repository: ghcr.io/authelia/authelia
+      tag: master@sha256:a3647c3dd136402745c7639e446944004145630c822f27e22f999c414c234d2f
+
+    args:
+      [
+        "--config",
+        "/config/configuration.yaml",
+        "--config.experimental.filters",
+        "expand-env",
+      ]
+
+    env:
+      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_ADDITIONAL_GROUPS_DN: ou=groups
+      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_ADDITIONAL_USERS_DN: ou=people
+      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_BASE_DN: dc=bjw-s,dc=dev
+      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_DISPLAY_NAME_ATTRIBUTE: displayName
+      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_GROUPS_FILTER: (member={dn})
+      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_GROUP_NAME_ATTRIBUTE: cn
+      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_IMPLEMENTATION: custom
+      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_MAIL_ATTRIBUTE: mail
+      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_START_TLS: "false"
+      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TIMEOUT: 5s
+      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_URL: ldap://lldap.security.svc.cluster.local:389
+      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_USERNAME_ATTRIBUTE: uid
+      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_USERS_FILTER: (&({username_attribute}={input})(objectClass=person))
+      AUTHELIA_AUTHENTICATION_BACKEND_PASSWORD_RESET_DISABLE: "true"
+      AUTHELIA_AUTHENTICATION_BACKEND_REFRESH_INTERVAL: 1m
+      AUTHELIA_DEFAULT_REDIRECTION_URL: https://auth.bjw-s.dev
+      AUTHELIA_DUO_API_DISABLE: "true"
+      AUTHELIA_LOG_LEVEL: info
+      AUTHELIA_NOTIFIER_SMTP_HOST: smtp.eu.mailgun.org
+      AUTHELIA_NOTIFIER_SMTP_PORT: "587"
+      AUTHELIA_NOTIFIER_SMTP_USERNAME: "authelia@mg.bjw-s.dev"
+      AUTHELIA_NOTIFIER_SMTP_SENDER: Authelia <authelia@bjw-s.dev>
+      AUTHELIA_SERVER_DISABLE_HEALTHCHECK: "true"
+      AUTHELIA_SERVER_PORT: &port 80
+      AUTHELIA_SESSION_DOMAIN: bjw-s.dev
+      AUTHELIA_SESSION_NAME: authelia-home-ops
+      AUTHELIA_STORAGE_LOCAL_PATH: /data/db.sqlite3
+      AUTHELIA_TELEMETRY_METRICS_ADDRESS: tcp://0.0.0.0:8080
+      AUTHELIA_TELEMETRY_METRICS_ENABLED: "true"
+      AUTHELIA_THEME: dark
+      AUTHELIA_TOTP_ISSUER: authelia.com
+      AUTHELIA_WEBAUTHN_DISABLE: "true"
+
+    envFrom:
+      - secretRef:
+          name: authelia-secret
+
+    enableServiceLinks: false
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+          metrics:
+            enabled: true
+            port: 8080
+
+    serviceMonitor:
+      main:
+        enabled: true
+        endpoints:
+          - port: metrics
+            scheme: http
+            path: /metrics
+            interval: 1m
+            scrapeTimeout: 10s
+
+    probes:
+      liveness: &probes
+        enabled: true
+        custom: true
+        spec:
+          httpGet:
+            path: /api/health
+            port: *port
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+
+      readiness: *probes
+
+      startup:
+        enabled: true
+        custom: true
+        spec:
+          httpGet:
+            path: /api/health
+            port: *port
+          failureThreshold: 30
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 1
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: external
+        annotations:
+          external-dns.alpha.kubernetes.io/target: external.devbu.io
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            add_header Cache-Control "no-store";
+            add_header Pragma "no-cache";
+            add_header X-Frame-Options "SAMEORIGIN";
+            add_header X-XSS-Protection "1; mode=block";
+        hosts:
+          - host: &host auth.bjw-s.dev
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - hosts:
+              - *host
+
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: OnRootMismatch
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: authelia-configmap
+        subPath: configuration.yaml
+        mountPath: /config/configuration.yaml
+        readOnly: false
+
+      data:
+        enabled: true
+        type: pvc
+        existingClaim: data-authelia
+
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: authelia
+
+    resources:
+      requests:
+        cpu: 5m
+        memory: 10Mi
+      limits:
+        memory: 200Mi
