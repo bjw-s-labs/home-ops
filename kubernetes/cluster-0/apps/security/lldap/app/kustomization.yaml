@@ -1,0 +1,12 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: security
+resources:
+  - ./externalsecret.yaml
+  - ./pvc.yaml
+  - ./helmrelease.yaml
+  - ./volsync.yaml
+commonLabels:
+  app.kubernetes.io/name: lldap
+  app.kubernetes.io/instance: lldap
