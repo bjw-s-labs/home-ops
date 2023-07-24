@@ -26,18 +26,21 @@ spec:
       tag: 2.0.46@sha256:0625952a7e45ff8824936d71eeaca57205c12b758d5b47e27fe11df98bebfcff
 
     env:
-      CREATE_ADMIN: "0"
+      CREATE_ADMIN: "1"
       DATABASE_URL:
         valueFrom:
           secretKeyRef:
             name: database-miniflux-user
             key: POSTGRES_URL
+      LOG_DATE_TIME: "1"
       POLLING_SCHEDULER: "entry_frequency"
       POLLING_FREQUENCY: "15"
       RUN_MIGRATIONS: "1"
-      OAUTH2_USER_CREATION: "1"
+      OAUTH2_CLIENT_ID: "miniflux"
+      OAUTH2_OIDC_DISCOVERY_ENDPOINT: https://auth.bjw-s.dev
       OAUTH2_PROVIDER: oidc
       OAUTH2_REDIRECT_URL: "https://miniflux.bjw-s.dev/oauth2/oidc/callback"
+      OAUTH2_USER_CREATION: "1"
 
     envFrom:
       - secretRef:
