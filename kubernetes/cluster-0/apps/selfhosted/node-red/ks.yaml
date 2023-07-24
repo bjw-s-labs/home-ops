@@ -1,0 +1,14 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cluster-apps-node-red
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: "./kubernetes/cluster-0/apps/selfhosted/node-red/app"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  wait: false # no flux ks dependents
