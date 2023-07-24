@@ -69,12 +69,23 @@ spec:
         readOnly: false
       backup:
         enabled: true
+        type: pvc
+        existingClaim: cephfs-hdd-backups-downloads
+        subPath: /Kubernetes/${CLUSTER_NAME}/Applications/bazarr
+        # type: custom
+        # volumeSpec:
+        #   nfs:
+        #     server: "${NAS_ADDRESS}"
+        #     path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/bazarr
+        mountPath: /config/Backups
+      backup-old:
+        enabled: true
         type: custom
         volumeSpec:
           nfs:
             server: "${NAS_ADDRESS}"
             path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/bazarr
-        mountPath: /config/Backups
+        mountPath: /config/Backups-old
       rclone-config:
         enabled: true
         type: secret
