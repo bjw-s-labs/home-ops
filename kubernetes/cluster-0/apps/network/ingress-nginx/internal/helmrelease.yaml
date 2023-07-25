@@ -39,6 +39,14 @@ spec:
         default: true
         controllerValue: k8s.io/ingress-nginx-internal
 
+      admissionWebhooks:
+        objectSelector:
+          matchExpressions:
+            - key: ingress-class
+              operator: In
+              values:
+                - internal-nginx
+
       config:
         client-header-timeout: 120
         client-body-buffer-size: "100M"
