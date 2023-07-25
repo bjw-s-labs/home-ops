@@ -22,7 +22,11 @@ access_control:
 identity_providers:
   oidc:
     cors:
-      endpoints: ["authorization", "token", "revocation", "introspection"]
+      endpoints:
+        - "authorization"
+        - "token"
+        - "revocation"
+        - "introspection"
       allowed_origins_from_client_redirect_uris: true
     clients:
       - id: grafana
@@ -31,8 +35,13 @@ identity_providers:
         public: false
         authorization_policy: two_factor
         pre_configured_consent_duration: 1y
-        scopes: ["openid", "profile", "groups", "email"]
-        redirect_uris: ["https://grafana.bjw-s.dev/login/generic_oauth"]
+        scopes:
+          - "openid"
+          - "profile"
+          - "groups"
+          - "email"
+        redirect_uris:
+          - "https://grafana.bjw-s.dev/login/generic_oauth"
         userinfo_signing_algorithm: none
       - id: miniflux
         description: Miniflux
@@ -40,6 +49,24 @@ identity_providers:
         public: false
         authorization_policy: one_factor
         pre_configured_consent_duration: 1y
-        scopes: ["openid", "profile", "groups", "email"]
-        redirect_uris: ["https://miniflux.bjw-s.dev/oauth2/oidc/callback"]
+        scopes:
+          - "openid"
+          - "profile"
+          - "groups"
+          - "email"
+        redirect_uris:
+          - "https://miniflux.bjw-s.dev/oauth2/oidc/callback"
+        userinfo_signing_algorithm: none
+      - id: nodered
+        description: Node-RED
+        secret: "${NODERED_OAUTH_CLIENT_SECRET}"
+        public: false
+        authorization_policy: two_factor
+        scopes:
+          - openid
+          - groups
+          - email
+          - profile
+        redirect_uris:
+          - https://nodered.bjw-s.dev/auth/strategy/callback
         userinfo_signing_algorithm: none
