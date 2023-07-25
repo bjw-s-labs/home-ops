@@ -65,11 +65,8 @@ spec:
         existingClaim: tautulli-config
       backup:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/tautulli
+        existingClaim: cephfs-hdd-backups-downloads
+        subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/tautulli
         mountPath: /config/backups
 
     ingress:

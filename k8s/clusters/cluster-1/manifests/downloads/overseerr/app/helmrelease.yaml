@@ -73,11 +73,8 @@ spec:
         mountPath: /app/config
       backup:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/overseerr
+        existingClaim: cephfs-hdd-backups-downloads
+        subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/overseerr
         mountPath: /app/config/Backups
 
     ingress:
