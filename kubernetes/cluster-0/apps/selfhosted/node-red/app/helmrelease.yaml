@@ -26,12 +26,9 @@ spec:
       repository: docker.io/nodered/node-red
       tag: 3.0.2@sha256:e2cd6b89e18361593276e3ef5282b403e0879040c96d3099c15e8f0200a36339
 
-    env:
-      NODE_RED_CREDENTIAL_SECRET:
-        valueFrom:
-          secretKeyRef:
-            name: node-red-secret
-            key: NODE_RED_CREDENTIAL_SECRET
+    envFrom:
+      - secretRef:
+          name: node-red-secret
 
     service:
       main:
@@ -50,6 +47,15 @@ spec:
         tls:
           - hosts:
               - *host
+
+    persistence:
+      config-file:
+        enabled: true
+        type: configMap
+        name: node-red-configmap
+        mountPath: "/data/settings.js"
+        subPath: "settings.js"
+        readOnly: true
 
     podSecurityContext:
       runAsUser: 1000
