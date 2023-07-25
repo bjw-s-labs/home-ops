@@ -29,7 +29,6 @@ spec:
   values:
     controller:
       type: statefulset
-      # type: deployment
       annotations:
         reloader.stakater.com/auto: "true"
     image:
@@ -70,15 +69,8 @@ spec:
         readOnly: false
       backup:
         enabled: true
-        # type: pvc
         existingClaim: cephfs-hdd-backups-downloads
         subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/bazarr
-        # accessMode: ReadWriteMany
-        # type: custom
-        # volumeSpec:
-        #   nfs:
-        #     server: "${NAS_ADDRESS}"
-        #     path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/bazarr
         mountPath: /config/Backups
       backup-old:
         enabled: true
