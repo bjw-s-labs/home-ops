@@ -23,21 +23,21 @@ provider "registry.terraform.io/1password/onepassword" {
 }
 
 provider "registry.terraform.io/aminueza/minio" {
-  version     = "1.16.0"
-  constraints = "1.16.0"
+  version     = "1.17.0"
+  constraints = "1.17.0"
   hashes = [
-    "h1:+hFIzLG/JOqxN/UnleWbqAMa2LF/9AFqMJFs6W7p8yQ=",
-    "h1:GVxxEbLlbxpl1MKAI/iGld+o3kS0Ro/o2RgDwuQC4f4=",
-    "h1:JMuVGAeH5hy2tKUyc3UKxKZiZUkN1RY8q/TSPyeYsuM=",
-    "h1:MCjPCTqWzN1fvimqWJSS9m/YITSN48r5KP3Dh8uI0+Y=",
-    "h1:OnW7iAhV8WnoWqs33LgJqh8Nz50lUwuRWq2GGu0ExgE=",
-    "h1:aqOgvS29Zu+lA3LBSb3qQD/YWzDs1QsfAuj+zS6Lq4w=",
-    "h1:c73ppG29axIqe1eTxzx4acnHebTH6Bu8eZT4BTyIasQ=",
-    "h1:d35nlTGaDoivgEAZYNzA+iDtBn8QEZBWbXDEZVOF3d8=",
-    "h1:lO/9FeTh9SFXC1G1kucRBTr2aQ+eF1/0LeYjXt3E9Gw=",
-    "h1:pNvp5GQ3RmvOso4dUSr0R48QKxKBUQSuKUBHvtxKaKs=",
-    "h1:sQX3ys4ORzHxA62sPcNyTUmarlLaXwoDe9AAtcZsDno=",
-    "h1:yZtL1qzpihs+4BQVQvatQ7go7jXbEStDeiPZ/FvdLIw=",
+    "h1:1cgribUfjj4sgk9hB+q0xLsFxXV9TGf1Az4QeVwtOxY=",
+    "h1:9FUB9tlLAxzKsGknW5BpTkrSqsbQDQza6NXf97ZfDyY=",
+    "h1:K9x9uG0pn3i6Lzu7CawGFYHEnBQJ+6dZTIaewLeTRxs=",
+    "h1:Moh42dQDKrVMvIb8ZN8zWJSrqA0iLhcD9pRsa/Rp/ek=",
+    "h1:Y4asnEMcZJs/VqCUgVVktVIyoUpRMKCb/AN4RNXnMDY=",
+    "h1:ZMkl13wW8ScBbazZAxs3Ad0Gw0DaUDWYDc6nxIbaC2g=",
+    "h1:be4OJ+SYjzhnkbuK7ViVsGEUke/zWQAxW3XEdt5Nm+U=",
+    "h1:qhiL5XWRuJB7r0ZPL/Or9R29qU72vFCeaWLUYbpTob4=",
+    "h1:ueddeY35wLKDxb4MzDIF76FclkC5uDtKYhambjX5TYc=",
+    "h1:xBHGw3s+CDtk4Z5RtJ3tyT7+FOcA7hcb07XwPh72rY8=",
+    "h1:ycpIy67YR7srUI+x0S2EoYRKZaScP+LhS8ZIXqiU99k=",
+    "h1:z8Cw7Cy4ncLIaEnT2g2OKU7F+igQcV0AvU4WCOQ3NGI=",
   ]
 }
 
