@@ -3,7 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: k8tz
-  namespace: system-hooks
+  namespace: system-controllers
 spec:
   chart:
     spec:
@@ -16,7 +16,7 @@ spec:
         namespace: flux-system
   interval: 30m
   values:
-    namespace: system-hooks
+    namespace: system-controllers
 
     timezone: Europe/Amsterdam
     cronJobTimeZone: true
