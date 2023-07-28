@@ -6,9 +6,11 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m
-  path: "./kubernetes/cluster-0/apps/kube-system/k8s-ycl/app"
+  path: "./kubernetes/cluster-0/apps/system-hooks/k8s-ycl/app"
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-ops-kubernetes
-  wait: true
+  wait: false # no flux ks dependents
+  dependsOn:
+    - name: cluster-apps-cert-manager
