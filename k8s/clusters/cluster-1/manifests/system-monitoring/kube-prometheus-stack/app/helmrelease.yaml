@@ -221,7 +221,8 @@ spec:
         storage:
           volumeClaimTemplate:
             spec:
-              storageClassName: local-path
+              storageClassName: "ceph-block-external"
+              # storageClassName: local-path
               resources:
                 requests:
                   storage: 1Gi
@@ -279,8 +280,8 @@ spec:
         storageSpec:
           volumeClaimTemplate:
             spec:
-              # storageClassName: "ceph-block-external"
-              storageClassName: local-path
+              storageClassName: "ceph-block-external"
+              # storageClassName: local-path
               resources:
                 requests:
                   storage: 10Gi
