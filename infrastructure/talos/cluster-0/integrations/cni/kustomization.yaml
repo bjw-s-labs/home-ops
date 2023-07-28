@@ -1,7 +1,6 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: kube-system
 
 helmCharts:
   - name: cilium
@@ -10,7 +9,10 @@ helmCharts:
     releaseName: cilium
     includeCRDs: true
     namespace: kube-system
-    valuesFile: ../../../../../kubernetes/cluster-0/apps/kube-system/cilium/app/values.yaml
+    valuesFile: values.yaml
 
-transformers:
-  - transformers.yaml
+commonAnnotations:
+  meta.helm.sh/release-name: cilium
+  meta.helm.sh/release-namespace: kube-system
+commonLabels:
+  app.kubernetes.io/managed-by: Helm
