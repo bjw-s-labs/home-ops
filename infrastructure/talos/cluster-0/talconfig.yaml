@@ -1,7 +1,7 @@
 ---
 clusterName: ${clusterName}
 
-talosVersion: v1.4.6
+talosVersion: v1.4.7
 kubernetesVersion: 1.27.3
 endpoint: "https://${clusterName}.bjw-s.tech:6443"
 
@@ -122,9 +122,6 @@ controlPlane:
         etcd:
           advertisedSubnets:
             - 10.1.1.0/24
-        extraManifests:
-          - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-0/integrations/cni/cilium.yaml
-          - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-0/integrations/kubelet-csr-approver/kubelet-csr-approver.yaml
 
     - |-
       - op: remove
