@@ -17,6 +17,18 @@ spec:
         namespace: flux-system
 
   values:
+    controller:
+      replicas: 3
+      strategy: RollingUpdate
+
     image:
       repository: ghcr.io/bjw-s/k8s-ycl
       tag: v0.1.0@sha256:5b18b022759d2dbee690ba2d75ea378b0a0e9bb4f16ba5ca0abafb428878b795
+
+    topologySpreadConstraints:
+      - maxSkew: 2
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: k8s-ycl
