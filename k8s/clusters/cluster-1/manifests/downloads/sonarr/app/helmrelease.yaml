@@ -93,14 +93,6 @@ spec:
         existingClaim: cephfs-hdd-backups-downloads
         subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/sonarr
         mountPath: /config/Backups
-      nas00-media:
-        enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /Media
-        mountPath: /mnt/remotes/nas00-media
 
     ingress:
       main:
