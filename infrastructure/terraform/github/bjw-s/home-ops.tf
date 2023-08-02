@@ -1,5 +1,5 @@
 module "home_ops" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.2.0"
 
   name         = "home-ops"
   description  = "My home or for-home infrastructure written as code, adhering to GitOps practices"
@@ -37,12 +37,34 @@ module "home_ops" {
     local.issue_labels_size,
     local.issue_labels_category
   )
-
   pages = {
     build_type = "legacy"
     branch     = "gh-pages"
     path       = "/"
   }
+
+  branch_protections_v4 = [
+    {
+      pattern          = "main"
+      allows_deletions = false
+
+      force_push_bypassers = [
+        "/bjw-s"
+      ]
+
+      required_pull_request_reviews = {
+        required_approving_review_count = 0
+      }
+
+      required_status_checks = {
+        contexts = [
+          "Enforce PR labels",
+          "Lint",
+        ]
+        strict = false
+      }
+    }
+  ]
 
   webhooks = [
     {

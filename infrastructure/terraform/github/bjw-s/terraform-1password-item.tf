@@ -1,5 +1,5 @@
 module "terraform_1password_item" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.2.0"
 
   name        = "terraform-1password-item"
   description = "Terraform Module that collects all fields for a 1Password Item."
