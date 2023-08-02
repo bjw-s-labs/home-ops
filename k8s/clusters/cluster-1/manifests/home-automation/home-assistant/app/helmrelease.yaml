@@ -133,13 +133,9 @@ spec:
         existingClaim: home-assistant-config
       backup:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /Backups/Kubernetes/${CLUSTER_NAME}/Applications/home-assistant
-        mountPath: /config/backups
-        readOnly: false
+        existingClaim: cephfs-hdd-backups-home-automation
+        subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/home-assistant
+        mountPath: /config/Backups
       matter-server-data:
         enabled: true
         type: emptyDir
