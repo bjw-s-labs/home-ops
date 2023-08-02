@@ -1,6 +1,6 @@
 module "cf_domain_hardware" {
   source     = "./modules/cf_domain"
-  domain     = "bjw-s.tech"
+  domain     = "bjw-s.casa"
   account_id = cloudflare_account.bjw_s.id
 
   dns_entries = [
@@ -14,7 +14,7 @@ module "cf_domain_hardware" {
       value = "v=DMARC1; p=quarantine;"
       type  = "TXT"
     },
-    # Fastmail settings
+    # Migadu settings
     {
       id       = "migadu_mx_1"
       name     = "@"
@@ -32,21 +32,21 @@ module "cf_domain_hardware" {
     {
       id      = "migadu_dkim_1"
       name    = "key1._domainkey"
-      value   = "key1.bjw-s.tech._domainkey.migadu.com."
+      value   = "key1.bjw-s.casa._domainkey.migadu.com."
       type    = "CNAME"
       proxied = false
     },
     {
       id      = "migadu_dkim_2"
       name    = "key2._domainkey"
-      value   = "key2.bjw-s.tech._domainkey.migadu.com."
+      value   = "key2.bjw-s.casa._domainkey.migadu.com."
       type    = "CNAME"
       proxied = false
     },
     {
       id      = "migadu_dkim_3"
       name    = "key3._domainkey"
-      value   = "key3.bjw-s.tech._domainkey.migadu.com."
+      value   = "key3.bjw-s.casa._domainkey.migadu.com."
       type    = "CNAME"
       proxied = false
     },
@@ -59,7 +59,7 @@ module "cf_domain_hardware" {
     {
       id    = "migadu_verification"
       name  = "@"
-      value = "hosted-email-verify=7qqry92a"
+      value = "hosted-email-verify=jr49lbxl"
       type  = "TXT"
     },
     # Mailgun settings
@@ -79,8 +79,8 @@ module "cf_domain_hardware" {
     },
     {
       id    = "mailgun_dkim_1"
-      name  = "s1._domainkey.mg"
-      value = "k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqQppZfQxBBxP3YU0WY14uo+s/pNomR6XP/OBy7Q5MXdd/bHf5/q/THXhVhek2DDMa2BiqTaaXbx0vR18YAKpU96mA0l1ot7dyX0G4nSOST7UO0EvqUxZLzPAl+eYhCGAlJWeZqWTzMqWpjNA2xYbqOOA5wFZ9L3BtC4VNJl8hnIRcGogLOUp7+q8u3D8hsPsAN5Hf6v8SaBRXoLn/r+CUwOqjEFoaRhH/37C5EnWWQ0zWbRQa4jv1meJBpoTnfN7jpAPTQddCBFPBap1UCVfXxEk7EtVYBwx+rAhz9nO4BvzYcE2Z5r1r7QcND/0oeCivAjT1Wt3oxb5VvHm38OJrwIDAQAB"
+      name  = "mta._domainkey.mg"
+      value = "k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8ogdJ39orzkyWiZyMMFS4IaThlDYUbFh/6yOJ6EujepDWtAV3HbY5MDCfW7e7+pMBvD8PIT88umYwUAwcJe1g86LDVS+DP0xGoNRnWqANqokeUjaxcd2YW1XGloGXm3TL8xs3rPMSD2rOu3aNSLAEUNlHzfOXvhsE46vh/eQv/QIDAQAB"
       type  = "TXT"
     },
     {
