@@ -1,5 +1,5 @@
 module "gh_workflows" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.2.0"
 
   name        = "gh-workflows"
   description = "A collection of reusable GitHub workflows"
