@@ -41,6 +41,20 @@ module "onepassword_item_discord" {
 module "bjw-s" {
   source = "./bjw-s"
 
+  defaults = {
+    auto_init              = true
+    allow_merge_commit     = false
+    allow_squash_merge     = true
+    allow_auto_merge       = true
+    delete_branch_on_merge = true
+
+    squash_merge_commit_message = "BLANK"
+
+    has_issues   = true
+    has_wiki     = false
+    has_projects = false
+  }
+
   secrets = {
     bjws_bot_app_id            = module.onepassword_item_github_bjws_bot.fields.github_app_id
     bjws_bot_private_key       = module.onepassword_item_github_bjws_bot.fields.github_app_private_key

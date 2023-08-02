@@ -37,6 +37,12 @@ locals {
   }
 }
 
+variable "defaults" {
+  type    = any
+  default = null
+}
+
 variable "secrets" {
-  type = map(string)
+  type    = map(string)
+  default = null
 }
