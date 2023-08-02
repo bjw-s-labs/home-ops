@@ -6,15 +6,17 @@ module "vyos_config" {
   topics      = ["vyos", "iac"]
   visibility  = "public"
 
-  auto_init              = true
-  allow_merge_commit     = false
-  allow_squash_merge     = true
-  allow_auto_merge       = true
-  delete_branch_on_merge = true
+  auto_init              = var.defaults.auto_init
+  allow_merge_commit     = var.defaults.allow_merge_commit
+  allow_squash_merge     = var.defaults.allow_squash_merge
+  allow_auto_merge       = var.defaults.allow_auto_merge
+  delete_branch_on_merge = var.defaults.delete_branch_on_merge
 
-  has_issues   = true
-  has_wiki     = false
-  has_projects = false
+  squash_merge_commit_message = var.defaults.squash_merge_commit_message
+
+  has_issues   = var.defaults.has_issues
+  has_wiki     = var.defaults.has_wiki
+  has_projects = var.defaults.has_projects
 
   plaintext_secrets = merge(
     {},
