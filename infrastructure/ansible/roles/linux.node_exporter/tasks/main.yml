@@ -11,14 +11,13 @@
   become: true
   when:
     - node_exporter_version_check.stdout is not defined
-      or node_exporter_version_clean not in node_exporter_version_check.stdout
   vars:
     install_path: "/usr/local/bin"
     package_name: node-exporter
     package_version: "{{ node_exporter_version }}"
     package_type: github_release
     package_repository: prometheus/node_exporter
-    package_asset: node_exporter-{{ node_exporter_version_clean }}.linux-{{ arch }}.tar.gz
+    package_asset: node_exporter-{{ node_exporter_version_check }}.linux-{{ arch }}.tar.gz
     package_format: archive
     package_source: "node_exporter"
     package_unpack_opts:
