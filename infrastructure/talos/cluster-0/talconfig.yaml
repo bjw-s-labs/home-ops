@@ -3,7 +3,7 @@ clusterName: ${clusterName}
 
 talosVersion: v1.4.7
 kubernetesVersion: 1.27.3
-endpoint: "https://${clusterName}.bjw-s.tech:6443"
+endpoint: "https://${clusterName}.bjw-s.casa:6443"
 
 cniConfig:
   name: none
@@ -13,10 +13,10 @@ additionalApiServerCertSans:
 
 additionalMachineCertSans:
   - ${clusterEndpointIP}
-  - ${clusterName}.bjw-s.tech
+  - ${clusterName}.bjw-s.casa
 
 nodes:
-  - hostname: delta.bjw-s.tech
+  - hostname: delta.bjw-s.casa
     disableSearchDomain: true
     ipAddress: 10.1.1.31
     controlPlane: true
@@ -48,7 +48,7 @@ nodes:
                   - rshared
                   - rw
 
-  - hostname: enigma.bjw-s.tech
+  - hostname: enigma.bjw-s.casa
     disableSearchDomain: true
     ipAddress: 10.1.1.32
     controlPlane: true
@@ -80,7 +80,7 @@ nodes:
                   - rshared
                   - rw
 
-  - hostname: felix.bjw-s.tech
+  - hostname: felix.bjw-s.casa
     disableSearchDomain: true
     ipAddress: 10.1.1.33
     controlPlane: true
@@ -150,7 +150,7 @@ controlPlane:
           extraHostEntries:
             - ip: ${clusterEndpointIP}
               aliases:
-                - ${clusterName}.bjw-s.tech
+                - ${clusterName}.bjw-s.casa
         install:
           extensions:
             - image: ghcr.io/siderolabs/i915-ucode:20230310
