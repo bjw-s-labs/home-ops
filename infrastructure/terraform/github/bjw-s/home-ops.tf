@@ -13,6 +13,8 @@ module "home_ops" {
   allow_auto_merge       = true
   delete_branch_on_merge = true
 
+  squash_merge_commit_message = "BLANK"
+
   has_issues   = true
   has_wiki     = false
   has_projects = false
