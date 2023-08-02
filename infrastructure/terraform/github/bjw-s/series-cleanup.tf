@@ -1,5 +1,5 @@
 module "series_cleanup" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.2.0"
 
   name        = "series-cleanup"
   description = "Script to periodically clean media files from disk"

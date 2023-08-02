@@ -1,5 +1,5 @@
 module "asdf_krew" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.2.0"
 
   name        = "asdf-krew"
   description = "krew plugin for the asdf version manager"

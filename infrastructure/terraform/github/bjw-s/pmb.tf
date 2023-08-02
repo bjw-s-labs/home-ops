@@ -1,5 +1,5 @@
 module "pmb" {
-  source = "github.com/bjw-s/terraform-github-repository?ref=v1.1.0"
+  source = "github.com/bjw-s/terraform-github-repository?ref=v1.2.0"
 
   name        = "pmb"
   description = "Poor Man's Backup"
