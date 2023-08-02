@@ -38,15 +38,15 @@ spec:
       FRIGATE__APPLICATION_URL: &host-cluster "frigate.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
       FRIGATE__LOG_LEVEL: info
 
-    # podSecurityContext:
+    podSecurityContext:
     #   runAsUser: 997
     #   runAsGroup: 100
-    #   fsGroup: 100
+      fsGroup: 100
     #   supplementalGroups:
     #     - 34
     #     - 100
     #     - 568
-    #   fsGroupChangePolicy: "OnRootMismatch"
+      fsGroupChangePolicy: "OnRootMismatch"
 
     envFrom:
       - secretRef:
@@ -57,7 +57,6 @@ spec:
         type: LoadBalancer
         annotations:
           io.cilium/lb-ipam-ips: "${LB_FRIGATE}"
-          # loadBalancerIP: ${LB_FRIGATE}
         ports:
           http:
             port: *port
@@ -92,6 +91,11 @@ spec:
           nfs:
             server: "${NAS_ADDRESS}"
             path: /Security/frigate
+        mountPath: /media/frigate
+      media-new:
+        enabled: true
+        existingClaim: cephfs-hdd-videos-home-automation
+        subPath: ./Security
         mountPath: /media/frigate
       usb:
         enabled: true
