@@ -39,14 +39,14 @@ spec:
       FRIGATE__LOG_LEVEL: info
 
     podSecurityContext:
-    #   runAsUser: 997
-    #   runAsGroup: 100
+      runAsUser: 1000
+      runAsGroup: 100
       fsGroup: 100
-    #   supplementalGroups:
-    #     - 34
+      supplementalGroups:
+        - 0
     #     - 100
     #     - 568
-      fsGroupChangePolicy: "OnRootMismatch"
+    #  fsGroupChangePolicy: "OnRootMismatch"
 
     envFrom:
       - secretRef:
