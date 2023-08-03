@@ -16,19 +16,14 @@ spec:
         namespace: flux-system
   interval: 30m
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
       repository: ghcr.io/onedr0p/jellyfin
       tag: 10.8.10@sha256:1ef614db6a4c589777eb48bc9004d573b9c09f0d6d573a509041c6060f3a956b
-
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: "OnRootMismatch"
-      supplementalGroups:
-        - 44
-        - 109
-        - 65539
 
     env:
       DOTNET_SYSTEM_IO_DISABLEFILELOCKING: "true"
@@ -38,7 +33,7 @@ spec:
         type: LoadBalancer
         externalTrafficPolicy: Cluster
         annotations:
-          io.cilium/lb-ipam-ips: "10.45.0.21"
+          io.cilium/lb-ipam-ips: "10.45.0.22"
         ports:
           http:
             port: 8096
@@ -56,10 +51,10 @@ spec:
           - hosts:
               - *host
 
+    nodeSelector:
+      intel.feature.node.kubernetes.io/gpu: "true"
+
     persistence:
-      config:
-        enabled: true
-        existingClaim: jellyfin-config
       nfs-nas-media:
         enabled: true
         mountPath: /storage/media
@@ -70,14 +65,28 @@ spec:
         enabled: true
         type: emptyDir
 
-    nodeSelector:
-      intel.feature.node.kubernetes.io/gpu: "true"
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: "OnRootMismatch"
+      supplementalGroups:
+        - 44
+        - 109
+        - 65539
 
     resources:
       requests:
-        cpu: 5m
+        cpu: 100m
         gpu.intel.com/i915: 1
-        memory: 197M
+        memory: 9248M
       limits:
         gpu.intel.com/i915: 1
-        memory: 197M
+        memory: 9248M
+
+    volumeClaimTemplates:
+      - name: config
+        mountPath: /config
+        accessMode: ReadWriteOnce
+        size: 30Gi
+        storageClass: ceph-block
