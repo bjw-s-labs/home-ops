@@ -42,9 +42,9 @@ spec:
     #   runAsUser: 1000
     #   runAsGroup: 100
       fsGroup: 100
-    #   supplementalGroups:
-    #     - 100
-    #     - 100
+      supplementalGroups:
+        - 1000
+        - 100
     #     - 568
       fsGroupChangePolicy: "OnRootMismatch"
 
@@ -85,14 +85,6 @@ spec:
         enabled: true
         existingClaim: frigate-data
       media:
-        enabled: false
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /Security/frigate
-        mountPath: /media/frigate
-      media-new:
         enabled: true
         existingClaim: cephfs-hdd-videos-home-automation
         subPath: ./Security/frigate
@@ -107,7 +99,7 @@ spec:
         enabled: true
         type: emptyDir
         medium: Memory
-        sizeLimit: 512Mi
+        sizeLimit: 2Gi
         mountPath: /dev/shm
 
     ingress:
