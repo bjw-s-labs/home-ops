@@ -63,28 +63,3 @@ module "bjw-s" {
     discord_ci_webhook_url     = module.onepassword_item_discord.fields.webhook_bjws_github_ci
   }
 }
-
-moved {
-  from = module.vyos-config
-  to   = module.bjw-s.module.vyos_config
-}
-
-moved {
-  from = module.terraform-1password-item
-  to   = module.bjw-s.module.terraform_1password_item
-}
-
-moved {
-  from = module.gh-workflows
-  to   = module.bjw-s.module.gh_workflows
-}
-
-moved {
-  from = module.helm-charts
-  to   = module.bjw-s.module.helm_charts
-}
-
-moved {
-  from = module.home-ops
-  to   = module.bjw-s.module.home_ops
-}
