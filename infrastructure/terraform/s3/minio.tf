@@ -3,7 +3,8 @@ locals {
     "loki",
     "thanos",
     "volsync",
-    "zalando-postgres"
+    "zalando-postgres",
+    "crunchy-postgres"
   ]
 }
 
