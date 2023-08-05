@@ -14,8 +14,20 @@ access_control:
         - "172.16.0.0/12"
         - "192.168.0.0/16"
   rules:
-    - domain: "echo-server.bjw-s.dev"
+    - domain:
+        - "echo-server.bjw-s.dev"
       policy: one_factor
+      subject:
+        - ["group:admins"]
+
+    - domain:
+        - "bookmarks.bjw-s.dev"
+      resources:
+        - "^/api/.*$"
+      policy: bypass
+    - domain:
+        - "bookmarks.bjw-s.dev"
+      policy: two_factor
       subject:
         - ["group:admins"]
 
