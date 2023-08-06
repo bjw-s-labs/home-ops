@@ -34,23 +34,23 @@ spec:
       DB_HOSTNAME:
         valueFrom:
           secretKeyRef:
-            name: database-immich-user
-            key: HOST
+            name: immich-pguser-immich
+            key: host
       DB_USERNAME:
         valueFrom:
           secretKeyRef:
-            name: database-immich-user
-            key: LOGIN
+            name: immich-pguser-immich
+            key: user
       DB_PASSWORD:
         valueFrom:
           secretKeyRef:
-            name: database-immich-user
-            key: PASSWORD
+            name: immich-pguser-immich
+            key: password
       DB_DATABASE_NAME:
         valueFrom:
           secretKeyRef:
-            name: database-immich-user
-            key: DATABASE_NAME
+            name: immich-pguser-immich
+            key: dbname
 
     envFrom:
       - secretRef:
