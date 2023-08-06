@@ -17,14 +17,6 @@ spec:
         namespace: flux-system
 
   values:
-    initContainers:
-      01-init-db:
-        image: ghcr.io/onedr0p/postgres-init:14.8
-        imagePullPolicy: IfNotPresent
-        envFrom:
-          - secretRef:
-              name: miniflux-secret
-
     controller:
       annotations:
         reloader.stakater.com/auto: "true"
@@ -36,6 +28,11 @@ spec:
     env:
       BASE_URL: https://miniflux.bjw-s.dev
       CREATE_ADMIN: "1"
+      DATABASE_URL:
+        valueFrom:
+          secretKeyRef:
+            name: miniflux-pguser-miniflux
+            key: uri
       DEBUG: "1"
       LOG_DATE_TIME: "1"
       OAUTH2_CLIENT_ID: miniflux
