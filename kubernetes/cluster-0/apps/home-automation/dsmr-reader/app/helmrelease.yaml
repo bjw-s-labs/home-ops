@@ -36,24 +36,28 @@ spec:
       DJANGO_DATABASE_HOST:
         valueFrom:
           secretKeyRef:
-            name: database-dsmr-reader-user
-            key: HOST
-      DJANGO_DATABASE_PORT: "5432"
+            name: dsmr-reader-pguser-dsmr-reader
+            key: host
+      DJANGO_DATABASE_PORT:
+        valueFrom:
+          secretKeyRef:
+            name: dsmr-reader-pguser-dsmr-reader
+            key: port
       DJANGO_DATABASE_USER:
         valueFrom:
           secretKeyRef:
-            name: database-dsmr-reader-user
-            key: LOGIN
+            name: dsmr-reader-pguser-dsmr-reader
+            key: user
       DJANGO_DATABASE_PASSWORD:
         valueFrom:
           secretKeyRef:
-            name: database-dsmr-reader-user
-            key: PASSWORD
+            name: dsmr-reader-pguser-dsmr-reader
+            key: password
       DJANGO_DATABASE_NAME:
         valueFrom:
           secretKeyRef:
-            name: database-dsmr-reader-user
-            key: DATABASE_NAME
+            name: dsmr-reader-pguser-dsmr-reader
+            key: dbname
 
     envFrom:
       - secretRef:
