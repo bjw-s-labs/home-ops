@@ -1,7 +1,7 @@
 # Steps to create cephfs subvolume & consume it via an external Rook Ceph client
 
 ```bash
-export VOL_NAME=hdd-ec-media
+export VOL_NAME=cephfs-hdd
 export SUBVOL_NAME='backups'
 export SUBVOL_SIZE='5000000000000'
 export SUBVOL_GID=100

@@ -8,7 +8,7 @@ spec:
     - ReadWriteMany
   capacity:
     storage: 5T
-  storageClassName: "cephfs-hdd-ec-media"
+  storageClassName: "cephfs-hdd-storage"
   csi:
     driver: rook-ceph.cephfs.csi.ceph.com 
     nodeStageSecretRef:
@@ -19,10 +19,10 @@ spec:
     volumeAttributes:
       # Required options from storageclass parameters need to be added in volumeAttributes
       "clusterID": "rook-ceph-external"
-      "fsName": "hdd-ec-media"
-      "pool": "hdd-ec-media-data"
+      "fsName": "cephfs-hdd"
+      "pool": "hdd-ec-storage-data"
       "staticVolume": "true"
-      "rootPath": /volumes/_nogroup/backups/5337a2fe-b861-451e-a284-9291e2947326
+      "rootPath": /volumes/_nogroup/backups/a736e129-076b-422d-ad97-2726f950dc17
     # volumeHandle can be anything, need not to be same
     # as PV name or volume name. keeping same for brevity
     volumeHandle: cephfs-hdd-backups-downloads
@@ -39,7 +39,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteMany
-  storageClassName: "cephfs-hdd-ec-media"
+  storageClassName: "cephfs-hdd-storage"
   resources:
     requests:
       storage: 5T
@@ -56,7 +56,7 @@ spec:
     - ReadWriteMany
   capacity:
     storage: 5T
-  storageClassName: "cephfs-hdd-ec-media"
+  storageClassName: "cephfs-hdd-storage"
   csi:
     driver: rook-ceph.cephfs.csi.ceph.com 
     nodeStageSecretRef:
@@ -67,10 +67,10 @@ spec:
     volumeAttributes:
       # Required options from storageclass parameters need to be added in volumeAttributes
       "clusterID": "rook-ceph-external"
-      "fsName": "hdd-ec-media"
-      "pool": "hdd-ec-media-data"
+      "fsName": "cephfs-hdd"
+      "pool": "hdd-ec-storage-data"
       "staticVolume": "true"
-      "rootPath": /volumes/_nogroup/backups/5337a2fe-b861-451e-a284-9291e2947326
+      "rootPath": /volumes/_nogroup/backups/a736e129-076b-422d-ad97-2726f950dc17
     # volumeHandle can be anything, need not to be same
     # as PV name or volume name. keeping same for brevity
     volumeHandle: cephfs-hdd-backups-media
@@ -87,7 +87,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteMany
-  storageClassName: "cephfs-hdd-ec-media"
+  storageClassName: "cephfs-hdd-storage"
   resources:
     requests:
       storage: 5T
@@ -104,7 +104,7 @@ spec:
     - ReadWriteMany
   capacity:
     storage: 5T
-  storageClassName: "cephfs-hdd-ec-media"
+  storageClassName: "cephfs-hdd-storage"
   csi:
     driver: rook-ceph.cephfs.csi.ceph.com 
     nodeStageSecretRef:
@@ -115,10 +115,10 @@ spec:
     volumeAttributes:
       # Required options from storageclass parameters need to be added in volumeAttributes
       "clusterID": "rook-ceph-external"
-      "fsName": "hdd-ec-media"
-      "pool": "hdd-ec-media-data"
+      "fsName": "cephfs-hdd"
+      "pool": "hdd-ec-storage-data"
       "staticVolume": "true"
-      "rootPath": /volumes/_nogroup/backups/5337a2fe-b861-451e-a284-9291e2947326
+      "rootPath": /volumes/_nogroup/backups/a736e129-076b-422d-ad97-2726f950dc17
     # volumeHandle can be anything, need not to be same
     # as PV name or volume name. keeping same for brevity
     volumeHandle: cephfs-hdd-backups-home-automation
@@ -135,7 +135,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteMany
-  storageClassName: "cephfs-hdd-ec-media"
+  storageClassName: "cephfs-hdd-storage"
   resources:
     requests:
       storage: 5T

@@ -62,7 +62,9 @@ https://pve.proxmox.com/pve-docs/pveceph.1.html
 ```bash
 pveceph pool create ssd-erasure-coded-backups --application cephfs --erasure-coding k=4,m=2,,device-class=ssd,failure-domain=osd,profile=ssd-erasure-coded
 
-pveceph pool create hdd-ec-media --application cephfs --add_storages 1 --erasure-coding k=6,m=3,,device-class=hdd,failure-domain=osd,profile=hdd-ec-media
+pveceph pool create hdd-ec-storage --application cephfs --add_storages 1 --pg_autoscale_mode on --erasure-coding k=12,m=3,,device-class=hdd,failure-domain=osd
+ceph fs new cephfs-hdd hdd-ec-storage-metadata hdd-ec-storage-data --force
+ceph fs set cephfs-hdd allow_standby_replay true
 ```
 
 ## NFS-Genesha
