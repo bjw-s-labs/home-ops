@@ -218,103 +218,96 @@ controlPlane:
             # renovate: docker-image
             image: docker.io/coredns/coredns:1.10.0
     inlinePatch:
-      # Allows Prometheus to pull metrics
-      etcd:
-        extraArgs:
-          listen-metrics-urls: http://0.0.0.0:2381
-      controllerManager:
-        extraArgs:
-          bind-address: 0.0.0.0
-      scheduler:
-        extraArgs:
-          bind-address: 0.0.0.0
-      apiServer:
-        admissionControl: null
-      # End
-        cluster:
-            apiServer:
-                disablePodSecurityPolicy: true
-                admissionControl: []
-                certSANs:
-                    - cluster-1
-                    - cluster-1.${secret_domain}
-                    - 10.200.1.1
-                extraArgs:
-                    feature-gates: MixedProtocolLBService=true
-            controllerManager:
-                extraArgs:
-                    feature-gates: MixedProtocolLBService=true
-            proxy:
-                disabled: true
-                extraArgs:
-                    feature-gates: MixedProtocolLBService=true
-            scheduler:
-                extraArgs:
-                    feature-gates: MixedProtocolLBService=true
-            discovery:
-                enabled: true
-                # registries:
-                #     kubernetes: {}
-                #     service:
-                #         disabled: true
-            etcd:
-                extraArgs:
-                    election-timeout: "5000"
-                advertisedSubnets:
-                  - 10.200.1.0/24
-                listenSubnets:
-                  - 10.200.1.0/24
-            extraManifests:
-                - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/ha-install.yaml
-                # - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-        machine:
-            certSANs:
-                - cluster-1.${secret_domain}
-                - 10.200.1.1
-            kubelet:
-                nodeIP:
-                    validSubnets:
-                        - 10.200.1.0/24
-                extraArgs:
-                    feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true,ServerSideApply=true
-                    rotate-server-certificates: "true"
-            sysctls:
-                fs.inotify.max_user_watches: "1048576"
-                fs.inotify.max_user_instances: "8192"
-            time:
-                disabled: false
-                servers:
-                    - 10.255.253.1
-worker:
-    configPatches:
-        - op: add
-          path: /machine/install/diskSelector
-          value:
-            size: <= 200GB
-        - op: add
-          path: /machine/kubelet/extraArgs
-          value:
+      cluster:
+        apiServer:
+          disablePodSecurityPolicy: true
+          admissionControl: []
+          certSANs:
+            - cluster-1
+            - cluster-1.${secret_domain}
+            - 10.200.1.1
+          extraArgs:
+            feature-gates: MixedProtocolLBService=true
+        controllerManager:
+          extraArgs:
+            feature-gates: MixedProtocolLBService=true
+            # Allows Prometheus to pull metrics
+            bind-address: 0.0.0.0
+        proxy:
+          disabled: true
+          extraArgs:
+              feature-gates: MixedProtocolLBService=true
+        scheduler:
+          extraArgs:
+              feature-gates: MixedProtocolLBService=true
+              # Allows Prometheus to pull metrics
+              bind-address: 0.0.0.0
+        discovery:
+          enabled: true
+          # registries:
+          #     kubernetes: {}
+          #     service:
+          #         disabled: true
+        etcd:
+          extraArgs:
+            election-timeout: "5000"
+            # Allows Prometheus to pull metrics
+            listen-metrics-urls: http://0.0.0.0:2381
+          advertisedSubnets:
+            - 10.200.1.0/24
+          listenSubnets:
+            - 10.200.1.0/24
+        extraManifests:
+          - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/ha-install.yaml
+          # - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+      machine:
+        certSANs:
+          - cluster-1.${secret_domain}
+          - 10.200.1.1
+        kubelet:
+          nodeIP:
+            validSubnets:
+              - 10.200.1.0/24
+          extraArgs:
+            feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true,ServerSideApply=true
             rotate-server-certificates: "true"
-            feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,MixedProtocolLBService=true,ServerSideApply=true
-    inlinePatch:
-        cluster:
-            extraManifests:
-                - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/ha-install.yaml
-                # - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-        machine:
-            certSANs:
-                - cluster-1
-                - cluster-1.${secret_domain}
-                - 10.200.1.1
-            time:
-                disabled: false
-                servers:
-                    - 10.255.253.1
-            kubelet:
-                nodeIP:
-                    validSubnets:
-                        - 10.200.1.0/24
-            sysctls:
-              # For CloudflareD QUIC, sets maximum receive buffer size to roughly 2.5 MB. 
-              # https://github.com/quic-go/quic-go/wiki/UDP-Receive-Buffer-Size
-              net.core.rmem_max: 2500000
+        sysctls:
+          fs.inotify.max_user_watches: "1048576"
+          fs.inotify.max_user_instances: "8192"
+        time:
+          disabled: false
+          servers:
+            - 10.255.253.1
+worker:
+  configPatches:
+      - op: add
+        path: /machine/install/diskSelector
+        value:
+          size: <= 200GB
+      - op: add
+        path: /machine/kubelet/extraArgs
+        value:
+          rotate-server-certificates: "true"
+          feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,MixedProtocolLBService=true,ServerSideApply=true
+  inlinePatch:
+    cluster:
+        extraManifests:
+            - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/ha-install.yaml
+            # - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+    machine:
+        certSANs:
+            - cluster-1
+            - cluster-1.${secret_domain}
+            - 10.200.1.1
+        time:
+            disabled: false
+            servers:
+                - 10.255.253.1
+        kubelet:
+            nodeIP:
+                validSubnets:
+                    - 10.200.1.0/24
+        sysctls:
+          # For CloudflareD QUIC, sets maximum receive buffer size to roughly 2.5 MB. 
+          # https://github.com/quic-go/quic-go/wiki/UDP-Receive-Buffer-Size
+          net.core.rmem_max: 2500000
