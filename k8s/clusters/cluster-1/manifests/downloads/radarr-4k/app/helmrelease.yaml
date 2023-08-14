@@ -94,7 +94,12 @@ spec:
         enabled: true
         existingClaim: cephfs-hdd-videos-downloads
         subPath: ./4KMovies
-        mountPath: /mnt/unionfs-new
+        mountPath: /mnt/unionfs-new/Media/4KMovies/
+      downloads:
+        enabled: true
+        existingClaim: downloads-nfs-share-pvc
+        subPath: ./downloads
+        mountPath: /mnt/unionfs-new/downloads
       backup:
         enabled: true
         existingClaim: cephfs-hdd-backups-downloads
