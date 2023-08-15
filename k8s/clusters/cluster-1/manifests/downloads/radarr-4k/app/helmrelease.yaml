@@ -95,9 +95,10 @@ spec:
         existingClaim: cephfs-hdd-videos-downloads
         subPath: ./4KMovies
         mountPath: /mnt/unionfs-new/Media/4KMovies/
-      downloads:
-        enabled: false
-        existingClaim: downloads-nfs-share-pvc
+      downloads-old:
+        enabled: true
+        type: nfs
+        server: nas00.elcarpenter.com
         subPath: ./
         mountPath: /mnt/unionfs-new/downloads
       backup:
