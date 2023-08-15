@@ -95,7 +95,8 @@ spec:
         existingClaim: cephfs-hdd-videos-downloads
         subPath: ./4KMovies
         mountPath: /mnt/unionfs-new/Media/4KMovies/
-      downloads-old:
+      # New mount location. Remove "-new" from the paths & names and disable nfs-nas-media above to switch
+      downloads-new:
         enabled: true
         type: nfs
         server: nas00.${INGRESS_DOMAIN}

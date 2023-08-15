@@ -102,6 +102,25 @@ spec:
         existingClaim: media-nfs-share-pvc
         mountPath: /mnt/unionfs
         readOnly: false
+      # New mount location. Remove "-new" from the paths & names and disable nfs-nas-media above to switch
+      4kmovies:
+        enabled: true
+        existingClaim: cephfs-hdd-videos-downloads
+        subPath: ./4KMovies
+        mountPath: /mnt/unionfs-new/Media/4KMovies/
+      downloads-new:
+        enabled: true
+        type: nfs
+        server: nas00.${INGRESS_DOMAIN}
+        path: /mnt/NFS/Media/Plex/Local-Media/downloads/
+        mountPath: /mnt/unionfs-new/downloads
+      4ktv-new:
+        enabled: true
+        type: nfs
+        server: nas00.${INGRESS_DOMAIN}
+        path: /mnt/NFS/Merged-Media/Media/4KTV/
+        mountPath: /mnt/unionfs-new/Media/4KTV
+
 
     ingress:
       main:
