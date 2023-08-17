@@ -112,7 +112,7 @@ spec:
             paths:
               - path: /
                 pathType: Prefix
-          - host: &foo "foo.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - host: &cheese "cheese.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
@@ -121,7 +121,7 @@ spec:
             hosts:
               - *host
               - *host-cluster
-              - *foo
+              - *cheese
 
     persistence:
       config:
@@ -137,36 +137,36 @@ spec:
         subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/plex
         mountPath: /config/Backups
       nfs-nas-media:
-        enabled: true
+        enabled: false
         existingClaim: media-nfs-share-pvc
         mountPath: /mnt/unionfs
         readOnly: false
       # New mount location. Remove "-new" from the paths & names and disable nfs-nas-media above to switch
       4kmovies:
-        enabled: false
+        enabled: true
         existingClaim: cephfs-hdd-videos-media
         subPath: ./4KMovies
         mountPath: /mnt/unionfs-new/Media/4KMovies/
       4ktv-new:
-        enabled: false
+        enabled: true
         type: nfs
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Merged-Media/Media/4KTV/
         mountPath: /mnt/unionfs-new/Media/4KTV
       movies-new:
-        enabled: false
+        enabled: true
         type: nfs
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Merged-Media/Media/Movies/
         mountPath: /mnt/unionfs-new/Media/Movies
       music-new:
-        enabled: false
+        enabled: true
         type: nfs
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Merged-Media/Media/Music/
         mountPath: /mnt/unionfs-new/Media/Music
       tv-new:
-        enabled: false
+        enabled: true
         type: nfs
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Merged-Media/Media/TV/
