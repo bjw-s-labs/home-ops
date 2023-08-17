@@ -41,8 +41,8 @@ spec:
 
     podSecurityContext:
       runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
+      runAsGroup: 100
+      fsGroup: 100
       supplementalGroups:
         - 34 # backup
         - 44 # videro
@@ -127,23 +127,56 @@ spec:
       config:
         enabled: true
         existingClaim: plex-config-nvme
-
       transcode:
         enabled: true
         type: emptyDir
         # medium: Memory
-
-      nfs-nas-media:
-        enabled: true
-        existingClaim: media-nfs-share-pvc
-        mountPath: /mnt/unionfs
-        readOnly: false
-
       backup:
         enabled: false
         existingClaim: cephfs-hdd-backups-media
         subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/plex
         mountPath: /config/Backups
+      nfs-nas-media:
+        enabled: false
+        existingClaim: media-nfs-share-pvc
+        mountPath: /mnt/unionfs
+        readOnly: false
+      # New mount location. Remove "-new" from the paths & names and disable nfs-nas-media above to switch
+      4kmovies:
+        enabled: true
+        existingClaim: cephfs-hdd-videos-media
+        subPath: ./4KMovies
+        mountPath: /mnt/unionfs/Media/4KMovies/
+      downloads-new:
+        enabled: false
+        type: nfs
+        server: nas00.${INGRESS_DOMAIN}
+        path: /mnt/NFS/Media/Plex/Local-Media/downloads/
+        mountPath: /mnt/unionfs/downloads
+      4ktv-new:
+        enabled: true
+        type: nfs
+        server: nas00.${INGRESS_DOMAIN}
+        path: /mnt/NFS/Merged-Media/Media/4KTV/
+        mountPath: /mnt/unionfs/Media/4KTV
+      movies-new:
+        enabled: true
+        type: nfs
+        server: nas00.${INGRESS_DOMAIN}
+        path: /mnt/NFS/Merged-Media/Media/Movies/
+        mountPath: /mnt/unionfs/Media/Movies
+      music-new:
+        enabled: true
+        type: nfs
+        server: nas00.${INGRESS_DOMAIN}
+        path: /mnt/NFS/Merged-Media/Media/Music/
+        mountPath: /mnt/unionfs/Media/Music
+      tv-new:
+        enabled: true
+        type: nfs
+        server: nas00.${INGRESS_DOMAIN}
+        path: /mnt/NFS/Merged-Media/Media/TV/
+        mountPath: /mnt/unionfs/Media/TV
 
     addons:
       promtail:
