@@ -137,7 +137,7 @@ spec:
         subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/plex
         mountPath: /config/Backups
       nfs-nas-media:
-        enabled: false
+        enabled: true
         existingClaim: media-nfs-share-pvc
         mountPath: /mnt/unionfs
         readOnly: false
@@ -146,37 +146,37 @@ spec:
         enabled: true
         existingClaim: cephfs-hdd-videos-media
         subPath: ./4KMovies
-        mountPath: /mnt/unionfs/Media/4KMovies/
+        mountPath: /mnt/unionfs-new/Media/4KMovies/
       downloads-new:
         enabled: false
         type: nfs
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Media/Plex/Local-Media/downloads/
-        mountPath: /mnt/unionfs/downloads
+        mountPath: /mnt/unionfs-new/downloads
       4ktv-new:
         enabled: true
         type: nfs
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Merged-Media/Media/4KTV/
-        mountPath: /mnt/unionfs/Media/4KTV
+        mountPath: /mnt/unionfs-new/Media/4KTV
       movies-new:
         enabled: true
         type: nfs
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Merged-Media/Media/Movies/
-        mountPath: /mnt/unionfs/Media/Movies
+        mountPath: /mnt/unionfs-new/Media/Movies
       music-new:
         enabled: true
         type: nfs
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Merged-Media/Media/Music/
-        mountPath: /mnt/unionfs/Media/Music
+        mountPath: /mnt/unionfs-new/Media/Music
       tv-new:
         enabled: true
         type: nfs
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Merged-Media/Media/TV/
-        mountPath: /mnt/unionfs/Media/TV
+        mountPath: /mnt/unionfs-new/Media/TV
 
     addons:
       promtail:
