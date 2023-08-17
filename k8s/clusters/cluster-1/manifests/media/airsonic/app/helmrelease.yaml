@@ -61,19 +61,11 @@ spec:
         enabled: true
         existingClaim: airsonic-config
         mountPath: /var/airsonic
-      nfs-nas-media:
+      music:
         enabled: true
-        existingClaim: media-nfs-share-pvc
-        mountPath: /mnt/unionfs
-        readOnly: false
-      nas00-media:
-        enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /Media
-        mountPath: /mnt/remotes/nas00-media
+        existingClaim: cephfs-hdd-videos-media
+        subPath: ./Music
+        mountPath: /mnt/unionfs/Media/Music/
 
     ingress:
       main:

@@ -147,24 +147,22 @@ spec:
         existingClaim: cephfs-hdd-videos-media
         subPath: ./4KMovies
         mountPath: /mnt/unionfs/Media/4KMovies/
-      4ktv-new:
+      4ktv:
         enabled: true
-        type: nfs
-        server: nas00.${INGRESS_DOMAIN}
-        path: /mnt/NFS/Merged-Media/Media/4KTV/
-        mountPath: /mnt/unionfs/Media/4KTV
+        existingClaim: cephfs-hdd-videos-media
+        subPath: ./4KTV
+        mountPath: /mnt/unionfs/Media/4KTV/
+      music:
+        enabled: true
+        existingClaim: cephfs-hdd-videos-media
+        subPath: ./Music
+        mountPath: /mnt/unionfs/Media/Music/
       movies-new:
         enabled: true
         type: nfs
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Merged-Media/Media/Movies/
         mountPath: /mnt/unionfs/Media/Movies
-      music-new:
-        enabled: true
-        type: nfs
-        server: nas00.${INGRESS_DOMAIN}
-        path: /mnt/NFS/Merged-Media/Media/Music/
-        mountPath: /mnt/unionfs/Media/Music
       tv-new:
         enabled: true
         type: nfs
