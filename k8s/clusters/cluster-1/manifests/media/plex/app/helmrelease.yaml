@@ -132,7 +132,7 @@ spec:
         type: emptyDir
         # medium: Memory
       backup:
-        enabled: false
+        enabled: true
         existingClaim: cephfs-hdd-backups-media
         subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/plex
         mountPath: /config/Backups
@@ -143,36 +143,30 @@ spec:
         readOnly: false
       # New mount location. Remove "-new" from the paths & names and disable nfs-nas-media above to switch
       4kmovies:
-        enabled: true
+        enabled: false
         existingClaim: cephfs-hdd-videos-media
         subPath: ./4KMovies
         mountPath: /mnt/unionfs-new/Media/4KMovies/
-      downloads-new:
-        enabled: false
-        type: nfs
-        server: nas00.${INGRESS_DOMAIN}
-        path: /mnt/NFS/Media/Plex/Local-Media/downloads/
-        mountPath: /mnt/unionfs-new/downloads
       4ktv-new:
-        enabled: true
+        enabled: false
         type: nfs
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Merged-Media/Media/4KTV/
         mountPath: /mnt/unionfs-new/Media/4KTV
       movies-new:
-        enabled: true
+        enabled: false
         type: nfs
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Merged-Media/Media/Movies/
         mountPath: /mnt/unionfs-new/Media/Movies
       music-new:
-        enabled: true
+        enabled: false
         type: nfs
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Merged-Media/Media/Music/
         mountPath: /mnt/unionfs-new/Media/Music
       tv-new:
-        enabled: true
+        enabled: false
         type: nfs
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Merged-Media/Media/TV/
