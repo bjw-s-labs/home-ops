@@ -108,18 +108,17 @@ spec:
         existingClaim: cephfs-hdd-videos-media
         subPath: ./4KMovies
         mountPath: /mnt/unionfs/Media/4KMovies/
+      4ktv:
+        enabled: true
+        existingClaim: cephfs-hdd-videos-media
+        subPath: ./4KTV
+        mountPath: /mnt/unionfs/Media/4KTV/
       downloads-new:
         enabled: true
         type: nfs
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Media/Plex/Local-Media/downloads/
         mountPath: /mnt/unionfs/downloads
-      4ktv-new:
-        enabled: true
-        type: nfs
-        server: nas00.${INGRESS_DOMAIN}
-        path: /mnt/NFS/Merged-Media/Media/4KTV/
-        mountPath: /mnt/unionfs/Media/4KTV
       movies-new:
         enabled: true
         type: nfs
