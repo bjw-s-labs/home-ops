@@ -21,6 +21,9 @@ spec:
     pspEnable: false
 
     csi:
+      # Indicate whether or not they support modifying a volume's ownership or permissions when the volume is being mounted.
+      # Default is "File". Other options are "None" and "ReadWriteOnceWithFSType"
+      cephFSFSGroupPolicy: "ReadWriteOnceWithFSType"
       logLevel: 4
       kubeletDirPath: /var/lib/kubelet
       enableCSIHostNetwork: true
