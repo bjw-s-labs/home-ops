@@ -83,10 +83,22 @@ spec:
         enabled: true
         existingClaim: radarr-config-nvme
       nfs-nas-media:
-        enabled: true
+        enabled: false
         existingClaim: downloads-nfs-share-pvc
         mountPath: /mnt/unionfs
         readOnly: false
+      movies:
+        enabled: true
+        existingClaim: cephfs-hdd-videos-downloads
+        subPath: ./Movies
+        mountPath: /mnt/unionfs/Media/Movies/
+      # New mount location. Remove "-new" from the paths & names and disable nfs-nas-media above to switch
+      downloads-new:
+        enabled: true
+        type: nfs
+        server: nas00.${INGRESS_DOMAIN}
+        path: /mnt/NFS/Media/Plex/Local-Media/downloads/
+        mountPath: /mnt/unionfs/downloads
       backup:
         enabled: true
         existingClaim: cephfs-hdd-backups-downloads

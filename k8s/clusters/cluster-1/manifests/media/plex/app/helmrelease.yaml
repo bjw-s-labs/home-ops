@@ -157,12 +157,11 @@ spec:
         existingClaim: cephfs-hdd-videos-media
         subPath: ./Music
         mountPath: /mnt/unionfs/Media/Music/
-      movies-new:
+      movies:
         enabled: true
-        type: nfs
-        server: nas00.${INGRESS_DOMAIN}
-        path: /mnt/NFS/Merged-Media/Media/Movies/
-        mountPath: /mnt/unionfs/Media/Movies
+        existingClaim: cephfs-hdd-videos-media
+        subPath: ./Movies
+        mountPath: /mnt/unionfs/Media/Movies/
       tv-new:
         enabled: true
         type: nfs

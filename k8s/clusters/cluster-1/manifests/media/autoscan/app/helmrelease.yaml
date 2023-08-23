@@ -119,12 +119,11 @@ spec:
         server: nas00.${INGRESS_DOMAIN}
         path: /mnt/NFS/Media/Plex/Local-Media/downloads/
         mountPath: /mnt/unionfs/downloads
-      movies-new:
+      movies:
         enabled: true
-        type: nfs
-        server: nas00.${INGRESS_DOMAIN}
-        path: /mnt/NFS/Merged-Media/Media/Movies/
-        mountPath: /mnt/unionfs/Media/Movies
+        existingClaim: cephfs-hdd-videos-media
+        subPath: ./Movies
+        mountPath: /mnt/unionfs/Media/Movies/
       music-new:
         enabled: true
         type: nfs
