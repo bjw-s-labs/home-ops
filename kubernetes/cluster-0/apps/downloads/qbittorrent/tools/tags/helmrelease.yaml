@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: qbittools-tagging
+  name: qbittools-tags
   namespace: downloads
 spec:
   interval: 30m
@@ -28,15 +28,17 @@ spec:
 
     image:
       repository: ghcr.io/buroa/qbittools
-      tag: v0.8.3@sha256:a9a9f03c9a3c30904679d18720d14c8c69e926e6b6327ab56f490dd80dd4c24f
+      tag: v0.8.3
 
     args:
       - tagging
-      - --not-working
-      - --unregistered
       - --added-on
+      - --expired
       - --last-activity
+      - --not-working
+      - --sites
       - --tracker-down
+      - --unregistered
       - -s
       - qbittorrent.downloads.svc.cluster.local
       - -p

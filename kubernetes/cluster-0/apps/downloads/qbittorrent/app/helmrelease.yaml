@@ -89,17 +89,6 @@ spec:
       limits:
         memory: 1222Mi
 
-    sidecars:
-      reannounce:
-        image: ghcr.io/buroa/qbittools:v0.8.3@sha256:a9a9f03c9a3c30904679d18720d14c8c69e926e6b6327ab56f490dd80dd4c24f
-        imagePullPolicy: IfNotPresent
-        args:
-          - "reannounce"
-          - "-s"
-          - "localhost"
-          - "-p"
-          - "8080"
-
     volumeClaimTemplates:
       - name: config
         mountPath: /config
