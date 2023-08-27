@@ -1,0 +1,62 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: thelounge
+  namespace: selfhosted
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controller:
+      type: statefulset
+
+    image:
+      repository: ghcr.io/thelounge/thelounge
+      tag: 4.4.1
+
+    enableServiceLinks: false
+
+    env:
+      THELOUNGE_HOME: /config
+
+    service:
+      main:
+        ports:
+          http:
+            port: 9000
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "internal-nginx"
+        hosts:
+          - host: &host "{{ .Release.Name }}.bjw-s.dev"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+
+    resources:
+      requests:
+        cpu: 12m
+        memory: 256M
+      limits:
+        memory: 512M
+
+    volumeClaimTemplates:
+      - name: config
+        mountPath: /config
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
