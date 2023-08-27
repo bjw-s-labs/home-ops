@@ -16,3 +16,19 @@ spec:
     - name: cluster-apps-pod-gateway-downloads
     - name: cluster-apps-rook-ceph-cluster
     - name: cluster-apps-external-secrets-stores
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cluster-apps-qbittorrent-tools
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: "./kubernetes/cluster-0/apps/downloads/qbittorrent/tools"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  wait: false # no flux ks dependents
+  dependsOn:
+    - name: cluster-apps-qbittorrent
