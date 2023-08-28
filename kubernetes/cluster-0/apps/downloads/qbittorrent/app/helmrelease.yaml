@@ -26,27 +26,13 @@ spec:
       repository: ghcr.io/onedr0p/qbittorrent
       tag: 4.5.4@sha256:f0a74313d750bc437ba2ad34f3412de5ab9a978f3f5b74227a1bda69271fef3e
 
-    podAnnotations:
-      setGateway: "true"
-
     podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: "OnRootMismatch"
       supplementalGroups:
         - 65539
 
     env:
       UMASK: "022"
       QBITTORRENT__PORT: &port 8080
-      QBITTORRENT__BT_PORT:
-        valueFrom:
-          secretKeyRef:
-            name: qbittorrent-secret
-            key: WIREGUARD_PORT
-
-    hostname: qbittorrent-0
 
     service:
       main:
@@ -59,7 +45,7 @@ spec:
         enabled: true
         ingressClassName: "internal-nginx"
         hosts:
-          - host: &host "qbittorrent.bjw-s.dev"
+          - host: &host "{{ .Release.Name }}.bjw-s.dev"
             paths:
               - path: /
         tls:
@@ -80,6 +66,40 @@ spec:
         memory: 1222Mi
       limits:
         memory: 1222Mi
+
+    securityContext:
+      runAsUser: 568
+      runAsGroup: 568
+
+    sidecars:
+      gluetun:
+        image: ghcr.io/qdm12/gluetun:latest@sha256:8d744532dc4a2394f9b6544637b1c1312be8e38903777df6081fd1511d5d1223
+        env:
+          - name: VPN_SERVICE_PROVIDER
+            value: custom
+          - name: VPN_TYPE
+            value: wireguard
+          - name: VPN_INTERFACE
+            value: wg0
+          - name: VPN_ENDPOINT_PORT
+            value: "51820"
+          - name: VPN_PORT_FORWARDING
+            value: "on"
+          - name: VPN_PORT_FORWARDING_PROVIDER
+            value: "protonvpn"
+          - name: FIREWALL_INPUT_PORTS
+            value: "8080"
+          - name: SHADOWSOCKS
+            value: "on"
+
+        envFrom:
+          - secretRef:
+              name: qbittorrent-secret
+
+        securityContext:
+          capabilities:
+            add:
+              - NET_ADMIN
 
     volumeClaimTemplates:
       - name: config
