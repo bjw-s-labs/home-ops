@@ -25,15 +25,6 @@ spec:
       repository: ghcr.io/onedr0p/prowlarr-nightly
       tag: 1.8.5.3886@sha256:ac8c45c174903a65f7cbdad884b13c1e107ce4ec897748f3e6d4964dc270c965
 
-    podAnnotations:
-      setGateway: "true"
-
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: "OnRootMismatch"
-
     env:
       PROWLARR__INSTANCE_NAME: Prowlarr
       PROWLARR__PORT: &port 9696
@@ -46,8 +37,6 @@ spec:
             name: prowlarr-secret
             key: api_key
 
-    hostname: prowlarr
-
     service:
       main:
         ports:
@@ -59,7 +48,7 @@ spec:
         enabled: true
         ingressClassName: "internal-nginx"
         hosts:
-          - host: &host "prowlarr.bjw-s.dev"
+          - host: &host "{{ .Release.Name }}.bjw-s.dev"
             paths:
               - path: /
         tls:
@@ -77,3 +66,7 @@ spec:
         memory: 160Mi
       limits:
         memory: 160Mi
+
+    securityContext:
+      runAsUser: 568
+      runAsGroup: 568
