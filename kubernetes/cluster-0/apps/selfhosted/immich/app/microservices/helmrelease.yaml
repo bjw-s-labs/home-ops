@@ -22,18 +22,16 @@ spec:
 
   values:
     controller:
-      replicas: 1
       strategy: RollingUpdate
       annotations:
         reloader.stakater.com/auto: "true"
 
     image:
       repository: ghcr.io/immich-app/immich-server
-      tag: v1.76.0@sha256:3aa5aed029c0bef43649f3b539b7611c59707be57f6e2827171026908e73468c
+      tag: v1.76.0
 
-    command: /bin/sh
     args:
-      - ./start-microservices.sh
+      - start-microservices.sh
 
     env:
       DB_HOSTNAME:
@@ -70,17 +68,42 @@ spec:
     persistence:
       library:
         enabled: true
-        type: nfs
-        server: "nas.bjw-s.casa"
-        path: /volume1/Backup/Photos/Immich
+        existingClaim: immich-nfs
         mountPath: /usr/src/app/upload
+      geocoding-dump:
+        enabled: true
+        type: emptyDir
+        mountPath: /usr/src/app/.reverse-geocoding-dump
+      geoname-dump:
+        enabled: true
+        type: emptyDir
+        mountPath: /usr/src/app/node_modules/local-reverse-geocoder/geonames_dump
+      transformers-cache:
+        enabled: true
+        type: emptyDir
+        mountPath: /usr/src/app/.transformers_cache
+
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: OnRootMismatch
+      supplementalGroups:
+        - 44
+        - 109
+        - 65541
 
     resources:
       requests:
-        cpu: 5m
-        memory: 277M
+        cpu: 100m
+        gpu.intel.com/i915: 1
+        memory: 512Mi
       limits:
-        memory: 512M
+        gpu.intel.com/i915: 1
+        memory: 8000Mi
+
+    nodeSelector:
+      intel.feature.node.kubernetes.io/gpu: "true"
 
     topologySpreadConstraints:
       - maxSkew: 1
