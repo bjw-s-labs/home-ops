@@ -21,14 +21,13 @@ spec:
 
   values:
     controller:
-      replicas: 1
       strategy: RollingUpdate
       annotations:
         reloader.stakater.com/auto: "true"
 
     image:
       repository: ghcr.io/immich-app/immich-web
-      tag: v1.76.0@sha256:6ea61efbb91c449149ba5124632628a6772a7570d962460a430f808366ff46cc
+      tag: v1.76.0
 
     command: /bin/sh
     args:
@@ -79,7 +78,7 @@ spec:
           nignx.ingress.kubernetes.io/force-ssl-redirect: "true"
           nginx.ingress.kubernetes.io/proxy-body-size: "0"
         hosts:
-          - host: &host photos.bjw-s.dev
+          - host: &host immich.bjw-s.dev
             paths:
               - path: /
                 pathType: Prefix
@@ -95,10 +94,16 @@ spec:
     persistence:
       library:
         enabled: true
-        type: nfs
-        server: "nas.bjw-s.casa"
-        path: /volume1/Backup/Photos/Immich
+        existingClaim: immich-nfs
         mountPath: /usr/src/app/upload
+
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: OnRootMismatch
+      supplementalGroups:
+        - 65541
 
     resources:
       requests:

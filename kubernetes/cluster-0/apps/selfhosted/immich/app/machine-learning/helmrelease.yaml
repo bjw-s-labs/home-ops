@@ -21,14 +21,13 @@ spec:
 
   values:
     controller:
-      replicas: 1
       strategy: RollingUpdate
       annotations:
         reloader.stakater.com/auto: "true"
 
     image:
       repository: ghcr.io/immich-app/immich-machine-learning
-      tag: v1.76.0@sha256:8c571206d24ffe48515a3f391889b0039f49da69330b06cd18e94cd9949d93d0
+      tag: v1.76.0
 
     env:
       DB_HOSTNAME:
@@ -67,17 +66,31 @@ spec:
     persistence:
       library:
         enabled: true
-        type: nfs
-        server: "nas.bjw-s.casa"
-        path: /volume1/Backup/Photos/Immich
+        existingClaim: immich-nfs
         mountPath: /usr/src/app/upload
       cache:
         enabled: true
         type: emptyDir
+      geocoding-dump:
+        enabled: true
+        type: emptyDir
+        mountPath: /usr/src/app/.reverse-geocoding-dump
+      transformers-cache:
+        enabled: true
+        type: emptyDir
+        mountPath: /usr/src/app/.transformers_cache
+
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: OnRootMismatch
+      supplementalGroups:
+        - 65541
 
     resources:
       requests:
-        cpu: 5m
+        cpu: 100m
         memory: 274M
       limits:
         memory: 3949M
