@@ -5,6 +5,14 @@ namespace: downloads
 resources:
   - ./reannounce
   - ./tags
+configMapGenerator:
+  - name: qbittools-configmap
+    files:
+      - config.yaml=./config/config.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
 commonLabels:
   app.kubernetes.io/name: qbittorrent
   app.kubernetes.io/instance: qbittorrent
