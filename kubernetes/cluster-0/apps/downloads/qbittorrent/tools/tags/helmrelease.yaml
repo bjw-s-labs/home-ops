@@ -33,18 +33,26 @@ spec:
     args:
       - tagging
       - --added-on
+      - --expired
       - --last-activity
       - --not-working
       - --sites
       - --unregistered
-      - -s
+      - --server
       - qbittorrent.downloads.svc.cluster.local
-      - -p
+      - --port
       - "8080"
+      - --config
+      - /config/config.yaml
 
-    service:
-      main:
-        enabled: false
+    persistence:
+      config-file:
+        enabled: true
+        type: configMap
+        name: qbittools-configmap
+        mountPath: /config/config.yaml
+        subPath: config.yaml
+        readOnly: true
 
     podSecurityContext:
       runAsUser: 568
@@ -56,3 +64,7 @@ spec:
         cpu: 25m
       limits:
         memory: 500Mi
+
+    service:
+      main:
+        enabled: false
