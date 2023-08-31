@@ -6,6 +6,12 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./volsync.yaml
+configMapGenerator:
+  - name: qbittorrent-scripts
+    files:
+      - ./scripts/completed.sh
+generatorOptions:
+  disableNameSuffixHash: true
 commonLabels:
   app.kubernetes.io/name: qbittorrent
   app.kubernetes.io/instance: qbittorrent
