@@ -20,7 +20,7 @@ spec:
     controller:
       type: statefulset
       annotations:
-        reloader.stakater.com/auto: "true"
+        configmap.reloader.stakater.com/reload: qbittorrent-scripts,qbittorrent-dnsdist
 
     image:
       repository: ghcr.io/onedr0p/qbittorrent
@@ -63,6 +63,11 @@ spec:
         name: qbittorrent-scripts
         defaultMode: 0775
         readOnly: true
+      dnsdist-config:
+        enabled: true
+        type: configMap
+        name: qbittorrent-dnsdist
+        mountPath: "-"
 
     resources:
       requests:
@@ -76,6 +81,15 @@ spec:
       runAsGroup: 568
 
     sidecars:
+      dnsdist:
+        image: docker.io/powerdns/dnsdist-18:1.8.0
+
+        volumeMounts:
+          - name: dnsdist-config
+            mountPath: /etc/dnsdist/dnsdist.conf
+            subPath: dnsdist.conf
+            readOnly: true
+
       gluetun:
         image: ghcr.io/qdm12/gluetun:latest@sha256:8d744532dc4a2394f9b6544637b1c1312be8e38903777df6081fd1511d5d1223
         env:
@@ -93,10 +107,15 @@ spec:
             value: "protonvpn"
           - name: FIREWALL_INPUT_PORTS
             value: "8080"
+          - name: FIREWALL_OUTBOUND_SUBNETS
+            # Allow access to k8s subnets
+            value: "10.96.0.0/12,10.244.0.0/16"
           - name: SHADOWSOCKS
             value: "on"
-          - name: DNS_KEEP_NAMESERVER
-            value: "on"
+          - name: DOT
+            value: "off"
+          - name: DNS_PLAINTEXT_ADDRESS
+            value: "127.0.0.2"
 
         envFrom:
           - secretRef:
