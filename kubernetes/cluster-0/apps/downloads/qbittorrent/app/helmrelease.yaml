@@ -57,6 +57,12 @@ spec:
         enabled: true
         existingClaim: nas-media
         mountPath: /data/nas-media
+      scripts:
+        enabled: true
+        type: configMap
+        name: qbittorrent-scripts
+        defaultMode: 0775
+        readOnly: true
 
     resources:
       requests:
@@ -88,6 +94,8 @@ spec:
           - name: FIREWALL_INPUT_PORTS
             value: "8080"
           - name: SHADOWSOCKS
+            value: "on"
+          - name: DNS_KEEP_NAMESERVER
             value: "on"
 
         envFrom:
