@@ -18,7 +18,6 @@ spec:
 
   values:
     controller:
-      type: statefulset
       annotations:
         configmap.reloader.stakater.com/reload: qbittorrent-scripts,qbittorrent-dnsdist
 
@@ -53,6 +52,9 @@ spec:
               - *host
 
     persistence:
+      config:
+        enabled: true
+        existingClaim: qbittorrent-config
       media:
         enabled: true
         existingClaim: nas-media
@@ -125,10 +127,3 @@ spec:
           capabilities:
             add:
               - NET_ADMIN
-
-    volumeClaimTemplates:
-      - name: config
-        mountPath: /config
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClass: ceph-block
