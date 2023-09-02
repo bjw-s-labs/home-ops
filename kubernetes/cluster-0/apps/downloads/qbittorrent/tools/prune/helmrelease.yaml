@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: qbittools-tags
+  name: qbittools-prune
   namespace: downloads
 spec:
   interval: 30m
@@ -22,7 +22,7 @@ spec:
     controller:
       type: cronjob
       cronjob:
-        schedule: "@hourly"
+        schedule: "5 * * * *"
 
     restartPolicy: OnFailure
 
@@ -31,28 +31,16 @@ spec:
       tag: v0.9.1
 
     args:
-      - tagging
-      - --added-on
-      - --expired
-      - --last-activity
-      - --not-working
-      - --sites
-      - --unregistered
+      - prune
+      - --exclude-category
+      - manual
+      - --include-tag
+      - unregistered
+      - --dry-run
       - --server
       - qbittorrent.downloads.svc.cluster.local
       - --port
       - "8080"
-      - --config
-      - /config/config.yaml
-
-    persistence:
-      config-file:
-        enabled: true
-        type: configMap
-        name: qbittools-configmap
-        mountPath: /config/config.yaml
-        subPath: config.yaml
-        readOnly: true
 
     podSecurityContext:
       runAsUser: 568
@@ -60,10 +48,10 @@ spec:
 
     resources:
       requests:
-        memory: 250Mi
+        memory: 64Mi
         cpu: 5m
       limits:
-        memory: 500Mi
+        memory: 128Mi
 
     service:
       main:
