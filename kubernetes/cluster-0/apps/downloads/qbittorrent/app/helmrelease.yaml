@@ -70,6 +70,10 @@ spec:
         type: configMap
         name: qbittorrent-dnsdist
         mountPath: "-"
+      gluetun-data:
+        enabled: true
+        type: emptyDir
+        mountPath: "-"
 
     resources:
       requests:
@@ -85,7 +89,6 @@ spec:
     sidecars:
       dnsdist:
         image: docker.io/powerdns/dnsdist-18:1.8.0
-
         volumeMounts:
           - name: dnsdist-config
             mountPath: /etc/dnsdist/dnsdist.conf
@@ -118,12 +121,26 @@ spec:
             value: "off"
           - name: DNS_PLAINTEXT_ADDRESS
             value: "127.0.0.2"
-
         envFrom:
           - secretRef:
               name: qbittorrent-secret
-
+        volumeMounts:
+          - name: gluetun-data
+            mountPath: /tmp/gluetun
         securityContext:
           capabilities:
             add:
               - NET_ADMIN
+
+      port-forward:
+        image: docker.io/snoringdragon/gluetun-qbittorrent-port-manager:1.0
+        env:
+          - name: QBITTORRENT_SERVER
+            value: localhost
+          - name: QBITTORRENT_SERVER
+            value: "8080"
+          - name: PORT_FORWARDED
+            value: "/tmp/gluetun/forwarded_port"
+        volumeMounts:
+          - name: gluetun-data
+            mountPath: /tmp/gluetun
