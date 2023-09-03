@@ -1,5 +1,5 @@
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1
+apiVersion: kustomize.toolkit.fluxcd.io/v2beta1
 kind: Kustomization
 metadata:
   name: system-namespace
@@ -29,7 +29,7 @@ spec:
         name: cluster-secrets
   patches:
     - patch: |-
-        apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+        apiVersion: kustomize.toolkit.fluxcd.io/v2beta1
         kind: Kustomization
         metadata:
           name: not-used
@@ -53,25 +53,10 @@ spec:
       target:
         kind: Kustomization
         group: kustomize.toolkit.fluxcd.io
-        version: v1beta2
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-chrony
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-namespace
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-1/manifests/system/chrony"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
+        # version: v2beta1
+        labelSelector: substitution.flux.home.arpa/disabled notin (true)
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1
+apiVersion: kustomize.toolkit.fluxcd.io/v2beta1
 kind: Kustomization
 metadata:
   name: system-intel-gpu-plugin
@@ -87,7 +72,7 @@ spec:
     kind: GitRepository
     name: home-ops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1
+apiVersion: kustomize.toolkit.fluxcd.io/v2beta1
 kind: Kustomization
 metadata:
   name: system-reloader

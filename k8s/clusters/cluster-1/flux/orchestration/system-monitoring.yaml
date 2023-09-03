@@ -1,5 +1,5 @@
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1
+apiVersion: kustomize.toolkit.fluxcd.io/v2beta1
 kind: Kustomization
 metadata:
   name: system-monitoring-namespace
@@ -29,7 +29,7 @@ spec:
         name: cluster-secrets
   patches:
     - patch: |-
-        apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+        apiVersion: kustomize.toolkit.fluxcd.io/v2beta1
         kind: Kustomization
         metadata:
           name: not-used
@@ -53,55 +53,5 @@ spec:
       target:
         kind: Kustomization
         group: kustomize.toolkit.fluxcd.io
-        version: v1beta2
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-monitoring-speedtest-exporter
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-monitoring-namespace
-#     - name: cluster-workloads-kube-prometheus-stack
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-1/manifests/system-monitoring/speedtest-exporter"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-monitoring-influxdb
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-monitoring-namespace
-#     - name: rook-ceph-external-cluster
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-1/manifests/system-monitoring/influxdb"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: system-monitoring-pve-exporter
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: system-monitoring-namespace
-#     - name: cluster-workloads-kube-prometheus-stack
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-1/manifests/system-monitoring/pve-exporter"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
+        # version: v2beta1
+        labelSelector: substitution.flux.home.arpa/disabled notin (true)
