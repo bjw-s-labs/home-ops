@@ -49,8 +49,6 @@ spec:
               mountPath: /etc/rook
             - name: direct-mount-scripts
               mountPath: /scripts
-            - name: nas-backup
-              mountPath: /mnt/nas-backup
           resources: {}
       # if hostNetwork: false, the "rbd map" command hangs, see https://github.com/rook/rook/issues/2021
       hostNetwork: true
@@ -70,10 +68,6 @@ spec:
             items:
               - key: data
                 path: mon-endpoints
-        - name: nas-backup
-          nfs:
-            server: "${NAS_ADDRESS}"
-            path: /Backups/Kubernetes/${CLUSTER_NAME}
         - name: direct-mount-scripts
           projected:
             defaultMode: 0775
