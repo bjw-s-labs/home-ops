@@ -83,15 +83,19 @@ spec:
       config:
         enabled: true
         existingClaim: sonarr-config-nvme
-      nfs-nas-media:
+      tv:
         enabled: true
-        existingClaim: downloads-nfs-share-pvc
-        mountPath: /mnt/unionfs
-        readOnly: false
+        existingClaim: cephfs-hdd-downloads-tv
+        mountPath: /mnt/unionfs/Media/TV
+        accessMode: ReadWriteMany
+      downloads:
+        enabled: true
+        existingClaim: cephfs-hdd-cache-downloads
+        mountPath: /mnt/unionfs/downloads
+        accessMode: ReadWriteMany
       backup:
         enabled: true
         existingClaim: cephfs-hdd-backups-sonarr
-        # subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/sonarr
         mountPath: /config/Backups
 
     ingress:

@@ -136,12 +136,6 @@ spec:
         existingClaim: cephfs-hdd-backups-media
         subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/plex
         mountPath: /config/Backups
-      nfs-nas-media:
-        enabled: false
-        existingClaim: media-nfs-share-pvc
-        mountPath: /mnt/unionfs
-        readOnly: false
-      # New mount location. Remove "-new" from the paths & names and disable nfs-nas-media above to switch
       4kmovies:
         enabled: true
         existingClaim: cephfs-hdd-media-4kmovies
@@ -162,12 +156,11 @@ spec:
         existingClaim: cephfs-hdd-media-movies
         mountPath: /mnt/unionfs/Media/Movies/
         accessMode: ReadWriteMany
-      tv-new:
+      tv:
         enabled: true
-        type: nfs
-        server: nas00.${INGRESS_DOMAIN}
-        path: /mnt/NFS/Merged-Media/Media/TV/
+        existingClaim: cephfs-hdd-media-tv
         mountPath: /mnt/unionfs/Media/TV
+        accessMode: ReadWriteMany
 
     addons:
       promtail:

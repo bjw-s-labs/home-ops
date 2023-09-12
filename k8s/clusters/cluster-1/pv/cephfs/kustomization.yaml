@@ -5,8 +5,9 @@ kind: Kustomization
 resources:
   - cephfs-hdd-cache.yaml
   - cephfs-hdd-media.yaml
-  - cephfs-hdd-media-subvolumes.yaml
   - cephfs-hdd-backups.yaml
+  # Backup PVCs
+  - ./cephfs-hdd-backups/bazarr.yaml
   - ./cephfs-hdd-backups/overseerr.yaml
   - ./cephfs-hdd-backups/sonarr.yaml
   - ./cephfs-hdd-backups/sonarr-4k.yaml
@@ -15,3 +16,7 @@ resources:
   - ./cephfs-hdd-backups/readarr.yaml
   - ./cephfs-hdd-backups/prowlarr.yaml
   - ./cephfs-hdd-backups/sabnzbd.yaml
+  # Downloads namespace PVC
+  - ./cephfs-hdd-media-subvolumes/namespace-downloads.yaml
+  # Media namespace PVC
+  - ./cephfs-hdd-media-subvolumes/namespace-media.yaml

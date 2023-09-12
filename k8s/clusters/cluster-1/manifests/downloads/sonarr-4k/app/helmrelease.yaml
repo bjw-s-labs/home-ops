@@ -85,28 +85,20 @@ spec:
       config:
         enabled: true
         existingClaim: sonarr-4k-config
-      nfs-nas-media:
-        enabled: false
-        existingClaim: downloads-nfs-share-pvc
-        mountPath: /mnt/unionfs
-        readOnly: false
       backup:
         enabled: true
         existingClaim: cephfs-hdd-backups-sonarr-4k
-        # subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/sonarr-4k
         mountPath: /config/Backups
       4ktv:
         enabled: true
-        existingClaim: cephfs-hdd-videos-downloads
-        subPath: ./4KTV
+        existingClaim: cephfs-hdd-downloads-4ktv
         mountPath: /mnt/unionfs/Media/4KTV/
-      # New mount location. Remove "-new" from the paths & names and disable nfs-nas-media above to switch
-      downloads-new:
+        accessMode: ReadWriteMany
+      downloads:
         enabled: true
-        type: nfs
-        server: nas00.${INGRESS_DOMAIN}
-        path: /mnt/NFS/Media/Plex/Local-Media/downloads/
+        existingClaim: cephfs-hdd-cache-downloads
         mountPath: /mnt/unionfs/downloads
+        accessMode: ReadWriteMany
 
     ingress:
       main:
