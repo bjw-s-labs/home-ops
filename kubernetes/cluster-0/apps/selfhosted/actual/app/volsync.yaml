@@ -2,19 +2,19 @@
 apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
-  name: tudo-restic
+  name: actual-restic
   namespace: selfhosted
 spec:
   secretStoreRef:
     kind: ClusterSecretStore
     name: onepassword-connect
   target:
-    name: tudo-restic-secret
+    name: actual-restic-secret
     creationPolicy: Owner
     template:
       engineVersion: v2
       data:
-        RESTIC_REPOSITORY: "{{ .REPOSITORY_TEMPLATE }}/tudo"
+        RESTIC_REPOSITORY: "{{ .REPOSITORY_TEMPLATE }}/actual"
         RESTIC_PASSWORD: "{{ .RESTIC_PASSWORD }}"
         AWS_ACCESS_KEY_ID: "{{ .AWS_ACCESS_KEY_ID }}"
         AWS_SECRET_ACCESS_KEY: "{{ .AWS_SECRET_ACCESS_KEY }}"
@@ -25,16 +25,16 @@ spec:
 apiVersion: volsync.backube/v1alpha1
 kind: ReplicationSource
 metadata:
-  name: tudo
+  name: actual
   namespace: selfhosted
 spec:
-  sourcePVC: data-tudo-0
+  sourcePVC: data-actual-0
   trigger:
     schedule: "0 */12 * * *"
   restic:
     copyMethod: Snapshot
     pruneIntervalDays: 14
-    repository: tudo-restic-secret
+    repository: actual-restic-secret
     moverSecurityContext:
       runAsUser: 568
       runAsGroup: 568
