@@ -1,6 +1,6 @@
 clusterName: cluster-1
-talosVersion: v1.5.1
-kubernetesVersion: v1.27.5
+talosVersion: v1.5.2
+kubernetesVersion: v1.28.1
 endpoint: https://cluster-1.${secret_domain}:6443
 # domain: cluster-1.${secret_domain}
 allowSchedulingOnMasters: false
@@ -152,52 +152,6 @@ nodes:
               mtu: 1500
               dhcpOptions:
                 routeMetric: 4096
-    - hostname: work5.cluster-1.${secret_domain}
-      ipAddress: work5.cluster-1.${secret_domain}
-      controlPlane: false
-      disableSearchDomain: true
-      installDiskSelector:
-        size: <= 200GB
-      nameservers:
-        - 10.255.253.1
-      networkInterfaces:
-        - interface: eth0
-          dhcp: true
-          mtu: 9000
-        - interface: eth1
-          dhcp: false
-          mtu: 9000
-          vlans:
-            - vlanId: 2
-              dhcp: true
-              mtu: 1500
-              dhcpOptions:
-                routeMetric: 2048
-            - vlanId: 100
-              dhcp: true
-              mtu: 1500
-              dhcpOptions:
-                routeMetric: 4096
-      configPatches:
-        - op: add
-          path: /machine/install/extensions
-          value:
-            - image: ghcr.io/siderolabs/nvidia-open-gpu-kernel-modules:515.65.01-v1.3.5
-            - image: ghcr.io/siderolabs/nvidia-container-toolkit:515.65.01-v1.11.0
-        - op: add
-          path: /machine/kernel
-          value:
-            modules:
-                - name: nvidia
-                  parameters:
-                    - NVreg_OpenRmEnableUnsupportedGpus=1
-                - name: nvidia_uvm
-                - name: nvidia_drm
-                - name: nvidia_modeset
-        - op: add
-          path: /machine/sysctls
-          value:
-            net.core.bpf_jit_harden: 1
 controlPlane:
     configPatches:
         - op: add
@@ -207,7 +161,7 @@ controlPlane:
           path: /machine/kubelet/extraArgs
           value:
             rotate-server-certificates: "true"
-            feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,MixedProtocolLBService=true,ServerSideApply=true
+            feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,ServerSideApply=true
         - op: add
           path: /machine/install/extraKernelArgs
           value:
@@ -226,20 +180,20 @@ controlPlane:
             - cluster-1
             - cluster-1.${secret_domain}
             - 10.200.1.1
-          extraArgs:
-            feature-gates: MixedProtocolLBService=true
+          # extraArgs:
+          #   feature-gates: MixedProtocolLBService=true
         controllerManager:
           extraArgs:
-            feature-gates: MixedProtocolLBService=true
+            # feature-gates: MixedProtocolLBService=true
             # Allows Prometheus to pull metrics
             bind-address: 0.0.0.0
         proxy:
           disabled: true
-          extraArgs:
-              feature-gates: MixedProtocolLBService=true
+          # extraArgs:
+          #     feature-gates: MixedProtocolLBService=true
         scheduler:
           extraArgs:
-              feature-gates: MixedProtocolLBService=true
+              # feature-gates: MixedProtocolLBService=true
               # Allows Prometheus to pull metrics
               bind-address: 0.0.0.0
         discovery:
@@ -269,7 +223,7 @@ controlPlane:
             validSubnets:
               - 10.200.1.0/24
           extraArgs:
-            feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true,ServerSideApply=true
+            feature-gates: GracefulNodeShutdown=true,ServerSideApply=true
             rotate-server-certificates: "true"
         sysctls:
           fs.inotify.max_user_watches: "1048576"
@@ -288,7 +242,7 @@ worker:
         path: /machine/kubelet/extraArgs
         value:
           rotate-server-certificates: "true"
-          feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,MixedProtocolLBService=true,ServerSideApply=true
+          feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,ServerSideApply=true
   inlinePatch:
     cluster:
         extraManifests:
