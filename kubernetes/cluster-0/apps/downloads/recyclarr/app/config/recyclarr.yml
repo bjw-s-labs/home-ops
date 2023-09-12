@@ -1,7 +1,7 @@
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/recyclarr/recyclarr/master/schemas/config-schema.json
 sonarr:
-  main:
+  series:
     base_url: http://sonarr.downloads.svc.cluster.local:8989
     api_key: !env_var SONARR_API_KEY
 
@@ -13,11 +13,14 @@ sonarr:
 
     quality_profiles:
       - name: HD-1080p
-        reset_unmatched_scores: true
+        reset_unmatched_scores: 
+          enabled: true
       - name: WEB-1080p
-        reset_unmatched_scores: true
+        reset_unmatched_scores: 
+          enabled: true
       - name: Ultra-HD
-        reset_unmatched_scores: true
+        reset_unmatched_scores:
+          enabled: true
 
     custom_formats:
       - trash_ids:
@@ -81,7 +84,7 @@ sonarr:
           - name: Ultra-HD
 
 radarr:
-  main:
+  movies:
     base_url: http://radarr.downloads.svc.cluster.local:7878
     api_key: !env_var RADARR_API_KEY
 
@@ -93,9 +96,11 @@ radarr:
 
     quality_profiles:
       - name: HD-1080p
-        reset_unmatched_scores: true
+        reset_unmatched_scores:
+          enabled: true
       - name: Ultra-HD
-        reset_unmatched_scores: true
+        reset_unmatched_scores:
+          enabled: true
 
     custom_formats:
       - trash_ids:
