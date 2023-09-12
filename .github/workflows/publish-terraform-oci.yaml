@@ -15,7 +15,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Generate Token
-        uses: tibdex/github-app-token@0d49dd721133f900ebd5e0dff2810704e8defbc6 # v1.8.2
+        uses: tibdex/github-app-token@0914d50df753bbc42180d982a6550f195390069f # v2.0.0
         id: generate-token
         with:
           app_id: "${{ secrets.DCPLAYA_APP_ID }}"
@@ -29,7 +29,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@48566bbcc22ceb7c5809ebdd27377309f2c3de8c # v39.0.0
+        uses: tj-actions/changed-files@6ee9cdc5816333acda68e01cf12eedc619e28316 # v39.0.2
         with:
           dir_names: true
           dir_names_max_depth: 2
@@ -55,7 +55,7 @@ jobs:
       matrix: ${{ fromJSON(needs.changed-files.outputs.matrix) }}
     steps:
       - name: Generate Token
-        uses: tibdex/github-app-token@0d49dd721133f900ebd5e0dff2810704e8defbc6 # v1.8.2
+        uses: tibdex/github-app-token@0914d50df753bbc42180d982a6550f195390069f # v2.0.0
         id: generate-token
         with:
           app_id: "${{ secrets.DCPLAYA_APP_ID }}"
@@ -74,7 +74,7 @@ jobs:
           brew install cosign fluxcd/tap/flux
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
