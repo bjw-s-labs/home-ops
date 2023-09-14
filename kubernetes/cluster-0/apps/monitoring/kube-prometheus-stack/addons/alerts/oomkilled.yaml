@@ -9,9 +9,7 @@ spec:
       rules:
         - alert: OOMKilled
           annotations:
-            summary: Container {{ $labels.container }} of pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is out of memory
-            message: Container {{ $labels.container }} of pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is out of memory
-            description: Container {{ $labels.container }} of pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is out of memory
-          expr: kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}==1
+            description: Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }} has been OOMKilled {{ $value }} times in the last 10 minutes.
+          expr: (kube_pod_container_status_restarts_total - kube_pod_container_status_restarts_total offset 10m >= 1) and ignoring (reason) min_over_time(kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}[10m]) == 1
           labels:
             severity: critical
