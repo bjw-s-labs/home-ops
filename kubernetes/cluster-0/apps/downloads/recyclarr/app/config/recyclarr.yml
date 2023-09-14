@@ -12,15 +12,32 @@ sonarr:
       type: series
 
     quality_profiles:
-      - name: HD-1080p
-        reset_unmatched_scores: 
-          enabled: true
       - name: WEB-1080p
-        reset_unmatched_scores: 
+        reset_unmatched_scores:
           enabled: true
+        upgrade:
+          allowed: false
+        min_format_score: 0
+        quality_sort: top
+        qualities:
+          - name: WEB 1080p
+            qualities:
+              - WEBDL-1080p
+              - WEBRip-1080p
       - name: Ultra-HD
         reset_unmatched_scores:
           enabled: true
+        upgrade:
+          allowed: false
+        min_format_score: 0
+        quality_sort: top
+        qualities:
+          - name: Bluray-2160p
+          - name: WEB 2160p
+            qualities:
+              - WEBDL-2160p
+              - WEBRip-2160p
+          - name: HDTV-2160p
 
     custom_formats:
       - trash_ids:
@@ -79,7 +96,7 @@ sonarr:
           - 47435ece6b99a0b477caf360e79ba0bb # x265 (HD)
 
         quality_profiles:
-          - name: HD-1080p
+          # - name: HD-1080p
           - name: WEB-1080p
           - name: Ultra-HD
 
@@ -98,9 +115,37 @@ radarr:
       - name: HD-1080p
         reset_unmatched_scores:
           enabled: true
+        upgrade:
+          allowed: true
+          until_quality: Remux-1080p
+          until_score: 0
+        min_format_score: 0
+        quality_sort: top
+        qualities:
+          - name: Remux-1080p
+          - name: Bluray-1080p
+          - name: WEB 1080p
+            qualities:
+              - WEBDL-1080p
+              - WEBRip-1080p
+          - name: HDTV-1080p
       - name: Ultra-HD
         reset_unmatched_scores:
           enabled: true
+        upgrade:
+          allowed: true
+          until_quality: Remux-2160p
+          until_score: 0
+        min_format_score: 0
+        quality_sort: top
+        qualities:
+          - name: Remux-2160p
+          - name: Bluray-2160p
+          - name: WEB 2160p
+            qualities:
+              - WEBDL-2160p
+              - WEBRip-2160p
+          - name: HDTV-2160p
 
     custom_formats:
       - trash_ids:
