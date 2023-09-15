@@ -164,12 +164,6 @@ spec:
                   matchLabels:
                     {{- include "loki.readSelectorLabels" . | nindent 12 }}
                 topologyKey: kubernetes.io/hostname
-      extraVolumeMounts:
-        - name: rules
-          mountPath: /rules
-      extraVolumes:
-        - name: rules
-          emptyDir: {}
 
     backend:
       replicas: 3
@@ -182,12 +176,6 @@ spec:
                   matchLabels:
                     {{- include "loki.backendSelectorLabels" . | nindent 12 }}
                 topologyKey: kubernetes.io/hostname
-      extraVolumeMounts:
-        - name: rules
-          mountPath: /rules
-      extraVolumes:
-        - name: rules
-          emptyDir: {}
       persistence:
         size: 20Gi
         storageClass: local-hostpath
