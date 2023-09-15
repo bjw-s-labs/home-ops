@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.0.0-beta.3
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,21 +18,87 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      annotations:
-        configmap.reloader.stakater.com/reload: qbittorrent-scripts,qbittorrent-dnsdist
+    controllers:
+      main:
+        annotations:
+          configmap.reloader.stakater.com/reload: qbittorrent-scripts,qbittorrent-dnsdist
 
-    image:
-      repository: ghcr.io/onedr0p/qbittorrent
-      tag: 4.5.5@sha256:30dffe7ad04ea0e39db0b50c0bd5e79362f99f7ff6b250526d2f389b58d96f14
+        pod:
+          securityContext:
+            supplementalGroups:
+              - 65539
 
-    podSecurityContext:
-      supplementalGroups:
-        - 65539
+        containers:
+          main:
+            nameOverride: qbittorrent
+            image:
+              repository: ghcr.io/onedr0p/qbittorrent
+              tag: 4.5.5@sha256:30dffe7ad04ea0e39db0b50c0bd5e79362f99f7ff6b250526d2f389b58d96f14
+            env:
+              UMASK: "022"
+              QBITTORRENT__PORT: &port 8080
+            resources:
+              requests:
+                cpu: 49m
+                memory: 1024Mi
+              limits:
+                memory: 8192Mi
+            securityContext:
+              runAsUser: 568
+              runAsGroup: 568
 
-    env:
-      UMASK: "022"
-      QBITTORRENT__PORT: &port 8080
+          dnsdist:
+            image:
+              repository: docker.io/powerdns/dnsdist-18
+              tag: 1.8.1
+
+          gluetun:
+            image:
+              repository: ghcr.io/qdm12/gluetun
+              tag: latest@sha256:088a23ddfe3d4843b0c14d5b7a2101ebfd0143e177a374fe4786da95b78583e0
+            env:
+              - name: VPN_SERVICE_PROVIDER
+                value: custom
+              - name: VPN_TYPE
+                value: wireguard
+              - name: VPN_INTERFACE
+                value: wg0
+              - name: VPN_ENDPOINT_PORT
+                value: "51820"
+              - name: VPN_PORT_FORWARDING
+                value: "on"
+              - name: VPN_PORT_FORWARDING_PROVIDER
+                value: "protonvpn"
+              - name: FIREWALL_INPUT_PORTS
+                value: "8080"
+              - name: FIREWALL_OUTBOUND_SUBNETS
+                # Allow access to k8s subnets
+                value: "10.96.0.0/12,10.244.0.0/16"
+              - name: SHADOWSOCKS
+                value: "on"
+              - name: DOT
+                value: "off"
+              - name: DNS_PLAINTEXT_ADDRESS
+                value: "127.0.0.2"
+            envFrom:
+              - secretRef:
+                  name: qbittorrent-secret
+            securityContext:
+              capabilities:
+                add:
+                  - NET_ADMIN
+
+          port-forward:
+            image:
+              repository: docker.io/snoringdragon/gluetun-qbittorrent-port-manager
+              tag: "1.0"
+            env:
+              - name: QBITTORRENT_SERVER
+                value: localhost
+              - name: QBITTORRENT_PORT
+                value: "8080"
+              - name: PORT_FORWARDED
+                value: "/tmp/gluetun/forwarded_port"
 
     service:
       main:
@@ -43,11 +109,14 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "internal-nginx"
+        className: "internal-nginx"
         hosts:
           - host: &host "{{ .Release.Name }}.bjw-s.dev"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
@@ -56,92 +125,44 @@ spec:
       config:
         enabled: true
         existingClaim: qbittorrent-config
-      media:
-        enabled: true
-        existingClaim: nas-media
-        mountPath: /data/nas-media
+        advancedMounts:
+          main:
+            main:
+              - path: /config
       scripts:
         enabled: true
         type: configMap
         name: qbittorrent-scripts
-        defaultMode: 0775
-        readOnly: true
+        advancedMounts:
+          main:
+            main:
+              - path: /scripts
+                defaultMode: 0775
+                readOnly: true
+      media:
+        enabled: true
+        existingClaim: nas-media
+        advancedMounts:
+          main:
+            main:
+              - path: /data/nas-media
       dnsdist-config:
         enabled: true
         type: configMap
         name: qbittorrent-dnsdist
-        mountPath: "-"
+        advancedMounts:
+          main:
+            dnsdist:
+              - path: /etc/dnsdist/dnsdist.conf
+                subPath: dnsdist.conf
+                readOnly: true
       gluetun-data:
         enabled: true
         type: emptyDir
-        mountPath: "-"
-
-    resources:
-      requests:
-        cpu: 49m
-        memory: 1024Mi
-      limits:
-        memory: 8192Mi
-
-    securityContext:
-      runAsUser: 568
-      runAsGroup: 568
-
-    sidecars:
-      dnsdist:
-        image: docker.io/powerdns/dnsdist-18:1.8.1
-        volumeMounts:
-          - name: dnsdist-config
-            mountPath: /etc/dnsdist/dnsdist.conf
-            subPath: dnsdist.conf
-            readOnly: true
-
-      gluetun:
-        image: ghcr.io/qdm12/gluetun:latest@sha256:088a23ddfe3d4843b0c14d5b7a2101ebfd0143e177a374fe4786da95b78583e0
-        env:
-          - name: VPN_SERVICE_PROVIDER
-            value: custom
-          - name: VPN_TYPE
-            value: wireguard
-          - name: VPN_INTERFACE
-            value: wg0
-          - name: VPN_ENDPOINT_PORT
-            value: "51820"
-          - name: VPN_PORT_FORWARDING
-            value: "on"
-          - name: VPN_PORT_FORWARDING_PROVIDER
-            value: "protonvpn"
-          - name: FIREWALL_INPUT_PORTS
-            value: "8080"
-          - name: FIREWALL_OUTBOUND_SUBNETS
-            # Allow access to k8s subnets
-            value: "10.96.0.0/12,10.244.0.0/16"
-          - name: SHADOWSOCKS
-            value: "on"
-          - name: DOT
-            value: "off"
-          - name: DNS_PLAINTEXT_ADDRESS
-            value: "127.0.0.2"
-        envFrom:
-          - secretRef:
-              name: qbittorrent-secret
-        volumeMounts:
-          - name: gluetun-data
-            mountPath: /tmp/gluetun
-        securityContext:
-          capabilities:
-            add:
-              - NET_ADMIN
-
-      port-forward:
-        image: docker.io/snoringdragon/gluetun-qbittorrent-port-manager:1.0
-        env:
-          - name: QBITTORRENT_SERVER
-            value: localhost
-          - name: QBITTORRENT_SERVER
-            value: "8080"
-          - name: PORT_FORWARDED
-            value: "/tmp/gluetun/forwarded_port"
-        volumeMounts:
-          - name: gluetun-data
-            mountPath: /tmp/gluetun
+        advancedMounts:
+          main:
+            gluetun:
+              - path: /tmp/gluetun
+            port-forward:
+              - path: /tmp/gluetun
+                readOnly: true
