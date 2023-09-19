@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: windmill
-      version: 1.6.45
+      version: 1.7.28
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -26,17 +26,39 @@ spec:
     windmill:
       # -- replica for the application app
       appReplicas: 1
+      # TODO: Remove once new k8tz version has been released
+      app:
+        annotations:
+          k8tz.io/inject: "false"
+
       # -- replicas for the workers, jobs are executed on the workers
       workerReplicas: 1
+      # TODO: Remove once new k8tz version has been released
+      workers:
+        annotations:
+          k8tz.io/inject: "false"
+
       # -- replicas for the lsp containers used by the app
       lspReplicas: 1
-      # -- replicas for the lsp containers used by the app
+      # TODO: Remove once new k8tz version has been released
+      lsp:
+        annotations:
+          k8tz.io/inject: "false"
+
+      # -- replicas for the multiplayer containers used by the app
       multiplayerReplicas: 1
-      # Set by valuesFrom
-      # databaseUrl:
+      # TODO: Remove once new k8tz version has been released
+      multiplayer:
+        annotations:
+          k8tz.io/inject: "false"
 
       baseDomain: &host windmill.bjw-s.dev
       baseProtocol: https
+
+      # Set by valuesFrom
+      # databaseUrl:
+
+      oauthSecretName: windmill-oauth
 
     ingress:
       enabled: true
@@ -47,6 +69,6 @@ spec:
 
   valuesFrom:
     - kind: Secret
-      name: database-windmill-user
-      valuesKey: POSTGRES_URL
+      name: windmill-pguser-windmill
+      valuesKey: uri
       targetPath: windmill.databaseUrl
