@@ -16,7 +16,7 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
       - name: Generate Token
-        uses: tibdex/github-app-token@0914d50df753bbc42180d982a6550f195390069f # v2.0.0
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
         id: generate-token
         with:
           app_id: "${{ secrets.DCPLAYA_APP_ID }}"
@@ -28,7 +28,7 @@ jobs:
           token: "${{ steps.generate-token.outputs.token }}"
 
       - name: Build docs
-        uses: docker://ghcr.io/bjw-s/mdbook:0.4.34@sha256:c04a31cb120a4bd18df2d43f30f08c2e08c4f51dd7229a751a9ef2b86f439f18
+        uses: docker://ghcr.io/bjw-s/mdbook:0.4.34@sha256:a9e9849832d38362a9918b5bd4026061a6771250d4114f006b0cc947c0d6a665
         with:
           args: mdbook build docs
 
