@@ -141,11 +141,14 @@ spec:
         mountPath: /mnt/unionfs/Media/TV
         accessMode: ReadWriteMany
       downloads:
-        enabled: true
+        enabled: false
         existingClaim: cephfs-hdd-cache-downloads
         mountPath: /mnt/unionfs/downloads
         accessMode: ReadWriteMany
-
+      downloads-nvme:
+        enabled: true
+        existingClaim: sabnzbd-nvme-cache
+        mountPath: /mnt/unionfs/downloads
       
     # nodeSelector:
     #   node-role.kubernetes.io/worker: "true"

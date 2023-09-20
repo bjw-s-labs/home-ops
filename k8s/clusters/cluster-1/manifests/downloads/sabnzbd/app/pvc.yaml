@@ -18,3 +18,23 @@ spec:
       storage: 1Gi
 
   storageClassName: ceph-block-external
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sabnzbd-nvme-cache
+  namespace: downloads
+  labels:
+    k10.kasten.io/backup: "false"
+    app.kubernetes.io/name: &name sabnzbd
+    app.kubernetes.io/instance: *name
+    snapshot.home.arpa/enabled: "false"
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 500Gi
+
+  storageClassName: ceph-block-external
