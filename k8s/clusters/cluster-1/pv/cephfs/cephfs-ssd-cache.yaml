@@ -1,0 +1,96 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cephfs-ssd-cache-downloads
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 500G
+  storageClassName: "cephfs-ssd-cache"
+  csi:
+    driver: rook-ceph.cephfs.csi.ceph.com 
+    nodeStageSecretRef:
+      # node stage secret name
+      name: rook-csi-cephfs-node
+      # node stage secret namespace where above secret is created
+      namespace: rook-ceph-external 
+    volumeAttributes:
+      # Required options from storageclass parameters need to be added in volumeAttributes
+      "clusterID": "rook-ceph-external"
+      "fsName": "ssd-cache"
+      "pool": "ssd-cache-data"
+      "staticVolume": "true"
+      "rootPath": /volumes/_nogroup/downloads/7d1f972d-e3ce-45db-b8ba-81b9dc3b7e5b
+    # volumeHandle can be anything, need not to be same
+    # as PV name or volume name. keeping same for brevity
+    volumeHandle: cephfs-ssd-cache-downloads
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cephfs-ssd-cache-downloads
+  namespace: downloads
+  labels:
+    backup: "false"
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: "cephfs-ssd-cache"
+  resources:
+    requests:
+      storage: 500G
+  volumeMode: Filesystem
+  # volumeName should be same as PV name
+  volumeName: cephfs-ssd-cache-downloads
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cephfs-ssd-cache-media
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 500G
+  storageClassName: "cephfs-ssdd-cache"
+  csi:
+    driver: rook-ceph.cephfs.csi.ceph.com 
+    nodeStageSecretRef:
+      # node stage secret name
+      name: rook-csi-cephfs-node
+      # node stage secret namespace where above secret is created
+      namespace: rook-ceph-external 
+    volumeAttributes:
+      # Required options from storageclass parameters need to be added in volumeAttributes
+      "clusterID": "rook-ceph-external"
+      "fsName": "ssd-cache"
+      "pool": "ssd-cache-data"
+      "staticVolume": "true"
+      "rootPath": /volumes/_nogroup/downloads/7d1f972d-e3ce-45db-b8ba-81b9dc3b7e5b
+    # volumeHandle can be anything, need not to be same
+    # as PV name or volume name. keeping same for brevity
+    volumeHandle: cephfs-ssdd-cache-media
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cephfs-ssdd-cache-media
+  namespace: media
+  labels:
+    backup: "false"
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: "cephfs-ssd-cache"
+  resources:
+    requests:
+      storage: 500G
+  volumeMode: Filesystem
+  # volumeName should be same as PV name
+  volumeName: cephfs-ssd-cache-media
