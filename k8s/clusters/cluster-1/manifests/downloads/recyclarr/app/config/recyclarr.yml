@@ -12,6 +12,13 @@ sonarr:
     delete_old_custom_formats: true
     quality_definition:
       type: series
+    quality_profiles:
+      - name: HD-1080p
+        reset_unmatched_scores: true
+      - name: WEB-1080p
+        reset_unmatched_scores: true
+      - name: Ultra-HD
+        reset_unmatched_scores: true
     custom_formats:
       - trash_ids:
           # Streaming Services
@@ -58,14 +65,6 @@ sonarr:
           - e1a997ddb54e3ecbfe06341ad323c458 # Obfuscated
           - 06d66ab109d4d2eddb2794d21526d140 # Retags
           - 47435ece6b99a0b477caf360e79ba0bb # x265 (HD)
-
-        quality_profiles:
-          - name: HD-1080p
-            reset_unmatched_scores: true
-          - name: WEB-1080p
-            reset_unmatched_scores: true
-          - name: Ultra-HD
-            reset_unmatched_scores: true
 
   4k:
     base_url: https://sonarr-4k.${CLUSTER_NAME}.${INGRESS_DOMAIN}
@@ -73,6 +72,13 @@ sonarr:
     delete_old_custom_formats: true
     quality_definition:
       type: series
+    quality_profiles:
+      - name: HD-1080p
+        reset_unmatched_scores: true
+      - name: WEB-1080p
+        reset_unmatched_scores: true
+      - name: Ultra-HD
+        reset_unmatched_scores: true
     custom_formats:
       - trash_ids:
           # Streaming Services
@@ -120,13 +126,6 @@ sonarr:
           - 06d66ab109d4d2eddb2794d21526d140 # Retags
           - 47435ece6b99a0b477caf360e79ba0bb # x265 (HD)
 
-        quality_profiles:
-          - name: HD-1080p
-            reset_unmatched_scores: true
-          - name: WEB-1080p
-            reset_unmatched_scores: true
-          - name: Ultra-HD
-            reset_unmatched_scores: true
 # Configuration specific to Radarr.
 radarr:
   main:
@@ -135,6 +134,11 @@ radarr:
     delete_old_custom_formats: true
     quality_definition:
       type: movie
+    quality_profiles:
+      - name: Ultra-HD
+        reset_unmatched_scores: true
+      - name: HD-1080p
+        reset_unmatched_scores: true
     custom_formats:
       - trash_ids:
           - ff5bc9e8ce91d46c997ca3ac6994d6f8 # UHD FraMeSToR (set to 0, 1 or 3200)
@@ -191,11 +195,6 @@ radarr:
           - 7357cf5161efbf8c4d5d0c30b4815ee2 # Obfuscated
           - ae9b7c9ebde1f3bd336a8cbd1ec4c5e5 # No-RlsGroup removed do avoid multiple downloads
           - dc98083864ea246d05a42df0d05f81cc # x265 (720/1080p)
-        quality_profiles:
-          - name: HD-1080p
-            reset_unmatched_scores: true
-          - name: Ultra-HD
-            reset_unmatched_scores: true
       - trash_ids:
           - 1c7d7b04b15cc53ea61204bebbcc1ee2 # HQ
         quality_profiles:
@@ -218,6 +217,11 @@ radarr:
     delete_old_custom_formats: true
     quality_definition:
       type: movie
+    quality_profiles:
+      - name: Ultra-HD
+        reset_unmatched_scores: true
+      - name: HD-1080p
+        reset_unmatched_scores: true
     custom_formats:
       - trash_ids:
           - ff5bc9e8ce91d46c997ca3ac6994d6f8 # UHD FraMeSToR (set to 0, 1 or 3200)
@@ -274,11 +278,6 @@ radarr:
           - 7357cf5161efbf8c4d5d0c30b4815ee2 # Obfuscated
           - ae9b7c9ebde1f3bd336a8cbd1ec4c5e5 # No-RlsGroup removed do avoid multiple downloads
           - dc98083864ea246d05a42df0d05f81cc # x265 (720/1080p)
-        quality_profiles:
-          - name: HD-1080p
-            reset_unmatched_scores: true
-          - name: Ultra-HD
-            reset_unmatched_scores: true
       - trash_ids:
           - 1c7d7b04b15cc53ea61204bebbcc1ee2 # HQ
         quality_profiles:
