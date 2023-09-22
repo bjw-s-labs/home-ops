@@ -6,7 +6,7 @@
 
 # Configuration specific to Sonarr
 sonarr:
-  main:
+  sonarr:
     base_url: https://sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}
     api_key: ${SONARR_API_KEY}
     delete_old_custom_formats: true
@@ -69,7 +69,7 @@ sonarr:
           - 06d66ab109d4d2eddb2794d21526d140 # Retags
           - 47435ece6b99a0b477caf360e79ba0bb # x265 (HD)
 
-  4k:
+  sonarr-4k:
     base_url: https://sonarr-4k.${CLUSTER_NAME}.${INGRESS_DOMAIN}
     api_key: ${SONARR_4K_API_KEY}
     delete_old_custom_formats: true
@@ -134,7 +134,7 @@ sonarr:
 
 # Configuration specific to Radarr.
 radarr:
-  main:
+  radarr:
     base_url: https://radarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}
     api_key: ${RADARR_API_KEY}
     delete_old_custom_formats: true
@@ -219,7 +219,7 @@ radarr:
           - name: Ultra-HD
             score: -10000
 
-  4k:
+  radarr-4k:
     base_url: https://radarr-4k.${CLUSTER_NAME}.${INGRESS_DOMAIN}
     api_key: ${RADARR_4K_API_KEY}
     delete_old_custom_formats: true
