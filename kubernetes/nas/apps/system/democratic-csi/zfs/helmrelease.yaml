@@ -1,0 +1,82 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: zfs-provisioner
+  namespace: system
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: democratic-csi
+      version: 0.14.1
+      sourceRef:
+        name: democratic-csi
+        kind: HelmRepository
+        namespace: flux-system
+  values:
+    csiDriver:
+      name: "org.democratic-csi.zfs-local-dataset"
+      attachRequired: false
+      storageCapacity: true
+      fsGroupPolicy: File
+
+    storageClasses:
+      - name: zfs-local-dataset
+        defaultClass: false
+        reclaimPolicy: Delete
+        volumeBindingMode: WaitForFirstConsumer
+        allowVolumeExpansion: false
+        parameters:
+          fsType: zfs
+
+        mountOptions: []
+        secrets:
+          provisioner-secret:
+          controller-publish-secret:
+          node-stage-secret:
+          node-publish-secret:
+          controller-expand-secret:
+
+    controller:
+      enabled: true
+      strategy: node
+      externalProvisioner:
+        extraArgs:
+          - --leader-election=false
+          - --node-deployment=true
+          - --node-deployment-immediate-binding=false
+          - --feature-gates=Topology=true
+          - --strict-topology=true
+          - --enable-capacity=true
+          - --capacity-ownerref-level=1
+
+      externalAttacher:
+        enabled: false
+
+      externalResizer:
+        enabled: false
+
+      externalSnapshotter:
+        enabled: true
+        extraArgs:
+          - --leader-election=false
+          - --node-deployment=true
+
+    driver:
+      config:
+        # please see the most up-to-date example of the corresponding config here:
+        # https://github.com/democratic-csi/democratic-csi/tree/master/examples
+        # YOU MUST COPY THE DATA HERE INLINE!
+        driver: zfs-local-dataset
+
+        zfs:
+          datasetParentName: tank/k8s/local/v
+          detachedSnapshotsDatasetParentName: tank/k8s/local/s
+
+          datasetProperties:
+            # key: value
+
+          datasetEnableQuotas: true
+          datasetEnableReservation: false
