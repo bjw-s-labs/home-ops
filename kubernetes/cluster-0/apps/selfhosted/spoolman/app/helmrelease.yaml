@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.0.0-beta.3
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -22,6 +22,13 @@ spec:
       main:
         annotations:
           reloader.stakater.com/auto: "true"
+
+        pod:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
           main:
@@ -35,13 +42,6 @@ spec:
                 memory: 431M
               limits:
                 memory: 431M
-
-        pod:
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-            fsGroup: 1000
-            fsGroupChangePolicy: "OnRootMismatch"
 
     service:
       main:

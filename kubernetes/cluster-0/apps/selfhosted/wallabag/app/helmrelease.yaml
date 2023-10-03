@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,49 +18,59 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      strategy: RollingUpdate
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    image:
-      repository: wallabag/wallabag
-      tag: 2.6.7
+        strategy: RollingUpdate
 
-    enableServiceLinks: false
+        pod:
+          enableServiceLinks: false
 
-    env:
-      SYMFONY__ENV__DATABASE_DRIVER: pdo_pgsql
-      SYMFONY__ENV__DATABASE_HOST:
-        valueFrom:
-          secretKeyRef:
-            name: wallabag-pguser-wallabag
-            key: host
-      SYMFONY__ENV__DATABASE_PORT:
-        valueFrom:
-          secretKeyRef:
-            name: wallabag-pguser-wallabag
-            key: port
-      SYMFONY__ENV__DATABASE_NAME:
-        valueFrom:
-          secretKeyRef:
-            name: wallabag-pguser-wallabag
-            key: dbname
-      SYMFONY__ENV__DATABASE_USER:
-        valueFrom:
-          secretKeyRef:
-            name: wallabag-pguser-wallabag
-            key: user
-      SYMFONY__ENV__DATABASE_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: wallabag-pguser-wallabag
-            key: password
-      SYMFONY__ENV__DOMAIN_NAME: https://wallabag.bjw-s.dev
-      SYMFONY__ENV__SERVER_NAME: Wallabag
-      SYMFONY__ENV__FOSUSER_REGISTRATION: "false"
-      SYMFONY__ENV__FOSUSER_CONFIRMATION: "false"
-      POPULATE_DATABASE: "false"
+        containers:
+          main:
+            image:
+              repository: wallabag/wallabag
+              tag: 2.6.7
+            env:
+              SYMFONY__ENV__DATABASE_DRIVER: pdo_pgsql
+              SYMFONY__ENV__DATABASE_HOST:
+                valueFrom:
+                  secretKeyRef:
+                    name: wallabag-pguser-wallabag
+                    key: host
+              SYMFONY__ENV__DATABASE_PORT:
+                valueFrom:
+                  secretKeyRef:
+                    name: wallabag-pguser-wallabag
+                    key: port
+              SYMFONY__ENV__DATABASE_NAME:
+                valueFrom:
+                  secretKeyRef:
+                    name: wallabag-pguser-wallabag
+                    key: dbname
+              SYMFONY__ENV__DATABASE_USER:
+                valueFrom:
+                  secretKeyRef:
+                    name: wallabag-pguser-wallabag
+                    key: user
+              SYMFONY__ENV__DATABASE_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: wallabag-pguser-wallabag
+                    key: password
+              SYMFONY__ENV__DOMAIN_NAME: https://wallabag.bjw-s.dev
+              SYMFONY__ENV__SERVER_NAME: Wallabag
+              SYMFONY__ENV__FOSUSER_REGISTRATION: "false"
+              SYMFONY__ENV__FOSUSER_CONFIRMATION: "false"
+              POPULATE_DATABASE: "false"
+            resources:
+              requests:
+                cpu: 12m
+                memory: 64M
+              limits:
+                memory: 256M
 
     service:
       main:
@@ -71,20 +81,16 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "external-nginx"
+        className: "external-nginx"
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         hosts:
           - host: &host "wallabag.bjw-s.dev"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
-
-    resources:
-      requests:
-        cpu: 12m
-        memory: 64M
-      limits:
-        memory: 256M

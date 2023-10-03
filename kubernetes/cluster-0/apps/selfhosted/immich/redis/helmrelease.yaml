@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,12 +18,21 @@ spec:
         namespace: flux-system
 
   values:
-    image:
-      repository: public.ecr.aws/docker/library/redis
-      tag: 7.2.1@sha256:ae51486efeea8a9b3f85542e408f79a5012d5b7fa35ae19733104ecc6992a248
-
-    env:
-      REDIS_REPLICATION_MODE: master
+    controllers:
+      main:
+        containers:
+          main:
+            image:
+              repository: public.ecr.aws/docker/library/redis
+              tag: 7.2.1
+            env:
+              REDIS_REPLICATION_MODE: master
+            resources:
+              requests:
+                cpu: 5m
+                memory: 256M
+              limits:
+                memory: 256M
 
     service:
       main:
@@ -33,10 +42,3 @@ spec:
           redis:
             enabled: true
             port: 6379
-
-    resources:
-      requests:
-        cpu: 5m
-        memory: 256M
-      limits:
-        memory: 256M

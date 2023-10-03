@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,42 +18,61 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        type: statefulset
 
-    image:
-      repository: ghcr.io/onedr0p/sabnzbd
-      tag: 4.1.0@sha256:d7eabae44168417a6acbc8f6e8510b0187a3f26d648941b3cf61b4c04a904da2
+        statefulset:
+          volumeClaimTemplates:
+            - name: config
+              accessMode: ReadWriteOnce
+              size: 1Gi
+              storageClass: ceph-block
+              globalMounts:
+                - path: /config
 
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: "OnRootMismatch"
-      supplementalGroups:
-        - 65539
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    env:
-      SABNZBD__PORT: &port 8080
-      SABNZBD__HOST_WHITELIST_ENTRIES: >-
-        sabnzbd,
-        sabnzbd.downloads,
-        sabnzbd.downloads.svc,
-        sabnzbd.downloads.svc.cluster,
-        sabnzbd.downloads.svc.cluster.local,
-        sabnzbd.bjw-s.dev
-      SABNZBD__API_KEY:
-        valueFrom:
-          secretKeyRef:
-            name: sabnzbd-secret
-            key: api_key
-      SABNZBD__NZB_KEY:
-        valueFrom:
-          secretKeyRef:
-            name: sabnzbd-secret
-            key: nzb_key
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: OnRootMismatch
+            supplementalGroups:
+              - 65539
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/sabnzbd
+              tag: 4.1.0@sha256:d7eabae44168417a6acbc8f6e8510b0187a3f26d648941b3cf61b4c04a904da2
+            env:
+              SABNZBD__PORT: &port 8080
+              SABNZBD__HOST_WHITELIST_ENTRIES: >-
+                sabnzbd,
+                sabnzbd.downloads,
+                sabnzbd.downloads.svc,
+                sabnzbd.downloads.svc.cluster,
+                sabnzbd.downloads.svc.cluster.local,
+                sabnzbd.bjw-s.dev
+              SABNZBD__API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: sabnzbd-secret
+                    key: api_key
+              SABNZBD__NZB_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: sabnzbd-secret
+                    key: nzb_key
+            resources:
+              requests:
+                cpu: 5m
+                memory: "1024M"
+              limits:
+                memory: "4096M"
 
     service:
       main:
@@ -64,31 +83,20 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "internal-nginx"
+        className: "internal-nginx"
         hosts:
           - host: &host "sabnzbd.bjw-s.dev"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
 
     persistence:
       media:
-        enabled: true
         existingClaim: nas-media
-        mountPath: /data/nas-media
-
-    resources:
-      requests:
-        cpu: 5m
-        memory: "1024M"
-      limits:
-        memory: "4096M"
-
-    volumeClaimTemplates:
-      - name: config
-        mountPath: /config
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClass: ceph-block
+        globalMounts:
+          - path: /data/nas-media
