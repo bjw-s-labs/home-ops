@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.0.0
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -20,29 +20,32 @@ spec:
     - name: qbittorrent
 
   values:
-    image:
-      repository: ghcr.io/buroa/qbittools
-      tag: v0.9.5
+    controllers:
+      main:
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
 
-    args:
-      - reannounce
-      - --process-seeding
-      - -s
-      - qbittorrent.downloads.svc.cluster.local
-      - -p
-      - "8080"
+        containers:
+          main:
+            image:
+              repository: ghcr.io/buroa/qbittools
+              tag: v0.9.5
+            args:
+              - reannounce
+              - --process-seeding
+              - -s
+              - qbittorrent.downloads.svc.cluster.local
+              - -p
+              - "8080"
+            resources:
+              requests:
+                memory: 250Mi
+                cpu: 25m
+              limits:
+                memory: 500Mi
 
     service:
       main:
         enabled: false
-
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-
-    resources:
-      requests:
-        memory: 250Mi
-        cpu: 25m
-      limits:
-        memory: 500Mi

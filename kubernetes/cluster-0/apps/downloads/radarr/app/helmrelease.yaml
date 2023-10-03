@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.0.0
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -23,12 +23,20 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
 
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 65539
+
         containers:
           main:
             image:
               repository: ghcr.io/onedr0p/radarr-develop
               tag: 5.0.3.8107@sha256:2c4fca668420dfa87b286da9b0a43f6dc64fd26329f9e914bc2de58887091eaf
-
             env:
               RADARR__INSTANCE_NAME: Radarr
               RADARR__PORT: &port 7878
@@ -41,22 +49,12 @@ spec:
                   secretKeyRef:
                     name: radarr-secret
                     key: api_key
-
             resources:
               requests:
                 cpu: 14m
                 memory: 431M
               limits:
                 memory: 431M
-
-        pod:
-          securityContext:
-            runAsUser: 568
-            runAsGroup: 568
-            fsGroup: 568
-            fsGroupChangePolicy: "OnRootMismatch"
-            supplementalGroups:
-              - 65539
 
     service:
       main:
@@ -83,9 +81,7 @@ spec:
       config:
         enabled: true
         existingClaim: radarr-config
-
       media:
-        enabled: true
         existingClaim: nas-media
         globalMounts:
           - path: /data/nas-media
