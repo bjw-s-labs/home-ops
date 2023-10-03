@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: windmill
-      version: 1.7.29
+      version: 2.0.4
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -26,31 +26,15 @@ spec:
     windmill:
       # -- replica for the application app
       appReplicas: 1
-      # TODO: Remove once new k8tz version has been released
-      app:
-        annotations:
-          k8tz.io/inject: "false"
 
       # -- replicas for the workers, jobs are executed on the workers
       workerReplicas: 1
-      # TODO: Remove once new k8tz version has been released
-      workers:
-        annotations:
-          k8tz.io/inject: "false"
 
       # -- replicas for the lsp containers used by the app
       lspReplicas: 1
-      # TODO: Remove once new k8tz version has been released
-      lsp:
-        annotations:
-          k8tz.io/inject: "false"
 
       # -- replicas for the multiplayer containers used by the app
       multiplayerReplicas: 1
-      # TODO: Remove once new k8tz version has been released
-      multiplayer:
-        annotations:
-          k8tz.io/inject: "false"
 
       baseDomain: &host windmill.bjw-s.dev
       baseProtocol: https
