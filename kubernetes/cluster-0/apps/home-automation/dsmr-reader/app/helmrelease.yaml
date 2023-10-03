@@ -31,45 +31,45 @@ spec:
             image:
               repository: ghcr.io/xirixiz/dsmr-reader-docker
               tag: 5.10.3-2023.04.02
-          env:
-            DJANGO_TIME_ZONE: "Europe/Amsterdam"
-            DSMRREADER_REMOTE_DATALOGGER_INPUT_METHOD: ipv4
-            DSMRREADER_REMOTE_DATALOGGER_NETWORK_HOST: "10.1.3.45"
-            DSMRREADER_REMOTE_DATALOGGER_NETWORK_PORT: "8088"
-            DJANGO_DATABASE_HOST:
-              valueFrom:
-                secretKeyRef:
-                  name: dsmr-reader-pguser-dsmr-reader
-                  key: host
-            DJANGO_DATABASE_PORT:
-              valueFrom:
-                secretKeyRef:
-                  name: dsmr-reader-pguser-dsmr-reader
-                  key: port
-            DJANGO_DATABASE_USER:
-              valueFrom:
-                secretKeyRef:
-                  name: dsmr-reader-pguser-dsmr-reader
-                  key: user
-            DJANGO_DATABASE_PASSWORD:
-              valueFrom:
-                secretKeyRef:
-                  name: dsmr-reader-pguser-dsmr-reader
-                  key: password
-            DJANGO_DATABASE_NAME:
-              valueFrom:
-                secretKeyRef:
-                  name: dsmr-reader-pguser-dsmr-reader
-                  key: dbname
-          envFrom:
-            - secretRef:
-                name: dsmr-reader-secret
-          resources:
-            requests:
-              cpu: 47m
-              memory: 662M
-            limits:
-              memory: 662M
+            env:
+              DJANGO_TIME_ZONE: "Europe/Amsterdam"
+              DSMRREADER_REMOTE_DATALOGGER_INPUT_METHOD: ipv4
+              DSMRREADER_REMOTE_DATALOGGER_NETWORK_HOST: "10.1.3.45"
+              DSMRREADER_REMOTE_DATALOGGER_NETWORK_PORT: "8088"
+              DJANGO_DATABASE_HOST:
+                valueFrom:
+                  secretKeyRef:
+                    name: dsmr-reader-pguser-dsmr-reader
+                    key: host
+              DJANGO_DATABASE_PORT:
+                valueFrom:
+                  secretKeyRef:
+                    name: dsmr-reader-pguser-dsmr-reader
+                    key: port
+              DJANGO_DATABASE_USER:
+                valueFrom:
+                  secretKeyRef:
+                    name: dsmr-reader-pguser-dsmr-reader
+                    key: user
+              DJANGO_DATABASE_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: dsmr-reader-pguser-dsmr-reader
+                    key: password
+              DJANGO_DATABASE_NAME:
+                valueFrom:
+                  secretKeyRef:
+                    name: dsmr-reader-pguser-dsmr-reader
+                    key: dbname
+            envFrom:
+              - secretRef:
+                  name: dsmr-reader-secret
+            resources:
+              requests:
+                cpu: 47m
+                memory: 662M
+              limits:
+                memory: 662M
 
     service:
       main:
