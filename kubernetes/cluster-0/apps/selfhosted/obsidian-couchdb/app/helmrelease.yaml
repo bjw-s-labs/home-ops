@@ -18,39 +18,62 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        type: statefulset
 
-    image:
-      repository: public.ecr.aws/docker/library/couchdb
-      tag: 3.3.2
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    initContainers:
-      init-config:
-        image: public.ecr.aws/docker/library/busybox:latest@sha256:3fbc632167424a6d997e74f52b878d7cc478225cffac6bc977eedfe51c7f4e79
-        command:
-          - "sh"
-          - "-c"
-          - "cp /tmp/config/*.ini /default.d/; ls -lrt /default.d;"
-        volumeMounts:
-          - name: config
-            mountPath: /tmp/config
-          - name: config-storage
-            mountPath: /default.d
+        statefulset:
+          volumeClaimTemplates:
+            - name: data
+              accessMode: ReadWriteOnce
+              size: 1Gi
+              storageClass: ceph-block
+              globalMounts:
+                - path: /opt/couchdb/data
 
-    env:
-      COUCHDB_USER:
-        valueFrom:
-          secretKeyRef:
-            name: obsidian-couchdb-secret
-            key: couchdb-user
-      COUCHDB_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: obsidian-couchdb-secret
-            key: couchdb-password
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: "OnRootMismatch"
+
+        initContainers:
+          init-config:
+            image:
+              repository: public.ecr.aws/docker/library/busybox
+              tag: latest@sha256:3fbc632167424a6d997e74f52b878d7cc478225cffac6bc977eedfe51c7f4e79
+              pullPolicy: IfNotPresent
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "cp /tmp/config/*.ini /opt/couchdb/etc/default.d/; ls -lrt /opt/couchdb/etc/default.d;"
+
+        containers:
+          main:
+            image:
+              repository: public.ecr.aws/docker/library/couchdb
+              tag: 3.3.2
+            env:
+              COUCHDB_USER:
+                valueFrom:
+                  secretKeyRef:
+                    name: obsidian-couchdb-secret
+                    key: couchdb-user
+              COUCHDB_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: obsidian-couchdb-secret
+                    key: couchdb-password
+            resources:
+              requests:
+                cpu: 48m
+                memory: 146M
+              limits:
+                memory: 146M
 
     service:
       main:
@@ -68,6 +91,9 @@ spec:
           - host: &host "obsidian-db.bjw-s.dev"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
@@ -77,29 +103,12 @@ spec:
         enabled: true
         type: configMap
         name: obsidian-couchdb-configmap
-        mountPath: "-"
-
+        advancedMounts:
+          main:
+            init-config:
+              - path: /tmp/config
       config-storage:
         enabled: true
         type: emptyDir
-        mountPath: /opt/couchdb/etc/default.d
-
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: "OnRootMismatch"
-
-    resources:
-      requests:
-        cpu: 48m
-        memory: 146M
-      limits:
-        memory: 146M
-
-    volumeClaimTemplates:
-      - name: data
-        mountPath: /opt/couchdb/data
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClass: ceph-block
+        globalMounts:
+          - path: /opt/couchdb/etc/default.d
