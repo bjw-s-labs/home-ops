@@ -39,10 +39,8 @@ spec:
             image:
               repository: ghcr.io/cross-seed/cross-seed
               tag: 5.5.1
-
             args:
               - daemon
-
             resources:
               requests:
                 cpu: 10m
@@ -60,18 +58,16 @@ spec:
       config:
         enabled: true
         existingClaim: qbittorrent-config
-
+        globalMounts:
+          - path: /config
       config-file:
-        enabled: true
         type: secret
         name: cross-seed-secret
         globalMounts:
           - path: /config/config.js
             subPath: config.js
             readOnly: true
-
       media:
-        enabled: true
         existingClaim: nas-media
         globalMounts:
           - path: /data/nas-media
