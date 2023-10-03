@@ -17,25 +17,44 @@ spec:
         namespace: flux-system
   interval: 30m
   values:
-    controller:
-      type: statefulset
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    image:
-      repository: ghcr.io/bjw-s/calibre-web
-      tag: 0.6.20@sha256:d897570fdd8a9f780d120937e57c1c717790461d15b77a02ce411efdd9bf0d8f
+        statefulset:
+          volumeClaimTemplates:
+            - name: config
+              accessMode: ReadWriteOnce
+              size: 1Gi
+              storageClass: ceph-block
+              globalMounts:
+                - path: /config
 
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: "OnRootMismatch"
-      supplementalGroups:
-        - 65539
+        pod:
+          enableServiceLinks: false
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 65539
 
-    enableServiceLinks: false
-
-    env:
-      CACHE_DIR: /cache
+        containers:
+          main:
+            image:
+              repository: ghcr.io/bjw-s/calibre-web
+              tag: 0.6.20
+            env:
+              CACHE_DIR: /cache
+            resources:
+              requests:
+                cpu: 5m
+                memory: 470M
+              limits:
+                memory: 470M
 
     service:
       main:
@@ -55,32 +74,21 @@ spec:
           - host: &host calibre-web.bjw-s.dev
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
 
     persistence:
       media:
-        enabled: true
-        mountPath: /data/nas-media
-        path: /volume1/Media
-        server: nas.bjw-s.casa
         type: nfs
+        server: nas.bjw-s.casa
+        path: /volume1/Media
+        globalMounts:
+          - path: /data/nas-media
       cache:
-        enabled: true
         type: emptyDir
-        mountPath: /cache
-
-    resources:
-      requests:
-        cpu: 5m
-        memory: 470M
-      limits:
-        memory: 470M
-
-    volumeClaimTemplates:
-      - name: config
-        mountPath: /config
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClass: ceph-block
+        globalMounts:
+          - path: /cache

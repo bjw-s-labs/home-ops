@@ -17,30 +17,59 @@ spec:
         namespace: flux-system
   interval: 30m
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    image:
-      repository: ghcr.io/taxel/plextraktsync
-      tag: 0.27.7@sha256:00739933fb8f523e42971ff4b158458345c063b91aae9ea71ff7358900c900ae
+        statefulset:
+          volumeClaimTemplates:
+            - name: config
+              accessMode: ReadWriteOnce
+              size: 1Gi
+              storageClass: ceph-block
+              globalMounts:
+                - path: /config
 
-    args:
-      - watch
+        pod:
+          enableServiceLinks: false
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: "OnRootMismatch"
 
-    enableServiceLinks: false
-
-    env:
-      PLEX_BASEURL: http://plex.media.svc.cluster.local:32400
-      PLEX_LOCALURL: http://plex.media.svc.cluster.local:32400
-      PLEX_TOKEN:
-        valueFrom:
-          secretKeyRef:
-            name: plex-trakt-sync-secret
-            key: PLEX_TOKEN
-      PLEX_USERNAME: bjw_s
-      TRAKT_USERNAME: bjw-s
+        containers:
+          main:
+            image:
+              repository: ghcr.io/taxel/plextraktsync
+              tag: 0.27.7
+            args:
+              - watch
+            env:
+              PLEX_BASEURL: http://plex.media.svc.cluster.local:32400
+              PLEX_LOCALURL: http://plex.media.svc.cluster.local:32400
+              PLEX_TOKEN:
+                valueFrom:
+                  secretKeyRef:
+                    name: plex-trakt-sync-secret
+                    key: PLEX_TOKEN
+              PLEX_USERNAME: bjw_s
+              TRAKT_USERNAME: bjw-s
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+            resources:
+              requests:
+                cpu: 5m
+                memory: 101M
+              limits:
+                memory: 101M
 
     service:
       main:
@@ -52,37 +81,9 @@ spec:
 
     persistence:
       config-yaml:
-        enabled: true
-        mountPath: /app/config/config.yml
-        name: plex-tract-sync-configmap
-        readOnly: true
-        subPath: config.yml
         type: configMap
-
-    podSecurityContext:
-      runAsUser: 1000
-      runAsGroup: 1000
-      fsGroup: 1000
-      fsGroupChangePolicy: "OnRootMismatch"
-
-    probes:
-      liveness:
-        enabled: false
-      readiness:
-        enabled: false
-      startup:
-        enabled: false
-
-    resources:
-      requests:
-        cpu: 5m
-        memory: 101M
-      limits:
-        memory: 101M
-
-    volumeClaimTemplates:
-      - name: config
-        mountPath: /app/config
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClass: ceph-block
+        name: plex-tract-sync-configmap
+        globalMounts:
+          - path: /app/config/config.yml
+            subPath: config.yml
+            readOnly: true

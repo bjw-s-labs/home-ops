@@ -17,23 +17,50 @@ spec:
         namespace: flux-system
   interval: 30m
   values:
-    controller:
-      type: statefulset
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    image:
-      repository: ghcr.io/navidrome/navidrome
-      tag: 0.49.3
+        statefulset:
+          volumeClaimTemplates:
+            - name: data
+              accessMode: ReadWriteOnce
+              size: 1Gi
+              storageClass: ceph-block
+              globalMounts:
+                - path: /data
 
-    env:
-      ND_DATAFOLDER: /data
-      ND_ENABLEDOWNLOADS: "true"
-      ND_ENABLEEXTERNALSERVICES: "false"
-      ND_ENABLESHARING: "false"
-      ND_ENABLESTARRATING: "false"
-      ND_LOGLEVEL: info
-      ND_MUSICFOLDER: /music
-      ND_PORT: &port 4533
-      ND_SCANSCHEDULE: 30m
+        pod:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            supplementalGroups:
+              - 65539
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/navidrome/navidrome
+              tag: 0.49.3
+            env:
+              ND_DATAFOLDER: /data
+              ND_ENABLEDOWNLOADS: "true"
+              ND_ENABLEEXTERNALSERVICES: "false"
+              ND_ENABLESHARING: "false"
+              ND_ENABLESTARRATING: "false"
+              ND_LOGLEVEL: info
+              ND_MUSICFOLDER: /music
+              ND_PORT: &port 4533
+              ND_SCANSCHEDULE: 30m
+            resources:
+              requests:
+                cpu: 5m
+                memory: 527M
+              limits:
+                memory: 527M
 
     service:
       main:
@@ -51,36 +78,18 @@ spec:
           - host: &host navidrome-kids.bjw-s.dev
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
 
     persistence:
       music-kids:
-        enabled: true
-        mountPath: /music
-        path: /volume1/Media/Library/Kids/Music
-        server: nas.bjw-s.casa
         type: nfs
-        readOnly: true
-
-    podSecurityContext:
-      runAsUser: 1000
-      runAsGroup: 1000
-      fsGroup: 1000
-      supplementalGroups:
-        - 65539
-
-    resources:
-      requests:
-        cpu: 5m
-        memory: 527M
-      limits:
-        memory: 527M
-
-    volumeClaimTemplates:
-      - name: data
-        mountPath: /data
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClass: ceph-block
+        server: nas.bjw-s.casa
+        path: /volume1/Media/Library/Kids/Music
+        globalMounts:
+          - path: /music
+            readOnly: true

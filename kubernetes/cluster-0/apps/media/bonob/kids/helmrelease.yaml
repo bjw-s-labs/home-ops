@@ -18,19 +18,28 @@ spec:
         namespace: flux-system
 
   values:
-    image:
-      repository: ghcr.io/simojenki/bonob
-      tag: v0.6.9
-
-    env:
-      BNB_PORT: 4534
-      BNB_SONOS_AUTO_REGISTER: true
-      BNB_SONOS_DEVICE_DISCOVERY: true
-      BNB_SONOS_SEED_HOST: 10.1.3.61
-      BNB_SONOS_SERVICE_ID: 247
-      BNB_SONOS_SERVICE_NAME: Library - Kids
-      BNB_SUBSONIC_URL: https://navidrome-kids.bjw-s.dev
-      BNB_URL: https://bonob-kids.bjw-s.dev
+    controllers:
+      main:
+        containers:
+          main:
+            image:
+              repository: ghcr.io/simojenki/bonob
+              tag: v0.6.9
+            env:
+              BNB_PORT: 4534
+              BNB_SONOS_AUTO_REGISTER: true
+              BNB_SONOS_DEVICE_DISCOVERY: true
+              BNB_SONOS_SEED_HOST: 10.1.3.61
+              BNB_SONOS_SERVICE_ID: 247
+              BNB_SONOS_SERVICE_NAME: Library - Kids
+              BNB_SUBSONIC_URL: https://navidrome-kids.bjw-s.dev
+              BNB_URL: https://bonob-kids.bjw-s.dev
+            resources:
+              requests:
+                cpu: 5m
+                memory: 256Mi
+              limits:
+                memory: 256Mi
 
     service:
       main:
@@ -46,13 +55,9 @@ spec:
           - host: &host bonob-kids.bjw-s.dev
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
-
-    resources:
-      requests:
-        cpu: 5m
-        memory: 256Mi
-      limits:
-        memory: 256Mi
