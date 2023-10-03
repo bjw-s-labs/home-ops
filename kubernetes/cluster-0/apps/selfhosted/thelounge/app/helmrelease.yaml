@@ -18,17 +18,38 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      type: statefulset
+    controllers:
+      main:
+        type: statefulset
 
-    image:
-      repository: ghcr.io/thelounge/thelounge
-      tag: 4.4.1
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    enableServiceLinks: false
+        pod:
+          enableServiceLinks: false
 
-    env:
-      THELOUNGE_HOME: /config
+        statefulset:
+          volumeClaimTemplates:
+            - name: config
+              accessMode: ReadWriteOnce
+              size: 1Gi
+              storageClass: ceph-block
+              globalMounts:
+                - path: /config
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/thelounge/thelounge
+              tag: 4.4.1
+            env:
+              THELOUNGE_HOME: /config
+            resources:
+              requests:
+                cpu: 12m
+                memory: 256M
+              limits:
+                memory: 512M
 
     service:
       main:
@@ -44,20 +65,9 @@ spec:
           - host: &host "{{ .Release.Name }}.bjw-s.dev"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
-
-    resources:
-      requests:
-        cpu: 12m
-        memory: 256M
-      limits:
-        memory: 512M
-
-    volumeClaimTemplates:
-      - name: config
-        mountPath: /config
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClass: ceph-block

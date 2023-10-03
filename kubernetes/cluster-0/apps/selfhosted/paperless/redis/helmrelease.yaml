@@ -18,9 +18,19 @@ spec:
         namespace: flux-system
 
   values:
-    image:
-      repository: public.ecr.aws/docker/library/redis
-      tag: 7.2.1@sha256:ae51486efeea8a9b3f85542e408f79a5012d5b7fa35ae19733104ecc6992a248
+    controllers:
+      main:
+        containers:
+          main:
+            image:
+              repository: public.ecr.aws/docker/library/redis
+              tag: 7.2.1
+            resources:
+              requests:
+                cpu: 5m
+                memory: 32M
+              limits:
+                memory: 32M
 
     service:
       main:
@@ -30,10 +40,3 @@ spec:
           redis:
             enabled: true
             port: 6379
-
-    resources:
-      requests:
-        cpu: 5m
-        memory: 12Mi
-      limits:
-        memory: 12Mi

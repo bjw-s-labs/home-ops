@@ -18,18 +18,44 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        type: statefulset
+        strategy: RollingUpdate
 
-    image:
-      repository: docker.io/nodered/node-red
-      tag: 3.1.0@sha256:81bc011a753112fa0abbaeb4d6e8e3f80e102ec7ff0ee816dc411515b7804c17
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    envFrom:
-      - secretRef:
-          name: node-red-secret
+        statefulset:
+          volumeClaimTemplates:
+            - name: data
+              accessMode: ReadWriteOnce
+              size: 1Gi
+              storageClass: ceph-block
+              globalMounts:
+                - path: /data
+
+        pod:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: "OnRootMismatch"
+
+        containers:
+          main:
+            image:
+              repository: docker.io/nodered/node-red
+              tag: 3.1.0
+            envFrom:
+              - secretRef:
+                  name: node-red-secret
+            resources:
+              requests:
+                cpu: 5m
+                memory: 512Mi
+              limits:
+                memory: 512Mi
 
     service:
       main:
@@ -45,35 +71,18 @@ spec:
           - host: &host "nodered.bjw-s.dev"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
 
     persistence:
       config-file:
-        enabled: true
         type: configMap
         name: node-red-configmap
-        mountPath: "/data/settings.js"
-        subPath: "settings.js"
-        readOnly: true
-
-    podSecurityContext:
-      runAsUser: 1000
-      runAsGroup: 1000
-      fsGroup: 1000
-      fsGroupChangePolicy: "OnRootMismatch"
-
-    resources:
-      requests:
-        cpu: 5m
-        memory: 512Mi
-      limits:
-        memory: 512Mi
-
-    volumeClaimTemplates:
-      - name: data
-        mountPath: /data
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClass: ceph-block
+        globalMounts:
+          - path: /data/settings.js
+            subPath: settings.js
+            readOnly: true

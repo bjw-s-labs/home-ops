@@ -18,20 +18,38 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        type: statefulset
 
-    image:
-      repository: ghcr.io/bjw-s/paperless-ngx
-      tag: 1.17.4@sha256:f0c59f0e4e9e3b5cd37e0e548deb2551df9462920590fef117e79dec7e3347f0
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    envFrom:
-      - secretRef:
-          name: paperless-secret
-      - configMapRef:
-          name: paperless-configmap
+        statefulset:
+          volumeClaimTemplates:
+            - name: data
+              accessMode: ReadWriteOnce
+              size: 15Gi
+              storageClass: ceph-block
+              globalMounts:
+                - path: /data/local
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/bjw-s/paperless-ngx
+              tag: 1.17.4@sha256:f0c59f0e4e9e3b5cd37e0e548deb2551df9462920590fef117e79dec7e3347f0
+            envFrom:
+              - secretRef:
+                  name: paperless-secret
+              - configMapRef:
+                  name: paperless-configmap
+            resources:
+              requests:
+                cpu: 11m
+                memory: 1812M
+              limits:
+                memory: 1812M
 
     service:
       main:
@@ -47,34 +65,23 @@ spec:
           - host: &host "paperless.bjw-s.dev"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
 
     persistence:
       nas-consume:
-        enabled: true
-        mountPath: /data/nas/consume
         type: nfs
         server: "nas.bjw-s.casa"
         path: /volume1/Docs/paperless/incoming
+        globalMounts:
+          - path: /data/nas/consume
       nas-export:
-        enabled: true
-        mountPath: /data/nas/export
         type: nfs
         server: "nas.bjw-s.casa"
         path: /volume1/Docs/paperless/export
-
-    resources:
-      requests:
-        cpu: 11m
-        memory: 1812M
-      limits:
-        memory: 1812M
-
-    volumeClaimTemplates:
-      - name: data
-        mountPath: /data/local
-        accessMode: ReadWriteOnce
-        size: 15Gi
-        storageClass: ceph-block
+        globalMounts:
+          - path: /data/nas/export

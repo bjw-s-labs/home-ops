@@ -18,14 +18,41 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        type: statefulset
+        strategy: RollingUpdate
 
-    image:
-      repository: ghcr.io/bjw-s/radicale
-      tag: 3.1.8
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        statefulset:
+          volumeClaimTemplates:
+            - name: data
+              accessMode: ReadWriteOnce
+              size: 1Gi
+              storageClass: ceph-block
+              globalMounts:
+                - path: /data
+
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: "OnRootMismatch"
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/bjw-s/radicale
+              tag: 3.1.8
+            resources:
+              requests:
+                cpu: 21m
+                memory: 192Mi
+              limits:
+                memory: 1024Mi
 
     service:
       main:
@@ -43,6 +70,9 @@ spec:
           - host: &host "radicale.bjw-s.dev"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
@@ -52,34 +82,15 @@ spec:
         enabled: true
         type: configMap
         name: radicale-configmap
-        subPath: config.cfg
-        mountPath: /config/config
-        readOnly: true
-
+        globalMounts:
+          - path: /config/config
+            subPath: config.cfg
+            readOnly: true
       auth:
         enabled: true
         type: secret
         name: radicale-secret
-        subPath: users
-        mountPath: /config/users
-        readOnly: true
-
-    resources:
-      requests:
-        cpu: 21m
-        memory: 192Mi
-      limits:
-        memory: 1024Mi
-
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: "OnRootMismatch"
-
-    volumeClaimTemplates:
-      - name: data
-        mountPath: /data
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClass: ceph-block
+        globalMounts:
+          - path: /config/users
+            subPath: users
+            readOnly: true

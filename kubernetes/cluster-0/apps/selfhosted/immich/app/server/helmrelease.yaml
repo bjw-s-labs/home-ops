@@ -21,45 +21,67 @@ spec:
     - name: immich-typesense
 
   values:
-    controller:
-      strategy: RollingUpdate
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    image:
-      repository: ghcr.io/immich-app/immich-server
-      tag: v1.79.1
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: OnRootMismatch
+            supplementalGroups:
+              - 65541
+          topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: immich-server
 
-    args:
-      - start-server.sh
-
-    env:
-      DB_HOSTNAME:
-        valueFrom:
-          secretKeyRef:
-            name: immich-pguser-immich
-            key: host
-      DB_USERNAME:
-        valueFrom:
-          secretKeyRef:
-            name: immich-pguser-immich
-            key: user
-      DB_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: immich-pguser-immich
-            key: password
-      DB_DATABASE_NAME:
-        valueFrom:
-          secretKeyRef:
-            name: immich-pguser-immich
-            key: dbname
-
-    envFrom:
-      - secretRef:
-          name: immich-secret
-      - configMapRef:
-          name: immich-configmap
+        containers:
+          main:
+            image:
+              repository: ghcr.io/immich-app/immich-server
+              tag: v1.79.1
+            args:
+              - start-server.sh
+            env:
+              DB_HOSTNAME:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-pguser-immich
+                    key: host
+              DB_USERNAME:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-pguser-immich
+                    key: user
+              DB_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-pguser-immich
+                    key: password
+              DB_DATABASE_NAME:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-pguser-immich
+                    key: dbname
+            envFrom:
+              - secretRef:
+                  name: immich-secret
+              - configMapRef:
+                  name: immich-configmap
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 512Mi
 
     service:
       main:
@@ -69,29 +91,7 @@ spec:
 
     persistence:
       library:
-        enabled: true
+        type: persistentVolumeClaim
         existingClaim: immich-nfs
-        mountPath: /usr/src/app/upload
-
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: OnRootMismatch
-      supplementalGroups:
-        - 65541
-
-    resources:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
-        memory: 512Mi
-
-    topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: DoNotSchedule
-        labelSelector:
-          matchLabels:
-            app.kubernetes.io/name: immich-server
+        globalMounts:
+          - path: /usr/src/app/upload
