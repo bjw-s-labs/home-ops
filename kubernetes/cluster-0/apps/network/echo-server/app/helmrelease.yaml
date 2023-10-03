@@ -18,14 +18,26 @@ spec:
         namespace: flux-system
 
   values:
-    image:
-      repository: ghcr.io/mendhak/http-https-echo
-      tag: "30"
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    env:
-      HTTP_PORT: &port 8080
-      LOG_WITHOUT_NEWLINE: "true"
-      LOG_IGNORE_PATH: "/healthz"
+        containers:
+          main:
+            image:
+              repository: ghcr.io/mendhak/http-https-echo
+              tag: 30
+            env:
+              HTTP_PORT: &port 8080
+              LOG_WITHOUT_NEWLINE: "true"
+              LOG_IGNORE_PATH: "/healthz"
+            resources:
+              requests:
+                cpu: 5m
+                memory: 30M
+              limits:
+                memory: 30M
 
     service:
       main:
@@ -46,13 +58,9 @@ spec:
           - host: &host "echo-server.bjw-s.dev"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
-
-    resources:
-      requests:
-        cpu: 5m
-        memory: 30M
-      limits:
-        memory: 30M
