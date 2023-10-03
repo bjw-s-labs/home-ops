@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,16 +18,40 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    image:
-      repository: ghcr.io/actualbudget/actual-server
-      tag: 23.9.0
+        statefulset:
+          volumeClaimTemplates:
+            - name: data
+              accessMode: ReadWriteOnce
+              size: 2Gi
+              storageClass: ceph-block
+              globalMounts:
+                - path: /data
 
-    enableServiceLinks: false
+        pod:
+          enableServiceLinks: false
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: "OnRootMismatch"
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/actualbudget/actual-server
+              tag: 23.9.0
+            resources:
+              requests:
+                cpu: 12m
+                memory: 128M
+              limits:
+                memory: 512M
 
     service:
       main:
@@ -38,33 +62,14 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "internal-nginx"
+        className: "internal-nginx"
         hosts:
           - host: &host "{{ .Release.Name }}.bjw-s.dev"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
-
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: "OnRootMismatch"
-      supplementalGroups:
-        - 65539
-
-    resources:
-      requests:
-        cpu: 12m
-        memory: 128M
-      limits:
-        memory: 512M
-
-    volumeClaimTemplates:
-      - name: data
-        mountPath: /data
-        accessMode: ReadWriteOnce
-        size: 2Gi
-        storageClass: ceph-block

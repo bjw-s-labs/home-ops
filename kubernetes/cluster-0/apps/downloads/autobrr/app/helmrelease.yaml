@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -20,49 +20,63 @@ spec:
     - name: qbittorrent
 
   values:
-    controller:
-      annotations:
-        secret.reloader.stakater.com/reload: autobrr-secret
-        configmap.reloader.stakater.com/reload: autobrr-configmap
+    controllers:
+      main:
+        annotations:
+          secret.reloader.stakater.com/reload: autobrr-secret
+          configmap.reloader.stakater.com/reload: autobrr-configmap
 
-    image:
-      repository: ghcr.io/autobrr/autobrr
-      tag: v1.29.0-rc1
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: OnRootMismatch
 
-    env:
-      AUTOBRR__CHECKFORUPDATES: "false"
-      AUTOBRR__HOST: 0.0.0.0
-      AUTOBRR__PORT: &port 7474
-      AUTOBRR__LOGLEVEL: DEBUG
+        containers:
+          main:
+            image:
+              repository: ghcr.io/autobrr/autobrr
+              tag: v1.29.0-rc1
+            env:
+              AUTOBRR__CHECKFORUPDATES: "false"
+              AUTOBRR__HOST: 0.0.0.0
+              AUTOBRR__PORT: &port 7474
+              AUTOBRR__LOGLEVEL: DEBUG
+              AUTOBRR__DATABASETYPE: postgres
+              AUTOBRR__POSTGRESHOST:
+                valueFrom:
+                  secretKeyRef:
+                    name: autobrr-pguser-autobrr
+                    key: host
+              AUTOBRR__POSTGRESPORT: "5432"
+              AUTOBRR__POSTGRESUSER:
+                valueFrom:
+                  secretKeyRef:
+                    name: autobrr-pguser-autobrr
+                    key: user
+              AUTOBRR__POSTGRESPASS:
+                valueFrom:
+                  secretKeyRef:
+                    name: autobrr-pguser-autobrr
+                    key: password
+              AUTOBRR__POSTGRESDATABASE:
+                valueFrom:
+                  secretKeyRef:
+                    name: autobrr-pguser-autobrr
+                    key: dbname
 
-      AUTOBRR__DATABASETYPE: postgres
-      AUTOBRR__POSTGRESHOST:
-        valueFrom:
-          secretKeyRef:
-            name: autobrr-pguser-autobrr
-            key: host
-      AUTOBRR__POSTGRESPORT: "5432"
-      AUTOBRR__POSTGRESUSER:
-        valueFrom:
-          secretKeyRef:
-            name: autobrr-pguser-autobrr
-            key: user
-      AUTOBRR__POSTGRESPASS:
-        valueFrom:
-          secretKeyRef:
-            name: autobrr-pguser-autobrr
-            key: password
-      AUTOBRR__POSTGRESDATABASE:
-        valueFrom:
-          secretKeyRef:
-            name: autobrr-pguser-autobrr
-            key: dbname
-
-      AUTOBRR__SESSIONSECRET:
-        valueFrom:
-          secretKeyRef:
-            name: autobrr-secret
-            key: session_secret
+              AUTOBRR__SESSIONSECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: autobrr-secret
+                    key: session_secret
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 256Mi
 
     service:
       main:
@@ -73,11 +87,14 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "internal-nginx"
+        className: "internal-nginx"
         hosts:
           - host: &host "{{ .Release.Name }}.bjw-s.dev"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
@@ -87,22 +104,9 @@ spec:
         enabled: true
         type: emptyDir
       config-file:
-        enabled: true
         type: configMap
         name: autobrr-configmap
-        subPath: config.toml
-        mountPath: /config/config.toml
-        readOnly: true
-
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: OnRootMismatch
-
-    resources:
-      requests:
-        cpu: 10m
-        memory: 128Mi
-      limits:
-        memory: 256Mi
+        globalMounts:
+          - path: /config/config.toml
+            subPath: config.toml
+            readOnly: true

@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -20,51 +20,53 @@ spec:
     - name: qbittorrent
 
   values:
-    controller:
-      type: cronjob
-      cronjob:
-        schedule: "@hourly"
+    controllers:
+      main:
+        type: cronjob
 
-    restartPolicy: OnFailure
+        cronjob:
+          schedule: "@hourly"
 
-    image:
-      repository: ghcr.io/buroa/qbittools
-      tag: v0.9.5
+        pod:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
 
-    args:
-      - tagging
-      - --added-on
-      - --expired
-      - --last-activity
-      - --not-working
-      - --sites
-      - --unregistered
-      - --server
-      - qbittorrent.downloads.svc.cluster.local
-      - --port
-      - "8080"
-      - --config
-      - /config/config.yaml
+        containers:
+          main:
+            image:
+              repository: ghcr.io/buroa/qbittools
+              tag: v0.9.5
+            args:
+              - tagging
+              - --added-on
+              - --expired
+              - --last-activity
+              - --not-working
+              - --sites
+              - --unregistered
+              - --server
+              - qbittorrent.downloads.svc.cluster.local
+              - --port
+              - "8080"
+              - --config
+              - /config/config.yaml
+            resources:
+              requests:
+                memory: 250Mi
+                cpu: 5m
+              limits:
+                memory: 500Mi
 
     persistence:
       config-file:
-        enabled: true
         type: configMap
         name: qbittools-configmap
-        mountPath: /config/config.yaml
-        subPath: config.yaml
-        readOnly: true
-
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-
-    resources:
-      requests:
-        memory: 250Mi
-        cpu: 5m
-      limits:
-        memory: 500Mi
+        globalMounts:
+          - path: /config/config.yaml
+            subPath: config.yaml
+            readOnly: true
 
     service:
       main:

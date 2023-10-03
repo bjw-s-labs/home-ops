@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -17,21 +17,52 @@ spec:
         namespace: flux-system
   interval: 30m
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    image:
-      repository: ghcr.io/onedr0p/jellyfin
-      tag: 10.8.11@sha256:02904ff44d66c9a549c1dbf7e5bb03f6185272786f871d5718da22ca9a0e600e
+        statefulset:
+          volumeClaimTemplates:
+            - name: config
+              accessMode: ReadWriteOnce
+              size: 30Gi
+              storageClass: ceph-block
+              globalMounts:
+                - path: /config
 
-    enableServiceLinks: false
+        pod:
+          enableServiceLinks: false
+          nodeSelector:
+            intel.feature.node.kubernetes.io/gpu: "true"
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 44
+              - 109
+              - 65539
 
-    env:
-      DOTNET_SYSTEM_IO_DISABLEFILELOCKING: "true"
-      JELLYFIN_FFmpeg__probesize: 50000000
-      JELLYFIN_FFmpeg__analyzeduration: 500000000
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/jellyfin
+              tag: 10.8.11@sha256:02904ff44d66c9a549c1dbf7e5bb03f6185272786f871d5718da22ca9a0e600e
+            env:
+              DOTNET_SYSTEM_IO_DISABLEFILELOCKING: "true"
+              JELLYFIN_FFmpeg__probesize: 50000000
+              JELLYFIN_FFmpeg__analyzeduration: 500000000
+            resources:
+              requests:
+                cpu: 100m
+                gpu.intel.com/i915: 1
+                memory: 9248M
+              limits:
+                gpu.intel.com/i915: 1
+                memory: 9248M
 
     service:
       main:
@@ -46,52 +77,26 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: internal-nginx
+        className: internal-nginx
         hosts:
           - host: &host jellyfin.bjw-s.dev
             paths:
               - path: /
-                pathType: Prefix
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
 
-    nodeSelector:
-      intel.feature.node.kubernetes.io/gpu: "true"
-
     persistence:
       nfs-nas-media:
-        enabled: true
-        mountPath: /data/nas-media
-        path: /volume1/Media
-        server: nas.bjw-s.casa
         type: nfs
+        server: nas.bjw-s.casa
+        path: /volume1/Media
+        globalMounts:
+          - path: /data/nas-media
       transcode:
-        enabled: true
         type: emptyDir
-
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: "OnRootMismatch"
-      supplementalGroups:
-        - 44
-        - 109
-        - 65539
-
-    resources:
-      requests:
-        cpu: 100m
-        gpu.intel.com/i915: 1
-        memory: 9248M
-      limits:
-        gpu.intel.com/i915: 1
-        memory: 9248M
-
-    volumeClaimTemplates:
-      - name: config
-        mountPath: /config
-        accessMode: ReadWriteOnce
-        size: 30Gi
-        storageClass: ceph-block
+        globalMounts:
+          - path: /transcode

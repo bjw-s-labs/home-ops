@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,36 +18,56 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    image:
-      repository: ghcr.io/miniflux/miniflux
-      tag: 2.0.48@sha256:1aa8755118cf2865ee72521d87b8645080361fb75421314facb3766c0b0c07a3
-
-    env:
-      BASE_URL: https://miniflux.bjw-s.dev
-      CREATE_ADMIN: "1"
-      DATABASE_URL:
-        valueFrom:
-          secretKeyRef:
-            name: miniflux-pguser-miniflux
-            key: uri
-      DEBUG: "1"
-      LOG_DATE_TIME: "1"
-      OAUTH2_CLIENT_ID: miniflux
-      OAUTH2_USER_CREATION: "1"
-      OAUTH2_OIDC_DISCOVERY_ENDPOINT: https://auth.bjw-s.dev
-      OAUTH2_PROVIDER: oidc
-      OAUTH2_REDIRECT_URL: https://miniflux.bjw-s.dev/oauth2/oidc/callback
-      POLLING_SCHEDULER: "entry_frequency"
-      POLLING_FREQUENCY: "15"
-      RUN_MIGRATIONS: "1"
-
-    envFrom:
-      - secretRef:
-          name: miniflux-secret
+        containers:
+          main:
+            image:
+              repository: ghcr.io/miniflux/miniflux
+              tag: 2.0.48@sha256:1aa8755118cf2865ee72521d87b8645080361fb75421314facb3766c0b0c07a3
+            env:
+              BASE_URL: https://miniflux.bjw-s.dev
+              CREATE_ADMIN: "1"
+              DATABASE_URL:
+                valueFrom:
+                  secretKeyRef:
+                    name: miniflux-pguser-miniflux
+                    key: uri
+              DEBUG: "1"
+              LOG_DATE_TIME: "1"
+              OAUTH2_CLIENT_ID: miniflux
+              OAUTH2_USER_CREATION: "1"
+              OAUTH2_OIDC_DISCOVERY_ENDPOINT: https://auth.bjw-s.dev
+              OAUTH2_PROVIDER: oidc
+              OAUTH2_REDIRECT_URL: https://miniflux.bjw-s.dev/oauth2/oidc/callback
+              POLLING_SCHEDULER: "entry_frequency"
+              POLLING_FREQUENCY: "15"
+              RUN_MIGRATIONS: "1"
+            envFrom:
+              - secretRef:
+                  name: miniflux-secret
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+                  httpGet:
+                    path: /healthcheck
+                    port: 8080
+            resources:
+              requests:
+                cpu: 12m
+                memory: 64M
+              limits:
+                memory: 256M
 
     service:
       main:
@@ -58,33 +78,16 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "external-nginx"
+        className: "external-nginx"
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         hosts:
           - host: &host "miniflux.bjw-s.dev"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
-
-    probes:
-      liveness:
-        enabled: true
-        custom: true
-        spec:
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 1
-          failureThreshold: 3
-          httpGet:
-            path: /healthcheck
-            port: 8080
-
-    resources:
-      requests:
-        cpu: 12m
-        memory: 64M
-      limits:
-        memory: 256M
