@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,29 +18,33 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      type: cronjob
-      cronjob:
-        schedule: "10 */6 * * *"
-        ttlSecondsAfterFinished: 86400
+    controllers:
+      main:
+        type: cronjob
 
-    podSecurityContext:
-      runAsUser: 1031
-      runAsGroup: 100
-      fsGroup: 2000
-      fsGroupChangePolicy: "OnRootMismatch"
-      supplementalGroups:
-        - 65539
+        cronjob:
+          schedule: "10 */6 * * *"
+          ttlSecondsAfterFinished: 86400
 
-    restartPolicy: OnFailure
+        pod:
+          enableServiceLinks: false
+          restartPolicy: OnFailure
+          securityContext:
+            runAsUser: 1031
+            runAsGroup: 100
+            fsGroup: 2000
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 65539
 
-    image:
-      repository: ghcr.io/bjw-s/series-cleanup
-      tag: 3.1.0@sha256:4ebc472ba50df978a5f947708d48577bbd7e2ee01c16088b97df460acafc776a
-
-    envFrom:
-      - secretRef:
-          name: series-cleanup-secret
+        containers:
+          main:
+            image:
+              repository: ghcr.io/bjw-s/series-cleanup
+              tag: 3.1.0@sha256:4ebc472ba50df978a5f947708d48577bbd7e2ee01c16088b97df460acafc776a
+            envFrom:
+              - secretRef:
+                  name: series-cleanup-secret
 
     service:
       main:
@@ -50,17 +54,19 @@ spec:
       config:
         enabled: true
         existingClaim: series-cleanup-data
+        globalMounts:
+          - path: /config
       settings:
-        enabled: true
         type: configMap
         name: series-cleanup-configmap
-        subPath: settings.json
-        mountPath: /config/settings.json
         defaultMode: 0775
-        readOnly: true
+        globalMounts:
+          - path: /config/settings.json
+            subPath: settings.json
+            readOnly: true
       nfs-nas-media:
-        enabled: true
-        mountPath: /storage/media
-        path: /volume1/Media
-        server: nas.bjw-s.casa
         type: nfs
+        server: nas.bjw-s.casa
+        path: /volume1/Media
+        globalMounts:
+          - path: /storage/media

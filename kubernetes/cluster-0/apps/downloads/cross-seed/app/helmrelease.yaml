@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.0.0-beta.3
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -24,6 +24,15 @@ spec:
       main:
         annotations:
           secret.reloader.stakater.com/reload: cross-seed-secret
+
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 65539
 
         containers:
           main:
@@ -40,14 +49,6 @@ spec:
                 memory: 128Mi
               limits:
                 memory: 256Mi
-
-        pod:
-          runAsUser: 568
-          runAsGroup: 568
-          fsGroup: 568
-          fsGroupChangePolicy: "OnRootMismatch"
-          supplementalGroups:
-            - 65539
 
     service:
       main:
@@ -73,6 +74,4 @@ spec:
         enabled: true
         existingClaim: nas-media
         globalMounts:
-          - controllers:
-              - main
-            path: /data/nas-media
+          - path: /data/nas-media

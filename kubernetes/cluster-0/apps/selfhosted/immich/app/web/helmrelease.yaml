@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -21,46 +21,62 @@ spec:
     - name: immich-server
 
   values:
-    controller:
-      strategy: RollingUpdate
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    image:
-      repository: ghcr.io/immich-app/immich-web
-      tag: v1.80.0
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: OnRootMismatch
+            supplementalGroups:
+              - 65541
 
-    command: /bin/sh
-    args:
-      - ./entrypoint.sh
-
-    env:
-      DB_HOSTNAME:
-        valueFrom:
-          secretKeyRef:
-            name: immich-pguser-immich
-            key: host
-      DB_USERNAME:
-        valueFrom:
-          secretKeyRef:
-            name: immich-pguser-immich
-            key: user
-      DB_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: immich-pguser-immich
-            key: password
-      DB_DATABASE_NAME:
-        valueFrom:
-          secretKeyRef:
-            name: immich-pguser-immich
-            key: dbname
-
-    envFrom:
-      - secretRef:
-          name: immich-secret
-      - configMapRef:
-          name: immich-configmap
+        containers:
+          main:
+            image:
+              repository: ghcr.io/immich-app/immich-web
+              tag: v1.80.0
+            command:
+              - /bin/sh
+            args:
+              - ./entrypoint.sh
+            env:
+              DB_HOSTNAME:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-pguser-immich
+                    key: host
+              DB_USERNAME:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-pguser-immich
+                    key: user
+              DB_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-pguser-immich
+                    key: password
+              DB_DATABASE_NAME:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-pguser-immich
+                    key: dbname
+            envFrom:
+              - secretRef:
+                  name: immich-secret
+              - configMapRef:
+                  name: immich-configmap
+            resources:
+              requests:
+                cpu: 5m
+                memory: 64M
+              limits:
+                memory: 256Mi
 
     service:
       main:
@@ -71,7 +87,7 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "external-nginx"
+        className: "external-nginx"
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
           nginx.ingress.kubernetes.io/configuration-snippet: |
@@ -82,7 +98,9 @@ spec:
           - host: &host immich.bjw-s.dev
             paths:
               - path: /
-                pathType: Prefix
+                service:
+                  name: main
+                  port: http
               - path: /api
                 pathType: Prefix
                 service:
@@ -94,21 +112,7 @@ spec:
 
     persistence:
       library:
-        enabled: true
+        type: persistentVolumeClaim
         existingClaim: immich-nfs
-        mountPath: /usr/src/app/upload
-
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: OnRootMismatch
-      supplementalGroups:
-        - 65541
-
-    resources:
-      requests:
-        cpu: 5m
-        memory: 64M
-      limits:
-        memory: 256Mi
+        globalMounts:
+          - path: /usr/src/app/upload

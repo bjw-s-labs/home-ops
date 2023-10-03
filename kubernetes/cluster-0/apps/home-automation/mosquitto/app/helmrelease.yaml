@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,28 +18,52 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    image:
-      repository: public.ecr.aws/docker/library/eclipse-mosquitto
-      tag: 2.0.18
+        statefulset:
+          volumeClaimTemplates:
+            - name: data
+              accessMode: ReadWriteOnce
+              size: 512Mi
+              storageClass: ceph-block
+              globalMounts:
+                - path: /data
 
-    initContainers:
-      copy-config:
-        image: public.ecr.aws/docker/library/eclipse-mosquitto:2.0.18@sha256:ddf2025790f12e23cf8750c1d2188a9511641d7676e7c70350e105c79fe1bef7
-        command:
-          - "/bin/sh"
-          - -c
-        args:
-          - cp /data/mosquitto_secret/* /data/external_config/ && mosquitto_passwd -U /data/external_config/mosquitto_pwd
-        volumeMounts:
-          - name: mosquitto-secret
-            mountPath: /data/mosquitto_secret
-          - name: external-config
-            mountPath: /data/external_config
+        pod:
+          annotations:
+            k8s.v1.cni.cncf.io/networks: |
+              [{
+                "name":"multus-iot",
+                "namespace": "network",
+                "ips": ["10.1.3.151/24"]
+              }]
+
+        initContainers:
+          init-config:
+            image:
+              repository: public.ecr.aws/docker/library/busybox
+              tag: latest@sha256:3fbc632167424a6d997e74f52b878d7cc478225cffac6bc977eedfe51c7f4e79
+              pullPolicy: IfNotPresent
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "cp /tmp/secret/* /mosquitto/external_config/ && mosquitto_passwd -U /mosquitto/external_config/mosquitto_pwd"
+
+        containers:
+          main:
+            image:
+              repository: public.ecr.aws/docker/library/eclipse-mosquitto
+              tag: 2.0.18
+            resources:
+              requests:
+                cpu: 5m
+                memory: 10M
+              limits:
+                memory: 10M
 
     service:
       main:
@@ -56,32 +80,22 @@ spec:
             port: 1883
 
     persistence:
-      mosquitto-config:
-        enabled: true
+      mosquitto-configfile:
         type: configMap
         name: mosquitto-configmap
-        mountPath: /mosquitto/config/mosquitto.conf
-        subPath: mosquitto.conf
+        advancedMounts:
+          main:
+            main:
+              - path: /mosquitto/config/mosquitto.conf
+                subPath: mosquitto.conf
       mosquitto-secret:
-        enabled: true
         type: secret
         name: mosquitto-secret
-        mountPath: "-"
-      external-config:
-        enabled: true
+        advancedMounts:
+          main:
+            init-config:
+              - path: /tmp/secret
+      mosquitto-externalconfig:
         type: emptyDir
-        mountPath: /mosquitto/external_config
-
-    resources:
-      requests:
-        cpu: 5m
-        memory: 10M
-      limits:
-        memory: 10M
-
-    volumeClaimTemplates:
-      - name: data
-        mountPath: /data
-        accessMode: ReadWriteOnce
-        size: 512Mi
-        storageClass: ceph-block
+        globalMounts:
+          - path: /mosquitto/external_config

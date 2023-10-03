@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,62 +18,67 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        type: statefulset
 
-    initContainers:
-      01-init-config:
-        image: public.ecr.aws/docker/library/busybox:latest@sha256:3fbc632167424a6d997e74f52b878d7cc478225cffac6bc977eedfe51c7f4e79
-        imagePullPolicy: IfNotPresent
-        command:
-          - "/bin/sh"
-          - "-c"
-          - "cp /tmp/config/recyclarr.yml /config/recyclarr.yml"
-        volumeMounts:
-          - name: config-file
-            mountPath: /tmp/config
-          - name: config
-            mountPath: /config
+        statefulset:
+          volumeClaimTemplates:
+            - name: config
+              accessMode: ReadWriteOnce
+              size: 1Gi
+              storageClass: ceph-block
+              globalMounts:
+                - path: /config
 
-    restartPolicy: OnFailure
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    image:
-      repository: ghcr.io/recyclarr/recyclarr
-      tag: 6.0.0@sha256:6f04bf16286ffe9af6f0af6932c8ca955a47b8aff7a3e3f36130bbed4958c3f9
+        pod:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: OnRootMismatch
 
-    envFrom:
-      - secretRef:
-          name: recyclarr-secret
+        initContainers:
+          init-config:
+            image:
+              repository: public.ecr.aws/docker/library/busybox
+              tag: latest@sha256:3fbc632167424a6d997e74f52b878d7cc478225cffac6bc977eedfe51c7f4e79
+              pullPolicy: IfNotPresent
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "cp /tmp/config/recyclarr.yml /config/recyclarr.yml"
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/recyclarr/recyclarr
+              tag: 6.0.0
+            envFrom:
+              - secretRef:
+                  name: recyclarr-secret
+            resources:
+              requests:
+                cpu: 5m
+                memory: 36M
+              limits:
+                memory: 128M
 
     persistence:
       config-file:
         enabled: true
         type: configMap
         name: recyclarr-configmap
-        mountPath: "-"
-
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: OnRootMismatch
-
-    resources:
-      requests:
-        cpu: 5m
-        memory: 36M
-      limits:
-        memory: 128M
+        advancedMounts:
+          main:
+            init-config:
+              - path: /tmp/config
+                readOnly: true
 
     service:
       main:
         enabled: false
-
-    volumeClaimTemplates:
-      - name: config
-        mountPath: /config
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClass: ceph-block

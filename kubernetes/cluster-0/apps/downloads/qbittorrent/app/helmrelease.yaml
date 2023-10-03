@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.0.0-beta.3
+      version: 2.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -130,7 +130,6 @@ spec:
             main:
               - path: /config
       scripts:
-        enabled: true
         type: configMap
         name: qbittorrent-scripts
         defaultMode: 0775
@@ -140,14 +139,12 @@ spec:
               - path: /scripts
                 readOnly: true
       media:
-        enabled: true
         existingClaim: nas-media
         advancedMounts:
           main:
             main:
               - path: /data/nas-media
       dnsdist-config:
-        enabled: true
         type: configMap
         name: qbittorrent-dnsdist
         advancedMounts:
@@ -157,7 +154,6 @@ spec:
                 subPath: dnsdist.conf
                 readOnly: true
       gluetun-data:
-        enabled: true
         type: emptyDir
         advancedMounts:
           main:
