@@ -18,21 +18,48 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      type: statefulset
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          secret.reloader.stakater.com/reload: esphome-secrets,esphome-deploykey
 
-    image:
-      repository: ghcr.io/esphome/esphome
-      tag: 2023.9.2@sha256:5e5e934b7933400bdfb744ebaa05be1191128f693b2973c46f4b425834713e71
+        statefulset:
+          volumeClaimTemplates:
+            - name: config
+              accessMode: ReadWriteOnce
+              size: 5Gi
+              storageClass: ceph-block
+              globalMounts:
+                - path: /config
 
-    podAnnotations:
-      secret.reloader.stakater.com/reload: esphome-secrets,esphome-deploykey
-      k8s.v1.cni.cncf.io/networks: |
-        [{
-          "name":"multus-iot",
-          "namespace": "network",
-          "ips": ["10.1.3.152/24"]
-        }]
+        pod:
+          annotations:
+            k8s.v1.cni.cncf.io/networks: |
+              [{
+                "name":"multus-iot",
+                "namespace": "network",
+                "ips": ["10.1.3.152/24"]
+              }]
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/esphome/esphome
+              tag: 2023.9.2@sha256:5e5e934b7933400bdfb744ebaa05be1191128f693b2973c46f4b425834713e71
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+            resources:
+              requests:
+                cpu: 5m
+                memory: 1374M
+              limits:
+                memory: 2048M
 
     service:
       main:
@@ -48,48 +75,28 @@ spec:
           - host: &host "esphome.bjw-s.dev"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
 
     persistence:
       secrets:
-        enabled: true
         type: secret
         name: esphome-secrets
-        mountPath: /config/secrets.yaml
-        subPath: secrets.yaml
+        globalMounts:
+          - path: /config/secrets.yaml
+            subPath: secrets.yaml
       esphome-cache:
-        enabled: true
         type: emptyDir
-        mountPath: /config/.esphome
+        globalMounts:
+          - path: /config/.esphome
       deploy-key:
-        enabled: true
         type: secret
         name: esphome-deploykey
         defaultMode: 256
-        subPath:
-          - path: id_ed25519
-            mountPath: /root/.ssh/id_ed25519
-
-    probes:
-      liveness:
-        enabled: false
-      readiness:
-        enabled: false
-      startup:
-        enabled: false
-
-    resources:
-      requests:
-        cpu: 5m
-        memory: 1374M
-      limits:
-        memory: 2048M
-
-    volumeClaimTemplates:
-      - name: config
-        mountPath: /config
-        accessMode: ReadWriteOnce
-        size: 5Gi
-        storageClass: ceph-block
+        globalMounts:
+          - path: /root/.ssh/id_ed25519
+            subPath: id_ed25519

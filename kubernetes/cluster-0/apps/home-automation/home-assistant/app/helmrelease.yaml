@@ -18,33 +18,57 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    image:
-      repository: ghcr.io/home-assistant/home-assistant
-      tag: 2023.9.3@sha256:067490d7b65cfa8b9e494a9447b0e5a7876be83ead7ec01738681c55d66e7cfe
+        statefulset:
+          volumeClaimTemplates:
+            - name: config
+              accessMode: ReadWriteOnce
+              size: 1Gi
+              storageClass: ceph-block
+              globalMounts:
+                - path: /config
 
-    podAnnotations:
-      k8s.v1.cni.cncf.io/networks: |
-        [{
-          "name":"multus-iot",
-          "namespace": "network",
-          "ips": ["10.1.3.151/24"]
-        }]
+        pod:
+          annotations:
+            k8s.v1.cni.cncf.io/networks: |
+              [{
+                "name":"multus-iot",
+                "namespace": "network",
+                "ips": ["10.1.3.151/24"]
+              }]
 
-    env:
-      SECRET_RECORDER_DB_URL:
-        valueFrom:
-          secretKeyRef:
-            name: home-assistant-pguser-home-assistant
-            key: uri
-
-    envFrom:
-      - secretRef:
-          name: home-assistant-secret
+        containers:
+          main:
+            image:
+              repository: ghcr.io/home-assistant/home-assistant
+              tag: 2023.9.3@sha256:067490d7b65cfa8b9e494a9447b0e5a7876be83ead7ec01738681c55d66e7cfe
+            env:
+              SECRET_RECORDER_DB_URL:
+                valueFrom:
+                  secretKeyRef:
+                    name: home-assistant-pguser-home-assistant
+                    key: uri
+            envFrom:
+              - secretRef:
+                  name: home-assistant-secret
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+            resources:
+              requests:
+                cpu: 47m
+                memory: 1254M
+              limits:
+                memory: 1254M
 
     service:
       main:
@@ -62,38 +86,18 @@ spec:
           - host: &host "domo.bjw-s.dev"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - hosts:
               - *host
 
     persistence:
       deploy-key:
-        enabled: true
         type: secret
         name: home-assistant-secret
         defaultMode: 256
-        subPath:
-          - path: GH_DEPLOY_KEY
-            mountPath: /root/.ssh/id_rsa
-
-    probes:
-      liveness:
-        enabled: false
-      readiness:
-        enabled: false
-      startup:
-        enabled: false
-
-    resources:
-      requests:
-        cpu: 47m
-        memory: 1254M
-      limits:
-        memory: 1254M
-
-    volumeClaimTemplates:
-      - name: config
-        mountPath: /config
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClass: ceph-block
+        globalMounts:
+          - path: /root/.ssh/id_rsa
+            subPath: GH_DEPLOY_KEY
