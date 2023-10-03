@@ -17,90 +17,95 @@ spec:
         namespace: flux-system
   interval: 30m
   values:
-    controller:
-      type: daemonset
-      strategy: RollingUpdate
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      main:
+        type: daemonset
+        strategy: RollingUpdate
 
-    image:
-      repository: ghcr.io/onedr0p/vector
-      tag: 0.33.0-debian@sha256:85449f3961ec0f6fb3881e8fda9a2f20c7ec583a03e9d0f2e4850c424e9e9a35
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    args: ["--config", "/etc/vector/vector.yaml"]
+        pod:
+          tolerations:
+            - key: node-role.kubernetes.io/master
+              effect: NoSchedule
 
-    env:
-      PROCFS_ROOT: /host/proc
-      SYSFS_ROOT: /host/sys
-      VECTOR_SELF_NODE_NAME:
-        valueFrom:
-          fieldRef:
-            apiVersion: v1
-            fieldPath: spec.nodeName
-      VECTOR_SELF_POD_NAME:
-        valueFrom:
-          fieldRef:
-            apiVersion: v1
-            fieldPath: metadata.name
-      VECTOR_SELF_POD_NAMESPACE:
-        valueFrom:
-          fieldRef:
-            apiVersion: v1
-            fieldPath: metadata.namespace
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/vector
+              tag: 0.33.0-debian@sha256:85449f3961ec0f6fb3881e8fda9a2f20c7ec583a03e9d0f2e4850c424e9e9a35
+            args:
+              - "--config"
+              - "/etc/vector/vector.yaml"
+            env:
+              PROCFS_ROOT: /host/proc
+              SYSFS_ROOT: /host/sys
+              VECTOR_SELF_NODE_NAME:
+                valueFrom:
+                  fieldRef:
+                    apiVersion: v1
+                    fieldPath: spec.nodeName
+              VECTOR_SELF_POD_NAME:
+                valueFrom:
+                  fieldRef:
+                    apiVersion: v1
+                    fieldPath: metadata.name
+              VECTOR_SELF_POD_NAMESPACE:
+                valueFrom:
+                  fieldRef:
+                    apiVersion: v1
+                    fieldPath: metadata.namespace
+            resources:
+              requests:
+                cpu: 23m
+                memory: 249M
+              # limits:
+              #   memory: 918M
+            securityContext:
+              privileged: true
 
     persistence:
       config:
         enabled: true
         type: configMap
         name: vector-agent-configmap
-        subPath: vector.yaml
-        mountPath: /etc/vector/vector.yaml
-        readOnly: true
+        globalMounts:
+          - path: /etc/vector/vector.yaml
+            subPath: vector.yaml
+            readOnly: true
       data:
-        enabled: true
         type: emptyDir
-        mountPath: /vector-data-dir
+        globalMounts:
+          - path: /vector-data-dir
       var-log:
-        enabled: true
         type: hostPath
         hostPath: /var/log
         hostPathType: Directory
-        mountPath: /var/log
-        readOnly: true
+        globalMounts:
+          - path: /var/log
+            readOnly: true
       var-lib:
-        enabled: true
         type: hostPath
         hostPath: /var/lib
         hostPathType: Directory
-        mountPath: /var/lib
-        readOnly: true
+        globalMounts:
+          - path: /var/lib
+            readOnly: true
       procfs:
-        enabled: true
         type: hostPath
         hostPath: /proc
         hostPathType: Directory
-        mountPath: /host/proc
-        readOnly: true
+        globalMounts:
+          - path: /host/proc
+            readOnly: true
       sysfs:
-        enabled: true
         type: hostPath
         hostPath: /sys
         hostPathType: Directory
-        mountPath: /host/sys
-        readOnly: true
-
-    podMonitor:
-      enabled: true
-
-    resources:
-      requests:
-        cpu: 23m
-        memory: 249M
-      # limits:
-      #   memory: 918M
-
-    securityContext:
-      privileged: true
+        globalMounts:
+          - path: /host/sys
+            readOnly: true
 
     service:
       main:
@@ -109,7 +114,3 @@ spec:
     serviceAccount:
       create: true
       name: vector-agent
-
-    tolerations:
-      - key: node-role.kubernetes.io/master
-        effect: NoSchedule

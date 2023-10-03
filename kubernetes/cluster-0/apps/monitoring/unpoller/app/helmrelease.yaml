@@ -18,21 +18,40 @@ spec:
         namespace: flux-system
 
   values:
-    image:
-      repository: ghcr.io/unpoller/unpoller
-      tag: v2.9.2@sha256:585a29a06d054749fdca4fc589209058b71df43695fffba028f6ee0a4ea0ba87
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    env:
-      UP_UNIFI_DEFAULT_ROLE: home-ops
-      UP_UNIFI_DEFAULT_URL: https://unifi:8443
-      UP_UNIFI_DEFAULT_VERIFY_SSL: false
-      UP_UNIFI_DEFAULT_USER: unifipoller
-      UP_UNIFI_DEFAULT_PASS:
-        valueFrom:
-          secretKeyRef:
-            name: unpoller-secret
-            key: unifipoller_password
-      UP_INFLUXDB_DISABLE: true
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: "OnRootMismatch"
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/unpoller/unpoller
+              tag: v2.9.2
+            env:
+              UP_UNIFI_DEFAULT_ROLE: home-ops
+              UP_UNIFI_DEFAULT_URL: https://unifi:8443
+              UP_UNIFI_DEFAULT_VERIFY_SSL: false
+              UP_UNIFI_DEFAULT_USER: unifipoller
+              UP_UNIFI_DEFAULT_PASS:
+                valueFrom:
+                  secretKeyRef:
+                    name: unpoller-secret
+                    key: unifipoller_password
+              UP_INFLUXDB_DISABLE: true
+            resources:
+              requests:
+                cpu: 10m
+                memory: 100Mi
+              limits:
+                memory: 500Mi
 
     service:
       main:
@@ -49,10 +68,3 @@ spec:
             path: /metrics
             interval: 2m # Unifi API only polls at 2m intervals
             scrapeTimeout: 5s
-
-    resources:
-      requests:
-        cpu: 10m
-        memory: 100Mi
-      limits:
-        memory: 500Mi
