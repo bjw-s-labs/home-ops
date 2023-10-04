@@ -27,34 +27,46 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
-    image:
-      repository: ghcr.io/airsonic-advanced/airsonic-advanced
-      tag: edge-11.0.0-SNAPSHOT.20220625052932
-      pullPolicy: IfNotPresent
 
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 100
-      fsGroup: 100
-      supplementalGroups:
-        - 100
-      fsGroupChangePolicy: "OnRootMismatch"
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 100
+            fsGroup: 100
+            supplementalGroups:
+              - 34
+              - 100
+            fsGroupChangePolicy: "OnRootMismatch"
+          hostAliases:
+            - ip: "10.200.1.50"
+              hostnames:
+                - "autoscan.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
-    env:
-      TZ: "${TIMEZONE}"
-      JAVA_OPTS: "-Xmx768m -Dserver.forward-headers-strategy=native"
+        containers:
+          main:
+            image:
+              repository: ghcr.io/airsonic-advanced/airsonic-advanced
+              tag: edge-11.0.0-SNAPSHOT.20220625052932
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+              JAVA_OPTS: "-Xmx768m -Dserver.forward-headers-strategy=native"
+            resources:
+              requests:
+                memory: "512M"
+              limits:
+                memory: "1024G"
 
     service:
       main:
         ports:
           http:
             port: 4040
-
-    enableServiceLinks: false
 
     persistence:
       config:
@@ -76,19 +88,15 @@ spec:
           # external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-
         hosts:
           - host: &host "airsonic.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
               - path: /
-
+                service:
+                  name: main
+                  port: http
         tls:
           - secretName: tls.airsonic
             hosts:
               - *host
 
-    resources:
-      requests:
-        memory: "512M"
-      limits:
-        memory: "1024M"

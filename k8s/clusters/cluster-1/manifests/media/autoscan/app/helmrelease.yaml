@@ -27,61 +27,69 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
     global:
       nameOverride: *app
-    fullnameOverride: *app
-    image:
-      repository: cloudb0x/autoscan
-      tag: "1.4.0"
+      fullnameOverride: *app
 
-    # podSecurityContext:
-    #   runAsUser: 568
-    #   runAsGroup: 100
-    #   fsGroup: 100
-    #   supplementalGroups:
-    #     - 34
-    #     - 100
-    #   fsGroupChangePolicy: "OnRootMismatch"
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          # securityContext:
+          #   runAsUser: 568
+          #   runAsGroup: 100
+          #   fsGroup: 100
+          #   supplementalGroups:
+          #     - 34
+          #     - 100
+          #   fsGroupChangePolicy: "OnRootMismatch"
+          hostAliases:
+            - ip: "10.200.1.50"
+              hostnames:
+                - "plex.${INGRESS_DOMAIN}"
+                - "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
-    env:
-      TZ: "${TIMEZONE}"
+        containers:
+          main:
+            image:
+              repository: cloudb0x/autoscan
+              tag: "1.4.0"
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+            resources:
+              requests:
+                memory: "128M"
+              limits:
+                memory: "512G"
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                ## The spec field contains the values for the default livenessProbe.
+                ## If you selected custom: true, this field holds the definition of the livenessProbe.
+                spec:
+                  exec:
+                    command:
+                      - /usr/bin/env
+                      - bash
+                      - -c
+                      - username=`grep -B 1 'username:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
+                        password=`grep -B 1 'password:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
+                        curl --fail $username:$password@localhost:3030/triggers/manual
+                  failureThreshold: 5
+                  initialDelaySeconds: 60
+                  periodSeconds: 10
+                  successThreshold: 1
+                  timeoutSeconds: 10
 
     service:
       main:
         ports:
           http:
             port: 3030
-
-    hostAliases:
-      - ip: "10.200.1.50"
-        hostnames:
-          - "plex.${INGRESS_DOMAIN}"
-          - "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-
-    probes:
-      liveness:
-        enabled: true
-        custom: true
-        ## The spec field contains the values for the default livenessProbe.
-        ## If you selected custom: true, this field holds the definition of the livenessProbe.
-        spec:
-          exec:
-            command:
-              - /usr/bin/env
-              - bash
-              - -c
-              - username=`grep -B 1 'username:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
-                password=`grep -B 1 'password:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
-                curl --fail $username:$password@localhost:3030/triggers/manual
-          failureThreshold: 5
-          initialDelaySeconds: 60
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 10
 
     persistence:
       config:
@@ -131,7 +139,7 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "traefik"
+        className: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
@@ -157,9 +165,3 @@ spec:
               - *host-cluster
               - *host
               - *cheesee
-
-    resources:
-      requests:
-        memory: "128M"
-      limits:
-        memory: "500Mi"
