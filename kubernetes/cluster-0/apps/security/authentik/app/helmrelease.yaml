@@ -21,17 +21,16 @@ spec:
       secret.reloader.stakater.com/reload: authentik-secret,authentik-pguser-authentik,authentik-redis-secret
 
     authentik:
-      log_level: info
-      # email:
-      #   port: 465
-      #   use_ssl: true
+      log_level: debug
+      email:
+        port: 587
+        use_tls: true
+      error_reporting:
+        enabled: false
+        send_pii: false
       redis:
         host: "authentik-redis.security.svc.cluster.local"
         password: ""
-
-    # envFrom:
-    #   - secretRef:
-    #       name: authentik-secret
 
     envValueFrom:
       AUTHENTIK_SECRET_KEY:
@@ -77,9 +76,9 @@ spec:
 
     ingress:
       enabled: true
-      ingressClassName: internal-nginx
+      ingressClassName: external-nginx
       annotations:
-        # external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
+        external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
         nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
       hosts:
