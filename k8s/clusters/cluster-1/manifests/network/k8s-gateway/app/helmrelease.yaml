@@ -1,9 +1,8 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/helmrelease_v2beta1.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: k8s-gateway
+  name: &app k8s-gateway
   namespace: network
 spec:
   interval: 30m
@@ -18,18 +17,67 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      replicas: 3
-      strategy: RollingUpdate
-    image:
-      repository: quay.io/oriedge/k8s_gateway
-      tag: v0.3.4
-      pullPolicy: IfNotPresent
+    global:
+      nameOverride: *app
 
-    podAnnotations:
-      configmap.reloader.stakater.com/reload: "k8s-gateway-config"
+    controllers:
+      main:
+        # type: statefulset
+        # annotations:
+        #   reloader.stakater.com/auto: "true"
+        replicas: 3
+        strategy: RollingUpdate
+        pod:
+          annotations:
+            configmap.reloader.stakater.com/reload: "k8s-gateway-config"
 
-    args: ["-conf", "/etc/coredns/Corefile"]
+        containers:
+          main:
+            image:
+              repository: quay.io/oriedge/k8s_gateway
+              tag: v0.3.4
+              pullPolicy: IfNotPresent
+            args: ["-conf", "/etc/coredns/Corefile"]
+            env:
+              TZ: "${TIMEZONE}"
+              HASS__INSTANCE_NAME: Home-Assistant
+              HASS__PORT: &port 8123
+              HASS__APPLICATION_URL: &host-cluster "home.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              HASS__LOG_LEVEL: info
+            envFrom:
+              - secretRef:
+                  name: home-assistant-secrets
+            resources:
+              requests:
+                memory: "512M"
+              limits:
+                memory: "6000M"
+            probes:
+              readiness:
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ready
+                    port: 8181
+                    scheme: HTTP
+              liveness:
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 8080
+                    scheme: HTTP
+              startup:
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ready
+                    port: 8181
+                    scheme: HTTP
+
+    serviceAccount:
+      create: true
+      name: k8s-gateway
 
     configMaps:
       config:
@@ -53,9 +101,6 @@ spec:
               reload
               loadbalance
             }
-    serviceAccount:
-      create: true
-      name: k8s-gateway
 
     service:
       main:
@@ -78,30 +123,8 @@ spec:
         enabled: true
         type: configMap
         name: k8s-gateway-config
-        mountPath: /etc/coredns
-        readOnly: true
-
-    probes:
-      readiness:
-        custom: true
-        spec:
-          httpGet:
-            path: /ready
-            port: 8181
-            scheme: HTTP
-      liveness:
-        custom: true
-        spec:
-          httpGet:
-            path: /health
-            port: 8080
-            scheme: HTTP
-      startup:
-        custom: true
-        spec:
-          httpGet:
-            path: /ready
-            port: 8181
-            scheme: HTTP
-
-    resources: {}
+        advancedMounts:
+          main:
+            main:
+              - path: /etc/coredns
+                readOnly: true
