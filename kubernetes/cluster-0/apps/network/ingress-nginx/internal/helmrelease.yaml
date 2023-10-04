@@ -24,6 +24,8 @@ spec:
       updateStrategy:
         type: RollingUpdate
 
+      allowSnippetAnnotations: true
+
       service:
         enabled: true
         type: LoadBalancer
@@ -49,11 +51,14 @@ spec:
                 - internal-nginx
 
       config:
+        block-user-agents: "GPTBot,~*GPTBot*,ChatGPT-User,~*ChatGPT-User*,Google-Extended,~*Google-Extended*,CCBot,~*CCBot*,Omgilibot,~*Omgilibot*,FacebookBot,~*FacebookBot*" # taken from https://github.com/superseriousbusiness/gotosocial/blob/main/internal/web/robots.go
         client-header-timeout: 120
         client-body-buffer-size: "100M"
         client-body-timeout: 120
         enable-brotli: "true"
+        enable-ocsp: "true"
         enable-real-ip: "true"
+        hide-headers: Server,X-Powered-By
         hsts-max-age: "31449600"
         keep-alive: 120
         keep-alive-requests: 10000
@@ -69,6 +74,7 @@ spec:
         proxy-body-size: 0
         proxy-buffer-size: "16k"
         ssl-protocols: "TLSv1.3 TLSv1.2"
+        use-forwarded-headers: "true"
 
       metrics:
         enabled: true
