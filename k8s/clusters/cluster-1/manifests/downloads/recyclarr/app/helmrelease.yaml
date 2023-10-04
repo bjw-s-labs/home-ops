@@ -58,8 +58,10 @@ spec:
 
         initContainers:
           01-init-config:
-            image: public.ecr.aws/docker/library/busybox:latest
-            imagePullPolicy: IfNotPresent
+            image: 
+              repository: public.ecr.aws/docker/library/busybox
+              tag: latest
+              pullPolicy: IfNotPresent
             command: ["/bin/sh", "-c", "cp /tmp/config/recyclarr.yml /config/recyclarr.yml"]
             volumeMounts:
               - { name: config-file, mountPath: /tmp/config }
