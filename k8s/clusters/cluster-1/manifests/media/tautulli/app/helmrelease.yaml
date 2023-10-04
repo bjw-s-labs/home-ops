@@ -27,37 +27,62 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
-    image:
-      repository: ghcr.io/onedr0p/tautulli
-      tag: 2.13.1
+    global:
+      nameOverride: *app
 
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 100
-      fsGroup: 100
-      supplementalGroups:
-        - 34
-        - 100
-      fsGroupChangePolicy: "OnRootMismatch"
+    defaultPodOptions:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - plex
+                topologyKey: kubernetes.io/hostname
 
-    env:
-      TZ: "${TIMEZONE}"
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 100
+            fsGroup: 100
+            supplementalGroups:
+              - 34
+              - 100
+            fsGroupChangePolicy: "OnRootMismatch"
+          hostAliases:
+            - ip: "10.200.1.50"
+              hostnames:
+                - "plex.${INGRESS_DOMAIN}"
+                - "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/tautulli
+              tag: 2.13.1
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+            resources:
+              requests:
+                memory: "128M"
+              limits:
+                memory: "500M"
 
     service:
       main:
         ports:
           http:
             port: 8181
-
-    hostAliases:
-      - ip: "10.200.1.50"
-        hostnames:
-          - "plex.${INGRESS_DOMAIN}"
-          - "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
     persistence:
       config:
@@ -72,7 +97,7 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "traefik"
+        className: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
@@ -86,21 +111,17 @@ spec:
           - host: &host-cluster "tautulli.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
           - host: &host "tautulli.${INGRESS_DOMAIN}"
             paths:
               - path: /
-          - host: &host-plexpy "plexpy.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - secretName: tls.tautulli
             hosts:
               - *host-cluster
               - *host
-              - *host-plexpy
-
-    resources:
-      requests:
-        memory: "128M"
-      limits:
-        memory: "500Mi"
