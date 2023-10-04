@@ -27,38 +27,45 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
-    image:
-      repository: ghcr.io/sct/overseerr
-      tag: 1.33.2
-      pullPolicy: IfNotPresent
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 100 
+            fsGroup: 100
+            supplementalGroups:
+              - 34
+              - 100
+            fsGroupChangePolicy: "OnRootMismatch"
+          hostAliases:
+            - ip: "10.200.1.50"
+              hostnames:
+                - "sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+                - "sonarr-4k.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+                - "radarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+                - "radarr-4k.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 100
-      fsGroup: 100
-    #   supplementalGroups:
-    #     - 34
-    #     - 100
-      fsGroupChangePolicy: "OnRootMismatch"
-
-    hostAliases:
-      - ip: "10.200.1.50"
-        hostnames:
-          - "sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-          - "sonarr-4k.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-          - "radarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-          - "radarr-4k.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-
-    env:
-      TZ: "${TIMEZONE}"
-      OVERSEERR__INSTANCE_NAME: Overseer
-      OVERSEERR__PORT: &port 5055
-      OVERSEERR__APPLICATION_URL: &host-cluster "overseerr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-      OVERSEERR__LOG_LEVEL: info
+        containers:
+          main:
+            image:
+              repository: ghcr.io/sct/overseerr
+              tag: 1.33.2
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+              OVERSEERR__INSTANCE_NAME: Overseer
+              OVERSEERR__PORT: &port 5055
+              OVERSEERR__APPLICATION_URL: &host-cluster "overseerr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              OVERSEERR__LOG_LEVEL: info
+            resources:
+              requests:
+                memory: "256M"
+              limits:
+                memory: "2048M"
 
     service:
       main:
@@ -79,7 +86,7 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "traefik"
+        className: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
@@ -91,21 +98,24 @@ spec:
           - host: *host-cluster
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
           - host: &host "request.${INGRESS_DOMAIN}"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
           - host: &hosts "requests.${INGRESS_DOMAIN}"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - secretName: tls.overseerr
             hosts:
               - *host-cluster
               - *host
               - *hosts
-
-    resources:
-      requests:
-        memory: "256M"
-      limits:
-        memory: "2048M"
