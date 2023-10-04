@@ -32,29 +32,34 @@ spec:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 100   # was 568 before app template upgrade
+            fsGroup: 100
+            supplementalGroups:
+              - 34
+              - 100
+            fsGroupChangePolicy: "OnRootMismatch"
+
         containers:
           main:
             image:
               repository: ghcr.io/onedr0p/lidarr
               tag: 1.3.5.3530
               pullPolicy: IfNotPresent
-
-    defaultPodOptions:
-      securityContext:
-        runAsUser: 568
-        runAsGroup: 100    # was 568 before app template upgrade
-        fsGroup: 100
-        supplementalGroups:
-          - 34
-          - 100
-        fsGroupChangePolicy: "OnRootMismatch"
-
-    env:
-      TZ: "${TIMEZONE}"
-      LIDARR__INSTANCE_NAME: Lidarr
-      LIDARR__PORT: &port 8686
-      LIDARR__APPLICATION_URL: &host-cluster "lidarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-      LIDARR__LOG_LEVEL: info
+            env:
+              TZ: "${TIMEZONE}"
+              LIDARR__INSTANCE_NAME: Lidarr
+              LIDARR__PORT: &port 8686
+              LIDARR__APPLICATION_URL: &host-cluster "lidarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              LIDARR__LOG_LEVEL: info
+            resources:
+              requests:
+                cpu: "0.04"
+                memory: "250M"
+              limits:
+                memory: "1000M"
 
     service:
       main:
@@ -93,18 +98,17 @@ spec:
           - host: *host-cluster
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
           - host: &host "music.${INGRESS_DOMAIN}"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - secretName: tls.lidarr
             hosts:
               - *host-cluster
               - *host
-
-    resources:
-      requests:
-        cpu: "0.04"
-        memory: "250M"
-      limits:
-        memory: "1000M"
