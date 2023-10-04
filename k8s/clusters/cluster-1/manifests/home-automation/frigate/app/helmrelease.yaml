@@ -130,8 +130,11 @@ spec:
         enabled: true
         type: configMap
         name: frigate-config
-        subPath: config.yaml
-        mountPath: /config/config.yml
+        advancedMounts:
+          main:
+            main:
+              - path: /config/config.yml
+                subPath: config.yaml
         readOnly: true
       data:
         enabled: true
@@ -139,20 +142,29 @@ spec:
       media:
         enabled: true
         existingClaim: cephfs-hdd-videos-home-automation
-        subPath: ./Security/frigate
-        mountPath: /media/frigate
+        advancedMounts:
+          main:
+            main:
+              - path: /media/frigate
+                subPath: ./Security/frigate
       usb:
         enabled: true
         type: hostPath
         hostPath: /dev/bus/usb
         hostPathType: Directory
-        mountPath: /dev/bus/usb
+        advancedMounts:
+          main:
+            main:
+              - path: /dev/bus/usb
       cache:
         enabled: true
         type: emptyDir
         medium: Memory
         sizeLimit: 2Gi
-        mountPath: /dev/shm
+        advancedMounts:
+          main:
+            main:
+              - path: /dev/shm
 
     ingress:
       main:

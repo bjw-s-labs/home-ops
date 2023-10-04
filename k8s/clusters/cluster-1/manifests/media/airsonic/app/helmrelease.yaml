@@ -72,11 +72,17 @@ spec:
       config:
         enabled: true
         existingClaim: airsonic-config
-        mountPath: /var/airsonic
+        advancedMounts:
+          main:
+            main:
+              - path: /var/airsonic
       music:
         enabled: true
         existingClaim: cephfs-hdd-media-music
-        mountPath: /mnt/unionfs/Media/Music/
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/Media/Music/
 
     ingress:
       main:
