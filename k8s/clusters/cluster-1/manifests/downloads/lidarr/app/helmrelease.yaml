@@ -27,22 +27,27 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
-    image:
-      repository: ghcr.io/onedr0p/lidarr
-      tag: 1.3.5.3530
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/lidarr
+              tag: 1.3.5.3530
+              pullPolicy: IfNotPresent
 
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 100
-      supplementalGroups:
-        - 34
-        - 100
-      fsGroupChangePolicy: "OnRootMismatch"
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 568
+        runAsGroup: 100    # was 568 before app template upgrade
+        fsGroup: 100
+        supplementalGroups:
+          - 34
+          - 100
+        fsGroupChangePolicy: "OnRootMismatch"
 
     env:
       TZ: "${TIMEZONE}"
@@ -79,7 +84,7 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "traefik"
+        className: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
