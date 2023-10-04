@@ -29,6 +29,7 @@ spec:
           reloader.stakater.com/auto: "true"
 
         pod:
+          enableServiceLinks: false
           nodeSelector:
             intel.feature.node.kubernetes.io/gpu: "true"
           securityContext:
@@ -56,11 +57,20 @@ spec:
             args:
               - start-microservices.sh
             env:
+              # General
+              LOG_LEVEL: log
+              IMMICH_MEDIA_LOCATION: &mediaLocation /usr/src/app/upload
+              # Geocoding
+              DISABLE_REVERSE_GEOCODING: "true"
+              # Ports
+              MICROSERVICES_PORT: 3002
+              # Database
               DB_HOSTNAME:
                 valueFrom:
                   secretKeyRef:
                     name: immich-pguser-immich
                     key: host
+              DB_PORT: 5432
               DB_USERNAME:
                 valueFrom:
                   secretKeyRef:
@@ -76,11 +86,43 @@ spec:
                   secretKeyRef:
                     name: immich-pguser-immich
                     key: dbname
-            envFrom:
-              - secretRef:
-                  name: immich-secret
-              - configMapRef:
-                  name: immich-configmap
+              # Redis
+              REDIS_HOSTNAME:
+                valueFrom:
+                  configMapKeyRef:
+                    name: immich-configmap
+                    key: REDIS_HOSTNAME
+              REDIS_PORT:
+                valueFrom:
+                  configMapKeyRef:
+                    name: immich-configmap
+                    key: REDIS_PORT
+              # Typesense
+              TYPESENSE_ENABLED:
+                valueFrom:
+                  configMapKeyRef:
+                    name: immich-configmap
+                    key: TYPESENSE_ENABLED
+              TYPESENSE_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-secret
+                    key: TYPESENSE_API_KEY
+              TYPESENSE_HOST:
+                valueFrom:
+                  configMapKeyRef:
+                    name: immich-configmap
+                    key: TYPESENSE_HOST
+              TYPESENSE_PORT:
+                valueFrom:
+                  configMapKeyRef:
+                    name: immich-configmap
+                    key: TYPESENSE_PORT
+              TYPESENSE_PROTOCOL:
+                valueFrom:
+                  configMapKeyRef:
+                    name: immich-configmap
+                    key: TYPESENSE_PROTOCOL
             resources:
               requests:
                 cpu: 100m
@@ -99,7 +141,7 @@ spec:
         type: persistentVolumeClaim
         existingClaim: immich-nfs
         globalMounts:
-          - path: /usr/src/app/upload
+          - path: *mediaLocation
       geocoding-dump:
         type: emptyDir
         globalMounts:

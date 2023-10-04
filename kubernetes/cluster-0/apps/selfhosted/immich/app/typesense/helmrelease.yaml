@@ -35,37 +35,21 @@ spec:
               globalMounts:
                 - path: /config
 
+        pod:
+          enableServiceLinks: false
+
         containers:
           main:
             image:
               repository: docker.io/typesense/typesense
               tag: 0.25.1
             env:
-              DB_HOSTNAME:
+              TYPESENSE_DATA_DIR: /config
+              TYPESENSE_API_KEY:
                 valueFrom:
                   secretKeyRef:
-                    name: immich-pguser-immich
-                    key: host
-              DB_USERNAME:
-                valueFrom:
-                  secretKeyRef:
-                    name: immich-pguser-immich
-                    key: user
-              DB_PASSWORD:
-                valueFrom:
-                  secretKeyRef:
-                    name: immich-pguser-immich
-                    key: password
-              DB_DATABASE_NAME:
-                valueFrom:
-                  secretKeyRef:
-                    name: immich-pguser-immich
-                    key: dbname
-            envFrom:
-              - secretRef:
-                  name: immich-secret
-              - configMapRef:
-                  name: immich-configmap
+                    name: immich-secret
+                    key: TYPESENSE_API_KEY
             probes:
               liveness: &probes
                 enabled: true

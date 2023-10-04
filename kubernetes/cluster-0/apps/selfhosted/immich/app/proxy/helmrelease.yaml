@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: immich-web
+  name: immich-proxy
   namespace: selfhosted
 spec:
   interval: 30m
@@ -19,6 +19,7 @@ spec:
 
   dependsOn:
     - name: immich-server
+    - name: immich-web
 
   values:
     controllers:
@@ -29,38 +30,24 @@ spec:
 
         pod:
           enableServiceLinks: false
-          securityContext:
-            runAsUser: 568
-            runAsGroup: 568
-            fsGroup: 568
-            fsGroupChangePolicy: OnRootMismatch
-            supplementalGroups:
-              - 65541
 
         containers:
           main:
             image:
-              repository: ghcr.io/immich-app/immich-web
+              repository: ghcr.io/immich-app/immich-proxy
               tag: v1.81.0
-            command:
-              - /bin/sh
-            args:
-              - ./entrypoint.sh
             env:
-              # Ports
-              PORT: &port 3000
               # URLs
+              IMMICH_WEB_URL:
+                valueFrom:
+                  configMapKeyRef:
+                    name: immich-configmap
+                    key: IMMICH_WEB_URL
               IMMICH_SERVER_URL:
                 valueFrom:
                   configMapKeyRef:
                     name: immich-configmap
                     key: IMMICH_SERVER_URL
-              PUBLIC_IMMICH_SERVER_URL:
-                valueFrom:
-                  configMapKeyRef:
-                    name: immich-configmap
-                    key: PUBLIC_IMMICH_SERVER_URL
-              IMMICH_API_URL_EXTERNAL: /api
             resources:
               requests:
                 cpu: 5m
@@ -72,4 +59,22 @@ spec:
       main:
         ports:
           http:
-            port: *port
+            port: 8080
+
+    ingress:
+      main:
+        enabled: true
+        className: "external-nginx"
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
+          nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        hosts:
+          - host: &host immich.bjw-s.dev
+            paths:
+              - path: /
+                service:
+                  name: main
+                  port: http
+        tls:
+          - hosts:
+              - *host

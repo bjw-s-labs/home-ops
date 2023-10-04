@@ -28,6 +28,7 @@ spec:
           reloader.stakater.com/auto: "true"
 
         pod:
+          enableServiceLinks: false
           securityContext:
             runAsUser: 568
             runAsGroup: 568
@@ -51,11 +52,19 @@ spec:
             args:
               - start-server.sh
             env:
+              # General
+              LOG_LEVEL: log
+              IMMICH_CONFIG_FILE: /config/immich.config.json
+              IMMICH_MEDIA_LOCATION: &mediaLocation /usr/src/app/upload
+              # Ports
+              SERVER_PORT: &port 3001
+              # Database
               DB_HOSTNAME:
                 valueFrom:
                   secretKeyRef:
                     name: immich-pguser-immich
                     key: host
+              DB_PORT: 5432
               DB_USERNAME:
                 valueFrom:
                   secretKeyRef:
@@ -71,11 +80,43 @@ spec:
                   secretKeyRef:
                     name: immich-pguser-immich
                     key: dbname
-            envFrom:
-              - secretRef:
-                  name: immich-secret
-              - configMapRef:
-                  name: immich-configmap
+              # Redis
+              REDIS_HOSTNAME:
+                valueFrom:
+                  configMapKeyRef:
+                    name: immich-configmap
+                    key: REDIS_HOSTNAME
+              REDIS_PORT:
+                valueFrom:
+                  configMapKeyRef:
+                    name: immich-configmap
+                    key: REDIS_PORT
+              # Typesense
+              TYPESENSE_ENABLED:
+                valueFrom:
+                  configMapKeyRef:
+                    name: immich-configmap
+                    key: TYPESENSE_ENABLED
+              TYPESENSE_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-secret
+                    key: TYPESENSE_API_KEY
+              TYPESENSE_HOST:
+                valueFrom:
+                  configMapKeyRef:
+                    name: immich-configmap
+                    key: TYPESENSE_HOST
+              TYPESENSE_PORT:
+                valueFrom:
+                  configMapKeyRef:
+                    name: immich-configmap
+                    key: TYPESENSE_PORT
+              TYPESENSE_PROTOCOL:
+                valueFrom:
+                  configMapKeyRef:
+                    name: immich-configmap
+                    key: TYPESENSE_PROTOCOL
             resources:
               requests:
                 cpu: 100m
@@ -87,11 +128,17 @@ spec:
       main:
         ports:
           http:
-            port: 3001
+            port: *port
 
     persistence:
+      config:
+        enabled: true
+        type: secret
+        name: immich-config-secret
+        globalMounts:
+          - path: /config
       library:
         type: persistentVolumeClaim
         existingClaim: immich-nfs
         globalMounts:
-          - path: /usr/src/app/upload
+          - path: *mediaLocation

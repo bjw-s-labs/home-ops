@@ -28,6 +28,7 @@ spec:
           reloader.stakater.com/auto: "true"
 
         pod:
+          enableServiceLinks: false
           securityContext:
             runAsUser: 568
             runAsGroup: 568
@@ -49,31 +50,14 @@ spec:
               repository: ghcr.io/immich-app/immich-machine-learning
               tag: v1.81.0
             env:
-              DB_HOSTNAME:
-                valueFrom:
-                  secretKeyRef:
-                    name: immich-pguser-immich
-                    key: host
-              DB_USERNAME:
-                valueFrom:
-                  secretKeyRef:
-                    name: immich-pguser-immich
-                    key: user
-              DB_PASSWORD:
-                valueFrom:
-                  secretKeyRef:
-                    name: immich-pguser-immich
-                    key: password
-              DB_DATABASE_NAME:
-                valueFrom:
-                  secretKeyRef:
-                    name: immich-pguser-immich
-                    key: dbname
-            envFrom:
-              - secretRef:
-                  name: immich-secret
-              - configMapRef:
-                  name: immich-configmap
+              # General
+              IMMICH_MEDIA_LOCATION: &mediaLocation /usr/src/app/upload
+              # Ports
+              MACHINE_LEARNING_HOST: 0.0.0.0
+              MACHINE_LEARNING_PORT: &port 3003
+              # Machine learning
+              MACHINE_LEARNING_CACHE_FOLDER: /cache
+              TRANSFORMERS_CACHE: /cache
             resources:
               requests:
                 cpu: 100m
@@ -85,14 +69,14 @@ spec:
       main:
         ports:
           http:
-            port: 3003
+            port: *port
 
     persistence:
       library:
         type: persistentVolumeClaim
         existingClaim: immich-nfs
         globalMounts:
-          - path: /usr/src/app/upload
+          - path: *mediaLocation
       cache:
         type: persistentVolumeClaim
         existingClaim: immich-machine-learning-cache
