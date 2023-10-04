@@ -29,41 +29,100 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
-    image:
-      # repository: plexinc/pms-docker
-      # tag: plexpass
-      repository: ghcr.io/onedr0p/plex-beta
-      tag: 1.32.7.7571-13cdc68dc
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 100
+            fsGroup: 100
+            supplementalGroups:
+              - 34 # backup
+              - 44 # videro
+              - 109 # render
+              - 100 # users
+              - 1000
+            fsGroupChangePolicy: "OnRootMismatch"
 
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 100
-      fsGroup: 100
-      supplementalGroups:
-        - 34 # backup
-        - 44 # videro
-        - 109 # render
-        - 100 # users
-        - 1000
-      fsGroupChangePolicy: "OnRootMismatch"
-
-    env:
-      TZ: "${TIMEZONE}"
-      # PUID: "1000"
-      # PGID: "100"
-      ADVERTISE_IP: "https://plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}:443,https://plex.${INGRESS_DOMAIN}:443,https://plex.${CLUSTER_NAME}.${INGRESS_DOMAIN},https://plex.${INGRESS_DOMAIN},https://${LB_PLEX}:32400"
-      # PLEX_PREFERENCE_1: "FriendlyName=plex-kubernetes"
-      # PLEX_PREFERENCE_2: "EnableIPv6=0"
-      # PLEX_PREFERENCE_3: "logDebug=0"
-      # PLEX_PREFERENCE_4: "DisableTLSv1_0=1"
-      # PLEX_PREFERENCE_5: "LanNetworksBandwidth=xxx.xxx.xxx.0/18\,xxx.xxx.xxx.0/24\,xxx.xxx.xxx.0/24"
-      # PLEX_PREFERENCE_6: "TranscoderQuality=2"
-      # PLEX_PREFERENCE_7: "TreatWanIpAsLocal=0"
-      # PLEX_PREFERENCE_8: "TranscoderH264BackgroundPreset=fast"
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/plex-beta
+              tag: 1.32.7.7571-13cdc68dc
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+              # PUID: "1000"
+              # PGID: "100"
+              ADVERTISE_IP: "https://plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}:443,https://plex.${INGRESS_DOMAIN}:443,https://plex.${CLUSTER_NAME}.${INGRESS_DOMAIN},https://plex.${INGRESS_DOMAIN},https://${LB_PLEX}:32400"
+              # PLEX_PREFERENCE_1: "FriendlyName=plex-kubernetes"
+              # PLEX_PREFERENCE_2: "EnableIPv6=0"
+              # PLEX_PREFERENCE_3: "logDebug=0"
+              # PLEX_PREFERENCE_4: "DisableTLSv1_0=1"
+              # PLEX_PREFERENCE_5: "LanNetworksBandwidth=xxx.xxx.xxx.0/18\,xxx.xxx.xxx.0/24\,xxx.xxx.xxx.0/24"
+              # PLEX_PREFERENCE_6: "TranscoderQuality=2"
+              # PLEX_PREFERENCE_7: "TreatWanIpAsLocal=0"
+              # PLEX_PREFERENCE_8: "TranscoderH264BackgroundPreset=fast"
+            resources:
+              requests:
+                # cpu: 35m
+                memory: 24Gi
+                # gpu.intel.com/i915: 1
+                # nvidia.com/gpu: 1
+              limits:
+                # gpu.intel.com/i915: 1
+                # nvidia.com/gpu: 1
+                memory: 32Gi
+            probes:
+              # -- Liveness probe configuration
+              # @default -- See below
+              liveness:
+                # -- Enable the liveness probe
+                enabled: true
+                # -- Set this to `true` if you wish to specify your own livenessProbe
+                custom: false
+                # -- The spec field contains the values for the default livenessProbe.
+                # If you selected `custom: true`, this field holds the definition of the livenessProbe.
+                # @default -- See below
+                spec:
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              # -- Redainess probe configuration
+              # @default -- See below
+              readiness:
+                # -- Enable the readiness probe
+                enabled: true
+                # -- Set this to `true` if you wish to specify your own readinessProbe
+                custom: false
+                # -- The spec field contains the values for the default readinessProbe.
+                # If you selected `custom: true`, this field holds the definition of the readinessProbe.
+                # @default -- See below
+                spec:
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              # -- Startup probe configuration
+              # @default -- See below
+              startup:
+                # -- Enable the startup probe
+                enabled: false
+                # -- Set this to `true` if you wish to specify your own startupProbe
+                custom: false
+                # -- The spec field contains the values for the default startupProbe.
+                # If you selected `custom: true`, this field holds the definition of the startupProbe.
+                # @default -- See below
+                spec:
+                  initialDelaySeconds: 0
+                  timeoutSeconds: 1
+                  ## This means it has a maximum of 5*30=150 seconds to start up before it fails
+                  periodSeconds: 5
+                  failureThreshold: 30
 
     service:
       main:
@@ -91,37 +150,6 @@ spec:
             protocol: TCP
             targetPort: 33400
         externalTrafficPolicy: Cluster
-
-    ingress:
-      main:
-        enabled: true
-        ingressClassName: "traefik"
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns/is-public: "true"
-          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
-          external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
-          traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
-        hosts:
-          - host: &host "plex.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-                pathType: Prefix
-          - host: &host-cluster "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-                pathType: Prefix
-          - host: &cheesee "cheesee.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-                pathType: Prefix
-        tls:
-          - secretName: tls.plex
-            hosts:
-              - *host
-              - *host-cluster
-              - *cheesee
 
     persistence:
       config:
@@ -162,92 +190,42 @@ spec:
         mountPath: /mnt/unionfs/Media/TV
         accessMode: ReadWriteMany
 
-    addons:
-      promtail:
+    ingress:
+      main:
         enabled: true
-        image:
-          repository: grafana/promtail
-          tag: 2.9.1
-        loki: http://loki.system-monitoring.svc.cluster.local:3100/loki/api/v1/push
-        logs:
-          - name: promtail/plex
-            path: "/config/Library/Application Support/Plex Media Server/Logs/*.log"
-          - name: promtail/plex/plugins
-            path: "/config/Library/Application Support/Plex Media Server/Logs/PMS Plugin Logs/*.log"
-        volumeMounts:
-          - name: config
-            mountPath: /config
-            readOnly: true
-        securityContext:
-          runAsUser: 568
-
-    resources:
-      requests:
-        # cpu: 35m
-        memory: 24Gi
-        # gpu.intel.com/i915: 1
-        # nvidia.com/gpu: 1
-      limits:
-        # gpu.intel.com/i915: 1
-        # nvidia.com/gpu: 1
-        memory: 32Gi
-
-    # affinity:
-    #   nodeAffinity:
-    #     requiredDuringSchedulingIgnoredDuringExecution:
-    #       nodeSelectorTerms:
-            # - matchExpressions:
-            #     - key: feature.node.kubernetes.io/custom-intel-gpu
-            #       operator: In
-            #       values:
-            #         - "true"
-
-    probes:
-      # -- Liveness probe configuration
-      # @default -- See below
-      liveness:
-        # -- Enable the liveness probe
-        enabled: true
-        # -- Set this to `true` if you wish to specify your own livenessProbe
-        custom: false
-        # -- The spec field contains the values for the default livenessProbe.
-        # If you selected `custom: true`, this field holds the definition of the livenessProbe.
-        # @default -- See below
-        spec:
-          initialDelaySeconds: 0
-          periodSeconds: 10
-          timeoutSeconds: 1
-          failureThreshold: 3
-
-      # -- Redainess probe configuration
-      # @default -- See below
-      readiness:
-        # -- Enable the readiness probe
-        enabled: true
-        # -- Set this to `true` if you wish to specify your own readinessProbe
-        custom: false
-        # -- The spec field contains the values for the default readinessProbe.
-        # If you selected `custom: true`, this field holds the definition of the readinessProbe.
-        # @default -- See below
-        spec:
-          initialDelaySeconds: 0
-          periodSeconds: 10
-          timeoutSeconds: 1
-          failureThreshold: 3
-
-      # -- Startup probe configuration
-      # @default -- See below
-      startup:
-        # -- Enable the startup probe
-        enabled: false
-        # -- Set this to `true` if you wish to specify your own startupProbe
-        custom: false
-        # -- The spec field contains the values for the default startupProbe.
-        # If you selected `custom: true`, this field holds the definition of the startupProbe.
-        # @default -- See below
-        spec:
-          initialDelaySeconds: 0
-          timeoutSeconds: 1
-          ## This means it has a maximum of 5*30=150 seconds to start up before it fails
-          periodSeconds: 5
-          failureThreshold: 30
+        className: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns/is-public: "true"
+          external-dns.alpha.kubernetes.io/target: ipv4.${INGRESS_DOMAIN}
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
+        hosts:
+          - host: &host "plex.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  name: main
+                  port: http
+          - host: &host-cluster "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  name: main
+                  port: http
+          - host: &cheesee "cheesee.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  name: main
+                  port: http
+        tls:
+          - secretName: tls.plex
+            hosts:
+              - *host
+              - *host-cluster
+              - *cheesee
