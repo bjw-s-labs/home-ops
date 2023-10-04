@@ -27,37 +27,49 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
-    initContainers:
-      01-init-config:
-        image: public.ecr.aws/docker/library/busybox:latest
-        imagePullPolicy: IfNotPresent
-        command: ["/bin/sh", "-c", "cp /tmp/config/recyclarr.yml /config/recyclarr.yml"]
-        volumeMounts:
-          - { name: config-file, mountPath: /tmp/config }
-          - { name: config, mountPath: /config }
-    image:
-      repository: ghcr.io/recyclarr/recyclarr
-      tag: edge
-    env:
-      TZ: America/Los_Angeles
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 100
+            fsGroup: 100
+            supplementalGroups:
+              - 34
+              - 100
+            fsGroupChangePolicy: "OnRootMismatch"
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/recyclarr/recyclarr
+              tag: edge
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+            resources:
+              requests:
+                memory: "50M"
+              limits:
+                memory: "200M"
+
+        initContainers:
+          01-init-config:
+            image: public.ecr.aws/docker/library/busybox:latest
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c", "cp /tmp/config/recyclarr.yml /config/recyclarr.yml"]
+            volumeMounts:
+              - { name: config-file, mountPath: /tmp/config }
+              - { name: config, mountPath: /config }
+
     service:
       main:
         enabled: false
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 100
-      fsGroupChangePolicy: OnRootMismatch
-    # volumeClaimTemplates:
-    #   - name: config
-    #     mountPath: /config
-    #     accessMode: ReadWriteOnce
-    #     size: 1Gi
-    #     storageClassName: ceph-block-external-nvme
+
+
     persistence:
       config:
         enabled: true
@@ -67,9 +79,3 @@ spec:
         type: configMap
         name: recyclarr-configmap
         mountPath: "-"
-    resources:
-      requests:
-        cpu: 10m
-        memory: 50Mi
-      limits:
-        memory: 200Mi

@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: radarr
+  name: &app radarr
   namespace: downloads
 spec:
   interval: 15m
@@ -27,30 +27,59 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
-    image:
-      repository: ghcr.io/onedr0p/radarr-develop
-      tag: 5.0.3.8107
-      pullPolicy: IfNotPresent
+    global:
+      nameOverride: *app
 
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 100
-      fsGroup: 100
-      supplementalGroups:
-        - 34
-        - 100
-      fsGroupChangePolicy: "OnRootMismatch"
+    defaultPodOptions:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - plex
+                topologyKey: kubernetes.io/hostname
 
-    env:
-      TZ: "${TIMEZONE}"
-      RADARR_INSTANCE_NAME: Radarr
-      RADARR__PORT: &port 7878
-      RADARR__APPLICATION_URL: &host-cluster "radarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-      RADARR__LOG_LEVEL: info
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 100
+            fsGroup: 100
+            supplementalGroups:
+              - 34
+              - 100
+            fsGroupChangePolicy: "OnRootMismatch"
+          hostAliases:
+            - ip: "10.200.1.50"
+              hostnames:
+                - "autoscan.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/radarr-develop
+              tag: 5.0.3.8107
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+              RADARR_INSTANCE_NAME: Radarr
+              RADARR__PORT: &port 7878
+              RADARR__APPLICATION_URL: &host-cluster "radarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              RADARR__LOG_LEVEL: info
+            resources:
+              requests:
+                memory: "256M"
+              limits:
+                memory: "6G"
 
     service:
       main:
@@ -58,26 +87,6 @@ spec:
           http:
             port: *port
 
-    hostAliases:
-      - ip: "10.200.1.50"
-        hostnames:
-          - "autoscan.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-
-    metrics:
-      enabled: true
-      serviceMonitor:
-        interval: 3m
-        scrapeTimeout: 1m
-      prometheusRule:
-        enabled: true
-      exporter:
-        image:
-          repository: ghcr.io/onedr0p/exportarr
-          tag: v1.5.5
-        env:
-          port: 9794
-          additionalMetrics: true
-          unknownQueueItems: true
     persistence:
       config:
         enabled: true
@@ -100,7 +109,7 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "traefik"
+        className: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
@@ -113,31 +122,15 @@ spec:
           - host: *host-cluster
             paths:
               - path: /
+                name: main
+                port: http
           - host: &host "radarr.${INGRESS_DOMAIN}"
             paths:
               - path: /
+                name: main
+                port: http
         tls:
           - secretName: tls.radarr
             hosts:
               - *host-cluster
               - *host
-
-    resources:
-      requests:
-        cpu: "0.04"
-        memory: "256M"
-      limits:
-        memory: "6G"
-
-    affinity:
-      podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                  - key: app.kubernetes.io/name
-                    operator: In
-                    values:
-                      - plex
-              topologyKey: kubernetes.io/hostname

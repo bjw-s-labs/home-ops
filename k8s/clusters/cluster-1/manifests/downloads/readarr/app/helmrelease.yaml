@@ -27,29 +27,38 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
-    image:
-      repository: ghcr.io/onedr0p/readarr-nightly
-      tag: 0.3.6.2232
-      pullPolicy: IfNotPresent
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 100   # was 568 before app template upgrade
+            fsGroup: 100
+            supplementalGroups:
+              - 34
+              - 100
+            fsGroupChangePolicy: "OnRootMismatch"
 
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 100
-      fsGroup: 100
-      supplementalGroups:
-        - 100
-      fsGroupChangePolicy: "OnRootMismatch"
-
-    env:
-      TZ: "${TIMEZONE}"
-      READARR_INSTANCE_NAME: Readarr
-      READARR__PORT: &port 8787
-      READARR__APPLICATION_URL: &host "readarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-      READARR__LOG_LEVEL: info
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/readarr-nightly
+              tag: 0.3.6.2232
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+              READARR__INSTANCE_NAME: Readarr
+              READARR__PORT: &port 8787
+              READARR__APPLICATION_URL: &host "readarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              READARR__LOG_LEVEL: info
+            resources:
+              requests:
+                memory: "256M"
+              limits:
+                memory: "512M"
 
     service:
       main:
@@ -99,7 +108,7 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "traefik"
+        className: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           # external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
@@ -109,14 +118,10 @@ spec:
           - host: *host
             paths:
               - path: /
+                name: main
+                port: http
         tls:
           - secretName: tls.readarr
             hosts:
               - *host
 
-    resources:
-      requests:
-        cpu: "0.04"
-        memory: "256M"
-      limits:
-        memory: "512M"

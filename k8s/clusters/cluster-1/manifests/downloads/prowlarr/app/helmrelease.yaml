@@ -27,41 +27,44 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
-    image:
-      repository: ghcr.io/onedr0p/prowlarr-nightly
-      tag: 1.9.3.4001
-      pullPolicy: IfNotPresent
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 100   # was 568 before app template upgrade
+            fsGroup: 100
+            supplementalGroups:
+              - 34
+              - 100
+            fsGroupChangePolicy: "OnRootMismatch"
 
-    hostname: prowlarr
-
-    # podAnnotations:
-    #   setGateway: "true"
-
-    env:
-      TZ: "${TIMEZONE}"
-      PROWLARR_INSTANCE_NAME: Prowlarr
-      PROWLARR__PORT: &port 9696
-      PROWLARR__APPLICATION_URL: &host "prowlarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-      PROWLARR__LOG_LEVEL: info
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/prowlarr-nightly
+              tag: 1.9.3.4001
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+              PROWLARR__INSTANCE_NAME: Prowlarr
+              PROWLARR__PORT: &port 9696
+              PROWLARR__APPLICATION_URL: &host "prowlarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              PROWLARR__LOG_LEVEL: info
+            resources:
+              requests:
+                memory: "256M"
+              limits:
+                memory: "384M"
 
     service:
       main:
         ports:
           http:
             port: *port
-
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 100
-      fsGroup: 100
-      supplementalGroups:
-        - 34
-        - 100
-      fsGroupChangePolicy: "OnRootMismatch"
 
     persistence:
       config:
@@ -79,7 +82,7 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "traefik"
+        className: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
@@ -92,13 +95,9 @@ spec:
           - host: *host
             paths:
               - path: /
+                name: main
+                port: http
         tls:
           - secretName: tls.prowlarr
             hosts:
               - *host
-
-    resources:
-      requests:
-        memory: "256M"
-      limits:
-        memory: "384M"

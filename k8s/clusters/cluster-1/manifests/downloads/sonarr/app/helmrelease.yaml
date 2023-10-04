@@ -27,57 +27,58 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
-    image:
-      repository: ghcr.io/onedr0p/sonarr-develop
-      tag: 4.0.0.688
-      pullPolicy: IfNotPresent
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 100   # was 568 before app template upgrade
+            fsGroup: 100
+            supplementalGroups:
+              - 34
+              - 100
+            fsGroupChangePolicy: "OnRootMismatch"
 
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 100
-      fsGroup: 100
-      supplementalGroups:
-        - 34
-        - 100
-      fsGroupChangePolicy: "OnRootMismatch"
-
-    env:
-      TZ: "${TIMEZONE}"
-      SONARR_INSTANCE_NAME: Sonarr
-      SONARR__PORT: &port 8989
-      SONARR__APPLICATION_URL: &host-cluster "sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-      SONARR__LOG_LEVEL: info
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/sonarr-develop
+              tag: 4.0.0.688
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+              SONARR_INSTANCE_NAME: Sonarr
+              SONARR__PORT: &port 8989
+              SONARR__APPLICATION_URL: &host-cluster "sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              SONARR__LOG_LEVEL: info
+            resources:
+              requests:
+                memory: "2500M"
+              limits:
+                memory: "6G"
+            hostAliases:
+              - ip: "10.200.1.50"
+                hostnames:
+                  - "autoscan.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            affinity:
+              podAntiAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  - labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - plex
+                    topologyKey: kubernetes.io/hostname
 
     service:
       main:
         ports:
           http:
             port: *port
-
-    hostAliases:
-      - ip: "10.200.1.50"
-        hostnames:
-          - "autoscan.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-
-    metrics:
-      enabled: true
-      serviceMonitor:
-        interval: 3m
-        scrapeTimeout: 1m
-      prometheusRule:
-        enabled: true
-      exporter:
-        image:
-          repository: ghcr.io/onedr0p/exportarr
-          tag: v1.5.5
-        env:
-          port: 9794
-          additionalMetrics: false
-          unknownQueueItems: true
 
     persistence:
       config:
@@ -114,33 +115,16 @@ spec:
           - host: *host-cluster
             paths:
               - path: /
+                name: main
+                port: http
           - host: &host "sonarr.${INGRESS_DOMAIN}"
             paths:
               - path: /
-          # - host: &host-cftest "sonarr.cftest.${INGRESS_DOMAIN}"
-          #   paths:
-          #     - path: /
+                name: main
+                port: http
         tls:
           - secretName: tls.sonarr
             hosts:
               - *host-cluster
               - *host
-              # - *host-cftest
 
-    resources:
-      requests:
-        memory: "2500M"
-      limits:
-        memory: "6G"
-
-    # Prevents instance from running on same node as Plex
-    affinity:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: app.kubernetes.io/name
-                  operator: In
-                  values:
-                    - plex
-            topologyKey: kubernetes.io/hostname
