@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: frigate
+  name: &app frigate
   namespace: home-automation
 spec:
   dependsOn:
@@ -18,39 +18,91 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
-    image:
-      repository: ghcr.io/blakeblackshear/frigate
-      tag: 0.12.1
+    global:
+      nameOverride: *app
+      fullnameOverride: *app
 
-    podAnnotations:
-      configmap.reloader.stakater.com/reload: "frigate-config"
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          #runAsUser: 1000
+          #runAsGroup: 100
+          fsGroup: 100
+          supplementalGroups:
+            - 1000
+            - 100
+          # - 568
+          fsGroupChangePolicy: "OnRootMismatch"
+          hostAliases:
+            - ip: "10.200.1.50"
+              hostnames:
+                - "plex.${INGRESS_DOMAIN}"
+                - "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
-    env:
-      TZ: "${TIMEZONE}"
-      FRIGATE__INSTANCE_NAME: Frigate
-      FRIGATE__PORT: &port 5000
-      FRIGATE__APPLICATION_URL: &host-cluster "frigate.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-      FRIGATE__LOG_LEVEL: info
-
-    podSecurityContext:
-    #   runAsUser: 1000
-    #   runAsGroup: 100
-      fsGroup: 100
-      supplementalGroups:
-        - 1000
-        - 100
-    #     - 568
-      fsGroupChangePolicy: "OnRootMismatch"
-
-    envFrom:
-      - secretRef:
-          name: frigate-secrets
+        containers:
+          main:
+            image:
+              repository: ghcr.io/blakeblackshear/frigate
+              tag: 0.12.1
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+              FRIGATE__INSTANCE_NAME: Frigate
+              FRIGATE__PORT: &port 5000
+              FRIGATE__APPLICATION_URL: &host-cluster "frigate.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              FRIGATE__LOG_LEVEL: info
+            envFrom:
+              - secretRef:
+                  name: frigate-secrets
+            resources:
+              requests:
+                memory: 300Mi
+                # gpu.intel.com/i915: 1
+              limits:
+                # gpu.intel.com/i915: 1
+                memory: 1000Mi
+            securityContext:
+                  privileged: true
+            annotations:
+              configmap.reloader.stakater.com/reload: "frigate-config"
+            nodeSelector:
+              google.feature.node.kubernetes.io/coral: "true"
+            probes:
+              liveness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/version
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/version
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/version
+                    port: *port
+                  failureThreshold: 30
+                  periodSeconds: 10
 
     service:
       main:
@@ -105,7 +157,7 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "traefik"
+        className: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
@@ -117,70 +169,17 @@ spec:
           - host: &host "frigate.${INGRESS_DOMAIN}"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
           - host: *host-cluster
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - secretName: tls.frigate
             hosts:
               - *host
               - *host-cluster
-
-    probes:
-      liveness: &probe
-        enabled: true
-        custom: true
-        spec:
-          httpGet:
-            path: /api/version
-            port: *port
-          initialDelaySeconds: 0
-          periodSeconds: 10
-          timeoutSeconds: 1
-          failureThreshold: 3
-      readiness:
-        enabled: true
-        custom: true
-        spec:
-          httpGet:
-            path: /api/version
-            port: *port
-          initialDelaySeconds: 0
-          periodSeconds: 10
-          timeoutSeconds: 1
-          failureThreshold: 3
-      startup:
-        enabled: true
-        custom: true
-        spec:
-          httpGet:
-            path: /api/version
-            port: *port
-          failureThreshold: 30
-          periodSeconds: 10
-
-    securityContext:
-      privileged: true
-
-    nodeSelector:
-      # node-role.kubernetes.io/worker: "true"
-      google.feature.node.kubernetes.io/coral: "true"
-      # intel.feature.node.kubernetes.io/gpu: "true"
-    # affinity:
-    #   podAntiAffinity:
-    #     requiredDuringSchedulingIgnoredDuringExecution:
-    #       - labelSelector:
-    #           matchExpressions:
-    #             - key: app.kubernetes.io/name
-    #               operator: In
-    #               values: ["plex"]
-    #         topologyKey: kubernetes.io/hostname
-
-    resources:
-      requests:
-        memory: 300Mi
-        cpu: 400m
-        # gpu.intel.com/i915: 1
-      limits:
-        # gpu.intel.com/i915: 1
-        memory: 1000Mi
