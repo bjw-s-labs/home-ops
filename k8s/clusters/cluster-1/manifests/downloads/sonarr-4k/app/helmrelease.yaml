@@ -79,16 +79,25 @@ spec:
       backup:
         enabled: true
         existingClaim: cephfs-hdd-backups-sonarr-4k
-        mountPath: /config/Backups
+        advancedMounts:
+          main:
+            main:
+              - path: /config/Backups
       4ktv:
         enabled: true
         existingClaim: cephfs-hdd-downloads-4ktv
-        mountPath: /mnt/unionfs/Media/4KTV/
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/Media/4KTV/
         accessMode: ReadWriteMany
       downloads:
         enabled: true
         existingClaim: cephfs-ssd-cache-downloads
-        mountPath: /mnt/unionfs/downloads
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/downloads
         accessMode: ReadWriteMany
 
     ingress:

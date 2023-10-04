@@ -94,17 +94,26 @@ spec:
       movies:
         enabled: true
         existingClaim: cephfs-hdd-downloads-movies
-        mountPath: /mnt/unionfs/Media/Movies/
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/Media/Movies/
         accessMode: ReadWriteMany
       downloads:
         enabled: true
         existingClaim: cephfs-ssd-cache-downloads
-        mountPath: /mnt/unionfs/downloads
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/downloads
         accessMode: ReadWriteMany
       backup:
         enabled: true
         existingClaim: cephfs-hdd-backups-radarr
-        mountPath: /config/Backups
+        advancedMounts:
+          main:
+            main:
+              - path: /config/Backups
 
     ingress:
       main:

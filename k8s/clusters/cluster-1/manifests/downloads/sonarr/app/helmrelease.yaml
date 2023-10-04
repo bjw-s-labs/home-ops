@@ -94,17 +94,26 @@ spec:
       tv:
         enabled: true
         existingClaim: cephfs-hdd-downloads-tv
-        mountPath: /mnt/unionfs/Media/TV
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/Media/TV
         accessMode: ReadWriteMany
       downloads:
         enabled: true
         existingClaim: cephfs-ssd-cache-downloads
-        mountPath: /mnt/unionfs/downloads
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/downloads
         accessMode: ReadWriteMany
       backup:
         enabled: true
         existingClaim: cephfs-hdd-backups-sonarr
-        mountPath: /config/Backups
+        advancedMounts:
+          main:
+            main:
+              - path: /config/Backups
 
     ingress:
       main:

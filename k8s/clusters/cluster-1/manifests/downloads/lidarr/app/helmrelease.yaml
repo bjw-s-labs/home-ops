@@ -73,16 +73,25 @@ spec:
       music:
         enabled: true
         existingClaim: cephfs-hdd-downloads-music
-        mountPath: /mnt/unionfs/Media/Music/
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/Media/Music/
         accessMode: ReadWriteMany
       backup:
         enabled: true
         existingClaim: cephfs-hdd-backups-lidarr
-        mountPath: /config/Backups
+        advancedMounts:
+          main:
+            main:
+              - path: /config/Backups
       downloads:
         enabled: true
         existingClaim: cephfs-ssd-cache-downloads
-        mountPath: /mnt/unionfs/downloads
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/downloads
         accessMode: ReadWriteMany
 
     ingress:

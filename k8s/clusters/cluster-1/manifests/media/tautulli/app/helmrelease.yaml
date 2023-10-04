@@ -91,8 +91,11 @@ spec:
       backup:
         enabled: true
         existingClaim: cephfs-hdd-backups-media
-        subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/tautulli
-        mountPath: /config/backups
+        advancedMounts:
+          main:
+            main:
+              - path: /config/backups
+                subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/tautulli
 
     ingress:
       main:

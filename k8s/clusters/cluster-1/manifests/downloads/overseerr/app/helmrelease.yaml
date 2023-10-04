@@ -77,11 +77,17 @@ spec:
       config:
         enabled: true
         existingClaim: overseerr-config-nvme
-        mountPath: /app/config
+        advancedMounts:
+          main:
+            main:
+              - path: /app/config
       backup:
         enabled: true
         existingClaim: cephfs-hdd-backups-overseerr
-        mountPath: /app/config/Backups
+        advancedMounts:
+          main:
+            main:
+              - path: /app/config/Backups
 
     ingress:
       main:

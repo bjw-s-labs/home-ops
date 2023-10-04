@@ -73,11 +73,17 @@ spec:
       shared:
         enabled: true
         type: emptyDir
-        mountPath: /shared
+        advancedMounts:
+          main:
+            main:
+              - path: /shared
       backup:
         enabled: true
         existingClaim: cephfs-hdd-backups-prowlarr
-        mountPath: /config/Backups
+        advancedMounts:
+          main:
+            main:
+              - path: /config/Backups
 
     ingress:
       main:

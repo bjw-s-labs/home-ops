@@ -80,17 +80,26 @@ spec:
       4kmovies:
         enabled: true
         existingClaim: cephfs-hdd-downloads-4kmovies
-        mountPath: /mnt/unionfs/Media/4KMovies/
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/Media/4KMovies/
         accessMode: ReadWriteMany
       downloads:
         enabled: true
         existingClaim: cephfs-ssd-cache-downloads
-        mountPath: /mnt/unionfs/downloads
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/downloads
         accessMode: ReadWriteMany
       backup:
         enabled: true
         existingClaim: cephfs-hdd-backups-radarr-4k
-        mountPath: /config/Backups
+        advancedMounts:
+          main:
+            main:
+              - path: /config/Backups
 
     ingress:
       main:

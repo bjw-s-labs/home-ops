@@ -86,34 +86,50 @@ spec:
         enabled: true
         type: configMap
         name: pmm-config
-        subPath: config.yaml
-        mountPath: /config/config.yml
+        advancedMounts:
+          main:
+            main:
+              - path: /config/config.yml
+                subPath: config.yaml
+        mountPath: 
         readOnly: false
       pmm-tv:
         enabled: true
         type: configMap
         name: pmm-tv
-        subPath: tv.yaml
-        mountPath: config/tv.yaml
+        advancedMounts:
+          main:
+            main:
+              - path: config/tv.yaml
+                subPath: tv.yaml
         readOnly: false
       pmm-tv-overlay:
         enabled: true
         type: configMap
         name: pmm-tv-overlay
-        subPath: tv_overlay.yaml
-        mountPath: config/tv_overlay.yaml
+        advancedMounts:
+          main:
+            main:
+              - path: config/tv_overlay.yaml
+                subPath: tv_overlay.yaml
         readOnly: false
       pmm-movies:
         enabled: true
         type: configMap
         name: pmm-movies
-        subPath: movies.yaml
-        mountPath: config/movies.yaml
+        advancedMounts:
+          main:
+            main:
+              - path: config/movies.yaml
+                subPath: movies.yaml
         readOnly: false
       pmm-movies-overlay:
         enabled: true
         type: configMap
         name: pmm-movies-overlay
-        subPath: movies_overlay.yaml
-        mountPath: config/movies_overlay.yaml
+        advancedMounts:
+          main:
+            main:
+              - path: config/movies_overlay.yaml
+                subPath: movies_overlay.yaml
         readOnly: false

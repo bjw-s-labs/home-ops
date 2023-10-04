@@ -73,37 +73,58 @@ spec:
       4kmovies:
         enabled: true
         existingClaim: cephfs-hdd-downloads-4kmovies
-        mountPath: /mnt/unionfs/Media/4KMovies/
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/Media/4KMovies/
         accessMode: ReadWriteMany
       4ktv:
         enabled: true
         existingClaim: cephfs-hdd-downloads-4ktv
-        mountPath: /mnt/unionfs/Media/4KTV/
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/Media/4KTV/
         accessMode: ReadWriteMany
       music:
         enabled: true
         existingClaim: cephfs-hdd-downloads-music
-        mountPath: /mnt/unionfs/Media/Music/
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/Media/Music/
         accessMode: ReadWriteMany
       movies:
         enabled: true
         existingClaim: cephfs-hdd-downloads-movies
-        mountPath: /mnt/unionfs/Media/Movies/
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/Media/Movies/
         accessMode: ReadWriteMany
       tv:
         enabled: true
         existingClaim: cephfs-hdd-downloads-tv
-        mountPath: /mnt/unionfs/Media/TV
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/Media/TV
         accessMode: ReadWriteMany
       downloads:
         enabled: true
         existingClaim: cephfs-ssd-cache-downloads
-        mountPath: /mnt/unionfs/downloads
+        advancedMounts:
+          main:
+            main:
+              - path: /mnt/unionfs/downloads
         accessMode: ReadWriteMany
       backup:
         enabled: true
         existingClaim: cephfs-hdd-backups-readarr
-        mountPath: /config/Backups
+        advancedMounts:
+          main:
+            main:
+              - path: /config/Backups
 
     ingress:
       main:
