@@ -27,47 +27,77 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
     global:
       nameOverride: *app
-    fullnameOverride: plex-auto-lang
-    image:
-      repository: remirigal/plex-auto-languages
-      tag: "v1.2.3"
+      fullnameOverride: *app
 
-    # podSecurityContext:
-    #   runAsUser: 568
-    #   runAsGroup: 100
-    #   fsGroup: 100
-    #   supplementalGroups:
-    #     - 34
-    #     - 100
-    #   fsGroupChangePolicy: "OnRootMismatch"
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          # securityContext:
+          #   runAsUser: 568
+          #   runAsGroup: 100
+          #   fsGroup: 100
+          #   supplementalGroups:
+          #     - 34
+          #     - 100
+          #   fsGroupChangePolicy: "OnRootMismatch"
+          hostAliases:
+            - ip: "10.200.1.50"
+              hostnames:
+                - "plex.${INGRESS_DOMAIN}"
+                - "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
-    env:
-      TZ: "${TIMEZONE}"
-      PLEX_URL: http://plex.media:32400
-      PLEX_TOKEN: "${PLEX_TOKEN}"
-
-      UPDATE_LEVEL: "show"
-      UPDATE_STRATEGY: "all"
-      TRIGGER_ON_PLAY: "true"
-      TRIGGER_ON_SCAN: "true"
-      TRIGGER_ON_ACTIVITY: "false"
-      REFRESH_LIBRARY_ON_SCAN: "true"
-
-      SCHEDULER_ENABLE: "true"
-      SCHEDULER_SCHEDULE_TIME: "04:30"
-
-      NOTIFICATIONS_ENABLE: "true"
-      # need to figure out how to do a list of env vars
-      # NOTIFICATIONS_APPRISE_CONFIGS
-
-      DEBUG: "false"
-
+        containers:
+          main:
+            image:
+              repository: remirigal/plex-auto-languages
+              tag: "v1.2.3"
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+              PLEX_URL: http://plex.media:32400
+              PLEX_TOKEN: "${PLEX_TOKEN}"
+              UPDATE_LEVEL: "show"
+              UPDATE_STRATEGY: "all"
+              TRIGGER_ON_PLAY: "true"
+              TRIGGER_ON_SCAN: "true"
+              TRIGGER_ON_ACTIVITY: "false"
+              REFRESH_LIBRARY_ON_SCAN: "true"
+              SCHEDULER_ENABLE: "true"
+              SCHEDULER_SCHEDULE_TIME: "04:30"
+              NOTIFICATIONS_ENABLE: "true"
+              # need to figure out how to do a list of env vars
+              # NOTIFICATIONS_APPRISE_CONFIGS
+              DEBUG: "false"
+            resources:
+              requests:
+                memory: "100M"
+              limits:
+                memory: "6G"
+            probes:
+              liveness:
+                enabled: false
+                custom: true
+                ## The spec field contains the values for the default livenessProbe.
+                ## If you selected custom: true, this field holds the definition of the livenessProbe.
+                spec:
+                  exec:
+                    command:
+                      - /usr/bin/env
+                      - bash
+                      - -c
+                      - username=`grep -B 1 'username:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
+                        password=`grep -B 1 'password:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
+                        curl --fail $username:$password@localhost:3030/triggers/manual
+                  failureThreshold: 5
+                  initialDelaySeconds: 60
+                  periodSeconds: 10
+                  successThreshold: 1
+                  timeoutSeconds: 10
 
     service:
       main:
@@ -75,33 +105,6 @@ spec:
         ports:
           http:
             port: 3030
-
-    hostAliases:
-      - ip: "10.200.1.50"
-        hostnames:
-          - "plex.${INGRESS_DOMAIN}"
-          - "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-
-    probes:
-      liveness:
-        enabled: false
-        custom: true
-        ## The spec field contains the values for the default livenessProbe.
-        ## If you selected custom: true, this field holds the definition of the livenessProbe.
-        spec:
-          exec:
-            command:
-              - /usr/bin/env
-              - bash
-              - -c
-              - username=`grep -B 1 'username:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
-                password=`grep -B 1 'password:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
-                curl --fail $username:$password@localhost:3030/triggers/manual
-          failureThreshold: 5
-          initialDelaySeconds: 60
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 10
 
     persistence:
       config:
@@ -111,7 +114,7 @@ spec:
     ingress:
       main:
         enabled: false
-        ingressClassName: "traefik"
+        className: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
@@ -125,18 +128,18 @@ spec:
           - host: &host-cluster "plex-auto-languages.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
           - host: &host "plex-auto-languages.${INGRESS_DOMAIN}"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - secretName: tls.plex-auto-languages
             hosts:
               - *host-cluster
               - *host
 
-    resources:
-      requests:
-        cpu: 50m
-        memory: "100M"
-      limits:
-        memory: "6G"
