@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: home-assistant
+  name: &app home-assistant
   namespace: home-automation
 spec:
   interval: 15m
@@ -27,20 +27,53 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
-    image:
-      repository: ghcr.io/onedr0p/home-assistant
-      tag: 2023.9.3@sha256:d6e4c153f71b544e0e216706beda9511e106d535f96a0fce75500efa7cbee01d
+    global:
+      nameOverride: *app
 
-    env:
-      TZ: "${TIMEZONE}"
-      HASS__INSTANCE_NAME: Home-Assistant
-      HASS__PORT: &port 8123
-      HASS__APPLICATION_URL: &host-cluster "home.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-      HASS__LOG_LEVEL: info
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          annotations:
+            k8s.v1.cni.cncf.io/networks: hass-iot-static
+            # k8s.v1.cni.cncf.io/networks: home-automation-iot-dhcp
+            secret.reloader.stakater.com/reload: home-assistant-secrets
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 100
+            fsGroup: 100
+            supplementalGroups:
+              - 34
+              - 100
+              - 568
+            fsGroupChangePolicy: "OnRootMismatch"
+          hostAliases:
+            - ip: "10.200.1.50"
+              hostnames:
+                - "home.${INGRESS_DOMAIN}"
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/home-assistant
+              tag: 2023.9.3@sha256:d6e4c153f71b544e0e216706beda9511e106d535f96a0fce75500efa7cbee01d
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+              HASS__INSTANCE_NAME: Home-Assistant
+              HASS__PORT: &port 8123
+              HASS__APPLICATION_URL: &host-cluster "home.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              HASS__LOG_LEVEL: info
+            envFrom:
+              - secretRef:
+                  name: home-assistant-secrets
+            resources:
+              requests:
+                memory: "512M"
+              limits:
+                memory: "6000M"
 
     service:
       main:
@@ -63,46 +96,10 @@ spec:
             protocol: UDP
             targetPort: 5353
 
-    nameOverride: "home-assistant"
-
-    hostAliases:
-      - ip: "10.200.1.50"
-        hostnames:
-          - "home.${INGRESS_DOMAIN}"
-
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 100
-      fsGroup: 100
-      supplementalGroups:
-        - 34
-        - 100
-        - 568
-      fsGroupChangePolicy: "OnRootMismatch"
-
-    podAnnotations:
-      k8s.v1.cni.cncf.io/networks: hass-iot-static
-      # k8s.v1.cni.cncf.io/networks: home-automation-iot-dhcp
-      secret.reloader.stakater.com/reload: home-assistant-secrets
-
-    probes:
-      liveness:
-        enabled: false
-      readiness:
-        enabled: false
-      startup:
-        enabled: false
-
-    # dnsPolicy: ClusterFirstWithHostNet
-    # dnsConfig:
-    #   options:
-    #     - name: ndots
-    #       value: "1"
-
     ingress:
       main:
         enabled: true
-        ingressClassName: "traefik"
+        className: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
@@ -114,18 +111,20 @@ spec:
           - host: *host-cluster
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
           - host: &host "home.${INGRESS_DOMAIN}"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - secretName: tls.home-assistant-frontend
             hosts:
               - *host-cluster
               - *host
-
-    envFrom:
-      - secretRef:
-          name: home-assistant-secrets
 
     persistence:
       config:
@@ -134,16 +133,16 @@ spec:
       backup:
         enabled: true
         existingClaim: cephfs-hdd-backups-home-automation
-        subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/home-assistant
-        mountPath: /config/Backups
+        advancedMounts:
+          main:
+            main:
+              - path: /config/Backups
+                subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/home-assistant
       matter-server-data:
         enabled: true
         type: emptyDir
-        mountPath: /data
+        advancedMounts:
+          main:
+            main:
+              - path: /data
 
-    resources:
-      requests:
-        cpu: 75m
-        memory: 512Mi
-      limits:
-        memory: 6000Mi
