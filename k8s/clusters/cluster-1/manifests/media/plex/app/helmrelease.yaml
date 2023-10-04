@@ -126,6 +126,7 @@ spec:
 
     service:
       main:
+        controller: main
         type: LoadBalancer
         annotations:
           traefik.ingress.kubernetes.io/service.serversscheme: https
@@ -142,6 +143,7 @@ spec:
         externalTrafficPolicy: Cluster
       webtools:
         enabled: true
+        controller: main
         type: NodePort
         ports:
           webtools:
