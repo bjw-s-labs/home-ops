@@ -12,11 +12,12 @@ module.exports = {
       icon: "fa-cloud",
       strategy: require("passport-openidconnect").Strategy,
       options: {
-        issuer: "https://auth.bjw-s.dev",
-        authorizationURL: "https://auth.bjw-s.dev/api/oidc/authorization",
-        tokenURL: "https://auth.bjw-s.dev/api/oidc/token",
-        userInfoURL: "https://auth.bjw-s.dev/api/oidc/userinfo",
-        clientID: "nodered",
+        issuer: "https://authentik.bjw-s.dev/application/o/node-red/",
+        authorizationURL:
+          "https://authentik.bjw-s.dev/application/o/authorize/",
+        tokenURL: "https://authentik.bjw-s.dev/application/o/token/",
+        userInfoURL: "https://authentik.bjw-s.dev/application/o/userinfo/",
+        clientID: "hN1VIEAhdR3noLaM6KLmKBYRWVsf5ywyFfh98GDV",
         clientSecret: process.env.NODE_RED_OAUTH_CLIENT_SECRET,
         callbackURL: "https://nodered.bjw-s.dev/auth/strategy/callback",
         scope: ["email", "profile", "openid"],
@@ -26,7 +27,7 @@ module.exports = {
         },
       },
     },
-    users: [{ username: "bernd", permissions: ["*"] }],
+    users: [{username: "bernd", permissions: ["*"]}],
   },
 
   uiPort: process.env.PORT || 1880,
