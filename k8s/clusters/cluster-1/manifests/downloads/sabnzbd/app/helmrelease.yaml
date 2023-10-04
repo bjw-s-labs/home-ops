@@ -154,13 +154,15 @@ spec:
           - host: *host-cluster
             paths:
               - path: /
-                name: main
-                port: http
+                service:
+                  name: main
+                  port: http
           - host: &host "sabnzbd.${INGRESS_DOMAIN}"
             paths:
               - path: /
-                name: main
-                port: http
+                service:
+                  name: main
+                  port: http
         tls:
           - secretName: tls.sabnzbd
             hosts:
