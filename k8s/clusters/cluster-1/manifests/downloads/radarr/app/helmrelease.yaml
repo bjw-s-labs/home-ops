@@ -122,13 +122,15 @@ spec:
           - host: *host-cluster
             paths:
               - path: /
-                name: main
-                port: http
+                service:
+                  name: main
+                  port: http
           - host: &host "radarr.${INGRESS_DOMAIN}"
             paths:
               - path: /
-                name: main
-                port: http
+                service:
+                  name: main
+                  port: http
         tls:
           - secretName: tls.radarr
             hosts:

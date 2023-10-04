@@ -107,13 +107,15 @@ spec:
           - host: *host-cluster
             paths:
               - path: /
-                name: main
-                port: http
+                service:
+                  name: main
+                  port: http
           - host: &host "sonarr-4k.${INGRESS_DOMAIN}"
             paths:
               - path: /
-                name: main
-                port: http
+                service:
+                  name: main
+                  port: http
         tls:
           - secretName: tls.sonarr-4k
             hosts:
