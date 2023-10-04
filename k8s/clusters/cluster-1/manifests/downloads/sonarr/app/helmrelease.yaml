@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: sonarr
+  name: &app sonarr
   namespace: downloads
 spec:
   interval: 15m
@@ -27,6 +27,23 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    global:
+      nameOverride: *app
+
+    defaultPodOptions:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - plex
+                topologyKey: kubernetes.io/hostname
+
     controllers:
       main:
         type: statefulset
@@ -63,16 +80,6 @@ spec:
               - ip: "10.200.1.50"
                 hostnames:
                   - "autoscan.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-            affinity:
-              podAntiAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchExpressions:
-                        - key: app.kubernetes.io/name
-                          operator: In
-                          values:
-                            - plex
-                    topologyKey: kubernetes.io/hostname
 
     service:
       main:
