@@ -30,19 +30,19 @@ spec:
     global:
       nameOverride: *app
 
-    defaultPodOptions:
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: app.kubernetes.io/name
-                      operator: In
-                      values:
-                        - plex
-                topologyKey: kubernetes.io/hostname
+    # defaultPodOptions:
+    #   affinity:
+    #     podAntiAffinity:
+    #       preferredDuringSchedulingIgnoredDuringExecution:
+    #         - weight: 100
+    #           podAffinityTerm:
+    #             labelSelector:
+    #               matchExpressions:
+    #                 - key: app.kubernetes.io/name
+    #                   operator: In
+    #                   values:
+    #                     - plex
+    #             topologyKey: kubernetes.io/hostname
 
     controllers:
       main:
