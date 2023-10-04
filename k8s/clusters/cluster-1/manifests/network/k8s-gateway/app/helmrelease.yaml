@@ -40,13 +40,6 @@ spec:
             args: ["-conf", "/etc/coredns/Corefile"]
             env:
               TZ: "${TIMEZONE}"
-              HASS__INSTANCE_NAME: Home-Assistant
-              HASS__PORT: &port 8123
-              HASS__APPLICATION_URL: &host-cluster "home.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-              HASS__LOG_LEVEL: info
-            envFrom:
-              - secretRef:
-                  name: home-assistant-secrets
             resources:
               requests:
                 memory: "512M"
