@@ -61,7 +61,8 @@ spec:
               repository: public.ecr.aws/docker/library/busybox
               tag: latest
               pullPolicy: IfNotPresent
-            command: ["/bin/sh", "-c", "cp /tmp/config/recyclarr.yml /config/recyclarr.yml"]
+            command: ["/bin/sh", "-c", "sleep 9999999999"]
+            # command: ["/bin/sh", "-c", "cp /tmp/config/recyclarr.yml /config/recyclarr.yml"]
             volumeMounts:
               - { name: config-file, mountPath: /tmp/config }
               - { name: config, mountPath: /config }
