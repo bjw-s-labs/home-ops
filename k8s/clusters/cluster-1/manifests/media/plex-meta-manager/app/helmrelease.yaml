@@ -27,57 +27,49 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
     global:
       nameOverride: *app
-    fullnameOverride: plex-meta-manager
-    image:
-      repository: meisnate12/plex-meta-manager
-      # tag: "v1.18.0"
-      # pullPolicy: IfNotPresent
-      tag: nightly
-      pullPolicy: Always
+      fullnameOverride: *app
 
-    # podSecurityContext:
-    #   runAsUser: 568
-    #   runAsGroup: 100
-    #   fsGroup: 100
-    #   supplementalGroups:
-    #     - 34
-    #     - 100
-    #   fsGroupChangePolicy: "OnRootMismatch"
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          # securityContext:
+          #   runAsUser: 568
+          #   runAsGroup: 100
+          #   fsGroup: 100
+          #   supplementalGroups:
+          #     - 34
+          #     - 100
+          #   fsGroupChangePolicy: "OnRootMismatch"
+          hostAliases:
+            - ip: "10.200.1.50"
+              hostnames:
+                - "plex.${INGRESS_DOMAIN}"
+                - "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
-    env:
-      TZ: "${TIMEZONE}"
-      PMM_CONFIG: /config/config.yml
-      PMM_TIME: "06:00, 18:00"
-      # Runs PMM immediately. Used to test
-      PMM_RUN: true
-      PMM_DEBUG: true
-      PMM_READ_ONLY_CONFIG: true
-      
-#       PLEX_URL: http://plex.media:32400
-#       PLEX_TOKEN: "${PLEX_TOKEN}"
-# 
-#       UPDATE_LEVEL: "show"
-#       UPDATE_STRATEGY: "all"
-#       TRIGGER_ON_PLAY: "true"
-#       TRIGGER_ON_SCAN: "true"
-#       TRIGGER_ON_ACTIVITY: "false"
-#       REFRESH_LIBRARY_ON_SCAN: "true"
-# 
-#       SCHEDULER_ENABLE: "true"
-#       SCHEDULER_SCHEDULE_TIME: "04:30"
-# 
-#       NOTIFICATIONS_ENABLE: "true"
-#       # need to figure out how to do a list of env vars
-#       # NOTIFICATIONS_APPRISE_CONFIGS
-# 
-#       DEBUG: "false"
-
+        containers:
+          main:
+            image:
+              repository: meisnate12/plex-meta-manager
+              tag: nightly
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+              PMM_CONFIG: /config/config.yml
+              PMM_TIME: "06:00, 18:00"
+              # Runs PMM immediately. Used to test
+              PMM_RUN: true
+              PMM_DEBUG: true
+              PMM_READ_ONLY_CONFIG: true
+            resources:
+              requests:
+                memory: "100M"
+              limits:
+                memory: "6G"
 
     service:
       main:
@@ -85,33 +77,6 @@ spec:
         ports:
           http:
             port: 3030
-# 
-#     hostAliases:
-#       - ip: "10.200.1.50"
-#         hostnames:
-#           - "plex.${INGRESS_DOMAIN}"
-#           - "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-# 
-#     probes:
-#       liveness:
-#         enabled: false
-#         custom: true
-#         ## The spec field contains the values for the default livenessProbe.
-#         ## If you selected custom: true, this field holds the definition of the livenessProbe.
-#         spec:
-#           exec:
-#             command:
-#               - /usr/bin/env
-#               - bash
-#               - -c
-#               - username=`grep -B 1 'username:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
-#                 password=`grep -B 1 'password:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
-#                 curl --fail $username:$password@localhost:3030/triggers/manual
-#           failureThreshold: 5
-#           initialDelaySeconds: 60
-#           periodSeconds: 10
-#           successThreshold: 1
-#           timeoutSeconds: 10
 
     persistence:
       config:
@@ -152,10 +117,3 @@ spec:
         subPath: movies_overlay.yaml
         mountPath: config/movies_overlay.yaml
         readOnly: false
-
-    # resources:
-    #   requests:
-    #     cpu: 50m
-    #     memory: "100M"
-    #   limits:
-    #     memory: "25G"
