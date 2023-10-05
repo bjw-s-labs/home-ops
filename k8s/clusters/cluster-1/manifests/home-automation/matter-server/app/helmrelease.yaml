@@ -41,7 +41,9 @@ spec:
             k8s.v1.cni.cncf.io/networks: matter-server-iot-static
             # k8s.v1.cni.cncf.io/networks: macvlan-conf-dhcp
           securityContext:
-            runAsUser: 568
+            # runAsUser: 568
+            # Must be run as root for now
+            runAsUser: 0
             runAsGroup: 100
             fsGroup: 100
             supplementalGroups:
