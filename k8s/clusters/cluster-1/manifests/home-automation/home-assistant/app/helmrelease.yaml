@@ -96,6 +96,26 @@ spec:
             protocol: UDP
             targetPort: 5353
 
+    persistence:
+      config:
+        enabled: true
+        existingClaim: home-assistant-config
+      backup:
+        enabled: true
+        existingClaim: cephfs-hdd-backups-home-automation
+        advancedMounts:
+          main:
+            main:
+              - path: /config/Backups
+                subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/home-assistant
+      matter-server-data:
+        enabled: true
+        type: emptyDir
+        advancedMounts:
+          main:
+            main:
+              - path: /data
+
     ingress:
       main:
         enabled: true
@@ -125,24 +145,3 @@ spec:
             hosts:
               - *host-cluster
               - *host
-
-    persistence:
-      config:
-        enabled: true
-        existingClaim: home-assistant-config
-      backup:
-        enabled: true
-        existingClaim: cephfs-hdd-backups-home-automation
-        advancedMounts:
-          main:
-            main:
-              - path: /config/Backups
-                subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/home-assistant
-      matter-server-data:
-        enabled: true
-        type: emptyDir
-        advancedMounts:
-          main:
-            main:
-              - path: /data
-

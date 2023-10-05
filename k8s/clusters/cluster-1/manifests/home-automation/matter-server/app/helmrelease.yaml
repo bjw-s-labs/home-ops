@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: matter-server
+  name: &app matter-server
   namespace: home-automation
 spec:
   interval: 15m
@@ -27,21 +27,50 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+    global:
+      nameOverride: *app
+      fullnameOverride: *app
 
-    image:
-      repository: ghcr.io/home-assistant-libs/python-matter-server
-      tag: 3.7.0
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          annotations:
+            k8s.v1.cni.cncf.io/networks: matter-server-iot-static
+            # k8s.v1.cni.cncf.io/networks: macvlan-conf-dhcp
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 100
+            fsGroup: 100
+            supplementalGroups:
+              - 34
+              - 100
+              - 568
+            fsGroupChangePolicy: "OnRootMismatch"
+          hostAliases:
+            - ip: "10.200.1.50"
+              hostnames:
+                - "home.${INGRESS_DOMAIN}"
 
-    env:
-      TZ: "${TIMEZONE}"
-      MATTER_SERVER__INSTANCE_NAME: Matter-Server
-      MATTER_SERVER__PORT: &port 5580
-      MATTER_SERVER__APPLICATION_URL: &host-cluster "matter.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-      MATTER_SERVER__LOG_LEVEL: info
+        containers:
+          main:
+            image:
+              repository: ghcr.io/home-assistant-libs/python-matter-server
+              tag: 3.7.0
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+              MATTER_SERVER__INSTANCE_NAME: Matter-Server
+              MATTER_SERVER__PORT: &port 5580
+              MATTER_SERVER__APPLICATION_URL: &host-cluster "matter.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              MATTER_SERVER__LOG_LEVEL: info
+            resources:
+              requests:
+                memory: "100M"
+              limits:
+                memory: "500M"
 
     service:
       main:
@@ -61,46 +90,44 @@ spec:
             port: *port
         externalTrafficPolicy: Cluster
 
-    podAnnotations:
-      k8s.v1.cni.cncf.io/networks: matter-server-iot-static
-      # k8s.v1.cni.cncf.io/networks: macvlan-conf-dhcp
+    persistence:
+      config:
+        enabled: true
+        existingClaim: matter-server-config
+        advancedMounts:
+          main:
+            main:
+              - path: "/data"
 
     ingress:
       main:
         enabled: false
+        className: "traefik"
         annotations:
-          kubernetes.io/ingress.class: "traefik"
+          # kubernetes.io/ingress.class: "traefik"
           cert-manager.io/cluster-issuer: letsencrypt-production
           # external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
           external-dns/is-public: "false"
-          hajimari.io/enable: "false"
-          hajimari.io/icon: "resistor-nodes"
         hosts:
           - host: *host-cluster
             paths:
               - path: /
                 pathType: Prefix
+                service:
+                  name: main
+                  port: http
           - host: &host "matter.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
+                service:
+                  name: main
+                  port: http
         tls:
           - secretName: tls.matter-server
             hosts:
               - *host-cluster
               - *host
 
-    persistence:
-      config:
-        enabled: true
-        existingClaim: matter-server-config
-        mountPath: "/data"
-
-    resources:
-      requests:
-        memory: 100Mi
-        cpu: 100m
-      limits:
-        memory: 500Mi

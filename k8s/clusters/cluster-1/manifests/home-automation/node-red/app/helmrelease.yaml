@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: node-red
+  name: &app node-red
   namespace: home-automation
 spec:
   interval: 15m
@@ -27,10 +27,100 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+    global:
+      nameOverride: *app
+      fullnameOverride: *app
+
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          # annotations:
+            # k8s.v1.cni.cncf.io/networks: home-automation-iot-dhcp
+            # k8s.v1.cni.cncf.io/networks: hyperhdr-iot-static
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 100
+            fsGroup: 100
+            supplementalGroups:
+              - 34
+              - 100
+              - 568
+            fsGroupChangePolicy: "OnRootMismatch"
+          hostAliases:
+            - ip: "10.200.1.50"
+              hostnames:
+                - "home.${INGRESS_DOMAIN}"
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/k8s-at-home/node-red
+              tag: v3.0.2
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+              NODE_RED_ENABLE_SAFE_MODE: "false"
+              NODE_RED_ENABLE_PROJECTS: "true"
+              NODE_RED__INSTANCE_NAME: NodeRed
+              NODE_RED__PORT: &port 1880
+              NODE_RED__APPLICATION_URL: &host-cluster "node-red.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              NODE_RED__LOG_LEVEL: info
+            resources:
+              requests:
+                memory: "100M"
+              limits:
+                memory: "500M"
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: node-red-config
+        advancedMounts:
+          main:
+            main:
+              - path: "/data"
+
+    ingress:
+      main:
+        enabled: true
+        className: "traefik"
+        annotations:
+          # kubernetes.io/ingress.class: "traefik"
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          # external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
+          external-dns/is-public: "false"
+        hosts:
+          - host: *host-cluster
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  name: main
+                  port: http
+          - host: &host "node-red.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  name: main
+                  port: http
+        tls:
+          - secretName: tls.node-red
+            hosts:
+              - *host-cluster
+              - *host
+
     # initContainers: #TODO #930
     #   npm-update-modules:
     #     image: node:12-buster-slim@sha256:426f05df1d1feefa841471c0faa22a20db286766bf528993421847f9a3b8efe3
@@ -39,61 +129,3 @@ spec:
     #     volumeMounts:
     #       - name: config
     #         mountPath: /data
-    image:
-      repository: ghcr.io/k8s-at-home/node-red
-      tag: v3.0.2
-
-    env:
-      TZ: "${TIMEZONE}"
-      NODE_RED_ENABLE_SAFE_MODE: "false"
-      NODE_RED_ENABLE_PROJECTS: "true"
-      NODE_RED__INSTANCE_NAME: NodeRed
-      NODE_RED__PORT: &port 1880
-      NODE_RED__APPLICATION_URL: &host-cluster "node-red.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-      NODE_RED__LOG_LEVEL: info
-
-    service:
-      main:
-        ports:
-          http:
-            port: *port
-
-    ingress:
-      main:
-        enabled: true
-        annotations:
-          kubernetes.io/ingress.class: "traefik"
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          # external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
-          traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
-          external-dns/is-public: "false"
-          hajimari.io/enable: "false"
-          hajimari.io/icon: "resistor-nodes"
-        hosts:
-          - host: *host-cluster
-            paths:
-              - path: /
-                pathType: Prefix
-          - host: &host "node-red.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-                pathType: Prefix
-        tls:
-          - secretName: tls.node-red
-            hosts:
-              - *host-cluster
-              - *host
-
-    persistence:
-      config:
-        enabled: true
-        existingClaim: node-red-config
-        mountPath: "/data"
-
-    resources:
-      requests:
-        memory: 100Mi
-        cpu: 100m
-      limits:
-        memory: 500Mi

@@ -27,33 +27,46 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
     global:
       nameOverride: *app
-    fullnameOverride: *app
-    image:
-      repository:  nocturno/hyper-hdr
-      tag: "18.0.0.0"
+      fullnameOverride: *app
 
-    podSecurityContext:
-      # runAsUser: 568
-      runAsUser: 0
-      runAsGroup: 100
-      fsGroup: 100
-      supplementalGroups:
-        - 34
-        - 100
-      fsGroupChangePolicy: "OnRootMismatch"
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          annotations:
+            # k8s.v1.cni.cncf.io/networks: home-automation-iot-dhcp
+            k8s.v1.cni.cncf.io/networks: hyperhdr-iot-static
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 100
+            fsGroup: 100
+            supplementalGroups:
+              - 34
+              - 100
+              - 568
+            fsGroupChangePolicy: "OnRootMismatch"
+          hostAliases:
+            - ip: "10.200.1.50"
+              hostnames:
+                - "home.${INGRESS_DOMAIN}"
 
-    env:
-      TZ: "${TIMEZONE}"
-
-    podAnnotations:
-      # k8s.v1.cni.cncf.io/networks: home-automation-iot-dhcp
-      k8s.v1.cni.cncf.io/networks: hyperhdr-iot-static
+        containers:
+          main:
+            image:
+              repository: nocturno/hyper-hdr
+              tag: "18.0.0.0"
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+            resources:
+              requests:
+                memory: "1024M"
+              limits:
+                memory: "6000M"
 
     service:
       main:
@@ -70,27 +83,6 @@ spec:
           protocolbuffer:
             port: 19445
 
-    probes:
-      liveness:
-        enabled: false
-        custom: true
-        ## The spec field contains the values for the default livenessProbe.
-        ## If you selected custom: true, this field holds the definition of the livenessProbe.
-        spec:
-          exec:
-            command:
-              - /usr/bin/env
-              - bash
-              - -c
-              - username=`grep -B 1 'username:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
-                password=`grep -B 1 'password:' /config/config.yml | tail -n1 | awk '{ print $2}'` &&
-                curl --fail $username:$password@localhost:3030/triggers/manual
-          failureThreshold: 5
-          initialDelaySeconds: 60
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 10
-
     persistence:
       config:
         enabled: true
@@ -99,7 +91,7 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "traefik"
+        className: "traefik"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
@@ -113,17 +105,18 @@ spec:
           - host: &host-cluster "hyperhdr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
           - host: &host "hyperhdr.${INGRESS_DOMAIN}"
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - secretName: tls.hyperhdr
             hosts:
               - *host-cluster
               - *host
 
-    resources:
-      requests:
-        memory: "1024M"
-      limits:
-        memory: "6000Mi"
