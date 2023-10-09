@@ -6,22 +6,21 @@ metadata:
   namespace: security
 spec:
   postgresVersion: 15
-  # TODO: Enable this
-  # dataSource:
-  #   pgbackrest:
-  #     stanza: db
-  #     configuration:
-  #       - secret:
-  #           name: pgo-s3-creds
-  #     global:
-  #       repo1-path: /authentik/repo1
-  #       repo1-s3-uri-style: path
-  #     repo:
-  #       name: repo1
-  #       s3:
-  #         bucket: "crunchy-postgres"
-  #         endpoint: "s3.bjw-s.dev"
-  #         region: "us-east-1"
+  dataSource:
+    pgbackrest:
+      stanza: db
+      configuration:
+        - secret:
+            name: pgo-s3-creds
+      global:
+        repo1-path: /authentik/repo1
+        repo1-s3-uri-style: path
+      repo:
+        name: repo1
+        s3:
+          bucket: "crunchy-postgres"
+          endpoint: "s3.bjw-s.dev"
+          region: "us-east-1"
   patroni:
     dynamicConfiguration:
       synchronous_mode: true
