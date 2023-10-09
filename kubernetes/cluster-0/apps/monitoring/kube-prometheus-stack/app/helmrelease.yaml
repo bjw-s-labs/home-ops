@@ -135,11 +135,11 @@ spec:
               - *host_prometheus
 
       prometheusSpec:
-        alertingEndpoints:
-          - namespace: monitoring
-            name: alertmanager
-            port: 9093
-            apiVersion: v2
+        additionalAlertManagerConfigs:
+          - static_configs:
+              - targets:
+                  - alertmanager.monitoring.svc.cluster.local:9093
+
         additionalScrapeConfigs:
           - job_name: node-exporter
             scrape_interval: 1m
