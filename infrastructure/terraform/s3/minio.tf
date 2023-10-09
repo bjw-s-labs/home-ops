@@ -4,7 +4,8 @@ locals {
     "thanos",
     "volsync",
     "crunchy-postgres",
-    "tagspaces"
+    "tagspaces",
+    "zipline"
   ]
 }
 
