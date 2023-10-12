@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: qbittools-tags
+  name: qbtools-tags
   namespace: downloads
 spec:
   interval: 30m
@@ -36,8 +36,8 @@ spec:
         containers:
           main:
             image:
-              repository: ghcr.io/buroa/qbittools
-              tag: v0.9.5
+              repository: ghcr.io/buroa/qbtools
+              tag: v0.10.0
             args:
               - tagging
               - --added-on
@@ -62,7 +62,7 @@ spec:
     persistence:
       config-file:
         type: configMap
-        name: qbittools-configmap
+        name: qbtools-configmap
         globalMounts:
           - path: /config/config.yaml
             subPath: config.yaml
