@@ -3,14 +3,14 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: k8s-ycl
+  name: &releaseName k8s-ycl
   namespace: system-controllers
 spec:
   interval: 30m
   chart:
     spec:
       chart: k8s-ycl
-      version: 0.2.1
+      version: 1.0.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,17 +18,21 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      replicas: 3
+    controllers:
+      main:
+        replicas: 3
 
-    image:
-      repository: ghcr.io/bjw-s/k8s-ycl
-      tag: v0.1.0@sha256:5b18b022759d2dbee690ba2d75ea378b0a0e9bb4f16ba5ca0abafb428878b795
+        pod:
+          topologySpreadConstraints:
+            - maxSkew: 2
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: *releaseName
 
-    topologySpreadConstraints:
-      - maxSkew: 2
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: DoNotSchedule
-        labelSelector:
-          matchLabels:
-            app.kubernetes.io/name: k8s-ycl
+        containers:
+          main:
+            image:
+              repository: ghcr.io/bjw-s/k8s-ycl
+              tag: v0.1.0
