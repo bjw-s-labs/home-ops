@@ -6,7 +6,9 @@
       ../common/nixos
       ../common/nixos/users/bjw-s
       ../common/optional/fish.nix
+      ../common/optional/nfs-server.nix
       ../common/optional/qemu.nix
+      ../common/optional/samba-server.nix
       ../common/optional/zfs.nix
   ];
 
