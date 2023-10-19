@@ -9,6 +9,7 @@
       ../common/nixos
       ../common/nixos/users/bjw-s
       ../common/optional/fish.nix
+      ../common/optional/k3s-server.nix
       ../common/optional/nfs-server.nix
       ../common/optional/qemu.nix
       ../common/optional/samba-server.nix
@@ -24,6 +25,8 @@
     networkmanager.enable = true;
   };
 
+  # environment.systemPackages = [ pkgs.unstable.nano ];
+
   # may fix issues with network service failing during a nixos-rebuild
   systemd.services.NetworkManager-wait-online.enable = lib.mkForce false;
   systemd.services.systemd-networkd-wait-online.enable = lib.mkForce false;
@@ -35,5 +38,4 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "23.05"; # Did you read the comment?
-
 }

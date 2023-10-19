@@ -4,9 +4,13 @@
     ./nix.nix
     ./openssh.nix
     ./systemd-initrd.nix
-  ] ++ (builtins.attrValues outputs.nixosModules);
+  ] ++ (builtins.attrValues {});
 
   nixpkgs = {
+    # Add overlays here
+    overlays = [
+      outputs.overlays.unstable-packages
+    ];
     # Configure your nixpkgs instance
     config = {
       # Disable if you don't want unfree packages
