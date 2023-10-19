@@ -7,6 +7,7 @@
       ../common/nixos/users/bjw-s
       ../common/optional/fish.nix
       ../common/optional/qemu.nix
+      ../common/optional/zfs.nix
   ];
 
   boot.loader = {
@@ -16,6 +17,7 @@
 
   networking = {
     hostName = "nas-vm";
+    hostId =  "8023d2b9";
     networkmanager.enable = true;
   };
 
