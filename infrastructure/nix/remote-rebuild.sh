@@ -13,4 +13,5 @@ nixos-rebuild switch \
   --fast \
   --use-remote-sudo \
   --build-host "${USER}"@"${TARGET}" \
-  --target-host "${USER}"@"${TARGET}"
+  --target-host "${USER}"@"${TARGET}" \
+  --no-eval-cache
