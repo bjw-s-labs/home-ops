@@ -2,7 +2,10 @@
 
 {
   imports = [
+      # Host-specific hardware
       ./hardware-configuration.nix
+
+      # Common imports
       ../common/nixos
       ../common/nixos/users/bjw-s
       ../common/optional/fish.nix
@@ -10,12 +13,10 @@
       ../common/optional/qemu.nix
       ../common/optional/samba-server.nix
       ../common/optional/zfs.nix
-  ];
 
-  boot.loader = {
-    systemd-boot.enable = true;
-    efi.canTouchEfiVariables = true;
-  };
+      # Host-specific imports
+      ./zfs.nix
+  ];
 
   networking = {
     hostName = "nas-vm";
