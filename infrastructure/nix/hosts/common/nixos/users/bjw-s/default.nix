@@ -2,12 +2,10 @@
 let ifTheyExist = groups: builtins.filter (group: builtins.hasAttr group config.users.groups) groups;
 in
 {
-  users.mutableUsers = true;
+  users.mutableUsers = false;
   users.users.bjw-s = {
     isNormalUser = true;
     shell = pkgs.fish;
-    # this needs to be set to a proper password using 'passwd' after initial build
-    initialPassword = "nix";
     extraGroups = [
       "wheel"
     ] ++ ifTheyExist [
