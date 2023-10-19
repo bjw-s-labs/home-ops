@@ -19,7 +19,7 @@
       forAllSystems = nixpkgs.lib.genAttrs [
         "aarch64-linux"
         # "i686-linux"
-        # "x86_64-linux"
+        "x86_64-linux"
         # "aarch64-darwin"
         # "x86_64-darwin"
       ];
@@ -28,30 +28,14 @@
         inherit modules;
         specialArgs = { inherit inputs outputs; };
       };
-
     in
     {
-      nixosModules = import ./modules/nixos;
+      # Custom packages and modifications, exported as overlays
+      overlays = import ./overlays { inherit inputs; };
 
       nixosConfigurations = {
         # VMs
         "nas-vm" = mkNixos [./hosts/nas-vm];
       };
     };
-  # outputs = {
-  #   self,
-  #   nixpkgs,
-  #   ...
-  # } @ inputs: let
-  #   inherit (self) outputs;
-  # in {
-  #   nixosConfigurations = {
-  #     "nas-vm" = nixpkgs.lib.nixosSystem {
-  #       specialArgs = {inherit inputs outputs;};
-  #       modules = [
-  #         ./nas/configuration.nix
-  #         #disko.nixosModules.disko
-  #       ];
-  #     };
-  #   };
 }
