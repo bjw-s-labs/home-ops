@@ -6,7 +6,7 @@ module.exports = {
     "http://prowlarr.downloads.svc.cluster.local:9696/6/api?apikey={{ .prowlarr_api_key }}", // bhd
     "http://prowlarr.downloads.svc.cluster.local:9696/13/api?apikey={{ .prowlarr_api_key }}", // blu
     "http://prowlarr.downloads.svc.cluster.local:9696/15/api?apikey={{ .prowlarr_api_key }}", // ant
-    "http://prowlarr.downloads.svc.cluster.local:9696/12/api?apikey={{ .prowlarr_api_key }}", // fl
+    "http://prowlarr.downloads.svc.cluster.local:9696/18/api?apikey={{ .prowlarr_api_key }}", // fl
     "http://prowlarr.downloads.svc.cluster.local:9696/16/api?apikey={{ .prowlarr_api_key }}", // phd
   ],
   action: "inject",
