@@ -34,8 +34,14 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           annotations:
-            k8s.v1.cni.cncf.io/networks: esphome-iot-static
+            # k8s.v1.cni.cncf.io/networks: esphome-iot-static
             # k8s.v1.cni.cncf.io/networks: home-automation-iot-dhcp
+            k8s.v1.cni.cncf.io/networks: |
+              [{
+                "name":"multus-iot",
+                "namespace": "network",
+                "ips": ["10.10.100.12/24"]
+              }]
 
         containers:
           main:
