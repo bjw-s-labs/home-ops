@@ -38,7 +38,12 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           annotations:
-            k8s.v1.cni.cncf.io/networks: matter-server-iot-static
+            k8s.v1.cni.cncf.io/networks: |
+              [{
+                "name":"multus-iot",
+                "namespace": "network",
+                "ips": ["10.10.100.14/24"]
+              }]
             # k8s.v1.cni.cncf.io/networks: macvlan-conf-dhcp
           securityContext:
             # runAsUser: 568
