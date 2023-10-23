@@ -1,6 +1,6 @@
 clusterName: cluster-1
-talosVersion: v1.5.2
-kubernetesVersion: v1.28.1
+talosVersion: v1.5.4
+kubernetesVersion: v1.28.2
 endpoint: https://cluster-1.${secret_domain}:6443
 # domain: cluster-1.${secret_domain}
 allowSchedulingOnMasters: false
@@ -22,7 +22,8 @@ nodes:
       nameservers:
         - 10.255.253.1
       networkInterfaces:
-        - interface: eth0
+        - deviceSelector:
+            hardwareAddr: "1c:69:7a:ae:55:58"
           dhcp: true
           mtu: 9000
     - hostname: cp2.cluster-1.${secret_domain}
@@ -33,7 +34,8 @@ nodes:
       nameservers:
         - 10.255.253.1
       networkInterfaces:
-        - interface: eth0
+        - deviceSelector:
+            hardwareAddr: "1c:69:7a:ae:55:22"
           dhcp: true
           mtu: 9000
     - hostname: cp3.cluster-1.${secret_domain}
@@ -45,7 +47,8 @@ nodes:
       nameservers:
         - 10.255.253.1
       networkInterfaces:
-        - interface: eth0
+        - deviceSelector:
+            hardwareAddr: "76:00:f6:96:c6:df"
           dhcp: true
           mtu: 9000
     - hostname: work1.cluster-1.${secret_domain}
@@ -57,10 +60,12 @@ nodes:
       nameservers:
         - 10.255.253.1
       networkInterfaces:
-        - interface: eth0
+        - deviceSelector:
+            hardwareAddr: "72:f2:0d:00:ac:b4"
           dhcp: true
           mtu: 9000
-        - interface: eth1
+        - deviceSelector:
+            hardwareAddr: "da:29:dc:d9:75:f7"
           dhcp: false
           mtu: 9000
           vlans:
@@ -83,10 +88,12 @@ nodes:
       nameservers:
         - 10.255.253.1
       networkInterfaces:
-        - interface: eth0
+        - deviceSelector:
+            hardwareAddr: "b2:85:37:24:ef:85"
           dhcp: true
           mtu: 9000
-        - interface: eth1
+        - deviceSelector:
+            hardwareAddr: "32:30:76:5d:f8:76"
           dhcp: false
           mtu: 9000
           vlans:
@@ -109,36 +116,12 @@ nodes:
       nameservers:
         - 10.255.253.1
       networkInterfaces:
-        - interface: eth0
+        - deviceSelector:
+            hardwareAddr: "8e:ee:0b:19:f4:94"
           dhcp: true
           mtu: 9000
-        - interface: eth1
-          dhcp: false
-          mtu: 9000
-          vlans:
-            - vlanId: 2
-              dhcp: true
-              mtu: 1500
-              dhcpOptions:
-                routeMetric: 2048
-            - vlanId: 100
-              dhcp: true
-              mtu: 1500
-              dhcpOptions:
-                routeMetric: 4096
-    - hostname: work4.cluster-1.${secret_domain}
-      ipAddress: work4.cluster-1.${secret_domain}
-      controlPlane: false
-      disableSearchDomain: true
-      installDiskSelector:
-        size: <= 200GB
-      nameservers:
-        - 10.255.253.1
-      networkInterfaces:
-        - interface: eth0
-          dhcp: true
-          mtu: 9000
-        - interface: eth1
+        - deviceSelector:
+            hardwareAddr: "ce:26:91:bd:80:d8"
           dhcp: false
           mtu: 9000
           vlans:
@@ -180,28 +163,18 @@ controlPlane:
             - cluster-1
             - cluster-1.${secret_domain}
             - 10.200.1.1
-          # extraArgs:
-          #   feature-gates: MixedProtocolLBService=true
         controllerManager:
           extraArgs:
-            # feature-gates: MixedProtocolLBService=true
             # Allows Prometheus to pull metrics
             bind-address: 0.0.0.0
         proxy:
           disabled: true
-          # extraArgs:
-          #     feature-gates: MixedProtocolLBService=true
         scheduler:
           extraArgs:
-              # feature-gates: MixedProtocolLBService=true
               # Allows Prometheus to pull metrics
               bind-address: 0.0.0.0
         discovery:
           enabled: true
-          # registries:
-          #     kubernetes: {}
-          #     service:
-          #         disabled: true
         etcd:
           extraArgs:
             election-timeout: "5000"
@@ -233,35 +206,49 @@ controlPlane:
           servers:
             - 10.255.253.1
 worker:
-  configPatches:
+  patches:
+    - |-
+      - op: add
+        path: /machine/install/extraKernelArgs
+        value:
+          - net.ifnames=0
+    - |-
       - op: add
         path: /machine/install/diskSelector
         value:
           size: <= 200GB
+    - |-
       - op: add
         path: /machine/kubelet/extraArgs
         value:
           rotate-server-certificates: "true"
           feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,ServerSideApply=true
-  inlinePatch:
-    cluster:
-        extraManifests:
-            - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/ha-install.yaml
-            # - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-    machine:
-        certSANs:
-            - cluster-1
-            - cluster-1.${secret_domain}
-            - 10.200.1.1
+    - |-
+      machine:
         time:
-            disabled: false
-            servers:
-                - 10.255.253.1
+          disabled: false
+          servers:
+            - 10.255.253.1
+    - |-
+      machine:
+        certSANs:
+          - cluster-1
+          - cluster-1.${secret_domain}
+          - 10.200.1.1
+    - |-
+      machine:
         kubelet:
             nodeIP:
                 validSubnets:
                     - 10.200.1.0/24
+    - |-
+      machine:
         sysctls:
           # For CloudflareD QUIC, sets maximum receive buffer size to roughly 2.5 MB. 
           # https://github.com/quic-go/quic-go/wiki/UDP-Receive-Buffer-Size
           net.core.rmem_max: 2500000
+    - |-
+      cluster:
+        extraManifests:
+            - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/ha-install.yaml
+            # - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
