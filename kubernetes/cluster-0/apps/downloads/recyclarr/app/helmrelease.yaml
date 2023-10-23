@@ -41,17 +41,6 @@ spec:
             fsGroup: 568
             fsGroupChangePolicy: OnRootMismatch
 
-        initContainers:
-          init-config:
-            image:
-              repository: public.ecr.aws/docker/library/busybox
-              tag: latest@sha256:3fbc632167424a6d997e74f52b878d7cc478225cffac6bc977eedfe51c7f4e79
-              pullPolicy: IfNotPresent
-            command:
-              - "/bin/sh"
-              - "-c"
-              - "cp /tmp/config/recyclarr.yml /config/recyclarr.yml"
-
         containers:
           main:
             image:
@@ -72,11 +61,10 @@ spec:
         enabled: true
         type: configMap
         name: recyclarr-configmap
-        advancedMounts:
-          main:
-            init-config:
-              - path: /tmp/config
-                readOnly: true
+        globalMounts:
+          - path: /config/recyclarr.yml
+            subPath: recyclarr.yml
+            readOnly: true
 
     service:
       main:
