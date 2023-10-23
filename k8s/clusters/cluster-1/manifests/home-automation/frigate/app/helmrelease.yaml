@@ -22,6 +22,8 @@ spec:
     global:
       nameOverride: *app
       fullnameOverride: *app
+    defaultPodOptions:
+      google.feature.node.kubernetes.io/coral: "true"
 
     controllers:
       main:
@@ -69,8 +71,8 @@ spec:
                   privileged: true
             annotations:
               configmap.reloader.stakater.com/reload: "frigate-config"
-            nodeSelector:
-              google.feature.node.kubernetes.io/coral: "true"
+            # nodeSelector:
+            #   google.feature.node.kubernetes.io/coral: "true"
             probes:
               liveness: &probe
                 enabled: true
