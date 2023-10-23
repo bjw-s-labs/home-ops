@@ -1,9 +1,19 @@
 ---
 clusterName: ${clusterName}
-
-talosVersion: v1.5.1
-kubernetesVersion: 1.28.1
 endpoint: "https://${clusterName}.bjw-s.casa:6443"
+
+talosVersion: v1.5.4
+kubernetesVersion: 1.28.3
+
+# Image URL rendered on https://factory.talos.dev
+# customization:
+#     extraKernelArgs:
+#         - net.ifnames=0
+#     systemExtensions:
+#         officialExtensions:
+#             - siderolabs/i915-ucode
+#             - siderolabs/intel-ucode
+talosImageURL: factory.talos.dev/installer/22b1d04da881ef7c57edb0f24d1f3ba2c78a8e22cbe3fa9af4f42d487b2863f7
 
 cniConfig:
   name: none
@@ -17,7 +27,6 @@ additionalMachineCertSans:
 
 nodes:
   - hostname: delta.bjw-s.casa
-    disableSearchDomain: true
     ipAddress: 10.1.1.31
     controlPlane: true
     installDiskSelector:
@@ -27,7 +36,8 @@ nodes:
         partitions:
           - mountpoint: /var/mnt/sata
     networkInterfaces:
-      - interface: eth0
+      - deviceSelector:
+          hardwareAddr: "48:21:0b:55:c4:8a"
         dhcp: true
         vlans:
           - vlanId: 40
@@ -49,7 +59,6 @@ nodes:
                   - rw
 
   - hostname: enigma.bjw-s.casa
-    disableSearchDomain: true
     ipAddress: 10.1.1.32
     controlPlane: true
     installDiskSelector:
@@ -59,7 +68,8 @@ nodes:
         partitions:
           - mountpoint: /var/mnt/sata
     networkInterfaces:
-      - interface: eth0
+      - deviceSelector:
+          hardwareAddr: "48:21:0b:55:dc:7b"
         dhcp: true
         vlans:
           - vlanId: 40
@@ -81,7 +91,6 @@ nodes:
                   - rw
 
   - hostname: felix.bjw-s.casa
-    disableSearchDomain: true
     ipAddress: 10.1.1.33
     controlPlane: true
     installDiskSelector:
@@ -91,7 +100,8 @@ nodes:
         partitions:
           - mountpoint: /var/mnt/sata
     networkInterfaces:
-      - interface: eth0
+      - deviceSelector:
+          hardwareAddr: "48:21:0b:56:09:47"
         dhcp: true
         vlans:
           - vlanId: 40
@@ -114,29 +124,51 @@ nodes:
 
 controlPlane:
   patches:
+    # Disable search domain everywhere
+    - |-
+      machine:
+        network:
+          disableSearchDomain: true
+
+    # Configure NTP
+    - |-
+      machine:
+        time:
+          disabled: false
+          servers:
+            - 10.1.1.1
+
+    # Configure cluster loopback
+    - |-
+      machine:
+        network:
+          extraHostEntries:
+            - ip: ${clusterEndpointIP}
+              aliases:
+                - ${clusterName}.bjw-s.casa
+
+    # Cluster configuration
     - |-
       cluster:
         allowSchedulingOnMasters: true
         proxy:
           disabled: true
+
+    # ETCD configuration
+    - |-
+      cluster:
         etcd:
           advertisedSubnets:
             - 10.1.1.0/24
 
+    # Disable default API server admission plugins.
     - |-
       - op: remove
         path: /cluster/apiServer/admissionControl
 
+    # Kubelet configuration
     - |-
       machine:
-        files:
-          - op: create
-            path: /etc/cri/conf.d/20-customization.part
-            content: |
-              [plugins]
-                [plugins."io.containerd.grpc.v1.cri"]
-                  enable_unprivileged_ports = true
-                  enable_unprivileged_icmp = true
         kubelet:
           extraArgs:
             feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,NewVolumeManagerReconstruction=false
@@ -146,19 +178,10 @@ controlPlane:
           nodeIP:
             validSubnets:
                 - 10.1.1.0/24
-        network:
-          extraHostEntries:
-            - ip: ${clusterEndpointIP}
-              aliases:
-                - ${clusterName}.bjw-s.casa
-        install:
-          extensions:
-            - image: ghcr.io/siderolabs/i915-ucode:20230310
-            - image: ghcr.io/siderolabs/intel-ucode:20230512
+
+    # Custom sysctls
+    - |-
+      machine:
         sysctls:
           fs.inotify.max_user_watches: "1048576"
           fs.inotify.max_user_instances: "8192"
-        time:
-          disabled: false
-          servers:
-            - 10.1.1.1
