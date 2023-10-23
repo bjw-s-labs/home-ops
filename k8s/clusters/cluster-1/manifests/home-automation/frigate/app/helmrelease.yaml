@@ -23,7 +23,8 @@ spec:
       nameOverride: *app
       fullnameOverride: *app
     defaultPodOptions:
-      google.feature.node.kubernetes.io/coral: "true"
+      nodeSelector:
+        google.feature.node.kubernetes.io/coral: "true"
 
     controllers:
       main:
