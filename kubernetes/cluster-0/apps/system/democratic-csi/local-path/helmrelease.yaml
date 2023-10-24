@@ -43,6 +43,7 @@ spec:
         enabled: false
       externalProvisioner:
         enabled: true
+        image: registry.k8s.io/sig-storage/csi-provisioner:v3.6.0
         extraArgs:
           - --leader-election=false
           - --node-deployment=true
@@ -65,6 +66,10 @@ spec:
           - name: local-hostpath
             mountPath: /var/mnt/sata/demo-csi-local-path
             mountPropagation: Bidirectional
+
+      driverRegistrar:
+        enabled: true
+        image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.9.0
 
       extraVolumes:
         - name: local-hostpath
