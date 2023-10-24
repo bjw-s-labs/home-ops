@@ -22,6 +22,13 @@ spec:
     crds: CreateReplace
   values:
     replicaCount: 3
+
+    args:
+      leaderElection: true
+      leaderElectionNamespace: "system-controllers"
+      httpEndpoint: ":8080"
+      enableDistributedSnapshotting: true
+
     volumeSnapshotClasses:
       - name: csi-ceph-blockpool
         driver: rook-ceph.rbd.csi.ceph.com
