@@ -17,20 +17,34 @@
   ];
 
   networking = {
-    hostName = "nas-vm";
-    hostId = "8023d2b9";
+    hostName = "gladius";
+    hostId = "775b7d55";
     networkmanager.enable = true;
+  };
+
+  # User config
+  users.users = {
+    manyie = {
+      isNormalUser = true;
+      extraGroups = [
+        "samba-users"
+      ];
+    };
   };
 
   # Group config
   users.groups = {
+    apps-rw = {
+      gid = 65542;
+      members = ["bjw-s"];
+    };
     backup-rw = {
       gid = 65541;
-      members = ["bjw-s"];
+      members = ["bjw-s" "manyie"];
     };
     docs-rw = {
       gid = 65543;
-      members = ["bjw-s"];
+      members = ["bjw-s" "manyie"];
     };
     media-ro = {
       gid = 65540;
@@ -44,7 +58,6 @@
 
   # ZFS config
   boot.zfs = {
-    devNodes = "/dev/disk/by-path";
     extraPools = [
       "tank"
     ];

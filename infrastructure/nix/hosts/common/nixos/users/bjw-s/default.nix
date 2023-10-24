@@ -10,6 +10,7 @@ in
       "wheel"
     ] ++ ifTheyExist [
       "network"
+      "samba-users"
     ];
 
     openssh.authorizedKeys.keys = [
