@@ -34,6 +34,8 @@
       overlays = import ./overlays { inherit inputs; };
 
       nixosConfigurations = {
+        # Metal
+        "nas" = mkNixos [./hosts/nas];
         # VMs
         "nas-vm" = mkNixos [./hosts/nas-vm];
       };
