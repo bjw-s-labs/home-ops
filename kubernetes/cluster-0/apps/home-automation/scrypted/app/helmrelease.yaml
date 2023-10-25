@@ -44,6 +44,9 @@ spec:
           nodeSelector:
             google.feature.node.kubernetes.io/coral: "true"
             intel.feature.node.kubernetes.io/gpu: "true"
+          securityContext:
+            supplementalGroups:
+              - 65542
 
         containers:
           main:
@@ -102,8 +105,7 @@ spec:
         hostPath: /sys/bus/usb
         hostPathType: Directory
       recs:
-        type: nfs
-        path: /volume1/Media/IPCams/scrypted
-        server: nas.bjw-s.casa
+        type: persistentVolumeClaim
+        existingClaim: scrypted-nfs
         globalMounts:
           - path: /recs
