@@ -34,16 +34,58 @@ spec:
               globalMounts:
                 - path: /data/local
 
+        pod:
+          securityContext:
+            supplementalGroups:
+              - 65542 # apps-rw
+
         containers:
           main:
             image:
               repository: ghcr.io/paperless-ngx/paperless-ngx
               tag: 1.17.4
-            envFrom:
-              - secretRef:
-                  name: paperless-secret
-              - configMapRef:
-                  name: paperless-configmap
+            env:
+              # Configure application
+              PAPERLESS_SECRET_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: paperless-secret
+                    key: PAPERLESS_SECRET_KEY
+              PAPERLESS_URL: https://paperless.bjw-s.dev
+              PAPERLESS_PORT: "8000"
+              PAPERLESS_TIME_ZONE: "Europe/Amsterdam"
+              PAPERLESS_WEBSERVER_WORKERS: "2"
+              PAPERLESS_TASK_WORKERS: "2"
+              # Configure Remote User auth
+              PAPERLESS_ENABLE_HTTP_REMOTE_USER: "true"
+              PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME: HTTP_X_AUTHENTIK_USERNAME
+              # Configure folders
+              PAPERLESS_CONSUMPTION_DIR: /data/nas/incoming
+              PAPERLESS_DATA_DIR: /data/local/data
+              PAPERLESS_EXPORT_DIR: /data/nas/export
+              PAPERLESS_MEDIA_ROOT: /data/local/media
+              # Configure folder importer
+              PAPERLESS_CONSUMER_POLLING: "60"
+              PAPERLESS_CONSUMER_RECURSIVE: "true"
+              PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
+              # Configure OCR
+              PAPERLESS_OCR_LANGUAGES: nld
+              PAPERLESS_OCR_LANGUAGE: nld
+              # Configure redis integration
+              PAPERLESS_REDIS: redis://paperless-redis.selfhosted.svc.cluster.local:6379
+              # Configure user permissions
+              USERMAP_GID: "65542" # apps-rw
+              # Configure admin user
+              PAPERLESS_ADMIN_USER:
+                valueFrom:
+                  secretKeyRef:
+                    name: paperless-secret
+                    key: PAPERLESS_ADMIN_USER
+              PAPERLESS_ADMIN_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: paperless-secret
+                    key: PAPERLESS_ADMIN_PASSWORD
             resources:
               requests:
                 cpu: 11m
@@ -78,15 +120,8 @@ spec:
               - *host
 
     persistence:
-      nas-consume:
-        type: nfs
-        server: "nas.bjw-s.casa"
-        path: /volume1/Docs/paperless/incoming
+      nas:
+        type: persistentVolumeClaim
+        existingClaim: paperless-nfs
         globalMounts:
-          - path: /data/nas/consume
-      nas-export:
-        type: nfs
-        server: "nas.bjw-s.casa"
-        path: /volume1/Docs/paperless/export
-        globalMounts:
-          - path: /data/nas/export
+          - path: /data/nas
