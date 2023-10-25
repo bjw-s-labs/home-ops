@@ -142,16 +142,6 @@ spec:
             apiVersion: v2
 
         additionalScrapeConfigs:
-          - job_name: node-exporter
-            scrape_interval: 1m
-            scrape_timeout: 10s
-            honor_timestamps: true
-            static_configs:
-              - targets:
-                  - gateway.bjw-s.casa:9100
-                  - nas.bjw-s.casa:9100
-                  - pikvm.bjw-s.casa:9100
-
           - job_name: speedtest-exporter
             scrape_interval: 60m
             scrape_timeout: 60s

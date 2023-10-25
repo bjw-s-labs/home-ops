@@ -9,43 +9,62 @@ spec:
   interval: 30m
   chart:
     spec:
-      chart: prometheus-node-exporter
-      version: 4.23.2
+      chart: app-template
+      version: 2.0.3
+      interval: 30m
       sourceRef:
         kind: HelmRepository
-        name: node-exporter
-      interval: 30m
+        name: bjw-s
+        namespace: flux-system
+
   values:
-    fullnameOverride: node-exporter
+    controllers:
+      main:
+        containers:
+          main:
+            image:
+              repository: quay.io/prometheus/node-exporter
+              tag: v1.6.1
+            args:
+              - --path.procfs=/host/proc
+              - --path.rootfs=/rootfs
+              - --path.sysfs=/host/sys
+              - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
+            resources:
+              requests:
+                cpu: 23m
+                memory: 64M
+              limits:
+                memory: 64M
+            securityContext:
+              privileged: true
 
-    image:
-      registry: quay.io
-      repository: prometheus/node-exporter
+    service:
+      main:
+        type: LoadBalancer
+        ports:
+          http:
+            port: 9100
 
-    prometheus:
-      monitor:
-        enabled: true
-        jobLabel: app.kubernetes.io/instance
-
-        relabelings:
-          - action: replace
-            regex: (.*)
-            replacement: $1
-            sourceLabels:
-              - __meta_kubernetes_pod_node_name
-            targetLabel: kubernetes_node
-          - action: replace
-            regex: (.*)
-            replacement: $1.bjw-s.casa:9100
-            sourceLabels:
-              - kubernetes_node
-            targetLabel: instance
-
-    resources:
-      requests:
-        cpu: 23m
-        memory: 64M
-      limits:
-        memory: 64M
-
-    hostNetwork: false
+    persistence:
+      procfs:
+        type: hostPath
+        hostPath: /proc
+        hostPathType: Directory
+        globalMounts:
+          - path: /host/proc
+            readOnly: true
+      sysfs:
+        type: hostPath
+        hostPath: /sys
+        hostPathType: Directory
+        globalMounts:
+          - path: /host/sys
+            readOnly: true
+      rootfs:
+        type: hostPath
+        hostPath: /
+        hostPathType: Directory
+        globalMounts:
+          - path: /rootfs
+            readOnly: true
