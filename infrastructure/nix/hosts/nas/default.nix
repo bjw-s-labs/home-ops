@@ -54,7 +54,15 @@
       gid = 65539;
       members = ["bjw-s"];
     };
+    admin-rw = {
+      members = ["bjw-s"];
+    };
   };
+
+  # Packages
+  environment.systemPackages = [
+    pkgs.rclone
+  ];
 
   # ZFS config
   boot.zfs = {
