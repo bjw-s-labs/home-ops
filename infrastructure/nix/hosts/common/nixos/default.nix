@@ -2,6 +2,7 @@
   imports = [
     ./locale.nix
     ./nix.nix
+    ./packages.nix
     ./openssh.nix
     ./systemd-initrd.nix
   ] ++ (builtins.attrValues {});
