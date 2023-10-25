@@ -9,5 +9,11 @@
     package = pkgs.unstable.k3s;
   };
 
+  services.k3s.extraFlags = toString [
+    "--tls-san" "${config.networking.hostName}.bjw-s.casa"
+    "--disable" "local-storage"
+    "--disable" "traefik"
+  ];
+
   environment.systemPackages = [ pkgs.unstable.k3s ];
 }
