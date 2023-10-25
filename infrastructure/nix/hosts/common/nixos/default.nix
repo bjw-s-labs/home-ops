@@ -4,6 +4,7 @@
     ./nix.nix
     ./packages.nix
     ./openssh.nix
+    ./smartd.nix
     ./systemd-initrd.nix
   ] ++ (builtins.attrValues {});
 
