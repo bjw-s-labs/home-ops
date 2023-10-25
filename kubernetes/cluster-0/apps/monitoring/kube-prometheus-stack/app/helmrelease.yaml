@@ -141,15 +141,6 @@ spec:
             port: 9093
             apiVersion: v2
 
-        additionalScrapeConfigs:
-          - job_name: speedtest-exporter
-            scrape_interval: 60m
-            scrape_timeout: 60s
-            honor_timestamps: true
-            static_configs:
-              - targets:
-                  - gateway.bjw-s.casa:9798
-
         enableAdminAPI: true
         externalLabels:
           cluster: cluster-0

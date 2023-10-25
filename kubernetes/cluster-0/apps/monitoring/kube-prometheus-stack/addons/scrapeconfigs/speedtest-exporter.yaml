@@ -2,16 +2,16 @@
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: ScrapeConfig
 metadata:
-  name: &name node-exporter
+  name: &name speedtest-exporter
   namespace: monitoring
 spec:
   staticConfigs:
     - targets:
-        - gladius.bjw-s.casa:9100
-        - gateway.bjw-s.casa:9100
-        - nas.bjw-s.casa:9100
-        - pikvm.bjw-s.casa:9100
+        - gateway.bjw-s.casa:9798
   metricsPath: /metrics
+  scrapeInterval: 60m
+  scrapeTimeout: 60s
+  honorTimestamps: true
   relabelings:
     - action: replace
       targetLabel: job
