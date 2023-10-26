@@ -1,0 +1,15 @@
+---
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: &name smartctl-exporter
+  namespace: monitoring
+spec:
+  staticConfigs:
+    - targets:
+        - gladius.bjw-s.casa:9633
+  metricsPath: /metrics
+  relabelings:
+    - action: replace
+      targetLabel: job
+      replacement: *name
