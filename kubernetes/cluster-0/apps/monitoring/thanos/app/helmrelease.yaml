@@ -17,7 +17,10 @@ spec:
         namespace: flux-system
       interval: 30m
   values:
-    existingObjstoreSecret: thanos-s3-secret
+    objstoreConfig:
+      type: s3
+      config:
+        insecure: true
 
     query:
       enabled: true
@@ -53,11 +56,11 @@ spec:
     compactor:
       enabled: true
       extraFlags:
-        - "--compact.concurrency"
-        - "4"
-      retentionResolutionRaw: 14d
-      retentionResolution5m: 14d
-      retentionResolution1h: 30d
+        - "--compact.concurrency=4"
+        - --delete-delay=30m
+      retentionResolutionRaw: 30d
+      retentionResolution5m: 60d
+      retentionResolution1h: 90d
       resources:
         requests:
           cpu: 15m
@@ -110,3 +113,25 @@ spec:
       enabled: true
       serviceMonitor:
         enabled: true
+
+  valuesFrom:
+    - targetPath: objstoreConfig.config.bucket
+      kind: ConfigMap
+      name: thanos-bucket
+      valuesKey: BUCKET_NAME
+    - targetPath: objstoreConfig.config.endpoint
+      kind: ConfigMap
+      name: thanos-bucket
+      valuesKey: BUCKET_HOST
+    - targetPath: objstoreConfig.config.region
+      kind: ConfigMap
+      name: thanos-bucket
+      valuesKey: BUCKET_REGION
+    - targetPath: objstoreConfig.config.access_key
+      kind: Secret
+      name: thanos-bucket
+      valuesKey: AWS_ACCESS_KEY_ID
+    - targetPath: objstoreConfig.config.secret_key
+      kind: Secret
+      name: thanos-bucket
+      valuesKey: AWS_SECRET_ACCESS_KEY
