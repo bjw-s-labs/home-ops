@@ -21,6 +21,7 @@ spec:
   values:
     crds:
       enabled: true
+    cleanPrometheusOperatorObjectNames: true
 
     ###
     ### Component values
@@ -140,8 +141,11 @@ spec:
             name: alertmanager
             port: 9093
             apiVersion: v2
-
         enableAdminAPI: true
+        enableFeatures:
+          - auto-gomaxprocs
+          - memory-snapshot-on-shutdown
+          - new-service-discovery-manager
         externalLabels:
           cluster: cluster-0
         podMonitorSelectorNilUsesHelmValues: false
@@ -155,7 +159,7 @@ spec:
           limits:
             memory: 3760M
         retention: 2d
-        retentionSize: "6GB"
+        retentionSize: "15GB"
         ruleSelectorNilUsesHelmValues: false
         scrapeConfigSelectorNilUsesHelmValues: false
         scrapeInterval: 1m
@@ -166,9 +170,9 @@ spec:
               storageClassName: ceph-block
               resources:
                 requests:
-                  storage: 10Gi
+                  storage: 20Gi
         thanos:
-          image: quay.io/thanos/thanos:v0.32.5@sha256:3e5c47dd3a0bfc6c595036c1c49c7ca95979a89c1fb93ee4cdee3bf5d296f944
+          image: quay.io/thanos/thanos:v0.32.5
           objectStorageConfig:
             existingSecret:
               name: thanos-objstore-secret
