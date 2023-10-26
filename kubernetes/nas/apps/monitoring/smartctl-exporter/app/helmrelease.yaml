@@ -1,0 +1,57 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: smartctl-exporter
+  namespace: monitoring
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 2.0.3
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controllers:
+      main:
+        containers:
+          main:
+            image:
+              repository: quay.io/prometheuscommunity/smartctl-exporter
+              tag: v0.11.0
+            args:
+              - --smartctl.path=/usr/sbin/smartctl
+              - --smartctl.interval=120s
+              - --web.listen-address=0.0.0.0:9633
+              - --web.telemetry-path=/metrics
+            resources:
+              requests:
+                cpu: 23m
+                memory: 64M
+              limits:
+                memory: 64M
+            securityContext:
+              privileged: true
+              runAsUser: 0
+
+    service:
+      main:
+        type: LoadBalancer
+        ports:
+          http:
+            port: 9633
+
+    persistence:
+      dev:
+        type: hostPath
+        hostPath: /dev
+        hostPathType: Directory
+        globalMounts:
+          - path: /host/dev
+            readOnly: true
