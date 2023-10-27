@@ -7,14 +7,19 @@
     openFirewall = true;
     securityType = "user";
     extraConfig = ''
+      min protocol = SMB2
       workgroup = WORKGROUP
+
+      browseable = yes
+      guest ok = no
       guest account = nobody
       map to guest = bad user
-      veto files = /._*/.DS_Store/
-      delete veto files = yes
       inherit acls = yes
       map acl inherit = yes
       valid users = @samba-users
+
+      veto files = /._*/.DS_Store/
+      delete veto files = yes
     '';
   };
 }

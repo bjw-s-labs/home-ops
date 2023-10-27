@@ -1,5 +1,6 @@
 { inputs, outputs, ... }: {
   imports = [
+    inputs.home-manager.nixosModules.home-manager
     ./locale.nix
     ./nix.nix
     ./packages.nix
@@ -7,6 +8,8 @@
     ./smartd.nix
     ./systemd-initrd.nix
   ] ++ (builtins.attrValues {});
+
+  home-manager.extraSpecialArgs = { inherit inputs outputs; };
 
   nixpkgs = {
     # Add overlays here
