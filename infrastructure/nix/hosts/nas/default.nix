@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, home-manager, ... }:
 
 {
   imports = [
@@ -13,6 +13,7 @@
       ../common/optional/nfs-server.nix
       ../common/optional/qemu.nix
       ../common/optional/samba-server.nix
+      # ../common/optional/starship.nix
       ../common/optional/zfs.nix
   ];
 
@@ -34,27 +35,10 @@
 
   # Group config
   users.groups = {
-    apps-rw = {
+    external-services = {
       gid = 65542;
-      members = ["bjw-s"];
     };
-    backup-rw = {
-      gid = 65541;
-      members = ["bjw-s" "manyie"];
-    };
-    docs-rw = {
-      gid = 65543;
-      members = ["bjw-s" "manyie"];
-    };
-    media-ro = {
-      gid = 65540;
-      members = ["manyie"];
-    };
-    media-rw = {
-      gid = 65539;
-      members = ["bjw-s"];
-    };
-    admin-rw = {
+    admins = {
       members = ["bjw-s"];
     };
   };
@@ -73,11 +57,21 @@
 
   # Samba config
   services.samba.shares = {
+    Docs = {
+      path = "/tank/Docs";
+      "read only" = "no";
+    };
     Media = {
       path = "/tank/Media";
-      browseable = "yes";
       "read only" = "no";
-      "guest ok" = "no";
+    };
+    Paperless = {
+      path = "/tank/Apps/paperless/incoming";
+      "read only" = "no";
+    };
+    Software = {
+      path = "/tank/Software";
+      "read only" = "no";
     };
   };
 

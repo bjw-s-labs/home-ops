@@ -17,5 +17,9 @@ in
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMyYn4k4V+myBBl79Nt3t7EZugvz9A+d3ZbKyaP1w7J5 Bernd personal"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINllIKQjpMumg9CCz1HIEsti/cN6MpUWZbCeLiLjKH2W Bernd iOS"
     ];
+
+    packages = [ pkgs.home-manager ];
   };
+
+  home-manager.users.bjw-s = import ../../../../../home-manager/bjw-s_${config.networking.hostName}.nix;
 }
