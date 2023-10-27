@@ -35,7 +35,7 @@ spec:
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
-              - 65539
+              - 65542 # gladius:external-services
 
         containers:
           main:
@@ -65,8 +65,8 @@ spec:
             subPath: settings.json
             readOnly: true
       nfs-nas-media:
-        type: nfs
-        server: nas.bjw-s.casa
-        path: /volume1/Media
-        globalMounts:
-          - path: /storage/media
+        existingClaim: nas-media
+        advancedMounts:
+          main:
+            main:
+              - path: /data/nas-media

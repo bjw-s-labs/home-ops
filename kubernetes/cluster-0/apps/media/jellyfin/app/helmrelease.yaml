@@ -44,7 +44,7 @@ spec:
             supplementalGroups:
               - 44
               - 109
-              - 65539
+              - 65542 # gladius:external-services
 
         containers:
           main:
@@ -91,11 +91,11 @@ spec:
 
     persistence:
       nfs-nas-media:
-        type: nfs
-        server: nas.bjw-s.casa
-        path: /volume1/Media
-        globalMounts:
-          - path: /data/nas-media
+        existingClaim: nas-media
+        advancedMounts:
+          main:
+            main:
+              - path: /data/nas-media
       transcode:
         type: emptyDir
         globalMounts:

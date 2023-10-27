@@ -37,7 +37,7 @@ spec:
         pod:
           securityContext:
             supplementalGroups:
-              - 65542 # apps-rw
+              - 65542 # gladius:external-services
 
         containers:
           main:
@@ -74,7 +74,7 @@ spec:
               # Configure redis integration
               PAPERLESS_REDIS: redis://paperless-redis.selfhosted.svc.cluster.local:6379
               # Configure user permissions
-              USERMAP_GID: "65542" # apps-rw
+              USERMAP_GID: "65542" # gladius:external-services
               # Configure admin user
               PAPERLESS_ADMIN_USER:
                 valueFrom:

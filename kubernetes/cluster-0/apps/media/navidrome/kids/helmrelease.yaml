@@ -38,7 +38,7 @@ spec:
             runAsGroup: 1000
             fsGroup: 1000
             supplementalGroups:
-              - 65539
+              - 65542 # gladius:external-services
 
         containers:
           main:
@@ -52,7 +52,7 @@ spec:
               ND_ENABLESHARING: "false"
               ND_ENABLESTARRATING: "false"
               ND_LOGLEVEL: info
-              ND_MUSICFOLDER: /music
+              ND_MUSICFOLDER: /data/nas-media/Library/Kids/Music
               ND_PORT: &port 4533
               ND_SCANSCHEDULE: 30m
             resources:
@@ -86,10 +86,10 @@ spec:
               - *host
 
     persistence:
-      music-kids:
-        type: nfs
-        server: nas.bjw-s.casa
-        path: /volume1/Media/Library/Kids/Music
-        globalMounts:
-          - path: /music
-            readOnly: true
+      nfs-nas-media:
+        existingClaim: nas-media
+        advancedMounts:
+          main:
+            main:
+              - path: /data/nas-media
+                readOnly: true
