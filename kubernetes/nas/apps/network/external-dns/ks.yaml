@@ -3,13 +3,15 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-reloader
+  name: cluster-apps-externaldns-internal
   namespace: flux-system
 spec:
   interval: 10m
-  path: "./kubernetes/cluster-0/apps/system/reloader/app"
+  path: "./kubernetes/nas/apps/network/external-dns/internal"
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-ops-kubernetes
-  wait: false # no flux ks dependents
+  wait: true
+  dependsOn:
+    - name: cluster-apps-external-secrets-stores
