@@ -1,0 +1,15 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "bjw-s-dev"
+  namespace: network
+spec:
+  secretName: "bjw-s-dev-tls"
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: "bjw-s.dev"
+  dnsNames:
+    - "bjw-s.dev"
+    - "*.bjw-s.dev"

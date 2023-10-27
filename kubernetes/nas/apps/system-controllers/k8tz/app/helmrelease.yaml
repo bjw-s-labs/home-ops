@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: k8tz
+  namespace: system-controllers
+spec:
+  chart:
+    spec:
+      chart: k8tz
+      version: 0.14.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: k8tz
+        namespace: flux-system
+  interval: 30m
+  values:
+    namespace: system-controllers
+
+    replicaCount: 1
+
+    timezone: Europe/Amsterdam
+    cronJobTimeZone: true
+
+    webhook:
+      certManager:
+        enabled: true
+        issuerRef:
+          name: k8tz-webhook-selfsign
+          kind: Issuer
+
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              version: v1
+              kind: Namespace
+            patch: |-
+              $patch: delete
+              apiVersion: v1
+              kind: Namespace
+              metadata:
+                name: not-used
