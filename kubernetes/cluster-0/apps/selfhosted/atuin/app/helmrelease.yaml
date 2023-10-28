@@ -1,0 +1,79 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: atuin
+  namespace: selfhosted
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 2.0.3
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controllers:
+      main:
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        pod:
+          enableServiceLinks: false
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/atuinsh/atuin
+              tag: 17.0.0
+            args:
+              - server
+              - start
+            env:
+              ATUIN_DB_URI:
+                valueFrom:
+                  secretKeyRef:
+                    name: atuin-pguser-atuin
+                    key: uri
+                    optional: false
+              ATUIN_HOST: 0.0.0.0
+              ATUIN_PORT: &port 8888
+              ATUIN_OPEN_REGISTRATION: "false"
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+
+    ingress:
+      main:
+        enabled: true
+        className: "internal-nginx"
+        hosts:
+          - host: &host "{{ .Release.Name }}.bjw-s.dev"
+            paths:
+              - path: /
+                service:
+                  name: main
+                  port: http
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      config:
+        enabled: true
+        type: emptyDir
