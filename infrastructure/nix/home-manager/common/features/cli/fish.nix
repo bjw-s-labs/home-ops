@@ -2,7 +2,7 @@
 let
   inherit (lib) mkIf;
   hasPackage = pname: lib.any (p: p ? pname && p.pname == pname) config.home.packages;
-  hasExa = hasPackage "exa";
+  hasLsd = hasPackage "lsd";
 in
 {
   programs.fish = {
@@ -24,10 +24,11 @@ in
 
     shellAliases = {
       # exa
-      ls = mkIf hasExa "exa";
-      ll = mkIf hasExa "exa -laag --git --icons --sort=type";
-      llrt = mkIf hasExa "exa -laag --git --icons -snew";
-      l = mkIf hasExa "exa -l --git --icons --sort=type";
+      ls = mkIf hasLsd "lsd";
+      ll = mkIf hasLsd "lsd -l";
+      la = mkIf hasLsd "lsd -a";
+      lt = mkIf hasLsd "lsd --tree";
+      lla = mkIf hasLsd "lsd -la";
 
       # other
       df = "df -h";

@@ -6,7 +6,7 @@
     ./starship.nix
   ];
   home.packages = with pkgs; [
-    exa
+    lsd
     zoxide
   ];
 }
