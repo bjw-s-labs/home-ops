@@ -24,12 +24,7 @@ in
   sops = {
     defaultSopsFile = ../../../../../secrets/bjw-s.sops.yaml;
     age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-    secrets = {
-      atuin_token = {};
-      #   owner = config.users.users.bjw-s.name;
-      #   group = config.users.users.bjw-s.group;
-      # };
-    };
+    secrets = {};
   };
 
   home-manager.users.bjw-s = import ../../../../../home-manager/bjw-s_${config.networking.hostName}.nix;
