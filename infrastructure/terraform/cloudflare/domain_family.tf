@@ -73,8 +73,8 @@ module "cf_domain_family" {
     },
     {
       enabled     = true
-      description = "Firewall rule to block all countries except NL/BE/DE"
-      expression  = "(ip.geoip.country ne \"NL\") and (ip.geoip.country ne \"BE\") and (ip.geoip.country ne \"DE\")"
+      description = "Firewall rule to block certain countries"
+      expression  = "(ip.geoip.country in {\"CN\" \"IN\" \"KP\" \"RU\"})"
       action      = "block"
     },
   ]
