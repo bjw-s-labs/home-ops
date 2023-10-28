@@ -1,14 +1,25 @@
 ---
-creation_rules:
-  - path_regex: k8s/(global|clusters)/.*\.sops\.ya?ml
-    encrypted_regex: "^(data|stringData)$"
-    # Personal, Flux
-    age: >-
-      age1uk0y2ahfavgsgqvrtg5a22w5gytpdmjuatxtcw6kntmxhlcgreesuwzw5s,
-      age1hawjtl6fm5czl8cun0ve7jvsmpqpn3qlxl2lnx7ndt7682tmva2qz3drfe
+keys:
+  - &host_bjw-s_macbook age1uk0y2ahfavgsgqvrtg5a22w5gytpdmjuatxtcw6kntmxhlcgreesuwzw5s
+  - &host_gladius age13hry6wpjk5zvzwn7jy9mmcv2tjy5axk2ur8ky6c9n4kvj8tc4s8suqfvy3
+  - &user_flux age1hawjtl6fm5czl8cun0ve7jvsmpqpn3qlxl2lnx7ndt7682tmva2qz3drfe
 
-  - path_regex: .*\.sops\.ya?ml
-    # Personal
-    age: >-
-      age1uk0y2ahfavgsgqvrtg5a22w5gytpdmjuatxtcw6kntmxhlcgreesuwzw5s,
-      age1hawjtl6fm5czl8cun0ve7jvsmpqpn3qlxl2lnx7ndt7682tmva2qz3drfe
+creation_rules:
+  - path_regex: kubernetes/.*\.sops\.ya?ml$
+    encrypted_regex: "^(data|stringData)$"
+    key_groups:
+      - age:
+          - *host_bjw-s_macbook
+          - *user_flux
+
+  - path_regex: infrastructure/nix/secrets/.*\.sops\.ya?ml$
+    key_groups:
+      - age:
+          - *host_gladius
+          - *host_bjw-s_macbook
+
+  - path_regex: .*\.sops\.ya?ml$
+    key_groups:
+      - age:
+          - *host_bjw-s_macbook
+          - *user_flux
