@@ -21,10 +21,10 @@ spec:
             fsGroup: 568
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
-              - 65541
+              - 65542 # gladius:external-services
 
           containers:
-            - name: mailbackup-2020
+            - name: mailbackup
               image: ghcr.io/bjw-s/getmail:6.18.13@sha256:f848a1dd335f03f03bb97b656cf1c9c776ec51e38421b1c83429306aea0f9ee1
               imagePullPolicy: IfNotPresent
               command:
@@ -37,7 +37,7 @@ spec:
                 - name: secrets
                   mountPath: /config
                   readOnly: true
-                - mountPath: /data
+                - mountPath: /data/nas-backup
                   name: mailbackup
 
           restartPolicy: OnFailure
@@ -57,5 +57,5 @@ spec:
                 secretName: mailbackup-secrets
             - name: mailbackup
               nfs:
-                server: "nas.bjw-s.casa"
-                path: /volume1/Backup/Bernd/Email
+                server: "gladius.bjw-s.casa"
+                path: /tank/Backup
