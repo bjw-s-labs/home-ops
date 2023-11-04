@@ -1,6 +1,7 @@
 locals {
   switch_core_1_name       = "Switch - Core 1"
   switch_core_2_name       = "Switch - Core 2"
+  switch_core_3_name       = "Switch - Core 3"
   switch_media_name        = "Switch - Media"
   ap_attic_office_name     = "AP - Attic Office"
   ap_hallway_name          = "AP - Hallway"
@@ -14,74 +15,74 @@ resource "unifi_device" "switch_core_1" {
   site = unifi_site.default.name
 
   port_override {
-    number          = 1
-    name            = unifi_device.ap_hallway.name
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 1
+    name   = unifi_device.ap_hallway.name
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
-    number          = 2
-    name            = local.switch_media_name
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 2
+    name   = local.switch_media_name
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
     number          = 3
     name            = "hallway_zigbee_adapter"
-    port_profile_id = data.unifi_port_profile.iot.id
+    port_profile_id = resource.unifi_port_profile.iot.id
   }
   port_override {
     number          = 4
     name            = "hallway_tado_bridge"
-    port_profile_id = data.unifi_port_profile.iot.id
+    port_profile_id = resource.unifi_port_profile.iot.id
   }
   port_override {
     number          = 5
     name            = "driveway_camera_doorbell"
-    port_profile_id = data.unifi_port_profile.video.id
+    port_profile_id = resource.unifi_port_profile.video.id
   }
   port_override {
-    number          = 6
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 6
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
-    number          = 7
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 7
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
-    number          = 8
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 8
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
-    number          = 9
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 9
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
-    number          = 10
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 10
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
-    number          = 11
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 11
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
-    number          = 12
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 12
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
-    number          = 13
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 13
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
-    number          = 14
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 14
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
-    number          = 15
-    name            = local.switch_core_2_name
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 15
+    name   = local.switch_core_2_name
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
-    number          = 16
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 16
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
 }
 
@@ -91,83 +92,129 @@ resource "unifi_device" "switch_core_2" {
   site = unifi_site.default.name
 
   port_override {
-    number          = 1
-    name            = local.switch_core_1_name
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 1
+    name   = local.switch_core_1_name
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
-    number          = 2
-    name            = unifi_device.ap_garage.name
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 2
+    name   = unifi_device.ap_attic_office.name
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
-    number          = 3
-    name            = unifi_device.ap_attic_office.name
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 3
+    name   = unifi_device.ap_garage.name
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
-    number          = 4
-    name            = unifi_device.ap_upstairs_hallway.name
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 4
+    name   = unifi_device.ap_upstairs_hallway.name
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
     number          = 5
     name            = "attic_office_hue_bridge"
-    port_profile_id = data.unifi_port_profile.iot.id
+    port_profile_id = resource.unifi_port_profile.iot.id
   }
   port_override {
     number          = 6
     name            = "diego"
-    port_profile_id = data.unifi_port_profile.servers.id
+    port_profile_id = resource.unifi_port_profile.servers.id
   }
+  port_override {
+    number = 7
+    name   = local.switch_core_3_name
+    # port_profile_id = resource.unifi_port_profile.all.id
+  }
+  port_override {
+    number = 8
+    # port_profile_id = resource.unifi_port_profile.all.id
+  }
+  port_override {
+    number = 9
+    # port_profile_id = resource.unifi_port_profile.all.id
+  }
+  port_override {
+    number = 10
+    # port_profile_id = resource.unifi_port_profile.all.id
+  }
+  port_override {
+    number = 11
+    # port_profile_id = resource.unifi_port_profile.all.id
+  }
+  port_override {
+    number = 12
+    # port_profile_id = resource.unifi_port_profile.all.id
+  }
+  port_override {
+    number = 13
+    # port_profile_id = resource.unifi_port_profile.all.id
+  }
+  port_override {
+    number = 14
+    name   = "gateway"
+    # port_profile_id = resource.unifi_port_profile.all.id
+  }
+  port_override {
+    number = 15
+    # port_profile_id = resource.unifi_port_profile.all.id
+  }
+
+  port_override {
+    number = 16
+    # port_profile_id = resource.unifi_port_profile.all.id
+  }
+}
+
+resource "unifi_device" "switch_core_3" {
+  mac  = "70:a7:41:e5:76:a2"
+  name = local.switch_core_3_name
+  site = unifi_site.default.name
+
+  port_override {
+    number = 1
+    name   = local.switch_core_2_name
+    # port_profile_id = resource.unifi_port_profile.all.id
+  }
+
+  port_override {
+    number = 2
+    # port_profile_id = resource.unifi_port_profile.all.id
+  }
+
+  port_override {
+    number = 3
+    # port_profile_id = resource.unifi_port_profile.all.id
+  }
+
+  port_override {
+    number = 4
+    # port_profile_id = resource.unifi_port_profile.all.id
+  }
+
+  port_override {
+    number          = 5
+    name            = "delta"
+    port_profile_id = data.unifi_port_profile.k8s_server.id
+  }
+
+  port_override {
+    number          = 6
+    name            = "enigma"
+    port_profile_id = data.unifi_port_profile.k8s_server.id
+  }
+
   port_override {
     number          = 7
-    port_profile_id = data.unifi_port_profile.all.id
+    name            = "felix"
+    port_profile_id = data.unifi_port_profile.k8s_server.id
   }
+
   port_override {
     number          = 8
-    port_profile_id = data.unifi_port_profile.all.id
+    name            = "nas"
+    port_profile_id = data.unifi_port_profile.k8s_server.id
   }
-  port_override {
-    number          = 9
-    name            = "delta"
-    port_profile_id = unifi_port_profile.k8s_server.id
-  }
-  port_override {
-    number          = 10
-    name            = "vyos_router"
-    port_profile_id = data.unifi_port_profile.all.id
-  }
-  port_override {
-    number          = 11
-    name            = "enigma"
-    port_profile_id = unifi_port_profile.k8s_server.id
-  }
-  port_override {
-    number          = 12
-    port_profile_id = data.unifi_port_profile.all.id
-  }
-  port_override {
-    number          = 13
-    name            = "felix"
-    port_profile_id = unifi_port_profile.k8s_server.id
-  }
-  port_override {
-    number          = 14
-    port_profile_id = data.unifi_port_profile.all.id
-  }
-  port_override {
-    number              = 15
-    name                = "nas"
-    port_profile_id     = data.unifi_port_profile.servers.id
-    op_mode             = "aggregate"
-    aggregate_num_ports = 2
-  }
-  # port_override {
-  #   number          = 16
-  #   name            = "nas"
-  #   port_profile_id = data.unifi_port_profile.servers.id
-  # }
 }
 
 resource "unifi_device" "switch_media" {
@@ -176,27 +223,28 @@ resource "unifi_device" "switch_media" {
   site = unifi_site.default.name
 
   port_override {
-    number          = 1
-    name            = local.switch_core_1_name
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 1
+    name   = local.switch_core_1_name
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
   port_override {
     number          = 2
-    name            = "livingroom_shield"
+    name            = "receiver"
     port_profile_id = unifi_port_profile.iot_poe_disabled.id
   }
   port_override {
     number          = 3
-    name            = "livingroom_receiver"
+    name            = "apple_tv"
     port_profile_id = unifi_port_profile.iot_poe_disabled.id
   }
   port_override {
     number          = 4
-    port_profile_id = data.unifi_port_profile.all.id
+    name            = "xbox"
+    port_profile_id = unifi_port_profile.iot_poe_disabled.id
   }
   port_override {
-    number          = 5
-    port_profile_id = data.unifi_port_profile.all.id
+    number = 5
+    # port_profile_id = resource.unifi_port_profile.all.id
   }
 }
 
