@@ -97,3 +97,7 @@ resource "unifi_network" "video" {
   wan_dns             = []
   wan_egress_qos      = 0
 }
+
+data "unifi_network" "default" {
+  name = "Default"
+}
