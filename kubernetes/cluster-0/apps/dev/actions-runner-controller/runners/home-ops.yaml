@@ -31,7 +31,8 @@ spec:
       spec:
         containers:
           - name: runner
-            image: ghcr.io/actions/actions-runner:2.311.0@sha256:08e29186e7cadd698afeb228e90e8a1fd2262b0ad48022ef731e799f80b6be16
+            image: ghcr.io/actions/actions-runner:2.311.0
+            command: ["/home/runner/run.sh"]
 
   valuesFrom:
     - kind: Secret
