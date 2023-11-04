@@ -19,7 +19,7 @@ spec:
     spec:
       # renovate: registryUrl=https://prometheus-community.github.io/helm-charts
       chart: kube-prometheus-stack
-      version: 51.3.0
+      version: 52.1.0
       sourceRef:
         kind: HelmRepository
         name: prometheus-community-charts
@@ -286,12 +286,12 @@ spec:
                 requests:
                   storage: 10Gi
         thanos:
-          image: quay.io/thanos/thanos:v0.32.4@sha256:f020de546269b62d3b7f2b0fe5cd815d632d1e11878708bd0d83a5c3f10747ad
+          image: quay.io/thanos/thanos:v0.32.5@sha256:3e5c47dd3a0bfc6c595036c1c49c7ca95979a89c1fb93ee4cdee3bf5d296f944
           objectStorageConfig:
             name: thanos-objstore-secret
             key: objstore.yml
           # renovate: datasource=docker depName=quay.io/thanos/thanos
-          version: "v0.32.4"
+          version: "v0.32.5"
         alertingEndpoints:
           - namespace: system-monitoring
             name: alertmanager
