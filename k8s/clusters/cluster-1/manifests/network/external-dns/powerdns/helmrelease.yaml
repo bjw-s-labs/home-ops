@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -35,18 +36,18 @@ spec:
             key: apikey
     podAnnotations:
       secret.reloader.stakater.com/reload: externaldns-powerdns-secrets
-    # extraArgs:
+    extraArgs:
       # - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       # - --crd-source-kind=DNSEndpoint
       # - --cloudflare-proxied
       # - --annotation-filter=external-dns/powerdns in (true)
+      - --ingress-class=traefik
     policy: sync
     provider: pdns
     sources:
       - ingress
       - service
-    # txtPrefix: "k8s."
-    txtSuffix:  ".k8s"
+    txtPrefix: "k8s."
     txtOwnerId: "default"
     domainFilters:
       - "${INGRESS_DOMAIN}"
