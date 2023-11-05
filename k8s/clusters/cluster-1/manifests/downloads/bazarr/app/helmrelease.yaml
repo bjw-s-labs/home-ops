@@ -143,12 +143,14 @@ spec:
           - host: *host-cluster
             paths:
               - path: /
+                pathType: Prefix
                 service:
                   name: main
                   port: http
           - host: &host "bazarr.${INGRESS_DOMAIN}"
             paths:
               - path: /
+                pathType: Prefix
                 service:
                   name: main
                   port: http
