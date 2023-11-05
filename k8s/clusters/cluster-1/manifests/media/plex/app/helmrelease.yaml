@@ -189,16 +189,8 @@ spec:
                 service:
                   name: main
                   port: http
-          - host: &cheesee "cheesee.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-                pathType: Prefix
-                service:
-                  name: main
-                  port: http
         tls:
           - secretName: tls.plex
             hosts:
               - *host
               - *host-cluster
-              - *cheesee
