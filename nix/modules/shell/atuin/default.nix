@@ -1,38 +1,42 @@
 { pkgs, pkgs-unstable, lib, config, ... }:
-with lib;
+
 let
   cfg = config.modules.shell.atuin;
+  defaultConfig = {
+    sync_address = cfg.sync_address;
+    auto_sync = true;
+    sync_frequency = "1m";
+    search_mode = "fuzzy";
+  };
 in {
   options.modules.shell.atuin = {
-    enable = mkEnableOption "atuin";
-
-    sync_address = mkOption {
-      type = types.str;
+    enable = lib.mkEnableOption "atuin";
+    sync_address = lib.mkOption {
+      type = lib.types.str;
       default = "";
+    };
+    username = lib.mkOption {
+      type = lib.types.str;
+    };
+    userConfig = lib.mkOption {
+      type = lib.types.attrs;
+      default = {};
     };
   };
 
-  config = mkIf cfg.enable {
-    programs.fish.enable = true;
+  config.home-manager.users.${cfg.username} = lib.mkIf cfg.enable {
+    programs.atuin = {
+      enable = true;
+      package = pkgs-unstable.atuin;
 
-    modules.shell.starship.enable = true;
+      flags = [
+        "--disable-up-arrow"
+      ];
 
-    home.manager = {
-      programs.atuin = {
-        enable = true;
-        package = pkgs-unstable.atuin;
-
-        flags = [
-          "--disable-up-arrow"
-        ];
-
-        settings = {
-          sync_address = cfg.sync_address;
-          auto_sync = true;
-          sync_frequency = "1m";
-          search_mode = "fuzzy";
-        };
-      };
+      settings = lib.mkMerge [
+        defaultConfig
+        cfg.userConfig
+      ];
     };
   };
 }

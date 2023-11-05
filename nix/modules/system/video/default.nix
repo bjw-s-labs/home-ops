@@ -1,13 +1,13 @@
 { pkgs, lib, config, ... }:
-with lib;
+
 let
   cfg = config.modules.system.video;
   device = config.modules.device;
 in {
-  options.modules.system.video = { enable = mkEnableOption "video"; };
+  options.modules.system.video = { enable = lib.mkEnableOption "video"; };
 
-  config = mkIf (cfg.enable) (mkMerge [
-    (mkIf (device.gpu == "amd") {
+  config = lib.mkIf (cfg.enable) (lib.mkMerge [
+    (lib.mkIf (device.gpu == "amd") {
       # enable amdgpu kernel module
       boot.initrd.kernelModules = [ "amdgpu" ];
       services.xserver.videoDrivers = [ "amdgpu" ];

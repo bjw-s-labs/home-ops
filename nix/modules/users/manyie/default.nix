@@ -1,10 +1,11 @@
 { pkgs, lib, config, options, ... }:
-with lib;
+
 let
   cfg = config.modules.users;
+  username = "manyie";
   ifGroupsExist = groups: builtins.filter (group: builtins.hasAttr group config.users.groups) groups;
 in {
-  config = mkIf (builtins.elem "manyie" cfg.presetUsers) {
+  config = lib.mkIf (builtins.elem username cfg.presetUsers) {
     users.users.manyie = {
       isNormalUser = true;
       extraGroups = [
@@ -13,6 +14,9 @@ in {
       ];
     };
 
-    home-manager.users.manyie = mkAliasDefinitions options.home.manager;
+    modules.shell.starship = {
+      enable = true;
+      username=username;
+    };
   };
 }

@@ -14,6 +14,9 @@
         "manyie"
       ];
     };
+
+    shell.openssh.enable = true;
+    system.video.enable = true;
   };
 
   # Use the systemd-boot EFI boot loader.
@@ -23,10 +26,6 @@
       efi.canTouchEfiVariables = true;
     };
   };
-
-  # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
-  services.openssh.settings.PermitRootLogin = "yes";
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

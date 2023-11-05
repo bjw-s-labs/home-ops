@@ -1,11 +1,12 @@
 { pkgs, lib, config, options, ... }:
-with lib;
+
 let
   cfg = config.modules.users;
+  username = "bjw-s";
   ifGroupsExist = groups: builtins.filter (group: builtins.hasAttr group config.users.groups) groups;
 in {
-  config = mkIf (builtins.elem "bjw-s" cfg.presetUsers) {
-    users.users.bjw-s = {
+  config = lib.mkIf (builtins.elem username cfg.presetUsers) {
+    users.users.${username} = {
       isNormalUser = true;
       shell = pkgs.fish;
       extraGroups = [
@@ -21,11 +22,13 @@ in {
       ];
     };
 
-    home-manager.users.bjw-s = mkAliasDefinitions options.home.manager;
+    modules.home-manager = { enable = true; username=username; };
 
-    modules.shell.fish.enable = true;
+    modules.shell.fish = { enable = true; username=username; };
+    modules.shell.starship = { enable = true; username=username; };
     modules.shell.atuin = {
       enable = true;
+      username=username;
       sync_address = "https://atuin.bjw-s.dev";
     };
   };

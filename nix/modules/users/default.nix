@@ -1,5 +1,5 @@
 { lib, config, ... }:
-with lib;
+
 let
   cfg = config.modules.users;
 in {
@@ -9,8 +9,8 @@ in {
   ];
 
   options.modules.users = {
-    presetUsers = mkOption {
-      type = types.listOf types.str;
+    presetUsers = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
       default = [];
     };
   };

@@ -1,16 +1,16 @@
 { pkgs, config, lib, myConfig, ... }:
-with lib;
+
 {
   options.modules.device = {
-    cpu = mkOption {
-      type = types.enum ["amd" "intel" "vm"];
+    cpu = lib.mkOption {
+      type = lib.types.enum ["amd" "intel" "vm"];
     };
-    gpu = mkOption {
-      type = types.enum ["amd" "intel" "nvidia" "vm"];
+    gpu = lib.mkOption {
+      type = lib.types.enum ["amd" "intel" "nvidia" "vm"];
     };
 
-    hostname = mkOption {
-      type = types.str;
+    hostname = lib.mkOption {
+      type = lib.types.str;
       default = myConfig.hostname;
     };
   };
