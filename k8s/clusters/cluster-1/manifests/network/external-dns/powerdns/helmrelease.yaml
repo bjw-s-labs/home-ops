@@ -35,11 +35,11 @@ spec:
             key: apikey
     podAnnotations:
       secret.reloader.stakater.com/reload: externaldns-powerdns-secrets
-    # extraArgs:
+    extraArgs:
       # - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       # - --crd-source-kind=DNSEndpoint
       # - --cloudflare-proxied
-      # - --annotation-filter=external-dns/is-public in (true)
+      - --annotation-filter=external-dns/powerdns in (true)
     policy: sync
     provider: pdns
     sources:
