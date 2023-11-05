@@ -84,6 +84,7 @@ spec:
         type: LoadBalancer
         annotations:
           io.cilium/lb-ipam-ips: "${LB_MATTER_SERVER}"
+          external-dns/powerdns: "true"
         # loadBalancerIP: ${LB_MATTER_SERVER}
         ports:
           http:
@@ -117,6 +118,7 @@ spec:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
           external-dns/is-public: "false"
+          external-dns/powerdns: "true"
         hosts:
           - host: *host-cluster
             paths:

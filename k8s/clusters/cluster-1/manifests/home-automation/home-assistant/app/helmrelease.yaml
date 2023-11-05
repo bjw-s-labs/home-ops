@@ -85,6 +85,7 @@ spec:
         type: LoadBalancer
         annotations:
           io.cilium/lb-ipam-ips: "${LB_HASS}"
+          external-dns/powerdns: "true"
         # loadBalancerIP: "${LB_HASS}"
         externalTrafficPolicy: Cluster
         ports:
@@ -132,6 +133,7 @@ spec:
           external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
           external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
           external-dns/is-public: "true"
+          external-dns/powerdns: "true"
         hosts:
           - host: *host-cluster
             paths:
