@@ -26,11 +26,9 @@ spec:
     interval: 2m
     # logLevel: debug
     env:
-      - name: EXTERNAL_DNS_PDNS_APIURL
-        value: "10.0.0.30"
-      - name: EXTERNAL_DNS_PDNS_APIPORT
-        value: "5300"
-      - name: EXTERNAL_DNS_PDNS_APIKEY
+      - name: EXTERNAL_DNS_PDNS_SERVER
+        value: "10.0.0.30:5300"
+      - name: EXTERNAL_DNS_PDNS_API_KEY
         valueFrom:
           secretKeyRef:
             name: externaldns-powerdns-secrets
