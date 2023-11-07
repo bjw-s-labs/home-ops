@@ -14,6 +14,15 @@
       default = myConfig.hostname;
     };
 
+    hostId = lib.mkOption {
+      type = lib.types.str;
+    };
+
+    domain = lib.mkOption {
+      type = lib.types.str;
+      default = "bjw-s.casa";
+    };
+
     presetUsers = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [];

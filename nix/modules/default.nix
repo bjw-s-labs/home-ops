@@ -8,11 +8,18 @@ let
     # Device options
     ./device.nix
 
+    ./filesystem/zfs
+
     ./monitoring/smartd
+
+    ./servers/nfs
+    ./servers/k3s
+    ./servers/samba
 
     ./shell/openssh
 
     ./system/cpu
+    ./system/qemu-guest-agent
     ./system/video
 
     ./users

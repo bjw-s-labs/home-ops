@@ -4,9 +4,9 @@
   modules = {
     # Device specific options
     device = {
-      cpu = "vm";
-      gpu = "vm";
-      hostId = "0e542f34";
+      cpu = "intel";
+      gpu = "intel";
+      hostId = "775b7d55";
     };
 
     users = {
@@ -18,22 +18,15 @@
 
     filesystem.zfs = {
       enable = true;
+      mountPoolsAtBoot = [
+        "tank"
+      ];
     };
 
-    # monitoring.smartd.enable = true;
-    servers.k3s.enable = true;
+    monitoring.smartd.enable = true;
     servers.nfs.enable = true;
-    servers.samba = {
-      enable = true;
-      shares = {
-        tmp = {
-          path = "/tmp";
-          "read only" = "no";
-        };
-      };
-    };
+    servers.samba.enable = true;
     shell.openssh.enable = true;
-    system.qemu-guest-agent.enable = true;
     system.video.enable = true;
   };
 

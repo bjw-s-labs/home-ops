@@ -4,6 +4,7 @@ let
 in {
 
   networking.hostName = deviceCfg.hostname;
+  networking.hostId = deviceCfg.hostId;
 
   i18n = {
     defaultLocale = lib.mkDefault "en_US.UTF-8";
