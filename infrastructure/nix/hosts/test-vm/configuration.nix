@@ -2,7 +2,6 @@
 
 {
   modules = {
-    # Device specific options
     device = {
       cpu = "vm";
       gpu = "vm";
@@ -14,6 +13,16 @@
         "bjw-s"
         "manyie"
       ];
+
+      groups = {
+        external-services = {
+          gid = 65542;
+        };
+        admins = {
+          gid = 991;
+          members = ["bjw-s"];
+        };
+      };
     };
 
     filesystem.zfs = {
@@ -40,12 +49,8 @@
   };
 
   # Use the systemd-boot EFI boot loader.
-  boot = {
-    loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
-    };
-  };
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

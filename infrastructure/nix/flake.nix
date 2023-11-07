@@ -4,7 +4,7 @@
   inputs = {
     # Nixpkgs and unstable
     nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
     # Home manager
     home-manager = {
@@ -18,35 +18,33 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # for VSCode remote-ssh
-    nix-ld-vscode = {
-      url = "github:scottstephens/nix-ld-vscode/main";
-      inputs.nixpkgs.follows = "nixpkgs";
+    # Flake-parts
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, sops-nix, nixpkgs-unstable, ... }@inputs:
+  outputs = { flake-parts, ... }@inputs:
     let
-      inherit (self) outputs;
-      forAllSystems = nixpkgs.lib.genAttrs [
-        "x86_64-linux"
-        # "aarch64-darwin"
-      ];
-
-      mkNixos = modules: nixpkgs.lib.nixosSystem {
-        inherit modules;
-        specialArgs = { inherit inputs outputs; };
-      };
+      myLib = import ./lib/default.nix { inherit inputs; };
     in
-    {
-      # Custom packages and modifications, exported as overlays
-      overlays = import ./overlays { inherit inputs; };
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [
+        "aarch64-linux"
+        "x86_64-linux"
+      ];
+      perSystem = {
+        inputs',
+        pkgs,
+        ...
+      }: {
+        # legacyPackages = import ./nixos/packages { inherit inputs' pkgs; };
+        # devShells.default = import ./nixos/packages/shell.nix { inherit inputs' pkgs; };
+      };
 
-      nixosConfigurations = {
-        # Metal
-        "nas" = mkNixos [./hosts/nas];
-        # VMs
-        "nas-vm" = mkNixos [./hosts/nas-vm];
+      flake.nixosConfigurations = {
+        nas = myLib.mkNixosSystem     "x86_64-linux"  "gladius";
+        test-vm = myLib.mkNixosSystem "aarch64-linux" "test-vm";
       };
     };
 }

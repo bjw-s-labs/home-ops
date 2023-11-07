@@ -2,7 +2,6 @@
 
 {
   modules = {
-    # Device specific options
     device = {
       cpu = "intel";
       gpu = "intel";
@@ -14,29 +13,54 @@
         "bjw-s"
         "manyie"
       ];
+
+      groups = {
+        external-services = {
+          gid = 65542;
+        };
+        admins = {
+          gid = 991;
+          members = ["bjw-s"];
+        };
+      };
     };
 
-    filesystem.zfs = {
-      enable = true;
-      mountPoolsAtBoot = [
-        "tank"
-      ];
-    };
+    filesystem.zfs.enable = true;
+    filesystem.zfs.mountPoolsAtBoot = [
+      "tank"
+    ];
 
     monitoring.smartd.enable = true;
+
+    servers.k3s.enable = true;
     servers.nfs.enable = true;
     servers.samba.enable = true;
+    servers.samba.shares = {
+      Docs = {
+        path = "/tank/Docs";
+        "read only" = "no";
+      };
+      Media = {
+        path = "/tank/Media";
+        "read only" = "no";
+      };
+      Paperless = {
+        path = "/tank/Apps/paperless/incoming";
+        "read only" = "no";
+      };
+      Software = {
+        path = "/tank/Software";
+        "read only" = "no";
+      };
+    };
+
     shell.openssh.enable = true;
     system.video.enable = true;
   };
 
   # Use the systemd-boot EFI boot loader.
-  boot = {
-    loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
-    };
-  };
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
