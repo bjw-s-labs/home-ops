@@ -9,4 +9,8 @@ in {
       default = [];
     };
   };
+
+  config = {
+    users.mutableUsers = false;
+  };
 }

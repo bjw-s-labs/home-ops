@@ -2,6 +2,7 @@
 let
   deviceCfg = config.modules.device;
 in {
+  boot.initrd.systemd.enable = true;
 
   networking.hostName = deviceCfg.hostname;
   networking.hostId = deviceCfg.hostId;

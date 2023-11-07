@@ -32,7 +32,9 @@
         };
       };
     };
+
     shell.openssh.enable = true;
+
     system.qemu-guest-agent.enable = true;
     system.video.enable = true;
   };

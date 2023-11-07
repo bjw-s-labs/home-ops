@@ -31,9 +31,6 @@ in {
     };
 
     modules.home-manager.${username}.enable = true;
-    modules.shell.fish.${username}.enable = true;
-    modules.shell.git.${username}.enable = true;
-    modules.shell.starship.${username}.enable = true;
     modules.shell.atuin.${username} = {
       enable = true;
       sync_address = "https://atuin.bjw-s.dev";
@@ -41,5 +38,9 @@ in {
         key_path = config.sops.secrets.atuin_key.path;
       };
     };
+    modules.shell.fish.${username}.enable = true;
+    modules.shell.git.${username}.enable = true;
+    modules.shell.starship.${username}.enable = true;
+    modules.shell.tmux.${username}.enable = true;
   };
 }
