@@ -34,13 +34,11 @@ spec:
                 - path: /data
 
         pod:
-          annotations:
-            k8s.v1.cni.cncf.io/networks: |
-              [{
-                "name":"multus-iot",
-                "namespace": "network",
-                "ips": ["10.1.3.151/24"]
-              }]
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: OnRootMismatch
 
         initContainers:
           init-config:
@@ -50,7 +48,10 @@ spec:
             command:
               - "/bin/sh"
               - "-c"
-              - "cp /tmp/secret/* /mosquitto/external_config/ && mosquitto_passwd -U /mosquitto/external_config/mosquitto_pwd"
+            args:
+              - cp /tmp/secret/* /mosquitto/external_config/;
+                mosquitto_passwd -U /mosquitto/external_config/mosquitto_pwd;
+                chmod 0600 /mosquitto/external_config/mosquitto_pwd;
 
         containers:
           main:
@@ -70,7 +71,7 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/hostname: "mqtt.bjw-s.dev."
           io.cilium/lb-ipam-ips: "10.45.0.10"
-        externalTrafficPolicy: Cluster
+        externalTrafficPolicy: Local
         ports:
           http:
             enabled: false
