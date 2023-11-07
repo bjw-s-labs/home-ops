@@ -1,13 +1,14 @@
 { pkgs, lib, config, ... }:
+with lib;
 
 let
   cfg = config.modules.system.video;
   device = config.modules.device;
 in {
-  options.modules.system.video = { enable = lib.mkEnableOption "video"; };
+  options.modules.system.video = { enable = mkEnableOption "video"; };
 
-  config = lib.mkIf (cfg.enable) (lib.mkMerge [
-    (lib.mkIf (device.gpu == "amd") {
+  config = mkIf (cfg.enable) (mkMerge [
+    (mkIf (device.gpu == "amd") {
       # enable amdgpu kernel module
       boot.initrd.kernelModules = [ "amdgpu" ];
       services.xserver.videoDrivers = [ "amdgpu" ];
@@ -24,7 +25,7 @@ in {
       environment.variables.AMD_VULKAN_ICD = "RADV";
     })
 
-    (lib.mkIf (device.gpu == "intel") {
+    (mkIf (device.gpu == "intel") {
       # enable the i915 kernel module
       boot.initrd.kernelModules = ["i915"];
       # better performance than the actual Intel driver

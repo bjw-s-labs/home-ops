@@ -14,9 +14,6 @@ in {
       ];
     };
 
-    modules.shell.starship = {
-      enable = true;
-      username=username;
-    };
+    # modules.shell.starship.${username}.enable = true;
   };
 }

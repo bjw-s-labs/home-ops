@@ -15,6 +15,7 @@
       ];
     };
 
+    # monitoring.smartd.enable = true;
     shell.openssh.enable = true;
     system.video.enable = true;
   };

@@ -13,5 +13,10 @@
       type = lib.types.str;
       default = myConfig.hostname;
     };
+
+    presetUsers = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+    };
   };
 }

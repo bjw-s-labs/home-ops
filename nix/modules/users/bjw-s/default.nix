@@ -1,4 +1,5 @@
 { pkgs, lib, config, options, ... }:
+with lib;
 
 let
   cfg = config.modules.users;
@@ -22,14 +23,23 @@ in {
       ];
     };
 
-    modules.home-manager = { enable = true; username=username; };
+    sops = {
+      defaultSopsFile = ./secrets.sops.yaml;
+      secrets = {
+        atuin_key = {};
+      };
+    };
 
-    modules.shell.fish = { enable = true; username=username; };
-    modules.shell.starship = { enable = true; username=username; };
-    modules.shell.atuin = {
+    modules.home-manager.${username}.enable = true;
+    modules.shell.fish.${username}.enable = true;
+    modules.shell.git.${username}.enable = true;
+    modules.shell.starship.${username}.enable = true;
+    modules.shell.atuin.${username} = {
       enable = true;
-      username=username;
       sync_address = "https://atuin.bjw-s.dev";
+      config = {
+        key_path = config.sops.secrets.atuin_key.path;
+      };
     };
   };
 }

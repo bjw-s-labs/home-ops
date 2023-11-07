@@ -1,26 +1,27 @@
+username:
+
 { pkgs, pkgs-unstable, lib, config, ... }:
+with lib;
 
 let
-  cfg = config.modules.shell.git;
+  cfg = config.modules.shell.git.${username};
+
 in {
-  options.modules.shell.git = {
+  options.modules.shell.git.${username} = {
     enable = lib.mkEnableOption "git";
-    username = lib.mkOption {
-      type = lib.types.str;
-    };
-    userConfig = lib.mkOption {
+    config = lib.mkOption {
       type = lib.types.attrs;
       default = {};
     };
   };
 
   config = lib.mkIf cfg.enable {
-    home-manager.users.${cfg.username} = {
+    home-manager.users.${username} = {
       programs.gh.enable = true;
       programs.git = {
         enable = true;
 
-        extraConfig = cfg.userConfig;
+        extraConfig = cfg.config;
       };
     };
   };

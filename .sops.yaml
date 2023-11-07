@@ -2,6 +2,7 @@
 keys:
   - &host_bjw-s_macbook age1uk0y2ahfavgsgqvrtg5a22w5gytpdmjuatxtcw6kntmxhlcgreesuwzw5s
   - &host_gladius age13hry6wpjk5zvzwn7jy9mmcv2tjy5axk2ur8ky6c9n4kvj8tc4s8suqfvy3
+  - &host_nixvm age132mjxmg49wvwdhq5vyc8ny567820rskn556hpjqumtttf2t3zg3sga54jn
   - &user_flux age1hawjtl6fm5czl8cun0ve7jvsmpqpn3qlxl2lnx7ndt7682tmva2qz3drfe
 
 creation_rules:
@@ -12,11 +13,12 @@ creation_rules:
           - *host_bjw-s_macbook
           - *user_flux
 
-  - path_regex: infrastructure/nix/secrets/.*\.sops\.ya?ml$
+  - path_regex: nix/.*\.sops\.ya?ml$
     key_groups:
       - age:
-          - *host_gladius
           - *host_bjw-s_macbook
+          - *host_gladius
+          - *host_nixvm
 
   - path_regex: .*\.sops\.ya?ml$
     key_groups:
