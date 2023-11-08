@@ -35,6 +35,10 @@ spec:
     copyMethod: Snapshot
     pruneIntervalDays: 14
     repository: mosquitto-restic-secret
+    moverSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
     retain:
       daily: 14
     volumeSnapshotClassName: csi-ceph-blockpool
