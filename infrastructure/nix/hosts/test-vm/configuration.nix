@@ -11,41 +11,12 @@
     users = {
       presetUsers = [
         "bjw-s"
-        "manyie"
       ];
-
-      groups = {
-        external-services = {
-          gid = 65542;
-        };
-        admins = {
-          gid = 991;
-          members = ["bjw-s"];
-        };
-      };
-    };
-
-    filesystem.zfs = {
-      enable = true;
-    };
-
-    # monitoring.smartd.enable = true;
-    servers.k3s.enable = true;
-    servers.nfs.enable = true;
-    servers.samba = {
-      enable = true;
-      shares = {
-        tmp = {
-          path = "/tmp";
-          "read only" = "no";
-        };
-      };
     };
 
     shell.openssh.enable = true;
 
     system.qemu-guest-agent.enable = true;
-    system.video.enable = true;
   };
 
   # Use the systemd-boot EFI boot loader.

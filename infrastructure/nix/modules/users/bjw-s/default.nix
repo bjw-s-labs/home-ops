@@ -26,7 +26,7 @@ in {
     sops = {
       defaultSopsFile = ./secrets.sops.yaml;
       secrets = {
-        atuin_key = {};
+        atuin_key = { owner = config.users.users.${username}.name; };
       };
     };
 
