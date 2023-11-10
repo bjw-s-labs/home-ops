@@ -1,0 +1,53 @@
+---
+name: "Flux Diff"
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths: ["kubernetes/**.yaml"]
+
+jobs:
+  flux-diff:
+    name: Flux Diff
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    strategy:
+      matrix:
+        path: ["kubernetes"]
+        resource: ["helmrelease", "kustomization"]
+    steps:
+      - name: Generate Token
+        uses: tibdex/github-app-token@v2
+        id: generate-token
+        with:
+          app_id: ${{ secrets.BJWS_APP_ID }}
+          private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.BJWS_APP_ID }}
+          password: "${{ steps.generate-token.outputs.token }}"
+
+      - name: Diff Resources
+        uses: allenporter/flux-local/action/diff@3.1.1
+        id: diff
+        with:
+          live-branch: master
+          sources: "${{ github.event.repository.name }}"
+          path: "${{ matrix.path }}"
+          resource: "${{ matrix.resource }}"
+
+      - if: ${{ steps.diff.outputs.diff != '' }}
+        name: Add comment
+        uses: mshick/add-pr-comment@v2.8.1
+        with:
+          repo-token: "${{ steps.generate-token.outputs.token }}"
+          message-id: "${{ github.event.pull_request.number }}/${{ matrix.path }}/${{ matrix.resource }}"
+          message-failure: Diff was not successful
+          message: |
+            ```diff
+            ${{ steps.diff.outputs.diff }}
+            ```
