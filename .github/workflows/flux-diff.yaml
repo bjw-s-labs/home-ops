@@ -14,7 +14,7 @@ jobs:
       pull-requests: write
     strategy:
       matrix:
-        path: ["kubernetes/cluster-0", "kubernetes/nas"]
+        path: ["kubernetes"]
         resource: ["helmrelease", "kustomization"]
     steps:
       - name: Generate Token
@@ -24,19 +24,11 @@ jobs:
           app_id: ${{ secrets.BJWS_APP_ID }}
           private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3.0.0
-        with:
-          registry: ghcr.io
-          username: ${{ secrets.BJWS_APP_ID }}
-          password: "${{ steps.generate-token.outputs.token }}"
-
       - name: Diff Resources
         uses: allenporter/flux-local/action/diff@3.1.1
         id: diff
         with:
-          live-branch: main
-          sources: "${{ github.event.repository.name }}"
+          sources: home-ops-kubernetes
           path: "${{ matrix.path }}"
           resource: "${{ matrix.resource }}"
 
