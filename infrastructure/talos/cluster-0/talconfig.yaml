@@ -2,7 +2,7 @@
 clusterName: ${clusterName}
 endpoint: "https://${clusterName}.bjw-s.casa:6443"
 
-talosVersion: v1.5.4
+talosVersion: v1.5.5
 kubernetesVersion: 1.28.3
 
 # Image URL rendered on https://factory.talos.dev
@@ -13,7 +13,7 @@ kubernetesVersion: 1.28.3
 #         officialExtensions:
 #             - siderolabs/i915-ucode
 #             - siderolabs/intel-ucode
-talosImageURL: factory.talos.dev/installer/22b1d04da881ef7c57edb0f24d1f3ba2c78a8e22cbe3fa9af4f42d487b2863f7
+talosImageURL: factory.talos.dev/installer/df491c50a5acc05b977ef00c32050e1ceb0df746e40b33c643ac8a9bfb7c7263
 
 cniConfig:
   name: none
@@ -154,6 +154,36 @@ controlPlane:
             - ip: ${clusterEndpointIP}
               aliases:
                 - ${clusterName}.bjw-s.casa
+
+    # Configure pull through cache
+    - |-
+      machine:
+        registries:
+          mirrors:
+            docker.io:
+              endpoints:
+                - https://zot.bjw-s.dev/v2/docker.io
+              overridePath: true
+            ghcr.io:
+              endpoints:
+                - https://zot.bjw-s.dev/v2/ghcr.io
+              overridePath: true
+            quay.io:
+              endpoints:
+                - https://zot.bjw-s.dev/v2/quay.io
+              overridePath: true
+            gcr.io:
+              endpoints:
+                - https://zot.bjw-s.dev/v2/gcr.io
+              overridePath: true
+            registry.k8s.io:
+              endpoints:
+                - https://zot.bjw-s.dev/v2/registry.k8s.io
+              overridePath: true
+            public.ecr.aws:
+              endpoints:
+                - https://zot.bjw-s.dev/v2/public.ecr.aws
+              overridePath: true
 
     # Cluster configuration
     - |-
