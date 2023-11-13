@@ -1,4 +1,4 @@
-{ config, ... }:
+{ ... }:
 
 {
   modules = {
@@ -8,14 +8,9 @@
       hostId = "0e542f34";
     };
 
-    users = {
-      presetUsers = [
-        "bjw-s"
-      ];
-    };
+    users.bjw-s.enable = true;
 
-    shell.openssh.enable = true;
-
+    system.openssh.enable = true;
     system.qemu-guest-agent.enable = true;
   };
 

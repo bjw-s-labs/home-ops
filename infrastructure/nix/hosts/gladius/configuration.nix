@@ -1,4 +1,4 @@
-{ config, ... }:
+{ ... }:
 
 {
   modules = {
@@ -8,20 +8,14 @@
       hostId = "775b7d55";
     };
 
-    users = {
-      presetUsers = [
-        "bjw-s"
-        "manyie"
-      ];
-
-      groups = {
-        external-services = {
-          gid = 65542;
-        };
-        admins = {
-          gid = 991;
-          members = ["bjw-s"];
-        };
+    users.bjw-s.enable = true;
+    users.groups = {
+      external-services = {
+        gid = 65542;
+      };
+      admins = {
+        gid = 991;
+        members = ["bjw-s"];
       };
     };
 
@@ -54,7 +48,7 @@
       };
     };
 
-    shell.openssh.enable = true;
+    system.openssh.enable = true;
     system.video.enable = true;
   };
 
