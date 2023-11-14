@@ -1,7 +1,19 @@
+# ---
+# ipam:
+#   mode: kubernetes
+# kubeProxyReplacement: disabled
+# securityContext:
+#   capabilities:
+#     ciliumAgent: [CHOWN, KILL, NET_ADMIN, NET_RAW, IPC_LOCK, SYS_ADMIN, SYS_RESOURCE, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
+#     cleanCiliumState: [NET_ADMIN, SYS_ADMIN, SYS_RESOURCE]
+# cgroup:
+#   autoMount:
+#     enabled: false
+#   hostRoot: /sys/fs/cgroup
 ---
 cluster:
-  name: "cluster-2"
-  id: "2"
+  name: "cluster-1"
+  id: "1"
 
 securityContext:
   capabilities:
@@ -32,7 +44,7 @@ localRedirectPolicy: true
 # kubeProxyReplacement enables kube-proxy replacement in Cilium BPF datapath
 kubeProxyReplacement: "strict"
 
-k8sServiceHost: cluster-2.elcarpenter.com
+k8sServiceHost: cluster-1.elcarpenter.com
 k8sServicePort: 6443
 
 ipam:
