@@ -9,11 +9,11 @@ spec:
   - name: ubuntu
     image: ubuntu
     command: ["/bin/sh","-c"]
+    # apt-get update &&
+    # apt-get install -y gdisk &&
+    # echo "Go to sleep now!" &&
     args:
       - >
-        apt-get update &&
-        apt-get install -y gdisk &&
-        echo "Go to sleep now!" &&
         sleep 6000000000000000000000000000000000000
     volumeMounts:
     - mountPath: /hostRoot
