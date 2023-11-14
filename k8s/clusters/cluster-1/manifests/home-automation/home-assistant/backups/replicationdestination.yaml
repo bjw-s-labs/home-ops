@@ -5,10 +5,10 @@ metadata:
   name: home-assistant
   namespace: home-automation
 spec:
-  destinationPVC: home-assistant-config
   trigger:
     manual: restore-once
   restic:
+    destinationPVC: home-assistant-config
     copyMethod: Direct
     repository: home-assistant-restic
     moverSecurityContext:
