@@ -6,10 +6,10 @@ metadata:
   name: frigate
   namespace: home-automation
 spec:
-  destinationPVC: frigate-data
   trigger:
     manual: restore-once
   restic:
+    destinationPVC: frigate-data
     copyMethod: Direct
     repository: frigate-restic
     cacheCapacity: 5Gi

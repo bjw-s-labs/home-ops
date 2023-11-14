@@ -240,3 +240,50 @@ controlPlane:
         sysctls:
           fs.inotify.max_user_watches: "1048576"
           fs.inotify.max_user_instances: "8192"
+
+worker:
+  patches:
+    - |-
+      - op: add
+        path: /machine/install/extraKernelArgs
+        value:
+          - net.ifnames=0
+    # Kubelet configuration
+    - |-
+      machine:
+        kubelet:
+          extraArgs:
+            feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,NewVolumeManagerReconstruction=false
+            rotate-server-certificates: "true"
+          extraConfig:
+            maxPods: 150
+          nodeIP:
+            validSubnets:
+                - 10.200.1.0/24
+    - |-
+      machine:
+        time:
+          disabled: false
+          servers:
+            - 10.255.253.1
+    # Custom sysctls
+    - |-
+      machine:
+        sysctls:
+          fs.inotify.max_user_watches: "1048576"
+          fs.inotify.max_user_instances: "8192"
+          # For CloudflareD QUIC, sets maximum receive buffer size to roughly 2.5 MB. 
+          # https://github.com/quic-go/quic-go/wiki/UDP-Receive-Buffer-Size
+          net.core.rmem_max: 2500000
+    # Configure containerd
+    - |-
+      machine:
+        files:
+          - op: create
+            path: /etc/cri/conf.d/20-customization.part
+            content: |
+              [plugins]
+                [plugins."io.containerd.grpc.v1.cri"]
+                  enable_unprivileged_ports = true
+                  enable_unprivileged_icmp = true
+
