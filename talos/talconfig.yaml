@@ -154,23 +154,11 @@ controlPlane:
           disabled: false
           servers:
             - 10.255.253.1
-
-    # Enable KubePrism
+    # Disable kube-proxy. I use an HAProxy instance externally to roundrobin
     - |-
-      machine:
-        features:
-          kubePrism:
-            enabled: false
-            port: 7445
-
-    # Configure cluster loopback
-    # - |-
-    #   machine:
-    #     network:
-    #       extraHostEntries:
-    #         - ip: ${clusterEndpointIP}
-    #           aliases:
-    #             - ${clusterName}.bjw-s.casa
+      cluster:
+        proxy:
+          disabled: true
 
     # Configure pull through cache
     # - |-
