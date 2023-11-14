@@ -20,12 +20,10 @@ spec:
         name: cilium-charts
         namespace: flux-system
       interval: 5m
-  install:
-    crds: CreateReplace
+  install:  
     remediation: # perform remediation when helm install fails
       retries: 100
   upgrade:
-    crds: CreateReplace
     remediation: # perform remediation when helm upgrade fails
       retries: 100
       remediateLastFailure: true # remediate the last failure, when no retries remain
