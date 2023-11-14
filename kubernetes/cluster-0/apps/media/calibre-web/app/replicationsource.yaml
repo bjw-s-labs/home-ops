@@ -1,0 +1,25 @@
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: calibre-web
+  namespace: media
+spec:
+  sourcePVC: calibre-web-config
+  trigger:
+    schedule: "0 */12 * * *"
+  restic:
+    copyMethod: Snapshot
+    pruneIntervalDays: 7
+    repository: calibre-web-restic-secret
+    moverSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+    retain:
+      daily: 7
+      within: 3d
+    volumeSnapshotClassName: csi-ceph-filesystem
+    storageClassName: ceph-filesystem
+    cacheStorageClassName: local-hostpath
+    cacheCapacity: 1Gi
