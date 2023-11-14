@@ -1,4 +1,4 @@
-{ username }: {lib, config, ... }:
+{ username }: {lib, pkgs, config, ... }:
 with lib;
 
 let
@@ -50,6 +50,8 @@ in {
         signing = cfg.signing;
       };
       programs.gpg.enable = true;
+
+      home.packages = [ pkgs.pinentry ];
     };
   };
 }
