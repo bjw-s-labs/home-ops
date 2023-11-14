@@ -49,4 +49,6 @@ in
       value = "1048576";
     }
   ];
+
+  system.stateVersion = "23.05";
 }
