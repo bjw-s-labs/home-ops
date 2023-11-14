@@ -23,6 +23,11 @@ in {
         inputs.sops-nix.homeManagerModules.sops
       ];
 
+      home.packages = [
+        pkgs.sops
+        pkgs.age
+      ];
+
       sops = {
         defaultSopsFile = cfg.defaultSopsFile;
         age.sshKeyPaths = [

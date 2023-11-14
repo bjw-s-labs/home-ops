@@ -2,7 +2,10 @@
 
 {
   modules = {
-    users.bjw-s.enable = true;
+    users.bjw-s = {
+      enable = true;
+      enableKubernetesTools = true;
+    };
   #   device = {
   #     cpu = "intel";
   #     gpu = "intel";
