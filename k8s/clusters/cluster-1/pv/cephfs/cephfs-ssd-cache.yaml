@@ -56,7 +56,7 @@ spec:
     - ReadWriteMany
   capacity:
     storage: 500G
-  storageClassName: "cephfs-ssdd-cache"
+  storageClassName: "cephfs-ssd-cache"
   csi:
     driver: rook-ceph.cephfs.csi.ceph.com 
     nodeStageSecretRef:
@@ -73,14 +73,14 @@ spec:
       "rootPath": /volumes/_nogroup/downloads/7d1f972d-e3ce-45db-b8ba-81b9dc3b7e5b
     # volumeHandle can be anything, need not to be same
     # as PV name or volume name. keeping same for brevity
-    volumeHandle: cephfs-ssdd-cache-media
+    volumeHandle: cephfs-ssd-cache-media
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: cephfs-ssdd-cache-media
+  name: cephfs-ssd-cache-media
   namespace: media
   labels:
     backup: "false"
