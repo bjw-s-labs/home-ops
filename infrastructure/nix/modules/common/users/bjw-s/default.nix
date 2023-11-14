@@ -10,11 +10,27 @@ in {
 
   options.modules.users.bjw-s = {
     enable = mkEnableOption "bjw-s";
+    enableKubernetesTools = mkEnableOption "Enable k8s tools" // {
+      default = false;
+    };
   };
 
   config = mkIf (cfg.enable) (mkMerge [
     (mkIf (pkgs.stdenv.isLinux) (import ./nixos.nix args))
     (mkIf (pkgs.stdenv.isDarwin) (import ./darwin.nix args))
+
+    (mkIf (cfg.enableKubernetesTools) {
+      modules.users.bjw-s.kubernetes.k9s.enable = true;
+      modules.users.bjw-s.kubernetes.krew.enable = true;
+      modules.users.bjw-s.kubernetes.kubecm.enable = true;
+      modules.users.bjw-s.kubernetes.stern.enable = true;
+
+      modules.users.bjw-s.shell.fish = {
+        config.programs.fish.shellAliases = {
+          k = "kubectl";
+        };
+      };
+    })
 
     {
       users.users.bjw-s = {
@@ -41,7 +57,9 @@ in {
         };
       };
 
-      modules.users.bjw-s.shell.fish.enable = true;
+      modules.users.bjw-s.shell.fish = {
+        enable = true;
+      };
 
       modules.users.bjw-s.shell.git = {
         enable = true;
