@@ -20,17 +20,6 @@ spec:
   values:
     controllers:
       main:
-        type: statefulset
-
-        statefulset:
-          volumeClaimTemplates:
-            - name: config
-              accessMode: ReadWriteOnce
-              size: 1Gi
-              storageClass: ceph-block
-              globalMounts:
-                - path: /config
-
         annotations:
           reloader.stakater.com/auto: "true"
 
@@ -70,9 +59,9 @@ spec:
             resources:
               requests:
                 cpu: 5m
-                memory: "1024M"
+                memory: 1024Mi
               limits:
-                memory: "4096M"
+                memory: 6144Mi
 
     service:
       main:
@@ -96,6 +85,13 @@ spec:
               - *host
 
     persistence:
+      config:
+        enabled: true
+        existingClaim: sabnzbd-config
+        advancedMounts:
+          main:
+            main:
+              - path: /config
       media:
         existingClaim: nas-media
         globalMounts:
