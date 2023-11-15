@@ -1,5 +1,4 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/replicationsource_v1alpha1.json
 apiVersion: volsync.backube/v1alpha1
 kind: ReplicationDestination
 metadata:
@@ -12,11 +11,11 @@ spec:
     destinationPVC: autoscan-config
     copyMethod: Direct
     repository: autoscan-restic
-    # moverSecurityContext:
-    #   runAsUser: 0
-    #   runAsGroup: 0
-    #   fsGroup: 0
-    #   fsGroupChangePolicy: "OnRootMismatch"
+    moverSecurityContext:
+      runAsUser: 0
+      runAsGroup: 100
+      fsGroup: 100
+      fsGroupChangePolicy: "OnRootMismatch"
     cacheCapacity: 5Gi
     volumeSnapshotClassName: csi-rbdplugin-snapclass
     storageClassName: ceph-block-external
