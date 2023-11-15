@@ -3,7 +3,8 @@ apiVersion: volsync.backube/v1alpha1
 kind: ReplicationDestination
 metadata:
   name: calibre-web-dst
-  namespace: media
+  annotations:
+    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
 spec:
   trigger:
     manual: restore-once
@@ -11,8 +12,8 @@ spec:
     copyMethod: Snapshot
     repository: calibre-web-restic-secret
     cacheStorageClassName: local-hostpath
-    storageClassName: ceph-filesystem
-    volumeSnapshotClassName: csi-ceph-filesystem
+    storageClassName: ceph-block
+    volumeSnapshotClassName: csi-ceph-blockpool
     moverSecurityContext:
       runAsUser: 568
       runAsGroup: 568
