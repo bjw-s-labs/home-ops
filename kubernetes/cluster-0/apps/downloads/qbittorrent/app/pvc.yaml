@@ -5,7 +5,12 @@ metadata:
   name: qbittorrent-config
   namespace: downloads
 spec:
-  accessModes: ["ReadWriteMany"]
+  accessModes:
+    - ReadWriteMany
+  dataSourceRef:
+    kind: ReplicationDestination
+    apiGroup: volsync.backube
+    name: qbittorrent-dst
   resources:
     requests:
       storage: 2Gi

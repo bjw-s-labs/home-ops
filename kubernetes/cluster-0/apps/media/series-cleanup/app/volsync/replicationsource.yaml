@@ -3,7 +3,6 @@ apiVersion: volsync.backube/v1alpha1
 kind: ReplicationSource
 metadata:
   name: series-cleanup-src
-  namespace: media
 spec:
   sourcePVC: series-cleanup-data
   trigger:
@@ -13,8 +12,8 @@ spec:
     repository: series-cleanup-restic-secret
     cacheStorageClassName: local-hostpath
     cacheCapacity: 1Gi
-    storageClassName: ceph-filesystem
-    volumeSnapshotClassName: csi-ceph-filesystem
+    storageClassName: ceph-block
+    volumeSnapshotClassName: csi-ceph-blockpool
     moverSecurityContext:
       runAsUser: 1031
       runAsGroup: 100

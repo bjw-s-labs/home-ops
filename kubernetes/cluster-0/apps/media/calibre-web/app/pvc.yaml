@@ -4,9 +4,6 @@ kind: PersistentVolumeClaim
 metadata:
   name: calibre-web-config
   namespace: media
-  labels:
-    kustomize.toolkit.fluxcd.io/prune: Disabled
-    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
 spec:
   accessModes:
     - ReadWriteOnce
@@ -17,4 +14,4 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  storageClassName: ceph-filesystem
+  storageClassName: ceph-block
