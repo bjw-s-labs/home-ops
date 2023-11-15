@@ -6,11 +6,11 @@ metadata:
   name: sonarr
   namespace: downloads
 spec:
-  destinationPVC: sonarr-config-nvme
   trigger:
     manual: restore-once
   restic:
     copyMethod: Direct
+    destinationPVC: sonarr-config-nvme
     repository: sonarr-restic
     cacheCapacity: 5Gi
     volumeSnapshotClassName: csi-rbdplugin-snapclass

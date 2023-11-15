@@ -6,11 +6,11 @@ metadata:
   name: radarr
   namespace: downloads
 spec:
-  destinationPVC: radarr-config-nvme
   trigger:
     manual: restore-once
   restic:
     copyMethod: Direct
+    destinationPVC: radarr-config-nvme
     repository: radarr-restic
     cacheCapacity: 5Gi
     volumeSnapshotClassName: csi-rbdplugin-snapclass

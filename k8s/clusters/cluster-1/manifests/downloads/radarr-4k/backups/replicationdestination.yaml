@@ -1,16 +1,15 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/replicationsource_v1alpha1.json
 apiVersion: volsync.backube/v1alpha1
 kind: ReplicationDestination
 metadata:
   name: radarr-4k
   namespace: downloads
 spec:
-  destinationPVC: radarr-4k-config
   trigger:
     manual: restore-once
   restic:
     copyMethod: Direct
+    destinationPVC: radarr-4k-config
     repository: radarr-4k-restic
     cacheCapacity: 5Gi
     volumeSnapshotClassName: csi-rbdplugin-snapclass

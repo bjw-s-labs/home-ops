@@ -1,16 +1,15 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/replicationsource_v1alpha1.json
 apiVersion: volsync.backube/v1alpha1
 kind: ReplicationDestination
 metadata:
   name: prowlarr
   namespace: downloads
 spec:
-  destinationPVC: prowlarr-config
   trigger:
     manual: restore-once
   restic:
     copyMethod: Direct
+    destinationPVC: prowlarr-config
     repository: prowlarr-restic
     cacheCapacity: 5Gi
     volumeSnapshotClassName: csi-rbdplugin-snapclass

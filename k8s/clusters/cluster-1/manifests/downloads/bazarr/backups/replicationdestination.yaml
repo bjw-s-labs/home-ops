@@ -6,11 +6,11 @@ metadata:
   name: bazarr
   namespace: downloads
 spec:
-  destinationPVC: bazarr-config
   trigger:
     manual: restore-once
   restic:
     copyMethod: Direct
+    destinationPVC: bazarr-config
     repository: bazarr-restic
     cacheCapacity: 5Gi
     volumeSnapshotClassName: csi-rbdplugin-snapclass
