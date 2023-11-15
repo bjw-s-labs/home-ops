@@ -19,18 +19,8 @@ spec:
   values:
     controllers:
       main:
-        type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
-
-        statefulset:
-          volumeClaimTemplates:
-            - name: config
-              accessMode: ReadWriteOnce
-              size: 50Gi
-              storageClass: ceph-block
-              globalMounts:
-                - path: /config
 
         pod:
           enableServiceLinks: false
@@ -89,6 +79,13 @@ spec:
               - *host
 
     persistence:
+      config:
+        enabled: true
+        existingClaim: plex-config
+        advancedMounts:
+          main:
+            main:
+              - path: /config
       nfs-nas-media:
         existingClaim: nas-media
         advancedMounts:
@@ -97,5 +94,7 @@ spec:
               - path: /data/nas-media
       transcode:
         type: emptyDir
-        globalMounts:
-          - path: /transcode
+        advancedMounts:
+          main:
+            main:
+              - path: /transcode

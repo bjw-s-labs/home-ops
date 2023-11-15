@@ -1,0 +1,21 @@
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationDestination
+metadata:
+  name: plex
+spec:
+  trigger:
+    manual: restore-once
+  restic:
+    copyMethod: Snapshot
+    repository: plex-restic-secret
+    cacheStorageClassName: local-hostpath
+    storageClassName: ceph-filesystem
+    volumeSnapshotClassName: csi-ceph-filesystem
+    moverSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+    accessModes:
+      - ReadWriteOnce
+    capacity: 50Gi
