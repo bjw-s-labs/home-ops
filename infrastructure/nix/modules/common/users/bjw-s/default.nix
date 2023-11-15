@@ -22,31 +22,6 @@ in {
     (mkIf (pkgs.stdenv.isLinux) (import ./nixos.nix args))
     (mkIf (pkgs.stdenv.isDarwin) (import ./darwin.nix args))
 
-    (mkIf (cfg.enableKubernetesTools) {
-      modules.users.bjw-s.kubernetes.k9s.enable = true;
-      modules.users.bjw-s.kubernetes.krew.enable = true;
-      modules.users.bjw-s.kubernetes.kubecm.enable = true;
-      modules.users.bjw-s.kubernetes.stern.enable = true;
-
-      modules.users.bjw-s.shell.fish = {
-        config.programs.fish.shellAliases = {
-          k = "kubectl";
-        };
-      };
-    })
-
-    (mkIf (cfg.enableDevTools) {
-      modules.users.bjw-s.shell.rtx = {
-        enable = true;
-        package = pkgs-unstable.rtx;
-      };
-
-      home-manager.users.bjw-s.home.packages = [
-        pkgs.envsubst
-        pkgs.go-task
-      ];
-    })
-
     {
       users.users.bjw-s = {
         shell = pkgs.fish;
@@ -118,5 +93,8 @@ in {
       modules.users.bjw-s.shell.starship.enable = true;
       modules.users.bjw-s.shell.tmux.enable = true;
     }
+
+    (mkIf (cfg.enableKubernetesTools) (import ./_kubernetes.nix))
+    (mkIf (cfg.enableKubernetesTools) (import ./_devtools.nix args))
   ]);
 }
