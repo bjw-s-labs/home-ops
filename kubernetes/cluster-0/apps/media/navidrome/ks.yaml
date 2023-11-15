@@ -3,7 +3,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-navidrome-main
+  name: navidrome-main
   namespace: flux-system
 spec:
   interval: 10m
@@ -15,12 +15,14 @@ spec:
   wait: true
   dependsOn:
     - name: cluster-apps-rook-ceph-cluster
+    - name: cluster-apps-volsync
+    - name: cluster-apps-external-secrets-stores
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-navidrome-kids
+  name: navidrome-kids
   namespace: flux-system
 spec:
   interval: 10m
@@ -32,3 +34,5 @@ spec:
   wait: true
   dependsOn:
     - name: cluster-apps-rook-ceph-cluster
+    - name: cluster-apps-volsync
+    - name: cluster-apps-external-secrets-stores

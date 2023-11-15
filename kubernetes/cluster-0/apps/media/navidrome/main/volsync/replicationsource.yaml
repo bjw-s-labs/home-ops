@@ -1,0 +1,25 @@
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: navidrome-main
+  namespace: media
+spec:
+  sourcePVC: navidrome-main-data
+  trigger:
+    schedule: "0 */12 * * *"
+  restic:
+    copyMethod: Snapshot
+    repository: navidrome-main-restic-secret
+    cacheStorageClassName: local-hostpath
+    cacheCapacity: 1Gi
+    storageClassName: ceph-filesystem
+    volumeSnapshotClassName: csi-ceph-filesystem
+    moverSecurityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+    pruneIntervalDays: 7
+    retain:
+      daily: 7
+      within: 3d
