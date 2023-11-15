@@ -1,0 +1,22 @@
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationDestination
+metadata:
+  name: navidrome-main
+  namespace: media
+spec:
+  trigger:
+    manual: restore-once
+  restic:
+    copyMethod: Snapshot
+    repository: navidrome-main-restic-secret
+    cacheStorageClassName: local-hostpath
+    storageClassName: ceph-filesystem
+    volumeSnapshotClassName: csi-ceph-filesystem
+    moverSecurityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+    accessModes:
+      - ReadWriteOnce
+    capacity: 1Gi
