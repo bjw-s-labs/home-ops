@@ -1,0 +1,22 @@
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationDestination
+metadata:
+  name: series-cleanup
+  namespace: media
+spec:
+  trigger:
+    manual: restore-once
+  restic:
+    copyMethod: Snapshot
+    repository: series-cleanup-restic-secret
+    cacheStorageClassName: local-hostpath
+    storageClassName: ceph-filesystem
+    volumeSnapshotClassName: csi-ceph-filesystem
+    moverSecurityContext:
+      runAsUser: 1031
+      runAsGroup: 100
+      fsGroup: 2000
+    accessModes:
+      - ReadWriteOnce
+    capacity: 32Mi

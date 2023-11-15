@@ -5,14 +5,16 @@ metadata:
   name: series-cleanup-data
   namespace: media
   labels:
-    app.kubernetes.io/name: series-cleanup
-    app.kubernetes.io/instance: series-cleanup
+    kustomize.toolkit.fluxcd.io/prune: Disabled
+    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
 spec:
   accessModes:
     - ReadWriteOnce
-
+  dataSourceRef:
+    kind: ReplicationDestination
+    apiGroup: volsync.backube
+    name: series-cleanup
   resources:
     requests:
-      storage: 10Mi
-
-  storageClassName: ceph-block
+      storage: 32Mi
+  storageClassName: ceph-filesystem
