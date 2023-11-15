@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: snapshot-controller
-      version: 2.0.0
+      version: 2.0.1
       sourceRef:
         kind: HelmRepository
         name: piraeus-charts
@@ -29,30 +29,26 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    image:
-      repository: registry.k8s.io/sig-storage/snapshot-controller
-      pullPolicy: IfNotPresent
-      # Overrides the image tag whose default is the chart appVersion.
-      tag: "v6.3.1"
-    replicaCount: 3
-    volumeSnapshotClasses:
-      - name: csi-rbdplugin-snapclass
-        driver: rook-ceph.rbd.csi.ceph.com
-        annotations:
-          snapshot.storage.kubernetes.io/is-default-class: "true"
-        parameters:
-          clusterID: rook-ceph-external
-          csi.storage.k8s.io/snapshotter-secret-name: rook-csi-rbd-provisioner
-          csi.storage.k8s.io/snapshotter-secret-namespace: rook-ceph-external
-        deletionPolicy: Delete
-      # - name: csi-cephfsplugin-snapclass
-      #   driver: rook-ceph.cephfs.csi.ceph.com
-      #   annotations:
-      #     snapshot.storage.kubernetes.io/is-default-class: "false"
-      #   parameters:
-      #     clusterID: rook-ceph
-      #     csi.storage.k8s.io/snapshotter-secret-name: rook-csi-cephfs-provisioner
-      #     csi.storage.k8s.io/snapshotter-secret-namespace: rook-ceph-external
-      #   deletionPolicy: Delete
-    # serviceMonitor:
-    #   create: true
+    controller:
+      replicaCount: 3
+      volumeSnapshotClasses:
+        - name: csi-rbdplugin-snapclass
+          driver: rook-ceph.rbd.csi.ceph.com
+          annotations:
+            snapshot.storage.kubernetes.io/is-default-class: "true"
+          parameters:
+            clusterID: rook-ceph-external
+            csi.storage.k8s.io/snapshotter-secret-name: rook-csi-rbd-provisioner
+            csi.storage.k8s.io/snapshotter-secret-namespace: rook-ceph-external
+          deletionPolicy: Delete
+        # - name: csi-cephfsplugin-snapclass
+        #   driver: rook-ceph.cephfs.csi.ceph.com
+        #   annotations:
+        #     snapshot.storage.kubernetes.io/is-default-class: "false"
+        #   parameters:
+        #     clusterID: rook-ceph
+        #     csi.storage.k8s.io/snapshotter-secret-name: rook-csi-cephfs-provisioner
+        #     csi.storage.k8s.io/snapshotter-secret-namespace: rook-ceph-external
+        #   deletionPolicy: Delete
+      # serviceMonitor:
+      #   create: true
