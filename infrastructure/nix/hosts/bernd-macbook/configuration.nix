@@ -5,6 +5,7 @@
     modules = {
       users.bjw-s = {
         enable = true;
+        enableDevTools = true;
         enableKubernetesTools = true;
       };
     };
