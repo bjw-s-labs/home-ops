@@ -90,6 +90,7 @@ in {
         ];
       };
 
+      modules.users.bjw-s.shell.nvim.enable = true;
       modules.users.bjw-s.shell.starship.enable = true;
       modules.users.bjw-s.shell.tmux.enable = true;
     }
