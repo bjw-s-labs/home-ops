@@ -10,6 +10,9 @@ in {
 
   options.modules.users.bjw-s = {
     enable = mkEnableOption "bjw-s";
+    enableDevTools = mkEnableOption "Enable dev tools" // {
+      default = false;
+    };
     enableKubernetesTools = mkEnableOption "Enable k8s tools" // {
       default = false;
     };
@@ -30,6 +33,18 @@ in {
           k = "kubectl";
         };
       };
+    })
+
+    (mkIf (cfg.enableDevTools) {
+      modules.users.bjw-s.shell.rtx = {
+        enable = true;
+        package = pkgs-unstable.rtx;
+      };
+
+      home-manager.users.bjw-s.home.packages = [
+        pkgs.envsubst
+        pkgs.go-task
+      ];
     })
 
     {
@@ -98,11 +113,6 @@ in {
           # Python virtualenvs
           ".venv"
         ];
-      };
-
-      modules.users.bjw-s.shell.rtx = {
-        enable = true;
-        package = pkgs-unstable.rtx;
       };
 
       modules.users.bjw-s.shell.starship.enable = true;
