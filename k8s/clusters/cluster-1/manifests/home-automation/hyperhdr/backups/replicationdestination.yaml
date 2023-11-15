@@ -6,11 +6,11 @@ metadata:
   name: hyperhdr
   namespace: home-automation
 spec:
-  destinationPVC: hyperhdr-config
   trigger:
     manual: restore-once
   restic:
     copyMethod: Direct
+    destinationPVC: hyperhdr-config
     repository: hyperhdr-restic
     cacheCapacity: 5Gi
     volumeSnapshotClassName: csi-rbdplugin-snapclass
