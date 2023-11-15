@@ -4,9 +4,6 @@ kind: PersistentVolumeClaim
 metadata:
   name: series-cleanup-data
   namespace: media
-  labels:
-    kustomize.toolkit.fluxcd.io/prune: Disabled
-    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
 spec:
   accessModes:
     - ReadWriteOnce
@@ -17,4 +14,4 @@ spec:
   resources:
     requests:
       storage: 32Mi
-  storageClassName: ceph-filesystem
+  storageClassName: ceph-block

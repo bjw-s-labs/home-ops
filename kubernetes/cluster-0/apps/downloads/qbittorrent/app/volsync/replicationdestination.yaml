@@ -2,7 +2,7 @@
 apiVersion: volsync.backube/v1alpha1
 kind: ReplicationDestination
 metadata:
-  name: navidrome-main-dst
+  name: qbittorrent-dst
   annotations:
     kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
 spec:
@@ -10,14 +10,14 @@ spec:
     manual: restore-once
   restic:
     copyMethod: Snapshot
-    repository: navidrome-main-restic-secret
+    repository: qbittorrent-restic-secret
     cacheStorageClassName: local-hostpath
-    storageClassName: ceph-block
-    volumeSnapshotClassName: csi-ceph-blockpool
+    storageClassName: ceph-filesystem
+    volumeSnapshotClassName: csi-ceph-filesystem
     moverSecurityContext:
-      runAsUser: 1000
-      runAsGroup: 1000
-      fsGroup: 1000
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
     accessModes:
-      - ReadWriteOnce
-    capacity: 1Gi
+      - ReadWriteMany
+    capacity: 2Gi

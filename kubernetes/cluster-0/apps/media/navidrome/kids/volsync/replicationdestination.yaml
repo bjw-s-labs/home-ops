@@ -3,7 +3,8 @@ apiVersion: volsync.backube/v1alpha1
 kind: ReplicationDestination
 metadata:
   name: navidrome-kids-dst
-  namespace: media
+  annotations:
+    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
 spec:
   trigger:
     manual: restore-once
@@ -11,8 +12,8 @@ spec:
     copyMethod: Snapshot
     repository: navidrome-kids-restic-secret
     cacheStorageClassName: local-hostpath
-    storageClassName: ceph-filesystem
-    volumeSnapshotClassName: csi-ceph-filesystem
+    storageClassName: ceph-block
+    volumeSnapshotClassName: csi-ceph-blockpool
     moverSecurityContext:
       runAsUser: 1000
       runAsGroup: 1000
