@@ -3,10 +3,18 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: tautulli-config
+  namespace: media
+  labels:
+    kustomize.toolkit.fluxcd.io/prune: Disabled
+    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
 spec:
   accessModes:
     - ReadWriteOnce
+  dataSourceRef:
+    kind: ReplicationDestination
+    apiGroup: volsync.backube
+    name: tautulli
   resources:
     requests:
       storage: 1Gi
-  storageClassName: ceph-block
+  storageClassName: ceph-filesystem
