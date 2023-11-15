@@ -8,15 +8,15 @@ spec:
   trigger:
     manual: restore-once
   restic:
+    copyMethod: Snapshot
     repository: calibre-web-restic-secret
+    cacheStorageClassName: local-hostpath
+    storageClassName: ceph-filesystem
+    volumeSnapshotClassName: csi-ceph-filesystem
     moverSecurityContext:
       runAsUser: 568
       runAsGroup: 568
       fsGroup: 568
-    copyMethod: Snapshot
-    storageClassName: ceph-filesystem
-    volumeSnapshotClassName: csi-ceph-filesystem
-    cacheStorageClassName: local-hostpath
     accessModes:
       - ReadWriteOnce
     capacity: 1Gi

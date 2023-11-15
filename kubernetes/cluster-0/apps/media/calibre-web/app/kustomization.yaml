@@ -3,8 +3,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: media
 resources:
+  - ./volsync
+  - ./pvc.yaml
   - ./helmrelease.yaml
-  - ./replicationsource.yaml
 commonLabels:
   app.kubernetes.io/name: calibre-web
   app.kubernetes.io/instance: calibre-web
