@@ -3,7 +3,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-paperless-redis
+  name: paperless-redis
   namespace: flux-system
 spec:
   interval: 10m
@@ -18,7 +18,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-paperless
+  name: paperless
   namespace: flux-system
 spec:
   interval: 10m
@@ -27,8 +27,9 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops-kubernetes
-  wait: false # no flux ks dependents
+  wait: false
   dependsOn:
-    - name: cluster-apps-paperless-redis
-    - name: cluster-apps-external-secrets-stores
+    - name: paperless-redis
     - name: cluster-apps-rook-ceph-cluster
+    - name: cluster-apps-volsync
+    - name: cluster-apps-external-secrets-stores
