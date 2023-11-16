@@ -7,9 +7,11 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-
+  dataSourceRef:
+    kind: ReplicationDestination
+    apiGroup: volsync.backube
+    name: radarr-dst
   resources:
     requests:
       storage: 1Gi
-
   storageClassName: ceph-block
