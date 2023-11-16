@@ -20,17 +20,6 @@ spec:
   values:
     controllers:
       main:
-        type: statefulset
-
-        statefulset:
-          volumeClaimTemplates:
-            - name: config
-              accessMode: ReadWriteOnce
-              size: 1Gi
-              storageClass: ceph-block
-              globalMounts:
-                - path: /config
-
         annotations:
           reloader.stakater.com/auto: "true"
 
@@ -57,6 +46,13 @@ spec:
                 memory: 128M
 
     persistence:
+      config:
+        enabled: true
+        existingClaim: recyclarr-config
+        advancedMounts:
+          main:
+            main:
+              - path: /config
       config-file:
         enabled: true
         type: configMap
