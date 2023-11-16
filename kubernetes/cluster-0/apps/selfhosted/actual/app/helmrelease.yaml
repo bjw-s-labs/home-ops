@@ -20,18 +20,8 @@ spec:
   values:
     controllers:
       main:
-        type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
-
-        statefulset:
-          volumeClaimTemplates:
-            - name: data
-              accessMode: ReadWriteOnce
-              size: 2Gi
-              storageClass: ceph-block
-              globalMounts:
-                - path: /data
 
         pod:
           enableServiceLinks: false
@@ -73,3 +63,12 @@ spec:
         tls:
           - hosts:
               - *host
+
+    persistence:
+      data:
+        enabled: true
+        existingClaim: actual-data
+        advancedMounts:
+          main:
+            main:
+              - path: /data
