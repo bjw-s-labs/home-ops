@@ -20,19 +20,8 @@ spec:
   values:
     controllers:
       main:
-        type: statefulset
-
         annotations:
           reloader.stakater.com/auto: "true"
-
-        statefulset:
-          volumeClaimTemplates:
-            - name: data
-              accessMode: ReadWriteOnce
-              size: 1Gi
-              storageClass: ceph-block
-              globalMounts:
-                - path: /opt/couchdb/data
 
         pod:
           securityContext:
@@ -107,6 +96,13 @@ spec:
           main:
             init-config:
               - path: /tmp/config
+      data:
+        enabled: true
+        existingClaim: obsidian-couchdb-data
+        advancedMounts:
+          main:
+            main:
+              - path: /opt/couchdb/data
       config-storage:
         enabled: true
         type: emptyDir
