@@ -20,19 +20,8 @@ spec:
   values:
     controllers:
       main:
-        type: statefulset
-
         annotations:
           reloader.stakater.com/auto: "true"
-
-        statefulset:
-          volumeClaimTemplates:
-            - name: data
-              accessMode: ReadWriteOnce
-              size: 15Gi
-              storageClass: ceph-block
-              globalMounts:
-                - path: /data/local
 
         pod:
           securityContext:
@@ -120,6 +109,13 @@ spec:
               - *host
 
     persistence:
+      data:
+        enabled: true
+        existingClaim: paperless-data
+        advancedMounts:
+          main:
+            main:
+              - path: /data/local
       nas:
         type: persistentVolumeClaim
         existingClaim: paperless-nfs
