@@ -1,0 +1,19 @@
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: esphome-src
+spec:
+  sourcePVC: esphome-config
+  trigger:
+    schedule: "0 */12 * * *"
+  restic:
+    copyMethod: Snapshot
+    repository: esphome-restic-secret
+    cacheStorageClassName: local-hostpath
+    storageClassName: ceph-block
+    volumeSnapshotClassName: csi-ceph-blockpool
+    pruneIntervalDays: 7
+    retain:
+      daily: 7
+      within: 3d
