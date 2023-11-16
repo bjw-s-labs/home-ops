@@ -3,12 +3,15 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: prowlarr-config
+  namespace: downloads
 spec:
   accessModes:
     - ReadWriteOnce
-
+  dataSourceRef:
+    kind: ReplicationDestination
+    apiGroup: volsync.backube
+    name: prowlarr-dst
   resources:
     requests:
       storage: 1Gi
-
   storageClassName: ceph-block
