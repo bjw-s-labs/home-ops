@@ -20,18 +20,8 @@ spec:
   values:
     controllers:
       main:
-        type: statefulset
         annotations:
           secret.reloader.stakater.com/reload: esphome-secrets,esphome-deploykey
-
-        statefulset:
-          volumeClaimTemplates:
-            - name: config
-              accessMode: ReadWriteOnce
-              size: 5Gi
-              storageClass: ceph-block
-              globalMounts:
-                - path: /config
 
         pod:
           annotations:
@@ -83,6 +73,13 @@ spec:
               - *host
 
     persistence:
+      config:
+        enabled: true
+        existingClaim: esphome-config
+        advancedMounts:
+          main:
+            main:
+              - path: /config
       secrets:
         type: secret
         name: esphome-secrets
