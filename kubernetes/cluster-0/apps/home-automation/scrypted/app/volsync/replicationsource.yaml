@@ -1,0 +1,20 @@
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: scrypted-src
+spec:
+  sourcePVC: scrypted-config
+  trigger:
+    schedule: "0 */12 * * *"
+  restic:
+    copyMethod: Snapshot
+    repository: scrypted-restic-secret
+    cacheStorageClassName: local-hostpath
+    cacheCapacity: 2Gi
+    storageClassName: ceph-block
+    volumeSnapshotClassName: csi-ceph-blockpool
+    pruneIntervalDays: 7
+    retain:
+      daily: 7
+      within: 3d
