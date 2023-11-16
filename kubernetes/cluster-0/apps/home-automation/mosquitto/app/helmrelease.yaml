@@ -20,18 +20,8 @@ spec:
   values:
     controllers:
       main:
-        type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
-
-        statefulset:
-          volumeClaimTemplates:
-            - name: data
-              accessMode: ReadWriteOnce
-              size: 512Mi
-              storageClass: ceph-block
-              globalMounts:
-                - path: /data
 
         pod:
           securityContext:
@@ -80,6 +70,12 @@ spec:
             port: 1883
 
     persistence:
+      data:
+        existingClaim: mosquitto-data
+        advancedMounts:
+          main:
+            main:
+              - path: /data
       mosquitto-configfile:
         type: configMap
         name: mosquitto-configmap
