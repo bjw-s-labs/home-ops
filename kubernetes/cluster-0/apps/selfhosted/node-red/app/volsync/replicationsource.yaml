@@ -1,0 +1,24 @@
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: node-red-src
+spec:
+  sourcePVC: node-red-data
+  trigger:
+    schedule: "0 */12 * * *"
+  restic:
+    copyMethod: Snapshot
+    repository: node-red-restic-secret
+    cacheStorageClassName: local-hostpath
+    cacheCapacity: 1Gi
+    storageClassName: ceph-block
+    volumeSnapshotClassName: csi-ceph-blockpool
+    moverSecurityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+    pruneIntervalDays: 7
+    retain:
+      daily: 7
+      within: 3d
