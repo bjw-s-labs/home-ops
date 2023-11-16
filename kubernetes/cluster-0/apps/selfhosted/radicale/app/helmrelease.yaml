@@ -20,20 +20,8 @@ spec:
   values:
     controllers:
       main:
-        type: statefulset
-        strategy: RollingUpdate
-
         annotations:
           reloader.stakater.com/auto: "true"
-
-        statefulset:
-          volumeClaimTemplates:
-            - name: data
-              accessMode: ReadWriteOnce
-              size: 1Gi
-              storageClass: ceph-block
-              globalMounts:
-                - path: /data
 
         pod:
           securityContext:
@@ -86,6 +74,13 @@ spec:
           - path: /config/config
             subPath: config.cfg
             readOnly: true
+      data:
+        enabled: true
+        existingClaim: radicale-data
+        advancedMounts:
+          main:
+            main:
+              - path: /data
       auth:
         enabled: true
         type: secret
