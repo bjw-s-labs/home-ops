@@ -89,7 +89,7 @@ in {
             version = false, -- always use the latest git commit
             -- version = "*", -- try installing the latest stable version for plugins that support semver
         },
-        install = { colorscheme = { "tokyonight", "habamax" } },
+        install = { colorscheme = { "catppuccin/nvim" } },
         checker = { enabled = true }, -- automatically check for plugin updates
         performance = {
             rtp = {
@@ -113,10 +113,22 @@ in {
         -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
         -- Add any additional options here
       '';
-      home.file.".config/nvim/lua/plugins/example.lua".text = ''
-        -- since this is just an example spec, don't actually load anything here and return an empty spec
-        -- stylua: ignore
-        if true then return {} end
+      home.file.".config/nvim/lua/plugins/colorscheme.lua".text = ''
+        return {
+          {
+            "catppuccin/nvim",
+            lazy = true,
+            name = "catppuccin",
+            priority = 1000,
+          },
+
+          {
+            "LazyVim/LazyVim",
+            opts = {
+              colorscheme = "catppuccin-macchiato",
+            },
+          },
+        }
       '';
     };
   };

@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, pkgs,... }:
 let
   deviceCfg = config.modules.device;
 in
@@ -26,4 +26,9 @@ in
       options = "--delete-older-than 2d";
     };
   };
+
+  environment.systemPackages = with pkgs; [
+    gnused
+    gnugrep
+  ];
 }
