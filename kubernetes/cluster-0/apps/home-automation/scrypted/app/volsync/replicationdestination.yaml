@@ -1,0 +1,19 @@
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationDestination
+metadata:
+  name: scrypted-dst
+  annotations:
+    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
+spec:
+  trigger:
+    manual: restore-once
+  restic:
+    copyMethod: Snapshot
+    repository: scrypted-restic-secret
+    cacheStorageClassName: local-hostpath
+    storageClassName: ceph-block
+    volumeSnapshotClassName: csi-ceph-blockpool
+    accessModes:
+      - ReadWriteOnce
+    capacity: 2Gi

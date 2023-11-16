@@ -1,43 +1,17 @@
 ---
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: scrypted-nfs
-provisioner: nfs
-parameters:
-  archiveOnDelete: "false"
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: scrypted-nfs
-spec:
-  storageClassName: scrypted-nfs
-  capacity:
-    storage: 1Mi # Size does not matter
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  nfs:
-    server: gladius.bjw-s.casa
-    path: /tank/Apps/scrypted
-  mountOptions:
-    - nfsvers=4.2
-    - nconnect=8
-    - hard
-    - noatime
-    - rsize=131072
-    - wsize=131072
----
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: scrypted-nfs
+  name: scrypted-config
   namespace: home-automation
 spec:
   accessModes:
-    - ReadWriteMany
-  storageClassName: scrypted-nfs
+    - ReadWriteOnce
+  dataSourceRef:
+    kind: ReplicationDestination
+    apiGroup: volsync.backube
+    name: scrypted-dst
   resources:
     requests:
-      storage: 1Mi # Size does not matter
+      storage: 2Gi
+  storageClassName: ceph-block
