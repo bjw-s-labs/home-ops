@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu-debug-cp1
+  namespace: downloads
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command: ["/bin/sh","-c"]
+    # apt-get update &&
+    # apt-get install -y gdisk &&
+    # echo "Go to sleep now!" &&
+    args:
+      - >
+        sleep 6000000000000000000000000000000000000
+    volumeMounts:
+    - mountPath: /hostRoot
+      name: root
+      readOnly: true
+    - mountPath: /mountedPVC
+      name: pvc
+      readOnly: false
+    securityContext:
+      privileged: true
+    resources:
+      requests:
+        memory: "640Mi"
+        cpu: "250m"
+      limits:
+        memory: "4096Mi"
+        cpu: "2000m"
+  volumes:
+  - name: root
+    hostPath:
+      path: /
+      type: Directory
+  - name: pvc
+    persistentVolumeClaim:
+      claimName: overseerr-config-nvme
+  # affinity:
+  #   nodeAffinity:
+  #     requiredDuringSchedulingIgnoredDuringExecution:
+  #       nodeSelectorTerms:
+  #       - matchExpressions:
+  #         - key: kubernetes.io/hostname
+  #           operator: In
+  #           values:
+  #           - cp1
