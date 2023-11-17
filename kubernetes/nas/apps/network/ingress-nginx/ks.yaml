@@ -3,7 +3,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-nginx-internal
+  name: nginx-internal
   namespace: flux-system
 spec:
   interval: 10m
@@ -14,4 +14,4 @@ spec:
     name: home-ops-kubernetes
   wait: false
   dependsOn:
-    - name: cluster-apps-cert-manager-issuers
+    - name: cert-manager-issuers

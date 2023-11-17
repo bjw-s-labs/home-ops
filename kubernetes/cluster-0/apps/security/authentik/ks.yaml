@@ -3,7 +3,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-authentik-redis
+  name: authentik-redis
   namespace: flux-system
 spec:
   interval: 10m
@@ -14,13 +14,13 @@ spec:
     name: home-ops-kubernetes
   wait: true
   dependsOn:
-    - name: cluster-apps-external-secrets-stores
+    - name: external-secrets-stores
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-authentik
+  name: authentik
   namespace: flux-system
 spec:
   interval: 10m
@@ -31,5 +31,5 @@ spec:
     name: home-ops-kubernetes
   wait: true
   dependsOn:
-    - name: cluster-apps-external-secrets-stores
-    - name: cluster-apps-authentik-redis
+    - name: external-secrets-stores
+    - name: authentik-redis
