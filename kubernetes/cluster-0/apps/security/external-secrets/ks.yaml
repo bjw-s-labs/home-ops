@@ -3,7 +3,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-external-secrets
+  name: external-secrets
   namespace: flux-system
 spec:
   interval: 10m
@@ -18,7 +18,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-external-secrets-stores
+  name: external-secrets-stores
   namespace: flux-system
 spec:
   interval: 10m
@@ -29,13 +29,13 @@ spec:
     name: home-ops-kubernetes
   wait: true
   dependsOn:
-    - name: cluster-apps-external-secrets
+    - name: external-secrets
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-external-secrets-cluster-secrets
+  name: external-secrets-cluster-secrets
   namespace: flux-system
 spec:
   interval: 10m
@@ -46,5 +46,5 @@ spec:
     name: home-ops-kubernetes
   wait: true
   dependsOn:
-    - name: cluster-apps-external-secrets
-    - name: cluster-apps-external-secrets-stores
+    - name: external-secrets
+    - name: external-secrets-stores
