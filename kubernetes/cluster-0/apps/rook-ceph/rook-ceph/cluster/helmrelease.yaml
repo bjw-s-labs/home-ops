@@ -36,45 +36,45 @@ spec:
         mgr:
           requests:
             cpu: "125m"
-            memory: "549M"
+            memory: "512Mi"
           limits:
-            memory: "2048Mi"
+            memory: "2Gi"
         mon:
           requests:
             cpu: "49m"
-            memory: "477M"
-          # limits:
-          #   memory: "1059M"
+            memory: "512Mi"
+          limits:
+            memory: "1Gi"
         osd:
           requests:
             cpu: "442m"
-            memory: "2678M"
-          # limits:
-          #   memory: "5944M"
+            memory: "2Gi"
+          limits:
+            memory: "6Gi"
         mgr-sidecar:
           requests:
             cpu: "49m"
-            memory: "94M"
+            memory: "128Mi"
           limits:
-            memory: "208M"
+            memory: "256Mi"
         crashcollector:
           requests:
             cpu: "15m"
-            memory: "64M"
+            memory: "64Mi"
           limits:
-            memory: "64M"
+            memory: "64Mi"
         logcollector:
           requests:
             cpu: "100m"
-            memory: "100M"
+            memory: "100Mi"
           limits:
-            memory: "1G"
+            memory: "1Gi"
         cleanup:
           requests:
             cpu: "250m"
-            memory: "100M"
+            memory: "100Mi"
           limits:
-            memory: "1G"
+            memory: "1Gi"
 
       crashCollector:
         disable: false
@@ -153,9 +153,9 @@ spec:
             resources:
               requests:
                 cpu: "35m"
-                memory: "2Gi"
+                memory: "1Gi"
               limits:
-                memory: "4Gi"
+                memory: "3Gi"
         storageClass:
           enabled: true
           isDefault: false
@@ -190,7 +190,7 @@ spec:
             resources:
               requests:
                 cpu: 100m
-                memory: 128M
+                memory: 256Mi
               limits:
                 memory: 2Gi
             instances: 1
