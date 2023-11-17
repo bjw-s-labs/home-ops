@@ -3,7 +3,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-cloudflared
+  name: cloudflared
   namespace: flux-system
 spec:
   interval: 10m
@@ -14,6 +14,6 @@ spec:
     name: home-ops-kubernetes
   wait: false
   dependsOn:
-    - name: cluster-apps-external-secrets-stores
-    - name: cluster-apps-externaldns-shared
-    - name: cluster-apps-nginx-external
+    - name: external-secrets-stores
+    - name: externaldns-shared
+    - name: nginx-external

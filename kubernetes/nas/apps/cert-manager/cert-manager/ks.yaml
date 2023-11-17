@@ -3,7 +3,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-cert-manager
+  name: cert-manager
   namespace: flux-system
 spec:
   interval: 10m
@@ -18,7 +18,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-cert-manager-issuers
+  name: cert-manager-issuers
   namespace: flux-system
 spec:
   interval: 10m
@@ -29,5 +29,5 @@ spec:
     name: home-ops-kubernetes
   wait: true
   dependsOn:
-    - name: cluster-apps-cert-manager
-    - name: cluster-apps-external-secrets-stores
+    - name: cert-manager
+    - name: external-secrets-stores
