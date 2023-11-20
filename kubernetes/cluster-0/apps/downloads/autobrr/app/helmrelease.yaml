@@ -3,8 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: autobrr
-  namespace: downloads
+  name: "${APP}"
 spec:
   interval: 30m
   chart:
@@ -23,14 +22,14 @@ spec:
     controllers:
       main:
         annotations:
-          secret.reloader.stakater.com/reload: autobrr-secret
-          configmap.reloader.stakater.com/reload: autobrr-configmap
+          secret.reloader.stakater.com/reload: ${APP}-secret,${APP}-pguser-${APP}
+          configmap.reloader.stakater.com/reload: ${APP}-configmap
 
         pod:
           securityContext:
-            runAsUser: 568
-            runAsGroup: 568
-            fsGroup: 568
+            runAsUser: ${RUN_AS_USER}
+            runAsGroup: ${RUN_AS_GROUP}
+            fsGroup: ${RUN_AS_GROUP}
             fsGroupChangePolicy: OnRootMismatch
 
         containers:
@@ -47,23 +46,23 @@ spec:
               AUTOBRR__POSTGRESHOST:
                 valueFrom:
                   secretKeyRef:
-                    name: autobrr-pguser-autobrr
+                    name: "${APP}-pguser-${APP}"
                     key: host
               AUTOBRR__POSTGRESPORT: "5432"
               AUTOBRR__POSTGRESUSER:
                 valueFrom:
                   secretKeyRef:
-                    name: autobrr-pguser-autobrr
+                    name: "${APP}-pguser-${APP}"
                     key: user
               AUTOBRR__POSTGRESPASS:
                 valueFrom:
                   secretKeyRef:
-                    name: autobrr-pguser-autobrr
+                    name: "${APP}-pguser-${APP}"
                     key: password
               AUTOBRR__POSTGRESDATABASE:
                 valueFrom:
                   secretKeyRef:
-                    name: autobrr-pguser-autobrr
+                    name: "${APP}-pguser-${APP}"
                     key: dbname
 
               AUTOBRR__SESSIONSECRET:
@@ -89,7 +88,7 @@ spec:
         enabled: true
         className: "internal-nginx"
         hosts:
-          - host: &host "{{ .Release.Name }}.bjw-s.dev"
+          - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
@@ -97,7 +96,7 @@ spec:
                   port: http
         tls:
           - hosts:
-              - *host
+              - "${HOSTNAME}"
 
     persistence:
       config:
@@ -105,7 +104,7 @@ spec:
         type: emptyDir
       config-file:
         type: configMap
-        name: autobrr-configmap
+        name: "${APP}-configmap"
         globalMounts:
           - path: /config/config.toml
             subPath: config.toml
