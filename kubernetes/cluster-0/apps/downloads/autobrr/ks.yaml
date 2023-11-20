@@ -3,9 +3,14 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: autobrr
+  name: &appname autobrr
   namespace: flux-system
 spec:
+  targetNamespace: downloads
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: autobrr
+      app.kubernetes.io/instance: autobrr
   interval: 10m
   path: "./kubernetes/cluster-0/apps/downloads/autobrr/app"
   prune: true
@@ -18,3 +23,11 @@ spec:
     - name: rook-ceph-cluster
     - name: crunchy-postgres-operator
     - name: qbittorrent
+  postBuild:
+    substitute:
+      APP: *appname
+      HOSTNAME: autobrr.bjw-s.dev
+      RUN_AS_USER: "568"
+      RUN_AS_GROUP: "568"
+      DB_NAME: autobrr
+      DB_USER: autobrr
