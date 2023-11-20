@@ -34,8 +34,6 @@ spec:
           deletionPolicy: Delete
         - name: csi-ceph-filesystem
           driver: rook-ceph.cephfs.csi.ceph.com
-          annotations:
-            snapshot.storage.kubernetes.io/is-default-class: "false"
           parameters:
             clusterID: rook-ceph
             csi.storage.k8s.io/snapshotter-secret-name: rook-csi-cephfs-provisioner
@@ -43,3 +41,6 @@ spec:
           deletionPolicy: Delete
       serviceMonitor:
         create: true
+
+    webhook:
+      enabled: false
