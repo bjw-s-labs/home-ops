@@ -3,9 +3,14 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: prowlarr
+  name: &appname prowlarr
   namespace: flux-system
 spec:
+  targetNamespace: downloads
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
+      app.kubernetes.io/instance: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/downloads/prowlarr/app"
   prune: true
@@ -17,3 +22,9 @@ spec:
     - name: rook-ceph-cluster
     - name: volsync
     - name: external-secrets-stores
+  postBuild:
+    substitute:
+      APP: *appname
+      HOSTNAME: prowlarr.bjw-s.dev
+      RUN_AS_USER: "568"
+      RUN_AS_GROUP: "568"
