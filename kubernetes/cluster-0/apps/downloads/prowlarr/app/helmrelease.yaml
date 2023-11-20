@@ -24,9 +24,9 @@ spec:
 
         pod:
           securityContext:
-            runAsUser: 568
-            runAsGroup: 568
-            fsGroup: 568
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GID}
+            fsGroup: ${APP_GID}
             fsGroupChangePolicy: OnRootMismatch
 
         containers:
@@ -63,7 +63,7 @@ spec:
         enabled: true
         className: "internal-nginx"
         hosts:
-          - host: &host "{{ .Release.Name }}.bjw-s.dev"
+          - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
@@ -71,9 +71,9 @@ spec:
                   port: http
         tls:
           - hosts:
-              - *host
+              - "${HOSTNAME}"
 
     persistence:
       config:
         enabled: true
-        existingClaim: prowlarr-config
+        existingClaim: ${VOLSYNC_CLAIM}
