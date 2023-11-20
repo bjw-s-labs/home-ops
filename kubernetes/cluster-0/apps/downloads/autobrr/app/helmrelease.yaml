@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: "${APP}"
+  name: autobrr
 spec:
   interval: 30m
   chart:
@@ -15,15 +15,12 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-  dependsOn:
-    - name: qbittorrent
-
   values:
     controllers:
       main:
         annotations:
-          secret.reloader.stakater.com/reload: ${APP}-secret,${APP}-pguser-${APP}
-          configmap.reloader.stakater.com/reload: ${APP}-configmap
+          secret.reloader.stakater.com/reload: autobrr-secret,${APP}-pguser-${DB_USER}
+          configmap.reloader.stakater.com/reload: autobrr-configmap
 
         pod:
           securityContext:
@@ -46,23 +43,23 @@ spec:
               AUTOBRR__POSTGRESHOST:
                 valueFrom:
                   secretKeyRef:
-                    name: "${APP}-pguser-${APP}"
+                    name: "${APP}-pguser-${DB_USER}"
                     key: host
               AUTOBRR__POSTGRESPORT: "5432"
               AUTOBRR__POSTGRESUSER:
                 valueFrom:
                   secretKeyRef:
-                    name: "${APP}-pguser-${APP}"
+                    name: "${APP}-pguser-${DB_USER}"
                     key: user
               AUTOBRR__POSTGRESPASS:
                 valueFrom:
                   secretKeyRef:
-                    name: "${APP}-pguser-${APP}"
+                    name: "${APP}-pguser-${DB_USER}"
                     key: password
               AUTOBRR__POSTGRESDATABASE:
                 valueFrom:
                   secretKeyRef:
-                    name: "${APP}-pguser-${APP}"
+                    name: "${APP}-pguser-${DB_USER}"
                     key: dbname
 
               AUTOBRR__SESSIONSECRET:
@@ -86,7 +83,7 @@ spec:
     ingress:
       main:
         enabled: true
-        className: "internal-nginx"
+        className: internal-nginx
         hosts:
           - host: "${HOSTNAME}"
             paths:
@@ -104,7 +101,7 @@ spec:
         type: emptyDir
       config-file:
         type: configMap
-        name: "${APP}-configmap"
+        name: autobrr-configmap
         globalMounts:
           - path: /config/config.toml
             subPath: config.toml
