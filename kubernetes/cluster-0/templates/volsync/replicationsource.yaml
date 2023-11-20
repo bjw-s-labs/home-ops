@@ -9,7 +9,7 @@ spec:
     schedule: "0 * * * *"
   restic:
     copyMethod: Snapshot
-    repository: ${APP}-volsync
+    repository: ${APP}-restic
     cacheStorageClassName: "${VOLSYNC_CACHE_SNAPSHOTCLASS:-local-hostpath}"
     cacheCapacity: "${VOLSYNC_CACHE_CAPACITY:-1Gi}"
     storageClassName: "${VOLSYNC_STORAGECLASS:-ceph-block}"
