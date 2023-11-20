@@ -4,7 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: autobrr
-  namespace: downloads
 spec:
   interval: 30m
   chart:
@@ -16,21 +15,18 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-  dependsOn:
-    - name: qbittorrent
-
   values:
     controllers:
       main:
         annotations:
-          secret.reloader.stakater.com/reload: autobrr-secret
+          secret.reloader.stakater.com/reload: autobrr-secret,${APP}-pguser-${DB_USER}
           configmap.reloader.stakater.com/reload: autobrr-configmap
 
         pod:
           securityContext:
-            runAsUser: 568
-            runAsGroup: 568
-            fsGroup: 568
+            runAsUser: ${RUN_AS_USER}
+            runAsGroup: ${RUN_AS_GROUP}
+            fsGroup: ${RUN_AS_GROUP}
             fsGroupChangePolicy: OnRootMismatch
 
         containers:
@@ -47,23 +43,23 @@ spec:
               AUTOBRR__POSTGRESHOST:
                 valueFrom:
                   secretKeyRef:
-                    name: autobrr-pguser-autobrr
+                    name: "${APP}-pguser-${DB_USER}"
                     key: host
               AUTOBRR__POSTGRESPORT: "5432"
               AUTOBRR__POSTGRESUSER:
                 valueFrom:
                   secretKeyRef:
-                    name: autobrr-pguser-autobrr
+                    name: "${APP}-pguser-${DB_USER}"
                     key: user
               AUTOBRR__POSTGRESPASS:
                 valueFrom:
                   secretKeyRef:
-                    name: autobrr-pguser-autobrr
+                    name: "${APP}-pguser-${DB_USER}"
                     key: password
               AUTOBRR__POSTGRESDATABASE:
                 valueFrom:
                   secretKeyRef:
-                    name: autobrr-pguser-autobrr
+                    name: "${APP}-pguser-${DB_USER}"
                     key: dbname
 
               AUTOBRR__SESSIONSECRET:
@@ -87,9 +83,9 @@ spec:
     ingress:
       main:
         enabled: true
-        className: "internal-nginx"
+        className: internal-nginx
         hosts:
-          - host: &host "{{ .Release.Name }}.bjw-s.dev"
+          - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
@@ -97,7 +93,7 @@ spec:
                   port: http
         tls:
           - hosts:
-              - *host
+              - "${HOSTNAME}"
 
     persistence:
       config:
