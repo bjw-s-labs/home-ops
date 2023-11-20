@@ -3,10 +3,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: downloads
 resources:
-  - ./volsync
-  - ./pvc.yaml
   - ./externalsecret.yaml
   - ./helmrelease.yaml
-commonLabels:
-  app.kubernetes.io/name: prowlarr
-  app.kubernetes.io/instance: prowlarr
+  - ../../../../templates/volsync
