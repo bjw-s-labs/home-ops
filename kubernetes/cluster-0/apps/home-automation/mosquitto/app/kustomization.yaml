@@ -1,15 +1,10 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: home-automation
 resources:
-  - ./volsync
-  - ./pvc.yaml
   - ./helmrelease.yaml
   - ./externalsecret.yaml
-commonLabels:
-  app.kubernetes.io/name: mosquitto
-  app.kubernetes.io/instance: mosquitto
+  - ../../../../templates/volsync
 configMapGenerator:
   - name: mosquitto-configmap
     files:
