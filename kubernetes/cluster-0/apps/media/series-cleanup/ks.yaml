@@ -3,9 +3,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: series-cleanup
+  name: &appname series-cleanup
   namespace: flux-system
 spec:
+  targetNamespace: media
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/media/series-cleanup/app"
   prune: true
@@ -17,3 +21,10 @@ spec:
     - name: rook-ceph-cluster
     - name: volsync
     - name: external-secrets-stores
+  postBuild:
+    substitute:
+      APP: *appname
+      APP_UID: "1000"
+      APP_GID: "1000"
+      VOLSYNC_CLAIM: series-cleanup-data
+      VOLSYNC_CAPACITY: 32Mi
