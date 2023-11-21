@@ -4,7 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: esphome
-  namespace: home-automation
 spec:
   interval: 30m
   chart:
@@ -62,7 +61,7 @@ spec:
         enabled: true
         className: "internal-nginx"
         hosts:
-          - host: &host "esphome.bjw-s.dev"
+          - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
@@ -70,12 +69,12 @@ spec:
                   port: http
         tls:
           - hosts:
-              - *host
+              - "${HOSTNAME}"
 
     persistence:
       config:
         enabled: true
-        existingClaim: esphome-config
+        existingClaim: "${VOLSYNC_CLAIM}"
         advancedMounts:
           main:
             main:
