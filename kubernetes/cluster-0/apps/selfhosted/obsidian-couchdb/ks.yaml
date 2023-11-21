@@ -3,9 +3,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: obsidian-couchdb
+  name: &appname obsidian-couchdb
   namespace: flux-system
 spec:
+  targetNamespace: selfhosted
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/selfhosted/obsidian-couchdb/app"
   prune: true
@@ -17,3 +21,10 @@ spec:
     - name: rook-ceph-cluster
     - name: volsync
     - name: external-secrets-stores
+  postBuild:
+    substitute:
+      APP: *appname
+      HOSTNAME: obsidian-db.bjw-s.dev
+      APP_UID: "568"
+      APP_GID: "568"
+      VOLSYNC_CLAIM: obsidian-couchdb-data
