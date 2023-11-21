@@ -3,9 +3,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: tautulli
+  name: &appname tautulli
   namespace: flux-system
 spec:
+  targetNamespace: media
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/media/tautulli/app"
   prune: true
@@ -18,3 +22,10 @@ spec:
     - name: volsync
     - name: external-secrets-stores
     - name: plex
+  postBuild:
+    substitute:
+      APP: *appname
+      HOSTNAME: tautulli.bjw-s.dev
+      APP_UID: "568"
+      APP_GID: "568"
+      VOLSYNC_CLAIM: tautulli-config
