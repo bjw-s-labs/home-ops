@@ -4,7 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: series-cleanup
-  namespace: default
 spec:
   interval: 30m
   chart:
@@ -30,9 +29,9 @@ spec:
           enableServiceLinks: false
           restartPolicy: OnFailure
           securityContext:
-            runAsUser: 1031
-            runAsGroup: 100
-            fsGroup: 2000
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GID}
+            fsGroup: ${APP_GID}
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 65542 # gladius:external-services
@@ -53,7 +52,7 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: series-cleanup-data
+        existingClaim: "${VOLSYNC_CLAIM}"
         globalMounts:
           - path: /config
       settings:
