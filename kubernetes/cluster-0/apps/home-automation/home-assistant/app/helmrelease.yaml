@@ -4,7 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: home-assistant
-  namespace: home-automation
 spec:
   interval: 30m
   chart:
@@ -41,7 +40,7 @@ spec:
               SECRET_RECORDER_DB_URL:
                 valueFrom:
                   secretKeyRef:
-                    name: home-assistant-pguser-home-assistant
+                    name: "${APP}-pguser-${DB_USER}"
                     key: uri
             envFrom:
               - secretRef:
@@ -73,7 +72,7 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         hosts:
-          - host: &host "domo.bjw-s.dev"
+          - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
@@ -81,12 +80,12 @@ spec:
                   port: http
         tls:
           - hosts:
-              - *host
+              - "${HOSTNAME}"
 
     persistence:
       config:
         enabled: true
-        existingClaim: home-assistant-config
+        existingClaim: "${VOLSYNC_CLAIM}"
         advancedMounts:
           main:
             main:
