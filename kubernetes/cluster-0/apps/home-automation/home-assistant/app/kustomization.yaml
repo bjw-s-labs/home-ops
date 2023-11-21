@@ -1,13 +1,8 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: home-automation
 resources:
-  - ./volsync
-  - ./pvc.yaml
   - ./externalsecret.yaml
   - ./helmrelease.yaml
-  - ./postgresCluster.yaml
-commonLabels:
-  app.kubernetes.io/name: home-assistant
-  app.kubernetes.io/instance: home-assistant
+  - ../../../../templates/postgres-database
+  - ../../../../templates/volsync
