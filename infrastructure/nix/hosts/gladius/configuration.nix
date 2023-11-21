@@ -31,6 +31,10 @@
       servers.nfs.enable = true;
       servers.samba.enable = true;
       servers.samba.shares = {
+        Backup = {
+          path = "/tank/Backup";
+          "read only" = "no";
+        };
         Docs = {
           path = "/tank/Docs";
           "read only" = "no";
