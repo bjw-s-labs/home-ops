@@ -4,7 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: mealie
-  namespace: selfhosted
 spec:
   interval: 30m
   chart:
@@ -33,9 +32,9 @@ spec:
               tag: v1.0.0-RC1.1
             env:
               ALLOW_SIGNUP: "false"
-              PUID: 1000
-              PGID: 1000
-              BASE_URL: https://mealie.bjw-s.dev
+              PUID: ${APP_UID}
+              PGID: ${APP_GID}
+              BASE_URL: https://${HOSTNAME}
               LDAP_AUTH_ENABLED: "true"
               LDAP_SERVER_URL: ldap://ak-outpost-ldap-outpost.security.svc.cluster.local
               LDAP_BASE_DN: "dc=ldap,dc=bjw-s,dc=dev"
@@ -73,7 +72,7 @@ spec:
         enabled: true
         className: "internal-nginx"
         hosts:
-          - host: &host "{{ .Release.Name }}.bjw-s.dev"
+          - host: ${HOSTNAME}
             paths:
               - path: /
                 service:
@@ -81,10 +80,10 @@ spec:
                   port: http
         tls:
           - hosts:
-              - *host
+              - ${HOSTNAME}
 
     persistence:
       data:
-        existingClaim: mealie-data
+        existingClaim: "${VOLSYNC_CLAIM}"
         globalMounts:
           - path: /app/data
