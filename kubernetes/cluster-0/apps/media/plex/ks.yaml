@@ -3,9 +3,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: plex
+  name: &appname plex
   namespace: flux-system
 spec:
+  targetNamespace: media
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/media/plex/app"
   prune: true
@@ -17,14 +21,26 @@ spec:
     - name: rook-ceph-cluster
     - name: volsync
     - name: external-secrets-stores
+  postBuild:
+    substitute:
+      APP: *appname
+      HOSTNAME: plex.bjw-s.dev
+      APP_UID: "568"
+      APP_GID: "568"
+      VOLSYNC_CLAIM: plex-config
+      VOLSYNC_CAPACITY: 50Gi
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: plex-trakt-sync
+  name: &appname plex-trakt-sync
   namespace: flux-system
 spec:
+  targetNamespace: media
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/media/plex/trakt-sync"
   prune: true
@@ -37,3 +53,9 @@ spec:
     - name: volsync
     - name: external-secrets-stores
     - name: plex
+  postBuild:
+    substitute:
+      APP: *appname
+      APP_UID: "1000"
+      APP_GID: "1000"
+      VOLSYNC_CLAIM: plex-trakt-sync-config
