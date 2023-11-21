@@ -24,9 +24,9 @@ spec:
         pod:
           enableServiceLinks: false
           securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-            fsGroup: 1000
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GID}
+            fsGroup: ${APP_GID}
             fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
@@ -71,7 +71,7 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: plex-trakt-sync-config
+        existingClaim: "${VOLSYNC_CLAIM}"
         advancedMounts:
           main:
             main:
