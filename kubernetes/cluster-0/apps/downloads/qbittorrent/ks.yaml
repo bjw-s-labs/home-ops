@@ -9,9 +9,7 @@ spec:
   targetNamespace: downloads
   commonMetadata:
     labels:
-      app.kubernetes.io/name: qbittorrent
-      app.kubernetes.io/instance: qbittorrent
-      app.kubernetes.io/component: app
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/downloads/qbittorrent/app"
   prune: true
@@ -45,9 +43,7 @@ spec:
   targetNamespace: downloads
   commonMetadata:
     labels:
-      app.kubernetes.io/name: qbittorrent
-      app.kubernetes.io/instance: qbittorrent
-      app.kubernetes.io/component: tools
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/downloads/qbittorrent/tools"
   prune: true
