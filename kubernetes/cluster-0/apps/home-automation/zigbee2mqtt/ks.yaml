@@ -3,9 +3,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: zigbee2mqtt
+  name: &appname zigbee2mqtt
   namespace: flux-system
 spec:
+  targetNamespace: home-automation
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/home-automation/zigbee2mqtt/app"
   prune: true
@@ -18,3 +22,10 @@ spec:
     - name: volsync
     - name: external-secrets-stores
     - name: mosquitto
+  postBuild:
+    substitute:
+      APP: *appname
+      HOSTNAME: zigbee2mqtt.bjw-s.dev
+      APP_UID: "568"
+      APP_GID: "568"
+      VOLSYNC_CLAIM: zigbee2mqtt-data
