@@ -1,0 +1,15 @@
+---
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: &name blocky
+  namespace: monitoring
+spec:
+  staticConfigs:
+    - targets:
+        - 10.5.0.7:4000
+  metricsPath: /metrics
+  relabelings:
+    - action: replace
+      targetLabel: job
+      replacement: *name
