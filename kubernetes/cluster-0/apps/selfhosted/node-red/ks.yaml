@@ -3,9 +3,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: node-red
+  name: &appname node-red
   namespace: flux-system
 spec:
+  targetNamespace: selfhosted
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/selfhosted/node-red/app"
   prune: true
@@ -17,3 +21,10 @@ spec:
     - name: rook-ceph-cluster
     - name: volsync
     - name: external-secrets-stores
+  postBuild:
+    substitute:
+      APP: *appname
+      HOSTNAME: nodered.bjw-s.dev
+      APP_UID: "1000"
+      APP_GID: "1000"
+      VOLSYNC_CLAIM: node-red-data

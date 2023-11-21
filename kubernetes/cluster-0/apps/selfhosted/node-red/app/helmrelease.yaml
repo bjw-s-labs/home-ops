@@ -4,7 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: node-red
-  namespace: selfhosted
 spec:
   interval: 30m
   chart:
@@ -25,9 +24,9 @@ spec:
 
         pod:
           securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-            fsGroup: 1000
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GID}
+            fsGroup: ${APP_GID}
             fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
@@ -56,7 +55,7 @@ spec:
         enabled: true
         className: "internal-nginx"
         hosts:
-          - host: &host "nodered.bjw-s.dev"
+          - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
@@ -64,12 +63,12 @@ spec:
                   port: http
         tls:
           - hosts:
-              - *host
+              - "${HOSTNAME}"
 
     persistence:
       data:
         enabled: true
-        existingClaim: node-red-data
+        existingClaim: "${VOLSYNC_CLAIM}"
         advancedMounts:
           main:
             main:
