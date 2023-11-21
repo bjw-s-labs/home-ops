@@ -4,7 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: qbittorrent
-  namespace: downloads
 spec:
   interval: 30m
   chart:
@@ -26,7 +25,7 @@ spec:
 
         pod:
           securityContext:
-            fsGroup: 568
+            fsGroup: ${APP_GID}
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 65542 # gladius:external-services
@@ -47,8 +46,8 @@ spec:
               limits:
                 memory: 8192Mi
             securityContext:
-              runAsUser: 568
-              runAsGroup: 568
+              runAsUser: ${APP_UID}
+              runAsGroup: ${APP_GID}
 
           dnsdist:
             image:
@@ -114,7 +113,7 @@ spec:
         enabled: true
         className: "internal-nginx"
         hosts:
-          - host: &host "{{ .Release.Name }}.bjw-s.dev"
+          - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
@@ -122,12 +121,12 @@ spec:
                   port: http
         tls:
           - hosts:
-              - *host
+              - "${HOSTNAME}"
 
     persistence:
       config:
         enabled: true
-        existingClaim: qbittorrent-config
+        existingClaim: "${VOLSYNC_CLAIM}"
         advancedMounts:
           main:
             main:
