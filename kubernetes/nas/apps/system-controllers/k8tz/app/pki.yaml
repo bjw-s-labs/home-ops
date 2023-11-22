@@ -5,7 +5,6 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: k8tz-webhook-selfsign
-  namespace: system-controllers
 spec:
   selfSigned: {}
 ---
@@ -14,7 +13,6 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: k8tz-webhook-ca
-  namespace: system-controllers
 spec:
   secretName: k8tz-webhook-ca
   duration: 43800h # 5y
@@ -29,7 +27,6 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: k8tz-webhook-ca
-  namespace: system-controllers
 spec:
   ca:
     secretName: k8tz-webhook-ca
