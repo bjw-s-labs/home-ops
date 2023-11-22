@@ -4,7 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: dsmr-reader
-  namespace: home-automation
 spec:
   interval: 30m
   chart:
@@ -39,27 +38,27 @@ spec:
               DJANGO_DATABASE_HOST:
                 valueFrom:
                   secretKeyRef:
-                    name: dsmr-reader-pguser-dsmr-reader
+                    name: "${APP}-pguser-${DB_USER}"
                     key: host
               DJANGO_DATABASE_PORT:
                 valueFrom:
                   secretKeyRef:
-                    name: dsmr-reader-pguser-dsmr-reader
+                    name: "${APP}-pguser-${DB_USER}"
                     key: port
               DJANGO_DATABASE_USER:
                 valueFrom:
                   secretKeyRef:
-                    name: dsmr-reader-pguser-dsmr-reader
+                    name: "${APP}-pguser-${DB_USER}"
                     key: user
               DJANGO_DATABASE_PASSWORD:
                 valueFrom:
                   secretKeyRef:
-                    name: dsmr-reader-pguser-dsmr-reader
+                    name: "${APP}-pguser-${DB_USER}"
                     key: password
               DJANGO_DATABASE_NAME:
                 valueFrom:
                   secretKeyRef:
-                    name: dsmr-reader-pguser-dsmr-reader
+                    name: "${APP}-pguser-${DB_USER}"
                     key: dbname
             envFrom:
               - secretRef:
@@ -82,7 +81,7 @@ spec:
         enabled: true
         className: "internal-nginx"
         hosts:
-          - host: &host "dsmr-reader.bjw-s.dev"
+          - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
@@ -90,4 +89,4 @@ spec:
                   port: http
         tls:
           - hosts:
-              - *host
+              - "${HOSTNAME}"
