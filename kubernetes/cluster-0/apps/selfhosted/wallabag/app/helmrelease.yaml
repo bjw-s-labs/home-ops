@@ -4,7 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: wallabag
-  namespace: selfhosted
 spec:
   interval: 30m
   chart:
@@ -38,29 +37,29 @@ spec:
               SYMFONY__ENV__DATABASE_HOST:
                 valueFrom:
                   secretKeyRef:
-                    name: wallabag-pguser-wallabag
+                    name: "${APP}-pguser-${DB_USER}"
                     key: host
               SYMFONY__ENV__DATABASE_PORT:
                 valueFrom:
                   secretKeyRef:
-                    name: wallabag-pguser-wallabag
+                    name: "${APP}-pguser-${DB_USER}"
                     key: port
               SYMFONY__ENV__DATABASE_NAME:
                 valueFrom:
                   secretKeyRef:
-                    name: wallabag-pguser-wallabag
+                    name: "${APP}-pguser-${DB_USER}"
                     key: dbname
               SYMFONY__ENV__DATABASE_USER:
                 valueFrom:
                   secretKeyRef:
-                    name: wallabag-pguser-wallabag
+                    name: "${APP}-pguser-${DB_USER}"
                     key: user
               SYMFONY__ENV__DATABASE_PASSWORD:
                 valueFrom:
                   secretKeyRef:
-                    name: wallabag-pguser-wallabag
+                    name: "${APP}-pguser-${DB_USER}"
                     key: password
-              SYMFONY__ENV__DOMAIN_NAME: https://wallabag.bjw-s.dev
+              SYMFONY__ENV__DOMAIN_NAME: https://${HOSTNAME}
               SYMFONY__ENV__SERVER_NAME: Wallabag
               SYMFONY__ENV__FOSUSER_REGISTRATION: "false"
               SYMFONY__ENV__FOSUSER_CONFIRMATION: "false"
@@ -85,7 +84,7 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         hosts:
-          - host: &host "wallabag.bjw-s.dev"
+          - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
@@ -93,4 +92,4 @@ spec:
                   port: http
         tls:
           - hosts:
-              - *host
+              - "${HOSTNAME}"
