@@ -7,7 +7,6 @@ kind: CiliumBGPPeeringPolicy
 # "CiliumBGPPeeringPolicy" is used with `bgpControlPlane.enabled: true` which uses GoBGP, NOT the old `bgp.enabled: true` which uses MetalLB
 metadata:
   name: bgp-loadbalancer-ip-main
-  namespace: kube-system
 spec:
   nodeSelector:
     matchLabels:
@@ -17,11 +16,9 @@ spec:
       exportPodCIDR: false
       serviceSelector: # this replaces address-pools, instead of defining the range of IPs that can be assigned to LoadBalancer services, now services have to match below selectors for their LB IPs to be announced
         matchExpressions:
-          - {
-              key: thisFakeSelector,
-              operator: NotIn,
-              values: ["will-match-and-announce-all-services"],
-            }
+          - key: thisFakeSelector,
+            operator: NotIn
+            values: ["will-match-and-announce-all-services"]
       neighbors:
         - peerAddress: "10.1.1.1/32" # unlike bgp-config ConfigMap, peerAddress needs to be in CIDR notation
           peerASN: 64512
