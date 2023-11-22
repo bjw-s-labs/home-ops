@@ -137,7 +137,7 @@ spec:
       auth:
         oauth_auto_login: true
         oauth_allow_insecure_email_lookup: true
-        signout_redirect_url: https://authentik.bjw-s.dev/application/o/grafana/end-session/
+        signout_redirect_url: https://auth.bjw-s.dev/application/o/grafana/end-session/
       auth.basic:
         enabled: false
       auth.generic_oauth:
@@ -152,9 +152,9 @@ spec:
         use_pkce: true
         client_id: pe1N4ey6PAzdBbUy8RtWbOPtxpvCWUfhAGiDGuRa
         client_secret: # Set by env vars
-        auth_url: https://authentik.bjw-s.dev/application/o/authorize/
-        token_url: https://authentik.bjw-s.dev/application/o/token/
-        api_url: https://authentik.bjw-s.dev/application/o/userinfo/
+        auth_url: https://auth.bjw-s.dev/application/o/authorize/
+        token_url: https://auth.bjw-s.dev/application/o/token/
+        api_url: https://auth.bjw-s.dev/application/o/userinfo/
         # map user groups to Grafana roles
         role_attribute_path: |
           contains(groups[*], 'bjw-s Admins') && 'Admin' || 'Viewer'

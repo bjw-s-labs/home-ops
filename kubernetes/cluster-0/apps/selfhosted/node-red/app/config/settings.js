@@ -12,11 +12,10 @@ module.exports = {
       icon: "fa-cloud",
       strategy: require("passport-openidconnect").Strategy,
       options: {
-        issuer: "https://authentik.bjw-s.dev/application/o/node-red/",
-        authorizationURL:
-          "https://authentik.bjw-s.dev/application/o/authorize/",
-        tokenURL: "https://authentik.bjw-s.dev/application/o/token/",
-        userInfoURL: "https://authentik.bjw-s.dev/application/o/userinfo/",
+        issuer: "https://auth.bjw-s.dev/application/o/node-red/",
+        authorizationURL: "https://auth.bjw-s.dev/application/o/authorize/",
+        tokenURL: "https://auth.bjw-s.dev/application/o/token/",
+        userInfoURL: "https://auth.bjw-s.dev/application/o/userinfo/",
         clientID: "hN1VIEAhdR3noLaM6KLmKBYRWVsf5ywyFfh98GDV",
         clientSecret: process.env.NODE_RED_OAUTH_CLIENT_SECRET,
         callbackURL: "https://nodered.bjw-s.dev/auth/strategy/callback",
