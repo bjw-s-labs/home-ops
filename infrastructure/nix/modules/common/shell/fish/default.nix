@@ -1,4 +1,4 @@
-{ username }: {lib, config, ... }:
+{ username }: args@{pkgs, lib, config, ... }:
 with lib;
 let
   cfg = config.modules.users.${username}.shell.fish;
@@ -14,25 +14,17 @@ in {
     };
   };
 
-  config = mkIf (cfg.enable) {
-    programs.fish.enable = true;
+  config = mkIf (cfg.enable) (mkMerge [
+    {
+      programs.fish.enable = true;
 
-    programs.fish.loginShellInit =
-      let
-        # This naive quoting is good enough in this case. There shouldn't be any
-        # double quotes in the input string, and it needs to be double quoted in case
-        # it contains a space (which is unlikely!)
-        dquote = str: "\"" + str + "\"";
+      home-manager.users.${username} = mkIf (cfg.enable) (mkMerge [
+        defaultConfig
+        cfg.config
+      ]);
+    }
 
-        makeBinPathList = map (path: path + "/bin");
-      in ''
-        fish_add_path --move --prepend --path ${lib.concatMapStringsSep " " dquote (makeBinPathList config.environment.profiles)}
-        set fish_user_paths $fish_user_paths
-      '';
-
-    home-manager.users.${username} = mkIf (cfg.enable) (mkMerge [
-      defaultConfig
-      cfg.config
-    ]);
-  };
+    # Fix for https://github.com/LnL7/nix-darwin/issues/122
+    (mkIf (pkgs.stdenv.isDarwin) (import ./darwin.nix args))
+  ]);
 }
