@@ -4,7 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: authentik
-  namespace: security
 spec:
   interval: 30m
   chart:
@@ -15,10 +14,9 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: authentik
-        namespace: security
   values:
     annotations:
-      secret.reloader.stakater.com/reload: authentik-secret,authentik-pguser-authentik,authentik-redis-secret
+      secret.reloader.stakater.com/reload: authentik-secret,${APP}-pguser-${DB_USER},authentik-redis-secret
 
     authentik:
       log_level: info
@@ -55,19 +53,19 @@ spec:
           key: authentik_email_from
       AUTHENTIK_POSTGRESQL__HOST:
         secretKeyRef:
-          name: authentik-pguser-authentik
+          name: "${APP}-pguser-${DB_USER}"
           key: host
       AUTHENTIK_POSTGRESQL__NAME:
         secretKeyRef:
-          name: authentik-pguser-authentik
+          name: "${APP}-pguser-${DB_USER}"
           key: dbname
       AUTHENTIK_POSTGRESQL__USER:
         secretKeyRef:
-          name: authentik-pguser-authentik
+          name: "${APP}-pguser-${DB_USER}"
           key: user
       AUTHENTIK_POSTGRESQL__PASSWORD:
         secretKeyRef:
-          name: authentik-pguser-authentik
+          name: "${APP}-pguser-${DB_USER}"
           key: password
       AUTHENTIK_REDIS__PASSWORD:
         secretKeyRef:
@@ -82,12 +80,12 @@ spec:
         nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
         nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
       hosts:
-        - host: &host authentik.bjw-s.dev
+        - host: "${HOSTNAME}"
           paths:
             - path: /
       tls:
         - hosts:
-            - *host
+            - "${HOSTNAME}"
 
     postgresql:
       enabled: false
