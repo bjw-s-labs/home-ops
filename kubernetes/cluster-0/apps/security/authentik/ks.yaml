@@ -3,9 +3,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: authentik-redis
+  name: &appname authentik-redis
   namespace: flux-system
 spec:
+  targetNamespace: security
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/security/authentik/redis"
   prune: true
@@ -20,9 +24,13 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: authentik
+  name: &appname authentik
   namespace: flux-system
 spec:
+  targetNamespace: security
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/security/authentik/app"
   prune: true
@@ -33,3 +41,9 @@ spec:
   dependsOn:
     - name: external-secrets-stores
     - name: authentik-redis
+  postBuild:
+    substitute:
+      APP: *appname
+      HOSTNAME: authentik.bjw-s.dev
+      DB_NAME: authentik
+      DB_USER: authentik

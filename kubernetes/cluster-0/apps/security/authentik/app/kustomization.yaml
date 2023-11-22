@@ -1,12 +1,8 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: security
 resources:
   - ./externalsecret.yaml
-  - ./postgresCluster.yaml
   - ./helmrepository.yaml
   - ./helmrelease.yaml
-commonLabels:
-  app.kubernetes.io/name: authentik
-  app.kubernetes.io/instance: authentik
+  - ../../../../templates/postgres-database
