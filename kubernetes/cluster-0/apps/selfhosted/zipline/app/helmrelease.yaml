@@ -4,7 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: zipline
-  namespace: selfhosted
 spec:
   interval: 30m
   chart:
@@ -43,7 +42,7 @@ spec:
               CORE_DATABASE_URL:
                 valueFrom:
                   secretKeyRef:
-                    name: zipline-pguser-zipline
+                    name: "${APP}-pguser-${DB_USER}"
                     key: uri
               CORE_RETURN_HTTPS: "true"
               CORE_COMPRESSION_ENABLED: "true"
@@ -100,7 +99,7 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         hosts:
-          - host: &host "s.bjw-s.dev"
+          - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
@@ -108,4 +107,4 @@ spec:
                   port: http
         tls:
           - hosts:
-              - *host
+              - "${HOSTNAME}"
