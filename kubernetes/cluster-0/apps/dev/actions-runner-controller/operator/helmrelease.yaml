@@ -4,7 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: actions-runner-controller
-  namespace: dev
 spec:
   interval: 30m
   chart:
@@ -24,8 +23,3 @@ spec:
 
   values:
     fullnameOverride: gha-runner-scale-set-controller
-    # resources:
-    #   requests:
-    #     memory: 64Mi
-    #   limits:
-    #     memory: 128Mi
