@@ -3,9 +3,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: externaldns-shared
+  name: &appname externaldns-shared
   namespace: flux-system
 spec:
+  targetNamespace: network
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/network/external-dns/shared"
   prune: true
@@ -18,9 +22,13 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: externaldns-external
+  name: &appname externaldns-external
   namespace: flux-system
 spec:
+  targetNamespace: network
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/network/external-dns/external"
   prune: true
@@ -36,9 +44,13 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: externaldns-internal
+  name: &appname externaldns-internal
   namespace: flux-system
 spec:
+  targetNamespace: network
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/network/external-dns/internal"
   prune: true
