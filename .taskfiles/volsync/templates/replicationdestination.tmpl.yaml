@@ -1,21 +1,22 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/volsync.backube/replicationdestination_v1alpha1.json
 apiVersion: volsync.backube/v1alpha1
 kind: ReplicationDestination
 metadata:
-  name: "${rsrc}-${claim}-${ts}"
-  namespace: "${namespace}"
+  name: "${app}-${ts}"
+  namespace: "${ns}"
 spec:
   trigger:
     manual: restore-once
   restic:
-    repository: "${rsrc}-restic"
+    repository: "${app}-volsync-minio"
     destinationPVC: "${claim}"
     copyMethod: Direct
     storageClassName: ceph-block
+    # storageClassName: ceph-filesystem
+    # accessModes: ["ReadWriteMany"]
     # IMPORTANT NOTE:
     #   Set to the last X number of snapshots to restore from
-    # previous: 2
+    previous: ${previous}
     # OR;
     # IMPORTANT NOTE:
     #   On bootstrap set `restoreAsOf` to the time the old cluster was destroyed.
@@ -23,8 +24,10 @@ spec:
     #   from a application that started with default data in the PVC.
     #   Do not restore snapshots made after the following RFC3339 Timestamp.
     #   date --rfc-3339=seconds (--utc)
-    restoreAsOf: "2023-04-21T08:00:00-00:00"
+    # restoreAsOf: "2022-12-10T16:00:00-05:00"
+
+    # Make sure to set/update these if required
     moverSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
+      runAsUser: ${app_uid}
+      runAsGroup: ${app_gid}
+      fsGroup: ${app_gid}
