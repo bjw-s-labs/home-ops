@@ -3,9 +3,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: tf-controller
+  name: &appname tf-controller
   namespace: flux-system
 spec:
+  targetNamespace: infrastructure
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/infrastructure/tf-controller/app"
   prune: true
@@ -20,9 +24,13 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: tf-controller-terraforms
+  name: &appname tf-controller-terraforms
   namespace: flux-system
 spec:
+  targetNamespace: infrastructure
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/infrastructure/tf-controller/terraforms"
   prune: true
