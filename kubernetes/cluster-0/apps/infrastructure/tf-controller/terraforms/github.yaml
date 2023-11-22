@@ -4,7 +4,6 @@ apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: OCIRepository
 metadata:
   name: oci-terraform-github
-  namespace: infrastructure
 spec:
   interval: 1m
   url: oci://ghcr.io/bjw-s/terraform/github
@@ -15,7 +14,6 @@ apiVersion: infra.contrib.fluxcd.io/v1alpha2
 kind: Terraform
 metadata:
   name: github
-  namespace: infrastructure
 spec:
   interval: 12h
   approvePlan: "auto"
