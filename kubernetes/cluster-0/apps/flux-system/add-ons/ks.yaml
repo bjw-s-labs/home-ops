@@ -3,45 +3,19 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: flux-monitoring
+  name: &appname flux-addons
   namespace: flux-system
 spec:
+  targetNamespace: flux-system
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
-  path: ./kubernetes/cluster-0/apps/flux-system/add-ons/monitoring
+  path: ./kubernetes/cluster-0/apps/flux-system/add-ons/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-ops-kubernetes
-  wait: true
----
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: flux-notifications
-  namespace: flux-system
-spec:
-  interval: 10m
-  path: ./kubernetes/cluster-0/apps/flux-system/add-ons/notifications
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops-kubernetes
-  wait: true
----
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: flux-webhooks
-  namespace: flux-system
-spec:
-  interval: 10m
-  path: ./kubernetes/cluster-0/apps/flux-system/add-ons/webhooks
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops-kubernetes
-  wait: true
+  wait: false
   dependsOn:
-    - name: external-secrets-stores
+    - name: cluster-apps-external-secrets-stores
