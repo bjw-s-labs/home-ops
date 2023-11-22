@@ -3,9 +3,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: zipline
+  name: &appname zipline
   namespace: flux-system
 spec:
+  targetNamespace: selfhosted
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: "./kubernetes/cluster-0/apps/selfhosted/zipline/app"
   prune: true
@@ -18,3 +22,9 @@ spec:
     - name: rook-ceph-cluster
     - name: crunchy-postgres-operator
     - name: external-secrets-cluster-secrets
+  postBuild:
+    substitute:
+      APP: *appname
+      HOSTNAME: s.bjw-s.dev
+      DB_NAME: zipline
+      DB_USER: zipline
