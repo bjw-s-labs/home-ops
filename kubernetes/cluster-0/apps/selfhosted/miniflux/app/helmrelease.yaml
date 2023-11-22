@@ -4,7 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: miniflux
-  namespace: selfhosted
 spec:
   interval: 30m
   chart:
@@ -30,12 +29,12 @@ spec:
               repository: ghcr.io/miniflux/miniflux
               tag: 2.0.50
             env:
-              BASE_URL: https://miniflux.bjw-s.dev
+              BASE_URL: https://${HOSTNAME}
               CREATE_ADMIN: "1"
               DATABASE_URL:
                 valueFrom:
                   secretKeyRef:
-                    name: miniflux-pguser-miniflux
+                    name: "${APP}-pguser-${DB_USER}"
                     key: uri
               DEBUG: "1"
               LOG_DATE_TIME: "1"
@@ -43,7 +42,7 @@ spec:
               OAUTH2_USER_CREATION: "1"
               OAUTH2_OIDC_DISCOVERY_ENDPOINT: https://authentik.bjw-s.dev/application/o/miniflux/
               OAUTH2_PROVIDER: oidc
-              OAUTH2_REDIRECT_URL: https://miniflux.bjw-s.dev/oauth2/oidc/callback
+              OAUTH2_REDIRECT_URL: https://${HOSTNAME}/oauth2/oidc/callback
               POLLING_SCHEDULER: "entry_frequency"
               POLLING_FREQUENCY: "15"
               RUN_MIGRATIONS: "1"
@@ -82,7 +81,7 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         hosts:
-          - host: &host "miniflux.bjw-s.dev"
+          - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
@@ -90,4 +89,4 @@ spec:
                   port: http
         tls:
           - hosts:
-              - *host
+              - "${HOSTNAME}"
