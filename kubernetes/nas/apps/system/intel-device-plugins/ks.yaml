@@ -3,9 +3,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: intel-device-plugins-operator
+  name: &appname intel-device-plugins-operator
   namespace: flux-system
 spec:
+  targetNamespace: system
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   path: "./kubernetes/nas/apps/system/intel-device-plugins/operator"
   sourceRef:
     kind: GitRepository
@@ -21,9 +25,13 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: intel-device-plugins-gpu
+  name: &appname intel-device-plugins-gpu
   namespace: flux-system
 spec:
+  targetNamespace: system
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   path: "./kubernetes/nas/apps/system/intel-device-plugins/gpu"
   sourceRef:
     kind: GitRepository
