@@ -4,7 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: atuin
-  namespace: selfhosted
 spec:
   interval: 30m
   chart:
@@ -39,7 +38,7 @@ spec:
               ATUIN_DB_URI:
                 valueFrom:
                   secretKeyRef:
-                    name: atuin-pguser-atuin
+                    name: "${APP}-pguser-${DB_USER}"
                     key: uri
                     optional: false
               ATUIN_HOST: 0.0.0.0
@@ -63,7 +62,7 @@ spec:
         enabled: true
         className: "internal-nginx"
         hosts:
-          - host: &host "{{ .Release.Name }}.bjw-s.dev"
+          - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
@@ -71,7 +70,7 @@ spec:
                   port: http
         tls:
           - hosts:
-              - *host
+              - "${HOSTNAME}"
 
     persistence:
       config:
