@@ -3,7 +3,7 @@ clusterName: ${clusterName}
 endpoint: "https://${clusterName}.bjw-s.casa:6443"
 
 talosVersion: v1.5.5
-kubernetesVersion: 1.28.3
+kubernetesVersion: 1.28.4
 
 # Image URL rendered on https://factory.talos.dev
 # customization:
@@ -13,7 +13,7 @@ kubernetesVersion: 1.28.3
 #         officialExtensions:
 #             - siderolabs/i915-ucode
 #             - siderolabs/intel-ucode
-talosImageURL: factory.talos.dev/installer/df491c50a5acc05b977ef00c32050e1ceb0df746e40b33c643ac8a9bfb7c7263
+talosImageURL: factory.talos.dev/installer/22b1d04da881ef7c57edb0f24d1f3ba2c78a8e22cbe3fa9af4f42d487b2863f7
 
 cniConfig:
   name: none
@@ -130,6 +130,13 @@ controlPlane:
         network:
           disableSearchDomain: true
 
+    # Force nameserver
+    - |-
+      machine:
+        network:
+          nameservers:
+            - 10.5.0.4
+
     # Configure NTP
     - |-
       machine:
@@ -215,7 +222,7 @@ controlPlane:
     - |-
       machine:
         files:
-          - op: create
+          - op: overwrite
             path: /etc/nfsmount.conf
             permissions: 0o644
             content: |
