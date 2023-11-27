@@ -116,7 +116,8 @@ spec:
             main:
               - path: /data/local
       nas:
-        type: persistentVolumeClaim
-        existingClaim: paperless-nfs
+        type: nfs
+        server: gladius.bjw-s.casa
+        path: /tank/Apps/paperless
         globalMounts:
           - path: /data/nas
