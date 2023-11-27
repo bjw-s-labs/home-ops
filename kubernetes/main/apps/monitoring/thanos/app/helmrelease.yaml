@@ -1,0 +1,136 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: thanos
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: thanos
+      version: 12.16.1
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+      interval: 30m
+  values:
+    objstoreConfig:
+      type: s3
+      config:
+        insecure: true
+
+    query:
+      enabled: true
+      dnsDiscovery:
+        sidecarsService: kube-prometheus-stack-thanos-discovery
+        sidecarsNamespace: monitoring
+      replicaLabels:
+        - "__replica__" # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.replicaExternalLabelName`
+      resources:
+        requests:
+          cpu: 15m
+          memory: 64M
+        # limits:
+        #   memory: 99M
+
+    queryFrontend:
+      enabled: true
+      ingress:
+        enabled: true
+        hostname: "thanos.bjw-s.dev"
+        ingressClassName: "internal-nginx"
+        tls: true
+
+    bucketweb:
+      enabled: true
+      resources:
+        requests:
+          cpu: 15m
+          memory: 64M
+        # limits:
+        #   memory: 64M
+
+    compactor:
+      enabled: true
+      extraFlags:
+        - "--compact.concurrency=4"
+        - --delete-delay=30m
+      retentionResolutionRaw: 30d
+      retentionResolution5m: 60d
+      retentionResolution1h: 90d
+      resources:
+        requests:
+          cpu: 15m
+          memory: 204M
+        # limits:
+        #   memory: 270M
+      persistence:
+        enabled: true
+        storageClass: "local-hostpath"
+        size: 15Gi
+
+    storegateway:
+      enabled: true
+      resources:
+        requests:
+          cpu: 23m
+          memory: 204M
+        # limits:
+        #   memory: 226M
+      persistence:
+        enabled: true
+        storageClass: "local-hostpath"
+        size: 1Gi
+
+    ruler:
+      enabled: true
+      alertmanagers:
+        - http://alertmanager.monitoring.svc.cluster.local:9093
+      clusterName: main # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.externalLabels.cluster`
+      config: |-
+        groups:
+          - name: "PrometheusWatcher"
+            rules:
+              - alert: "PrometheusDown"
+                expr: absent(up{job="kube-prometheus-stack-prometheus"})
+      dnsDiscovery:
+        enabled: true
+      persistence:
+        enabled: true
+        storageClass: "local-hostpath"
+        size: 512Mi
+      resources:
+        requests:
+          cpu: 23m
+          memory: 128M
+        limits:
+          memory: 256M
+
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+
+  valuesFrom:
+    - targetPath: objstoreConfig.config.bucket
+      kind: ConfigMap
+      name: thanos-bucket
+      valuesKey: BUCKET_NAME
+    - targetPath: objstoreConfig.config.endpoint
+      kind: ConfigMap
+      name: thanos-bucket
+      valuesKey: BUCKET_HOST
+    - targetPath: objstoreConfig.config.region
+      kind: ConfigMap
+      name: thanos-bucket
+      valuesKey: BUCKET_REGION
+    - targetPath: objstoreConfig.config.access_key
+      kind: Secret
+      name: thanos-bucket
+      valuesKey: AWS_ACCESS_KEY_ID
+    - targetPath: objstoreConfig.config.secret_key
+      kind: Secret
+      name: thanos-bucket
+      valuesKey: AWS_SECRET_ACCESS_KEY

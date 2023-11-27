@@ -1,0 +1,30 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &appname actual
+  namespace: flux-system
+spec:
+  targetNamespace: selfhosted
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
+  interval: 10m
+  path: "./kubernetes/main/apps/selfhosted/actual/app"
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  wait: false
+  dependsOn:
+    - name: rook-ceph-cluster
+    - name: volsync
+    - name: external-secrets-stores
+  postBuild:
+    substitute:
+      APP: *appname
+      HOSTNAME: actual.bjw-s.dev
+      APP_UID: "568"
+      APP_GID: "568"
+      VOLSYNC_CLAIM: actual-data
