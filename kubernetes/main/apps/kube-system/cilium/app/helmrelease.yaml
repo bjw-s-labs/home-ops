@@ -1,0 +1,57 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cilium
+spec:
+  chart:
+    spec:
+      chart: cilium
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: cilium
+        namespace: flux-system
+      version: 1.14.4
+  interval: 30m
+
+  valuesFrom:
+    - kind: ConfigMap
+      name: cilium-values
+
+  values:
+    hubble:
+      serviceMonitor:
+        enabled: true
+
+      dashboards:
+        enabled: true
+        label: grafana_dashboard
+        namespace: monitoring
+        labelValue: "1"
+        annotations: {}
+
+      relay:
+        prometheus:
+          serviceMonitor:
+            enabled: true
+
+      ui:
+        ingress:
+          enabled: true
+          className: "internal-nginx"
+          hosts:
+            - &host hubble-main.bjw-s.dev
+          tls:
+            - hosts:
+                - *host
+
+    prometheus:
+      serviceMonitor:
+        enabled: true
+
+    operator:
+      prometheus:
+        serviceMonitor:
+          enabled: true

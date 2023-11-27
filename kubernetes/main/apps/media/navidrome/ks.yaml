@@ -1,0 +1,60 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &appname navidrome-kids
+  namespace: flux-system
+spec:
+  targetNamespace: media
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
+  interval: 10m
+  path: "./kubernetes/main/apps/media/navidrome/kids"
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  wait: true
+  dependsOn:
+    - name: rook-ceph-cluster
+    - name: volsync
+    - name: external-secrets-stores
+  postBuild:
+    substitute:
+      APP: *appname
+      HOSTNAME: navidrome-kids.bjw-s.dev
+      APP_UID: "1000"
+      APP_GID: "1000"
+      VOLSYNC_CLAIM: navidrome-kids-data
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &appname navidrome-main
+  namespace: flux-system
+spec:
+  targetNamespace: media
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
+  interval: 10m
+  path: "./kubernetes/main/apps/media/navidrome/main"
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  wait: true
+  dependsOn:
+    - name: rook-ceph-cluster
+    - name: volsync
+    - name: external-secrets-stores
+  postBuild:
+    substitute:
+      APP: *appname
+      HOSTNAME: navidrome-main.bjw-s.dev
+      APP_UID: "1000"
+      APP_GID: "1000"
+      VOLSYNC_CLAIM: navidrome-main-data

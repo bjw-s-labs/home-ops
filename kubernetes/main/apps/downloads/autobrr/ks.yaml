@@ -1,0 +1,32 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &appname autobrr
+  namespace: flux-system
+spec:
+  targetNamespace: downloads
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
+  interval: 10m
+  path: "./kubernetes/main/apps/downloads/autobrr/app"
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  wait: false
+  dependsOn:
+    - name: external-secrets-stores
+    - name: rook-ceph-cluster
+    - name: crunchy-postgres-operator
+    - name: qbittorrent
+  postBuild:
+    substitute:
+      APP: *appname
+      HOSTNAME: autobrr.bjw-s.dev
+      APP_UID: "568"
+      APP_GID: "568"
+      DB_NAME: autobrr
+      DB_USER: autobrr

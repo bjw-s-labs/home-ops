@@ -101,7 +101,7 @@ module "cf_domain_ingress" {
     {
       enabled     = true
       description = "Allow GitHub flux API"
-      expression  = "(ip.geoip.asnum eq 36459 and http.host eq \"flux-receiver-cluster-0.bjw-s.dev\")"
+      expression  = "(ip.geoip.asnum eq 36459 and http.host eq \"flux-receiver-main.bjw-s.dev\")"
       action      = "skip"
       action_parameters = {
         ruleset = "current"

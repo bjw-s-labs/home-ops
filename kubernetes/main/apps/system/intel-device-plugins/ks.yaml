@@ -1,0 +1,43 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &appname intel-device-plugins-operator
+  namespace: flux-system
+spec:
+  targetNamespace: system
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
+  path: "./kubernetes/main/apps/system/intel-device-plugins/operator"
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  interval: 10m
+  prune: false
+  wait: true
+  dependsOn:
+    - name: cert-manager
+    - name: node-feature-discovery-rules
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &appname intel-device-plugins-gpu
+  namespace: flux-system
+spec:
+  targetNamespace: system
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
+  path: "./kubernetes/main/apps/system/intel-device-plugins/gpu"
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  interval: 30m
+  prune: false
+  wait: true
+  dependsOn:
+    - name: intel-device-plugins-operator
