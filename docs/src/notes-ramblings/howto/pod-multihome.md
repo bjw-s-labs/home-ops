@@ -20,12 +20,12 @@ I use the Helm chart provided by [@angelnu](https://github.com/angelnu/helm-char
 Make sure that the Kubernetes node has a network interface that is connected to the VLAN you wish to connect to.
 
 ```admonish note
-[My nodes](../../overview/hardware.md) only have a single NIC, so I have [set them up](https://github.com/bjw-s/home-ops/blob/main/infrastructure/talos/cluster-0/talconfig.yaml) so their main interface gets it's IP address over DHCP and a virtual interface connecting to the VLAN. How to do this will depend on your operating system.
+[My nodes](../../overview/hardware.md) only have a single NIC, so I have [set them up](https://github.com/bjw-s/home-ops/blob/main/infrastructure/talos/main/talconfig.yaml) so their main interface gets it's IP address over DHCP and a virtual interface connecting to the VLAN. How to do this will depend on your operating system.
 ```
 
 ## Multus Configuration
 
-My Multus Helm configuration can be found [here](https://github.com/bjw-s/home-ops/blob/main/kubernetes/cluster-0/apps/network/multus/app/helmrelease.yaml).
+My Multus Helm configuration can be found [here](https://github.com/bjw-s/home-ops/blob/main/kubernetes/main/apps/network/multus/app/helmrelease.yaml).
 
 It is important to note that the paths of your CNI plugin binaries / config might differ depending on the Kubernetes distribution you are running. For my [Talos](https://www.talos.dev) setup they need to be set to `/opt/cni/bin` and `etc/cni/net.d` respectively.
 
@@ -34,14 +34,14 @@ It is important to note that the paths of your CNI plugin binaries / config migh
 Once the Multus CNI has been installed and configured you can use the `NetworkAttachmentDefinition` Custom Resource to define the virtual IP addresses that you want to hand out. These need to be free addresses within the VLAN subnet, so it's important to make sure that they do not overlap with your DHCP server range(s).
 
 ```yaml
-{{ #include ../../../../kubernetes/cluster-0/apps/home-automation/home-assistant/app/networkattachmentdefinition.yaml }}
+{{ #include ../../../../kubernetes/main/apps/home-automation/home-assistant/app/networkattachmentdefinition.yaml }}
 ```
 
 Be sure to check out the [official documentation](https://github.com/k8snetworkplumbingwg/multus-cni/blob/master/docs/configuration.md) for more information on how to configure the `spec.config` field.
 
 ## Pod configuration
 
-Once the NetworkAttachmentDefinition has been loaded it is possible to use it within a Pod. This can be done by setting an annotation on the Pod that references it. Staying with the Home Assistant example ([full Helm values](https://github.com/bjw-s/home-ops/blob/main/kubernetes/cluster-0/apps/home-automation/home-assistant/app/helmrelease.yaml)), this would be:
+Once the NetworkAttachmentDefinition has been loaded it is possible to use it within a Pod. This can be done by setting an annotation on the Pod that references it. Staying with the Home Assistant example ([full Helm values](https://github.com/bjw-s/home-ops/blob/main/kubernetes/main/apps/home-automation/home-assistant/app/helmrelease.yaml)), this would be:
 
 `k8s.v1.cni.cncf.io/networks: macvlan-static-iot-hass`
 
