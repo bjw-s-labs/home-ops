@@ -70,6 +70,18 @@ spec:
       target:
         kind: Deployment
         name: "(kustomize-controller|helm-controller|source-controller)"
+    # Enable in-memory-kustomize builds
+    # https://fluxcd.io/flux/installation/configuration/vertical-scaling/#enable-in-memory-kustomize-builds
+    - patch: |
+        - op: replace
+          path: /spec/template/spec/volumes/0
+          value:
+            name: temp
+            emptyDir:
+              medium: Memory
+      target:
+        kind: Deployment
+        name: "kustomize-controller"
     # Enable drift detection for HelmReleases and set the log level to debug
     # https://fluxcd.io/flux/components/helm/helmreleases/#drift-detection
     - patch: |
