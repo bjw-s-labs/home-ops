@@ -211,6 +211,23 @@ controlPlane:
                   enable_unprivileged_ports = true
                   enable_unprivileged_icmp = true
 
+    # Configure nfs mount options
+    - |-
+      machine:
+        files:
+          - op: create
+            path: /etc/nfsmount.conf
+            permissions: 0o644
+            content: |
+              [ NFSMount_Global_Options ]
+              nfsvers=4.2
+              hard=True
+              noatime=True
+              nodiratime=True
+              rsize=131072
+              wsize=131072
+              nconnect=8
+
     # Disable default API server admission plugins.
     - |-
       - op: remove
