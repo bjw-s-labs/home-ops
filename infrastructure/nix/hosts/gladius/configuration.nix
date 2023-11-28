@@ -51,6 +51,13 @@
           path = "/tank/Software";
           "read only" = "no";
         };
+        TimeMachineBackup = {
+          "vfs objects" = "acl_xattr catia fruit streams_xattr";
+          "fruit:time machine" = "yes";
+          "comment" = "Time Machine Backups";
+          "path" = "/tank/Backup/TimeMachine";
+          "read only" = "no";
+        };
       };
 
       system.openssh.enable = true;
