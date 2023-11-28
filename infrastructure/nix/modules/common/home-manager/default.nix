@@ -7,6 +7,8 @@ in
   imports = [
     ( import ../sops {username=username;} )
 
+    ( import ../editor/vscode {username=username;} )
+
     ( import ../kubernetes/k9s {username=username;} )
     ( import ../kubernetes/krew {username=username;} )
     ( import ../kubernetes/kubecm {username=username;} )

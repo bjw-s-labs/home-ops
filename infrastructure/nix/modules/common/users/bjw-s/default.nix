@@ -1,4 +1,4 @@
-args@{ pkgs, pkgs-unstable, lib, config, ... }:
+args@{ pkgs, pkgs-unstable, vscode-extensions, lib, config, ... }:
 with lib;
 
 let
@@ -95,7 +95,7 @@ in {
       modules.users.bjw-s.shell.tmux.enable = true;
     }
 
-    (mkIf (cfg.enableKubernetesTools) (import ./_kubernetes.nix))
-    (mkIf (cfg.enableKubernetesTools) (import ./_devtools.nix args))
+    (mkIf (cfg.enableKubernetesTools) (import ./_kubernetes.nix args))
+    (mkIf (cfg.enableDevTools) (import ./_devtools.nix args))
   ]);
 }
