@@ -25,9 +25,11 @@
     };
 
     # Flake-parts
-    flake-parts = {
-      url = "github:hercules-ci/flake-parts";
+    nix-vscode-extensions = {
+      url = "github:nix-community/nix-vscode-extensions";
     };
+
+
   };
 
   outputs = { flake-parts, ... }@inputs:

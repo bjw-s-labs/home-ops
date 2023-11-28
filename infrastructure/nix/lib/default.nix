@@ -23,6 +23,7 @@ in {
               config.allowUnfree = true;
               overlays = [ (import ../packages/overlay.nix {inherit inputs system;}) ];
             };
+            vscode-extensions = inputs.nix-vscode-extensions.extensions.${system};
           };
         }
         inputs.home-manager.nixosModules.home-manager
@@ -56,6 +57,7 @@ in {
               config.allowUnfree = true;
               overlays = [ (import ../packages/overlay.nix {inherit inputs system;}) ];
             };
+            vscode-extensions = inputs.nix-vscode-extensions.extensions.${system};
           };
         }
         inputs.home-manager.darwinModules.home-manager
