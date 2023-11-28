@@ -1,3 +1,4 @@
+{ vscode-extensions, ...}:
 {
   modules.users.bjw-s.kubernetes.k9s.enable = true;
   modules.users.bjw-s.kubernetes.krew.enable = true;
@@ -12,6 +13,18 @@
       interactiveShellInit = ''
         flux completion fish | source
       '';
+    };
+  };
+
+  modules.users.bjw-s.editor.vscode = {
+    extensions = with vscode-extensions.vscode-marketplace; [
+      ms-kubernetes-tools.vscode-kubernetes-tools
+    ];
+
+    config = {
+      vs-kubernetes = {
+        "vs-kubernetes.crd-code-completion" = "disabled";
+      };
     };
   };
 }
