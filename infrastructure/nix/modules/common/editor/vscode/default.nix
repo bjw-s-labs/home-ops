@@ -1,7 +1,8 @@
-{ username }: args@{pkgs, lib, config, vscode-extensions, ... }:
+{ username }: args@{pkgs, lib, config, ... }:
 with lib;
 
 let
+  vscode-extensions = (import ./extensions.nix){pkgs = pkgs;};
   cfg = config.modules.users.${username}.editor.vscode;
 
   userDir = if pkgs.stdenv.hostPlatform.isDarwin then
@@ -10,12 +11,12 @@ let
     "${config.xdg.configHome}/Code/User";
   configFilePath = "${userDir}/settings.json";
 
-  defaultExtensions = with vscode-extensions.vscode-marketplace; [
+  defaultExtensions = with vscode-extensions; [
     catppuccin.catppuccin-vsc
     catppuccin.catppuccin-vsc-icons
     elagil.pre-commit-helper
     esbenp.prettier-vscode
-    gruntfuggly.todo-tre
+    gruntfuggly.todo-tree
     ionutvmi.path-autocomplete
     redhat.vscode-yaml
     signageos.signageos-vscode-sops
