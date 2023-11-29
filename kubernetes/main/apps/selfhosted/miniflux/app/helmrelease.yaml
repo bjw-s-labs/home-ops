@@ -23,11 +23,16 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
 
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+
         containers:
           main:
             image:
               repository: ghcr.io/miniflux/miniflux
-              tag: 2.0.50
+              tag: 2.0.50-distroless
             env:
               BASE_URL: https://${HOSTNAME}
               CREATE_ADMIN: "1"

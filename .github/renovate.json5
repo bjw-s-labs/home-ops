@@ -41,6 +41,12 @@
       versioning: "regex:^(?<compatibility>(?<nodeVersion>\\d{2})-(?<ubuntuVersion>.*?)-(?<scryptedFlavor>.*?))-v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
       matchPackageNames: ["ghcr.io/koush/scrypted"],
     },
+    {
+      description: "Use custom versioning for miniflux",
+      matchDatasources: ["docker"],
+      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>)$",
+      matchPackageNames: ["ghcr.io/miniflux/miniflux"],
+    },
     // Version strategies
     {
       matchDatasources: ["docker"],
