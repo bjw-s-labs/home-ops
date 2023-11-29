@@ -1,4 +1,7 @@
-{ vscode-extensions, ...}:
+{ pkgs, ... }:
+let
+  vscode-extensions = (import ../../editor/vscode/extensions.nix){pkgs = pkgs;};
+in
 {
   modules.users.bjw-s.kubernetes.k9s.enable = true;
   modules.users.bjw-s.kubernetes.krew.enable = true;
@@ -17,7 +20,7 @@
   };
 
   modules.users.bjw-s.editor.vscode = {
-    extensions = with vscode-extensions.vscode-marketplace; [
+    extensions = with vscode-extensions; [
       ms-kubernetes-tools.vscode-kubernetes-tools
     ];
 

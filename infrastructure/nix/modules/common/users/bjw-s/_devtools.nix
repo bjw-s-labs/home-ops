@@ -1,20 +1,25 @@
-{ pkgs, pkgs-unstable, vscode-extensions, ... }:
+{ pkgs, pkgs-unstable, ... }:
+
+let
+  vscode-extensions = (import ../../editor/vscode/extensions.nix){pkgs = pkgs;};
+in
 {
   modules.users.bjw-s.editor.vscode = {
     enable = true;
     package = pkgs-unstable.vscode;
 
-    extensions = with vscode-extensions.vscode-marketplace; [
+    extensions = (with vscode-extensions; [
       eamodio.gitlens
       golang.go
       fnando.linter
       hashicorp.terraform
       jnoortheen.nix-ide
-      ms-python.python
       ms-vscode-remote.remote-containers
       ms-vscode-remote.remote-ssh
       redhat.ansible
-    ];
+      ms-python.python
+      ms-python.vscode-pylance
+    ]);
 
     config = {
       # Extension settings
