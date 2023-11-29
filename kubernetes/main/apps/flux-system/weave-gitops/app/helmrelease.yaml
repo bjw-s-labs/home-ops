@@ -16,12 +16,13 @@ spec:
         name: weave-gitops
   values:
     podAnnotations:
-      secret.reloader.stakater.com/reload: weave-gitops-secrets
+      secret.reloader.stakater.com/reload: oidc-auth,cluster-user-auth
 
     logLevel: info
 
     adminUser:
       create: true
+      createSecret: false
       username: &admin_user admin
 
     networkPolicy:
@@ -32,8 +33,6 @@ spec:
 
     rbac:
       create: true
-      impersonationResourceNames:
-        - *admin_user
       additionalRules:
         - apiGroups:
             - "infra.contrib.fluxcd.io"
@@ -48,16 +47,10 @@ spec:
       enabled: true
       className: internal-nginx
       hosts:
-        - host: &host "gitops.bjw-s.dev"
+        - host: "${HOSTNAME}"
           paths:
             - path: /
               pathType: Prefix
       tls:
         - hosts:
-            - *host
-
-  valuesFrom:
-    - kind: Secret
-      name: weave-gitops-secrets
-      valuesKey: adminPassword
-      targetPath: adminUser.passwordHash
+            - "${HOSTNAME}"
