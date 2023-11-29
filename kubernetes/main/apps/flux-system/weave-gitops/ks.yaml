@@ -19,3 +19,7 @@ spec:
   wait: false
   dependsOn:
     - name: external-secrets-stores
+  postBuild:
+    substitute:
+      APP: *appname
+      HOSTNAME: gitops.bjw-s.dev
