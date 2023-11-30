@@ -1,45 +1,33 @@
-# This file is maintained automatically by "terraform init".
+# This file is maintained automatically by "tofu init".
 # Manual edits may be lost in future updates.
 
-provider "registry.terraform.io/1password/onepassword" {
-  version     = "1.1.4"
-  constraints = "1.1.4"
+provider "registry.opentofu.org/1password/onepassword" {
+  version     = "1.3.0"
+  constraints = "1.3.0"
   hashes = [
-    "h1:3TVsJ9fbNOerTE00uFqqKQDW6WRAPP0kZVhVhfd0COw=",
-    "zh:018f3e223ae82ba675f0f088af135a9196326501f9f57f397067a65342cdcca3",
-    "zh:1a077bba8db0ffa0c969bbcd8525d30f4d8018257363408b4e6891b319397e91",
-    "zh:273534ba172eec6bc71cdf107cb51197fb58818b5a31bf9812b89ebaa0545522",
-    "zh:2956acd7594b024f708588fe47f495abb555593bd0360c544b97a700490810fb",
-    "zh:2a204b457c53c2808a990e9fe2ceafc73c1371eb11d60a7e9baf5f2db2d5891d",
-    "zh:329bcfccbb6f96d3cdfc79d04c677545a5e170e3a29480a3002459fc1801db0e",
-    "zh:446e6e9fad793e14f53cecf8140407fab6a8178590a032f764a0fe300171e2d8",
-    "zh:69ca3fa115f292b48defdc5c06297f68ce38389596b0cb715ac8730a1080512d",
-    "zh:cce0942774602a0357251f3c10570fb71c4d2b4769c324cea6532e75d7e58c14",
-    "zh:d4aec090dbd03beba2f4eea52d64cfc9417433418c7ada6d76649364429af220",
-    "zh:e99adab86730b3847332d93d66621fdf4fea3b309579266c45469358f68f10c9",
-    "zh:eef501df7d4f1694cb1145a6c8a905d7338a4abd0001d43e2425986e3d8768f6",
-    "zh:f8424c10cc66fd8feea457aaab47fc122f67ca5a9dfbcb47c7c79859cf7291ed",
+    "h1:HG/rr/r53SIe8h9sOVGVaqfECDwhGvrK/RQ1CWSfMYs=",
+    "zh:408cff888c21edf174d1499f00f8396a8e473b986a0d797cf6bcb45e6bf2d791",
+    "zh:419e1d159d60ad13ea3f409b6205d89e308d81fd3918391e0c62eac025ed6e76",
+    "zh:4e72b7985812bf3f17f8e541d4bc327cfec2b288fcd745562b7105d9ed9045fe",
+    "zh:5c14ce90201966b26bcae9443ac5d4863848fb8d843f521da3e94706dd9efa0f",
+    "zh:5c3f73f02fcec1e2c80027a459c8fb9ad4c16843fae0b9fc722263f4d803d3d8",
+    "zh:6419d64c9b6329f159f902a3a12958a4675cdabc7a80938377b5ab31974b7edc",
+    "zh:6552e74457325b5bdef4376bcf0509599934f95b0ecb02b34f406482e3d8c0fd",
+    "zh:667de204e54ee598b0c3cec6c320d9bd9d5b1873c1cb0cc36f5a1c7d467bed28",
+    "zh:6b6f4b4e6b43687f0a86eeac40e74b87182675b618530b5e56ae408657baffda",
+    "zh:7fc5425e1679710c8062c35f57d97296e0c26b0eb09af5b0f92530669915953f",
+    "zh:9dbbb2f76cf3fd33578a084780c3745fcb4cc635777046b7935c7db0abb273d6",
+    "zh:a0fa0b5acdf040d9211d2e4b98d6675222f2cba4d1d40e4e8fbc74cfec46e653",
+    "zh:a67acf88560db4e4b27c71f10ec910275ee56f4a4a4b5754b5ee458b0d1b0f90",
+    "zh:f53a50555c607b73609db7a912b32a36724770372d56bdc4be278b60e50a06f7",
   ]
 }
 
-provider "registry.terraform.io/integrations/github" {
+provider "registry.opentofu.org/integrations/github" {
   version     = "5.42.0"
-  constraints = "5.42.0"
+  constraints = ">= 5.31.0, 5.42.0, < 6.0.0"
   hashes = [
-    "h1:2uSfpW53r+kRABY5ykGtN+iShcq0HhGLqbkBADlZI6c=",
-    "h1:5F47qf2YtvU/HO5SC1DXMBdI6s7UQYleoIQDJ6O5Sto=",
-    "h1:CZUAXhUhMIuIyTPm9VDcvOZgM1Lsl9tuKm5wW9tBEsM=",
-    "h1:G4wxoLU6Zqqac0JgOFaumwF/Mf1L4GoxCGxdclW3xG4=",
-    "h1:KQ38BDTaErQN0nEGDUvg5ZJ6k+62Rw+JEzUdx/ZUh4M=",
-    "h1:NFTgnTxXlECS0t9PQkZuW3cGeoS/rM+LFCp95JhvPmw=",
-    "h1:QqkUVWcKwrj8VMDhpNgMepQgP3UKKDNMQn3CPoG2DkM=",
-    "h1:aE0XON8y1jL8/975LQm9Ph6DD1t+xV6oRNBi6o5wo30=",
-    "h1:aZiah7zdjBrja4EfeVcDOLKOD0wj7YSYF1bUTuffmV0=",
-    "h1:bMu+m11M8FV7/TeiMT+5QSN63x5LrfdgxuMFcpe816I=",
-    "h1:fSOh6pAWpNwoYL/jSMeU4h+FU0i8ihWsgEhpcSszy7A=",
     "h1:rfyLEgbZCk3MMCBuGd4PNFM914vtLqGIYcsmVKr6tdg=",
-    "h1:vHTdYL6eXJfUzz4bs0ICyg2f8ct/K2EnGAjwLrAmL3U=",
-    "h1:vMcWbPoE1dctzFAs623XRYjjhVY3KqE/8fQ2EkMXy88=",
     "zh:0f97039c6b70295c4a82347bc8a0bcea700b3fb3df0e0be53585da025584bb7c",
     "zh:12e78898580cc2a72b5f2a77e191b158f88e974b0500489b691f34842288745c",
     "zh:23660933e4f00293c0d4d6cd6b4d72e382c0df46b70cecf22b5c4c090d3b61e3",
