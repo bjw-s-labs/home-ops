@@ -38,7 +38,7 @@ in
     (mkIf (cfg.enable) {
       home-manager.users.${username} = {
         home = {
-          stateVersion = "23.05";
+          stateVersion = "23.11";
         };
 
         programs = {

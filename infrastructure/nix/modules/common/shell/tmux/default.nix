@@ -1,7 +1,7 @@
 { username }: {lib, config, ... }:
 with lib;
 let
-  cfg = config.modules.users.${username}.shell.starship;
+  cfg = config.modules.users.${username}.shell.tmux;
 
 in {
   options.modules.users.${username}.shell.tmux = {
