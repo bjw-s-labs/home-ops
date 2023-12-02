@@ -35,34 +35,33 @@ spec:
               repository: ghcr.io/autobrr/autobrr
               tag: v1.34.0
             env:
-              AUTOBRR__CHECKFORUPDATES: "false"
+              AUTOBRR__CHECK_FOR_UPDATES: "false"
               AUTOBRR__HOST: 0.0.0.0
               AUTOBRR__PORT: &port 7474
-              AUTOBRR__LOGLEVEL: DEBUG
-              AUTOBRR__DATABASETYPE: postgres
-              AUTOBRR__POSTGRESHOST:
+              AUTOBRR__LOG_LEVEL: DEBUG
+              AUTOBRR__DATABASE_TYPE: postgres
+              AUTOBRR__POSTGRES_HOST:
                 valueFrom:
                   secretKeyRef:
                     name: "${APP}-pguser-${DB_USER}"
                     key: host
-              AUTOBRR__POSTGRESPORT: "5432"
-              AUTOBRR__POSTGRESUSER:
+              AUTOBRR__POSTGRES_PORT: "5432"
+              AUTOBRR__POSTGRES_USER:
                 valueFrom:
                   secretKeyRef:
                     name: "${APP}-pguser-${DB_USER}"
                     key: user
-              AUTOBRR__POSTGRESPASS:
+              AUTOBRR__POSTGRES_PASS:
                 valueFrom:
                   secretKeyRef:
                     name: "${APP}-pguser-${DB_USER}"
                     key: password
-              AUTOBRR__POSTGRESDATABASE:
+              AUTOBRR__POSTGRES_DATABASE:
                 valueFrom:
                   secretKeyRef:
                     name: "${APP}-pguser-${DB_USER}"
                     key: dbname
-
-              AUTOBRR__SESSIONSECRET:
+              AUTOBRR__SESSION_SECRET:
                 valueFrom:
                   secretKeyRef:
                     name: autobrr-secret
@@ -94,15 +93,3 @@ spec:
         tls:
           - hosts:
               - "${HOSTNAME}"
-
-    persistence:
-      config:
-        enabled: true
-        type: emptyDir
-      config-file:
-        type: configMap
-        name: autobrr-configmap
-        globalMounts:
-          - path: /config/config.toml
-            subPath: config.toml
-            readOnly: true
