@@ -2,46 +2,25 @@
 version: "3"
 
 tasks:
-  gr-sync:
-    desc: Sync all Flux GitRepositories
-    cmds:
-      - |
-        kubectl get gitrepositories --all-namespaces --no-headers | awk '{print $1, $2}' \
-          | xargs -P 4 -L 1 bash -c \
-            'kubectl -n $0 annotate gitrepository/$1 reconcile.fluxcd.io/requestedAt=$(date +%s) --field-manager=flux-client-side-apply --overwrite'
-
-  ks-sync:
-    desc: Sync all Flux Kustomizations
-    cmds:
-      - |
-        kubectl get kustomization --all-namespaces --no-headers | awk '{print $1, $2}' \
-          | xargs -P 4 -L 1 bash -c \
-            'kubectl -n $0 annotate kustomization/$1 reconcile.fluxcd.io/requestedAt="$(date +%s)" --field-manager=flux-client-side-apply --overwrite'
-
-  hr-sync:
-    desc: Sync all Flux HelmReleases
-    cmds:
-      - |
-        kubectl get helmreleases --all-namespaces --no-headers | awk '{print $1, $2}' \
-          | xargs -P 4 -L 1 bash -c \
-            'kubectl -n $0 annotate helmrelease/$1 reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite'
-
-  tf-sync:
-    desc: Sync Flux Terraforms
-    cmds:
-      - |
-        kubectl get terraforms --all-namespaces --no-headers | awk '{print $1, $2}' \
-          | xargs -P 4 -L 1 bash -c \
-            'kubectl -n $0 annotate terraform/$1 reconcile.fluxcd.io/requestedAt="$(date +%s)" --overwrite'
-  hr-suspend:
-    desc: Suspend all Flux HelmReleases
-    cmds:
-      - |
-        flux get helmrelease --all-namespaces --no-header | awk '{print $1, $2}' \
-          | xargs -L 1 bash -c 'flux -n $0 suspend helmrelease $1'
-  hr-resume:
-    desc: Resume all Flux HelmReleases
-    cmds:
-      - |
-        flux get helmrelease --all-namespaces --no-header | awk '{print $1, $2}' \
-          | xargs -L 1 bash -c 'flux -n $0 resume helmrelease $1'
+  apply:
+    desc: Apply a Flux Kustomization resource for a cluster
+    summary: |
+      Args:
+        cluster: Cluster to run command against (required)
+        path: Path to the Flux Kustomization resource (required)
+        ns: Namespace the Flux Kustomization exists in (default: flux-system)
+    cmd: |
+      flux --context {{.cluster}} build ks $(basename {{.path}}) \
+        --namespace {{.ns}} \
+        --kustomization-file {{.KUBERNETES_DIR}}/{{.cluster}}/apps/{{.path}}/ks.yaml \
+        --path {{.KUBERNETES_DIR}}/{{.cluster}}/apps/{{.path}} \
+      | \
+      kubectl --context {{.cluster}} apply --server-side \
+        --field-manager=kustomize-controller -f -
+    vars:
+      cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
+      path: '{{ or .path (fail "Argument (path) is required") }}'
+      ns: '{{.ns | default "flux-system"}}'
+    preconditions:
+      - sh: "test -f {{.KUBERNETES_DIR}}/{{.cluster}}/apps/{{.path}}/ks.yaml"
+        msg: "Kustomization file not found"
