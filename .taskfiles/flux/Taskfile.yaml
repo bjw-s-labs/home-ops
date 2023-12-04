@@ -15,7 +15,7 @@ tasks:
         --namespace {{.ns}} \
         --kustomization-file {{.kustomization_file}} \
         --path {{.kustomization_path}} \
-        {{- if not (eq .new "false") }}--dry-run \{{ end }}
+        {{- if contains "not found" .kustomization_found }}--dry-run \{{ end }}
       | \
       kubectl --context {{.cluster}} apply --server-side \
         --field-manager=kustomize-controller -f - \
@@ -25,7 +25,8 @@ tasks:
       cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
       path: '{{ or .path (fail "Argument (path) is required") }}'
       ns: '{{.ns | default "flux-system"}}'
-      new: '{{.new | default "false"}}'
+      kustomization_found:
+        sh: flux --context {{.cluster}} --namespace {{.ns}} get kustomization $(basename {{.path}}) 2>&1
     preconditions:
       - sh: "test -f {{.kustomization_file}}"
         msg: "Kustomization file {{.kustomization_file}} not found"
