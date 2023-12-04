@@ -4,13 +4,19 @@ version: "3"
 tasks:
   mount:
     desc: Mount a PersistentVolumeClaim to a pod temporarily
+    summary: |
+      Args:
+        cluster: Cluster to run command against (required)
+        ns: Namespace the PVC is in (default: default)
+        claim: PVC to mount (required)
     interactive: true
     vars:
-      claim: '{{ or .claim (fail "PersistentVolumeClaim `claim` is required") }}'
-      namespace: '{{.namespace | default "default"}}'
+      claim: '{{ or .cluster (fail "Argument (claim) is required") }}'
+      ns: '{{.ns | default "default"}}'
+      cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
     cmds:
       - |
-        kubectl run -n {{.namespace}} debug-{{.claim}} -i --tty --rm --image=null --privileged --overrides='
+        kubectl --context {{.cluster}} run -n {{.ns}} debug-{{.claim}} -i --tty --rm --image=null --privileged --overrides='
           {
             "apiVersion": "v1",
             "spec": {
@@ -26,15 +32,15 @@ tasks:
                   "tty": true,
                   "volumeMounts": [
                     {
-                      "name": "config",
-                      "mountPath": "/data/config"
+                      "name": "claim",
+                      "mountPath": "/mnt/claim"
                     }
                   ]
                 }
               ],
               "volumes": [
                 {
-                  "name": "config",
+                  "name": "claim",
                   "persistentVolumeClaim": {
                     "claimName": "{{.claim}}"
                   }
@@ -44,9 +50,25 @@ tasks:
             }
           }'
     preconditions:
-      - kubectl -n {{.namespace}} get pvc {{.claim}}
+      - sh: kubectl --context {{.cluster}} -n {{.ns}} get pvc {{.claim}}
+        msg: "PVC not found"
 
   delete-failed-pods:
-    desc: Deletes failed pods
+    desc: Deletes pods with Failed phase
+    summary: |
+      Args:
+        cluster: Cluster to run command against (required)
+    vars:
+      cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
     cmds:
-      - kubectl delete pods --field-selector status.phase=Failed -A --ignore-not-found=true
+      - kubectl --context {{.cluster}} delete pods --field-selector status.phase=Failed -A --ignore-not-found=true
+
+  delete-succeeded-pods:
+    desc: Deletes pods with Succeeded phase
+    summary: |
+      Args:
+        cluster: Cluster to run command against (required)
+    vars:
+      cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
+    cmds:
+      - kubectl --context {{.cluster}} delete pods --field-selector status.phase=Succeeded -A --ignore-not-found=true
