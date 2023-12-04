@@ -1,0 +1,99 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kopia
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 2.3.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        containers:
+          main:
+            image:
+              repository: docker.io/kopia/kopia
+              tag: 0.15.0
+            args:
+              - server
+              - start
+              - --insecure
+              - --address
+              - 0.0.0.0:80
+              - --override-hostname
+              - gladius.bjw-s.casa
+              - --without-password
+              - --metrics-listen-addr
+              - 0.0.0.0:8080
+            env:
+              KOPIA_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: kopia-secret
+                    key: KOPIA_PASSWORD
+            resources:
+              requests:
+                cpu: 5m
+                memory: 128M
+            securityContext:
+              privileged: true
+              runAsUser: 0
+
+    service:
+      main:
+        ports:
+          http:
+            port: 80
+          metrics:
+            port: 8080
+
+    ingress:
+      main:
+        enabled: true
+        className: "internal-nginx"
+        hosts:
+          - host: &host "kopia.bjw-s.dev"
+            paths:
+              - path: /
+                service:
+                  name: main
+                  port: http
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      config-file:
+        type: secret
+        name: kopia-b2-repo-secret
+        globalMounts:
+          - path: /app/config/repository.config
+            subPath: repository.config
+            readOnly: true
+      cache:
+        type: emptyDir
+        globalMounts:
+          - path: /app/cache
+      logs:
+        type: emptyDir
+        globalMounts:
+          - path: /app/logs
+      tank:
+        type: hostPath
+        hostPath: /tank
+        hostPathType: Directory
+        globalMounts:
+          - path: /tank
