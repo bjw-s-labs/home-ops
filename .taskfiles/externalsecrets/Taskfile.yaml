@@ -4,17 +4,17 @@ version: "3"
 tasks:
   sync:
     desc: Sync ExternalSecret resources
+    summary: |
+      Args:
+        cluster: Cluster to run command against (required)
+        ns: Namespace the PVC is in (default: default)
+        secret: ExternalSecret to sync (required)
     silent: true
     vars:
-      secret: '{{ .SECRET | default ""}}'
-      namespace: '{{.NAMESPACE | default "default"}}'
-    cmds:
-      - |
-        {{if eq .secret ""}}
-          kubectl get externalsecret.external-secrets.io --all-namespaces --no-headers -A | awk '{print $1, $2}' \
-            | xargs -P 4 -L 1 bash -c 'kubectl -n $0 annotate externalsecret.external-secrets.io $1 force-sync=$(date +%s) --overwrite'
-        {{else}}
-          kubectl -n {{.namespace}} annotate externalsecret.external-secrets.io {{.secret}} force-sync=$(date +%s) --overwrite
-        {{end}}
+      secret: "{{ .secret }}"
+      ns: '{{.ns | default "default"}}'
+      cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
+    cmd: kubectl --context {{.cluster}} -n {{.ns}} annotate externalsecret.external-secrets.io {{.secret}} force-sync=$(date +%s) --overwrite
     preconditions:
-      - kubectl -n {{.namespace}} get es {{.secret}}
+      - sh: kubectl --context {{.cluster}} -n {{.ns}} get es {{.secret}}
+        msg: "ExternalSecret not found"
