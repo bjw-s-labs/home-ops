@@ -53,6 +53,8 @@ spec:
                   secretKeyRef:
                     name: gh-safe-settings-secret
                     key: webhook_secret
+              CRON: "0 */6 * * *"
+              ENABLE_PR_COMMENT: "true"
             resources:
               requests:
                 cpu: 14m
@@ -84,7 +86,7 @@ spec:
               - "${HOSTNAME}"
 
     persistence:
-      configFile:
+      config:
         enabled: true
         type: configMap
         name: gh-safe-settings-configmap
