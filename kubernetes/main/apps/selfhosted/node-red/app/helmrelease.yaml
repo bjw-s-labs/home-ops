@@ -53,7 +53,9 @@ spec:
     ingress:
       main:
         enabled: true
-        className: "internal-nginx"
+        className: "external-nginx"
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         hosts:
           - host: "${HOSTNAME}"
             paths:
