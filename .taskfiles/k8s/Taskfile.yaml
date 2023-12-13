@@ -11,9 +11,13 @@ tasks:
         claim: PVC to mount (required)
     interactive: true
     vars:
-      claim: '{{ or .cluster (fail "Argument (claim) is required") }}'
+      cluster: "{{ .cluster }}"
       ns: '{{.ns | default "default"}}'
-      cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
+      claim: "{{ .claim }}"
+    requires:
+      vars:
+        - claim
+        - cluster
     cmds:
       - |
         kubectl --context {{.cluster}} run -n {{.ns}} debug-{{.claim}} -i --tty --rm --image=null --privileged --overrides='
