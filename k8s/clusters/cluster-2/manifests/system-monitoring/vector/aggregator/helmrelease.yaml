@@ -1,0 +1,95 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  labels:
+    app.kubernetes.io/instance: vector-aggregator
+    app.kubernetes.io/name: vector-aggregator
+  name: vector-aggregator
+  namespace: system-monitoring
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 2.0.3
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+      interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controller:
+      replicas: 1
+      strategy: Recreate
+      annotations:
+        reloader.stakater.com/auto: "true"
+
+    image:
+      repository: ghcr.io/onedr0p/vector
+      tag: 0.33.1-debian
+
+    args: ["--config", "/etc/vector/vector.yaml"]
+
+    service:
+      main:
+        type: LoadBalancer
+        annotations:
+          external-dns.alpha.kubernetes.io/hostname: "vector.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          metallb.universe.tf/loadBalancerIPs: ${LB_VECTOR}
+          io.cilium/lb-ipam-ips: "${LB_VECTOR}"
+        externalTrafficPolicy: Cluster
+        ports:
+          http:
+            port: 8686
+          kubernetes-logs:
+            enabled: true
+            port: 6000
+          vyos-syslog:
+            enabled: true
+            port: 6001
+          journald-logs:
+            enabled: true
+            port: 6002
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: vector-aggregator-configmap
+        subPath: vector.yaml
+        mountPath: /etc/vector/vector.yaml
+        readOnly: true
+      data:
+        enabled: true
+        type: emptyDir
+        mountPath: /vector-data-dir
+      geoip:
+        enabled: true
+        existingClaim: vector-geoipupdate-config
+
+    # resources:
+    #   requests:
+    #     cpu: 35m
+    #     memory: 381M
+    #   limits:
+    #     memory: 726M
+
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: vector-aggregator

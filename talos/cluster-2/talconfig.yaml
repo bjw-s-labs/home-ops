@@ -106,25 +106,36 @@ nodes:
       nameservers:
         - 10.0.0.4
       networkInterfaces:
+        # 1G Internal Port
         - deviceSelector:
-            hardwareAddr: "d8:3a:dd:90:f0:ae"
-          dhcp: true
+            driver: bcmgenet
+            # hardwareAddr: "d8:3a:dd:90:f0:ae"
+          dhcp: false
+          # mtu: 9000
+          vlans:
+            - vlanId: 2002
+              dhcp: true
+              # mtu: 9000
+        # 2.5G PICe Port
+        - deviceSelector:
+            # Talos cant detect MAC address at boot, so it assigns a random one.
+            # Using pciID to get a consistant naming scheme
+            pciID: 10EC:8125
+          dhcp: false
           mtu: 9000
-        # - deviceSelector:
-        #     hardwareAddr: "da:29:dc:d9:75:f7"
-        #   dhcp: false
-        #   mtu: 9000
-        #   vlans:
-        #     - vlanId: 2
-        #       dhcp: true
-        #       mtu: 1500
-        #       dhcpOptions:
-        #         routeMetric: 2048
-        #     - vlanId: 100
-        #       dhcp: true
-        #       mtu: 1500
-        #       dhcpOptions:
-        #         routeMetric: 4096
+          dhcpOptions:
+            routeMetric: 4096
+          vlans:
+            - vlanId: 2040
+              dhcp: true
+              mtu: 9000
+              dhcpOptions:
+                routeMetric: 2048
+          #   - vlanId: 100
+          #     dhcp: true
+          #     mtu: 1500
+          #     dhcpOptions:
+          #       routeMetric: 4096
 
     - hostname: work2.cluster-2.${secret_domain}
       ipAddress: work2.cluster-2.${secret_domain}
@@ -135,25 +146,37 @@ nodes:
       nameservers:
         - 10.0.0.4
       networkInterfaces:
+        # 1G Internal Port
         - deviceSelector:
-            hardwareAddr: "d8:3a:dd:38:12:e4"
-          dhcp: true
+            driver: bcmgenet
+            # hardwareAddr: "d8:3a:dd:38:12:e4"
+          dhcp: false
+          # mtu: 9000
+          vlans:
+            - vlanId: 2002
+              dhcp: true
+              # mtu: 9000
+        # 2.5G PICe Port
+        - deviceSelector:
+            # hardwareAddr: "32:30:76:5d:f8:76"
+            # Talos cant detect MAC address at boot, so it assigns a random one.
+            # Using pciID to get a consistant naming scheme
+            pciID: 10EC:8125
+          dhcp: false
           mtu: 9000
-        # - deviceSelector:
-        #     hardwareAddr: "32:30:76:5d:f8:76"
-        #   dhcp: false
-        #   mtu: 9000
-        #   vlans:
-        #     - vlanId: 2
-        #       dhcp: true
-        #       mtu: 1500
-        #       dhcpOptions:
-        #         routeMetric: 2048
-        #     - vlanId: 100
-        #       dhcp: true
-        #       mtu: 1500
-        #       dhcpOptions:
-        #         routeMetric: 4096
+          dhcpOptions:
+            routeMetric: 4096
+          vlans:
+            - vlanId: 2040
+              dhcp: true
+              mtu: 9000
+              dhcpOptions:
+                routeMetric: 2048
+          #   - vlanId: 100
+          #     dhcp: true
+          #     mtu: 1500
+          #     dhcpOptions:
+          #       routeMetric: 4096
 
     - hostname: work3.cluster-2.${secret_domain}
       ipAddress: work3.cluster-2.${secret_domain}
@@ -164,28 +187,206 @@ nodes:
       nameservers:
         - 10.0.0.4
       networkInterfaces:
+        # 1G Internal Port
         - deviceSelector:
-            hardwareAddr: "d8:3a:dd:90:f1:e4"
-          dhcp: true
+            driver: bcmgenet
+            # hardwareAddr: "d8:3a:dd:90:f1:e4"
+          dhcp: false
+          # mtu: 9000
+          vlans:
+            - vlanId: 2002
+              dhcp: true
+              # mtu: 9000
+        # 2.5G PICe Port
+        - deviceSelector:
+            # hardwareAddr: "c2:8d:68:a7:da:ed"
+            # Talos cant detect MAC address at boot, so it assigns a random one.
+            # Using pciID to get a consistant naming scheme
+            pciID: 10EC:8125
+          dhcp: false
           mtu: 9000
-        # - deviceSelector:
-        #     hardwareAddr: "ce:26:91:bd:80:d8"
-        #   dhcp: false
-        #   mtu: 9000
-        #   vlans:
-        #     - vlanId: 2
-        #       dhcp: true
-        #       mtu: 1500
-        #       dhcpOptions:
-        #         routeMetric: 2048
-        #     - vlanId: 100
-        #       dhcp: true
-        #       mtu: 1500
-        #       dhcpOptions:
-        #         routeMetric: 4096
+          dhcpOptions:
+            routeMetric: 4096
+          vlans:
+            - vlanId: 2040
+              dhcp: true
+              mtu: 9000
+              dhcpOptions:
+                routeMetric: 2048
+          #   - vlanId: 100
+          #     dhcp: true
+          #     mtu: 1500
+          #     dhcpOptions:
+          #       routeMetric: 4096
+
+    - hostname: work4.cluster-2.${secret_domain}
+      ipAddress: work4.cluster-2.${secret_domain}
+      controlPlane: false
+      disableSearchDomain: true
+      installDiskSelector:
+        size: <= 50GB
+      nameservers:
+        - 10.0.0.4
+      networkInterfaces:
+        # 1G Internal Port
+        - deviceSelector:
+            driver: bcmgenet
+          dhcp: false
+          vlans:
+            - vlanId: 2002
+              dhcp: true
+        # 2.5G PICe Port
+        - deviceSelector:
+            # Talos cant detect MAC address at boot, so it assigns a random one.
+            # Using pciID to get a consistant naming scheme
+            pciID: 10EC:8125
+          dhcp: false
+          mtu: 9000
+          dhcpOptions:
+            routeMetric: 4096
+          vlans:
+            - vlanId: 2040
+              dhcp: true
+              mtu: 9000
+              dhcpOptions:
+                routeMetric: 2048
+
+    - hostname: work5.cluster-2.${secret_domain}
+      ipAddress: work5.cluster-2.${secret_domain}
+      controlPlane: false
+      disableSearchDomain: true
+      installDiskSelector:
+        size: <= 50GB
+      nameservers:
+        - 10.0.0.4
+      networkInterfaces:
+        # 1G Internal Port
+        - deviceSelector:
+            driver: bcmgenet
+          dhcp: false
+          vlans:
+            - vlanId: 2002
+              dhcp: true
+        # 2.5G PICe Port
+        - deviceSelector:
+            # Talos cant detect MAC address at boot, so it assigns a random one.
+            # Using pciID to get a consistant naming scheme
+            pciID: 10EC:8125
+          dhcp: false
+          mtu: 9000
+          dhcpOptions:
+            routeMetric: 4096
+          vlans:
+            - vlanId: 2040
+              dhcp: true
+              mtu: 9000
+              dhcpOptions:
+                routeMetric: 2048
+
+    - hostname: work6.cluster-2.${secret_domain}
+      ipAddress: work6.cluster-2.${secret_domain}
+      controlPlane: false
+      disableSearchDomain: true
+      installDiskSelector:
+        size: <= 50GB
+      nameservers:
+        - 10.0.0.4
+      networkInterfaces:
+        # 1G Internal Port
+        - deviceSelector:
+            driver: bcmgenet
+          dhcp: false
+          vlans:
+            - vlanId: 2002
+              dhcp: true
+        # 2.5G PICe Port
+        - deviceSelector:
+            # Talos cant detect MAC address at boot, so it assigns a random one.
+            # Using pciID to get a consistant naming scheme
+            pciID: 10EC:8125
+          dhcp: false
+          mtu: 9000
+          dhcpOptions:
+            routeMetric: 4096
+          vlans:
+            - vlanId: 2040
+              dhcp: true
+              mtu: 9000
+              dhcpOptions:
+                routeMetric: 2048
+
+    - hostname: work7.cluster-2.${secret_domain}
+      ipAddress: work7.cluster-2.${secret_domain}
+      controlPlane: false
+      disableSearchDomain: true
+      installDiskSelector:
+        size: <= 50GB
+      nameservers:
+        - 10.0.0.4
+      networkInterfaces:
+        # 1G Internal Port
+        - deviceSelector:
+            driver: bcmgenet
+          dhcp: false
+          vlans:
+            - vlanId: 2002
+              dhcp: true
+        # 2.5G PICe Port
+        - deviceSelector:
+            # Talos cant detect MAC address at boot, so it assigns a random one.
+            # Using pciID to get a consistant naming scheme
+            pciID: 10EC:8125
+          dhcp: false
+          mtu: 9000
+          dhcpOptions:
+            routeMetric: 4096
+          vlans:
+            - vlanId: 2040
+              dhcp: true
+              mtu: 9000
+              dhcpOptions:
+                routeMetric: 2048
+
+    - hostname: work8.cluster-2.${secret_domain}
+      ipAddress: work8.cluster-2.${secret_domain}
+      controlPlane: false
+      disableSearchDomain: true
+      installDiskSelector:
+        size: <= 50GB
+      nameservers:
+        - 10.0.0.4
+      networkInterfaces:
+        # 1G Internal Port
+        - deviceSelector:
+            driver: bcmgenet
+          dhcp: false
+          vlans:
+            - vlanId: 2002
+              dhcp: true
+        # 2.5G PICe Port
+        - deviceSelector:
+            # Talos cant detect MAC address at boot, so it assigns a random one.
+            # Using pciID to get a consistant naming scheme
+            pciID: 10EC:8125
+          dhcp: false
+          mtu: 9000
+          dhcpOptions:
+            routeMetric: 4096
+          vlans:
+            - vlanId: 2040
+              dhcp: true
+              mtu: 9000
+              dhcpOptions:
+                routeMetric: 2048
 
 controlPlane:
   patches:
+  # To get consistent naming for interfaces
+    - |-
+      - op: add
+        path: /machine/install/extraKernelArgs
+        value:
+          - net.ifnames=0
     # Disable search domain everywhere
     - |-
       machine:
@@ -281,6 +482,12 @@ controlPlane:
 
 worker:
   patches:
+  # To get consistent naming for interfaces
+    - |-
+      - op: add
+        path: /machine/install/extraKernelArgs
+        value:
+          - net.ifnames=0
     # Kubelet configuration
     - |-
       machine:

@@ -1,0 +1,19 @@
+data_dir: /vector-data-dir
+
+api:
+  enabled: false
+
+# Sources
+sources:
+  kubernetes_logs:
+    type: kubernetes_logs
+
+# Sinks
+sinks:
+  kubernetes_sink:
+    type: vector
+    compression: true
+    inputs:
+      - kubernetes_logs
+    address: "vector-aggregator.system-monitoring.svc.cluster.local:6000"
+    version: "2"

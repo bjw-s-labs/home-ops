@@ -1,0 +1,253 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: rook-ceph-cluster
+  namespace: rook-ceph
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: rook-ceph-cluster
+      version: v1.13.0
+      sourceRef:
+        kind: HelmRepository
+        name: rook-ceph-charts
+        namespace: flux-system
+  values:
+    toolbox:
+      enabled: false
+
+    monitoring:
+      enabled: true
+
+    # Times are in UTC
+    configOverride: |
+      [global]
+      bdev_enable_discard = true
+      bdev_async_discard = true
+
+    cephClusterSpec:
+      cephVersion:
+        image: quay.io/ceph/ceph:v18.2.0
+
+    network:
+      addressRanges:
+        public:
+          - "10.200.40.0/24"
+        cluster:
+          - "10.200.2.0/24"
+
+      mgr:
+        count: 3
+
+      mon:
+        count: 3
+
+      dashboard:
+        enabled: true
+        urlPrefix: /
+
+      resources:
+        mgr:
+          limits:
+            cpu: "2000m"
+            memory: "2Gi"
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+        mon:
+          limits:
+            cpu: "2000m"
+            memory: "2Gi"
+          requests:
+            cpu: "1000m"
+            memory: "1Gi"
+        osd:
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+          requests:
+            cpu: "1000m"
+            memory: "2Gi"
+        prepareosd:
+          limits:
+            cpu: "2000m"
+            memory: "7000Mi"
+          requests:
+            cpu: "500m"
+            memory: "1000Mi"
+        mgr-sidecar:
+          limits:
+            cpu: "500m"
+            memory: "100Mi"
+          requests:
+            cpu: "100m"
+            memory: "40Mi"
+        crashcollector:
+          limits:
+            cpu: "500m"
+            memory: "60Mi"
+          requests:
+            cpu: "100m"
+            memory: "60Mi"
+        logcollector:
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+          requests:
+            cpu: "100m"
+            memory: "100Mi"
+        cleanup:
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+          requests:
+            cpu: "500m"
+            memory: "100Mi"
+
+      storage:
+        useAllNodes: false
+        useAllDevices: false
+        config:
+          osdsPerDevice: "1"
+        nodes:
+          - name: "work1"
+            metadataDevice: "sda"
+            devices:
+              - name: "sdb"
+          - name: "work2"
+            metadataDevice: "sda"
+            devices:
+              - name: "sdb"
+          - name: "work3"
+            metadataDevice: "sda"
+            devices:
+              - name: "sdb"
+
+    ingress:
+      dashboard:
+        ingressClassName: "internal-nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns/is-public: "false"
+          # external-dns.alpha.kubernetes.io/target: ${CLOUDFLARE_TUNNEL_ID}.cfargotunnel.com
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+        host:
+          name: "rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          path: "/"
+        tls:
+          - secretName: tls.rook-ceph
+            hosts:
+              - "rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+
+    cephBlockPools:
+      - name: hdd-ec
+        spec:
+          failureDomain: host
+          deviceClass: hdd
+          enableRBDStats: true
+          erasureCoded:
+            dataChunks: 6
+            codingChunks: 2
+        storageClass:
+          enabled: true
+          name: ceph-block
+          isDefault: false
+          reclaimPolicy: Delete
+          allowVolumeExpansion: true
+          mountOptions:
+            - discard
+          parameters:
+            imageFormat: "2"
+            imageFeatures: layering
+            csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+            csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+            csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+            csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+            csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+            csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+            csi.storage.k8s.io/fstype: ext4
+
+    cephBlockPoolsVolumeSnapshotClass:
+      enabled: true
+      name: csi-ceph-blockpool
+      isDefault: false
+      deletionPolicy: Delete
+
+    cephFileSystems:
+      - name: cephfs-hdd
+        spec:
+          deviceClass: hdd
+          metadataPool:
+            replicated:
+              size: 3
+          # For erasure coded pools, we have to create a replicated pool as the default data pool and an erasure-coded pool as a secondary pool.
+          dataPools:
+            - name: default
+              failureDomain: host
+              replicated:
+                size: 3
+            - name: erasurecoded
+              failureDomain: host
+              erasureCoded:
+                dataChunks: 6
+                codingChunks: 2
+          metadataServer:
+            activeCount: 3
+            activeStandby: true
+        storageClass:
+          enabled: true
+          isDefault: false
+          name: ceph-filesystem
+          reclaimPolicy: Delete
+          allowVolumeExpansion: true
+          mountOptions:
+            - discard
+          parameters:
+            csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
+            csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+            csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
+            csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+            csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
+            csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+            csi.storage.k8s.io/fstype: ext4
+
+    cephFileSystemVolumeSnapshotClass:
+      enabled: true
+      name: csi-ceph-filesystem
+      isDefault: false
+      deletionPolicy: Delete
+
+#     cephObjectStores:
+#       - name: ceph-objectstore
+#         spec:
+#           metadataPool:
+#             failureDomain: host
+#             replicated:
+#               size: 3
+#           dataPool:
+#             failureDomain: host
+#             erasureCoded:
+#               dataChunks: 2
+#               codingChunks: 1
+#           preservePoolsOnDelete: true
+#           gateway:
+#             port: 80
+#             # resources:
+#             #   requests:
+#             #     cpu: 1000m
+#             #     memory: 1Gi
+#             #   limits:
+#             #     memory: 2Gi
+#             instances: 1
+#           healthCheck:
+#             bucket:
+#               interval: 60s
+#         storageClass:
+#           enabled: true
+#           name: ceph-bucket
+#           reclaimPolicy: Delete
+#           parameters:
+#             region: us-east-1
+# 

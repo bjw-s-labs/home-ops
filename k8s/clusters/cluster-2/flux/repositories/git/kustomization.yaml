@@ -1,0 +1,13 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../../../../global/flux/repositories/git
+  - cilium.yaml
+  - external-snapshotter.yaml
+  - home-ops.yaml
+  - kube-prometheus-stack.yaml
+  - rook-ceph.yaml
+  - local-path-provisioner.yaml
+  - kubernetes-csi-addons.yaml

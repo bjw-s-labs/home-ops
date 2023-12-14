@@ -1,0 +1,22 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: home-ops
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  ref:
+    branch: main
+  url: https://github.com/dcplaya/home-ops.git
+  ignore: |
+    # exclude all
+    /*
+    # include charts dirs
+    !/k8s/charts
+    # include gitops dirs
+    !/k8s/global
+    !/k8s/clusters/cluster-2
+    # exclude files from gitops dirs
+    /k8s/**/*.md
+    /k8s/**/*.tmpl

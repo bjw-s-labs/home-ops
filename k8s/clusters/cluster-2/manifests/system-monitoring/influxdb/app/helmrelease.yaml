@@ -1,0 +1,72 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: &app influxdb
+  namespace: system-monitoring
+spec:
+  interval: 10m
+  chart:
+    spec:
+      chart: influxdb2
+      version: 2.1.1
+      sourceRef:
+        kind: HelmRepository
+        name: influxdata-charts
+        namespace: flux-system
+      interval: 60m
+  # dependsOn:
+  #   - name: rook-ceph-cluster
+  #     namespace: rook-ceph
+  # Values link: https://github.com/influxdata/helm-charts/blob/master/charts/influxdb2/values.yaml
+  values:
+    image:
+      repository: influxdb
+      tag: 2.7.3-alpine
+
+    pdb:
+      create: false
+    # service:
+    #   type: LoadBalancer
+    #   annotations:
+    #     metallb.universe.tf/loadBalancerIPs: |-
+    #       ${LB_HASS_CODE_SERVER}
+
+    env:
+      - name: TZ
+        value: "${TZ}"
+
+    resources:
+      limits:
+        memory: 1024Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+    adminUser:
+      existingSecret: influxdb-auth
+      organization: "homelab"
+      user: "admin"
+      retention_policy: "60d"
+      bucket: "default"
+      # password: ${INFLUXDB_PASSWORD}
+
+    persistence:
+      enabled: true
+      useExisting: true
+      name: influxdb-data
+
+    ingress:
+      enabled: true
+      className: "traefik"
+      hostname: influx.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+      secretName: tls.influxdb
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        external-dns/is-public: "false"
+        # external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
+      path: /
+      tls: true

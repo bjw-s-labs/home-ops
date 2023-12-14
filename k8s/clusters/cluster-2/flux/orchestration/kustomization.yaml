@@ -1,0 +1,14 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./pv.yaml
+  - ./cert-manager.yaml
+  # - ./flux-system.yaml    # Only deploys prometheus monitoring stuff
+  - ./kube-system.yaml
+  - ./network.yaml
+  - ./rook-ceph.yaml
+  - ./system-monitoring.yaml
+  - ./system.yaml
+  - ./volsync.yaml
