@@ -108,10 +108,8 @@ spec:
 
     ingress:
       main:
-        enabled: false # Disabled because personal accounts can't set account-wide webhooks :(
-        annotations:
-          external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
-        className: "external-nginx"
+        enabled: true # Disabled because personal accounts can't set account-wide webhooks :(
+        className: "internal-nginx"
         hosts:
           - host: "${HOSTNAME}"
             paths:
