@@ -1,7 +1,7 @@
 clusterName: cluster-2
 
-talosVersion: v1.5.5
-kubernetesVersion: v1.28.3
+talosVersion: v1.6.0
+kubernetesVersion: v1.29.0
 
 # Image URL rendered on https://factory.talos.dev
 # customization:
@@ -465,7 +465,7 @@ controlPlane:
       machine:
         kubelet:
           extraArgs:
-            feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,NewVolumeManagerReconstruction=false
+            feature-gates: GracefulNodeShutdown=true,NewVolumeManagerReconstruction=false
             rotate-server-certificates: "true"
           extraConfig:
             maxPods: 150
@@ -493,7 +493,7 @@ worker:
       machine:
         kubelet:
           extraArgs:
-            feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,NewVolumeManagerReconstruction=false
+            feature-gates: GracefulNodeShutdown=true,NewVolumeManagerReconstruction=false
             rotate-server-certificates: "true"
           extraConfig:
             maxPods: 150
