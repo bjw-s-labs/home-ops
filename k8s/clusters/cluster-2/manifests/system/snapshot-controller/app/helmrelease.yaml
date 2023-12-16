@@ -4,7 +4,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: snapshot-controller
-  namespace: rook-ceph-external
+  namespace: system
 spec:
   interval: 15m
   chart:
@@ -30,25 +30,22 @@ spec:
     keepHistory: false
   values:
     controller:
+      serviceMonitor:
+        create: true
       replicaCount: 3
-      volumeSnapshotClasses:
-        - name: csi-rbdplugin-snapclass
-          driver: rook-ceph.rbd.csi.ceph.com
-          annotations:
-            snapshot.storage.kubernetes.io/is-default-class: "true"
-          parameters:
-            clusterID: rook-ceph-external
-            csi.storage.k8s.io/snapshotter-secret-name: rook-csi-rbd-provisioner
-            csi.storage.k8s.io/snapshotter-secret-namespace: rook-ceph-external
-          deletionPolicy: Delete
-        # - name: csi-cephfsplugin-snapclass
-        #   driver: rook-ceph.cephfs.csi.ceph.com
-        #   annotations:
-        #     snapshot.storage.kubernetes.io/is-default-class: "false"
-        #   parameters:
-        #     clusterID: rook-ceph
-        #     csi.storage.k8s.io/snapshotter-secret-name: rook-csi-cephfs-provisioner
-        #     csi.storage.k8s.io/snapshotter-secret-namespace: rook-ceph-external
-        #   deletionPolicy: Delete
-      # serviceMonitor:
-      #   create: true
+    webhook:
+      enabled: true
+      tls:
+        certManagerIssuerRef:
+          name: snapshot-controller-webhook-ca
+          kind: Issuer
+      # volumeSnapshotClasses:
+      #   - name: csi-rbdplugin-snapclass
+      #     driver: rook-ceph.rbd.csi.ceph.com
+      #     annotations:
+      #       snapshot.storage.kubernetes.io/is-default-class: "true"
+      #     parameters:
+      #       clusterID: rook-ceph
+      #       csi.storage.k8s.io/snapshotter-secret-name: rook-csi-rbd-provisioner
+      #       csi.storage.k8s.io/snapshotter-secret-namespace: rook-ceph
+      #     deletionPolicy: Delete
