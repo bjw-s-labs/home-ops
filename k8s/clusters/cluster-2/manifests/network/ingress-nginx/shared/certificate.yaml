@@ -1,0 +1,14 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "elcarpenter.com"
+spec:
+  secretName: "elcarpenter-com-tls"
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: "elcarpenter.com"
+  dnsNames:
+    - "elcarpenter.com"
+    - "*.elcarpenter.com"

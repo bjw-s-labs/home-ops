@@ -3,9 +3,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  # Pre Flux-Kustomizations
   - namespace.yaml
+
+  # Flux-Kustomizations  
   # - ./multus/ks.yaml
   - ./k8s-gateway/ks.yaml
   - ./external-dns/ks.yaml
-  # - ./cloudflared/ks.yaml
-  # - ./cloudflare-ddns/ks.yaml
+  - ./ingress-nginx/ks.yaml
