@@ -2,7 +2,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-workloads-vector-geoipupdate
+  name: vector-geoipupdate
   namespace: flux-system
   labels:
     substitution.flux.home.arpa/enabled: "true"
@@ -10,7 +10,7 @@ spec:
   path: ./k8s/clusters/cluster-2/manifests/system-monitoring/vector/geoipupdate
   prune: true
   # dependsOn:
-  #   - name: cluster-workloads-external-secrets-stores
+  #   - name: external-secrets-stores
   sourceRef:
     kind: GitRepository
     name: home-ops
@@ -27,7 +27,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-workloads-vector-aggregator
+  name: vector-aggregator
   namespace: flux-system
   labels:
     substitution.flux.home.arpa/enabled: "true"
@@ -35,8 +35,8 @@ spec:
   path: ./k8s/clusters/cluster-2/manifests/system-monitoring/vector/aggregator
   prune: true
   dependsOn:
-    - name: cluster-workloads-loki
-    - name: cluster-workloads-vector-geoipupdate
+    - name: loki
+    - name: vector-geoipupdate
   sourceRef:
     kind: GitRepository
     name: home-ops
@@ -53,7 +53,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-workloads-vector-agent
+  name: vector-agent
   namespace: flux-system
   labels:
     substitution.flux.home.arpa/enabled: "true"
@@ -61,7 +61,7 @@ spec:
   path: ./k8s/clusters/cluster-2/manifests/system-monitoring/vector/agent
   prune: true
   dependsOn:
-    - name: cluster-workloads-vector-aggregator
+    - name: vector-aggregator
   sourceRef:
     kind: GitRepository
     name: home-ops
