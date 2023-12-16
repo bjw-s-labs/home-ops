@@ -126,20 +126,16 @@ spec:
               - name: "sdb"
 
     ingress:
+      ingressClassName: "internal-nginx"
       dashboard:
-        ingressClassName: "internal-nginx"
         annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns/is-public: "false"
-          # external-dns.alpha.kubernetes.io/target: ${CLOUDFLARE_TUNNEL_ID}.cfargotunnel.com
-          external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
         host:
-          name: "rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          name: &host "rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
           path: "/"
         tls:
-          - secretName: tls.rook-ceph
-            hosts:
-              - "rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - hosts:
+              - *host
 
     cephBlockPools:
       - name: hdd-ec
