@@ -36,23 +36,20 @@ spec:
             key: apikey
     podAnnotations:
       secret.reloader.stakater.com/reload: externaldns-powerdns-secrets
-    extraArgs:
-      # - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
-      # - --crd-source-kind=DNSEndpoint
-      # - --cloudflare-proxied
-      - --annotation-filter=external-dns/powerdns in (true)
-      # - --ingress-class=traefik
+    # extraArgs:
+    #   - --annotation-filter=external-dns/powerdns in (true)
+    #   # - --ingress-class=traefik
     policy: sync
     provider: pdns
     sources:
       - ingress
       - service
-    txtPrefix: "ceph."
-    txtOwnerId: "ceph"
+    txtPrefix: "${CLUSTER_NAME}."
+    txtOwnerId: "${CLUSTER_NAME}"
     domainFilters:
       - "${INGRESS_DOMAIN}"
     # serviceMonitor:
-    #   enabled: true
+    #   enabled: true  # enable after prometheus is installed
     resources:
       requests:
         memory: 100Mi
