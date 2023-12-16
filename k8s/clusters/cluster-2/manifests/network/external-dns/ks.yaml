@@ -1,10 +1,15 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-workloads-externaldns-shared
+  name: &appname externaldns-shared
   namespace: flux-system
 spec:
+  targetNamespace: network
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
   path: ./k8s/clusters/cluster-2/manifests/network/external-dns/shared
   prune: true
@@ -13,17 +18,21 @@ spec:
     name: home-ops
   wait: true
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/kustomization_v1beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-workloads-externaldns-external
+  name: &appname externaldns-external
   namespace: flux-system
 spec:
-  path: ./k8s/clusters/cluster-2/manifests/network/external-dns/external
+  targetNamespace: network
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
+  path: ./k8s/clusters/cluster-2/manifests/network/external-dns/external/app
   prune: true
   dependsOn:
-    - name: cluster-workloads-externaldns-shared
+    - name: externaldns-shared
   sourceRef:
     kind: GitRepository
     name: home-ops
@@ -36,17 +45,21 @@ spec:
   retryInterval: 1m
   timeout: 3m
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/kustomization_v1beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-workloads-externaldns-powerdns
+  name: &appname externaldns-powerdns
   namespace: flux-system
 spec:
+  targetNamespace: network
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   path: ./k8s/clusters/cluster-2/manifests/network/external-dns/powerdns
   prune: true
   dependsOn:
-    - name: cluster-workloads-externaldns-shared
+    - name: externaldns-shared
   sourceRef:
     kind: GitRepository
     name: home-ops
