@@ -12,36 +12,3 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1
-# kind: Kustomization
-# metadata:
-#   name: cert-manager-certmanager
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: cert-manager-namespace
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-2/manifests/cert-manager/cert-manager/base"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1
-# kind: Kustomization
-# metadata:
-#   name: cert-manager-certmanager-config
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: cert-manager-namespace
-#     - name: cert-manager-certmanager
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-2/manifests/cert-manager/cert-manager/config"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: home-ops
