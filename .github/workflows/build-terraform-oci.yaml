@@ -17,14 +17,17 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        uses: actions/checkout@v4
 
-      - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
+      - name: Install Nix
+        uses: cachix/install-nix-action@v24
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Tools
-        run: |
-          brew install jo
+      - name: Switch to Nix devShell
+        uses: nicknovitski/nix-develop@v1.1.0
+        with:
+          arguments: "./.ci"
 
       - name: Get changed files
         id: changed-files
