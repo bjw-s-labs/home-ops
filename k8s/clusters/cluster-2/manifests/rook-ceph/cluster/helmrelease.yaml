@@ -110,14 +110,25 @@ spec:
         config:
           osdsPerDevice: "1"
         nodes:
+          # work1 node
           - name: "work1"
+            metadataDevice: "sda"
+            devices:
+              - name: "sdb"
+          - name: "work1"
+            metadataDevice: "sda"
+            devices:
+              - name: "sdc"
+          # work2 node
+          - name: "work2"
             metadataDevice: "sda"
             devices:
               - name: "sdb"
           - name: "work2"
             metadataDevice: "sda"
             devices:
-              - name: "sdb"
+              - name: "sdc"
+          # work3 node
           - name: "work3"
             metadataDevice: "sda"
             devices:
