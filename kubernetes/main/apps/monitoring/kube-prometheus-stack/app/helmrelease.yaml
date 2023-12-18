@@ -97,12 +97,6 @@ spec:
 
     grafana:
       enabled: false
-      forceDeployDashboards: true
-      sidecar:
-        dashboards:
-          multicluster:
-            etcd:
-              enabled: true
 
     ###
     ### Prometheus operator values
@@ -178,7 +172,7 @@ spec:
           image: quay.io/thanos/thanos:v0.33.0
           objectStorageConfig:
             existingSecret:
-              name: thanos-objstore-secret
+              name: kube-prometheus-stack-secret
               key: objstore.yml
           # renovate: datasource=docker depName=quay.io/thanos/thanos
           version: "0.33.0"
@@ -189,19 +183,3 @@ spec:
 
       thanosServiceMonitor:
         enabled: true
-
-  postRenderers:
-    - kustomize:
-        patches:
-          - target:
-              version: v1
-              kind: ConfigMap
-              labelSelector: grafana_dashboard in (1)
-            patch: |-
-              apiVersion: v1
-              kind: ConfigMap
-              metadata:
-                name: not-used
-                namespace: not-used
-                annotations:
-                  grafana_folder: Kubernetes
