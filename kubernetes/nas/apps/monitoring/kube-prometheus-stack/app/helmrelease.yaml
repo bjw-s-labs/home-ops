@@ -129,6 +129,10 @@ spec:
               - *host_prometheus
 
       prometheusSpec:
+        additionalAlertManagerConfigs:
+          - static_configs:
+              - targets:
+                  - alertmanager.bjw-s.dev
         enableFeatures:
           - auto-gomaxprocs
           - memory-snapshot-on-shutdown
