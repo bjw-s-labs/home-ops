@@ -123,7 +123,7 @@ spec:
         ingressClassName: internal-nginx
         pathType: Prefix
         hosts:
-          - &host_prometheus prometheus-nas.bjw-s.dev
+          - &host_prometheus prometheus-${CLUSTER_NAME}.bjw-s.dev
         tls:
           - hosts:
               - *host_prometheus
@@ -138,7 +138,7 @@ spec:
           - memory-snapshot-on-shutdown
           - new-service-discovery-manager
         externalLabels:
-          cluster: nas
+          cluster: ${CLUSTER_NAME}
         podMonitorSelectorNilUsesHelmValues: false
         probeSelectorNilUsesHelmValues: false
         replicas: 1
@@ -174,7 +174,7 @@ spec:
         enabled: true
         type: LoadBalancer
         annotations:
-          external-dns.alpha.kubernetes.io/hostname: "thanos-nas-int.bjw-s.dev"
+          external-dns.alpha.kubernetes.io/hostname: "thanos-svc-${CLUSTER_NAME}.bjw-s.dev"
         externalTrafficPolicy: Cluster
 
       thanosServiceMonitor:

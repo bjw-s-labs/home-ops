@@ -128,7 +128,7 @@ spec:
         ingressClassName: internal-nginx
         pathType: Prefix
         hosts:
-          - &host_prometheus prometheus.bjw-s.dev
+          - &host_prometheus prometheus-${CLUSTER_NAME}.bjw-s.dev
         tls:
           - hosts:
               - *host_prometheus
@@ -145,7 +145,7 @@ spec:
           - memory-snapshot-on-shutdown
           - new-service-discovery-manager
         externalLabels:
-          cluster: main
+          cluster: ${CLUSTER_NAME}
         podMonitorSelectorNilUsesHelmValues: false
         probeSelectorNilUsesHelmValues: false
         replicas: 1
