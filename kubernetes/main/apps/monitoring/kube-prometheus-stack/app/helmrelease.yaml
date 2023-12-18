@@ -81,6 +81,8 @@ spec:
               replacement: $1
               sourceLabels: ["__meta_kubernetes_pod_node_name"]
               targetLabel: kubernetes_node
+            - targetLabel: kubernetes_cluster
+              replacement: "${CLUSTER_NAME}"
       resources:
         requests:
           cpu: 15m
