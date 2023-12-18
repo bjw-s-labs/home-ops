@@ -27,7 +27,7 @@ spec:
         sidecarsService: kube-prometheus-stack-thanos-discovery
         sidecarsNamespace: monitoring
       stores:
-        - thanos-nas-int.bjw-s.dev:10901
+        - thanos-svc-nas.bjw-s.dev:10901
       replicaLabels:
         - "__replica__" # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.replicaExternalLabelName`
       resources:
@@ -59,8 +59,8 @@ spec:
       extraFlags:
         - "--compact.concurrency=4"
         - --delete-delay=30m
-      retentionResolutionRaw: 30d
-      retentionResolution5m: 60d
+      retentionResolutionRaw: 14d
+      retentionResolution5m: 30d
       retentionResolution1h: 90d
       resources:
         requests:
@@ -90,7 +90,7 @@ spec:
       enabled: true
       alertmanagers:
         - http://alertmanager.monitoring.svc.cluster.local:9093
-      clusterName: main # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.externalLabels.cluster`
+      clusterName: ${CLUSTER_NAME} # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.externalLabels.cluster`
       config: |-
         groups:
           - name: "PrometheusWatcher"
