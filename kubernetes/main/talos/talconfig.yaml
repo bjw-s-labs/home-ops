@@ -4,7 +4,7 @@ clusterName: ${clusterName}
 endpoint: "https://${clusterName}.${clusterDNSSuffix}:6443"
 
 talosVersion: v1.6.0
-kubernetesVersion: 1.28.4
+kubernetesVersion: 1.29.0
 
 cniConfig:
   name: none
@@ -220,7 +220,7 @@ controlPlane:
       machine:
         kubelet:
           extraArgs:
-            feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,NewVolumeManagerReconstruction=false
+            feature-gates: GracefulNodeShutdown=true,NewVolumeManagerReconstruction=false
             rotate-server-certificates: "true"
           extraConfig:
             maxPods: 150
