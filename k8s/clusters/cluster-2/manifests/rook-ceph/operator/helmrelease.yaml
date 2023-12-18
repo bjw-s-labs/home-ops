@@ -35,11 +35,7 @@ spec:
         - effect: "NoSchedule"
           operator: "Exists"
       pluginNodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-          - matchExpressions:
-            - key: ceph-osd
-              operator: DoesNotExist
+        - ceph-csi=true
 
     monitoring:
       enabled: true
