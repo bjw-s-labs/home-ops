@@ -135,33 +135,33 @@ spec:
           - hosts:
               - *host
 
-    cephBlockPools:
-      - name: hdd-ec
-        spec:
-          failureDomain: host
-          deviceClass: hdd
-          enableRBDStats: true
-          erasureCoded:
-            dataChunks: 6
-            codingChunks: 2
-        storageClass:
-          enabled: true
-          name: ceph-block
-          isDefault: false
-          reclaimPolicy: Delete
-          allowVolumeExpansion: true
-          mountOptions:
-            - discard
-          parameters:
-            imageFormat: "2"
-            imageFeatures: layering
-            csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
-            csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
-            csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
-            csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
-            csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
-            csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
-            csi.storage.k8s.io/fstype: ext4
+#     cephBlockPools:
+#       - name: hdd-ec
+#         spec:
+#           failureDomain: host
+#           deviceClass: hdd
+#           enableRBDStats: true
+#           erasureCoded:
+#             dataChunks: 6
+#             codingChunks: 2
+#         storageClass:
+#           enabled: true
+#           name: ceph-block
+#           isDefault: false
+#           reclaimPolicy: Delete
+#           allowVolumeExpansion: true
+#           mountOptions:
+#             - discard
+#           parameters:
+#             imageFormat: "2"
+#             imageFeatures: layering
+#             csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+#             csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+#             csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+#             csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+#             csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+#             csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+#             csi.storage.k8s.io/fstype: ext4
 
     cephBlockPoolsVolumeSnapshotClass:
       enabled: true
