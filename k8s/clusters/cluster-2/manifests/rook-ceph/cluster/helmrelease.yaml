@@ -169,43 +169,43 @@ spec:
       isDefault: false
       deletionPolicy: Delete
 
-    cephFileSystems:
-      - name: cephfs-hdd
-        spec:
-          deviceClass: hdd
-          metadataPool:
-            replicated:
-              size: 3
-          # For erasure coded pools, we have to create a replicated pool as the default data pool and an erasure-coded pool as a secondary pool.
-          dataPools:
-            - name: default
-              failureDomain: host
-              replicated:
-                size: 3
-            - name: erasurecoded
-              failureDomain: host
-              erasureCoded:
-                dataChunks: 6
-                codingChunks: 2
-          metadataServer:
-            activeCount: 3
-            activeStandby: true
-        storageClass:
-          enabled: true
-          isDefault: false
-          name: ceph-filesystem
-          reclaimPolicy: Delete
-          allowVolumeExpansion: true
-          mountOptions:
-            - discard
-          parameters:
-            csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
-            csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
-            csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
-            csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
-            csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
-            csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
-            csi.storage.k8s.io/fstype: ext4
+#     cephFileSystems:
+#       - name: cephfs-hdd
+#         spec:
+#           deviceClass: hdd
+#           metadataPool:
+#             replicated:
+#               size: 3
+#           # For erasure coded pools, we have to create a replicated pool as the default data pool and an erasure-coded pool as a secondary pool.
+#           dataPools:
+#             - name: default
+#               failureDomain: host
+#               replicated:
+#                 size: 3
+#             - name: erasurecoded
+#               failureDomain: host
+#               erasureCoded:
+#                 dataChunks: 6
+#                 codingChunks: 2
+#           metadataServer:
+#             activeCount: 3
+#             activeStandby: true
+#         storageClass:
+#           enabled: true
+#           isDefault: false
+#           name: ceph-filesystem
+#           reclaimPolicy: Delete
+#           allowVolumeExpansion: true
+#           mountOptions:
+#             - discard
+#           parameters:
+#             csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
+#             csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+#             csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
+#             csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+#             csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
+#             csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+#             csi.storage.k8s.io/fstype: ext4
 
     cephFileSystemVolumeSnapshotClass:
       enabled: true
