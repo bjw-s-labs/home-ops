@@ -157,7 +157,7 @@ spec:
           image: quay.io/thanos/thanos:v0.33.0
           objectStorageConfig:
             existingSecret:
-              name: thanos-objstore-secret
+              name: kube-prometheus-stack-secret
               key: objstore.yml
           # renovate: datasource=docker depName=quay.io/thanos/thanos
           version: "0.33.0"
@@ -165,6 +165,13 @@ spec:
 
       thanosService:
         enabled: true
+
+      thanosServiceExternal:
+        enabled: true
+        type: LoadBalancer
+        annotations:
+          external-dns.alpha.kubernetes.io/hostname: "thanos-nas-int.bjw-s.dev"
+        externalTrafficPolicy: Cluster
 
       thanosServiceMonitor:
         enabled: true
