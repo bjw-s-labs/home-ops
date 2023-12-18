@@ -1,5 +1,5 @@
 clusterName: cluster-1
-talosVersion: v1.5.5
+talosVersion: v1.6.0
 kubernetesVersion: v1.28.3
 endpoint: https://cluster-1.${secret_domain}:6443
 # domain: cluster-1.${secret_domain}
@@ -64,10 +64,12 @@ nodes:
         - 10.0.0.4
       networkInterfaces:
         - deviceSelector:
+            driver: virtio_net
             hardwareAddr: "72:f2:0d:00:ac:b4"
           dhcp: true
           mtu: 9000
         - deviceSelector:
+            driver: virtio_net
             hardwareAddr: "da:29:dc:d9:75:f7"
           dhcp: false
           mtu: 9000
@@ -92,10 +94,12 @@ nodes:
         - 10.0.0.4
       networkInterfaces:
         - deviceSelector:
+            driver: virtio_net
             hardwareAddr: "b2:85:37:24:ef:85"
           dhcp: true
           mtu: 9000
         - deviceSelector:
+            driver: virtio_net
             hardwareAddr: "32:30:76:5d:f8:76"
           dhcp: false
           mtu: 9000
@@ -120,10 +124,12 @@ nodes:
         - 10.0.0.4
       networkInterfaces:
         - deviceSelector:
+            driver: virtio_net
             hardwareAddr: "8e:ee:0b:19:f4:94"
           dhcp: true
           mtu: 9000
         - deviceSelector:
+            driver: virtio_net
             hardwareAddr: "ce:26:91:bd:80:d8"
           dhcp: false
           mtu: 9000
