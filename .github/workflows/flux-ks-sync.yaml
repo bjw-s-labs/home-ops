@@ -1,0 +1,70 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: "Flux Kustomization Sync"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/flux-ks-sync.yaml
+      - kubernetes/main/**
+      - kubernetes/nas/**
+
+jobs:
+  sync:
+    name: Flux Kustomization Sync
+    runs-on:
+      - arc-runner-set-home-ops
+    environment: production
+    strategy:
+      matrix:
+        cluster:
+          - main
+          - nas
+    steps:
+      - name: Generate Token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app_id: ${{ secrets.BJWS_APP_ID }}
+          private_key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: "${{ steps.app-token.outputs.token }}"
+
+      - name: Install OS Deps
+        shell: bash
+        run: |
+          sudo apt-get update && sudo apt-get install -y curl git xz-utils
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v24
+        with:
+          github_access_token: "${{ steps.app-token.outputs.token }}"
+
+      - name: Switch to Nix devShell
+        uses: nicknovitski/nix-develop@v1.1.0
+        with:
+          arguments: "./.ci"
+
+      - name: Write kubeconfig
+        id: kubeconfig
+        uses: timheuer/base64-to-file@v1
+        with:
+          encodedString: "${{ secrets.KUBECONFIG }}"
+          fileName: kubeconfig
+
+      - name: Sync Kustomization
+        env:
+          KUBECONFIG: "${{ steps.kubeconfig.outputs.filePath }}"
+        shell: bash
+        run: |
+          flux \
+            --context "${{ matrix.cluster }}" \
+            --namespace flux-system \
+            reconcile ks cluster \
+            --with-source
