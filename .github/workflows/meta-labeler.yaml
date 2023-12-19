@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Generate Token
-        uses: tibdex/github-app-token@v2
-        id: generate-token
+        uses: actions/create-github-app-token@v1
+        id: app-token
         with:
           app-id: ${{ secrets.BJWS_APP_ID }}
           private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
@@ -21,5 +21,5 @@ jobs:
       - name: Labeler
         uses: actions/labeler@v5
         with:
-          repo-token: "${{ steps.generate-token.outputs.token }}"
+          repo-token: "${{ steps.app-token.outputs.token }}"
           configuration-path: .github/labeler.yaml
