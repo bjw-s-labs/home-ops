@@ -6,7 +6,8 @@ on:
     branches:
       - main
     paths:
-      - kubernetes/**.yaml"
+      - .github/workflows/flux-diff.yaml
+      - kubernetes/**.yaml
 
 jobs:
   flux-diff:
@@ -18,7 +19,7 @@ jobs:
       matrix:
         path:
           - kubernetes/main
-          - kuebrnetes/nas
+          - kubernetes/nas
         resource:
           - helmrelease
           - kustomization
