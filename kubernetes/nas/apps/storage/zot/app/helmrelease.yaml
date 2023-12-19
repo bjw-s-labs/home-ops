@@ -36,6 +36,18 @@ spec:
             image:
               repository: ghcr.io/project-zot/zot-linux-amd64
               tag: v2.0.0
+            probes:
+              liveness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /v2/
+                    port: 5000
+                  initialDelaySeconds: 5
+              readiness: *probe
+              startup:
+                enabled: false
 
     service:
       main:
