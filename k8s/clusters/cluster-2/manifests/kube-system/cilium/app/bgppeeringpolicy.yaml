@@ -23,15 +23,15 @@ spec:
       neighbors:
         - peerAddress: "10.255.253.1/32"
           peerASN: 64514
-    - localASN: 64514
-      exportPodCIDR: true
-      # the "NotIn" operator makes all services anounced over BGP
-      serviceSelector:
-        matchExpressions:
-          - {key: allservices, operator: NotIn, values: ['will-match-and-announce-all-services']}
-      neighbors:
-        - peerAddress: "10.200.2.1/32"
-          peerASN: 64513
+    # - localASN: 64514
+    #   exportPodCIDR: true
+    #   # the "NotIn" operator makes all services anounced over BGP
+    #   serviceSelector:
+    #     matchExpressions:
+    #       - {key: allservices, operator: NotIn, values: ['will-match-and-announce-all-services']}
+    #   neighbors:
+    #     - peerAddress: "10.200.2.1/32"
+    #       peerASN: 64513
 ---
 apiVersion: "cilium.io/v2alpha1"
 kind: CiliumLoadBalancerIPPool
