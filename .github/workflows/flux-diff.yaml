@@ -109,9 +109,6 @@ jobs:
     name: Flux Diff successful
     runs-on: ubuntu-latest
     steps:
-      - name: Echo matrix status
-        run: echo "${{ toJSON(needs.*.result) }}"
-
       - name: Check matrix status
         if: >-
           ${{
