@@ -10,6 +10,10 @@ on:
       - .github/workflows/flux-hr-image-test.yaml
       - kubernetes/**/helmrelease.yaml
 
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   changed-files:
     name: Get Changed Files
@@ -88,7 +92,6 @@ jobs:
       - name: Test Images from Helm Release
         run: docker pull ${{ matrix.images }}
 
-  # Summarize matrix https://github.community/t/status-check-for-a-matrix-jobs/127354/7
   test-images-success:
     needs:
       - test-images
