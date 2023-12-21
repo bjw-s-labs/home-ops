@@ -23,7 +23,7 @@ jobs:
 
       - name: Install System Tools
         shell: bash
-        run: sudo apt-get -qq update && sudo apt-get -qq install --no-install-recommends -y jo
+        run: sudo apt-get -qq update && sudo apt-get -qq install --no-install-recommends -y curl git jo
 
       - name: Get changed files
         id: changed-files
@@ -66,6 +66,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ steps.app-token.outputs.token }}
+
+      - name: Install System Tools
+        shell: bash
+        run: sudo apt-get -qq update && sudo apt-get -qq install --no-install-recommends -y curl git
 
       - uses: jdx/rtx-action@v1
         with:
