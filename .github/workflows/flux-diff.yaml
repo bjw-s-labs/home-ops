@@ -109,7 +109,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Echo matrix status
-        run: echo "${{ needs.*.result }}"
+        run: echo "${{ toJSON(needs.*.result) }}"
 
       - name: Check matrix status
         if: >-
