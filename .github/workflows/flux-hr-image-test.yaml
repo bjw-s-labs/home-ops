@@ -6,9 +6,10 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - .github/workflows/flux-hr-image-test.yaml
-      - kubernetes/**/helmrelease.yaml
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
 
 jobs:
   changed-files:
@@ -47,6 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - changed-files
+    if: ${{ needs.changed-files.outputs.matrix != '[]' }}
     strategy:
       matrix:
         files: ${{ fromJSON(needs.changed-files.outputs.matrix) }}
@@ -79,6 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - "extract-images"
+    if: ${{ needs.extract-images.outputs.matrix != '[]' }}
     strategy:
       matrix:
         images: ${{ fromJSON(needs.extract-images.outputs.matrix) }}
@@ -88,7 +91,6 @@ jobs:
       - name: Test Images from Helm Release
         run: docker pull ${{ matrix.images }}
 
-  # Summarize matrix https://github.community/t/status-check-for-a-matrix-jobs/127354/7
   test-images-success:
     needs:
       - test-images
