@@ -12,6 +12,10 @@ on:
       - kubernetes/main/**
       - kubernetes/nas/**
 
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   sync:
     name: Flux Kustomization Sync
@@ -36,20 +40,13 @@ jobs:
         with:
           token: "${{ steps.app-token.outputs.token }}"
 
-      - name: Install OS Deps
-        shell: bash
-        run: |
-          sudo apt-get update && sudo apt-get install -y curl git xz-utils
-
-      - name: Install Nix
-        uses: cachix/install-nix-action@v24
+      - uses: jdx/rtx-action@v1
         with:
-          github_access_token: "${{ steps.app-token.outputs.token }}"
-
-      - name: Switch to Nix devShell
-        uses: nicknovitski/nix-develop@v1.1.0
-        with:
-          arguments: "./.ci"
+          install: true
+          cache: true
+          rtx_toml: |
+            [tools]
+            flux2 = "latest"
 
       - name: Write kubeconfig
         id: kubeconfig
