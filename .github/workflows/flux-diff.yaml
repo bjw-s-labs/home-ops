@@ -55,7 +55,7 @@ jobs:
       - changed-files
     permissions:
       pull-requests: write
-    if: ${{ needs.changed-files.outputs.matrix != [] }}
+    if: ${{ needs.changed-files.outputs.matrix != '[]' }}
     strategy:
       matrix:
         paths: ${{ fromJSON(needs.changed-files.outputs.matrix) }}
