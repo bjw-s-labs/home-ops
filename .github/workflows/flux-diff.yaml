@@ -69,6 +69,10 @@ jobs:
           app-id: ${{ secrets.BJWS_APP_ID }}
           private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
 
+      - name: Install System Tools
+        shell: bash
+        run: sudo apt-get -qq update && sudo apt-get -qq install --no-install-recommends -y curl git
+
       - uses: jdx/rtx-action@v1
         with:
           install: true
