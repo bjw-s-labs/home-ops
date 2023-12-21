@@ -55,6 +55,7 @@ jobs:
       - changed-files
     permissions:
       pull-requests: write
+    if: ${{ needs.changed-files.outputs.matrix != '[]' }}
     strategy:
       matrix:
         paths: ${{ fromJSON(needs.changed-files.outputs.matrix) }}
@@ -82,7 +83,7 @@ jobs:
             flux2 = "latest"
 
       - name: Diff Resources
-        uses: allenporter/flux-local/action/diff@3.2.0
+        uses: allenporter/flux-local/action/diff@4.0.0
         id: diff
         with:
           sources: home-ops-kubernetes
