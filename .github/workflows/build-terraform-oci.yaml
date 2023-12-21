@@ -1,33 +1,29 @@
 ---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: "Terraform: Build OCI artifacts"
 
-on: # yamllint disable-line rule:truthy
+on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - "infrastructure/terraform/**"
+      - .github/workflows/build-terraform-oci.yaml
+      - infrastructure/terraform/**
 
 jobs:
   changed-files:
     name: Generate matrix for building images
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Nix
-        uses: cachix/install-nix-action@v24
-        with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Switch to Nix devShell
-        uses: nicknovitski/nix-develop@v1.1.0
-        with:
-          arguments: "./.ci"
+      - name: Install System Tools
+        shell: bash
+        run: sudo apt-get -qq update && sudo apt-get -qq install --no-install-recommends -y jo
 
       - name: Get changed files
         id: changed-files
@@ -53,21 +49,31 @@ jobs:
           fi
 
   publish:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs:
       - changed-files
     strategy:
       matrix: ${{ fromJSON(needs.changed-files.outputs.matrix) }}
     steps:
+      - name: Generate Token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.BJWS_APP_ID }}
+          private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
+
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
 
-      - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
-
-      - name: Setup Tools
-        run: |
-          brew install fluxcd/tap/flux
+      - uses: jdx/rtx-action@v1
+        with:
+          install: true
+          cache: true
+          rtx_toml: |
+            [tools]
+            flux2 = "latest"
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -76,14 +82,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Generate tag
+        id: generate-tag
+        shell: bash
+        run: echo "tag=ghcr.io/${{ github.repository_owner }}/terraform/$(basename ${{ matrix.project }}):$(git rev-parse --short HEAD)" >> "${GITHUB_OUTPUT}"
+
       - name: Publish OCI
         run: |
-          flux push artifact "oci://ghcr.io/bjw-s/terraform/$(basename ${{ matrix.project }}):$(git rev-parse --short HEAD)" \
+          flux push artifact "oci://${{ steps.generate-tag.outputs.tag }}" \
             --path="./${{ matrix.project }}" \
             --source="$(git config --get remote.origin.url)" \
             --revision="$(git branch --show-current)/$(git rev-parse HEAD)"
 
       - name: Tag OCI
         run: |
-          flux tag artifact "oci://ghcr.io/bjw-s/terraform/$(basename ${{ matrix.project }}):$(git rev-parse --short HEAD)" \
-            --tag main
+          flux tag artifact "oci://${{ steps.generate-tag.outputs.tag }}" --tag main

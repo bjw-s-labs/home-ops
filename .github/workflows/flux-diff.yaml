@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: "Flux Diff"
 
 on:
@@ -7,20 +8,57 @@ on:
       - main
     paths:
       - .github/workflows/flux-diff.yaml
-      - kubernetes/**.yaml
+      - kubernetes/**
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
 
 jobs:
+  changed-files:
+    name: Get Changed Files
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.changed-files.outputs.all_changed_and_modified_files }}
+    steps:
+      - name: Generate Token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.BJWS_APP_ID }}
+          private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: "${{ steps.app-token.outputs.token }}"
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v40
+        with:
+          files: kubernetes/**
+          dir_names: true
+          dir_names_max_depth: 2
+          json: true
+          quotepath: false
+          escape_json: false
+
+      - name: List all changed files
+        run: echo "${{ steps.changed-files.outputs.all_changed_and_modified_files }}"
+
   flux-diff:
     name: Flux Diff
     runs-on: ubuntu-latest
+    needs:
+      - changed-files
     permissions:
       pull-requests: write
     strategy:
       matrix:
-        path:
-          - kubernetes/main
-          - kubernetes/nas
-        resource:
+        paths: ${{ fromJSON(needs.changed-files.outputs.matrix) }}
+        resources:
           - helmrelease
           - kustomization
     steps:
@@ -31,22 +69,45 @@ jobs:
           app-id: ${{ secrets.BJWS_APP_ID }}
           private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
 
+      - uses: jdx/rtx-action@v1
+        with:
+          install: true
+          cache: true
+          rtx_toml: |
+            [tools]
+            flux2 = "latest"
+
       - name: Diff Resources
         uses: allenporter/flux-local/action/diff@3.2.0
         id: diff
         with:
           sources: home-ops-kubernetes
-          path: "${{ matrix.path }}"
-          resource: "${{ matrix.resource }}"
+          path: "${{ matrix.paths }}"
+          resource: "${{ matrix.resources }}"
 
       - if: ${{ steps.diff.outputs.diff != '' }}
         name: Add comment
         uses: mshick/add-pr-comment@v2.8.1
         with:
           repo-token: "${{ steps.app-token.outputs.token }}"
-          message-id: "${{ github.event.pull_request.number }}/${{ matrix.path }}/${{ matrix.resource }}"
+          message-id: "${{ github.event.pull_request.number }}/${{ matrix.paths }}/${{ matrix.resources }}"
           message-failure: Diff was not successful
           message: |
             ```diff
             ${{ steps.diff.outputs.diff }}
             ```
+
+  flux-diff-success:
+    needs:
+      - flux-diff
+    if: ${{ always() }}
+    name: Flux Diff successful
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check matrix status
+        if: >-
+          ${{
+               contains(needs.*.result, 'failure')
+            || contains(needs.*.result, 'cancelled')
+          }}
+        run: exit 1
