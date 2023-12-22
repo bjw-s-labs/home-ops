@@ -37,14 +37,17 @@
       separateMinorPatch: true,
     },
     {
-      description: "External Snapshotter charts",
-      groupName: "External Snapshotter",
-      matchPackageNames: ["snapshot-controller", "snapshot-validation-webhook"],
-      matchDatasources: ["helm"],
+      description: "Actions Runner Controller charts",
+      groupName: "ARC",
+      matchPackageNames: [
+        "actions-runner-controller-charts/gha-runner-scale-set-controller",
+        "actions-runner-controller-charts/gha-runner-scale-set",
+      ],
+      matchDatasources: ["helm", "docker"],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
-      separateMinorPatch: true,
+      separateMinorPatch: false,
     },
     {
       description: "Thanos image and chart - versions do not match",
