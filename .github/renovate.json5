@@ -5,9 +5,10 @@
     "github>bjw-s/renovate-config:automerge-github-actions",
     "github>bjw-s/home-ops//.github/renovate/allowedVersions.json5",
     "github>bjw-s/home-ops//.github/renovate/autoMerge.json5",
-    "github>bjw-s/home-ops//.github/renovate/customVersioning.json5",
-    "github>bjw-s/home-ops//.github/renovate/disabledDatasources.json5",
+    "github>bjw-s/home-ops//.github/renovate/versioning.json5",
     "github>bjw-s/home-ops//.github/renovate/groups.json5",
+    "github>bjw-s/home-ops//.github/renovate/clusters.json5",
+    "github>bjw-s/home-ops//.github/renovate/grafanaDashboards.json5",
   ],
   ignorePaths: ["^.archive/**"],
   flux: {
@@ -19,21 +20,4 @@
   kubernetes: {
     fileMatch: ["^kubernetes/.+\\.ya?ml$"],
   },
-  packageRules: [
-    // Version strategies
-    {
-      matchDatasources: ["docker"],
-      matchPackageNames: [
-        "ghcr.io/onedr0p/plex",
-        "ghcr.io/onedr0p/qbittorrent",
-        "ghcr.io/xirixiz/dsmr-reader-docker",
-      ],
-      versioning: "loose",
-    },
-    {
-      matchDatasources: ["docker"],
-      matchPackageNames: ["tomsquest/docker-radicale"],
-      versioning: "pep440",
-    },
-  ],
 }
