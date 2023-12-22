@@ -2,6 +2,22 @@
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   packageRules: [
     {
+      description: "Loose versioning for non-semver packages",
+      matchDatasources: ["docker"],
+      matchPackageNames: [
+        "ghcr.io/onedr0p/plex",
+        "ghcr.io/onedr0p/qbittorrent",
+        "ghcr.io/xirixiz/dsmr-reader-docker",
+      ],
+      versioning: "loose",
+    },
+    {
+      description: "PEP440 versioning for radicale",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["tomsquest/docker-radicale"],
+      versioning: "pep440",
+    },
+    {
       description: "Custom versioning for http-https-echo",
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/mendhak/http-https-echo"],

@@ -1,0 +1,33 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  customDatasources: {
+    "grafana-dashboards": {
+      defaultRegistryUrlTemplate: "https://grafana.com/api/dashboards/{{packageName}}",
+      format: "json",
+      transformTemplates: ['{"releases":[{"version": $string(revision)}]}'],
+    },
+  },
+  customManagers: [
+    {
+      customType: "regex",
+      description: "Process Grafana dashboards",
+      fileMatch: ["(^|/)kubernetes/.+\\.ya?ml(\\.j2)?$"],
+      matchStrings: [
+        'depName="(?<depName>.*)"\\n.*?gnetId: (?<packageName>\\d+)\\n.*?revision: (?<currentValue>\\d+)',
+      ],
+      datasourceTemplate: "custom.grafana-dashboards",
+      versioningTemplate: "regex:^(?<major>\\d+)$",
+    },
+  ],
+  packageRules: [
+    {
+      addLabels: ["renovate/grafana-dashboard"],
+      matchDatasources: ["grafana-dashboards", "custom.grafana-dashboards"],
+      matchUpdateTypes: ["major"],
+      semanticCommitScope: "grafana-dashboards",
+      semanticCommitType: "",
+      commitMessageTopic: "dashboard {{depName}}",
+      commitMessageExtra: "( {{currentVersion}} → {{newVersion}} )",
+    },
+  ],
+}
