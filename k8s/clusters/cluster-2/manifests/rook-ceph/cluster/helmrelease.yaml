@@ -161,10 +161,8 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: role
-                operator: In
-                values:
-                - rook-mon-node
+              - key: node-role.kubernetes.io/rook-mon-node
+                operator: Exists
     #   # Monitor deployments may contain an anti-affinity rule for avoiding monitor
     #   # collocation on the same node. This is a required rule when host network is used
     #   # or when AllowMultiplePerNode is false. Otherwise this anti-affinity rule is a
@@ -174,19 +172,15 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: role
-                operator: In
-                values:
-                - rook-osd-node
+              - key: node-role.kubernetes.io/rook-osd-node
+                operator: Exists
       mgr:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: role
-                operator: In
-                values:
-                - rook-mgr-node
+              - key: node-role.kubernetes.io/rook-mgr-node
+                operator: Exists
     #   cleanup:
 
     ingress:
