@@ -35,10 +35,8 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: role
-                operator: NotIn
-                values:
-                - rook-osd-node
+              - key: node-role.kubernetes.io/rook-osd-node
+                operator: DoesNotExist
       serviceMonitor:
         create: false   # Enable when prometheus is installed
       replicaCount: 3
