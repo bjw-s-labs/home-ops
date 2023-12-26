@@ -8,7 +8,7 @@ on:
       - main
 
 concurrency:
-  group: ${{ github.ref }}-${{ github.workflow }}
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -35,23 +35,26 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v40
         with:
-          files: kubernetes/**/helmrelease.yaml
+          files: kubernetes/**
+          dir_names: true
+          dir_names_max_depth: 2
           json: true
-          quotepath: false
           escape_json: false
 
       - name: List all changed files
         run: echo "${{ steps.changed-files.outputs.all_changed_and_modified_files }}"
 
   extract-images:
-    name: Extract images from Helm Release
+    name: Extract Images
     runs-on: ubuntu-latest
     needs:
       - changed-files
     if: ${{ needs.changed-files.outputs.matrix != '[]' }}
+    permissions:
+      pull-requests: read
     strategy:
       matrix:
-        files: ${{ fromJSON(needs.changed-files.outputs.matrix) }}
+        paths: ${{ fromJSON(needs.changed-files.outputs.matrix) }}
       max-parallel: 4
       fail-fast: false
     outputs:
@@ -64,15 +67,69 @@ jobs:
           app-id: ${{ secrets.BJWS_APP_ID }}
           private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
 
-      - name: Checkout
+      - name: Setup System Tools
+        shell: bash
+        run: sudo apt-get -qq update && sudo apt-get -qq install --no-install-recommends -y curl git jo
+
+      - name: Setup Workflow Tools
+        uses: jdx/rtx-action@v1
+        with:
+          install: true
+          rtx_toml: |
+            [tools]
+            flux2 = "latest"
+            yq = "latest"
+
+      - name: Checkout default branch
         uses: actions/checkout@v4
         with:
           token: "${{ steps.app-token.outputs.token }}"
+          ref: "${{ github.event.repository.default_branch }}"
+          path: default
 
-      - name: Extract Images from Helm Release
-        id: extract-images
+      - name: Checkout Pull Request branch
+        uses: actions/checkout@v4
+        with:
+          token: "${{ steps.app-token.outputs.token }}"
+          path: pull
+
+      - name: Gather Images in Default Branch
+        uses: docker://ghcr.io/allenporter/flux-local:pr-472
+        with:
+          args: >-
+            get cluster
+            --path /github/workspace/default/${{ matrix.paths }}
+            --enable-images
+            --output yaml
+            --output-file default.yaml
+
+      - name: Gather Images in Pull Request Branch
+        uses: docker://ghcr.io/allenporter/flux-local:pr-472
+        with:
+          args: >-
+            get cluster
+            --path /github/workspace/pull/${{ matrix.paths }}
+            --enable-images
+            --output yaml
+            --output-file pull.yaml
+
+      - name: Filter Default Branch Results
+        shell: bash
         run: |
-          images=$(npx zx ".ci/scripts/extract-images.mjs" --kubernetes-dir "./kubernetes" --helmrelease "${{ matrix.files }}")
+          yq -r '[.. | .images? | select(. != null)] | flatten | sort | unique | .[]' \
+              default.yaml > default.txt
+
+      - name: Filter Pull Request Branch Results
+        shell: bash
+        run: |
+          yq -r '[.. | .images? | select(. != null)] | flatten | sort | unique | .[]' \
+              pull.yaml > pull.txt
+
+      - name: Compare Default and Pull Request Images
+        id: extract-images
+        shell: bash
+        run: |
+          images=$(jo -a $(grep -vf default.txt pull.txt))
           echo "images=${images}" >> $GITHUB_OUTPUT
           echo "${images}"
 
