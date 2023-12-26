@@ -20,6 +20,17 @@ spec:
     global:
       nameOverride: *app
 
+    defaultPodOptions:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: role
+                operator: DoesNotExist
+                values:
+                - rook-osd-node
+
     controllers:
       main:
         # type: statefulset
@@ -121,3 +132,5 @@ spec:
             main:
               - path: /etc/coredns
                 readOnly: true
+
+
