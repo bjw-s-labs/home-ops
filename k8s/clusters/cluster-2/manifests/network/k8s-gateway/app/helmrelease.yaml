@@ -31,11 +31,9 @@ spec:
           nodeAffinity:
             requiredDuringSchedulingIgnoredDuringExecution:
               nodeSelectorTerms:
-              - matchExpressions:
-                - key: role
-                  operator: NotIn
-                  values:
-                  - rook-osd-node
+                - matchExpressions:
+                  - key: node-role.kubernetes.io/rook-osd-node
+                    operator: DoesNotExist
         pod:
           annotations:
             configmap.reloader.stakater.com/reload: "k8s-gateway-config"
