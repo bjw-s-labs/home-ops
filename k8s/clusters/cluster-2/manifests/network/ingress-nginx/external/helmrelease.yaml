@@ -20,6 +20,16 @@ spec:
     fullnameOverride: nginx-external
 
     controller:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: role
+                operator: NotIn
+                values:
+                - rook-osd-node
+
       replicaCount: 1   # Increase after more nodes are installed
 
       updateStrategy:

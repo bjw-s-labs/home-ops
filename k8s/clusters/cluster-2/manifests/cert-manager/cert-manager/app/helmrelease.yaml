@@ -17,6 +17,17 @@ spec:
       interval: 5m
 
   values:
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: role
+              operator: NotIn
+              values:
+              - rook-osd-node
+
     installCRDs: true
 
     webhook:

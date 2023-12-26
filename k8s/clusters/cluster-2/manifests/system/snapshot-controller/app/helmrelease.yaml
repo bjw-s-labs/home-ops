@@ -30,6 +30,15 @@ spec:
     keepHistory: false
   values:
     controller:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: role
+                operator: NotIn
+                values:
+                - rook-osd-node
       serviceMonitor:
         create: false   # Enable when prometheus is installed
       replicaCount: 3
