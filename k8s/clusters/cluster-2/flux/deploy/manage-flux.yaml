@@ -124,3 +124,24 @@ spec:
       target:
         kind: ClusterRole
         name: crd-controller-flux-system
+    - patch: |
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: all
+        spec:
+          template:
+            metadata:
+              annotations:
+                cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+            spec:
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                      - matchExpressions:
+                        - key: node-role.kubernetes.io/rook-osd-node
+                          operator: DoesNotExist    
+      target:
+        kind: Deployment
+        labelSelector: app.kubernetes.io/part-of=flux
