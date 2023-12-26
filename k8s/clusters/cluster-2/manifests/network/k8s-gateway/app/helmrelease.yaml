@@ -20,17 +20,6 @@ spec:
     global:
       nameOverride: *app
 
-    defaultPodOptions:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: role
-                operator: NotIn
-                values:
-                - rook-osd-node
-
     controllers:
       main:
         # type: statefulset
@@ -38,6 +27,15 @@ spec:
         #   reloader.stakater.com/auto: "true"
         replicas: 3
         strategy: RollingUpdate
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: role
+                  operator: NotIn
+                  values:
+                  - rook-osd-node
         pod:
           annotations:
             configmap.reloader.stakater.com/reload: "k8s-gateway-config"
