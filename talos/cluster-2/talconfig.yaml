@@ -102,7 +102,7 @@ nodes:
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
-        ceph-osd: true
+        node-role.kubernetes.io/rook-osd-node: "true"
       installDiskSelector:
         size: <= 50GB
       nameservers:
@@ -143,7 +143,7 @@ nodes:
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
-        ceph-osd: true
+        node-role.kubernetes.io/rook-osd-node: "true"
       installDiskSelector:
         size: <= 50GB
       nameservers:
@@ -184,7 +184,7 @@ nodes:
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
-        ceph-osd: true
+        node-role.kubernetes.io/rook-osd-node: "true"
       installDiskSelector:
         size: <= 50GB
       nameservers:
@@ -225,7 +225,7 @@ nodes:
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
-        ceph-osd: true
+        node-role.kubernetes.io/rook-osd-node: "true"
       installDiskSelector:
         size: <= 50GB
       nameservers:
@@ -259,7 +259,7 @@ nodes:
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
-        ceph-osd: true
+        node-role.kubernetes.io/rook-osd-node: "true"
       installDiskSelector:
         size: <= 50GB
       nameservers:
@@ -293,7 +293,7 @@ nodes:
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
-        ceph-osd: true
+        node-role.kubernetes.io/rook-osd-node: "true"
       installDiskSelector:
         size: <= 50GB
       nameservers:
@@ -327,7 +327,7 @@ nodes:
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
-        ceph-osd: true
+        node-role.kubernetes.io/rook-osd-node: "true"
       installDiskSelector:
         size: <= 50GB
       nameservers:
@@ -361,7 +361,7 @@ nodes:
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
-        ceph-osd: true
+        node-role.kubernetes.io/rook-osd-node: "true"
       installDiskSelector:
         size: <= 50GB
       nameservers:
@@ -389,6 +389,24 @@ nodes:
               mtu: 9000
               dhcpOptions:
                 routeMetric: 2048
+
+    - hostname: temp1.cluster-2.${secret_domain}
+      ipAddress: temp1.cluster-2.${secret_domain}
+      controlPlane: false
+      disableSearchDomain: true
+      nodeLabels:
+        node-role.kubernetes.io/rook-mon-node: "true"
+        node-role.kubernetes.io/rook-mgr-node: "true"
+      installDiskSelector:
+        size: <= 50GB
+      nameservers:
+        - 10.0.0.4
+      networkInterfaces:
+        - deviceSelector:
+            driver: virtio_net
+            hardwareAddr: "52:53:e4:5a:89:e1"
+          dhcp: true
+          mtu: 9000
 
 controlPlane:
   patches:

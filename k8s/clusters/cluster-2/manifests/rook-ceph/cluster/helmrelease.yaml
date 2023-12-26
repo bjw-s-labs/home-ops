@@ -32,8 +32,10 @@ spec:
         image: quay.io/ceph/ceph:v18.2.1
       mgr:
         count: 1    # increase when more nodes are added
+        allowMultiplePerNode: false
       mon:
         count: 1    # increase when more nodes are added
+        allowMultiplePerNode: false
 
     network:
       addressRanges:
@@ -133,6 +135,59 @@ spec:
             metadataDevice: "sda"
             devices:
               - name: "sdb"
+
+    # To control where various services will be scheduled by kubernetes, use the placement configuration sections below.
+    # The example under 'all' would have all services scheduled on kubernetes nodes labeled with 'role=storage-node' and
+    # tolerate taints with a key of 'storage-node'.
+    placement:
+    #   all:
+    #     nodeAffinity:
+    #       requiredDuringSchedulingIgnoredDuringExecution:
+    #         nodeSelectorTerms:
+    #           - matchExpressions:
+    #             - key: role
+    #               operator: In
+    #               values:
+    #               - storage-node
+    #     podAffinity:
+    #     podAntiAffinity:
+    #     topologySpreadConstraints:
+    #     tolerations:
+    #     - key: storage-node
+    #       operator: Exists
+    #   # The above placement information can also be specified for mon, osd, and mgr components
+      mon:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - rook-mon-node
+    #   # Monitor deployments may contain an anti-affinity rule for avoiding monitor
+    #   # collocation on the same node. This is a required rule when host network is used
+    #   # or when AllowMultiplePerNode is false. Otherwise this anti-affinity rule is a
+    #   # preferred rule with weight: 50.
+      osd:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - rook-osd-node
+      mgr:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - rook-mgr-node
+    #   cleanup:
 
     ingress:
       dashboard:
