@@ -48,63 +48,63 @@ spec:
         enabled: true
         urlPrefix: /
 
-      # resources:
-      #   mgr:
-      #     limits:
-      #       cpu: "2000m"
-      #       memory: "2Gi"
-      #     requests:
-      #       cpu: "500m"
-      #       memory: "512Mi"
-      #   mon:
-      #     limits:
-      #       cpu: "2000m"
-      #       memory: "2Gi"
-      #     requests:
-      #       cpu: "1000m"
-      #       memory: "1Gi"
-      #   osd:
-      #     limits:
-      #       cpu: "1500m"
-      #       memory: "3Gi"
-      #     requests:
-      #       cpu: "500m"
-      #       memory: "1Gi"
-      #   prepareosd:
-      #     limits:
-      #       cpu: "1500m"
-      #       memory: "4Mi"
-      #     requests:
-      #       cpu: "500m"
-      #       memory: "500Mi"
-      #   mgr-sidecar:
-      #     limits:
-      #       cpu: "500m"
-      #       memory: "100Mi"
-      #     requests:
-      #       cpu: "100m"
-      #       memory: "40Mi"
-      #   crashcollector:
-      #     limits:
-      #       cpu: "500m"
-      #       memory: "60Mi"
-      #     requests:
-      #       cpu: "100m"
-      #       memory: "60Mi"
-      #   logcollector:
-      #     limits:
-      #       cpu: "500m"
-      #       memory: "1Gi"
-      #     requests:
-      #       cpu: "100m"
-      #       memory: "100Mi"
-      #   cleanup:
-      #     limits:
-      #       cpu: "500m"
-      #       memory: "1Gi"
-      #     requests:
-      #       cpu: "500m"
-      #       memory: "100Mi"
+      resources:
+        mgr:
+          limits:
+            cpu: "2000m"
+            memory: "2Gi"
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+        mon:
+          limits:
+            cpu: "2000m"
+            memory: "2Gi"
+          requests:
+            cpu: "1000m"
+            memory: "1Gi"
+        osd:
+          limits:
+            cpu: "1500m"
+            memory: "3Gi"
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+        prepareosd:
+          limits:
+            cpu: "1500m"
+            memory: "4Mi"
+          requests:
+            cpu: "500m"
+            memory: "500Mi"
+        mgr-sidecar:
+          limits:
+            cpu: "500m"
+            memory: "100Mi"
+          requests:
+            cpu: "100m"
+            memory: "40Mi"
+        crashcollector:
+          limits:
+            cpu: "500m"
+            memory: "60Mi"
+          requests:
+            cpu: "100m"
+            memory: "60Mi"
+        logcollector:
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+          requests:
+            cpu: "100m"
+            memory: "100Mi"
+        cleanup:
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+          requests:
+            cpu: "500m"
+            memory: "100Mi"
 
       storage:
         useAllNodes: false
@@ -114,39 +114,39 @@ spec:
         nodes:
           # work1 node
           - name: "work1"
-            resources:
-              limits:
-                cpu: "1500m"
-                memory: "4096Mi"
-              requests:
-                cpu: "500m"
-                memory: "2048Mi"
+            # resources:
+            #   limits:
+            #     cpu: "1500m"
+            #     memory: "4096Mi"
+            #   requests:
+            #     cpu: "500m"
+            #     memory: "2048Mi"
             metadataDevice: "sda"
             devices:
               - name: "sdb"
               - name: "sdc"
           # work2 node
           - name: "work2"
-            resources:
-              limits:
-                cpu: "1500m"
-                memory: "4096Mi"
-              requests:
-                cpu: "500m"
-                memory: "2048Mi"
+            # resources:
+            #   limits:
+            #     cpu: "1500m"
+            #     memory: "4096Mi"
+            #   requests:
+            #     cpu: "500m"
+            #     memory: "2048Mi"
             metadataDevice: "sda"
             devices:
               - name: "sdb"
               - name: "sdc"
           # work3 node
           - name: "work3"
-            resources:
-              limits:
-                cpu: "1500m"
-                memory: "4096Mi"
-              requests:
-                cpu: "500m"
-                memory: "2048Mi"
+            # resources:
+            #   limits:
+            #     cpu: "1500m"
+            #     memory: "4096Mi"
+            #   requests:
+            #     cpu: "500m"
+            #     memory: "2048Mi"
             metadataDevice: "sda"
             devices:
               - name: "sdb"
