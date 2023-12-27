@@ -86,7 +86,7 @@ tasks:
     cmds:
       # # TODO: Only suspend when a arg is passed to the task
       # # https://github.com/go-task/task/issues/608
-      # - task: suspend-task
+      # - task: .suspend
       #   vars: *env
       - kubectl --context {{.cluster}} -n {{.ns}} patch replicationsources {{.app}} --type merge -p '{"spec":{"trigger":{"manual":"{{.ts}}"}}}'
       - bash {{.scriptsDir}}/wait-for-k8s-job.sh volsync-src-{{.app}} {{.ns}} {{.cluster}}
@@ -121,13 +121,13 @@ tasks:
         app: Application to list snapshots for (required)
         previous: Previous number of snapshots to restore (default: 2)
     cmds:
-      - task: suspend-task
+      - task: .suspend
         vars: *env
-      - task: wipe-task
+      - task: .wipe
         vars: *env
-      - task: restore-task
+      - task: .restore
         vars: *env
-      - task: resume-task
+      - task: .resume
         vars: *env
     vars:
       cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
@@ -163,8 +163,33 @@ tasks:
       - sh: test -f {{.scriptsDir}}/wait-for-k8s-job.sh
         msg: "Wait script not found"
 
+  cleanup:
+    desc: Delete volume populator PVCs in all namespaces
+    silent: true
+    summary: |
+      Args:
+        cluster: Cluster to run command against (required)
+    requires:
+      vars:
+        - cluster
+    vars:
+      bootstrap_dest:
+        sh: kubectl --context {{.cluster}} get pvc --all-namespaces --no-headers | grep "bootstrap-dest" | awk '{print $1 "/" $2}'
+      bootstrap_cache:
+        sh: kubectl --context {{.cluster}} get pvc --all-namespaces --no-headers | grep "bootstrap-cache" | awk '{print $1 "/" $2}'
+    cmds:
+      - for: {var: bootstrap_dest}
+        cmd: |
+          {{- $items := (split "/" .ITEM) }}
+          kubectl --context {{.cluster}} delete pvc -n {{ $items._0 }} {{ $items._1 }}
+      - for: {var: bootstrap_cache}
+        cmd: |
+          {{- $items := (split "/" .ITEM) }}
+          kubectl --context {{.cluster}} delete pvc -n {{ $items._0 }} {{ $items._1 }}
+    env: *env
+
   # Suspend the Flux ks and hr
-  suspend-task:
+  .suspend:
     internal: true
     cmds:
       - flux --context {{.cluster}} -n flux-system suspend kustomization {{.app}}
@@ -174,7 +199,7 @@ tasks:
     env: *env
 
   # Wipe the PVC of all data
-  wipe-task:
+  .wipe:
     internal: true
     cmds:
       - envsubst < <(cat {{.templatesDir}}/wipe.tmpl.yaml) | kubectl --context {{.cluster}} apply -f -
@@ -185,7 +210,7 @@ tasks:
     env: *env
 
   # Create VolSync replicationdestination CR to restore data
-  restore-task:
+  .restore:
     internal: true
     cmds:
       - envsubst < <(cat {{.templatesDir}}/replicationdestination.tmpl.yaml) | kubectl --context {{.cluster}} apply -f -
@@ -195,7 +220,7 @@ tasks:
     env: *env
 
   # Resume Flux ks and hr
-  resume-task:
+  .resume:
     internal: true
     cmds:
       - flux --context {{.cluster}} -n {{.ns}} resume helmrelease {{.app}}
