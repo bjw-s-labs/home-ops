@@ -82,15 +82,15 @@ spec:
             - "10.200.40.0/24"
           cluster:
             - "10.200.2.0/24"
-      placement:
-        mon: &placement
-          nodeAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              nodeSelectorTerms:
-                - matchExpressions:
-                  - key: node-role.kubernetes.io/rook-osd-node
-                    operator: DoesNotExist
-        mgr: *placement
+      # placement:
+      #   mon: &placement
+      #     nodeAffinity:
+      #       requiredDuringSchedulingIgnoredDuringExecution:
+      #         nodeSelectorTerms:
+      #           - matchExpressions:
+      #             - key: node-role.kubernetes.io/rook-osd-node
+      #               operator: DoesNotExist
+      #   mgr: *placement
       resources:
         mgr:
           limits:
@@ -163,8 +163,8 @@ spec:
           - name: work1
             devices:
               - name: ^sd[b-c]
-                #config:
-                #  metadataDevice: "sda"
+                config:
+                  metadataDevice: "sda"
           - name: work2
             devices:
               - name: ^sd[b-c]
