@@ -83,14 +83,14 @@ spec:
           cluster:
             - "10.200.2.0/24"
       placement:
-        mon: &placement
+        mgr: &placement
           nodeAffinity:
             requiredDuringSchedulingIgnoredDuringExecution:
               nodeSelectorTerms:
                 - matchExpressions:
                   - key: node-role.kubernetes.io/rook-osd-node
                     operator: DoesNotExist
-        mgr: *placement
+        # mon: *placement
       resources:
         mgr:
           limits:
