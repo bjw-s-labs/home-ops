@@ -57,7 +57,7 @@ spec:
       dashboard:
         enabled: true
         urlPrefix: /
-        ssl: false
+        ssl: true
 
       resources:
         mgr:
@@ -198,8 +198,10 @@ spec:
     ingress:
       dashboard:
         ingressClassName: "internal-nginx"
-        # annotations:
-        #   nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        annotations:
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+          nginx.ingress.kubernetes.io/server-snippet: |
+            proxy_ssl_verify off;
         host:
           name: &host "rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
           path: "/"
