@@ -5,15 +5,10 @@ runs:
   using: "composite"
 
   steps:
-    - name: Update apt
-      shell: bash
-      run: |-
-        sudo apt-get -qq update
-
     - name: Install system tools
-      shell: bash
-      run: |-
-        sudo apt-get -qq install --no-install-recommends -y curl git jo jq
+      uses: awalsh128/cache-apt-pkgs-action@v1
+      with:
+        packages: curl git jo jq
 
     - name: Install yq
       uses: frenck/action-setup-yq@v1
