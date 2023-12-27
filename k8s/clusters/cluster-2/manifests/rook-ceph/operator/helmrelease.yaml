@@ -25,12 +25,11 @@ spec:
     pspEnable: false
 
     csi:
-      # -- Enable Ceph CSI RBD driver
-      enableRbdDriver: true
-      # -- Enable Ceph CSI CephFS driver
-      enableCephfsDriver: true
+      # Disabled since I dont plan to use any ceph mounts in this cluster
+      enableRbdDriver: false
+      enableCephfsDriver: false
       csiAddons:
-        enabled: true
+        enabled: false
       # Indicate whether or not they support modifying a volume's ownership or permissions when the volume is being mounted.
       # Default is "File". Other options are "None" and "ReadWriteOnceWithFSType"
       # cephFSFSGroupPolicy: "None"
