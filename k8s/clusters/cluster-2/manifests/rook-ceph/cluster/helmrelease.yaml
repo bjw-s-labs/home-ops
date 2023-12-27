@@ -116,6 +116,9 @@ spec:
             cpu: "500m"
             memory: "100Mi"
 
+      crashCollector:
+        disable: false
+
       storage:
         useAllNodes: false
         useAllDevices: false
@@ -144,52 +147,52 @@ spec:
               - name: "sdb"
               - name: "sdc"
 
-    # To control where various services will be scheduled by kubernetes, use the placement configuration sections below.
-    # The example under 'all' would have all services scheduled on kubernetes nodes labeled with 'role=storage-node' and
-    # tolerate taints with a key of 'storage-node'.
-    placement:
-    #   all:
-    #     nodeAffinity:
-    #       requiredDuringSchedulingIgnoredDuringExecution:
-    #         nodeSelectorTerms:
-    #           - matchExpressions:
-    #             - key: role
-    #               operator: In
-    #               values:
-    #               - storage-node
-    #     podAffinity:
-    #     podAntiAffinity:
-    #     topologySpreadConstraints:
-    #     tolerations:
-    #     - key: storage-node
-    #       operator: Exists
-    #   # The above placement information can also be specified for mon, osd, and mgr components
-      mon:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node-role.kubernetes.io/rook-mon-node
-                operator: Exists
-    #   # Monitor deployments may contain an anti-affinity rule for avoiding monitor
-    #   # collocation on the same node. This is a required rule when host network is used
-    #   # or when AllowMultiplePerNode is false. Otherwise this anti-affinity rule is a
-    #   # preferred rule with weight: 50.
-      osd:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node-role.kubernetes.io/rook-osd-node
-                operator: Exists
-      mgr:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node-role.kubernetes.io/rook-mgr-node
-                operator: Exists
-    #   cleanup:
+      # To control where various services will be scheduled by kubernetes, use the placement configuration sections below.
+      # The example under 'all' would have all services scheduled on kubernetes nodes labeled with 'role=storage-node' and
+      # tolerate taints with a key of 'storage-node'.
+      placement:
+      #   all:
+      #     nodeAffinity:
+      #       requiredDuringSchedulingIgnoredDuringExecution:
+      #         nodeSelectorTerms:
+      #           - matchExpressions:
+      #             - key: role
+      #               operator: In
+      #               values:
+      #               - storage-node
+      #     podAffinity:
+      #     podAntiAffinity:
+      #     topologySpreadConstraints:
+      #     tolerations:
+      #     - key: storage-node
+      #       operator: Exists
+      #   # The above placement information can also be specified for mon, osd, and mgr components
+        mon:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/rook-mon-node
+                  operator: Exists
+      #   # Monitor deployments may contain an anti-affinity rule for avoiding monitor
+      #   # collocation on the same node. This is a required rule when host network is used
+      #   # or when AllowMultiplePerNode is false. Otherwise this anti-affinity rule is a
+      #   # preferred rule with weight: 50.
+        osd:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/rook-osd-node
+                  operator: Exists
+        mgr:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/rook-mgr-node
+                  operator: Exists
+      #   cleanup:
 
     ingress:
       dashboard:
