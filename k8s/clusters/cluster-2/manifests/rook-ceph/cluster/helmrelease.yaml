@@ -17,6 +17,14 @@ spec:
   values:
     toolbox:
       enabled: true
+      image: quay.io/ceph/ceph:v18.2.1
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/rook-osd-node
+                operator: DoesNotExist
 
     monitoring:
       enabled: false        # Enable once prometheus is installed
@@ -38,12 +46,12 @@ spec:
         count: 1    # increase when more nodes are added
         allowMultiplePerNode: false
 
-    network:
-      addressRanges:
-        public:
-          - "10.200.40.0/24"
-        cluster:
-          - "10.200.2.0/24"
+      network:
+        addressRanges:
+          public:
+            - "10.200.40.0/24"
+          cluster:
+            - "10.200.2.0/24"
 
       dashboard:
         enabled: true
