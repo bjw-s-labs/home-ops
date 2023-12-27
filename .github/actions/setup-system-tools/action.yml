@@ -5,10 +5,16 @@ runs:
   using: "composite"
 
   steps:
+    - name: Update APT cache
+      shell: bash
+      run: |-
+        sudo apt-get -qq update
+
     - name: Install system tools
-      uses: awalsh128/cache-apt-pkgs-action@v1
-      with:
-        packages: curl git jo jq
+      shell: bash
+      run: |-
+        sudo apt-get -qq install \
+          curl git jo jq
 
     - name: Install yq
       uses: frenck/action-setup-yq@v1
