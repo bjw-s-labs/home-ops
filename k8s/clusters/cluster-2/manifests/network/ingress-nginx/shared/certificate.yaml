@@ -2,7 +2,7 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: "elcarpenter.com"
+  name: "${INGRESS_DOMAIN}"
 spec:
   secretName: "elcarpenter-com-tls"
   issuerRef:
@@ -10,5 +10,7 @@ spec:
     kind: ClusterIssuer
   commonName: "elcarpenter.com"
   dnsNames:
-    - "elcarpenter.com"
-    - "*.elcarpenter.com"
+    - "${INGRESS_DOMAIN}"
+    - "*.${INGRESS_DOMAIN}"
+    - ".${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    - "*.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
