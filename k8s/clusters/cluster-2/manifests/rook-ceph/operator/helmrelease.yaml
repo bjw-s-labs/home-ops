@@ -16,11 +16,19 @@ spec:
         name: rook-ceph-charts
         namespace: flux-system
   values:
+    # -- Global log level for the operator.
+    # Options: `ERROR`, `WARNING`, `INFO`, `DEBUG`
+    logLevel: INFO
+
     crds:
       enabled: true
     pspEnable: false
 
     csi:
+      # -- Enable Ceph CSI RBD driver
+      enableRbdDriver: true
+      # -- Enable Ceph CSI CephFS driver
+      enableCephfsDriver: true
       csiAddons:
         enabled: true
       # Indicate whether or not they support modifying a volume's ownership or permissions when the volume is being mounted.
