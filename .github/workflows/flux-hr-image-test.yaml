@@ -33,7 +33,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v40
+        uses: tj-actions/changed-files@v41
         with:
           files: kubernetes/**
           dir_names: true
@@ -122,8 +122,9 @@ jobs:
         id: extract-images
         shell: bash
         run: |
-          images=$(jo -a $(grep -vf default.txt pull.txt))
-          echo "images=${images}" >> $GITHUB_OUTPUT
+          diff="$(grep -vf default.txt pull.txt)"
+          images=$(jo -a "${diff}")
+          echo "images=${images}" >> "${GITHUB_OUTPUT}"
           echo "${images}"
 
   test-images:
