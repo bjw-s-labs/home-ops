@@ -112,11 +112,7 @@ jobs:
         id: extract-images
         shell: bash
         run: |
-          ls -l
-          which grep
-          grep --version
-          diff="$(grep -vf default.txt pull.txt)"
-          echo "${diff}"
+          diff="$(grep -vf default.txt pull.txt | cat)"
           images=$(jo -a "${diff}")
           echo "images=${images}" >> "${GITHUB_OUTPUT}"
           echo "${images}"
