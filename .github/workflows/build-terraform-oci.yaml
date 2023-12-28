@@ -35,7 +35,7 @@ jobs:
         run: |
           echo '${{ steps.changed-files.outputs.all_changed_files }}'
 
-      - name: Install system tools
+      - name: Install jo
         uses: awalsh128/cache-apt-pkgs-action@v1.3.1
         with:
           packages: jo
@@ -57,17 +57,8 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.changed-files.outputs.matrix) }}
     steps:
-      - name: Generate Token
-        uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-          app-id: ${{ secrets.BJWS_APP_ID }}
-          private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
-
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ steps.app-token.outputs.token }}
 
       - name: Install Flux
         uses: fluxcd/flux2/action@main
