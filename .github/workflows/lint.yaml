@@ -24,6 +24,7 @@ jobs:
 
       - name: Generate Token
         uses: actions/create-github-app-token@v1
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
         id: app-token
         with:
           app-id: ${{ secrets.BJWS_APP_ID }}
