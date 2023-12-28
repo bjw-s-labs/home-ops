@@ -112,8 +112,8 @@ jobs:
         id: extract-images
         shell: bash
         run: |
+          jo --version
           ls -l
-          grep --version
           diff="$(grep -vf default.txt pull.txt)"
           echo "${diff}")
           images=$(jo -a "${diff}")
