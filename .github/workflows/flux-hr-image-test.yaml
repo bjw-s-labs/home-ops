@@ -94,7 +94,7 @@ jobs:
       - name: Filter Default Branch Results
         shell: bash
         run: |
-          yq --version
+          cat default.yaml
           yq -r '[.. | .images? | select(. != null)] | flatten | sort | unique | .[]' \
               default.yaml > default.txt
 
