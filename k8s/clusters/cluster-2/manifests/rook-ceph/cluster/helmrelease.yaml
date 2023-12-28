@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: rook-ceph-cluster
-      version: v1.13.1
+      version: v1.13.0
       sourceRef:
         kind: HelmRepository
         name: rook-ceph-charts
@@ -173,9 +173,18 @@ spec:
             deviceFilter: ^sd[b-c]
             config:
               metadataDevice: "sda"
+          - name: work4
+            deviceFilter: ^sd[b-c]
+            config:
+              metadataDevice: "sda"
+          - name: work5
+            deviceFilter: ^sd[b-c]
+            config:
+              metadataDevice: "sda"
     cephBlockPools:
       - name: ceph-blockpool
         spec:
+          deviceClass: ssd
           failureDomain: host
           replicated:
             size: 3
@@ -217,10 +226,10 @@ spec:
             - name: erasurecoded
               failureDomain: host
               erasureCoded:
-                dataChunks: 2
-                codingChunks: 1
+                dataChunks: 8
+                codingChunks: 2
           metadataServer:
-            activeCount: 2
+            activeCount: 1
             activeStandby: true
             placement:
               podAntiAffinity:
@@ -250,7 +259,7 @@ spec:
           enabled: true
           isDefault: false
           name: ceph-filesystem
-          pool: data0
+          pool: erasurecoded
           reclaimPolicy: Delete
           allowVolumeExpansion: true
           parameters:
@@ -269,6 +278,7 @@ spec:
     cephObjectStores:
       - name: ceph-objectstore
         spec:
+          deviceClass: ssd
           metadataPool:
             failureDomain: host
             replicated:
@@ -288,6 +298,23 @@ spec:
               limits:
                 memory: 2Gi
             instances: 1
+            placement:
+              podAntiAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  - labelSelector:
+                      matchExpressions:
+                        - key: app
+                          operator: In
+                          values:
+                            - rook-ceph-rgw
+                    # topologyKey: kubernetes.io/hostname will place RGW across different hosts
+                    topologyKey: kubernetes.io/hostname
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: node-role.kubernetes.io/rook-osd-node
+                        operator: DoesNotExist
           healthCheck:
             bucket:
               interval: 60s
