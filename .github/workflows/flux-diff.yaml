@@ -79,8 +79,8 @@ jobs:
           path: "${{ matrix.paths }}"
           resource: "${{ matrix.resources }}"
 
-      - if: ${{ steps.diff.outputs.diff != '' }}
-        name: Add comment
+      - name: Add comment
+        if: ${{ steps.diff.outputs.diff != '' && github.event.pull_request.head.repo.full_name == github.repository }}
         uses: mshick/add-pr-comment@v2.8.1
         with:
           repo-token: "${{ github.event.pull_request.head.repo.full_name == github.repository && steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}"

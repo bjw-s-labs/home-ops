@@ -113,6 +113,8 @@ jobs:
         shell: bash
         run: |
           ls -l
+          which grep
+          grep --version
           diff="$(grep -vf default.txt pull.txt)"
           echo "${diff}"
           images=$(jo -a "${diff}")
