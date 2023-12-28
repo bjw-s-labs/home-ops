@@ -35,6 +35,11 @@ jobs:
         run: |
           echo '${{ steps.changed-files.outputs.all_changed_files }}'
 
+      - name: Install system tools
+        uses: awalsh128/cache-apt-pkgs-action@v1.3.1
+        with:
+          packages: jo
+
       - name: Store changed projects
         id: set-matrix
         run: |
