@@ -18,17 +18,9 @@ jobs:
     outputs:
       matrix: ${{ steps.changed-files.outputs.all_changed_and_modified_files }}
     steps:
-      - name: Generate Token
-        uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-          app-id: ${{ secrets.BJWS_APP_ID }}
-          private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: "${{ steps.app-token.outputs.token }}"
           fetch-depth: 0
 
       - name: Get changed files
@@ -62,6 +54,7 @@ jobs:
     steps:
       - name: Generate Token
         uses: actions/create-github-app-token@v1
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
         id: app-token
         with:
           app-id: ${{ secrets.BJWS_APP_ID }}
@@ -85,7 +78,7 @@ jobs:
           path: "${{ matrix.paths }}"
           resource: "${{ matrix.resources }}"
 
-      - if: ${{ steps.diff.outputs.diff != '' }}
+      - if: ${{ steps.diff.outputs.diff != '' && github.event.pull_request.head.repo.full_name == github.repository }}
         name: Add comment
         uses: mshick/add-pr-comment@v2.8.1
         with:
