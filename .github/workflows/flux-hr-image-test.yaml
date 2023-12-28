@@ -18,17 +18,9 @@ jobs:
     outputs:
       matrix: ${{ steps.changed-files.outputs.all_changed_and_modified_files }}
     steps:
-      - name: Generate Token
-        uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-          app-id: ${{ secrets.BJWS_APP_ID }}
-          private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: "${{ steps.app-token.outputs.token }}"
           fetch-depth: 0
 
       - name: Get changed files
@@ -60,31 +52,21 @@ jobs:
     outputs:
       matrix: ${{ steps.extract-images.outputs.images }}
     steps:
-      - name: Generate Token
-        uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-          app-id: ${{ secrets.BJWS_APP_ID }}
-          private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
-
       - name: Checkout default branch
         uses: actions/checkout@v4
         with:
-          token: "${{ steps.app-token.outputs.token }}"
           ref: "${{ github.event.repository.default_branch }}"
           path: default
 
       - name: Checkout Pull Request branch
         uses: actions/checkout@v4
         with:
-          token: "${{ steps.app-token.outputs.token }}"
           path: pull
 
-      - name: Install System Tools
-        uses: ./default/.github/actions/setup-system-tools
-
       - name: Install Flux
-        uses: ./default/.github/actions/install-flux
+        uses: fluxcd/flux2/action@main
+        with:
+          version: "latest"
 
       - name: Gather Images in Default Branch
         uses: docker://ghcr.io/allenporter/flux-local:pr-472
