@@ -201,27 +201,51 @@ spec:
       name: csi-ceph-blockpool
       isDefault: false
       deletionPolicy: Delete
+
     cephFileSystems:
       - name: ceph-filesystem
         spec:
+          deviceClass: hdd
           metadataPool:
             replicated:
               size: 3
           dataPools:
-            - failureDomain: host
+            - name: data0
+              failureDomain: host
               replicated:
                 size: 3
-              name: data0
+            - name: erasurecoded
+              failureDomain: host
+              erasureCoded:
+                dataChunks: 2
+                codingChunks: 1
           metadataServer:
-            activeCount: 1
+            activeCount: 2
             activeStandby: true
+            placement:
+              podAntiAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  - labelSelector:
+                      matchExpressions:
+                        - key: app
+                          operator: In
+                          values:
+                            - rook-ceph-mds
+                    # topologyKey: kubernetes.io/hostname will place MDS across different hosts
+                    topologyKey: kubernetes.io/hostname
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: node-role.kubernetes.io/rook-osd-node
+                        operator: DoesNotExist
             resources:
               requests:
                 cpu: 100m
                 memory: 64M
               limits:
                 cpu: 1000m
-                memory: 850M
+                memory: 1000M
         storageClass:
           enabled: true
           isDefault: false
