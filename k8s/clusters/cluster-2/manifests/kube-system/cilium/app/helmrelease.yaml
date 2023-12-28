@@ -120,6 +120,13 @@ spec:
       relay:
         enabled: true
         rollOutPods: true
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/rook-osd-node
+                  operator: DoesNotExist
       ui:
         enabled: true
         rollOutPods: true

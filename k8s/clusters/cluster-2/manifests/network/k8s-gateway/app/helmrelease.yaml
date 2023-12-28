@@ -20,6 +20,15 @@ spec:
     global:
       nameOverride: *app
 
+    defaultPodOptions:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/rook-osd-node
+                operator: DoesNotExist
+
     controllers:
       main:
         # type: statefulset

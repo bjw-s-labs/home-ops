@@ -20,9 +20,17 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
-    # master:
+    master:
     #   config:
     #     enableTaints: true          # Allows NFD to taint worker nodes
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/rook-osd-node
+                operator: DoesNotExist
+
     worker:
       resources:
         requests:

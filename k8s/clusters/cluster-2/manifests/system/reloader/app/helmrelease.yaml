@@ -15,3 +15,12 @@ spec:
         name: stakater-charts
         namespace: flux-system
       interval: 5m
+  values:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node-role.kubernetes.io/rook-osd-node
+              operator: DoesNotExist
+
