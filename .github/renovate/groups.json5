@@ -13,21 +13,6 @@
       separateMinorPatch: true,
     },
     {
-      description: "Immich images",
-      groupName: "Immich",
-      matchPackageNames: [
-        "ghcr.io/immich-app/immich-machine-learning",
-        "ghcr.io/immich-app/immich-proxy",
-        "ghcr.io/immich-app/immich-server",
-        "ghcr.io/immich-app/immich-web",
-      ],
-      matchDatasources: ["docker"],
-      group: {
-        commitMessageTopic: "{{{groupName}}} group",
-      },
-      separateMinorPatch: true,
-    },
-    {
       description: "Rook-Ceph image and chart",
       groupName: "Rook Ceph",
       matchPackagePatterns: ["rook.ceph"],
@@ -52,14 +37,17 @@
       separateMinorPatch: true,
     },
     {
-      description: "External Snapshotter charts",
-      groupName: "External Snapshotter",
-      matchPackageNames: ["snapshot-controller", "snapshot-validation-webhook"],
-      matchDatasources: ["helm"],
+      description: "Actions Runner Controller charts",
+      groupName: "ARC",
+      matchPackageNames: [
+        "actions-runner-controller-charts/gha-runner-scale-set-controller",
+        "actions-runner-controller-charts/gha-runner-scale-set",
+      ],
+      matchDatasources: ["helm", "docker"],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
-      separateMinorPatch: true,
+      separateMinorPatch: false,
     },
     {
       description: "Thanos image and chart - versions do not match",

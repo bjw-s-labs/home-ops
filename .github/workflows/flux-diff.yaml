@@ -33,7 +33,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v40
+        uses: tj-actions/changed-files@v41
         with:
           files: kubernetes/**
           dir_names: true
@@ -67,20 +67,18 @@ jobs:
           app-id: ${{ secrets.BJWS_APP_ID }}
           private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
 
-      - name: Install System Tools
-        shell: bash
-        run: sudo apt-get -qq update && sudo apt-get -qq install --no-install-recommends -y curl git
-
-      - uses: jdx/rtx-action@v1
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          install: true
-          cache: true
-          rtx_toml: |
-            [tools]
-            flux2 = "latest"
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Install Flux
+        uses: fluxcd/flux2/action@main
+        with:
+          version: "latest"
 
       - name: Diff Resources
-        uses: allenporter/flux-local/action/diff@4.0.0
+        uses: allenporter/flux-local/action/diff@4.2.1
         id: diff
         with:
           sources: home-ops-kubernetes

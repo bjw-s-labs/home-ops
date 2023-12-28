@@ -20,8 +20,10 @@ spec:
       enabled: true
 
     csi:
+      provisioner:
+        image: registry.k8s.io/sig-storage/csi-provisioner:v3.6.3
       csiAddons:
-        enabled: true
+        enabled: false
 
       enableLiveness: true
       serviceMonitor:

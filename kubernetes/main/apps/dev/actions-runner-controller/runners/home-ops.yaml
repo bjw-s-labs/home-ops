@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: actions-runner-controller-charts/gha-runner-scale-set
-      version: 0.8.0
+      version: 0.8.1
       sourceRef:
         kind: HelmRepository
         name: actions-runner-controller
@@ -21,17 +21,21 @@ spec:
 
     githubConfigUrl: https://github.com/bjw-s/home-ops
 
-    minRunners: 0
+    minRunners: 1
     maxRunners: 6
 
     containerMode:
       type: "dind"
 
+    controllerServiceAccount:
+      name: actions-runner-controller-gha-rs-controller
+      namespace: dev
+
     template:
       spec:
         containers:
           - name: runner
-            image: ghcr.io/actions/actions-runner:2.311.0
+            image: ghcr.io/onedr0p/actions-runner:2.311.0
             command: ["/home/runner/run.sh"]
 
   valuesFrom:
