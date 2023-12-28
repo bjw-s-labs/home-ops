@@ -68,8 +68,13 @@ jobs:
         with:
           version: "latest"
 
-      - name: Setup yq
+      - name: Install yq
         uses: frenck/action-setup-yq@v1
+
+      - name: Install jo
+        uses: awalsh128/cache-apt-pkgs-action@v1.3.1
+        with:
+          packages: jo
 
       - name: Gather Images in Default Branch
         uses: docker://ghcr.io/allenporter/flux-local:pr-472
@@ -94,7 +99,6 @@ jobs:
       - name: Filter Default Branch Results
         shell: bash
         run: |
-          yq --version
           yq -r '[.. | .images? | select(. != null)] | flatten | sort | unique | .[]' \
               default.yaml > default.txt
 
