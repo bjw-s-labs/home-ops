@@ -83,7 +83,7 @@ jobs:
         if: ${{ steps.diff.outputs.diff != '' && github.event.pull_request.head.repo.full_name == github.repository }}
         uses: mshick/add-pr-comment@v2.8.1
         with:
-          repo-token: "${{ github.event.pull_request.head.repo.full_name == github.repository && steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}"
+          repo-token: "${{ steps.app-token.outputs.token }}"
           message-id: "${{ github.event.pull_request.number }}/${{ matrix.paths }}/${{ matrix.resources }}"
           message-failure: Diff was not successful
           message: |
