@@ -25,11 +25,26 @@ spec:
     #     enableTaints: true          # Allows NFD to taint worker nodes
       affinity:
         nodeAffinity:
+          # Custom added affinity
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
               - key: node-role.kubernetes.io/rook-osd-node
                 operator: DoesNotExist
+          # Default affinity in values.yaml
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: "node-role.kubernetes.io/master"
+                    operator: In
+                    values: [""]
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: "node-role.kubernetes.io/control-plane"
+                    operator: In
+                    values: [""]
 
     worker:
       resources:
