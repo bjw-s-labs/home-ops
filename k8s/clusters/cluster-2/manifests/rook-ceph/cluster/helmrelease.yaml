@@ -50,7 +50,8 @@ spec:
               - *host
     toolbox:
       enabled: true
-      image: quay.io/ceph/ceph:v18.2.1
+      # Use stable v17 build
+      # image: quay.io/ceph/ceph:v18.2.1
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -69,7 +70,8 @@ spec:
       mon_data_avail_warn = 20
     cephClusterSpec:
       cephVersion:
-        image: quay.io/ceph/ceph:v18.2.1
+        # Use stable v17 build
+        # image: quay.io/ceph/ceph:v18.2.1
       mgr:
         count: 1    # increase when more nodes are added
         allowMultiplePerNode: false
