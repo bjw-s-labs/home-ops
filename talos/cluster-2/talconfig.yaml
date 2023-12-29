@@ -20,11 +20,11 @@ endpoint: https://cluster-2.${secret_domain}:6443
 allowSchedulingOnMasters: false
 cniConfig:
   name: none
-additionalApiServerCertSans:
-  - cluster-2
-additionalMachineCertSans:
+additionalApiServerCertSans: &san
   - cluster-2
   - cluster-2.${secret_domain}
+  - "127.0.0.1" # KubePrism
+additionalMachineCertSans: *san
 clusterPodNets:
     - ${pod_cidr}
 clusterSvcNets:
@@ -120,7 +120,8 @@ nodes:
           dhcp: false
           # mtu: 9000
           vlans:
-            - vlanId: 2002
+            - &vlan2002
+              vlanId: 2002
               dhcp: true
               # mtu: 9000
         # 2.5G PICe Port
@@ -133,16 +134,12 @@ nodes:
           dhcpOptions:
             routeMetric: 4096
           vlans:
-            - vlanId: 2040
+            - &vlan2040
+              vlanId: 2040
               dhcp: true
               mtu: 9000
               dhcpOptions:
                 routeMetric: 2048
-          #   - vlanId: 100
-          #     dhcp: true
-          #     mtu: 1500
-          #     dhcpOptions:
-          #       routeMetric: 4096
 
     - hostname: work2.cluster-2.${secret_domain}
       ipAddress: work2.cluster-2.${secret_domain}
@@ -161,9 +158,7 @@ nodes:
           dhcp: false
           # mtu: 9000
           vlans:
-            - vlanId: 2002
-              dhcp: true
-              # mtu: 9000
+            - *vlan2002
         # 2.5G PICe Port
         - deviceSelector:
             # Talos cant detect MAC address at boot, so it assigns a random one.
@@ -174,16 +169,7 @@ nodes:
           dhcpOptions:
             routeMetric: 4096
           vlans:
-            - vlanId: 2040
-              dhcp: true
-              mtu: 9000
-              dhcpOptions:
-                routeMetric: 2048
-          #   - vlanId: 100
-          #     dhcp: true
-          #     mtu: 1500
-          #     dhcpOptions:
-          #       routeMetric: 4096
+            - *vlan2040
 
     - hostname: work3.cluster-2.${secret_domain}
       ipAddress: work3.cluster-2.${secret_domain}
@@ -202,9 +188,7 @@ nodes:
           dhcp: false
           # mtu: 9000
           vlans:
-            - vlanId: 2002
-              dhcp: true
-              # mtu: 9000
+            - *vlan2002
         # 2.5G PICe Port
         - deviceSelector:
             # Talos cant detect MAC address at boot, so it assigns a random one.
@@ -215,16 +199,7 @@ nodes:
           dhcpOptions:
             routeMetric: 4096
           vlans:
-            - vlanId: 2040
-              dhcp: true
-              mtu: 9000
-              dhcpOptions:
-                routeMetric: 2048
-          #   - vlanId: 100
-          #     dhcp: true
-          #     mtu: 1500
-          #     dhcpOptions:
-          #       routeMetric: 4096
+            - *vlan2040
 
     - hostname: work4.cluster-2.${secret_domain}
       ipAddress: work4.cluster-2.${secret_domain}
@@ -242,8 +217,7 @@ nodes:
             driver: bcmgenet
           dhcp: false
           vlans:
-            - vlanId: 2002
-              dhcp: true
+            - *vlan2002
         # 2.5G PICe Port
         - deviceSelector:
             # Talos cant detect MAC address at boot, so it assigns a random one.
@@ -254,11 +228,7 @@ nodes:
           dhcpOptions:
             routeMetric: 4096
           vlans:
-            - vlanId: 2040
-              dhcp: true
-              mtu: 9000
-              dhcpOptions:
-                routeMetric: 2048
+            - *vlan2040
 
     - hostname: work5.cluster-2.${secret_domain}
       ipAddress: work5.cluster-2.${secret_domain}
@@ -276,8 +246,7 @@ nodes:
             driver: bcmgenet
           dhcp: false
           vlans:
-            - vlanId: 2002
-              dhcp: true
+            - *vlan2002
         # 2.5G PICe Port
         - deviceSelector:
             # Talos cant detect MAC address at boot, so it assigns a random one.
@@ -288,11 +257,7 @@ nodes:
           dhcpOptions:
             routeMetric: 4096
           vlans:
-            - vlanId: 2040
-              dhcp: true
-              mtu: 9000
-              dhcpOptions:
-                routeMetric: 2048
+            - *vlan2040
 
     - hostname: work6.cluster-2.${secret_domain}
       ipAddress: work6.cluster-2.${secret_domain}
@@ -310,8 +275,7 @@ nodes:
             driver: bcmgenet
           dhcp: false
           vlans:
-            - vlanId: 2002
-              dhcp: true
+            - *vlan2002
         # 2.5G PICe Port
         - deviceSelector:
             # Talos cant detect MAC address at boot, so it assigns a random one.
@@ -322,11 +286,7 @@ nodes:
           dhcpOptions:
             routeMetric: 4096
           vlans:
-            - vlanId: 2040
-              dhcp: true
-              mtu: 9000
-              dhcpOptions:
-                routeMetric: 2048
+            - *vlan2040
 
     - hostname: work7.cluster-2.${secret_domain}
       ipAddress: work7.cluster-2.${secret_domain}
@@ -344,8 +304,7 @@ nodes:
             driver: bcmgenet
           dhcp: false
           vlans:
-            - vlanId: 2002
-              dhcp: true
+            - *vlan2002
         # 2.5G PICe Port
         - deviceSelector:
             # Talos cant detect MAC address at boot, so it assigns a random one.
@@ -356,11 +315,7 @@ nodes:
           dhcpOptions:
             routeMetric: 4096
           vlans:
-            - vlanId: 2040
-              dhcp: true
-              mtu: 9000
-              dhcpOptions:
-                routeMetric: 2048
+            - *vlan2040
 
     - hostname: work8.cluster-2.${secret_domain}
       ipAddress: work8.cluster-2.${secret_domain}
@@ -378,8 +333,7 @@ nodes:
             driver: bcmgenet
           dhcp: false
           vlans:
-            - vlanId: 2002
-              dhcp: true
+            - *vlan2002
         # 2.5G PICe Port
         - deviceSelector:
             # Talos cant detect MAC address at boot, so it assigns a random one.
@@ -390,11 +344,7 @@ nodes:
           dhcpOptions:
             routeMetric: 4096
           vlans:
-            - vlanId: 2040
-              dhcp: true
-              mtu: 9000
-              dhcpOptions:
-                routeMetric: 2048
+            - *vlan2040
 
     - hostname: temp1.cluster-2.${secret_domain}
       ipAddress: temp1.cluster-2.${secret_domain}
@@ -447,13 +397,25 @@ nodes:
             routeMetric: 2048
 
 controlPlane:
+  schematic:
+    customization:
+      extraKernelArgs:
+        - net.ifnames=0
+      systemExtensions:
+        officialExtensions: &extensions
+          # - siderolabs/intel-ucode
+          # - siderolabs/i915-ucode
+          - siderolabs/tailscale
+          - siderolabs/util-linux-tools
+          - siderolabs/nut-client
+          - siderolabs/stargz-snapshotter
   patches:
   # To get consistent naming for interfaces
-    - |-
-      - op: add
-        path: /machine/install/extraKernelArgs
-        value:
-          - net.ifnames=0
+  #   - |-
+  #     - op: add
+  #       path: /machine/install/extraKernelArgs
+  #       value:
+  #         - net.ifnames=0
     # Disable search domain everywhere
     - |-
       machine:
@@ -548,13 +510,19 @@ controlPlane:
           fs.inotify.max_user_instances: "8192"
 
 worker:
+  schematic:
+    customization:
+      extraKernelArgs:
+        - net.ifnames=0
+      systemExtensions:
+        officialExtensions: *extensions
   patches:
   # To get consistent naming for interfaces
-    - |-
-      - op: add
-        path: /machine/install/extraKernelArgs
-        value:
-          - net.ifnames=0
+    # - |-
+    #   - op: add
+    #     path: /machine/install/extraKernelArgs
+    #     value:
+    #       - net.ifnames=0
     # Kubelet configuration
     - |-
       machine:
