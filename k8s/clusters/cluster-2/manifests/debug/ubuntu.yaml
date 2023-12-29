@@ -1,52 +1,50 @@
 ---
-apiVersion: apps/v1
-kind: DaemonSet
+apiVersion: v1
+kind: Pod
 metadata:
-  name: ubuntu-debug
+  name: ubuntu-debug-work4
   namespace: kube-system
-  labels:
-    k8s-app: ubuntu-debug
 spec:
-  selector:
-    matchLabels:
-      name: ubuntu-debug
-  template:
-    metadata:
-      labels:
-        name: ubuntu-debug
-    spec:
-      tolerations:
-      # these tolerations are to have the daemonset runnable on control plane nodes
-      # remove them if your control plane nodes should not run pods
-      - key: node-role.kubernetes.io/control-plane
-        operator: Exists
-        effect: NoSchedule
-      containers:
-        - name: ubuntu
-          image: ubuntu
-          command: ["/bin/sh","-c"]
-          args:
-            - >
-              apt-get update &&
-              apt-get install -y gdisk &&
-              echo "Go to sleep now!" &&
-              sleep 6000000000000000000000000000000000000
-          volumeMounts:
-            - mountPath: /hostRoot
-              name: root
-              readOnly: true
-          securityContext:
-            privileged: true
-          resources:
-            requests:
-              memory: "640Mi"
-              cpu: "250m"
-            limits:
-              memory: "4096Mi"
-              cpu: "2000m"
-      terminationGracePeriodSeconds: 30
-      volumes:
-        - name: root
-          hostPath:
-            path: /
-            type: Directory
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command: ["/bin/sh","-c"]
+    # apt-get update &&
+    # apt-get install -y gdisk &&
+    # echo "Go to sleep now!" &&
+    args:
+      - >
+        sleep 6000000000000000000000000000000000000
+    volumeMounts:
+    - mountPath: /hostRoot
+      name: root
+      readOnly: true
+    # - mountPath: /mountedPVC
+    #   name: pvc
+    #   readOnly: false
+    securityContext:
+      privileged: true
+    # resources:
+    #   requests:
+    #     memory: "640Mi"
+    #     cpu: "250m"
+    #   limits:
+    #     memory: "4096Mi"
+    #     cpu: "2000m"
+  volumes:
+  - name: root
+    hostPath:
+      path: /
+      type: Directory
+  # - name: pvc
+  #   persistentVolumeClaim:
+  #     claimName: overseerr-config-nvme
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - work4
