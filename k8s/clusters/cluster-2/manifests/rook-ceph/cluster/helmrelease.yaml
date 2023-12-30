@@ -113,7 +113,7 @@ spec:
             memory: 256Mi
         osd:
           limits:
-            cpu: 500m
+            cpu: 1000m
             memory: 3072Mi
           requests:
             cpu: 250m
@@ -153,6 +153,15 @@ spec:
           requests:
             cpu: "100m"
             memory: "100Mi"
+      healthCheck:
+        daemonHealth:
+          mon:
+            disabled: false
+            interval: 45s
+          osd:
+            disabled: false
+            # Default is 60s
+            interval: 60s
       crashCollector:
         disable: false
       dashboard:
