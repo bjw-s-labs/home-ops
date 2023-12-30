@@ -218,8 +218,8 @@ spec:
     cephFileSystems:
       - name: ceph-filesystem
         spec:
-          # Default is true
-          preservePoolsOnDelete: false
+          # Default is true. Setting to false will allow the cephh-operator to delete the pools when deleting the filesystem
+          preservePoolsOnDelete: true
           deviceClass: hdd
           metadataPool:
             replicated:
