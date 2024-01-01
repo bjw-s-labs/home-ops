@@ -26,6 +26,7 @@ spec:
           securityContext:
             runAsUser: ${APP_UID}
             runAsGroup: ${APP_GID}
+            runAsNonRoot: true
             fsGroup: ${APP_GID}
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
@@ -37,6 +38,7 @@ spec:
               repository: ghcr.io/onedr0p/radarr-develop
               tag: 5.2.6.8376@sha256:73f934fcaa652d0ee41af3038b943a3a1ee5146ad17646b99ed425f657a1b44a
             env:
+              COMPlus_EnableDiagnostics: "0"
               RADARR__INSTANCE_NAME: Radarr
               RADARR__PORT: &port 7878
               RADARR__AUTHENTICATION_METHOD: External
@@ -54,6 +56,12 @@ spec:
                 memory: 431M
               limits:
                 memory: 431M
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
 
     service:
       main:
