@@ -55,11 +55,6 @@ spec:
                 drop:
                   - ALL
 
-          dnsdist:
-            image:
-              repository: docker.io/powerdns/dnsdist-18
-              tag: 1.8.3
-
           gluetun:
             image:
               repository: ghcr.io/qdm12/gluetun
@@ -82,12 +77,6 @@ spec:
               - name: FIREWALL_OUTBOUND_SUBNETS
                 # Allow access to k8s subnets
                 value: "10.96.0.0/12,10.244.0.0/16"
-              - name: SHADOWSOCKS
-                value: "on"
-              - name: DOT
-                value: "off"
-              - name: DNS_ADDRESS
-                value: "127.0.0.2"
             envFrom:
               - secretRef:
                   name: qbittorrent-secret
