@@ -27,6 +27,7 @@ spec:
           securityContext:
             runAsUser: ${APP_UID}
             runAsGroup: ${APP_GID}
+            runAsNonRoot: true
             fsGroup: ${APP_GID}
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
@@ -45,6 +46,12 @@ spec:
                 memory: 128Mi
               limits:
                 memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
 
     service:
       main:

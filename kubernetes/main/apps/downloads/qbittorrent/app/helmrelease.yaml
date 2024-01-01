@@ -48,6 +48,12 @@ spec:
             securityContext:
               runAsUser: ${APP_UID}
               runAsGroup: ${APP_GID}
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
 
           dnsdist:
             image:
@@ -80,7 +86,7 @@ spec:
                 value: "on"
               - name: DOT
                 value: "off"
-              - name: DNS_PLAINTEXT_ADDRESS
+              - name: DNS_ADDRESS
                 value: "127.0.0.2"
             envFrom:
               - secretRef:
@@ -89,6 +95,7 @@ spec:
               capabilities:
                 add:
                   - NET_ADMIN
+              allowPrivilegeEscalation: false
 
           port-forward:
             image:
@@ -101,6 +108,11 @@ spec:
                 value: "8080"
               - name: PORT_FORWARDED
                 value: "/tmp/gluetun/forwarded_port"
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
 
     service:
       main:
