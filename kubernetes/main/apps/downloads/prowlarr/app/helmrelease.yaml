@@ -1,6 +1,6 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: prowlarr
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.3.0
+      version: 2.4.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -26,6 +26,7 @@ spec:
           securityContext:
             runAsUser: ${APP_UID}
             runAsGroup: ${APP_GID}
+            runAsNonRoot: true
             fsGroup: ${APP_GID}
             fsGroupChangePolicy: OnRootMismatch
 
@@ -33,8 +34,9 @@ spec:
           main:
             image:
               repository: ghcr.io/onedr0p/prowlarr-nightly
-              tag: 1.11.1.4143@sha256:5f82c09cbe1b21e0815b98c9b34b6b427b609a572b748115fb9a970ff3b7cfe0
+              tag: 1.12.0.4180@sha256:67da6fae19a50544f13598920ece1d180dbc46509b901347ae79c3f3f41a6ae5
             env:
+              COMPlus_EnableDiagnostics: "0"
               PROWLARR__INSTANCE_NAME: Prowlarr
               PROWLARR__PORT: &port 9696
               PROWLARR__LOG_LEVEL: info
@@ -51,6 +53,12 @@ spec:
                 memory: 128Mi
               limits:
                 memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
 
     service:
       main:

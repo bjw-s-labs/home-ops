@@ -5,13 +5,12 @@
     "github>bjw-s/renovate-config:automerge-github-actions",
     "github>bjw-s/home-ops//.github/renovate/allowedVersions.json5",
     "github>bjw-s/home-ops//.github/renovate/autoMerge.json5",
-    "github>bjw-s/home-ops//.github/renovate/disabledDatasources.json5",
+    "github>bjw-s/home-ops//.github/renovate/versioning.json5",
     "github>bjw-s/home-ops//.github/renovate/groups.json5",
+    "github>bjw-s/home-ops//.github/renovate/clusters.json5",
+    "github>bjw-s/home-ops//.github/renovate/grafanaDashboards.json5",
   ],
-  platform: "github",
-  username: "bjw-s-bot[bot]",
-  gitAuthor: "bjw-s-bot <87358111+bjw-s-bot[bot]@users.noreply.github.com>",
-  ignorePaths: ["^archive/**"],
+  ignorePaths: ["^.archive/**"],
   flux: {
     fileMatch: ["^kubernetes/.+\\.ya?ml$"],
   },
@@ -21,46 +20,4 @@
   kubernetes: {
     fileMatch: ["^kubernetes/.+\\.ya?ml$"],
   },
-  packageRules: [
-    // Custom version schemes
-    {
-      description: "Use custom versioning for http-https-echo",
-      matchDatasources: ["docker"],
-      matchPackageNames: ["ghcr.io/mendhak/http-https-echo"],
-      versioning: "regex:^(?<major>\\d+)$",
-    },
-    {
-      description: "Use custom versioning for Minio",
-      matchDatasources: ["docker"],
-      versioning: "regex:^RELEASE\\.(?<major>\\d+)-(?<minor>\\d+)-(?<patch>\\d+)T.*Z(-(?<compatibility>.*))?$",
-      matchPackageNames: ["quay.io/minio/minio"],
-    },
-    {
-      description: "Use custom versioning for Scrypted",
-      matchDatasources: ["docker"],
-      versioning: "regex:^(?<compatibility>(?<nodeVersion>\\d{2})-(?<ubuntuVersion>.*?)-(?<scryptedFlavor>.*?))-v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
-      matchPackageNames: ["ghcr.io/koush/scrypted"],
-    },
-    {
-      description: "Use custom versioning for miniflux",
-      matchDatasources: ["docker"],
-      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>)$",
-      matchPackageNames: ["ghcr.io/miniflux/miniflux"],
-    },
-    // Version strategies
-    {
-      matchDatasources: ["docker"],
-      matchPackageNames: [
-        "ghcr.io/onedr0p/plex",
-        "ghcr.io/onedr0p/qbittorrent",
-        "ghcr.io/xirixiz/dsmr-reader-docker",
-      ],
-      versioning: "loose",
-    },
-    {
-      matchDatasources: ["docker"],
-      matchPackageNames: ["tomsquest/docker-radicale"],
-      versioning: "pep440",
-    },
-  ],
 }

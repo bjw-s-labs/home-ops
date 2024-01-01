@@ -1,6 +1,6 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: qbittorrent
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.3.0
+      version: 2.4.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -48,16 +48,17 @@ spec:
             securityContext:
               runAsUser: ${APP_UID}
               runAsGroup: ${APP_GID}
-
-          dnsdist:
-            image:
-              repository: docker.io/powerdns/dnsdist-18
-              tag: 1.8.2
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
 
           gluetun:
             image:
               repository: ghcr.io/qdm12/gluetun
-              tag: latest@sha256:c8f61c8ecaa86e66b7afd53517a3530082ed4bb8697601ff251bbbff3f7f9f9c
+              tag: latest@sha256:722940e681edc65cba9e93dea7b8b4096a96e1ef02a690fa62cef4609f6d80a6
             env:
               - name: VPN_SERVICE_PROVIDER
                 value: custom
@@ -76,12 +77,6 @@ spec:
               - name: FIREWALL_OUTBOUND_SUBNETS
                 # Allow access to k8s subnets
                 value: "10.96.0.0/12,10.244.0.0/16"
-              - name: SHADOWSOCKS
-                value: "on"
-              - name: DOT
-                value: "off"
-              - name: DNS_PLAINTEXT_ADDRESS
-                value: "127.0.0.2"
             envFrom:
               - secretRef:
                   name: qbittorrent-secret
@@ -89,6 +84,7 @@ spec:
               capabilities:
                 add:
                   - NET_ADMIN
+              allowPrivilegeEscalation: false
 
           port-forward:
             image:
@@ -101,6 +97,11 @@ spec:
                 value: "8080"
               - name: PORT_FORWARDED
                 value: "/tmp/gluetun/forwarded_port"
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
 
     service:
       main:

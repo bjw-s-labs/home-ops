@@ -1,0 +1,52 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: "Flux Kustomization Sync"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/flux-ks-sync.yaml
+      - kubernetes/main/**
+      - kubernetes/nas/**
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    name: Flux Kustomization Sync
+    runs-on:
+      - arc-runner-set-home-ops
+    environment: production
+    strategy:
+      matrix:
+        cluster:
+          - main
+          - nas
+    steps:
+      - name: Install Flux
+        uses: fluxcd/flux2/action@main
+        with:
+          version: "latest"
+
+      - name: Write kubeconfig
+        id: kubeconfig
+        uses: timheuer/base64-to-file@v1
+        with:
+          encodedString: "${{ secrets.KUBECONFIG }}"
+          fileName: kubeconfig
+
+      - name: Sync Kustomization
+        env:
+          KUBECONFIG: "${{ steps.kubeconfig.outputs.filePath }}"
+        shell: bash
+        run: |
+          flux \
+            --context "${{ matrix.cluster }}" \
+            --namespace flux-system \
+            reconcile ks cluster \
+            --with-source

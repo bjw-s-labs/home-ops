@@ -1,0 +1,129 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: renovate-ce
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 2.4.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controllers:
+      main:
+        replicas: 1
+        strategy: RollingUpdate
+
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        pod:
+          securityContext:
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GID}
+            fsGroup: ${APP_GID}
+            fsGroupChangePolicy: OnRootMismatch
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/mend/renovate-ce
+              tag: 6.7.0
+            env:
+              MEND_RNV_SERVER_PORT: &port 8080
+              MEND_RNV_ACCEPT_TOS: "y"
+              MEND_RNV_LICENSE_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: renovate-ce-secret
+                    key: license_key
+              MEND_RNV_PLATFORM: github
+              MEND_RNV_GITHUB_APP_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: renovate-ce-secret
+                    key: github_app_id
+              MEND_RNV_GITHUB_APP_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: renovate-ce-secret
+                    key: github_app_key
+              MEND_RNV_AUTODISCOVER_FILTER: "bjw-s/*"
+              RENOVATE_REQUIRE_CONFIG: "optional"
+              RENOVATE_ONBOARDING: "true"
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+                  successThreshold: 1
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+                  successThreshold: 1
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  failureThreshold: 30
+                  periodSeconds: 10
+            resources:
+              requests:
+                cpu: 14m
+                memory: 256Mi
+              limits:
+                memory: 2048Mi
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+
+    ingress:
+      main:
+        enabled: true # Disabled because personal accounts can't set account-wide webhooks :(
+        className: "internal-nginx"
+        hosts:
+          - host: "${HOSTNAME}"
+            paths:
+              - path: /
+                service:
+                  name: main
+                  port: http
+        tls:
+          - hosts:
+              - "${HOSTNAME}"
+
+    persistence:
+      cache:
+        type: persistentVolumeClaim
+        existingClaim: renovate-ce-cache
+        globalMounts:
+          - path: /tmp/renovate

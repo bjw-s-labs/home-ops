@@ -1,6 +1,6 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: thanos
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: thanos
-      version: 12.16.2
+      version: 12.20.1
       sourceRef:
         kind: HelmRepository
         name: bitnami
@@ -26,6 +26,8 @@ spec:
       dnsDiscovery:
         sidecarsService: kube-prometheus-stack-thanos-discovery
         sidecarsNamespace: monitoring
+      stores:
+        - thanos-svc-nas.bjw-s.dev:10901
       replicaLabels:
         - "__replica__" # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.replicaExternalLabelName`
       resources:
@@ -57,8 +59,8 @@ spec:
       extraFlags:
         - "--compact.concurrency=4"
         - --delete-delay=30m
-      retentionResolutionRaw: 30d
-      retentionResolution5m: 60d
+      retentionResolutionRaw: 14d
+      retentionResolution5m: 30d
       retentionResolution1h: 90d
       resources:
         requests:
@@ -88,7 +90,7 @@ spec:
       enabled: true
       alertmanagers:
         - http://alertmanager.monitoring.svc.cluster.local:9093
-      clusterName: main # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.externalLabels.cluster`
+      clusterName: ${CLUSTER_NAME} # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.externalLabels.cluster`
       config: |-
         groups:
           - name: "PrometheusWatcher"
@@ -115,22 +117,22 @@ spec:
 
   valuesFrom:
     - targetPath: objstoreConfig.config.bucket
-      kind: ConfigMap
-      name: thanos-bucket
-      valuesKey: BUCKET_NAME
+      kind: Secret
+      name: thanos-secret
+      valuesKey: S3_BUCKET
     - targetPath: objstoreConfig.config.endpoint
-      kind: ConfigMap
-      name: thanos-bucket
-      valuesKey: BUCKET_HOST
+      kind: Secret
+      name: thanos-secret
+      valuesKey: S3_HOST
     - targetPath: objstoreConfig.config.region
-      kind: ConfigMap
-      name: thanos-bucket
-      valuesKey: BUCKET_REGION
+      kind: Secret
+      name: thanos-secret
+      valuesKey: S3_REGION
     - targetPath: objstoreConfig.config.access_key
       kind: Secret
-      name: thanos-bucket
-      valuesKey: AWS_ACCESS_KEY_ID
+      name: thanos-secret
+      valuesKey: S3_ACCESS_KEY
     - targetPath: objstoreConfig.config.secret_key
       kind: Secret
-      name: thanos-bucket
-      valuesKey: AWS_SECRET_ACCESS_KEY
+      name: thanos-secret
+      valuesKey: S3_SECRET_KEY

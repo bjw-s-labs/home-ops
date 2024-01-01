@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: "Docs: Release to GitHub pages"
 
 on:
@@ -7,31 +8,30 @@ on:
     branches:
       - main
     paths:
-      - ".github/workflows/docs-publish.yaml"
-      - "docs/**"
+      - .github/workflows/docs-publish.yaml
+      - docs/**
 
 jobs:
   release-docs:
     name: Release documentation
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
-      - name: "Generate Short Lived OAuth App Token (ghs_*)"
-        uses: actions/create-github-app-token@v1.6.2
+      - name: Generate Token
+        uses: actions/create-github-app-token@v1
         id: app-token
         with:
-          app-id: "${{ secrets.BJWS_APP_ID }}"
-          private-key: "${{ secrets.BJWS_APP_PRIVATE_KEY }}"
+          app-id: ${{ secrets.BJWS_APP_ID }}
+          private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
 
       - name: Checkout main branch
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        uses: actions/checkout@v4
         with:
           token: ${{ steps.app-token.outputs.token }}
-          fetch-depth: 0
 
       - name: Build docs
-        uses: docker://ghcr.io/bjw-s/mdbook:0.4.36@sha256:e3df8bb915bbbf21438d872bf83ad5bb588963ea4fe0af710cab128fdbe65a2d
+        uses: docker://ghcr.io/bjw-s/mdbook:0.4.36@sha256:3fbcec25a31d9f9849619de4a5a16b1bc846002cc891be4dc869a1441282211e
         with:
           args: bash -c "cd docs && mdbook build"
 

@@ -1,0 +1,74 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: local-path-provisioner
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: democratic-csi
+      version: 0.14.2
+      sourceRef:
+        name: democratic-csi
+        kind: HelmRepository
+  values:
+    fullnameOverride: local-path-provisioner
+    controller:
+      enabled: true
+      strategy: node
+      externalProvisioner:
+        enabled: true
+        image: registry.k8s.io/sig-storage/csi-provisioner:v3.6.3
+        extraArgs:
+          - --leader-election=false
+          - --node-deployment=true
+          - --node-deployment-immediate-binding=false
+          - --feature-gates=Topology=true
+          - --strict-topology=true
+          - --enable-capacity=true
+          - --capacity-ownerref-level=1
+      externalResizer:
+        enabled: false
+      externalAttacher:
+        enabled: false
+      externalSnapshotter:
+        enabled: false
+
+    csiDriver:
+      name: "org.democratic-csi.local-hostpath"
+      attachRequired: false
+      storageCapacity: true
+      fsGroupPolicy: File
+
+    storageClasses:
+      - name: local-hostpath
+        defaultClass: false
+        reclaimPolicy: Delete
+        volumeBindingMode: WaitForFirstConsumer
+        allowVolumeExpansion: true
+
+    driver:
+      config:
+        driver: local-hostpath
+        local-hostpath:
+          shareBasePath: &storagePath "/tank/Apps/kubernetes"
+          controllerBasePath: *storagePath
+          dirPermissionsMode: "0770"
+          dirPermissionsUser: 0
+          dirPermissionsGroup: 0
+
+    node:
+      driver:
+        image: ghcr.io/democratic-csi/democratic-csi:v1.8.4
+        extraVolumeMounts:
+          - name: local-hostpath
+            mountPath: *storagePath
+            mountPropagation: Bidirectional
+
+      extraVolumes:
+        - name: local-hostpath
+          hostPath:
+            path: *storagePath
+            type: DirectoryOrCreate

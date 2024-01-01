@@ -1,0 +1,87 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: windmill
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: windmill
+      version: 2.0.50
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: windmill
+        namespace: flux-system
+
+  values:
+    postgresql:
+      enabled: false
+
+    minio:
+      enabled: false
+
+    windmill:
+      # -- replica for the application app
+      appReplicas: 1
+
+      # -- replicas for the lsp containers used by the app
+      lspReplicas: 1
+
+      # -- replicas for the multiplayer containers used by the app
+      multiplayerReplicas: 1
+
+      baseDomain: "${HOSTNAME}"
+      baseProtocol: https
+
+      # Set by valuesFrom
+      # databaseUrl:
+
+      workerGroups:
+        - name: "default"
+          replicas: 2
+          annotations: {}
+          labels: {}
+          nodeSelector: {}
+          tolerations: []
+          affinity: {}
+          resources:
+            requests:
+              memory: "1028Mi"
+              cpu: "500m"
+            limits:
+              memory: "2048Mi"
+              cpu: "1000m"
+          extraEnv: []
+          volumes: []
+          volumeMounts: []
+        - name: "native"
+          replicas: 2
+          annotations: {}
+          labels: {}
+          nodeSelector: {}
+          tolerations: []
+          affinity: {}
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+
+    ingress:
+      enabled: true
+      className: "external-nginx"
+      annotations:
+        external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
+      tls:
+        - hosts:
+            - "${HOSTNAME}"
+
+  valuesFrom:
+    - kind: Secret
+      name: ${APP}-pguser-${DB_USER}
+      valuesKey: uri
+      targetPath: windmill.databaseUrl

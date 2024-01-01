@@ -1,52 +1,44 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 clusterName: ${clusterName}
-endpoint: "https://${clusterName}.bjw-s.casa:6443"
+endpoint: "https://${clusterName}.${clusterDNSSuffix}:6443"
 
-talosVersion: v1.5.5
-kubernetesVersion: 1.28.4
-
-# Image URL rendered on https://factory.talos.dev
-# customization:
-#     extraKernelArgs:
-#         - net.ifnames=0
-#     systemExtensions:
-#         officialExtensions:
-#             - siderolabs/i915-ucode
-#             - siderolabs/intel-ucode
-talosImageURL: factory.talos.dev/installer/22b1d04da881ef7c57edb0f24d1f3ba2c78a8e22cbe3fa9af4f42d487b2863f7
+talosVersion: v1.6.0
+kubernetesVersion: 1.29.0
 
 cniConfig:
   name: none
 
-additionalApiServerCertSans:
+additionalApiServerCertSans: &san
   - ${clusterEndpointIP}
-
-additionalMachineCertSans:
-  - ${clusterEndpointIP}
-  - ${clusterName}.bjw-s.casa
+  - ${clusterName}.${clusterDNSSuffix}
+  - "127.0.0.1" # KubePrism
+additionalMachineCertSans: *san
 
 nodes:
   - hostname: delta.bjw-s.casa
     ipAddress: 10.1.1.31
     controlPlane: true
     installDiskSelector:
-      busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0/
+      size: "<= 256GB"
+      model: "TS240GMTS420S"
     machineDisks:
       - device: /dev/disk/by-id/ata-CT500MX500SSD1_2149E5EC1D9D
         partitions:
           - mountpoint: /var/mnt/sata
     networkInterfaces:
       - deviceSelector:
-          hardwareAddr: "48:21:0b:55:c4:8a"
+          driver: igc
         dhcp: true
         vlans:
-          - vlanId: 40
+          - &vlan40
+            vlanId: 40
             mtu: 1500
             dhcp: true
             dhcpOptions:
               routeMetric: 4096
     patches:
-      - |-
+      - &kubelet_extra_mounts |-
         machine:
           kubelet:
             extraMounts:
@@ -62,67 +54,50 @@ nodes:
     ipAddress: 10.1.1.32
     controlPlane: true
     installDiskSelector:
-      busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0/
+      size: "<= 256GB"
+      model: "TS240GMTS420S"
     machineDisks:
       - device: /dev/disk/by-id/ata-CT500MX500SSD1_2149E5EC1D31
         partitions:
           - mountpoint: /var/mnt/sata
     networkInterfaces:
       - deviceSelector:
-          hardwareAddr: "48:21:0b:55:dc:7b"
+          driver: igc
         dhcp: true
         vlans:
-          - vlanId: 40
-            mtu: 1500
-            dhcp: true
-            dhcpOptions:
-              routeMetric: 4096
+          - *vlan40
     patches:
-      - |-
-        machine:
-          kubelet:
-            extraMounts:
-              - destination: /var/mnt/sata
-                type: bind
-                source: /var/mnt/sata
-                options:
-                  - rbind
-                  - rshared
-                  - rw
+      - *kubelet_extra_mounts
 
   - hostname: felix.bjw-s.casa
     ipAddress: 10.1.1.33
     controlPlane: true
     installDiskSelector:
-      busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0/
+      size: "<= 256GB"
+      model: "TS240GMTS420S"
     machineDisks:
       - device: /dev/disk/by-id/ata-KINGSTON_SA400S37480G_50026B77825B2170
         partitions:
           - mountpoint: /var/mnt/sata
     networkInterfaces:
       - deviceSelector:
-          hardwareAddr: "48:21:0b:56:09:47"
+          driver: igc
         dhcp: true
         vlans:
-          - vlanId: 40
-            mtu: 1500
-            dhcp: true
-            dhcpOptions:
-              routeMetric: 4096
+          - *vlan40
     patches:
-      - |-
-        machine:
-          kubelet:
-            extraMounts:
-              - destination: /var/mnt/sata
-                type: bind
-                source: /var/mnt/sata
-                options:
-                  - rbind
-                  - rshared
-                  - rw
+      - *kubelet_extra_mounts
 
 controlPlane:
+  schematic:
+    customization:
+      extraKernelArgs:
+        - net.ifnames=0
+      systemExtensions:
+        officialExtensions:
+          - siderolabs/intel-ucode
+          - siderolabs/i915-ucode
+
   patches:
     # Disable search domain everywhere
     - |-
@@ -160,7 +135,7 @@ controlPlane:
           extraHostEntries:
             - ip: ${clusterEndpointIP}
               aliases:
-                - ${clusterName}.bjw-s.casa
+                - ${clusterName}.${clusterDNSSuffix}
 
     # Configure pull through cache
     - |-
@@ -245,7 +220,7 @@ controlPlane:
       machine:
         kubelet:
           extraArgs:
-            feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true,NewVolumeManagerReconstruction=false
+            feature-gates: GracefulNodeShutdown=true,NewVolumeManagerReconstruction=false
             rotate-server-certificates: "true"
           extraConfig:
             maxPods: 150

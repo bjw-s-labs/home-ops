@@ -44,13 +44,16 @@ provider "registry.opentofu.org/aminueza/minio" {
 }
 
 provider "registry.opentofu.org/backblaze/b2" {
-  version     = "0.8.4"
-  constraints = "0.8.4"
+  version     = "0.8.7"
+  constraints = "0.8.7"
   hashes = [
-    "h1:vtRe9tVLQqXMJPthxF+lh1uq2xai/FdOUUY8OkPHBqk=",
-    "zh:0181814e41ca950f0854d30efd9ac12ed46f031adab9628f768c7f1c3e851a46",
-    "zh:d2c76fa03670a9b4b54b768e897ba2a9b6e382eba666850228b041d744619dda",
-    "zh:f0d9e9d991215e69d9631b7bf75d3f6a7e8f76249c634bc704061a15b12349cd",
-    "zh:fb7dbb61143d0fa338a596063aa66ad3ecaa5b3537c9ab0b9f05dc30eed16cbf",
+    "h1:00oWKpRLaWlwNwebBlsy4ZDN9dsYPZv6G3VoYxz5SSE=",
+    "h1:GLJrlMQ3CxORGarOlpbdKNjfdVxwWF7D1Sa5Svtsi2Q=",
+    "h1:R+Ota2rVe+KaYwJIrlVGgRxtTGgkqXgsMRApg6r/+5M=",
+    "h1:hSsgVZdn6G7G8Zp03Ij9lLQYEQ0aWGy3j3loEsjkJMQ=",
+    "zh:832081241cdf62ea27af5e9999c7c94bbec1816dc552c53da1caa8a2ff7b987f",
+    "zh:c130917d8da3e85392fb3c8c7b2be3b2fd1d1eb5023993d33e3d0838e8375d05",
+    "zh:f9f7dbf09d818c5a05570d73facaf0bb840c541de07439b0891381df4c75875a",
+    "zh:fc142bb2370c541ae14ea4f8f8c5437efa07911a8c36be60820cba6671fa6c81",
   ]
 }

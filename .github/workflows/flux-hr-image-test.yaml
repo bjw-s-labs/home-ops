@@ -1,0 +1,148 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: "Flux Helm Release Image Test"
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changed-files:
+    name: Get Changed Files
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.changed-files.outputs.all_changed_and_modified_files }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          files: kubernetes/**
+          dir_names: true
+          dir_names_max_depth: 2
+          json: true
+          escape_json: false
+
+      - name: List all changed files
+        run: echo "${{ steps.changed-files.outputs.all_changed_and_modified_files }}"
+
+  extract-images:
+    name: Extract Images
+    runs-on: ubuntu-latest
+    needs:
+      - changed-files
+    if: ${{ needs.changed-files.outputs.matrix != '[]' }}
+    permissions:
+      pull-requests: read
+    strategy:
+      matrix:
+        paths: ${{ fromJSON(needs.changed-files.outputs.matrix) }}
+      max-parallel: 4
+      fail-fast: false
+    outputs:
+      matrix: ${{ steps.extract-images.outputs.images }}
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          ref: "${{ github.event.repository.default_branch }}"
+          path: default
+
+      - name: Checkout Pull Request branch
+        uses: actions/checkout@v4
+        with:
+          path: pull
+
+      - name: Install Flux
+        uses: fluxcd/flux2/action@main
+        with:
+          version: "latest"
+
+      - name: Install yq
+        uses: frenck/action-setup-yq@v1
+
+      - name: Install jo
+        uses: awalsh128/cache-apt-pkgs-action@v1.3.1
+        with:
+          packages: jo
+
+      - name: Gather Images in Default Branch
+        uses: docker://ghcr.io/allenporter/flux-local:pr-472
+        with:
+          args: >-
+            get cluster
+            --path /github/workspace/default/${{ matrix.paths }}
+            --enable-images
+            --output yaml
+            --output-file default.yaml
+
+      - name: Gather Images in Pull Request Branch
+        uses: docker://ghcr.io/allenporter/flux-local:pr-472
+        with:
+          args: >-
+            get cluster
+            --path /github/workspace/pull/${{ matrix.paths }}
+            --enable-images
+            --output yaml
+            --output-file pull.yaml
+
+      - name: Filter Default Branch Results
+        shell: bash
+        run: |
+          yq -r '[.. | .images? | select(. != null)] | flatten | sort | unique | .[]' \
+              default.yaml > default.txt
+
+      - name: Filter Pull Request Branch Results
+        shell: bash
+        run: |
+          yq -r '[.. | .images? | select(. != null)] | flatten | sort | unique | .[]' \
+              pull.yaml > pull.txt
+
+      - name: Compare Default and Pull Request Images
+        id: extract-images
+        shell: bash
+        run: |
+          diff="$(grep -vf default.txt pull.txt || true)"
+          images=$(jo -a "${diff}")
+          echo "images=${images}" >> "${GITHUB_OUTPUT}"
+          echo "${images}"
+
+  test-images:
+    name: Test images from Helm Release
+    runs-on: ubuntu-latest
+    needs:
+      - "extract-images"
+    if: ${{ needs.extract-images.outputs.matrix != '[null]' }}
+    strategy:
+      matrix:
+        images: ${{ fromJSON(needs.extract-images.outputs.matrix) }}
+      max-parallel: 4
+      fail-fast: false
+    steps:
+      - name: Test Images from Helm Release
+        run: docker pull ${{ matrix.images }}
+
+  test-images-success:
+    needs:
+      - test-images
+    if: ${{ always() }}
+    name: Test images from Helm Release successful
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check matrix status
+        if: >-
+          ${{
+               contains(needs.*.result, 'failure')
+            || contains(needs.*.result, 'cancelled')
+          }}
+        run: exit 1
