@@ -30,6 +30,9 @@ spec:
           - hostssl all all all md5
   instances:
     - name: postgres
+      metadata:
+        labels:
+          app.kubernetes.io/name: pgo-${APP}
       replicas: 2
       dataVolumeClaimSpec:
         storageClassName: local-hostpath
