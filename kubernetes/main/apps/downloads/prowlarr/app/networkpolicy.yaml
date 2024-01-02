@@ -2,11 +2,11 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: radarr
+  name: prowlarr
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: radarr
+      app.kubernetes.io/name: prowlarr
   policyTypes:
     - Ingress
     - Egress
@@ -21,68 +21,41 @@ spec:
               app.kubernetes.io/name: ingress-nginx
               app.kubernetes.io/instance: nginx-internal
       ports:
-        - port: &port 7878
+        - port: &port 9696
           protocol: TCP
-    # autobrr
+    # radarr
     - from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: autobrr
+              app.kubernetes.io/name: radarr
       ports:
         - port: *port
           protocol: TCP
-    # prowlarr
+    # sonarr
     - from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: prowlarr
-      ports:
-        - port: *port
-          protocol: TCP
-    # recyclarr
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: recyclarr
+              app.kubernetes.io/name: sonarr
       ports:
         - port: *port
           protocol: TCP
   egress:
-    # qBittorrent
+    # radarr
     - to:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: qbittorrent
+              app.kubernetes.io/name: radarr
       ports:
-        - port: 8080
+        - port: 7878
           protocol: TCP
-    # sabnzbd
+    # sonarr
     - to:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: sabnzbd
+              app.kubernetes.io/name: sonarr
       ports:
-        - port: 8080
+        - port: 8989
           protocol: TCP
-    # prowlarr
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: prowlarr
-      ports:
-        - port: 9696
-          protocol: TCP
-    # plex
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: media
-          podSelector:
-            matchLabels:
-              app.kubernetes.io/name: plex
-      ports:
-        - port: 32400
-          protocol: UDP
     # kube-dns
     - to:
         - namespaceSelector:

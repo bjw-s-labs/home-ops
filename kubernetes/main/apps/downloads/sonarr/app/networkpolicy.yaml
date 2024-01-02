@@ -31,6 +31,14 @@ spec:
       ports:
         - port: *port
           protocol: TCP
+    # prowlarr
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prowlarr
+      ports:
+        - port: *port
+          protocol: TCP
     # recyclarr
     - from:
         - podSelector:
