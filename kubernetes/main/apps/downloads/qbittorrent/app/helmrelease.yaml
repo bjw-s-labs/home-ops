@@ -60,23 +60,14 @@ spec:
               repository: ghcr.io/qdm12/gluetun
               tag: latest@sha256:450a487b23cd460da99b025b32b22fbccd41e7f3a0b083d34326d5a4c88519b0
             env:
-              - name: VPN_SERVICE_PROVIDER
-                value: custom
-              - name: VPN_TYPE
-                value: wireguard
-              - name: VPN_INTERFACE
-                value: wg0
-              - name: VPN_ENDPOINT_PORT
-                value: "51820"
-              - name: VPN_PORT_FORWARDING
-                value: "on"
-              - name: VPN_PORT_FORWARDING_PROVIDER
-                value: "protonvpn"
-              - name: FIREWALL_INPUT_PORTS
-                value: "8080"
-              - name: FIREWALL_OUTBOUND_SUBNETS
-                # Allow access to k8s subnets
-                value: "10.96.0.0/12,10.244.0.0/16"
+              VPN_SERVICE_PROVIDER: custom
+              VPN_TYPE: wireguard
+              VPN_INTERFACE: wg0
+              VPN_ENDPOINT_PORT: 51820
+              VPN_PORT_FORWARDING: on
+              VPN_PORT_FORWARDING_PROVIDER: protonvpn
+              FIREWALL_INPUT_PORTS: 8080
+              FIREWALL_OUTBOUND_SUBNETS: 10.96.0.0/12,10.244.0.0/16 # Allow access to k8s subnets
             envFrom:
               - secretRef:
                   name: qbittorrent-secret
@@ -88,17 +79,22 @@ spec:
 
           port-forward:
             image:
-              repository: docker.io/snoringdragon/gluetun-qbittorrent-port-manager
-              tag: "1.3"
+              repository: ghcr.io/bjw-s/gluetun-qb-port-sync
+              tag: v0.0.1
             env:
-              - name: QBITTORRENT_SERVER
-                value: localhost
-              - name: QBITTORRENT_PORT
-                value: "8080"
-              - name: PORT_FORWARDED
-                value: "/tmp/gluetun/forwarded_port"
+              GLUETUN_CONTROL_SERVER_HOST: localhost
+              GLUETUN_CONTROL_SERVER_PORT: 8000
+              QBITTORRENT_HOST: localhost
+              QBITTORRENT_WEBUI_PORT: *port
+              CRON_ENABLED: true
+              CRON_SCHEDULE: "*/5 * * * *"
+              LOG_TIMESTAMP: false
             securityContext:
+              runAsUser: ${APP_UID}
+              runAsGroup: ${APP_GID}
+              runAsNonRoot: true
               allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
               capabilities:
                 drop:
                   - ALL
@@ -149,21 +145,3 @@ spec:
           main:
             main:
               - path: /data/nas-media
-      dnsdist-config:
-        type: configMap
-        name: qbittorrent-dnsdist
-        advancedMounts:
-          main:
-            dnsdist:
-              - path: /etc/dnsdist/dnsdist.conf
-                subPath: dnsdist.conf
-                readOnly: true
-      gluetun-data:
-        type: emptyDir
-        advancedMounts:
-          main:
-            gluetun:
-              - path: /tmp/gluetun
-            port-forward:
-              - path: /tmp/gluetun
-                readOnly: true
