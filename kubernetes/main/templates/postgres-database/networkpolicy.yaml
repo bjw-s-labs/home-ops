@@ -19,6 +19,8 @@ spec:
       ports:
         - port: &port 5432
           protocol: TCP
+        - port: 8008
+          protocol: TCP
     # app
     - from:
         - podSelector:
@@ -36,12 +38,16 @@ spec:
       ports:
         - port: *port
           protocol: TCP
+        - port: 8008
+          protocol: TCP
     # Minio
     - to:
         - ipBlock:
             cidr: 10.1.1.12/32
       ports:
         - port: 80
+          protocol: TCP
+        - port: 443
           protocol: TCP
     # kube-dns
     - to:
