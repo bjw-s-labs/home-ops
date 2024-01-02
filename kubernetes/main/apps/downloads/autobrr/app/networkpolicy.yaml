@@ -2,23 +2,52 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: cross-seed
+  name: autobrr
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: cross-seed
+      app.kubernetes.io/name: autobrr
   policyTypes:
     - Ingress
     - Egress
   ingress:
+    # Ingress controller
     - from:
-        - podSelector:
+        - namespaceSelector:
             matchLabels:
-              app.kubernetes.io/name: autobrr
+              kubernetes.io/metadata.name: network
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ingress-nginx
+              app.kubernetes.io/instance: nginx-internal
       ports:
-        - port: 2468
+        - port: 7474
           protocol: TCP
   egress:
+    # Database
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: pgo-${APP}
+      ports:
+        - port: 5432
+          protocol: TCP
+    # radarr
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: radarr
+      ports:
+        - port: 7878
+          protocol: TCP
+    # sonarr
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: sonarr
+      ports:
+        - port: 8989
+          protocol: TCP
     # qBittorrent
     - to:
         - podSelector:
