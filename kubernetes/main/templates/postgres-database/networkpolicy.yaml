@@ -1,0 +1,49 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: pgo-${APP}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: pgo-${APP}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # internal
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: pgo-${APP}
+      ports:
+        - port: &port 5432
+          protocol: TCP
+    # app
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ${APP}
+      ports:
+        - port: *port
+          protocol: TCP
+  egress:
+    # internal
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: pgo-${APP}
+      ports:
+        - port: *port
+          protocol: TCP
+    # kube-dns
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
