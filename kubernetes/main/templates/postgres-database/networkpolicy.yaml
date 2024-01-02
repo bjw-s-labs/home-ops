@@ -60,3 +60,18 @@ spec:
       ports:
         - port: 53
           protocol: UDP
+    # k8s api-server
+    - to:
+        - ipBlock:
+            cidr: 10.96.0.1/32
+        - ipBlock:
+            cidr: 10.1.1.31/32
+        - ipBlock:
+            cidr: 10.1.1.32/32
+        - ipBlock:
+            cidr: 10.1.1.33/32
+      ports:
+        - port: 443
+          protocol: TCP
+        - port: 6443
+          protocol: TCP
