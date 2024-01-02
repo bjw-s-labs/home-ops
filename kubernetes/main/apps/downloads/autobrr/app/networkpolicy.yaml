@@ -56,6 +56,14 @@ spec:
       ports:
         - port: 8080
           protocol: TCP
+    # cross-seed
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: cross-seed
+      ports:
+        - port: 2468
+          protocol: TCP
     # kube-dns
     - to:
         - namespaceSelector:
