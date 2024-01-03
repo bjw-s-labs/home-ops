@@ -1,77 +1,40 @@
 ---
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
 metadata:
   name: pgo-${APP}
 spec:
-  podSelector:
+  endpointSelector:
     matchLabels:
       app.kubernetes.io/name: pgo-${APP}
-  policyTypes:
-    - Ingress
-    - Egress
   ingress:
     # internal
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: pgo-${APP}
-      ports:
-        - port: &port 5432
-          protocol: TCP
-        - port: 8008
-          protocol: TCP
-    # app
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: ${APP}
-      ports:
-        - port: *port
-          protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: pgo-${APP}
+      toPorts:
+        - ports:
+            - port: &port "5432"
+              protocol: TCP
+            - port: "8008"
+              protocol: TCP
+    # application
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: ${APP}
+      toPorts:
+        - ports:
+            - port: *port
+              protocol: TCP
   egress:
     # internal
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: pgo-${APP}
-      ports:
-        - port: *port
-          protocol: TCP
-        - port: 8008
-          protocol: TCP
-    # Minio
-    - to:
-        - ipBlock:
-            cidr: 10.1.1.12/32
-      ports:
-        - port: 80
-          protocol: TCP
-        - port: 443
-          protocol: TCP
-    # kube-dns
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: kube-system
-          podSelector:
-            matchLabels:
-              k8s-app: kube-dns
-      ports:
-        - port: 53
-          protocol: UDP
-    # k8s api-server
-    - to:
-        - ipBlock:
-            cidr: 10.96.0.1/32
-        - ipBlock:
-            cidr: 10.1.1.31/32
-        - ipBlock:
-            cidr: 10.1.1.32/32
-        - ipBlock:
-            cidr: 10.1.1.33/32
-      ports:
-        - port: 443
-          protocol: TCP
-        - port: 6443
-          protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: ${APP}
+      toPorts:
+        - ports:
+            - port: *port
+              protocol: TCP
+            - port: "8008"
+              protocol: TCP
