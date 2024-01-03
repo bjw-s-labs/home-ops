@@ -33,6 +33,8 @@ spec:
       metadata:
         labels:
           app.kubernetes.io/name: pgo-${APP}
+          egress.home.arpa/apiserver: allow
+          egress.home.arpa/minio: allow
       replicas: 2
       dataVolumeClaimSpec:
         storageClassName: local-hostpath
