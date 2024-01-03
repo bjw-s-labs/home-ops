@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: pgo
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: pgo
+  ingress: []
+  egress:
+    # allow access to all pgo cluster pods
+    - toEndpoints:
+        - matchExpressions:
+            - key: postgres-operator.crunchydata.com/cluster
+              operator: Exists
+            - key: io.kubernetes.pod.namespace
+              operator: Exists
