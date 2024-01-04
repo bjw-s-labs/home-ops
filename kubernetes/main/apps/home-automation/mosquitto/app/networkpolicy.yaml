@@ -1,0 +1,22 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosquitto
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: mosquitto
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: home-assistant
+        - matchLabels:
+            app.kubernetes.io/name: dsmr-reader
+        - matchLabels:
+            app.kubernetes.io/name: zigbee2mqtt
+      toPorts:
+        - ports:
+            - port: "1883"
+              protocol: TCP

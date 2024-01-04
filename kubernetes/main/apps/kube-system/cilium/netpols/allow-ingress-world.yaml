@@ -1,0 +1,13 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cilium.io/ciliumclusterwidenetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-ingress-world
+spec:
+  endpointSelector:
+    matchLabels:
+      ingress.home.arpa/world: allow
+  ingress:
+    - fromEntities:
+        - world

@@ -28,6 +28,9 @@ spec:
           schedule: "@daily"
 
         pod:
+          labels:
+            egress.home.arpa/world: allow
+            egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
           securityContext:
             runAsUser: ${APP_UID}
             runAsGroup: ${APP_GID}
