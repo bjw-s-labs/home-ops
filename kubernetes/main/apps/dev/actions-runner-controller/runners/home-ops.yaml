@@ -31,7 +31,22 @@ spec:
       name: actions-runner-controller-gha-rs-controller
       namespace: dev
 
+    listenerTemplate:
+      metadata:
+        labels:
+          app.kubernetes.io/name: arc-home-ops-listener
+          egress.home.arpa/world: allow
+          egress.home.arpa/apiserver: allow
+          egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
+      spec:
+        containers: []
+
     template:
+      metadata:
+        labels:
+          app.kubernetes.io/name: arc-home-ops-runner
+          egress.home.arpa/world: allow
+          egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
       spec:
         containers:
           - name: runner
