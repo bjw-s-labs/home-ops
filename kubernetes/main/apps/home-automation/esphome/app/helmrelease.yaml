@@ -23,6 +23,10 @@ spec:
           secret.reloader.stakater.com/reload: esphome-secrets,esphome-deploykey
 
         pod:
+          labels:
+            ingress.home.arpa/nginx-internal: allow
+            egress.home.arpa/world: allow
+            egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
           annotations:
             k8s.v1.cni.cncf.io/networks: |
               [{
