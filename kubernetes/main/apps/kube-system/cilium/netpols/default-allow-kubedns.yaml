@@ -1,26 +1,5 @@
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cilium.io/ciliumclusterwidenetworkpolicy_v2.json
-apiVersion: cilium.io/v2
-kind: CiliumClusterwideNetworkPolicy
-metadata:
-  name: default-allow-kubedns-ingress
-spec:
-  description: "Policy for ingress allow to kube-dns from all Cilium managed endpoints in the cluster"
-  endpointSelector:
-    matchLabels:
-      k8s:io.kubernetes.pod.namespace: kube-system
-      k8s-app: kube-dns
-  ingress:
-    - fromEndpoints:
-        - {}
-      toPorts:
-        - ports:
-            - port: "53"
-              protocol: "TCP"
-            - port: "53"
-              protocol: "UDP"
----
-# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cilium.io/ciliumclusterwidenetworkpolicy_v2.json
 apiVersion: "cilium.io/v2"
 kind: CiliumClusterwideNetworkPolicy
 metadata:

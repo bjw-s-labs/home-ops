@@ -1,85 +1,67 @@
 ---
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
 metadata:
   name: autobrr
 spec:
-  podSelector:
+  endpointSelector:
     matchLabels:
       app.kubernetes.io/name: autobrr
-  policyTypes:
-    - Ingress
-    - Egress
-  ingress:
-    # Ingress controller
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: network
-          podSelector:
-            matchLabels:
-              app.kubernetes.io/name: ingress-nginx
-              app.kubernetes.io/instance: nginx-internal
-      ports:
-        - port: 7474
-          protocol: TCP
   egress:
-    # Database
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: pgo-${APP}
-      ports:
-        - port: 5432
-          protocol: TCP
+    # database
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: pgo-${APP}
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+
     # radarr
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: radarr
-      ports:
-        - port: 7878
-          protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: radarr
+      toPorts:
+        - ports:
+            - port: "7878"
+              protocol: TCP
+
     # sonarr
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: sonarr
-      ports:
-        - port: 8989
-          protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: sonarr
+      toPorts:
+        - ports:
+            - port: "8989"
+              protocol: TCP
+
     # qBittorrent
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: qbittorrent
-      ports:
-        - port: 8080
-          protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: qbittorrent
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+
     # cross-seed
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: cross-seed
-      ports:
-        - port: 2468
-          protocol: TCP
-    # kube-dns
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: kube-system
-          podSelector:
-            matchLabels:
-              k8s-app: kube-dns
-      ports:
-        - port: 53
-          protocol: UDP
-    # Internet
-    - to:
-        - ipBlock:
-            cidr: 0.0.0.0/0
-            except:
-              - 10.0.0.0/8
-              - 172.16.0.0/12
-              - 192.168.0.0/16
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: cross-seed
+      toPorts:
+        - ports:
+            - port: "2468"
+              protocol: TCP
+
+    # TODO: Remove when clusterNetworkPolicy is in place
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s:k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: "TCP"
+            - port: "53"
+              protocol: "UDP"

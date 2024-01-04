@@ -23,6 +23,9 @@ spec:
           configmap.reloader.stakater.com/reload: autobrr-configmap
 
         pod:
+          labels:
+            egress.home.arpa/world: allow
+            ingress.home.arpa/nginx-internal: allow
           securityContext:
             runAsUser: ${APP_UID}
             runAsGroup: ${APP_GID}

@@ -31,10 +31,22 @@ spec:
     # internal
     - toEndpoints:
         - matchLabels:
-            app.kubernetes.io/name: ${APP}
+            app.kubernetes.io/name: pgo-${APP}
       toPorts:
         - ports:
             - port: *port
               protocol: TCP
             - port: "8008"
               protocol: TCP
+
+    # TODO: Remove when clusterNetworkPolicy is in place
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s:k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: "TCP"
+            - port: "53"
+              protocol: "UDP"
