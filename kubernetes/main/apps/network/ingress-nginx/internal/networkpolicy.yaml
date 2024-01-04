@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cilium.io/ciliumclusterwidenetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-ingress-nginx-internal
+spec:
+  description: "Allow pods that require ingress to allow traffic from ingress-nginx, no port restrictions"
+  endpointSelector:
+    matchLabels:
+      ingress.home.arpa/nginx-internal: allow
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: ingress-nginx
+            app.kubernetes.io/instance: nginx-internal
+            io.kubernetes.pod.namespace: network
