@@ -4,12 +4,12 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: pgo
-  namespace: database
 spec:
   endpointSelector:
     matchLabels:
       app.kubernetes.io/name: pgo
-  ingress: []
+  ingress:
+    - {}
   egress:
     # allow access to all pgo cluster pods
     - toEndpoints:
@@ -18,14 +18,3 @@ spec:
               operator: Exists
             - key: io.kubernetes.pod.namespace
               operator: Exists
-    # allow access to kubedns
-    - toEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: kube-system
-            k8s:k8s-app: kube-dns
-      toPorts:
-        - ports:
-            - port: "53"
-              protocol: "TCP"
-            - port: "53"
-              protocol: "UDP"

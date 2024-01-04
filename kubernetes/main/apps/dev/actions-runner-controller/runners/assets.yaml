@@ -4,6 +4,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: arc-assets
+  namespace: dev
 spec:
   interval: 30m
   chart:
@@ -31,7 +32,22 @@ spec:
       name: actions-runner-controller-gha-rs-controller
       namespace: dev
 
+    listenerTemplate:
+      metadata:
+        labels:
+          app.kubernetes.io/name: arc-assets-listener
+          egress.home.arpa/world: allow
+          egress.home.arpa/apiserver: allow
+          egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
+      spec:
+        containers: []
+
     template:
+      metadata:
+        labels:
+          app.kubernetes.io/name: arc-assets-runner
+          egress.home.arpa/world: allow
+          egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
       spec:
         containers:
           - name: runner
