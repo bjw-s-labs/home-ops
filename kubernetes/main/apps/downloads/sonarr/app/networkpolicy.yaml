@@ -1,104 +1,54 @@
 ---
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
 metadata:
   name: sonarr
 spec:
-  podSelector:
+  endpointSelector:
     matchLabels:
       app.kubernetes.io/name: sonarr
-  policyTypes:
-    - Ingress
-    - Egress
   ingress:
-    # Ingress controller
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: network
-          podSelector:
-            matchLabels:
-              app.kubernetes.io/name: ingress-nginx
-              app.kubernetes.io/instance: nginx-internal
-      ports:
-        - port: &port 8989
-          protocol: TCP
-    # autobrr
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: autobrr
-      ports:
-        - port: *port
-          protocol: TCP
-    # prowlarr
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: prowlarr
-      ports:
-        - port: *port
-          protocol: TCP
-    # recyclarr
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: recyclarr
-      ports:
-        - port: *port
-          protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: autobrr
+        - matchLabels:
+            app.kubernetes.io/name: prowlarr
+        - matchLabels:
+            app.kubernetes.io/name: recyclarr
+        - matchLabels:
+            app.kubernetes.io/name: maintainerr
+            io.kubernetes.pod.namespace: media
+      toPorts:
+        - ports:
+            - port: "8989"
+              protocol: TCP
+
   egress:
-    # qBittorrent
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: qbittorrent
-      ports:
-        - port: 8080
-          protocol: TCP
-    # sabnzbd
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: sabnzbd
-      ports:
-        - port: 8080
-          protocol: TCP
-    # prowlarr
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: prowlarr
-      ports:
-        - port: 9696
-          protocol: TCP
     # plex
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: media
-          podSelector:
-            matchLabels:
-              app.kubernetes.io/name: plex
-      ports:
-        - port: 32400
-          protocol: UDP
-    # kube-dns
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: kube-system
-          podSelector:
-            matchLabels:
-              k8s-app: kube-dns
-      ports:
-        - port: 53
-          protocol: UDP
-    # Internet
-    - to:
-        - ipBlock:
-            cidr: 0.0.0.0/0
-            except:
-              - 10.0.0.0/8
-              - 172.16.0.0/12
-              - 192.168.0.0/16
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: plex
+            io.kubernetes.pod.namespace: media
+      toPorts:
+        - ports:
+            - port: "32400"
+              protocol: TCP
+
+    # qbittorrent
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: qbittorrent
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+
+    # sabnzbd
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: sabnzbd
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

@@ -23,6 +23,9 @@ spec:
 
         pod:
           enableServiceLinks: false
+          labels:
+            egress.home.arpa/internet: allow
+            egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
           securityContext:
             runAsUser: ${APP_UID}
             runAsGroup: ${APP_GID}
