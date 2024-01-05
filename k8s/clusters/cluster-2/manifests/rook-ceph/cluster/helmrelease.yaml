@@ -194,30 +194,30 @@ spec:
             deviceFilter: ^sdb
             config:
               metadataDevice: "sda"
-    cephBlockPools:
-      - name: ceph-blockpool
-        spec:
-          deviceClass: ssd
-          failureDomain: host
-          replicated:
-            size: 3
-        storageClass:
-          enabled: true
-          name: ceph-block
-          isDefault: true
-          reclaimPolicy: Delete
-          allowVolumeExpansion: true
-          mountOptions: ["discard"]
-          parameters:
-            imageFormat: "2"
-            imageFeatures: layering
-            csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
-            csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
-            csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
-            csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
-            csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
-            csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
-            csi.storage.k8s.io/fstype: ext4
+    cephBlockPools: []
+      # - name: ceph-blockpool
+      #   spec:
+      #     deviceClass: ssd
+      #     failureDomain: host
+      #     replicated:
+      #       size: 3
+      #   storageClass:
+      #     enabled: true
+      #     name: ceph-block
+      #     isDefault: true
+      #     reclaimPolicy: Delete
+      #     allowVolumeExpansion: true
+      #     mountOptions: ["discard"]
+      #     parameters:
+      #       imageFormat: "2"
+      #       imageFeatures: layering
+      #       csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+      #       csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+      #       csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+      #       csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+      #       csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+      #       csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+      #       csi.storage.k8s.io/fstype: ext4
     cephBlockPoolsVolumeSnapshotClass:
       enabled: true
       name: csi-ceph-blockpool
@@ -290,52 +290,52 @@ spec:
       name: csi-ceph-filesystem
       isDefault: false
       deletionPolicy: Delete
-    cephObjectStores:
-      - name: ceph-objectstore
-        spec:
-          deviceClass: ssd
-          metadataPool:
-            failureDomain: host
-            replicated:
-              size: 3
-          dataPool:
-            failureDomain: host
-            erasureCoded:
-              dataChunks: 2
-              codingChunks: 1
-          preservePoolsOnDelete: true
-          gateway:
-            port: 80
-            resources:
-              requests:
-                cpu: 250m
-                memory: 1Gi
-              limits:
-                memory: 2Gi
-            instances: 1
-            placement:
-              podAntiAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchExpressions:
-                        - key: app
-                          operator: In
-                          values:
-                            - rook-ceph-rgw
-                    # topologyKey: kubernetes.io/hostname will place RGW across different hosts
-                    topologyKey: kubernetes.io/hostname
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                      - key: node-role.kubernetes.io/rook-osd-node
-                        operator: DoesNotExist
-          healthCheck:
-            bucket:
-              interval: 60s
-        storageClass:
-          enabled: true
-          name: ceph-bucket
-          reclaimPolicy: Delete
-          parameters:
-            region: us-east-1
+    cephObjectStores: []
+      # - name: ceph-objectstore
+      #   spec:
+      #     deviceClass: ssd
+      #     metadataPool:
+      #       failureDomain: host
+      #       replicated:
+      #         size: 3
+      #     dataPool:
+      #       failureDomain: host
+      #       erasureCoded:
+      #         dataChunks: 2
+      #         codingChunks: 1
+      #     preservePoolsOnDelete: true
+      #     gateway:
+      #       port: 80
+      #       resources:
+      #         requests:
+      #           cpu: 250m
+      #           memory: 1Gi
+      #         limits:
+      #           memory: 2Gi
+      #       instances: 1
+      #       placement:
+      #         podAntiAffinity:
+      #           requiredDuringSchedulingIgnoredDuringExecution:
+      #             - labelSelector:
+      #                 matchExpressions:
+      #                   - key: app
+      #                     operator: In
+      #                     values:
+      #                       - rook-ceph-rgw
+      #               # topologyKey: kubernetes.io/hostname will place RGW across different hosts
+      #               topologyKey: kubernetes.io/hostname
+      #         nodeAffinity:
+      #           requiredDuringSchedulingIgnoredDuringExecution:
+      #             nodeSelectorTerms:
+      #               - matchExpressions:
+      #                 - key: node-role.kubernetes.io/rook-osd-node
+      #                   operator: DoesNotExist
+      #     healthCheck:
+      #       bucket:
+      #         interval: 60s
+      #   storageClass:
+      #     enabled: true
+      #     name: ceph-bucket
+      #     reclaimPolicy: Delete
+      #     parameters:
+      #       region: us-east-1
