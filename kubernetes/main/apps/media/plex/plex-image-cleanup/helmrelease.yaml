@@ -27,6 +27,16 @@ spec:
           schedule: "30 8 * * 6"
 
         pod:
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values:
+                          - plex
+                  topologyKey: kubernetes.io/hostname
           enableServiceLinks: false
           labels:
             egress.home.arpa/internet: allow
