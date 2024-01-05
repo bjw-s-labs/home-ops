@@ -224,67 +224,67 @@ spec:
       isDefault: false
       deletionPolicy: Delete
 
-    cephFileSystems:
-      - name: ceph-filesystem
-        spec:
-          # Default is true. Setting to false will allow the ceph-operator to delete the pools when deleting the filesystem
-          preservePoolsOnDelete: false
-          deviceClass: hdd
-          metadataPool:
-            replicated:
-              size: 3
-          dataPools:
-            - name: data0
-              failureDomain: host
-              replicated:
-                size: 3
-            - name: erasurecoded
-              failureDomain: host
-              erasureCoded:
-                dataChunks: 6
-                codingChunks: 2
-          metadataServer:
-            activeCount: 1
-            activeStandby: true
-            placement:
-              podAntiAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchExpressions:
-                        - key: app
-                          operator: In
-                          values:
-                            - rook-ceph-mds
-                    # topologyKey: kubernetes.io/hostname will place MDS across different hosts
-                    topologyKey: kubernetes.io/hostname
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                      - key: node-role.kubernetes.io/rook-osd-node
-                        operator: DoesNotExist
-            resources:
-              requests:
-                cpu: 100m
-                memory: 64M
-              limits:
-                cpu: 1000m
-                memory: 1000M
-        storageClass:
-          enabled: true
-          isDefault: false
-          name: ceph-filesystem
-          pool: erasurecoded
-          reclaimPolicy: Delete
-          allowVolumeExpansion: true
-          parameters:
-            csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
-            csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
-            csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
-            csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
-            csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
-            csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
-            csi.storage.k8s.io/fstype: ext4
+    cephFileSystems: []
+      # - name: ceph-filesystem
+      #   spec:
+      #     # Default is true. Setting to false will allow the ceph-operator to delete the pools when deleting the filesystem
+      #     preservePoolsOnDelete: false
+      #     deviceClass: hdd
+      #     metadataPool:
+      #       replicated:
+      #         size: 3
+      #     dataPools:
+      #       - name: data0
+      #         failureDomain: host
+      #         replicated:
+      #           size: 3
+      #       - name: erasurecoded
+      #         failureDomain: host
+      #         erasureCoded:
+      #           dataChunks: 6
+      #           codingChunks: 2
+      #     metadataServer:
+      #       activeCount: 1
+      #       activeStandby: true
+      #       placement:
+      #         podAntiAffinity:
+      #           requiredDuringSchedulingIgnoredDuringExecution:
+      #             - labelSelector:
+      #                 matchExpressions:
+      #                   - key: app
+      #                     operator: In
+      #                     values:
+      #                       - rook-ceph-mds
+      #               # topologyKey: kubernetes.io/hostname will place MDS across different hosts
+      #               topologyKey: kubernetes.io/hostname
+      #         nodeAffinity:
+      #           requiredDuringSchedulingIgnoredDuringExecution:
+      #             nodeSelectorTerms:
+      #               - matchExpressions:
+      #                 - key: node-role.kubernetes.io/rook-osd-node
+      #                   operator: DoesNotExist
+      #       resources:
+      #         requests:
+      #           cpu: 100m
+      #           memory: 64M
+      #         limits:
+      #           cpu: 1000m
+      #           memory: 1000M
+      #   storageClass:
+      #     enabled: true
+      #     isDefault: false
+      #     name: ceph-filesystem
+      #     pool: erasurecoded
+      #     reclaimPolicy: Delete
+      #     allowVolumeExpansion: true
+      #     parameters:
+      #       csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
+      #       csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+      #       csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
+      #       csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+      #       csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
+      #       csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+      #       csi.storage.k8s.io/fstype: ext4
     cephFileSystemVolumeSnapshotClass:
       enabled: true
       name: csi-ceph-filesystem
