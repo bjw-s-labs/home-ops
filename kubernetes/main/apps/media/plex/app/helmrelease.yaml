@@ -23,6 +23,10 @@ spec:
 
         pod:
           enableServiceLinks: false
+          labels:
+            egress.home.arpa/internet: allow
+            ingress.home.arpa/nginx-external: allow
+            egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
           nodeSelector:
             intel.feature.node.kubernetes.io/gpu: "true"
           securityContext:
