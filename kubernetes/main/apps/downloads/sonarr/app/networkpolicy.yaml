@@ -35,6 +35,15 @@ spec:
             - port: "32400"
               protocol: TCP
 
+    # prowlarr
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: prowlarr
+      toPorts:
+        - ports:
+            - port: "9696"
+              protocol: TCP
+
     # qbittorrent
     - toEndpoints:
         - matchLabels:
