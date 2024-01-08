@@ -1,0 +1,17 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./helmrelease.yaml
+  - ./externalsecret.yaml
+  - ./networkpolicy.yaml
+  - ../../../../templates/volsync
+configMapGenerator:
+  - name: plex-meta-manager-configmap
+    files:
+      - ./config/config.yml
+      - ./config/tv_shows.yml
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
