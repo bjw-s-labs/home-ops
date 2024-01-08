@@ -8,6 +8,15 @@ spec:
   endpointSelector:
     matchLabels:
       app.kubernetes.io/name: tautulli
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: plex-meta-manager
+      toPorts:
+        - ports:
+            - port: "8181"
+              protocol: TCP
+
   egress:
     # plex
     - toEndpoints:

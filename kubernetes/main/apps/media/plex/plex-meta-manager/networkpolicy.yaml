@@ -3,32 +3,46 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: plex
+  name: plex-meta-manager
 spec:
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/name: plex
-  ingress:
-    - fromEndpoints:
+      app.kubernetes.io/name: plex-meta-manager
+  egress:
+    # plex
+    - toEndpoints:
         - matchLabels:
-            app.kubernetes.io/name: maintainerr
-        - matchLabels:
-            app.kubernetes.io/name: plex-auto-languages
-        - matchLabels:
-            app.kubernetes.io/name: plex-image-cleanup
-        - matchLabels:
-            app.kubernetes.io/name: plex-meta-manager
-        - matchLabels:
-            app.kubernetes.io/name: plex-trakt-sync
+            app.kubernetes.io/name: plex
+      toPorts:
+        - ports:
+            - port: "32400"
+              protocol: TCP
+
+    # tautulli
+    - toEndpoints:
         - matchLabels:
             app.kubernetes.io/name: tautulli
+      toPorts:
+        - ports:
+            - port: "8181"
+              protocol: TCP
+
+    # radarr
+    - toEndpoints:
         - matchLabels:
             app.kubernetes.io/name: radarr
             io.kubernetes.pod.namespace: downloads
+      toPorts:
+        - ports:
+            - port: "7878"
+              protocol: TCP
+
+    # sonarr
+    - toEndpoints:
         - matchLabels:
             app.kubernetes.io/name: sonarr
             io.kubernetes.pod.namespace: downloads
       toPorts:
         - ports:
-            - port: "32400"
+            - port: "8989"
               protocol: TCP
