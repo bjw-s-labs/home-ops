@@ -1,0 +1,91 @@
+---
+libraries:
+  TV Shows:
+    collection_files:
+      - file: config/tv_shows.yml
+
+settings:
+  cache: true
+  cache_expiration: 60
+  asset_directory: None
+  asset_folders: true
+  asset_depth: 0
+  create_asset_folders: false
+  prioritize_assets: false
+  dimensional_asset_rename: false
+  download_url_assets: false
+  show_missing_assets: true
+  show_missing_season_assets: false
+  show_missing_episode_assets: false
+  show_asset_not_needed: true
+  sync_mode: append
+  default_collection_order: None
+  minimum_items: 1
+  item_refresh_delay: 0
+  delete_below_minimum: false
+  delete_not_scheduled: false
+  run_again_delay: 0
+  missing_only_released: false
+  only_filter_missing: false
+  show_unmanaged: true
+  show_unconfigured: true
+  show_filtered: false
+  show_options: false
+  show_missing: true
+  save_report: false
+  tvdb_language: default
+  playlist_sync_to_users: all
+  playlist_exclude_users: None
+  playlist_report: true
+  verify_ssl: true
+  custom_repo: None
+  check_nightly: false
+
+plex:
+  url: http://plex.media.svc.cluster.local:32400
+  token: <<PLEX_API_KEY>>
+  timeout: 60
+  clean_bundles: false
+  empty_trash: false
+  optimize: false
+
+tmdb:
+  apikey: <<TMDB_API_KEY>>
+  language: en
+  cache_expiration: 60
+  region:
+
+radarr:
+  url: http://radarr.downloads.svc.cluster.local:7878
+  token: <<RADARR_API_KEY>>
+  add_missing: false
+  add_existing: false
+  root_folder_path: /data/nas-media/Library/Main/Movies
+  monitor: true
+  availability: released
+  quality_profile: Ultra-HD
+  tag:
+  search: false
+  radarr_path:
+  plex_path:
+  upgrade_existing: false
+  ignore_cache: false
+
+sonarr:
+  url: http://sonarr.downloads.svc.cluster.local:8989
+  token: <<SONARR_API_KEY>>
+  add_missing: false
+  add_existing: false
+  root_folder_path: /data/nas-media/Library/Main/Series
+  monitor: all
+  quality_profile: Ultra-HD
+  language_profile: English
+  series_type: standard
+  season_folder: true
+  tag:
+  search: false
+  cutoff_search: false
+  sonarr_path:
+  plex_path:
+  upgrade_existing: false
+  ignore_cache: false

@@ -16,6 +16,12 @@ spec:
             app.kubernetes.io/name: prowlarr
         - matchLabels:
             app.kubernetes.io/name: recyclarr
+        - matchLabels:
+            app.kubernetes.io/name: maintainerr
+            io.kubernetes.pod.namespace: media
+        - matchLabels:
+            app.kubernetes.io/name: plex-meta-manager
+            io.kubernetes.pod.namespace: media
       toPorts:
         - ports:
             - port: "7878"

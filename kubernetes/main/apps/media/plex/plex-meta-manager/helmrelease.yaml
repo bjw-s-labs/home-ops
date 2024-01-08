@@ -1,0 +1,92 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: plex-meta-manager
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 2.4.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 30m
+  values:
+    controllers:
+      main:
+        type: cronjob
+
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        cronjob:
+          schedule: 0 0 * * *
+
+        pod:
+          enableServiceLinks: false
+          labels:
+            egress.home.arpa/internet: allow
+            egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
+          securityContext:
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GID}
+            fsGroup: ${APP_GID}
+            fsGroupChangePolicy: "OnRootMismatch"
+
+        containers:
+          main:
+            image:
+              repository: docker.io/meisnate12/plex-meta-manager
+              tag: v1.20.0
+            args:
+              - --run
+              - --read-only-config
+            envFrom:
+              - secretRef:
+                  name: plex-meta-manager-secret
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+            resources:
+              requests:
+                cpu: 10m
+                memory: 512Mi
+              limits:
+                memory: 1024Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+
+    service:
+      main:
+        enabled: false
+
+    ingress:
+      main:
+        enabled: false
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: "${VOLSYNC_CLAIM}"
+      config-file:
+        type: configMap
+        name: plex-meta-manager-configmap
+        globalMounts:
+          - path: /config/config.yml
+            subPath: config.yml
+            readOnly: true
+          - path: /config/tv_shows.yml
+            subPath: tv_shows.yml
+            readOnly: true
