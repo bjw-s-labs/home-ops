@@ -1,0 +1,30 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &appname music-assistant
+  namespace: flux-system
+spec:
+  targetNamespace: home-automation
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
+  interval: 10m
+  path: "./kubernetes/main/apps/home-automation/music-assistant/app"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  wait: false
+  dependsOn:
+    - name: multus-config
+    - name: rook-ceph-cluster
+    - name: volsync
+  postBuild:
+    substitute:
+      APP: *appname
+      HOSTNAME: music-assistant.bjw-s.dev
+      APP_UID: "1000"
+      APP_GID: "1000"
+      VOLSYNC_CLAIM: music-assistant-config
