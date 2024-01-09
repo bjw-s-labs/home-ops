@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: music-assistant
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: music-assistant
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: home-assistant
+      toPorts:
+        - ports:
+            - port: "8095"
+              protocol: TCP
+
+  # egress:
+  #   # home-assistant
+  #   - toEndpoints:
+  #       - matchLabels:
+  #           app.kubernetes.io/name: home-assistant
+  #     toPorts:
+  #       - ports:
+  #           - port: "8123"
+  #             protocol: TCP
