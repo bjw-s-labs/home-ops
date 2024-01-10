@@ -7,6 +7,9 @@ metadata:
 spec:
   ttlSecondsAfterFinished: 3600
   template:
+    metadata:
+      labels:
+        app.kubernetes.io/created-by: volsync
     spec:
       automountServiceAccountToken: false
       restartPolicy: OnFailure
