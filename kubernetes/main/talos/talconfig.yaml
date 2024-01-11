@@ -137,36 +137,6 @@ controlPlane:
               aliases:
                 - ${clusterName}.${clusterDNSSuffix}
 
-    # Configure pull through cache
-    - |-
-      machine:
-        registries:
-          mirrors:
-            docker.io:
-              endpoints:
-                - https://zot.bjw-s.dev/v2/docker.io
-              overridePath: true
-            ghcr.io:
-              endpoints:
-                - https://zot.bjw-s.dev/v2/ghcr.io
-              overridePath: true
-            quay.io:
-              endpoints:
-                - https://zot.bjw-s.dev/v2/quay.io
-              overridePath: true
-            gcr.io:
-              endpoints:
-                - https://zot.bjw-s.dev/v2/gcr.io
-              overridePath: true
-            registry.k8s.io:
-              endpoints:
-                - https://zot.bjw-s.dev/v2/registry.k8s.io
-              overridePath: true
-            public.ecr.aws:
-              endpoints:
-                - https://zot.bjw-s.dev/v2/public.ecr.aws
-              overridePath: true
-
     # Cluster configuration
     - |-
       cluster:
