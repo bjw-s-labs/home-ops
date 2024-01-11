@@ -40,12 +40,6 @@ spec:
             image:
               repository: ghcr.io/home-assistant/home-assistant
               tag: 2024.1.2
-            env:
-              SECRET_RECORDER_DB_URL:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: uri
             envFrom:
               - secretRef:
                   name: home-assistant-secret

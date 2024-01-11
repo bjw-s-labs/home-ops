@@ -22,8 +22,6 @@ spec:
     - name: rook-ceph-cluster
     - name: volsync
     - name: external-secrets-stores
-    - name: external-secrets-cluster-secrets
-    - name: crunchy-postgres-operator
   postBuild:
     substitute:
       APP: *appname
@@ -31,5 +29,4 @@ spec:
       APP_UID: "0"
       APP_GID: "0"
       VOLSYNC_CLAIM: home-assistant-config
-      DB_NAME: home-assistant
-      DB_USER: home-assistant
+      VOLSYNC_CAPACITY: 5Gi
