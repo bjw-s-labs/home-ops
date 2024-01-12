@@ -3,7 +3,9 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
 metadata:
-  name: authentik
+  name: xenitab
+  namespace: flux-system
 spec:
-  interval: 1h
-  url: https://charts.goauthentik.io
+  type: oci
+  interval: 5m
+  url: oci://ghcr.io/xenitab/helm-charts
