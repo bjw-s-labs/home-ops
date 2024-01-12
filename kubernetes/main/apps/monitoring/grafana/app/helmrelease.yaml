@@ -230,22 +230,37 @@ spec:
     deploymentStrategy:
       type: Recreate
 
+    env:
+      GF_ANALYTICS_CHECK_FOR_UPDATES: false
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: false
+      GF_ANALYTICS_REPORTING_ENABLED: false
+      GF_AUTH_GENERIC_OAUTH_NAME: Authentik
+      GF_AUTH_GENERIC_OAUTH_API_URL: https://auth.bjw-s.dev/application/o/userinfo/
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: https://auth.bjw-s.dev/application/o/authorize/
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: pe1N4ey6PAzdBbUy8RtWbOPtxpvCWUfhAGiDGuRa
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: https://auth.bjw-s.dev/application/o/token/
+      GF_AUTH_SIGNOUT_REDIRECT_URL: https://auth.bjw-s.dev/application/o/grafana/end-session/
+      GF_DATE_FORMATS_USE_BROWSER_LOCALE: true
+      GF_EXPLORE_ENABLED: true
+      GF_FEATURE_TOGGLES_ENABLE: publicDashboards
+      GF_LOG_MODE: console
+      GF_NEWS_NEWS_FEED_ENABLED: false
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: natel-discrete-panel,pr0ps-trackmap-panel,panodata-map-panel
+      GF_SECURITY_COOKIE_SAMESITE: grafana
+      GF_SERVER_ROOT_URL: https://grafana.bjw-s.dev
+
     envFromSecret: grafana-secret
 
     grafana.ini:
-      analytics:
-        check_for_updates: false
-        check_for_plugin_updates: false
-        reporting_enabled: false
       auth:
         oauth_auto_login: true
         oauth_allow_insecure_email_lookup: true
-        signout_redirect_url: https://auth.bjw-s.dev/application/o/grafana/end-session/
+      auth.anonymous:
+        enabled: false
       auth.basic:
         enabled: false
       auth.generic_oauth:
         enabled: true
-        name: Authentik
         icon: signin
         scopes: openid profile email
         empty_scopes: false
@@ -253,38 +268,10 @@ spec:
         groups_attribute_path: groups
         name_attribute_path: name
         use_pkce: true
-        client_id: pe1N4ey6PAzdBbUy8RtWbOPtxpvCWUfhAGiDGuRa
-        client_secret: # Set by env vars
-        auth_url: https://auth.bjw-s.dev/application/o/authorize/
-        token_url: https://auth.bjw-s.dev/application/o/token/
-        api_url: https://auth.bjw-s.dev/application/o/userinfo/
-        # map user groups to Grafana roles
+      auth.generic_oauth.group_mapping:
+        org_id: 1
         role_attribute_path: |
           contains(groups[*], 'bjw-s Admins') && 'Admin' || 'Viewer'
-      dashboards:
-        default_home_dashboard_path: /tmp/dashboards/home.json
-      date_formats:
-        use_browser_locale: true
-      explore:
-        enabled: true
-      grafana_net:
-        url: https://grafana.net
-      log:
-        mode: console
-      news:
-        news_feed_enabled: false
-      panels:
-        disable_sanitize_html: true
-      paths:
-        data: /var/lib/grafana/data
-        logs: /var/log/grafana
-        plugins: /var/lib/grafana/plugins
-        provisioning: /etc/grafana/provisioning
-      security:
-        allow_embedding: true
-        cookie_samesite: grafana
-      server:
-        root_url: https://grafana.bjw-s.dev
 
     imageRenderer:
       enabled: true
@@ -302,12 +289,12 @@ spec:
       enabled: false
 
     plugins:
+      - grafana-clock-panel
+      - grafana-piechart-panel
+      - grafana-worldmap-panel
       - natel-discrete-panel
       - pr0ps-trackmap-panel
-      - grafana-piechart-panel
       - vonage-status-panel
-      - grafana-worldmap-panel
-      - grafana-clock-panel
 
     rbac:
       pspEnabled: false
