@@ -1,0 +1,11 @@
+---
+apiVersion: ceph.rook.io/v1
+kind: CephClient
+metadata:
+  name: workhorse
+  namespace: rook-ceph # namespace:cluster
+spec:
+  caps:
+    mon: 'profile fs-client'
+    osd: 'allow rw tag cephfs data=ceph-filesystem'
+    mds: 'allow r, allow rw path=/'
