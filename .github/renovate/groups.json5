@@ -50,6 +50,19 @@
       separateMinorPatch: false,
     },
     {
+      description: "Talos",
+      groupName: "Talos",
+      matchPackageNames: [
+        "ghcr.io/siderolabs/installer",
+        "ghcr.io/siderolabs/talosctl",
+      ],
+      matchDatasources: ["docker"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      separateMinorPatch: true,
+    },
+    {
       description: "Thanos image and chart - versions do not match",
       groupName: "Thanos",
       matchPackagePatterns: ["quay.io/thanos/thanos", "thanos"],
