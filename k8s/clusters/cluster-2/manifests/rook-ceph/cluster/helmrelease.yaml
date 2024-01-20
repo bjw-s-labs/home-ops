@@ -109,6 +109,9 @@ spec:
                   - key: node-role.kubernetes.io/rook-osd-node
                     operator: DoesNotExist
         # mon: *placement
+      annotations:
+        mon: 
+          external-dns.alpha.kubernetes.io/hostname: ceph.elcarpenter.com
       resources:
         mgr:
           limits:
