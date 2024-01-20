@@ -385,7 +385,12 @@ nodes:
               vlanId: 2002
               dhcp: true
               # mtu: 9000
-            - *vlan2040
+            - &vlan2040-noMTU
+              vlanId: 2040
+              dhcp: true
+              # mtu: 9000
+              dhcpOptions:
+                routeMetric: 2048
 
     - hostname: temp1.cluster-2.${secret_domain}
       ipAddress: temp1.cluster-2.${secret_domain}
