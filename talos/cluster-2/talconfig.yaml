@@ -385,6 +385,7 @@ nodes:
               vlanId: 2002
               dhcp: true
               # mtu: 9000
+            - *vlan2040
 
     - hostname: temp1.cluster-2.${secret_domain}
       ipAddress: temp1.cluster-2.${secret_domain}
@@ -539,6 +540,7 @@ controlPlane:
     - &discoveryPatch |-
       cluster:
         discovery:
+          enabled: true
           registries:
             kubernetes:
               disabled: false
