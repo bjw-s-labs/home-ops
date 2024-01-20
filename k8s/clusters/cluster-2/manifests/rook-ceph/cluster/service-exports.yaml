@@ -2,10 +2,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mon
+  name: rook-ceph-mon
 spec:
   selector:
     app.kubernetes.io/name: ceph-mon
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname:  ceph.elcarpenter.com
   ports:
     - protocol: TCP
       port: 6789
