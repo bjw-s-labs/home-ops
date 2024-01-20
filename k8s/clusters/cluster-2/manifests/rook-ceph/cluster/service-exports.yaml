@@ -7,6 +7,7 @@ metadata:
     external-dns.alpha.kubernetes.io/hostname:  test.ceph.elcarpenter.com
     io.cilium/lb-ipam-ips: ${LB_CEPH_MONS}
 spec:
+  type: LoadBalancer
   selector:
     app.kubernetes.io/name: ceph-mon
   ports:
