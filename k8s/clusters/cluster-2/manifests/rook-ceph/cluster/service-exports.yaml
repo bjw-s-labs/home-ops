@@ -5,9 +5,9 @@ metadata:
   name: rook-ceph-mon
   annotations:
     external-dns.alpha.kubernetes.io/hostname:  test.ceph.elcarpenter.com
-    io.cilium/lb-ipam-ips: ${LB_CEPH_MONS}
+    # io.cilium/lb-ipam-ips: ${LB_CEPH_MONS}
 spec:
-  type: LoadBalancer
+  # type: LoadBalancer
   selector:
     app.kubernetes.io/name: ceph-mon
   ports:
