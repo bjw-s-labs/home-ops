@@ -8,9 +8,11 @@ metadata:
     # io.cilium/lb-ipam-ips: ${LB_CEPH_MONS}
 spec:
   # type: LoadBalancer
+  clusterIP: None
   selector:
     app.kubernetes.io/name: ceph-mon
   ports:
     - protocol: TCP
       port: 6789
       targetPort: 6789
+      name: ceph-mon
