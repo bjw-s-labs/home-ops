@@ -1,5 +1,12 @@
 ---
-apiVersion: multicluster.x-k8s.io/v1alpha1
-kind: ServiceExport
+apiVersion: v1
+kind: Service
+metadata:
   name: mon
-  namespace: rook-ceph
+spec:
+  selector:
+    app.kubernetes.io/name: app=rook-ceph-mon
+  ports:
+    - protocol: TCP
+      port: 6789
+      targetPort: 6789
