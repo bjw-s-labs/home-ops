@@ -3,8 +3,10 @@
 clusterName: ${clusterName}
 endpoint: "https://${clusterName}.${clusterDNSSuffix}:6443"
 
-talosVersion: v1.6.0
-kubernetesVersion: 1.29.0
+# renovate: depName=ghcr.io/siderolabs/installer datasource=docker extractVersion=^(?<version>.*)$
+talosVersion: v1.6.2
+# renovate: depName=kubernetes/kubernetes datasource=github-releases extractVersion=^v(?<version>.*)$
+kubernetesVersion: 1.29.1
 
 cniConfig:
   name: none
@@ -204,3 +206,14 @@ controlPlane:
         sysctls:
           fs.inotify.max_user_watches: "1048576"
           fs.inotify.max_user_instances: "8192"
+
+    # Enable K8s Talos API Access
+    - |-
+      machine:
+        features:
+          kubernetesTalosAPIAccess:
+            enabled: true
+            allowedRoles:
+              - os:admin
+            allowedKubernetesNamespaces:
+              - system-controllers

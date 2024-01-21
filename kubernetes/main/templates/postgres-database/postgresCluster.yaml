@@ -44,6 +44,14 @@ spec:
         resources:
           requests:
             storage: 5Gi
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: "kubernetes.io/hostname"
+          whenUnsatisfiable: "DoNotSchedule"
+          labelSelector:
+            matchLabels:
+              postgres-operator.crunchydata.com/cluster: ${APP}
+              postgres-operator.crunchydata.com/data: postgres
   users:
     - name: "${DB_USER}"
       databases:
@@ -70,6 +78,7 @@ spec:
         labels:
           app.kubernetes.io/name: pgo-${APP}-backup
           egress.home.arpa/apiserver: allow
+          egress.home.arpa/minio: allow
           egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
       repos:
         - name: repo1
