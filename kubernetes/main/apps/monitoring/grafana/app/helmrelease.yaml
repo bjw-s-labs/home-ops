@@ -51,6 +51,14 @@ spec:
             editable: true
             options:
               path: /var/lib/grafana/dashboards/flux
+          - name: kubernetes
+            orgId: 1
+            folder: Kubernetes
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/flux
           - name: nginx
             orgId: 1
             folder: Nginx
@@ -161,6 +169,28 @@ spec:
           datasource: Prometheus
         flux-logs:
           url: https://raw.githubusercontent.com/fluxcd/flux2-monitoring-example/main/monitoring/configs/dashboards/logs.json
+          datasource: Prometheus
+
+      kubernetes:
+        k8s-system-api-server:
+          gnetId: 15761
+          revision: 15
+          datasource: Prometheus
+        k8s-views-global:
+          gnetId: 15757
+          revision: 35
+          datasource: Prometheus
+        k8s-views-nodes:
+          gnetId: 15759
+          revision: 27
+          datasource: Prometheus
+        k8s-views-namespaces:
+          gnetId: 15758
+          revision: 32
+          datasource: Prometheus
+        k8s-views-pods:
+          gnetId: 15760
+          revision: 26
           datasource: Prometheus
 
       nginx:
