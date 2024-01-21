@@ -9,3 +9,14 @@ spec:
     mon: 'profile fs-client'
     osd: 'allow rw tag cephfs data=ceph-filesystem'
     mds: 'allow r, allow rw path=/'
+---
+apiVersion: ceph.rook.io/v1
+kind: CephClient
+metadata:
+  name: healthchecker
+  namespace: rook-ceph # namespace:cluster
+spec:
+  caps:
+    mon: 'allow r, allow command quorum_status, allow command version'
+    osd: 'allow rwx pool=default.rgw.meta, allow r pool=.rgw.root, allow rw pool=default.rgw.control, allow rx pool=default.rgw.log, allow x pool=default.rgw.buckets.index'
+    mgr: 'allow command config'
