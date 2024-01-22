@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: rook-ceph-mon-external
+  namespace: rook-ceph
   annotations:
     external-dns.alpha.kubernetes.io/hostname:  mon.ceph.${INGRESS_DOMAIN}
 spec:
@@ -19,6 +20,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: rook-ceph-mgr-external
+  namespace: rook-ceph
   annotations:
     external-dns.alpha.kubernetes.io/hostname:  mgr.ceph.${INGRESS_DOMAIN}
 spec:
@@ -30,3 +32,15 @@ spec:
       port: 9283
       targetPort: 9283
       name: ceph-mgr
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: rook-ceph-mon-srv-record
+  namespace: rook-ceph
+spec:
+  endpoints:
+  - dnsName: _ceph-mon._tcp.ceph.elcarpenter.com.
+    recordType: SRV
+    targets:
+      - "60 IN SRV 10 20 6789 mon.ceph.elcarpenter.com"
