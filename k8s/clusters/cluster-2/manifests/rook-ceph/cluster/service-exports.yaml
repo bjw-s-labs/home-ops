@@ -40,7 +40,7 @@ metadata:
   namespace: rook-ceph
 spec:
   endpoints:
-  - dnsName: _ceph-mon._tcp.ceph.elcarpenter.com.
+  - dnsName: _ceph-mon._tcp.ceph.${INGRESS_DOMAIN}.
     recordType: SRV
     targets:
-      - "60 IN SRV 10 20 6789 mon.ceph.elcarpenter.com"
+      - "60 IN SRV 10 20 6789 mon.ceph.${INGRESS_DOMAIN}"
