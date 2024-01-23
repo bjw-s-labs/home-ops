@@ -11,12 +11,16 @@ spec:
   chart:
     spec:
       chart: kube-prometheus-stack
-      version: 55.5.0
+      version: 56.0.3
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
         namespace: flux-system
       interval: 30m
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
   values:
     crds:
       enabled: true
@@ -94,11 +98,6 @@ spec:
     grafana:
       enabled: false
       forceDeployDashboards: true
-      sidecar:
-        dashboards:
-          multicluster:
-            etcd:
-              enabled: true
 
     ###
     ### Prometheus operator values
@@ -129,7 +128,7 @@ spec:
         ingressClassName: internal-nginx
         pathType: Prefix
         hosts:
-          - &host_prometheus prometheus.bjw-s.dev
+          - &host_prometheus prometheus.${CLUSTER_NAME}.${INGRESS_DOMAIN}
         tls:
           - hosts:
               - *host_prometheus
@@ -146,7 +145,7 @@ spec:
           - memory-snapshot-on-shutdown
           - new-service-discovery-manager
         externalLabels:
-          cluster: main
+          cluster: ${CLUSTER_NAME}
         podMonitorSelectorNilUsesHelmValues: false
         probeSelectorNilUsesHelmValues: false
         replicas: 1
@@ -157,6 +156,13 @@ spec:
             memory: 3760M
           limits:
             memory: 3760M
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                  - key: node-role.kubernetes.io/rook-osd-node
+                    operator: DoesNotExist
         retention: 2d
         retentionSize: "15GB"
         ruleSelectorNilUsesHelmValues: false
@@ -164,12 +170,15 @@ spec:
         scrapeInterval: 1m
         serviceMonitorSelectorNilUsesHelmValues: false
         storageSpec:
-          volumeClaimTemplate:
-            spec:
-              storageClassName: ceph-block
-              resources:
-                requests:
-                  storage: 20Gi
+          ## Using tmpfs volume
+           emptyDir:
+             medium: Memory
+          # volumeClaimTemplate:
+          #   spec:
+          #     storageClassName: ceph-block
+          #     resources:
+          #       requests:
+          #         storage: 20Gi
         thanos:
           image: quay.io/thanos/thanos:v0.32.5
           objectStorageConfig:
