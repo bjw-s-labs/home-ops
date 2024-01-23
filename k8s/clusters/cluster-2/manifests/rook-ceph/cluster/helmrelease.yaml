@@ -112,9 +112,6 @@ spec:
                   - key: node-role.kubernetes.io/rook-osd-node
                     operator: DoesNotExist
         # mon: *placement
-      annotations:
-        mon: 
-          external-dns.alpha.kubernetes.io/hostname: ceph.elcarpenter.com
       resources:
         mgr:
           limits:
@@ -172,6 +169,13 @@ spec:
           requests:
             cpu: "100m"
             memory: "100Mi"
+        exporter:
+          limits:
+            cpu: "500m"
+            memory: "128Mi"
+          requests:
+            cpu: "50m"
+            memory: "50Mi"
       crashCollector:
         disable: false
       dashboard:
