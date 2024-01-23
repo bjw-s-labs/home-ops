@@ -182,9 +182,14 @@ spec:
         thanos:
           image: quay.io/thanos/thanos:v0.32.5
           objectStorageConfig:
-            existingSecret:
-              name: thanos-objstore-secret
-              key: objstore.yml
+            # existingSecret:
+            #   name: thanos-objstore-secret
+            #   key: objstore.yml
+            secret:
+              type: "FILESYSTEM"
+              config:
+                directory: ""
+              prefix: ""
           # renovate: datasource=docker depName=quay.io/thanos/thanos
           version: "0.32.5"
         walCompression: true
