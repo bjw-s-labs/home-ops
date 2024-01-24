@@ -16,12 +16,6 @@ spec:
         name: bjw-s
         namespace: flux-system
   values:
-    controllers:
-      main:
-        type: statefulset
-        annotations:
-          reloader.stakater.com/auto: "true"
-
     defaultPodOptions:
       affinity:
         nodeAffinity:
@@ -30,6 +24,12 @@ spec:
               - matchExpressions:
                 - key: node-role.kubernetes.io/rook-osd-node
                   operator: DoesNotExist
+
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
 
         # statefulset:
         #   volumeClaimTemplates:
