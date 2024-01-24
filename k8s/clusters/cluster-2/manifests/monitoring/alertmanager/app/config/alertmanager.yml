@@ -1,11 +1,11 @@
 global:
-  slack_api_url: "${ALERT_MANAGER_DISCORD_WEBHOOK}"
+  slack_api_url: "${ALERT_MANAGER_DISCORD_WEBHOOK_CLUSTER_2}"
   resolve_timeout: 5m
 receivers:
   - name: 'null'
   - name: 'discord'
     slack_configs:
-      - api_url: "${ALERT_MANAGER_DISCORD_WEBHOOK}"
+      - api_url: "${ALERT_MANAGER_DISCORD_WEBHOOK_CLUSTER_2}"
         channel: '#prometheus'
         send_resolved: true
         title: |-
