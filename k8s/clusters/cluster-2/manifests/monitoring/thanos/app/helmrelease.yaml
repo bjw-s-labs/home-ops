@@ -70,9 +70,16 @@ spec:
         # limits:
         #   memory: 270M
       persistence:
-        enabled: true
+        enabled: false
         storageClass: "local-hostpath"
         size: 2Gi
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/rook-osd-node
+                  operator: DoesNotExist
 
     storegateway:
       enabled: true
@@ -83,9 +90,16 @@ spec:
         # limits:
         #   memory: 226M
       persistence:
-        enabled: true
+        enabled: false
         storageClass: "local-hostpath"
         size: 1Gi
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/rook-osd-node
+                  operator: DoesNotExist
 
     ruler:
       enabled: true
@@ -101,7 +115,7 @@ spec:
       dnsDiscovery:
         enabled: true
       persistence:
-        enabled: true
+        enabled: false
         storageClass: "local-hostpath"
         size: 512Mi
       resources:
@@ -110,6 +124,13 @@ spec:
           memory: 128M
         limits:
           memory: 256M
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/rook-osd-node
+                  operator: DoesNotExist
 
     metrics:
       enabled: true
