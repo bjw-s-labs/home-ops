@@ -1,0 +1,90 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: alertmanager
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 2.5.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+    defaultPodOptions:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/rook-osd-node
+                  operator: DoesNotExist
+
+        # statefulset:
+        #   volumeClaimTemplates:
+        #     - name: storage
+        #       accessMode: ReadWriteOnce
+        #       size: 50Mi
+        #       storageClass: ceph-block
+        #       globalMounts:
+        #         - path: /alertmanager
+
+        containers:
+          main:
+            image:
+              repository: quay.io/prometheus/alertmanager
+              tag: v0.26.0
+            ports:
+              - name: http
+                containerPort: 9093
+            resources:
+              requests:
+                cpu: 11m
+                memory: 50M
+              limits:
+                memory: 99M
+
+    service:
+      main:
+        ports:
+          http:
+            port: 9093
+
+    ingress:
+      main:
+        enabled: true
+        className: internal-nginx
+        hosts:
+          - host: &host alertmanager.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+            paths:
+              - path: /
+                service:
+                  name: main
+                  port: http
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: alertmanager-configmap
+        globalMounts:
+          - path: /etc/alertmanager
+      # secrets:
+      #   type: secret
+      #   name: alertmanager-secret
+      #   globalMounts:
+      #     - path: /etc/secrets
