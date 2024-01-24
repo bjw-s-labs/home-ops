@@ -490,34 +490,34 @@ controlPlane:
             bind-address: 0.0.0.0
 
     # Configure pull through cache
-    - &pullThroughCachePatch |-
-      machine:
-        registries:
-          mirrors:
-            docker.io:
-              endpoints:
-                - https://zot.${secret_domain}/v2/docker.io
-              overridePath: true
-            ghcr.io:
-              endpoints:
-                - https://zot.${secret_domain}/v2/ghcr.io
-              overridePath: true
-            quay.io:
-              endpoints:
-                - https://zot.${secret_domain}/v2/quay.io
-              overridePath: true
-            gcr.io:
-              endpoints:
-                - https://zot.${secret_domain}/v2/gcr.io
-              overridePath: true
-            registry.k8s.io:
-              endpoints:
-                - https://zot.${secret_domain}/v2/registry.k8s.io
-              overridePath: true
-            public.ecr.aws:
-              endpoints:
-                - https://zot.${secret_domain}/v2/public.ecr.aws
-              overridePath: true
+    # - &pullThroughCachePatch |-
+    #   machine:
+    #     registries:
+    #       mirrors:
+    #         docker.io:
+    #           endpoints:
+    #             - https://zot.${secret_domain}/v2/docker.io
+    #           overridePath: true
+    #         ghcr.io:
+    #           endpoints:
+    #             - https://zot.${secret_domain}/v2/ghcr.io
+    #           overridePath: true
+    #         quay.io:
+    #           endpoints:
+    #             - https://zot.${secret_domain}/v2/quay.io
+    #           overridePath: true
+    #         gcr.io:
+    #           endpoints:
+    #             - https://zot.${secret_domain}/v2/gcr.io
+    #           overridePath: true
+    #         registry.k8s.io:
+    #           endpoints:
+    #             - https://zot.${secret_domain}/v2/registry.k8s.io
+    #           overridePath: true
+    #         public.ecr.aws:
+    #           endpoints:
+    #             - https://zot.${secret_domain}/v2/public.ecr.aws
+    #           overridePath: true
 
     # ETCD configuration
     - |-
@@ -643,7 +643,7 @@ worker:
     - *ntpPatch
     - *sysctlPatch
     - *talosPatch
-    - *pullThroughCachePatch
+    # - *pullThroughCachePatch
     - *encryptedOSD
 
 
