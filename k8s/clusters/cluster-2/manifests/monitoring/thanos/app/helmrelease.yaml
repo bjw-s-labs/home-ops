@@ -37,6 +37,13 @@ spec:
           memory: 64M
         # limits:
         #   memory: 99M
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/rook-osd-node
+                  operator: DoesNotExist
 
     queryFrontend:
       enabled: true
