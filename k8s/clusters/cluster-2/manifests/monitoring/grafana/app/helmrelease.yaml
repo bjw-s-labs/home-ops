@@ -313,7 +313,7 @@ spec:
         port = 389
         use_ssl = false
         start_tls = false
-        ssl_skip_verify = false
+        ssl_skip_verify = true
         bind_dn = "uid=service_grafana,ou=people,dc=elcarpenter,dc=com"
         bind_password = "testpassword"
 
@@ -332,13 +332,18 @@ spec:
         surname = "sn"
         username = "uid"
 
-    # grafana.ini:
-    #   auth.generic_oauth:
-    #     icon: signin
-    #     login_attribute_path: preferred_username
-    #     groups_attribute_path: groups
-    #     name_attribute_path: name
-    #     use_pkce: true
+        # If you want to map your ldap groups to grafana's groups, see: https://grafana.com/docs/grafana/latest/auth/ldap/#group-mappings
+        # As a quick example, here is how you would map lldap's admin group to grafana's admin
+        [[servers.group_mappings]]
+        group_dn = "cn=lldap_admin,ou=groups,dc=elcarpenter,dc=com"
+        org_role = "Admin"
+        grafana_admin = true
+
+    grafana.ini:
+      auth.ldap:
+        enabled: true
+        allow_sign_up: true
+        config_file: /etc/grafana/ldap.toml
 
     imageRenderer:
       enabled: true
