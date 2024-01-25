@@ -50,8 +50,6 @@ spec:
               - *host
     toolbox:
       enabled: true
-      # Use stable v17 build
-      # image: quay.io/ceph/ceph:v18.2.1
       image: quay.io/ceph/ceph:v18.2.1
       affinity:
         nodeAffinity:
@@ -71,8 +69,6 @@ spec:
       mon_data_avail_warn = 20
     cephClusterSpec:
       cephVersion:
-        # Use stable v17 build
-        # image: quay.io/ceph/ceph:v18.2.1
         image: quay.io/ceph/ceph:v18.2.1
       mgr:
         count: 2    # increase when more nodes are added
@@ -182,6 +178,7 @@ spec:
         enabled: true
         urlPrefix: /
         ssl: true
+        prometheusEndpoint: http://kube-prometheus-stack-prometheus.monitoring.svc:9090
       storage:
         useAllNodes: false
         useAllDevices: false
