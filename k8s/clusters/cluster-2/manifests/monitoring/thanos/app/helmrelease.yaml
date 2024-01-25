@@ -17,10 +17,6 @@ spec:
       interval: 30m
   values:
     existingObjstoreSecret: thanos-secret
-    # objstoreConfig:
-    #   type: s3
-    #   config:
-    #     insecure: true
 
     query:
       enabled: true
@@ -44,6 +40,9 @@ spec:
               - matchExpressions:
                 - key: node-role.kubernetes.io/rook-osd-node
                   operator: DoesNotExist
+                - key: kubernetes.io/arch
+                  operator: In
+                  value: amd64
 
     queryFrontend:
       enabled: true
@@ -87,6 +86,9 @@ spec:
               - matchExpressions:
                 - key: node-role.kubernetes.io/rook-osd-node
                   operator: DoesNotExist
+                - key: kubernetes.io/arch
+                  operator: In
+                  value: amd64
 
     storegateway:
       enabled: true
@@ -107,6 +109,9 @@ spec:
               - matchExpressions:
                 - key: node-role.kubernetes.io/rook-osd-node
                   operator: DoesNotExist
+                - key: kubernetes.io/arch
+                  operator: In
+                  value: amd64
 
     ruler:
       enabled: true
@@ -138,6 +143,9 @@ spec:
               - matchExpressions:
                 - key: node-role.kubernetes.io/rook-osd-node
                   operator: DoesNotExist
+                - key: kubernetes.io/arch
+                  operator: In
+                  value: amd64
 
     metrics:
       enabled: true
@@ -151,3 +159,6 @@ spec:
             - matchExpressions:
               - key: node-role.kubernetes.io/rook-osd-node
                 operator: DoesNotExist
+              - key: kubernetes.io/arch
+                operator: In
+                value: amd64
