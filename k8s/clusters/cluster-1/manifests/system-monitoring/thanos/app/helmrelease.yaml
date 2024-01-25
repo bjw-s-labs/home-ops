@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: thanos
-      version: 12.6.1
+      version: 12.21.1
       sourceRef:
         kind: HelmRepository
         name: bitnami-charts
@@ -18,9 +18,9 @@ spec:
   upgrade:
     remediation:
       retries: 5
-  dependsOn:
-    - name: kube-prometheus-stack
-      namespace: system-monitoring
+  # dependsOn:
+  #   - name: kube-prometheus-stack
+  #     namespace: system-monitoring
   values:
     image:
       registry: quay.io
@@ -77,7 +77,7 @@ spec:
         storageClass: ceph-block-external
         size: 20Gi
     ruler:
-      enabled: true
+      enabled: false
       replicaCount: 3
       replicaLabel: __replica__
       alertmanagers: ["http://kube-prometheus-stack-alertmanager.system-monitoring.svc.cluster.local:9093"]
