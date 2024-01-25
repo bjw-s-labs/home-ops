@@ -51,6 +51,16 @@ spec:
         hostname: "thanos.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
         ingressClassName: "internal-nginx"
         tls: true
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/rook-osd-node
+                  operator: DoesNotExist
+                - key: kubernetes.io/arch
+                  operator: In
+                  value: amd64
 
     bucketweb:
       enabled: true
@@ -60,6 +70,16 @@ spec:
           memory: 64M
         # limits:
         #   memory: 64M
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/rook-osd-node
+                  operator: DoesNotExist
+                - key: kubernetes.io/arch
+                  operator: In
+                  value: amd64
 
     compactor:
       enabled: true
