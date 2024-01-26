@@ -10,5 +10,13 @@
       matchPackagePrefixes: ["ghcr.io/onedr0p", "ghcr.io/bjw-s"],
       ignoreTests: true,
     },
+    {
+      description: "Auto merge KPS minors and patches",
+      matchDatasources: ["helm"],
+      automerge: true,
+      matchUpdateTypes: ["minor", "patch"],
+      matchPackageNames: ["kube-prometheus-stack"],
+      ignoreTests: false,
+    },
   ],
 }
