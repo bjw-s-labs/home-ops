@@ -1,0 +1,100 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: maker-management-platform
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 2.5.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        pod:
+          enableServiceLinks: false
+          securityContext:
+            # TODO: can't run  all containers as ${APP_UID} until https://github.com/Maker-Management-Platform/agent/pull/86 gets merged
+            fsGroup: ${APP_GID}
+            fsGroupChangePolicy: "OnRootMismatch"
+
+        containers:
+          main:
+            enabled: false
+          agent:
+            image:
+              repository: ghcr.io/maker-management-platform/agent
+              tag: v1.0.3
+            env:
+              LIBRARY_PATH: /library
+              LOG_PATH: ""
+            resources:
+              requests:
+                cpu: 12m
+                memory: 128M
+              limits:
+                memory: 512M
+          ui:
+            image:
+              repository: ghcr.io/maker-management-platform/mmp-ui
+              tag: v1.0.2
+            env:
+              AGENT_ADDRESS: localhost:8000
+            resources:
+              requests:
+                cpu: 12m
+                memory: 128M
+              limits:
+                memory: 128M
+            securityContext:
+              runAsUser: ${APP_UID}
+              runAsGroup: ${APP_GID}
+
+    service:
+      main:
+        ports:
+          http:
+            port: 8081
+
+    ingress:
+      main:
+        enabled: true
+        className: "internal-nginx"
+        hosts:
+          - host: "${HOSTNAME}"
+            paths:
+              - path: /
+                service:
+                  name: main
+                  port: http
+        tls:
+          - hosts:
+              - "${HOSTNAME}"
+
+    persistence:
+      library:
+        enabled: true
+        existingClaim: "${VOLSYNC_CLAIM}"
+        advancedMounts:
+          main:
+            main:
+              - path: /library
+      # Prevents errors due to running as non-default user
+      caddy:
+        enabled: true
+        type: emptyDir
+        advancedMounts:
+          main:
+            ui:
+              - path: /config/caddy
