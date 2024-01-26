@@ -170,15 +170,12 @@ spec:
         scrapeInterval: 1m
         serviceMonitorSelectorNilUsesHelmValues: false
         storageSpec:
-          ## Using tmpfs volume
-           emptyDir:
-             medium: Memory
-          # volumeClaimTemplate:
-          #   spec:
-          #     storageClassName: ceph-block
-          #     resources:
-          #       requests:
-          #         storage: 20Gi
+          volumeClaimTemplate:
+            spec:
+              storageClassName: "local-hostpath"
+              resources:
+                requests:
+                  storage: 20Gi
 
       thanosService:
         enabled: true
