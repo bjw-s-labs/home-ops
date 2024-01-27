@@ -77,14 +77,14 @@ spec:
       mgr:
         count: 2
         allowMultiplePerNode: false
-      #   modules:
-      #     # Several modules should not need to be included in this list. The "dashboard" and "monitoring" modules
-      #     # are already enabled by other settings in the cluster CR.
-      #     - name: pg_autoscaler
-      #       enabled: true
-      #     # Start non-default
-      #     - name: rook
-      #       enabled: true
+        modules:
+          # Several modules should not need to be included in this list. The "dashboard" and "monitoring" modules
+          # are already enabled by other settings in the cluster CR.
+          - name: pg_autoscaler
+            enabled: true
+          # Start non-default
+          - name: rook
+            enabled: true
 
       mon:
         count: 3    # increase when more nodes are added
