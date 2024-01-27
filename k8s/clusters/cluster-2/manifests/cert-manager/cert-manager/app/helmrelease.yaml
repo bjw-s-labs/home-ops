@@ -16,6 +16,11 @@ spec:
         namespace: flux-system
       interval: 5m
 
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+
   values:
 
     affinity:
@@ -25,6 +30,9 @@ spec:
           - matchExpressions:
               - key: node-role.kubernetes.io/rook-osd-node
                 operator: DoesNotExist
+
+    cainjector:
+      enabled: true
 
     installCRDs: true
 
@@ -43,3 +51,8 @@ spec:
       nameservers:
         - "1.1.1.1"
         - "9.9.9.9"
+
+    prometheus:
+      enabled: true
+      servicemonitor:
+        enabled: true
