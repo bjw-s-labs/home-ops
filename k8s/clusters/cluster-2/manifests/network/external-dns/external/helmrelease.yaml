@@ -40,6 +40,8 @@ spec:
       # - --cloudflare-proxied
       - --annotation-filter=external-dns/is-public in (true)
     policy: sync
+    serviceMonitor:
+      enabled: true
     sources:
       - ingress
       - crd
@@ -47,8 +49,6 @@ spec:
     txtOwnerId: "default"
     domainFilters:
       - "${INGRESS_DOMAIN}"
-    # serviceMonitor:
-    #   enabled: true
     resources:
       requests:
         memory: 100Mi

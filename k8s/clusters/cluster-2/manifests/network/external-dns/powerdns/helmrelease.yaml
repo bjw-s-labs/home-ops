@@ -41,6 +41,8 @@ spec:
     #   # - --ingress-class=traefik
     policy: sync
     provider: pdns
+    serviceMonitor:
+      enabled: true
     sources:
       - ingress
       - service
@@ -49,8 +51,6 @@ spec:
     txtOwnerId: "${CLUSTER_NAME}"
     domainFilters:
       - "${INGRESS_DOMAIN}"
-    # serviceMonitor:
-    #   enabled: true  # enable after prometheus is installed
     resources:
       requests:
         memory: 100Mi
