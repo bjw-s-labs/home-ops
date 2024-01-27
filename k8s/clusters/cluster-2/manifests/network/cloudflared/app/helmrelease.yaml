@@ -47,18 +47,14 @@ spec:
         containers:
           main:
             image:
-              # repository: docker.io/cloudflare/cloudflared
-              # tag: 2024.1.5
-              repository: ubuntu
-              tag: 23.10
-            command: ["/bin/sh","-c"]
+              repository: docker.io/cloudflare/cloudflared
+              tag: 2024.1.5
             args:
-              - sleep 6000000000000000000000000000000000000
-              # - tunnel
-              # - --config
-              # - /etc/cloudflared/config/config.yaml
-              # - run
-              # - "$(TUNNEL_ID)"
+              - tunnel
+              - --config
+              - /etc/cloudflared/config/config.yaml
+              - run
+              - "$(TUNNEL_ID)"
             env:
               NO_AUTOUPDATE: "true"
               TUNNEL_CRED_FILE: /etc/cloudflared/creds/credentials.json
