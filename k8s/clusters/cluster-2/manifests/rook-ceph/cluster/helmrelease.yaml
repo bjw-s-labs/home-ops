@@ -74,17 +74,17 @@ spec:
     cephClusterSpec:
       cephVersion:
         image: quay.io/ceph/ceph:v18.2.1
-      mgr:
-        count: 2    # increase when more nodes are added
-        allowMultiplePerNode: false
-        modules:
-          # Several modules should not need to be included in this list. The "dashboard" and "monitoring" modules
-          # are already enabled by other settings in the cluster CR.
-          - name: pg_autoscaler
-            enabled: true
-          # Start non-default
-          - name: rook
-            enabled: true
+      # mgr:
+      #   count: 2    # increase when more nodes are added
+      #   allowMultiplePerNode: false
+      #   modules:
+      #     # Several modules should not need to be included in this list. The "dashboard" and "monitoring" modules
+      #     # are already enabled by other settings in the cluster CR.
+      #     - name: pg_autoscaler
+      #       enabled: true
+      #     # Start non-default
+      #     - name: rook
+      #       enabled: true
 
       mon:
         count: 3    # increase when more nodes are added
