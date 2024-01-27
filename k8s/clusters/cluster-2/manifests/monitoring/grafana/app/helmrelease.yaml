@@ -358,6 +358,8 @@ spec:
     ingress:
       enabled: true
       ingressClassName: internal-nginx
+      annotations:
+        external-dns/is-public: "true"
       hosts:
         - &host grafana.${CLUSTER_NAME}.${INGRESS_DOMAIN}
       tls:
