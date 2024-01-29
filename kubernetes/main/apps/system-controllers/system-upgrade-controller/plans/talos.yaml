@@ -12,6 +12,11 @@ spec:
       path: /var/run/secrets/talos.dev
       ignoreUpdates: true
   concurrency: 1
+  cordon: true
+  drain:
+    deleteLocalData: true
+    disableEviction: false
+    ignoreDaemonSets: true
   exclusive: true
   nodeSelector:
     matchExpressions:
