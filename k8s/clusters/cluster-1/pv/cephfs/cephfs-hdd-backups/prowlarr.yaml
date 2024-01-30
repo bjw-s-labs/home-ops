@@ -46,3 +46,54 @@ spec:
   volumeMode: Filesystem
   # volumeName should be same as PV name
   volumeName: cephfs-hdd-backups-prowlarr
+############################################################
+#        Cluster 2 Ceph PVs
+############################################################
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ceph-filesystem-backups-prowlarr
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 5T
+  storageClassName: "ceph-filesystem-storage"
+  csi:
+    driver: rook-ceph.cephfs.csi.ceph.com 
+    nodeStageSecretRef:
+      # node stage secret name
+      name: rook-csi-cephfs-node
+      # node stage secret namespace where above secret is created
+      namespace: rook-ceph-cluster-2
+    volumeAttributes:
+      # Required options from storageclass parameters need to be added in volumeAttributes
+      "clusterID": "rook-ceph-cluster-2"
+      "fsName": "ceph-filesystem"
+      "pool": "ceph-filesystem-erasurecoded"
+      "staticVolume": "true"
+      "rootPath": /volumes/backups/Kubernetes/${CLUSTER_NAME}/Applications/prowlarr
+    # volumeHandle can be anything, need not to be same
+    # as PV name or volume name. keeping same for brevity
+    volumeHandle: ceph-filesystem-backups-prowlarr
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ceph-filesystem-backups-prowlarr
+  namespace: downloads
+  labels:
+    backup: "false"
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: "ceph-filesystem-storage"
+  resources:
+    requests:
+      storage: 5T
+  volumeMode: Filesystem
+  # volumeName should be same as PV name
+  volumeName: ceph-filesystem-backups-prowlarr
