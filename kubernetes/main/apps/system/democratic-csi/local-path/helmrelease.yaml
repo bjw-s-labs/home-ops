@@ -11,35 +11,14 @@ spec:
       chart: democratic-csi
       version: 0.14.5
       sourceRef:
-        name: democratic-csi
         kind: HelmRepository
+        name: democratic-csi
         namespace: flux-system
   values:
-    csiDriver:
-      name: "org.democratic-csi.local-hostpath"
-      attachRequired: false
-      storageCapacity: true # With storage capacity tracking, the scheduler filters out nodes which do not have enough capacity.
-      fsGroupPolicy: File # fsGroupChangePolicy
-
-    storageClasses:
-      - name: local-hostpath
-        defaultClass: false
-        reclaimPolicy: Delete
-        volumeBindingMode: WaitForFirstConsumer
-        # distributed support is not yet ready for expansion
-        allowVolumeExpansion: false
-
-    volumeSnapshotClasses:
-      - name: local-hostpath
-        deletionPolicy: Delete
-        parameters:
-          dummy: {}
-
+    fullnameOverride: local-path-provisioner
     controller:
       enabled: true
       strategy: node
-      externalAttacher:
-        enabled: false
       externalProvisioner:
         enabled: true
         image: registry.k8s.io/sig-storage/csi-provisioner:v4.0.0
@@ -53,36 +32,44 @@ spec:
           - --capacity-ownerref-level=1
       externalResizer:
         enabled: false
+      externalAttacher:
+        enabled: false
       externalSnapshotter:
-        enabled: true
-        extraArgs:
-          - --leader-election=false
-          - --node-deployment=true
+        enabled: false
 
-    node:
-      driver:
-        extraVolumeMounts:
-          - name: local-hostpath
-            mountPath: /var/mnt/sata/demo-csi-local-path
-            mountPropagation: Bidirectional
+    csiDriver:
+      name: "org.democratic-csi.local-hostpath"
+      attachRequired: false
+      storageCapacity: true
+      fsGroupPolicy: File
 
-      driverRegistrar:
-        enabled: true
-        image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.10.0
-
-      extraVolumes:
-        - name: local-hostpath
-          hostPath:
-            path: /var/mnt/sata/demo-csi-local-path
-            type: DirectoryOrCreate
+    storageClasses:
+      - name: local-hostpath
+        defaultClass: false
+        reclaimPolicy: Delete
+        volumeBindingMode: WaitForFirstConsumer
+        allowVolumeExpansion: true
 
     driver:
       config:
         driver: local-hostpath
-        instance_id:
         local-hostpath:
-          shareBasePath: "/var/mnt/sata/demo-csi-local-path"
-          controllerBasePath: "/var/mnt/sata/demo-csi-local-path"
+          shareBasePath: &storagePath "/var/mnt/sata/demo-csi-local-path"
+          controllerBasePath: *storagePath
           dirPermissionsMode: "0770"
           dirPermissionsUser: 0
           dirPermissionsGroup: 0
+
+    node:
+      driver:
+        image: ghcr.io/democratic-csi/democratic-csi:v1.8.4
+        extraVolumeMounts:
+          - name: local-hostpath
+            mountPath: *storagePath
+            mountPropagation: Bidirectional
+
+      extraVolumes:
+        - name: local-hostpath
+          hostPath:
+            path: *storagePath
+            type: DirectoryOrCreate
