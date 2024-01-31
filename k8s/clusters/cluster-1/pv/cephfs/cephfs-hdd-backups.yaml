@@ -149,49 +149,49 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: cephfs-hdd-backups-home-automation
+  name: ceph-filesystem-backups-home-automation
 spec:
   accessModes:
     - ReadWriteMany
   capacity:
     storage: 5T
-  storageClassName: "cephfs-hdd-storage"
+  storageClassName: "ceph-filesystem-storage"
   csi:
     driver: rook-ceph.cephfs.csi.ceph.com 
     nodeStageSecretRef:
       # node stage secret name
       name: rook-csi-cephfs-node
       # node stage secret namespace where above secret is created
-      namespace: rook-ceph-external 
+      namespace: rook-ceph-cluster-2 
     volumeAttributes:
       # Required options from storageclass parameters need to be added in volumeAttributes
-      "clusterID": "rook-ceph-external"
-      "fsName": "cephfs-hdd"
-      "pool": "hdd-ec-storage-data"
+      "clusterID": "rook-ceph-cluster-2"
+      "fsName": "ceph-filesystem"
+      "pool": "ceph-filesystem-erasurecoded"
       "staticVolume": "true"
-      "rootPath": /volumes/_nogroup/backups/a736e129-076b-422d-ad97-2726f950dc17
+      "rootPath": /volumes/backups/
     # volumeHandle can be anything, need not to be same
     # as PV name or volume name. keeping same for brevity
-    volumeHandle: cephfs-hdd-backups-home-automation
+    volumeHandle: ceph-filesystem-backups-home-automation
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: cephfs-hdd-backups-home-automation
+  name: ceph-filesystem-backups-home-automation
   namespace: home-automation
   labels:
     backup: "false"
 spec:
   accessModes:
   - ReadWriteMany
-  storageClassName: "cephfs-hdd-storage"
+  storageClassName: "ceph-filesystem-storage"
   resources:
     requests:
       storage: 5T
   volumeMode: Filesystem
   # volumeName should be same as PV name
-  volumeName: cephfs-hdd-backups-home-automation
+  volumeName: ceph-filesystem-backups-home-automation
 
 
