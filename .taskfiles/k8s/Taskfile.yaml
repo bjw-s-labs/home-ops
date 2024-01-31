@@ -76,3 +76,13 @@ tasks:
       cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
     cmds:
       - kubectl --context {{.cluster}} delete pods --field-selector status.phase=Succeeded -A --ignore-not-found=true
+
+  delete-pending-pods:
+    desc: Deletes pods with Pending phase
+    summary: |
+      Args:
+        cluster: Cluster to run command against (required)
+    vars:
+      cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
+    cmds:
+      - kubectl --context {{.cluster}} delete pods --field-selector status.phase=Pending -A --ignore-not-found=true
