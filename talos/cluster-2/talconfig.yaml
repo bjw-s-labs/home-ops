@@ -1,7 +1,7 @@
 clusterName: cluster-2
 
-talosVersion: v1.6.2
-kubernetesVersion: v1.29.0
+talosVersion: v1.6.3
+kubernetesVersion: v1.29.1
 
 # Image URL rendered on https://factory.talos.dev
 # customization:
@@ -63,7 +63,7 @@ nodes:
       #             - siderolabs/gvisor
       #             - siderolabs/qemu-guest-agent
       #             - siderolabs/intel-ucode    
-      talosImageURL: factory.talos.dev/installer/8a2ad5c57a1985acd0d33b6bb0ad3f6b9bc77b3226a2b39e4381109cef58d4bd
+      talosImageURL: factory.talos.dev/installer/25a0f1b6a0d9395a006be275f1dd7137ddb2105c57c5d226baae9eace262cf09
       disableSearchDomain: true
       installDiskSelector:
         size: <= 50GB
@@ -73,7 +73,7 @@ nodes:
         - deviceSelector:
             hardwareAddr: "f6:ce:9a:7b:a7:b3"
           dhcp: true
-          mtu: 9000
+          # mtu: 9000
 
     - hostname: cp2.cluster-2.${secret_domain}
       ipAddress: cp2.cluster-2.${secret_domain}
@@ -84,10 +84,8 @@ nodes:
       #         - net.ifnames=0
       #     systemExtensions:
       #         officialExtensions:
-      #             - siderolabs/gvisor
       #             - siderolabs/qemu-guest-agent
-      #             - siderolabs/intel-ucode    
-      talosImageURL: factory.talos.dev/installer/8a2ad5c57a1985acd0d33b6bb0ad3f6b9bc77b3226a2b39e4381109cef58d4bd
+      talosImageURL: factory.talos.dev/installer/f683308f6e49ec36d715bd41c90d800910552d8cbc015c8363ec350594535fa1
       disableSearchDomain: true
       installDiskSelector:
         size: <= 50GB
@@ -97,7 +95,7 @@ nodes:
         - deviceSelector:
             hardwareAddr: "06:5e:c2:d2:3f:c3"
           dhcp: true
-          mtu: 9000
+          # mtu: 9000
 
     - hostname: cp3.cluster-2.${secret_domain}
       ipAddress: cp3.cluster-2.${secret_domain}
@@ -111,7 +109,7 @@ nodes:
       #             - siderolabs/gvisor
       #             - siderolabs/qemu-guest-agent
       #             - siderolabs/intel-ucode    
-      talosImageURL: factory.talos.dev/installer/8a2ad5c57a1985acd0d33b6bb0ad3f6b9bc77b3226a2b39e4381109cef58d4bd
+      talosImageURL: factory.talos.dev/installer/25a0f1b6a0d9395a006be275f1dd7137ddb2105c57c5d226baae9eace262cf09
       disableSearchDomain: true
       installDiskSelector:
         size: <= 50GB
@@ -121,7 +119,7 @@ nodes:
         - deviceSelector:
             hardwareAddr: "da:82:bd:f5:37:5f"
           dhcp: true
-          mtu: 9000
+          # mtu: 9000
 
     - hostname: work1.cluster-2.${secret_domain}
       ipAddress: work1.cluster-2.${secret_domain}
