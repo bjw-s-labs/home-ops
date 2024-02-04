@@ -48,7 +48,7 @@ spec:
                 memory: 512M
             securityContext:
               allowPrivilegeEscalation: false
-              # readOnlyRootFilesystem: true
+              readOnlyRootFilesystem: true
               capabilities:
                 drop:
                   - ALL
@@ -93,18 +93,27 @@ spec:
               - "${HOSTNAME}"
 
     persistence:
-      library:
+      data:
         enabled: true
         existingClaim: "${VOLSYNC_CLAIM}"
         advancedMounts:
           main:
-            main:
+            agent:
               - path: /library
+                subPath: library
+              - path: /app/data
+                subPath: data
       # Prevents errors due to running as non-default user
-      caddy:
+      temp:
         enabled: true
         type: emptyDir
         advancedMounts:
           main:
+            agent:
+              - path: /app/temp
+                subPath: agent-tmp
+              - path: /app/cache
+                subPath: agent-cache
             ui:
               - path: /config/caddy
+                subPath: caddy
