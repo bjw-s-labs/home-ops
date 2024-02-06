@@ -1,6 +1,6 @@
 clusterName: cluster-2
 
-talosVersion: v1.6.3
+talosVersion: v1.6.4
 kubernetesVersion: v1.29.1
 
 # Image URL rendered on https://factory.talos.dev
@@ -31,49 +31,50 @@ clusterSvcNets:
     - ${svc_cidr}
 
 nodes:
-#     - hostname: cp1.cluster-2.${secret_domain}
-#       ipAddress: cp1.cluster-2.${secret_domain}
-#       controlPlane: true
-#       disableSearchDomain: true
-#       installDiskSelector:
-#         size: <= 50GB
-#       nameservers:
-#         - 10.0.0.4
-#       networkInterfaces:
-#         # 1G Internal Port
-#         - deviceSelector:
-#             driver: bcmgenet
-#           dhcp: false
-#           # mtu: 9000
-#           vlans:
-#             - &vlan2002
-#               vlanId: 2002
-#               dhcp: true
-#               # mtu: 9000
-
     - hostname: cp1.cluster-2.${secret_domain}
       ipAddress: cp1.cluster-2.${secret_domain}
       controlPlane: true
-      # Image URL rendered on https://factory.talos.dev
-      # customization:
-      #     extraKernelArgs:
-      #         - net.ifnames=0
-      #     systemExtensions:
-      #         officialExtensions:
-      #             - siderolabs/gvisor
-      #             - siderolabs/qemu-guest-agent
-      #             - siderolabs/intel-ucode    
-      talosImageURL: factory.talos.dev/installer/25a0f1b6a0d9395a006be275f1dd7137ddb2105c57c5d226baae9eace262cf09
       disableSearchDomain: true
       installDiskSelector:
-        size: <= 50GB
+        # size: <= 50GB
+        type: nvme
       nameservers:
         - 10.0.0.4
       networkInterfaces:
+        # 1G Internal Port
         - deviceSelector:
-            hardwareAddr: "f6:ce:9a:7b:a7:b3"
-          dhcp: true
+            driver: bcmgenet
+          dhcp: false
           # mtu: 9000
+          vlans:
+            - &vlan2002
+              vlanId: 2002
+              dhcp: true
+
+
+    # - hostname: cp1.cluster-2.${secret_domain}
+    #   ipAddress: cp1.cluster-2.${secret_domain}
+    #   controlPlane: true
+    #   # Image URL rendered on https://factory.talos.dev
+    #   # customization:
+    #   #     extraKernelArgs:
+    #   #         - net.ifnames=0
+    #   #     systemExtensions:
+    #   #         officialExtensions:
+    #   #             - siderolabs/gvisor
+    #   #             - siderolabs/qemu-guest-agent
+    #   #             - siderolabs/intel-ucode    
+    #   talosImageURL: factory.talos.dev/installer/25a0f1b6a0d9395a006be275f1dd7137ddb2105c57c5d226baae9eace262cf09
+    #   disableSearchDomain: true
+    #   installDiskSelector:
+    #     size: <= 50GB
+    #   nameservers:
+    #     - 10.0.0.4
+    #   networkInterfaces:
+    #     - deviceSelector:
+    #         hardwareAddr: "f6:ce:9a:7b:a7:b3"
+    #       dhcp: true
+    #       # mtu: 9000
 
     - hostname: cp2.cluster-2.${secret_domain}
       ipAddress: cp2.cluster-2.${secret_domain}
@@ -138,11 +139,7 @@ nodes:
           dhcp: false
           # mtu: 9000
           vlans:
-            - &vlan2002
-              vlanId: 2002
-              dhcp: true
-              # mtu: 9000
-        # 2.5G PICe Port
+            - *vlan2002
         - deviceSelector:
             # Talos cant detect MAC address at boot, so it assigns a random one.
             # Using pciID to get a consistant naming scheme
@@ -379,10 +376,7 @@ nodes:
           dhcp: false
           # mtu: 9000
           vlans:
-            - &vlan2002
-              vlanId: 2002
-              dhcp: true
-              # mtu: 9000
+            - *vlan2002
             - &vlan2040-noMTU
               vlanId: 2040
               dhcp: true
@@ -406,12 +400,12 @@ nodes:
             driver: virtio_net
             hardwareAddr: "52:53:e4:5a:89:e1"
           dhcp: true
-          mtu: 9000
+          # mtu: 9000
         - deviceSelector:
             driver: virtio_net
             hardwareAddr: "52:53:e4:5a:89:e2"
           dhcp: true
-          mtu: 9000
+          # mtu: 9000
           dhcpOptions:
             routeMetric: 2048
 
@@ -431,12 +425,37 @@ nodes:
             driver: virtio_net
             hardwareAddr: "52:53:e4:5a:89:e3"
           dhcp: true
-          mtu: 9000
+          # mtu: 9000
         - deviceSelector:
             driver: virtio_net
             hardwareAddr: "52:53:e4:5a:89:e4"
           dhcp: true
-          mtu: 9000
+          # mtu: 9000
+          dhcpOptions:
+            routeMetric: 2048
+
+    - hostname: temp3.cluster-2.${secret_domain}
+      ipAddress: temp3.cluster-2.${secret_domain}
+      controlPlane: false
+      disableSearchDomain: true
+      nodeLabels:
+        node-role.kubernetes.io/rook-mon-node: "true"
+        node-role.kubernetes.io/rook-mgr-node: "true"
+      installDiskSelector:
+        size: <= 50GB
+      nameservers:
+        - 10.0.0.4
+      networkInterfaces:
+        - deviceSelector:
+            driver: virtio_net
+            hardwareAddr: "52:53:e4:5a:89:e5"
+          dhcp: true
+          # mtu: 9000
+        - deviceSelector:
+            driver: virtio_net
+            hardwareAddr: "52:53:e4:5a:89:e6"
+          dhcp: true
+          # mtu: 9000
           dhcpOptions:
             routeMetric: 2048
 
