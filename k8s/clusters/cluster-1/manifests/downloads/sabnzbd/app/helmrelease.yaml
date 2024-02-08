@@ -181,14 +181,14 @@ spec:
                 service:
                   name: main
                   port: http
-          - host: &host "sabnzbd.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  name: main
-                  port: http
+          # - host: &host "sabnzbd.${INGRESS_DOMAIN}"
+          #   paths:
+          #     - path: /
+          #       service:
+          #         name: main
+          #         port: http
         tls:
           - secretName: tls.sabnzbd
             hosts:
               - *host-cluster
-              - *host
+              # - *host
