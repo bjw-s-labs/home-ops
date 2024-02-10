@@ -94,10 +94,6 @@ spec:
         allowMultiplePerNode: false
       network:
         provider: host
-        # public:
-        #   -"10.200.40.0/24"
-        # cluster:
-        #   -"10.200.2.0/24"
         addressRanges:
           public:
             - "10.200.40.0/24"
@@ -114,7 +110,7 @@ spec:
                 - matchExpressions:
                   - key: node-role.kubernetes.io/rook-osd-node
                     operator: DoesNotExist
-        # mon: *placement
+        mon: *placement
       resources:
         mgr:
           limits:
@@ -254,7 +250,7 @@ spec:
       isDefault: false
       deletionPolicy: Delete
 
-    cephFileSystems: []
+    cephFileSystems:
       - name: ceph-filesystem
         spec:
           # Default is true. Setting to false will allow the ceph-operator to delete the pools when deleting the filesystem
