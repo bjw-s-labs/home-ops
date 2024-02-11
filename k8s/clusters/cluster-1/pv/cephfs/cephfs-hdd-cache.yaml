@@ -101,7 +101,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: ceph-filesystem-cache-downloads
+  name: ceph-filesystem-downloads
 spec:
   accessModes:
     - ReadWriteMany
@@ -124,14 +124,14 @@ spec:
       "rootPath": /volumes/downloads
     # volumeHandle can be anything, need not to be same
     # as PV name or volume name. keeping same for brevity
-    volumeHandle: ceph-filesystem-cache-downloads
+    volumeHandle: ceph-filesystem-downloads
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ceph-filesystem-cache-downloads
+  name: ceph-filesystem-downloads
   namespace: downloads
   labels:
     backup: "false"
@@ -144,42 +144,42 @@ spec:
       storage: 500G
   volumeMode: Filesystem
   # volumeName should be same as PV name
-  volumeName: ceph-filesystem-cache-downloads
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: ceph-filesystem-cache-media
-spec:
-  accessModes:
-    - ReadWriteMany
-  capacity:
-    storage: 500G
-  storageClassName: "ceph-filesystem-storage"
-  csi:
-    driver: rook-ceph.cephfs.csi.ceph.com 
-    nodeStageSecretRef:
-      # node stage secret name
-      name: rook-csi-cephfs-node
-      # node stage secret namespace where above secret is created
-      namespace: rook-ceph-cluster-2 
-    volumeAttributes:
-      # Required options from storageclass parameters need to be added in volumeAttributes
-      "clusterID": "rook-ceph-cluster-2"
-      "fsName": "ceph-filesystem"
-      "pool": "ceph-filesystem-erasurecoded-ssd"
-      "staticVolume": "true"
-      "rootPath": /volumes/downloads
-    # volumeHandle can be anything, need not to be same
-    # as PV name or volume name. keeping same for brevity
-    volumeHandle: ceph-filesystem-cache-media
-  persistentVolumeReclaimPolicy: Retain
-  volumeMode: Filesystem
+  volumeName: ceph-filesystem-downloads
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: ceph-filesystem-cache-media
+# spec:
+#   accessModes:
+#     - ReadWriteMany
+#   capacity:
+#     storage: 500G
+#   storageClassName: "ceph-filesystem-storage"
+#   csi:
+#     driver: rook-ceph.cephfs.csi.ceph.com 
+#     nodeStageSecretRef:
+#       # node stage secret name
+#       name: rook-csi-cephfs-node
+#       # node stage secret namespace where above secret is created
+#       namespace: rook-ceph-cluster-2 
+#     volumeAttributes:
+#       # Required options from storageclass parameters need to be added in volumeAttributes
+#       "clusterID": "rook-ceph-cluster-2"
+#       "fsName": "ceph-filesystem"
+#       "pool": "ceph-filesystem-erasurecoded-ssd"
+#       "staticVolume": "true"
+#       "rootPath": /volumes/downloads
+#     # volumeHandle can be anything, need not to be same
+#     # as PV name or volume name. keeping same for brevity
+#     volumeHandle: ceph-filesystem-cache-media
+#   persistentVolumeReclaimPolicy: Retain
+#   volumeMode: Filesystem
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ceph-filesystem-cache-media
+  name: ceph-filesystem-downloads
   namespace: media
   labels:
     backup: "false"
@@ -192,4 +192,4 @@ spec:
       storage: 500G
   volumeMode: Filesystem
   # volumeName should be same as PV name
-  volumeName: ceph-filesystem-cache-media
+  volumeName: ceph-filesystem-downloads
