@@ -96,7 +96,8 @@ spec:
         existingClaim: sabnzbd-config
       incomplete:
         enabled: true
-        type: emptyDir
+        existingClaim: ceph-blockpool-sabnzbd-incomplete
+        # type: emptyDir
       backup:
         enabled: true
         existingClaim: ceph-filesystem-backups-sabnzbd
@@ -129,7 +130,7 @@ spec:
               - path: /mnt/unionfs/Media/Music/
         accessMode: ReadWriteMany
       movies:
-        enabled: true
+        enabled: false
         existingClaim: cephfs-hdd-downloads-movies
         advancedMounts:
           main:
@@ -137,7 +138,7 @@ spec:
               - path: /mnt/unionfs/Media/Movies/
         accessMode: ReadWriteMany
       tv:
-        enabled: true
+        enabled: false
         existingClaim: cephfs-hdd-downloads-tv
         advancedMounts:
           main:
@@ -146,8 +147,7 @@ spec:
         accessMode: ReadWriteMany
       downloads:
         enabled: true
-        # existingClaim: cephfs-ssd-cache-downloads
-        existingClaim: ceph-blockpool-sabnzbd-cache
+        existingClaim: cephfs-ssd-cache-downloads
         advancedMounts:
           main:
             main:
