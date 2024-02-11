@@ -272,16 +272,16 @@ spec:
             activeCount: 1
             activeStandby: true
             placement:
-              # podAntiAffinity:
-              #   requiredDuringSchedulingIgnoredDuringExecution:
-              #     - labelSelector:
-              #         matchExpressions:
-              #           - key: app
-              #             operator: In
-              #             values:
-              #               - rook-ceph-mds
-              #       # topologyKey: kubernetes.io/hostname will place MDS across different hosts
-              #       topologyKey: kubernetes.io/hostname
+              podAntiAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  - labelSelector:
+                      matchExpressions:
+                        - key: app
+                          operator: In
+                          values:
+                            - rook-ceph-mds
+                    # topologyKey: kubernetes.io/hostname will place MDS across different hosts
+                    topologyKey: kubernetes.io/hostname
               nodeAffinity:
                 requiredDuringSchedulingIgnoredDuringExecution:
                   nodeSelectorTerms:
