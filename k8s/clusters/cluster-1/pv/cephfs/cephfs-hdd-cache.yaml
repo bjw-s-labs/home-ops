@@ -149,7 +149,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: ceph-filesystem-downloads-media
+  name: ceph-filesystem-media-downloads
 spec:
   accessModes:
     - ReadWriteMany
@@ -172,7 +172,7 @@ spec:
       "rootPath": /volumes/downloads
     # volumeHandle can be anything, need not to be same
     # as PV name or volume name. keeping same for brevity
-    volumeHandle: ceph-filesystem-downloads-media
+    volumeHandle: ceph-filesystem-media-downloads
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
 ---
