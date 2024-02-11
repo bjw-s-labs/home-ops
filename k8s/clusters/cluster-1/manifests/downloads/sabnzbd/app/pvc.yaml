@@ -38,3 +38,25 @@ spec:
       storage: 500Gi
 
   storageClassName: ceph-block-external
+
+############################################################
+#        Cluster 2 Ceph PVs
+############################################################
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ceph-blockpool-sabnzbd-cache
+  namespace: downloads
+  labels:
+    k10.kasten.io/backup: "true"
+    app.kubernetes.io/name: &name sabnzbd
+    app.kubernetes.io/instance: *name
+    snapshot.home.arpa/enabled: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Gi
+  storageClassName: ceph-blockpool
