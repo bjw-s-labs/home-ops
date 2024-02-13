@@ -1,0 +1,29 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: rpi-cpu-stats-scrape-config
+  namespace: monitoring
+  labels:
+    prometheus: system-monitoring-prometheus
+spec:
+  kubernetesSDConfig:
+    role: pod
+    relabelConfigs:
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: pod
+      # scrape the pod on port 9669
+      - source_labels: [__meta_kubernetes_pod_ip]
+        action: replace
+        regex: ([^:]+):.*
+        replacement: $1:9669
+        target_label: __address__
+      # scrape only pods that have the name "rpi-cpu-stats"
+      - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+        action: keep
+        regex: rpi-cpu-stats
