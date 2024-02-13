@@ -1,59 +1,41 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
-  name: smartctl-exporter
+  name: &app smartctl-exporter
+  namespace: monitoring
 spec:
   interval: 30m
   chart:
     spec:
-      chart: app-template
-      version: 2.5.0
-      interval: 30m
+      chart: prometheus-smartctl-exporter
+      version: 0.7.0
       sourceRef:
         kind: HelmRepository
-        name: bjw-s
+        name: prometheus-community-charts
         namespace: flux-system
-
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
-    controllers:
-      main:
-        containers:
-          main:
-            image:
-              # Doesnt have ARM images
-              # repository: quay.io/prometheuscommunity/smartctl-exporter
-              # tag: v0.11.0
-              repository: ghcr.io/prometheus-community/charts/prometheus-smartctl-exporter
-              tag: 0.7.0
-            args:
-              - --smartctl.path=/usr/sbin/smartctl
-              - --smartctl.interval=120s
-              - --web.listen-address=0.0.0.0:9633
-              - --web.telemetry-path=/metrics
-            resources:
-              requests:
-                cpu: 23m
-                memory: 64M
-              limits:
-                memory: 64M
-            securityContext:
-              privileged: true
-              runAsUser: 0
-
-    service:
-      main:
-        type: LoadBalancer
-        ports:
-          http:
-            port: 9633
-
-    persistence:
-      dev:
-        type: hostPath
-        hostPath: /dev
-        hostPathType: Directory
-        globalMounts:
-          - path: /host/dev
-            readOnly: true
+    fullnameOverride: *app
+    image:
+      repository: ghcr.io/lildrunkensmurf/smartctl_exporter
+      tag: 0.11.0@sha256:433da1713768101c374a9af74452f65c352ad68aa5ff9a479ff8878f681d5aab
+    config:
+      devices:
+        - /hostdev/sda
+        - /hostdev/sdb
+        - /hostdev/sdc
+    serviceMonitor:
+      enabled: true
+    prometheusRules:
+      enabled: false
+    tolerations: {}
