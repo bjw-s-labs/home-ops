@@ -17,8 +17,18 @@ spec:
         namespace: flux-system
 
   values:
+    defaultPodOptions:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                - arm64
     controllers:
-      # type: daemonset
+      type: daemonset
       main:
         containers:
           main:
@@ -37,7 +47,7 @@ spec:
 
     service:
       main:
-        type: LoadBalancer
+        # type: LoadBalancer
         ports:
           http:
             port: 9669
