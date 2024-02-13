@@ -38,4 +38,12 @@ spec:
       enabled: true
     prometheusRules:
       enabled: false
-    tolerations: {}
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values: 
+                  - arm64
