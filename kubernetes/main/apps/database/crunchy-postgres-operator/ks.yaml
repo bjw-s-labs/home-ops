@@ -11,9 +11,52 @@ spec:
     labels:
       app.kubernetes.io/name: *appname
   interval: 10m
-  path: "./kubernetes/main/apps/database/crunchy-postgres-operator/operator"
+  path: ./kubernetes/main/apps/database/crunchy-postgres-operator/operator
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-ops-kubernetes
   wait: true
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &appname crunchy-postgres-operator-cluster
+  namespace: flux-system
+spec:
+  targetNamespace: database
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
+  interval: 10m
+  path: ./kubernetes/main/apps/database/crunchy-postgres-operator/cluster
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  wait: true
+  dependsOn:
+    - name: crunchy-postgres-operator
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &appname crunchy-postgres-operator-secretstore
+  namespace: flux-system
+spec:
+  targetNamespace: database
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
+  interval: 10m
+  path: ./kubernetes/main/apps/database/crunchy-postgres-operator/clustersecretstore
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  wait: true
+  dependsOn:
+    - name: crunchy-postgres-operator-cluster
+    - name: external-secrets

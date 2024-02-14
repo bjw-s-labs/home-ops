@@ -1,0 +1,123 @@
+---
+apiVersion: postgres-operator.crunchydata.com/v1beta1
+kind: PostgresCluster
+metadata:
+  name: &name postgres
+spec:
+  postgresVersion: 16
+
+  patroni: # turn on sync writes to at least 1 other replica
+    dynamicConfiguration:
+      synchronous_mode: true
+      postgresql:
+        synchronous_commit: "on"
+
+  instances:
+    - name: postgres
+      metadata:
+        labels:
+          app.kubernetes.io/name: crunchy-postgres
+          egress.home.arpa/apiserver: allow
+          egress.home.arpa/minio: allow
+          egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
+      replicas: &replica 3
+      dataVolumeClaimSpec:
+        storageClassName: local-hostpath
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 20Gi
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: "kubernetes.io/hostname"
+          whenUnsatisfiable: "DoNotSchedule"
+          labelSelector:
+            matchLabels:
+              postgres-operator.crunchydata.com/cluster: *name
+              postgres-operator.crunchydata.com/data: postgres
+
+  users:
+    # Superuser
+    - name: "postgres"
+      databases: []
+      options: "SUPERUSER"
+      password:
+        type: AlphaNumeric
+    # Applications
+    - name: "authentik"
+      databases: ["authentik"]
+      password:
+        type: AlphaNumeric
+
+  backups:
+    pgbackrest:
+      configuration: &backupConfig
+        - secret:
+            name: crunchy-postgres-secret
+      global: &backupFlag
+        archive-timeout: "60"
+        compress-type: "bz2"
+        compress-level: "9"
+        delta: "y"
+        repo1-retention-full-type: "time"
+        repo1-retention-full: "14"
+        repo1-retention-diff: "30"
+        repo1-path: "/crunchy-pgo"
+        repo1-s3-uri-style: path
+        # repo2-bundle: "y"
+        # repo2-block: "y"
+        # repo2-path: "/crunchy-pgo"
+        # repo2-s3-uri-style: "path"
+        # repo2-retention-full-type: "time"
+        # repo2-retention-full: "2"
+        # repo2-retention-diff: "7"
+        # repo2-cipher-type: "aes-256-cbc"
+        archive-push-queue-max: 4GiB
+      manual:
+        repoName: repo1
+        options:
+          - --type=full
+      metadata:
+        labels:
+          app.kubernetes.io/name: crunchy-postgres-backup
+          egress.home.arpa/apiserver: allow
+          egress.home.arpa/minio: allow
+          egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
+      repos:
+        - name: repo1 # Minio
+          s3: &minio
+            bucket: "crunchy-postgres"
+            endpoint: "s3.bjw-s.dev"
+            region: "us-east-1"
+          schedules:
+            full: "0 1 * * 0" # Sunday at 01:00
+            differential: "0 1 * * 1-6" # Mon-Sat at 01:00
+            incremental: "0 2-23 * * *" # Every hour except 01:00
+
+  dataSource:
+    pgbackrest:
+      stanza: "db"
+      configuration: *backupConfig
+      global: *backupFlag
+      repo:
+        name: "repo1"
+        s3: *minio
+
+  proxy:
+    pgBouncer:
+      service:
+        type: LoadBalancer
+      port: 5432
+      replicas: *replica
+      config:
+        global:
+          pool_mode: "transaction" #pgBouncer is set to transaction for Authentik. Grafana requires session https://github.com/grafana/grafana/issues/74260#issuecomment-1702795311. Everything else is happy with transaction
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: "kubernetes.io/hostname"
+          whenUnsatisfiable: "DoNotSchedule"
+          labelSelector:
+            matchLabels:
+              postgres-operator.crunchydata.com/cluster: *name
+              postgres-operator.crunchydata.com/role: "pgbouncer"
