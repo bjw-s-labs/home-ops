@@ -1,62 +1,8 @@
 ---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
 tasks:
-  mount:
-    desc: Mount a PersistentVolumeClaim to a pod temporarily
-    summary: |
-      Args:
-        cluster: Cluster to run command against (required)
-        ns: Namespace the PVC is in (default: default)
-        claim: PVC to mount (required)
-    interactive: true
-    vars:
-      cluster: "{{ .cluster }}"
-      ns: '{{.ns | default "default"}}'
-      claim: "{{ .claim }}"
-    requires:
-      vars:
-        - claim
-        - cluster
-    cmds:
-      - |
-        kubectl --context {{.cluster}} run -n {{.ns}} debug-{{.claim}} -i --tty --rm --image=null --privileged --overrides='
-          {
-            "apiVersion": "v1",
-            "spec": {
-              "containers": [
-                {
-                  "name": "debug",
-                  "image": "ghcr.io/onedr0p/alpine:rolling",
-                  "command": [
-                    "/bin/bash"
-                  ],
-                  "stdin": true,
-                  "stdinOnce": true,
-                  "tty": true,
-                  "volumeMounts": [
-                    {
-                      "name": "claim",
-                      "mountPath": "/mnt/claim"
-                    }
-                  ]
-                }
-              ],
-              "volumes": [
-                {
-                  "name": "claim",
-                  "persistentVolumeClaim": {
-                    "claimName": "{{.claim}}"
-                  }
-                }
-              ],
-              "restartPolicy": "Never"
-            }
-          }'
-    preconditions:
-      - sh: kubectl --context {{.cluster}} -n {{.ns}} get pvc {{.claim}}
-        msg: "PVC not found"
-
   delete-failed-pods:
     desc: Deletes pods with Failed phase
     summary: |
