@@ -1,0 +1,23 @@
+---
+repositories:
+  - name: postfinance
+    url: https://postfinance.github.io/kubelet-csr-approver
+  - name: cilium
+    url: https://helm.cilium.io
+
+releases:
+  - name: cilium
+    namespace: kube-system
+    chart: cilium/cilium
+    version: 1.15.0
+    wait: true
+    values:
+      - ../../../apps/kube-system/cilium/app/values.yaml
+
+  - name: kubelet-csr-approver
+    namespace: system-controllers
+    chart: postfinance/kubelet-csr-approver
+    version: 1.0.7
+    wait: true
+    values:
+      - ../../../apps/system-controllers/kubelet-csr-approver/app/values.yaml
