@@ -37,3 +37,22 @@ spec:
       storage: 20Gi
 
   storageClassName: ceph-block-external-nvme
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sonarr-config-cluster-2
+  namespace: downloads
+  labels:
+    app.kubernetes.io/name: &name sonarr
+    app.kubernetes.io/instance: *name
+    snapshot.home.arpa/enabled: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 20Gi
+
+  storageClassName: ceph-blockpool
