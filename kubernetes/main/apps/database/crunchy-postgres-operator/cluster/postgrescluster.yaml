@@ -11,6 +11,9 @@ spec:
       synchronous_mode: true
       postgresql:
         synchronous_commit: "on"
+        pg_hba:
+          - hostnossl all all 10.244.0.0/16 md5
+          - hostssl all all all md5
 
   instances:
     - name: postgres
@@ -40,11 +43,14 @@ spec:
   users:
     # Superuser
     - name: "postgres"
-      databases: []
       options: "SUPERUSER"
       password:
         type: AlphaNumeric
     # Applications
+    - name: "atuin"
+      databases: ["atuin"]
+      password:
+        type: AlphaNumeric
     - name: "authentik"
       databases: ["authentik"]
       password:
