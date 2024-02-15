@@ -38,8 +38,8 @@ spec:
               ATUIN_DB_URI:
                 valueFrom:
                   secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: uri
+                    name: atuin-db-secret
+                    key: ATUIN_DB_URI
                     optional: false
               ATUIN_HOST: 0.0.0.0
               ATUIN_PORT: &port 8888

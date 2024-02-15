@@ -18,8 +18,8 @@ spec:
     name: home-ops-kubernetes
   wait: false
   dependsOn:
-    - name: crunchy-postgres-operator
-    - name: external-secrets-cluster-secrets
+    - name: crunchy-postgres-operator-cluster
+    - name: crunchy-postgres-operator-secretstore
   postBuild:
     substitute:
       APP: *appname
