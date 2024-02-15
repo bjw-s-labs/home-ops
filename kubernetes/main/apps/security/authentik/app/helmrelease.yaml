@@ -54,20 +54,20 @@ spec:
           key: authentik_email_from
       AUTHENTIK_POSTGRESQL__HOST:
         secretKeyRef:
-          name: "${APP}-pguser-${DB_USER}"
-          key: host
+          name: authentik-db-secret
+          key: AUTHENTIK_POSTGRESQL__HOST
       AUTHENTIK_POSTGRESQL__NAME:
         secretKeyRef:
-          name: "${APP}-pguser-${DB_USER}"
-          key: dbname
+          name: authentik-db-secret
+          key: AUTHENTIK_POSTGRESQL__NAME
       AUTHENTIK_POSTGRESQL__USER:
         secretKeyRef:
-          name: "${APP}-pguser-${DB_USER}"
-          key: user
+          name: authentik-db-secret
+          key: AUTHENTIK_POSTGRESQL__USER
       AUTHENTIK_POSTGRESQL__PASSWORD:
         secretKeyRef:
-          name: "${APP}-pguser-${DB_USER}"
-          key: password
+          name: authentik-db-secret
+          key: AUTHENTIK_POSTGRESQL__PASSWORD
       AUTHENTIK_REDIS__PASSWORD:
         secretKeyRef:
           name: authentik-redis-secret
