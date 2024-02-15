@@ -18,7 +18,7 @@ tasks:
       output_dir: '{{ .output_dir | default "." }}'
       cli_args:
         sh: |-
-          [[ -n "{{.cli_args}}" ]] && echo "{{.cli_args}}" || echo "--verbose --format=c --no-comments --clean --if-exists --no-owner"
+          [[ -n "{{.cli_args}}" ]] && echo "{{.cli_args}}" || echo "--verbose --format=c --no-comments --clean --if-exists --no-owner --extension plpgsql"
     cmds:
       - kubectl --context {{.cluster}} exec -it --container database -n {{.ns}} {{.crunchy_primary}} -- /bin/bash -c 'pg_dump --dbname {{.db_name}} {{.cli_args}} --file {{.data_dir}}/{{.db_name}}.psql'
       - kubectl --context {{.cluster}} cp --container database "{{.ns}}/{{.crunchy_primary}}:{{.data_dir}}/{{.db_name}}.psql" "{{.output_dir}}/{{.db_name}}.psql"
