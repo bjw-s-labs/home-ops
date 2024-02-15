@@ -245,18 +245,20 @@ spec:
         spec:
           # Default is true. Setting to false will allow the ceph-operator to delete the pools when deleting the filesystem
           preservePoolsOnDelete: false
-          deviceClass: hdd
           metadataPool:
+            failureDomain: host
             deviceClass: ssd
             replicated:
               size: 3
           dataPools:
             - name: data0
               failureDomain: host
+              deviceClass: hdd
               replicated:
                 size: 3
             - name: erasurecoded
               failureDomain: host
+              deviceClass: hdd
               erasureCoded:
                 dataChunks: 6
                 codingChunks: 2
