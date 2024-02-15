@@ -11,9 +11,6 @@ spec:
       synchronous_mode: true
       postgresql:
         synchronous_commit: "on"
-        pg_hba:
-          - hostnossl all all 10.244.0.0/16 md5
-          - hostssl all all all md5
 
   instances:
     - name: postgres
@@ -119,6 +116,7 @@ spec:
       config:
         global:
           pool_mode: "transaction" #pgBouncer is set to transaction for Authentik. Grafana requires session https://github.com/grafana/grafana/issues/74260#issuecomment-1702795311. Everything else is happy with transaction
+          client_tls_sslmode: prefer
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: "kubernetes.io/hostname"
