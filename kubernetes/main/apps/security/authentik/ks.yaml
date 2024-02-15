@@ -39,7 +39,8 @@ spec:
     name: home-ops-kubernetes
   wait: true
   dependsOn:
-    - name: external-secrets-stores
+    - name: crunchy-postgres-operator-cluster
+    - name: crunchy-postgres-operator-secretstore
     - name: authentik-redis
   postBuild:
     substitute:

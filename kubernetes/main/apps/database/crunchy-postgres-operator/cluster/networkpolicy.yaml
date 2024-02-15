@@ -19,6 +19,15 @@ spec:
               protocol: TCP
             - port: "8008"
               protocol: TCP
+    # pgbouncer
+    - fromEndpoints:
+        - matchLabels:
+            postgres-operator.crunchydata.com/cluster: postgres
+            postgres-operator.crunchydata.com/role: pgbouncer
+      toPorts:
+        - ports:
+            - port: *port
+              protocol: TCP
   egress:
     # internal
     - toEndpoints:
