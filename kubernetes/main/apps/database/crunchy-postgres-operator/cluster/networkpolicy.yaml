@@ -3,101 +3,93 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: postgres
+  name: postgres-cluster
 spec:
   endpointSelector:
     matchLabels:
       postgres-operator.crunchydata.com/cluster: postgres
-      postgres-operator.crunchydata.com/role: master
   ingress:
-    # replicas
+    # allow Postgres pods to talk to each other
     - fromEndpoints:
         - matchLabels:
             postgres-operator.crunchydata.com/cluster: postgres
-            postgres-operator.crunchydata.com/role: replica
-      toPorts:
-        - ports:
-            - port: &port "5432"
-              protocol: TCP
-            - port: "8008"
-              protocol: TCP
-    # pgbouncer
+
+    # allow operator to connect
     - fromEndpoints:
         - matchLabels:
-            postgres-operator.crunchydata.com/cluster: postgres
-            postgres-operator.crunchydata.com/role: pgbouncer
-      toPorts:
-        - ports:
-            - port: *port
-              protocol: TCP
-    # dbman
+            postgres-operator.crunchydata.com/control-plane: pgo
+
+    # allow labelled pods to connect to Postgres only and ping with pg_health
     - fromEndpoints:
         - matchLabels:
-            app.kubernetes.io/name: dbman
-            app.kubernetes.io/instance: dbman-operator
-      toPorts:
-        - ports:
-            - port: *port
-              protocol: TCP
-    # apps
-    - fromEndpoints:
-        - matchLabels:
-            egress.home.arpa/postgres-master: allow
+            db.home.arpa/pg: "postgres"
           matchExpressions:
             - key: io.kubernetes.pod.namespace
               operator: Exists
       toPorts:
         - ports:
-            - port: *port
-              protocol: TCP
+            - port: "5432"
+    - fromEndpoints:
+        - matchLabels:
+            db.home.arpa/pg: "postgres"
+          matchExpressions:
+            - key: io.kubernetes.pod.namespace
+              operator: Exists
+      icmps:
+        - {}
 
   egress:
-    # replicas
+    # allow Postgres pods to talk to each other
     - toEndpoints:
         - matchLabels:
             postgres-operator.crunchydata.com/cluster: postgres
-            postgres-operator.crunchydata.com/role: replica
-      toPorts:
-        - ports:
-            - port: *port
-              protocol: TCP
-            - port: "8008"
-              protocol: TCP
+
+    # connect to operator
+    - toEndpoints:
+        - matchLabels:
+            postgres-operator.crunchydata.com/control-plane: pgo
+
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cilium.io/ciliumclusterwidenetworkpolicy_v2.json
 apiVersion: cilium.io/v2
 kind: CiliumClusterwideNetworkPolicy
 metadata:
-  name: allow-egress-database-postgres-master
+  name: apps-to-pg-postgres
 spec:
   endpointSelector:
     matchLabels:
-      egress.home.arpa/postgres-master: allow
+      db.home.arpa/pg: "postgres"
   egress:
+    # Connections to master
     - toEndpoints:
         - matchLabels:
             postgres-operator.crunchydata.com/cluster: postgres
             postgres-operator.crunchydata.com/role: master
+            io.kubernetes.pod.namespace: database
       toPorts:
         - ports:
             - port: "5432"
               protocol: "TCP"
----
-# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cilium.io/ciliumclusterwidenetworkpolicy_v2.json
-apiVersion: cilium.io/v2
-kind: CiliumClusterwideNetworkPolicy
-metadata:
-  name: allow-egress-database-postgres-pgbouncer
-spec:
-  endpointSelector:
-    matchLabels:
-      egress.home.arpa/postgres-pgbouncer: allow
-  egress:
+    - toEndpoints:
+        - matchLabels:
+            postgres-operator.crunchydata.com/cluster: postgres
+            postgres-operator.crunchydata.com/role: master
+            io.kubernetes.pod.namespace: database
+      icmps: [{}]
+
+    # Connections to pgbouncer
     - toEndpoints:
         - matchLabels:
             postgres-operator.crunchydata.com/cluster: postgres
             postgres-operator.crunchydata.com/role: pgbouncer
+            io.kubernetes.pod.namespace: database
       toPorts:
         - ports:
             - port: "5432"
               protocol: "TCP"
+    - toEndpoints:
+        - matchLabels:
+            postgres-operator.crunchydata.com/cluster: postgres
+            postgres-operator.crunchydata.com/role: pgbouncer
+            io.kubernetes.pod.namespace: database
+      icmps: [{}]
