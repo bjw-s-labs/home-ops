@@ -2,15 +2,13 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
-vars:
-  db_cluster: '{{.db_cluster | default "postgres"}}' #postgres cluster name
-  ns: '{{.ns | default "database"}}' #database namespace
-
 tasks:
   crunchy-dump:
     desc: Run pg_dump on the master instance of a CrunchyData Postgres cluster.
     dir: "{{.USER_WORKING_DIR}}"
     vars:
+      db_cluster: '{{.db_cluster | default "postgres"}}' #postgres cluster name
+      ns: '{{.ns | default "database"}}' #database namespace
       crunchy_primary:
         sh: |-
           kubectl --context {{.cluster}} get pods -n {{.ns}} -l postgres-operator.crunchydata.com/role=master,postgres-operator.crunchydata.com/cluster={{.db_cluster}} -o jsonpath='{.items[0].metadata.name}'
@@ -28,13 +26,16 @@ tasks:
         - cluster
         - db_name
     preconditions:
-      - kubectl config get-contexts {{.cluster}}
+      - sh: kubectl config get-contexts {{.cluster}}
+        msg: "Kubectl context {{.cluster}} not found"
       - kubectl --context {{.cluster}} get pods -n {{.ns}} -l postgres-operator.crunchydata.com/role=master,postgres-operator.crunchydata.com/cluster={{.db_cluster}}
 
   crunchy-restore:
     desc: Restore a pg_dump to a CrunchyData Postgres cluster, writing to the master instance.
     dir: "{{.USER_WORKING_DIR}}"
     vars:
+      db_cluster: '{{.db_cluster | default "postgres"}}' #postgres cluster name
+      ns: '{{.ns | default "database"}}' #database namespace
       crunchy_primary:
         sh: |-
           kubectl --context {{.cluster}} get pods -n {{.ns}} -l postgres-operator.crunchydata.com/role=master,postgres-operator.crunchydata.com/cluster={{.db_cluster}} -o jsonpath='{.items[0].metadata.name}'
@@ -54,7 +55,8 @@ tasks:
         - db_user
         - file
     preconditions:
-      - kubectl config get-contexts {{.cluster}}
+      - sh: kubectl config get-contexts {{.cluster}}
+        msg: "Kubectl context {{.cluster}} not found"
       - kubectl --context {{.cluster}} get pods -n {{.ns}} -l postgres-operator.crunchydata.com/role=master,postgres-operator.crunchydata.com/cluster={{.db_cluster}}
       - test -f "{{.file}}"
 
@@ -62,6 +64,8 @@ tasks:
     desc: Exec in to the master instance of a CrunchyData Postgres cluster.
     dir: "{{.USER_WORKING_DIR}}"
     vars:
+      db_cluster: '{{.db_cluster | default "postgres"}}' #postgres cluster name
+      ns: '{{.ns | default "database"}}' #database namespace
       crunchy_primary:
         sh: |-
           kubectl --context {{.cluster}} get pods -n {{.ns}} -l postgres-operator.crunchydata.com/role=master,postgres-operator.crunchydata.com/cluster={{.db_cluster}} -o jsonpath='{.items[0].metadata.name}'

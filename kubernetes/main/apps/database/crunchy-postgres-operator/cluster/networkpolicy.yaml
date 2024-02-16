@@ -30,6 +30,15 @@ spec:
         - ports:
             - port: *port
               protocol: TCP
+    # dbman
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: dbman
+            app.kubernetes.io/instance: dbman-operator
+      toPorts:
+        - ports:
+            - port: *port
+              protocol: TCP
     # apps
     - fromEndpoints:
         - matchLabels:
