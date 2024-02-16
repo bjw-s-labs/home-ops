@@ -16,8 +16,8 @@ spec:
         name: authentik
         namespace: flux-system
   values:
-    annotations:
-      secret.reloader.stakater.com/reload: authentik-secret,${APP}-pguser-${DB_USER},authentik-redis-secret
+    podAnnotations:
+      secret.reloader.stakater.com/reload: authentik-secret, authentik-db-secret,authentik-redis-secret
 
     authentik:
       log_level: info
@@ -31,47 +31,13 @@ spec:
         host: "authentik-redis.security.svc.cluster.local"
         password: ""
 
-    env:
-      AUTHENTIK_POSTGRESQL__USE_PGBOUNCER: true
-      AUTHENTIK_POSTGRESQL__SSLMODE: "require"
+    envFrom:
+      - secretRef:
+          name: authentik-secret
+      - secretRef:
+          name: authentik-db-secret
 
     envValueFrom:
-      AUTHENTIK_SECRET_KEY:
-        secretKeyRef:
-          name: authentik-secret
-          key: authentik_secret_key
-      AUTHENTIK_EMAIL__HOST:
-        secretKeyRef:
-          name: authentik-secret
-          key: authentik_email_host
-      AUTHENTIK_EMAIL__USERNAME:
-        secretKeyRef:
-          name: authentik-secret
-          key: authentik_email_username
-      AUTHENTIK_EMAIL__PASSWORD:
-        secretKeyRef:
-          name: authentik-secret
-          key: authentik_email_password
-      AUTHENTIK_EMAIL__FROM:
-        secretKeyRef:
-          name: authentik-secret
-          key: authentik_email_from
-      AUTHENTIK_POSTGRESQL__HOST:
-        secretKeyRef:
-          name: authentik-db-secret
-          key: AUTHENTIK_POSTGRESQL__HOST
-      AUTHENTIK_POSTGRESQL__NAME:
-        secretKeyRef:
-          name: authentik-db-secret
-          key: AUTHENTIK_POSTGRESQL__NAME
-      AUTHENTIK_POSTGRESQL__USER:
-        secretKeyRef:
-          name: authentik-db-secret
-          key: AUTHENTIK_POSTGRESQL__USER
-      AUTHENTIK_POSTGRESQL__PASSWORD:
-        secretKeyRef:
-          name: authentik-db-secret
-          key: AUTHENTIK_POSTGRESQL__PASSWORD
       AUTHENTIK_REDIS__PASSWORD:
         secretKeyRef:
           name: authentik-redis-secret
@@ -103,3 +69,38 @@ spec:
 
     redis:
       enabled: false
+
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              version: v1
+              kind: Deployment
+              name: authentik-server
+            patch: |
+              - op: add
+                path: /spec/template/metadata/labels/egress.home.arpa~1apiserver
+                value: allow
+              - op: add
+                path: /spec/template/metadata/labels/egress.home.arpa~1internet
+                value: allow
+              - op: add
+                path: /spec/template/metadata/labels/db.home.arpa~1pg
+                value: postgres
+              - op: add
+                path: /spec/template/metadata/labels/egress.home.arpa~1kubedns
+                value: allow
+          - target:
+              version: v1
+              kind: Deployment
+              name: authentik-worker
+            patch: |
+              - op: add
+                path: /spec/template/metadata/labels/egress.home.arpa~1apiserver
+                value: allow
+              - op: add
+                path: /spec/template/metadata/labels/db.home.arpa~1pg
+                value: postgres
+              - op: add
+                path: /spec/template/metadata/labels/egress.home.arpa~1kubedns
+                value: allow
