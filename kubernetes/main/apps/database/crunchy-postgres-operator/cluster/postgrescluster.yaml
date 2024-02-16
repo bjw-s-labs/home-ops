@@ -6,11 +6,21 @@ metadata:
 spec:
   postgresVersion: 16
 
+  service:
+    type: LoadBalancer
+    metadata:
+      annotations:
+        external-dns.alpha.kubernetes.io/hostname: postgres.bjw-s.dev
+        io.cilium/lb-ipam-ips: 10.45.0.4
+
   patroni: # turn on sync writes to at least 1 other replica
     dynamicConfiguration:
       synchronous_mode: true
       postgresql:
         synchronous_commit: "on"
+        pg_hba:
+          - hostnossl all all 10.244.0.0/16 md5 # Needed because dbman does not support SSL yet
+          - hostssl all all all md5
 
   instances:
     - name: postgres
@@ -109,8 +119,6 @@ spec:
 
   proxy:
     pgBouncer:
-      service:
-        type: LoadBalancer
       port: 5432
       replicas: *replica
       config:
