@@ -18,3 +18,25 @@ spec:
       storage: 15Gi
 
   storageClassName: ceph-block-external
+
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lidarr-config-cluster-2
+  namespace: downloads
+  labels:
+    k10.kasten.io/backup: "true"
+    app.kubernetes.io/name: &name lidarr
+    app.kubernetes.io/instance: *name
+    snapshot.home.arpa/enabled: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 15Gi
+
+  storageClassName: ceph-blockpool
