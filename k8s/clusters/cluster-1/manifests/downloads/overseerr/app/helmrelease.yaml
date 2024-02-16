@@ -77,13 +77,14 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: overseerr-config-nvme
+        existingClaim: overseerr-config-cluster-2
+        # existingClaim: overseerr-config-nvme
         advancedMounts:
           main:
             main:
               - path: /app/config
       config-new:
-        enabled: true
+        enabled: false
         existingClaim: overseerr-config-cluster-2
       backup:
         enabled: true
