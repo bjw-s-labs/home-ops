@@ -28,7 +28,8 @@ tasks:
       # Install Flux Kustomization resources
       - kubectl --context {{.cluster}} apply --server-side --kustomize {{.KUBERNETES_DIR}}/{{.cluster}}/flux/config
     preconditions:
-      - kubectl config get-contexts {{.cluster}}
+      - sh: kubectl config get-contexts {{.cluster}}
+        msg: "Kubectl context {{.cluster}} not found"
       - test -f $HOME/.config/age/keys.txt
       - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/flux/age-key.sops.yaml
       - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/flux/vars/cluster-settings.yaml
@@ -47,25 +48,28 @@ tasks:
       Args:
         cluster: Cluster to run command against (required)
         path: Path to the Flux Kustomization resource (required)
+        name: Name of the Flux Kustomization to apply (default: last segment of <path> variable)
         ns: Namespace the Flux Kustomization exists in (default: flux-system)
-        new: Whether Flux Kustomization already exists in the cluster (default: false)
-    cmd: |
-      flux --context {{.cluster}} build ks $(basename {{.path}}) \
-        --namespace {{.ns}} \
-        --kustomization-file {{.kustomization_file}} \
-        --path {{.kustomization_path}} \
-        {{- if contains "not found" .kustomization_found }}--dry-run \{{ end }}
-      | \
-      kubectl --context {{.cluster}} apply --server-side \
-        --field-manager=kustomize-controller -f - \
+    cmds:
+      - flux --context {{.cluster}} build ks {{.ks_name}}
+        --namespace {{.ns}}
+        --kustomization-file {{.kustomization_file}}
+        --path {{.kustomization_path}}
+        {{ if contains "not found" .kustomization_found }}--dry-run{{ end }}
+        |
+        kubectl --context {{.cluster}} apply --server-side
+        --field-manager=kustomize-controller -f -
     vars:
       kustomization_path: "{{.KUBERNETES_DIR}}/{{.cluster}}/apps/{{.path}}"
       kustomization_file: "{{.kustomization_path}}/ks.yaml"
       cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
       path: '{{ or .path (fail "Argument (path) is required") }}'
+      ks_name: '{{ .name | default (splitList "/" .path | last) }}'
       ns: '{{.ns | default "flux-system"}}'
       kustomization_found:
-        sh: flux --context {{.cluster}} --namespace {{.ns}} get kustomization $(basename {{.path}}) 2>&1
+        sh: flux --context {{.cluster}} --namespace {{.ns}} get kustomization {{.ks_name}} 2>&1
     preconditions:
       - sh: "test -f {{.kustomization_file}}"
         msg: "Kustomization file {{.kustomization_file}} not found"
+      - sh: kubectl config get-contexts {{.cluster}}
+        msg: "Kubectl context {{.cluster}} not found"

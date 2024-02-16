@@ -43,7 +43,8 @@ tasks:
         - cluster
     preconditions:
       - which helmfile
-      - kubectl config get-contexts {{.cluster}}
+      - sh: kubectl config get-contexts {{.cluster}}
+        msg: "Kubectl context {{.cluster}} not found"
       - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/integrations/helmfile.yaml
 
   fetch-kubeconfig:
