@@ -6,6 +6,11 @@ metadata:
 spec:
   postgresVersion: 16
 
+  metadata:
+    labels:
+      crunchy-userinit.ramblurr.github.com/enabled: "true"
+      crunchy-userinit.ramblurr.github.com/superuser: "postgres"
+
   service:
     type: LoadBalancer
     metadata:
@@ -50,17 +55,21 @@ spec:
 
   users:
     # Superuser
-    - name: "postgres"
+    - name: postgres
+      databases:
+        - postgres
       options: "SUPERUSER"
       password:
         type: AlphaNumeric
     # Applications
-    - name: "atuin"
-      databases: ["atuin"]
+    - name: atuin
+      databases:
+        - atuin
       password:
         type: AlphaNumeric
-    - name: "authentik"
-      databases: ["authentik"]
+    - name: authentik
+      databases:
+        - authentik
       password:
         type: AlphaNumeric
 
@@ -122,6 +131,10 @@ spec:
     pgBouncer:
       port: 5432
       replicas: *replica
+      metadata:
+        labels:
+          app.kubernetes.io/name: crunchy-postgres-pgbouncer
+          egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
       config:
         global:
           pool_mode: "transaction" #pgBouncer is set to transaction for Authentik. Grafana requires session https://github.com/grafana/grafana/issues/74260#issuecomment-1702795311. Everything else is happy with transaction
