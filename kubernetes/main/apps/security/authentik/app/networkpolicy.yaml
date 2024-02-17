@@ -9,6 +9,8 @@ spec:
     matchLabels:
       app.kubernetes.io/name: authentik
       app.kubernetes.io/component: server
+  ingress:
+    - {}
   egress:
     # allow redis connection
     - toEndpoints:
@@ -28,6 +30,8 @@ spec:
     matchLabels:
       app.kubernetes.io/name: authentik
       app.kubernetes.io/component: worker
+  ingress:
+    - {}
   egress:
     # allow redis connection
     - toEndpoints:
