@@ -26,6 +26,7 @@ spec:
           labels:
             ingress.home.arpa/nginx-internal: allow
             egress.home.arpa/lan: allow
+            db.home.arpa/pg: postgres
             egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
           enableServiceLinks: false
 
@@ -34,39 +35,21 @@ spec:
             image:
               repository: ghcr.io/xirixiz/dsmr-reader-docker
               tag: 5.10.4-2023.11.01
+            # command:
+            #   - /bin/sh
+            #   - -c
+            # args:
+            #   - "while true; do echo hello; sleep 10;done"
             env:
               DJANGO_TIME_ZONE: "Europe/Amsterdam"
               DSMRREADER_REMOTE_DATALOGGER_INPUT_METHOD: ipv4
               DSMRREADER_REMOTE_DATALOGGER_NETWORK_HOST: "10.1.3.45"
               DSMRREADER_REMOTE_DATALOGGER_NETWORK_PORT: "8088"
-              DJANGO_DATABASE_HOST:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: host
-              DJANGO_DATABASE_PORT:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: port
-              DJANGO_DATABASE_USER:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: user
-              DJANGO_DATABASE_PASSWORD:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: password
-              DJANGO_DATABASE_NAME:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: dbname
             envFrom:
               - secretRef:
                   name: dsmr-reader-secret
+              - secretRef:
+                  name: dsmr-reader-db-secret
             resources:
               requests:
                 cpu: 47m
