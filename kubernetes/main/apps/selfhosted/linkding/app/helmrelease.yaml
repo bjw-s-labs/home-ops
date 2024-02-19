@@ -25,6 +25,11 @@ spec:
 
         pod:
           enableServiceLinks: false
+          labels:
+            ingress.home.arpa/nginx-external: allow
+            egress.home.arpa/internet: allow
+            db.home.arpa/pg: postgres
+            egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
 
         containers:
           main:
@@ -32,35 +37,12 @@ spec:
               repository: sissbruecker/linkding
               tag: 1.24.0
             env:
-              LD_DB_ENGINE: "postgres"
-              LD_DB_HOST:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: host
-              LD_DB_PORT:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: port
-              LD_DB_DATABASE:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: dbname
-              LD_DB_USER:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: user
-              LD_DB_PASSWORD:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: password
               LD_SUPERUSER_NAME: bernd
               LD_ENABLE_AUTH_PROXY: "True"
               LD_AUTH_PROXY_USERNAME_HEADER: "HTTP_X_AUTHENTIK_USERNAME"
+            envFrom:
+              - secretRef:
+                  name: linkding-db-secret
             resources:
               requests:
                 cpu: 12m
