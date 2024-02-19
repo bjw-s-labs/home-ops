@@ -26,6 +26,11 @@ spec:
 
         pod:
           enableServiceLinks: false
+          labels:
+            ingress.home.arpa/nginx-external: allow
+            egress.home.arpa/internet: allow
+            db.home.arpa/pg: postgres
+            egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
 
         containers:
           main:
@@ -33,37 +38,14 @@ spec:
               repository: wallabag/wallabag
               tag: 2.6.8
             env:
-              SYMFONY__ENV__DATABASE_DRIVER: pdo_pgsql
-              SYMFONY__ENV__DATABASE_HOST:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: host
-              SYMFONY__ENV__DATABASE_PORT:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: port
-              SYMFONY__ENV__DATABASE_NAME:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: dbname
-              SYMFONY__ENV__DATABASE_USER:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: user
-              SYMFONY__ENV__DATABASE_PASSWORD:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: password
               SYMFONY__ENV__DOMAIN_NAME: https://${HOSTNAME}
               SYMFONY__ENV__SERVER_NAME: Wallabag
               SYMFONY__ENV__FOSUSER_REGISTRATION: "false"
               SYMFONY__ENV__FOSUSER_CONFIRMATION: "false"
               POPULATE_DATABASE: "false"
+            envFrom:
+              - secretRef:
+                  name: wallabag-db-secret
             resources:
               requests:
                 cpu: 12m
