@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: ubuntu-debug
-  namespace: kube-system
+  namespace: rook-ceph
   labels:
     k8s-app: ubuntu-debug
 spec:
@@ -28,7 +28,7 @@ spec:
           args:
             - >
               apt-get update &&
-              apt-get install -y gdisk smartmontools hdparm &&
+              apt-get install -y gdisk smartmontools hdparm sysstat &&
               echo "Go to sleep now!" &&
               sleep infinity
           volumeMounts:
@@ -39,11 +39,11 @@ spec:
             privileged: true
           resources:
             requests:
-              memory: "640Mi"
+              memory: "128Mi"
               cpu: "250m"
             limits:
-              memory: "4096Mi"
-              cpu: "2000m"
+              memory: "1024Mi"
+              # cpu: "2000m"
       terminationGracePeriodSeconds: 30
       volumes:
         - name: root
