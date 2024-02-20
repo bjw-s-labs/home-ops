@@ -38,25 +38,3 @@ spec:
   wait: true
   dependsOn:
     - name: external-secrets
----
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: &appname external-secrets-cluster-secrets
-  namespace: flux-system
-spec:
-  targetNamespace: security
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: *appname
-  interval: 10m
-  path: "./kubernetes/main/apps/security/external-secrets/cluster-secrets"
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops-kubernetes
-  wait: true
-  dependsOn:
-    - name: external-secrets
-    - name: external-secrets-stores
