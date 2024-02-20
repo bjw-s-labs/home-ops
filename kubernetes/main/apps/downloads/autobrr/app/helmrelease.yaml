@@ -25,6 +25,7 @@ spec:
         pod:
           labels:
             egress.home.arpa/world: allow
+            db.home.arpa/pg: postgres
             egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
             ingress.home.arpa/nginx-internal: allow
           securityContext:
@@ -42,33 +43,11 @@ spec:
               AUTOBRR__HOST: 0.0.0.0
               AUTOBRR__PORT: &port 7474
               AUTOBRR__LOG_LEVEL: DEBUG
-              AUTOBRR__DATABASE_TYPE: postgres
-              AUTOBRR__POSTGRES_HOST:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: host
-              AUTOBRR__POSTGRES_PORT: "5432"
-              AUTOBRR__POSTGRES_USER:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: user
-              AUTOBRR__POSTGRES_PASS:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: password
-              AUTOBRR__POSTGRES_DATABASE:
-                valueFrom:
-                  secretKeyRef:
-                    name: "${APP}-pguser-${DB_USER}"
-                    key: dbname
-              AUTOBRR__SESSION_SECRET:
-                valueFrom:
-                  secretKeyRef:
-                    name: autobrr-secret
-                    key: session_secret
+            envFrom:
+              - secretRef:
+                  name: autobrr-secret
+              - secretRef:
+                  name: autobrr-db-secret
             resources:
               requests:
                 cpu: 10m
