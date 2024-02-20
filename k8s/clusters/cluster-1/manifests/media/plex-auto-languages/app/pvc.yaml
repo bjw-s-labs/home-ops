@@ -18,3 +18,24 @@ spec:
       storage: 100Mi
 
   storageClassName: ceph-block-external
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: plex-auto-lang-config-cluster-2
+  namespace: media
+  labels:
+    k10.kasten.io/backup: "true"
+    app.kubernetes.io/name: &name plex-auto-lang
+    app.kubernetes.io/instance: *name
+    snapshot.home.arpa/enabled: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 100Mi
+
+  storageClassName: ceph-blockpool

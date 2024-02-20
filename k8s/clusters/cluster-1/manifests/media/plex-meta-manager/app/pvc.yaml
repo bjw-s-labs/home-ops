@@ -17,3 +17,24 @@ spec:
       storage: 50Gi
 
   storageClassName: ceph-block-external
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: plex-meta-manager-cluster-2
+  namespace: media
+  labels:
+    app: plex-meta-manager
+    app.kubernetes.io/name: &name plex-meta-manager
+    app.kubernetes.io/instance: *name
+    # snapshot.home.arpa/enabled: "true"
+spec:
+  accessModes:
+  - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 50Gi
+
+  storageClassName: ceph-blockpool
