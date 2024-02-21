@@ -9,13 +9,12 @@ spec:
     matchLabels:
       app.kubernetes.io/name: tandoor
   egress:
-    # ingress-nginx (OIDC auth)
+    # authentik ldap outpost
     - toEndpoints:
         - matchLabels:
-            app.kubernetes.io/name: ingress-nginx
-            app.kubernetes.io/instance: nginx-external
-            io.kubernetes.pod.namespace: network
+            app.kubernetes.io/name: authentik-outpost-ldap
+            io.kubernetes.pod.namespace: security
       toPorts:
         - ports:
-            - port: "443"
+            - port: "3389"
               protocol: TCP
