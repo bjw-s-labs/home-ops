@@ -51,12 +51,34 @@ spec:
               GUNICORN_MEDIA: 0
               MAX_OWNED_SPACES_PREF_DEFAULT: 0
               SHOPPING_MIN_AUTOSYNC_INTERVAL: 5
-              TANDOOR_PORT: &servicePort 8000
+              TANDOOR_PORT: &tandoorPort 8000
             envFrom:
               - secretRef:
                   name: tandoor-secret
               - secretRef:
                   name: tandoor-db-secret
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /accounts/login/
+                    port: *tandoorPort
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /accounts/login/
+                    port: *tandoorPort
+                  failureThreshold: 30
+                  periodSeconds: 10
             resources:
               requests:
                 cpu: 10m
@@ -70,11 +92,16 @@ spec:
                 drop:
                   - ALL
 
+          nginx:
+            image:
+              repository: ghcr.io/nginxinc/nginx-unprivileged
+              tag: 1.25.4
+
     service:
       main:
         ports:
           http:
-            port: *servicePort
+            port: 8080
 
     ingress:
       main:
@@ -103,6 +130,20 @@ spec:
                 subPath: mediafiles
               - path: /opt/recipes/staticfiles
                 subPath: staticfiles
+            nginx:
+              - path: /media
+                subPath: mediafiles
+              - path: /static
+                subPath: staticfiles
+      nginx-config:
+        type: configMap
+        name: tandoor-nginx
+        advancedMounts:
+          main:
+            nginx:
+              - path: /etc/nginx/nginx.conf
+                subPath: nginx-config
+                readOnly: true
       temp:
         type: emptyDir
         advancedMounts:
