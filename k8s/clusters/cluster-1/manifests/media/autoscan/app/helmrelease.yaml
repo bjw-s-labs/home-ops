@@ -37,14 +37,14 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
-          # securityContext:
-          #   runAsUser: 568
-          #   runAsGroup: 100
-          #   fsGroup: 100
-          #   supplementalGroups:
-          #     - 34
-          #     - 100
-          #   fsGroupChangePolicy: "OnRootMismatch"
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 100
+            fsGroup: 100
+            supplementalGroups:
+              - 34
+              - 100
+            fsGroupChangePolicy: "OnRootMismatch"
           hostAliases:
             - ip: "10.200.1.50"
               hostnames:
