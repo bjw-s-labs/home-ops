@@ -1,0 +1,41 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tandoor-nginx
+data:
+  nginx-config: |
+    pid /tmp/nginx.pid;
+    events {
+      worker_connections 1024;
+    }
+    http {
+      client_body_temp_path /tmp/client_temp;
+      proxy_temp_path       /tmp/proxy_temp_path;
+      fastcgi_temp_path     /tmp/fastcgi_temp;
+      uwsgi_temp_path       /tmp/uwsgi_temp;
+      scgi_temp_path        /tmp/scgi_temp;
+
+      include mime.types;
+      server {
+        listen 8080;
+        server_name _;
+        client_max_body_size 128M;
+        # serve static files
+        location /static/ {
+          alias /static/;
+        }
+        # serve media files
+        location /media/ {
+          alias /media//;
+        }
+        location ^~ /accounts/signup {
+          return 401;
+        }
+        # pass requests for dynamic content to gunicorn
+        location / {
+        proxy_set_header Host $host;
+        proxy_pass http://localhost:8000;
+        }
+      }
+    }
