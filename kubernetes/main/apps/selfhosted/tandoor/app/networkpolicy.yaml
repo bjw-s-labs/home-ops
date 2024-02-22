@@ -9,12 +9,11 @@ spec:
     matchLabels:
       app.kubernetes.io/name: tandoor
   egress:
-    # authentik ldap outpost
+    # allow lldap connection
     - toEndpoints:
         - matchLabels:
-            app.kubernetes.io/name: authentik-outpost-ldap
+            app.kubernetes.io/name: lldap
             io.kubernetes.pod.namespace: security
       toPorts:
         - ports:
-            - port: "3389"
-              protocol: TCP
+            - port: "389"
