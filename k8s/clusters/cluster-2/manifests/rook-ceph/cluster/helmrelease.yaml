@@ -364,13 +364,13 @@ spec:
           reclaimPolicy: Delete
           parameters:
             region: us-east-1
-          ingress: 
-            enabled: true
-            ingressClassName: "internal-nginx"
-            host:
-              name: &host-s3 "s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-              path: "/"
-            tls:
-              - hosts:
-                  - *host-s3
+        ingress: 
+          enabled: true
+          ingressClassName: "internal-nginx"
+          host:
+            name: &host-s3 "s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            path: "/"
+          tls:
+            - hosts:
+                - *host-s3
 
