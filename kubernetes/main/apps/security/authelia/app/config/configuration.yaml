@@ -56,14 +56,26 @@ duo_api:
   disable: true
 
 access_control:
-  default_policy: two_factor
+  default_policy: deny
   networks:
     - name: internal
       networks:
         - "10.0.0.0/8"
         - "172.16.0.0/12"
         - "192.168.0.0/16"
-  rules: []
+  rules:
+    - domain:
+        - bookmarks.bjw-s.dev
+        - calibre-web.bjw-s.dev
+        - libreddit.bjw-s.dev
+      subject:
+        - ["group:bjws_users"]
+      policy: one_factor
+    - domain:
+        - echo-server.bjw-s.dev
+      subject:
+        - ["user:bernd"]
+      policy: one_factor
 
 identity_providers:
   oidc:
