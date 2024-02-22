@@ -9,27 +9,15 @@ spec:
     matchLabels:
       app.kubernetes.io/name: lldap
   ingress:
-    # allow redis connection
+    # allow client connections
     - fromEndpoints:
         - matchLabels:
             app.kubernetes.io/name: authelia
+        - matchLabels:
+            app.kubernetes.io/name: tandoor
+            io.kubernetes.pod.namespace: selfhosted
       toPorts:
         - ports:
             - port: "389"
   egress:
     - {}
-
-    # # allow redis connection
-    # - toEndpoints:
-    #     - matchLabels:
-    #         app.kubernetes.io/name: authelia-redis
-    #   toPorts:
-    #     - ports:
-    #         - port: "6379"
-    # # allow lldap connection
-    # - toEndpoints:
-    #     - matchLabels:
-    #         app.kubernetes.io/name: lldap
-    #   toPorts:
-    #     - ports:
-    #         - port: "389"
