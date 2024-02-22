@@ -90,7 +90,8 @@ identity_providers:
         authorization_policy: one_factor
         pre_configured_consent_duration: 1y
         scopes: ["openid", "profile", "groups", "email"]
-        redirect_uris: ["https://grafana.bjw-s.dev/login/generic_oauth"]
+        redirect_uris:
+          - https://grafana.bjw-s.dev/login/generic_oauth
         userinfo_signed_response_alg: none
 
       - id: miniflux
@@ -100,7 +101,8 @@ identity_providers:
         authorization_policy: one_factor
         pre_configured_consent_duration: 1y
         scopes: ["openid", "profile", "groups", "email"]
-        redirect_uris: ["https://miniflux.bjw-s.dev/oauth2/oidc/callback"]
+        redirect_uris:
+          - https://miniflux.bjw-s.dev/oauth2/oidc/callback
         userinfo_signed_response_alg: none
 
       - id: nodered
@@ -110,5 +112,17 @@ identity_providers:
         authorization_policy: one_factor
         pre_configured_consent_duration: 1y
         scopes: ["openid", "profile", "groups", "email"]
-        redirect_uris: ["https://nodered.bjw-s.dev/auth/strategy/callback"]
+        redirect_uris:
+          - https://nodered.bjw-s.dev/auth/strategy/callback
+        userinfo_signed_response_alg: none
+
+      - id: paperless
+        description: Paperless
+        secret: "$${OAUTH_CLIENT_SECRET_PAPERLESS}"
+        public: false
+        authorization_policy: one_factor
+        pre_configured_consent_duration: 1y
+        scopes: ["openid", "profile", "groups", "email"]
+        redirect_uris:
+          - https://paperless.bjw-s.dev/accounts/oidc/authelia/login/callback/
         userinfo_signed_response_alg: none
