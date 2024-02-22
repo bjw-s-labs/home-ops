@@ -94,7 +94,7 @@ spec:
             - name: "DS_PROMETHEUS"
               value: Prometheus
             - name: "VAR_BLOCKY_URL"
-              value: 'http:\\/\\/10.5.0.7:4000'
+              value: 'http:\/\/10.5.0.7:4000'
 
         cert-manager:
           url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/cert-manager/dashboards/cert-manager.json
@@ -307,15 +307,14 @@ spec:
       GF_AUTH_ANONYMOUS_ENABLED: false
       GF_AUTH_BASIC_ENABLED: false
       GF_AUTH_GENERIC_OAUTH_ENABLED: true
-      GF_AUTH_GENERIC_OAUTH_API_URL: https://auth.bjw-s.dev/application/o/userinfo/
-      GF_AUTH_GENERIC_OAUTH_AUTH_URL: https://auth.bjw-s.dev/application/o/authorize/
-      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: pe1N4ey6PAzdBbUy8RtWbOPtxpvCWUfhAGiDGuRa
-      GF_AUTH_GENERIC_OAUTH_NAME: Authentik
-      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups[*], 'bjw-s Admins') && 'Admin' || 'Viewer'"
-      GF_AUTH_GENERIC_OAUTH_SCOPES: openid profile email
-      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: https://auth.bjw-s.dev/application/o/token/
+      GF_AUTH_GENERIC_OAUTH_API_URL: https://auth.bjw-s.dev/api/oidc/userinfo
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: https://auth.bjw-s.dev/api/oidc/authorization
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: grafana
+      GF_AUTH_GENERIC_OAUTH_EMPTY_SCOPES: false
+      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups[*], 'bjws_admins') && 'Admin' || 'Viewer'"
+      GF_AUTH_GENERIC_OAUTH_SCOPES: openid profile email groups
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: https://auth.bjw-s.dev/api/oidc/token
       GF_AUTH_OAUTH_AUTO_LOGIN: true
-      GF_AUTH_SIGNOUT_REDIRECT_URL: https://auth.bjw-s.dev/application/o/grafana/end-session/
       GF_DATE_FORMATS_USE_BROWSER_LOCALE: true
       GF_EXPLORE_ENABLED: true
       GF_FEATURE_TOGGLES_ENABLE: publicDashboards
