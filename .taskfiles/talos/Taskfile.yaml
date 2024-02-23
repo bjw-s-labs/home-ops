@@ -121,6 +121,60 @@ tasks:
       vars:
         - cluster
 
+  upgrade:
+    desc: Upgrade Talos version for a node
+    vars:
+      TALOS_VERSION:
+        sh: |
+          yq -r ".talosVersion" {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talconfig.yaml
+      TALOS_IMAGE:
+        sh: |
+          talhelper genurl installer \
+            --env-file {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talenv.sops.yaml \
+            --config-file {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talconfig.yaml \
+          | grep {{.node}} \
+          | awk '{split($0,u," "); print u[2]}'
+    cmds:
+      - talosctl --context {{.cluster}} upgrade -n {{.node}} --image {{.TALOS_IMAGE }}
+    requires:
+      vars:
+        - cluster
+        - node
+    preconditions:
+      - which talhelper
+      - talosctl config get-contexts | grep {{.cluster}}
+      - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talenv.sops.yaml
+      - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talconfig.yaml
+      - msg: "Talos image could not be determined for {{.node}}"
+        sh: 'test -n "{{.TALOS_IMAGE}}"'
+
+  upgrade-k8s:
+    desc: Upgrade Kubernetes version for a Talos cluster
+    vars:
+      KUBERNETES_VERSION:
+        sh: |
+          yq -r ".kubernetesVersion" {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talconfig.yaml
+      CONTROLPLANE_NODE:
+        sh: |
+          talosctl --context main config info \
+          | grep Endpoints: \
+          | awk '{split($0,u," "); print u[2]}' \
+          | sed -E 's/,//'
+    cmds:
+      - talosctl upgrade-k8s -n {{.CONTROLPLANE_NODE}} --to {{.KUBERNETES_VERSION}}
+    requires:
+      vars:
+        - cluster
+    preconditions:
+      - which talhelper
+      - talosctl config get-contexts | grep {{.cluster}}
+      - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talenv.sops.yaml
+      - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talconfig.yaml
+      - msg: "Kubernetes version could not be determined for cluster {{.cluster}}"
+        sh: 'test -n "{{.KUBERNETES_VERSION}}"'
+      - msg: "Control plane node could not be determined for cluster {{.cluster}}"
+        sh: 'test -n "{{.CONTROLPLANE_NODE}}"'
+
   apply-clusterconfig:
     desc: Apply clusterconfig for a Talos cluster
     vars:
