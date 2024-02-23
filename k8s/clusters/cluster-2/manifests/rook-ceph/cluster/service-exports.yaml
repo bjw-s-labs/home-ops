@@ -1,15 +1,15 @@
----
-apiVersion: externaldns.k8s.io/v1alpha1
-kind: DNSEndpoint
-metadata:
-  name: rook-ceph-rgw-wildcard
-  namespace: rook-ceph
-spec:
-  endpoints:
-  - dnsName: "*.s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}."
-    recordType: ALIAS
-    targets:
-      - "s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+# ---
+# apiVersion: externaldns.k8s.io/v1alpha1
+# kind: DNSEndpoint
+# metadata:
+#   name: rook-ceph-rgw-wildcard
+#   namespace: rook-ceph
+# spec:
+#   endpoints:
+#   - dnsName: "*.s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}."
+#     recordType: ALIAS
+#     targets:
+#       - "s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 ---
 apiVersion: v1
 kind: Service

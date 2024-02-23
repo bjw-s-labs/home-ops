@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: object-ingress
+  namespace: rook-ceph
+spec:
+  ingressClassName: internal-nginx
+  rules:
+  # - host: "s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+  #   http:
+  #     paths:
+  #     - backend:
+  #         service:
+  #           name: rook-ceph-rgw-ceph-objectstore
+  #           port:
+  #             number: 80
+  #       path: /
+  #       pathType: Prefix
+  - host: "*.s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    http:
+      paths:
+      - backend:
+          service:
+            name: rook-ceph-rgw-ceph-objectstore
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - "s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    - "*.s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    # secretName: objects.example.org-tls
