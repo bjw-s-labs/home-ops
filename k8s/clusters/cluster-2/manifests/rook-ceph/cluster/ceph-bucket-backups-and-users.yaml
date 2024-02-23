@@ -38,3 +38,28 @@ spec:
   # specify the namespace where the cluster and object store are found.
   # "allowUsersInNamespaces" must include this namespace to enable this feature.
   # clusterNamespace: rook-ceph
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rook-ceph-rgw-backups-service
+  namespace: rook-ceph
+  labels:
+    app: rook-ceph-rgw
+    rook_cluster: rook-ceph
+    rook_object_store: ceph-objectstore
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: "backups.s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+    io.cilium/lb-ipam-ips: ${LB_INGRESS_BACKUPS_BUCKET}
+spec:
+  ports:
+  - name: rgw
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: rook-ceph-rgw
+    rook_cluster: rook-ceph
+    rook_object_store: ceph-objectstore
+  sessionAffinity: None
+  type: LoadBalancer
