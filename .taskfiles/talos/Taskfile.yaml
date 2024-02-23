@@ -75,6 +75,52 @@ tasks:
       - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talsecret.sops.yaml
       - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talconfig.yaml
 
+  bootstrap-matchbox:
+    desc: Bootstrap required Matchbox configuration to Vyos for PXE Boot
+    vars:
+      VYOS_ADDR: gateway.bjw-s.casa
+      VYOS_USER: vyos
+      VYOS_MATCHBOX_DIR: /config/containers/matchbox/data
+      VYOS_MATCHBOX_GROUPS_DIR: "{{.VYOS_MATCHBOX_DIR}}/groups"
+      VYOS_MATCHBOX_PROFILES_DIR: "{{.VYOS_MATCHBOX_DIR}}/profiles"
+      VYOS_MATCHBOX_ASSETS_DIR: "{{.VYOS_MATCHBOX_DIR}}/assets/talos/{{.cluster}}"
+      TALOS_VERSION:
+        sh: |
+          yq -r ".talosVersion" {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talconfig.yaml
+      TALOS_BASE_URL:
+        sh: |
+          talhelper genurl iso \
+            --env-file {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talenv.sops.yaml \
+            --config-file {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talconfig.yaml \
+          | head -n 1 \
+          | awk '{split($0,u," "); print u[2]}' \
+          | sed -E 's/\/metal-amd64.iso//'
+    cmds:
+      # Prepare folders
+      - ssh -l {{.VYOS_USER}} {{.VYOS_ADDR}} "sudo mkdir -p {{.VYOS_MATCHBOX_GROUPS_DIR}}"
+      - ssh -l {{.VYOS_USER}} {{.VYOS_ADDR}} "sudo mkdir -p {{.VYOS_MATCHBOX_PROFILES_DIR}}"
+      - ssh -l {{.VYOS_USER}} {{.VYOS_ADDR}} "sudo mkdir -p {{.VYOS_MATCHBOX_ASSETS_DIR}}"
+      - ssh -l {{.VYOS_USER}} {{.VYOS_ADDR}} "sudo chown -R {{.VYOS_USER}}:vyattacfg {{.VYOS_MATCHBOX_DIR}}"
+      # Upload Talos to Matchbox
+      - for: ["kernel-amd64", "initramfs-amd64.xz"]
+        cmd: |
+          ssh -l {{.VYOS_USER}} {{.VYOS_ADDR}} "wget -q -O {{.VYOS_MATCHBOX_ASSETS_DIR}}/{{.ITEM}} {{.TALOS_BASE_URL}}/{{.ITEM}}"
+      # Generate new cluster config
+      - task: generate-clusterconfig
+        vars:
+          cluster: "{{.cluster}}"
+      # Copy generated clusterconfigs to Matchbox
+      - find {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/clusterconfig/*.yaml -type f | xargs -I{} scp -p {} vyos@{{.VYOS_ADDR}}:/{{.VYOS_MATCHBOX_ASSETS_DIR}}/
+      # Copy groups to Matchbox
+      - find {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/matchbox/groups/*.json -type f | xargs -I{} scp -p {} vyos@{{.VYOS_ADDR}}:/{{.VYOS_MATCHBOX_GROUPS_DIR}}/
+      # Copy profiles to Matchbox
+      - find {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/matchbox/profiles/*.json -type f | xargs -I{} scp -p {} vyos@{{.VYOS_ADDR}}:/{{.VYOS_MATCHBOX_PROFILES_DIR}}/
+      # Restart the Matchbox container
+      - ssh -l {{.VYOS_USER}} {{.VYOS_ADDR}} -t /opt/vyatta/bin/vyatta-op-cmd-wrapper "restart container matchbox"
+    requires:
+      vars:
+        - cluster
+
   apply-clusterconfig:
     desc: Apply clusterconfig for a Talos cluster
     vars:
@@ -89,6 +135,7 @@ tasks:
           filename: "{{.ITEM}}"
           hostname: |-
             {{ trimPrefix (printf "%s-" .cluster) .ITEM | trimSuffix ".yaml" }}
+          dry_run: "{{ .dry_run }}"
     requires:
       vars:
         - cluster
