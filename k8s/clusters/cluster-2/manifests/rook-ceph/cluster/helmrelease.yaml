@@ -64,6 +64,8 @@ spec:
       bdev_async_discard = true
       osd_class_update_on_start = false
       bluefs_buffered_io = false
+      # Enables subdomain style S3 endpoints
+      rgw_dns_name = s3.cluster-2.elcarpenter.com
 
       [mon]
       mon_data_avail_warn = 20
@@ -72,6 +74,10 @@ spec:
       bluestore_min_alloc_size_hdd = 65536
       osd_max_backfills = 4
       osd_recovery_max_active_hdd = 16
+      # Default is false. Set to true to auto repair inconsensistencies on EC & bluestore pools
+      osd_scrub_auto_repair = true
+      # Default is 5
+      osd_scrub_auto_repair_num_errors = 5
 
     cephClusterSpec:
       cephVersion:
