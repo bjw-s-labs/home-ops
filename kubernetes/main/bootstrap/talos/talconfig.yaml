@@ -28,8 +28,12 @@ nodes:
         partitions:
           - mountpoint: /var/mnt/sata
     networkInterfaces:
-      - deviceSelector:
-          driver: igc
+      - interface: bond0
+        bond:
+          mode: active-backup
+          deviceSelectors:
+            - hardwareAddr: 48:21:0b:55:c4:8a
+              driver: igc
         dhcp: true
         vlans:
           - &vlan40
@@ -62,8 +66,12 @@ nodes:
         partitions:
           - mountpoint: /var/mnt/sata
     networkInterfaces:
-      - deviceSelector:
-          driver: igc
+      - interface: bond0
+        bond:
+          mode: active-backup
+          deviceSelectors:
+            - hardwareAddr: 48:21:0b:55:dc:7b
+              driver: igc
         dhcp: true
         vlans:
           - *vlan40
@@ -81,8 +89,12 @@ nodes:
         partitions:
           - mountpoint: /var/mnt/sata
     networkInterfaces:
-      - deviceSelector:
-          driver: igc
+      - interface: bond0
+        bond:
+          mode: active-backup
+          deviceSelectors:
+            - hardwareAddr: 48:21:0b:56:09:47
+              driver: igc
         dhcp: true
         vlans:
           - *vlan40
@@ -92,8 +104,6 @@ nodes:
 controlPlane:
   schematic:
     customization:
-      extraKernelArgs:
-        - net.ifnames=0
       systemExtensions:
         officialExtensions:
           - siderolabs/intel-ucode
