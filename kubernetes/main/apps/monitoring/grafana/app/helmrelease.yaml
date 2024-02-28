@@ -278,10 +278,13 @@ spec:
         apiVersion: 1
         datasources:
           - access: proxy
-            isDefault: true
             name: Prometheus
             type: prometheus
             url: http://thanos-query.monitoring:9090
+            isDefault: true
+            jsonData:
+              prometheusType: Thanos
+              timeInterval: 1m
           - access: proxy
             name: Loki
             type: loki
