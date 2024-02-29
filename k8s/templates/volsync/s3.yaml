@@ -28,7 +28,7 @@ spec:
     repository: "${APP}-volsync-secret"
     volumeSnapshotClassName: "${VOLSYNC_SNAPSHOTCLASS:-csi-ceph-blockpool}"
     cacheCapacity: "${VOLSYNC_CACHE_CAPACITY:-4Gi}"
-    cacheStorageClassName: "${VOLSYNC_SNAPSHOTCLASS:-csi-ceph-blockpool}"
+    cacheStorageClassName: "${VOLSYNC_SNAPSHOTCLASS:-ceph-blockpool}"
     cacheAccessModes: ["${VOLSYNC_CACHE_ACCESSMODES:-ReadWriteOnce}"]
     storageClassName: "${VOLSYNC_STORAGECLASS:-ceph-blockpool}"
     accessModes: ["${VOLSYNC_ACCESSMODES:-ReadWriteOnce}"]
@@ -53,7 +53,7 @@ spec:
     repository: "${APP}-volsync-secret"
     copyMethod: Snapshot # must be Snapshot
     volumeSnapshotClassName: "${VOLSYNC_SNAPSHOTCLASS:-csi-ceph-blockpool}"
-    cacheStorageClassName: "${VOLSYNC_SNAPSHOTCLASS:-csi-ceph-blockpool}"
+    cacheStorageClassName: "${VOLSYNC_SNAPSHOTCLASS:-ceph-blockpool}"
     cacheAccessModes: ["${VOLSYNC_CACHE_ACCESSMODES:-ReadWriteOnce}"]
     cacheCapacity: "${VOLSYNC_CACHE_CAPACITY:-8Gi}"
     storageClassName: "${VOLSYNC_STORAGECLASS:-ceph-blockpool}"
