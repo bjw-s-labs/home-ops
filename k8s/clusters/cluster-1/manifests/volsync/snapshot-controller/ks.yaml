@@ -6,11 +6,11 @@ metadata:
   name: &app snapshot-controller
   namespace: flux-system
 spec:
-  targetNamespace: volsync
+  targetNamespace: &namespace volsync
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./k8s/clusters/cluster-1/manifests/volsync/snapshot-controller/app
+  path: ./k8s/clusters/cluster-1/manifests/*namespace/*app/app
   prune: true
   sourceRef:
     kind: GitRepository
@@ -22,5 +22,5 @@ spec:
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2beta1
       kind: HelmRelease
-      name: snapshot-controller
-      namespace: volsync
+      name: *app
+      namespace: *namespace
