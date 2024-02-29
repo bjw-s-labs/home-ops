@@ -111,17 +111,18 @@ spec:
       config:
         enabled: true
         existingClaim: plex-config-cluster-2
-        # existingClaim: plex-config-nvme
-      config-new:
-        enabled: false
-        existingClaim: plex-config-cluster-2
+      # Separate PVC for cache to avoid backing up cache files
+      plex-cache:
+        enabled: true
+        existingClaim: plex-cache-cluster-2
+        globalMounts:
+          - path: /config/Library/Application Support/Plex Media Server/Cache
       transcode:
         enabled: true
         type: emptyDir
         # medium: Memory
       backup:
         enabled: true
-        # existingClaim: cephfs-hdd-backups-media
         existingClaim: ceph-filesystem-backups-media
         advancedMounts:
           main:
@@ -130,7 +131,6 @@ spec:
                 subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/plex
       4kmovies:
         enabled: true
-        # existingClaim: cephfs-hdd-media-4kmovies
         existingClaim: ceph-filesystem-media-4kmovies
         advancedMounts:
           main:
@@ -139,7 +139,6 @@ spec:
         accessMode: ReadWriteMany
       4ktv:
         enabled: true
-        # existingClaim: cephfs-hdd-media-4ktv
         existingClaim: ceph-filesystem-media-4ktv
         advancedMounts:
           main:
