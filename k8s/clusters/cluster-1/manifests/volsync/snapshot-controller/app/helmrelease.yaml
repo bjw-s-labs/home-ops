@@ -29,5 +29,16 @@ spec:
     controller:
       serviceMonitor:
         create: true
+      # replicaCount: 3
+      volumeSnapshotClasses:
+        - name: csi-rbdplugin-snapclass
+          driver: rook-ceph.rbd.csi.ceph.com
+          annotations:
+            snapshot.storage.kubernetes.io/is-default-class: "true"
+          parameters:
+            clusterID: rook-ceph-cluster-2
+            csi.storage.k8s.io/snapshotter-secret-name: rook-csi-rbd-provisioner
+            csi.storage.k8s.io/snapshotter-secret-namespace: rook-ceph-cluster-2
+          deletionPolicy: Delete
     webhook:
       enabled: false
