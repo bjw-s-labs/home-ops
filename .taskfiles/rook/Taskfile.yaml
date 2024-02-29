@@ -20,7 +20,7 @@ tasks:
       - task: wipe-disk
         vars:
           node: "{{.node}}"
-          ceph_disk: "/dev/disk/by-id/nvme-Samsung_SSD_980_1TB_S649NX0RB57009Y"
+          ceph_disk: "/dev/nvme0n1"
       - task: wipe-data
         vars:
           node: "{{.node}}"
@@ -33,7 +33,7 @@ tasks:
       - task: wipe-disk
         vars:
           node: "{{.node}}"
-          ceph_disk: "/dev/disk/by-id/nvme-Samsung_SSD_980_1TB_S649NX0RB57050E"
+          ceph_disk: "/dev/nvme0n1"
       - task: wipe-data
         vars:
           node: "{{.node}}"
@@ -46,7 +46,7 @@ tasks:
       - task: wipe-disk
         vars:
           node: "{{.node}}"
-          ceph_disk: "/dev/disk/by-id/nvme-CT1000P1SSD8_202228759489"
+          ceph_disk: "/dev/nvme0n1"
       - task: wipe-data
         vars:
           node: "{{.node}}"
@@ -67,7 +67,7 @@ tasks:
       cluster: '{{ or .cluster (fail "`cluster` is required") }}'
       node: '{{ or .node (fail "`node` is required") }}'
       ceph_disk: '{{ or .ceph_disk (fail "`ceph_disk` is required") }}'
-      jobName: 'wipe-disk-{{- .node -}}-{{- .ceph_disk | replace "/" "-" -}}-{{- .ts -}}'
+      jobName: "wipe-disk-{{- .node -}}"
       wipeRookDiskJobTemplate: "WipeDiskJob.tmpl.yaml"
     env: *task-vars
     preconditions:
@@ -87,7 +87,7 @@ tasks:
     vars:
       cluster: '{{ or .cluster (fail "`cluster` is required") }}'
       node: '{{ or .node (fail "`node` is required") }}'
-      jobName: "wipe-rook-data-{{- .node -}}-{{- .ts -}}"
+      jobName: "wipe-rook-data-{{- .node -}}"
       wipeRookDataJobTemplate: "WipeRookDataJob.tmpl.yaml"
     env: *task-vars
     preconditions:

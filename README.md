@@ -11,7 +11,9 @@ _... managed by Flux, Renovate and GitHub Actions_ :robot:
 
 Main k8s cluster stats:
 
-[![Kubernetes](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fbjw-s%2Fhome-ops%2Fmain%2Fkubernetes%2Fmain%2Fbootstrap%2Ftalos%2Ftalconfig.yaml&query=%24.kubernetesVersion&flat-square&logo=kubernetes&logoColor=white&label=version)
+[![Kubernetes](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fbjw-s%2Fhome-ops%2Fmain%2Fkubernetes%2Fmain%2Fbootstrap%2Ftalos%2Ftalconfig.yaml&query=%24.kubernetesVersion&flat-square&logo=kubernetes&logoColor=white&label=k8s)
+](https://www.talos.dev/)&nbsp;
+[![Talos](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fbjw-s%2Fhome-ops%2Fmain%2Fkubernetes%2Fmain%2Fbootstrap%2Ftalos%2Ftalconfig.yaml&query=%24.talosVersion&flat-square&logo=kubernetes&logoColor=white&color=orange&label=talos)
 ](https://www.talos.dev/)&nbsp;
 [![Age-Days](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.bjw-s.dev%2Fquery%3Fformat%3Dendpoint%26metric%3Dmain_cluster_age_days&style=flat-square&label=Age)](https://github.com/kashalls/kromgo/)&nbsp;
 [![Node-Count](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.bjw-s.dev%2Fquery%3Fformat%3Dendpoint%26metric%3Dmain_cluster_node_count&style=flat-square&label=Nodes)](https://github.com/kashalls/kromgo/)&nbsp;
