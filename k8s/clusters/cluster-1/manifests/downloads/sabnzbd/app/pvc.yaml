@@ -46,6 +46,26 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: sabnzbd-config-cluster-2
+  namespace: downloads
+  labels:
+    k10.kasten.io/backup: "true"
+    app.kubernetes.io/name: &name sabnzbd
+    app.kubernetes.io/instance: *name
+    snapshot.home.arpa/enabled: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 1Gi
+
+  storageClassName: ceph-blockpool
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
   name: ceph-blockpool-sabnzbd-incomplete
   namespace: downloads
   labels:
