@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/kustomization_v1beta2.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -31,21 +31,21 @@ spec:
       NAMESPACE: *namespace 
       GATUS_PATH: /web/index.html
       VOLSYNC_CAPACITY: 30Gi
----
-# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/kustomization_v1beta2.json
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: cluster-workloads-plex-volsync
-  namespace: flux-system
-spec:
-  path: ./k8s/clusters/cluster-1/manifests/media/plex/backups
-  prune: false
-#   dependsOn:
-#     - name: network-namespace
-  sourceRef:
-    kind: GitRepository
-    name: home-ops
-  interval: 30m
-  retryInterval: 1m
-  timeout: 3m
+# ---
+# # yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/kustomization_v1beta2.json
+# apiVersion: kustomize.toolkit.fluxcd.io/v1
+# kind: Kustomization
+# metadata:
+#   name: cluster-workloads-plex-volsync
+#   namespace: flux-system
+# spec:
+#   path: ./k8s/clusters/cluster-1/manifests/media/plex/backups
+#   prune: false
+# #   dependsOn:
+# #     - name: network-namespace
+#   sourceRef:
+#     kind: GitRepository
+#     name: home-ops
+#   interval: 30m
+#   retryInterval: 1m
+#   timeout: 3m
