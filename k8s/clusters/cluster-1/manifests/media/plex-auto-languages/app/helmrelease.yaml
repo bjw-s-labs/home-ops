@@ -109,10 +109,6 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: plex-auto-lang-config-cluster-2
-        # existingClaim: plex-auto-lang-config
-      config-new:
-        enabled: true
         existingClaim: plex-auto-languages-config-cluster-2
 
     ingress:
@@ -134,15 +130,8 @@ spec:
                 service:
                   name: main
                   port: http
-          - host: &host "plex-auto-languages.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  name: main
-                  port: http
         tls:
           - secretName: tls.plex-auto-languages
             hosts:
               - *host-cluster
-              - *host
 

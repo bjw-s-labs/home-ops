@@ -5,7 +5,8 @@ kind: Kustomization
 resources:
   - pvc.yaml
   - helmrelease.yaml
-  - ../../../../../../templates/volsync
+  # No need to run a backup, only thing stored is cache data
+  # - ../../../../../../templates/volsync
 labels:
   - pairs:
       app.kubernetes.io/name: plex-auto-languages
