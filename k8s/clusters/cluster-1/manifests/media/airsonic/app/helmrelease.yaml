@@ -76,7 +76,13 @@ spec:
           main:
             main:
               - path: /var/airsonic/data
-              # - path: /airsonic/data
+      config-new:
+        enabled: true
+        existingClaim: airsonic-config-cluster-2
+        advancedMounts:
+          main:
+            main:
+              - path: /config-new
       music:
         enabled: true
         existingClaim: ceph-filesystem-media-music

@@ -18,3 +18,23 @@ spec:
       storage: 1Gi
 
   storageClassName: ceph-block-external
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: airsonic-config-cluster-2
+  namespace: media
+  labels:
+    k10.kasten.io/backup: "true"
+    app.kubernetes.io/name: &name airsonic
+    app.kubernetes.io/instance: *name
+    snapshot.home.arpa/enabled: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 1Gi
+
+  storageClassName: ceph-blockpool
