@@ -67,14 +67,14 @@ spec:
       retentionResolution1h: 14d
       persistence:
         enabled: true
-        storageClass: ceph-block-external
+        storageClass: ceph-blockpool
         size: 20Gi
     storegateway:
       enabled: true
       replicaCount: 3
       persistence:
         enabled: true
-        storageClass: ceph-block-external
+        storageClass: ceph-blockpool
         size: 20Gi
     ruler:
       enabled: false
@@ -95,7 +95,7 @@ spec:
                   severity: critical
       persistence:
         enabled: true
-        storageClass: ceph-block-external
+        storageClass: ceph-blockpool
         size: 20Gi
     metrics:
       enabled: true
