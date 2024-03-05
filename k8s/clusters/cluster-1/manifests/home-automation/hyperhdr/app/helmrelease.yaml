@@ -3,7 +3,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: &app hyperhdr
-  namespace: home-automation
 spec:
   interval: 5m
   chart:
@@ -90,9 +89,6 @@ spec:
 
     persistence:
       config:
-        enabled: true
-        existingClaim: hyperhdr-config
-      config-new:
         enabled: true
         existingClaim: hyperhdr-config-cluster-2
 
