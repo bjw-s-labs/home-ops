@@ -3,18 +3,19 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - cephfs-hdd-backups.yaml
   # Backup PVCs
-  - ./cephfs-hdd-backups/bazarr.yaml
-  - ./cephfs-hdd-backups/lidarr.yaml
-  - ./cephfs-hdd-backups/overseerr.yaml
-  - ./cephfs-hdd-backups/sonarr.yaml
-  - ./cephfs-hdd-backups/sonarr-4k.yaml
-  - ./cephfs-hdd-backups/radarr.yaml
-  - ./cephfs-hdd-backups/radarr-4k.yaml
-  - ./cephfs-hdd-backups/readarr.yaml
-  - ./cephfs-hdd-backups/prowlarr.yaml
-  - ./cephfs-hdd-backups/sabnzbd.yaml
+  - ./backups-subvolumes/bazarr.yaml
+  - ./backups-subvolumes/lidarr.yaml
+  - ./backups-subvolumes/overseerr.yaml
+  - ./backups-subvolumes/sonarr.yaml
+  - ./backups-subvolumes/sonarr-4k.yaml
+  - ./backups-subvolumes/radarr.yaml
+  - ./backups-subvolumes/radarr-4k.yaml
+  - ./backups-subvolumes/readarr.yaml
+  - ./backups-subvolumes/prowlarr.yaml
+  - ./backups-subvolumes/sabnzbd.yaml
+  - ./backups-subvolumes/namespace-media.yaml
+  - ./backups-subvolumes/namespace-home-automation.yaml
   # Downloads namespace PVC
   - ./cephfs-hdd-media-subvolumes/namespace-downloads.yaml
   # Media namespace PVC
