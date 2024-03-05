@@ -18,3 +18,23 @@ spec:
       storage: 20Gi
 
   storageClassName: ceph-block-external
+
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: esphome-config-cluster-2
+  namespace: home-automation
+  labels:
+    app.kubernetes.io/name: &name esphome
+    app.kubernetes.io/instance: *name
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 20Gi
+
+  storageClassName: ceph-blockpool

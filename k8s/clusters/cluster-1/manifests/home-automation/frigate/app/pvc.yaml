@@ -18,3 +18,22 @@ spec:
       storage: 1Gi
 
   storageClassName: ceph-block-external
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: frigate-config-cluster-2
+  namespace: home-automation
+  labels:
+    app.kubernetes.io/name: &name frigate
+    app.kubernetes.io/instance: *name
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 1Gi
+
+  storageClassName: ceph-blockpool
