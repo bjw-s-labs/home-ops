@@ -2,29 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: home-assistant-config
-  namespace: home-automation
-  labels:
-    app.kubernetes.io/name: &name home-assistant
-    app.kubernetes.io/instance: *name
-    snapshot.home.arpa/enabled: "true"
-spec:
-  accessModes:
-    - ReadWriteOnce
-
-  resources:
-    requests:
-      storage: 50Gi
-
-  storageClassName: ceph-block-external
-
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
   name: home-assistant-config-cluster-2
-  namespace: home-automation
   labels:
     app.kubernetes.io/name: &name home-assistant
     app.kubernetes.io/instance: *name
