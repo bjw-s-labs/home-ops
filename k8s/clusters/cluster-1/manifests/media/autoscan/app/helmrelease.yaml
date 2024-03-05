@@ -110,7 +110,6 @@ spec:
         readOnly: true
       4kmovies:
         enabled: true
-        # existingClaim: cephfs-hdd-media-4kmovies
         existingClaim: ceph-filesystem-media-4kmovies
         advancedMounts:
           main:
@@ -119,7 +118,6 @@ spec:
         accessMode: ReadWriteMany
       4ktv:
         enabled: true
-        # existingClaim: cephfs-hdd-media-4ktv
         existingClaim: ceph-filesystem-media-4ktv
         advancedMounts:
           main:
@@ -142,7 +140,7 @@ spec:
             main:
               - path: /mnt/unionfs/Media/Movies/
         accessMode: ReadWriteMany
-      tvw:
+      tv:
         enabled: true
         existingClaim: cephfs-hdd-media-tv
         advancedMounts:
@@ -152,7 +150,7 @@ spec:
         accessMode: ReadWriteMany
       downloads:
         enabled: true
-        existingClaim: cephfs-hdd-cache-media
+        existingClaim: ceph-filesystem-downloads-media
         advancedMounts:
           main:
             main:
