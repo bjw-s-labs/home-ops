@@ -1,15 +1,3 @@
-# ---
-# apiVersion: externaldns.k8s.io/v1alpha1
-# kind: DNSEndpoint
-# metadata:
-#   name: rook-ceph-rgw-wildcard
-#   namespace: rook-ceph
-# spec:
-#   endpoints:
-#   - dnsName: "*.s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}."
-#     recordType: ALIAS
-#     targets:
-#       - "s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 ---
 apiVersion: v1
 kind: Service
@@ -45,15 +33,15 @@ spec:
       port: 9283
       targetPort: 9283
       name: ceph-mgr
----
-apiVersion: externaldns.k8s.io/v1alpha1
-kind: DNSEndpoint
-metadata:
-  name: rook-ceph-mon-srv-record
-  namespace: rook-ceph
-spec:
-  endpoints:
-  - dnsName: _ceph-mon._tcp.ceph.${INGRESS_DOMAIN}.
-    recordType: SRV
-    targets:
-      - "60 IN SRV 10 20 6789 mon.ceph.${INGRESS_DOMAIN}"
+# ---
+# apiVersion: externaldns.k8s.io/v1alpha1
+# kind: DNSEndpoint
+# metadata:
+#   name: rook-ceph-mon-srv-record
+#   namespace: rook-ceph
+# spec:
+#   endpoints:
+#   - dnsName: _ceph-mon._tcp.ceph.${INGRESS_DOMAIN}.
+#     recordType: SRV
+#     targets:
+#       - "60 IN SRV 10 20 6789 mon.ceph.${INGRESS_DOMAIN}"
