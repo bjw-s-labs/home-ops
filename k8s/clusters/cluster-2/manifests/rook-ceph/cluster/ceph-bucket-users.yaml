@@ -1,0 +1,15 @@
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStoreUser
+metadata:
+  name: backups
+  namespace: rook-ceph
+spec:
+  store: ceph-objectstore-1
+  displayName: backup-user
+  quotas:
+    maxBuckets: 1
+    maxSize: 500G
+    maxObjects: 100000
+  capabilities:
+    user: "*"
+    bucket: "*"
