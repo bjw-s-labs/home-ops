@@ -6,26 +6,24 @@ apiVersion: objectbucket.io/v1alpha1
 kind: ObjectBucketClaim
 metadata:
   name: ceph-bucket-thanos-cluster-2
-  namespace: rook-ceph
 spec:
   bucketName: thanos-cluster-2
   storageClassName: ceph-bucket
   additionalConfig:
     maxObjects: "100000"
     maxSize: "100G"
----
-apiVersion: ceph.rook.io/v1
-kind: CephObjectStoreUser
-metadata:
-  name: cluster-2
-  namespace: rook-ceph
-spec:
-  store: ceph-objectstore
-  displayName: cluster-2
-  quotas:
-    maxBuckets: 1
-    maxSize: 50G
-    maxObjects: 10000
-  capabilities:
-    user: "*"
-    bucket: "*"
+# ---
+# apiVersion: ceph.rook.io/v1
+# kind: CephObjectStoreUser
+# metadata:
+#   name: cluster-2
+# spec:
+#   store: thanos-cluster-2
+#   displayName: cluster-2
+#   quotas:
+#     maxBuckets: 1
+#     maxSize: 50G
+#     maxObjects: 10000
+#   capabilities:
+#     user: "*"
+#     bucket: "*"
