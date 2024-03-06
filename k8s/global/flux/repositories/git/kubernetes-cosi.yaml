@@ -1,0 +1,17 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: cosi-crds
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  ref:
+    # renovate: datasource=github-releases depName=kubernetes-sigs/container-object-storage-interface-api
+    tag: v0.1.0
+  url: https://github.com/kubernetes-sigs/container-object-storage-interface-api
+  ignore: |
+    # exclude all
+    /*
+    # include manifest dir
+    !/crds
