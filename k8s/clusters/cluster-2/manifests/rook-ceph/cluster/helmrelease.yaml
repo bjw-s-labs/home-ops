@@ -65,8 +65,9 @@ spec:
       osd_class_update_on_start = false
       bluefs_buffered_io = false
       # Enables subdomain style S3 endpoints
-      rgw_dns_name = s3.cluster-2.elcarpenter.com
-      rgw_resolve_cname = true
+      # Cannot enable for Rook Ceph. Causes issues with reconciling Cephobjectstores
+      # rgw_dns_name = s3.cluster-2.elcarpenter.com
+      # rgw_resolve_cname = true
 
       [mon]
       mon_data_avail_warn = 20
