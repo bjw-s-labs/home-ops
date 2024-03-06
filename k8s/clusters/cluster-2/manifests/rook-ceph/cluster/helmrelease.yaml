@@ -321,64 +321,63 @@ spec:
       name: csi-ceph-filesystem
       isDefault: false
       deletionPolicy: Delete
-    cephObjectStores:
-      - name: ceph-objectstore
-        spec:
-          deviceClass: ssd
-          metadataPool:
-            deviceClass: ssd
-            failureDomain: host
-            replicated:
-              size: 3
-          dataPool:
-            deviceClass: ssd
-            failureDomain: host
-            erasureCoded:
-              dataChunks: 2
-              codingChunks: 1
-          preservePoolsOnDelete: true
-          gateway:
-            port: 80
-            resources:
-              requests:
-                cpu: 250m
-                memory: 1Gi
-              limits:
-                memory: 2Gi
-            instances: 1
-            placement:
-              podAntiAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchExpressions:
-                        - key: app
-                          operator: In
-                          values:
-                            - rook-ceph-rgw
-                    # topologyKey: kubernetes.io/hostname will place RGW across different hosts
-                    topologyKey: kubernetes.io/hostname
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                      - key: node-role.kubernetes.io/rook-osd-node
-                        operator: DoesNotExist
-          healthCheck:
-            bucket:
-              interval: 60s
-        storageClass:
-          enabled: true
-          name: ceph-bucket
-          reclaimPolicy: Delete
-          parameters:
-            region: us-east-1
-        ingress: 
-          enabled: true
-          ingressClassName: "internal-nginx"
-          host:
-            name: &host-s3 "s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-            path: "/"
-          tls:
-            - hosts:
-                - *host-s3
-
+    cephObjectStores: []
+#       - name: ceph-objectstore
+#         spec:
+#           deviceClass: ssd
+#           metadataPool:
+#             deviceClass: ssd
+#             failureDomain: host
+#             replicated:
+#               size: 3
+#           dataPool:
+#             deviceClass: ssd
+#             failureDomain: host
+#             erasureCoded:
+#               dataChunks: 2
+#               codingChunks: 1
+#           preservePoolsOnDelete: true
+#           gateway:
+#             port: 80
+#             resources:
+#               requests:
+#                 cpu: 250m
+#                 memory: 1Gi
+#               limits:
+#                 memory: 2Gi
+#             instances: 1
+#             placement:
+#               podAntiAffinity:
+#                 requiredDuringSchedulingIgnoredDuringExecution:
+#                   - labelSelector:
+#                       matchExpressions:
+#                         - key: app
+#                           operator: In
+#                           values:
+#                             - rook-ceph-rgw
+#                     # topologyKey: kubernetes.io/hostname will place RGW across different hosts
+#                     topologyKey: kubernetes.io/hostname
+#               nodeAffinity:
+#                 requiredDuringSchedulingIgnoredDuringExecution:
+#                   nodeSelectorTerms:
+#                     - matchExpressions:
+#                       - key: node-role.kubernetes.io/rook-osd-node
+#                         operator: DoesNotExist
+#           healthCheck:
+#             bucket:
+#               interval: 60s
+#         storageClass:
+#           enabled: true
+#           name: ceph-bucket
+#           reclaimPolicy: Delete
+#           parameters:
+#             region: us-east-1
+#         ingress: 
+#           enabled: true
+#           ingressClassName: "internal-nginx"
+#           host:
+#             name: &host-s3 "s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+#             path: "/"
+#           tls:
+#             - hosts:
+#                 - *host-s3
