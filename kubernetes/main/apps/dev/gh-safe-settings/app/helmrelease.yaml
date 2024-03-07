@@ -65,8 +65,9 @@ spec:
                 enabled: true
               startup:
                 enabled: true
-                failureThreshold: 30
-                periodSeconds: 10
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 cpu: 14m
@@ -92,7 +93,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  name: app
                   port: http
         tls:
           - hosts:
