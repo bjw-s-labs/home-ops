@@ -58,6 +58,15 @@ spec:
                     key: webhook_secret
               CRON: "0 * * * *"
               ENABLE_PR_COMMENT: "true"
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                failureThreshold: 30
+                periodSeconds: 10
             resources:
               requests:
                 cpu: 14m
