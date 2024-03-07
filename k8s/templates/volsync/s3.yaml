@@ -23,6 +23,7 @@ spec:
   trigger:
     schedule: "0 8 * * *"
   restic:
+    unlock: true
     copyMethod: "${VOLSYNC_COPYMETHOD:-Snapshot}"
     pruneIntervalDays: 7
     repository: "${APP}-volsync-secret"
