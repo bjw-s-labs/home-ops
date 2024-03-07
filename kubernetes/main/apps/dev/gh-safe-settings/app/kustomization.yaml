@@ -9,7 +9,9 @@ configMapGenerator:
   - name: gh-safe-settings-configmap
     files:
       - deployment-settings.yml=./config/deployment-settings.yml
+    options:
+      annotations:
+        kustomize.toolkit.fluxcd.io/substitute: disabled
+
 generatorOptions:
   disableNameSuffixHash: true
-  annotations:
-    kustomize.toolkit.fluxcd.io/substitute: disabled
