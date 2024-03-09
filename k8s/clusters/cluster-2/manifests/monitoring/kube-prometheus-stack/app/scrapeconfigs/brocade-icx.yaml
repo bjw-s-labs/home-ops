@@ -1,0 +1,11 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: brocade-icx
+spec:
+  staticConfigs:
+    - targets:
+        - snmp-exporter-brocade-icx.monitoring.svc.cluster.local:9116
+  metricsPath: /metrics
