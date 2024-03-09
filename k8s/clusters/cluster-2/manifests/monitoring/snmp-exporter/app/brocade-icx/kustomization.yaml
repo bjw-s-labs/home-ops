@@ -5,16 +5,16 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   # - ./prometheusrule.yaml
-configMapGenerator:
+# configMapGenerator:
   # - name: apc-ups-dashboard
   #   files:
   #     - apc-ups-dashboard.json=./resources/dashboard.json
   #   options:
   #     labels:
   #       grafana_dashboard: "true"
-  - name: brocade-icx-snmp-configmap
-    files:
-      - snmp.yaml=./resources/snmp.yaml
+#   - name: brocade-icx-snmp-configmap
+#     files:
+#       - snmp.yaml=./resources/snmp.yaml
 generatorOptions:
   disableNameSuffixHash: true
   annotations:
