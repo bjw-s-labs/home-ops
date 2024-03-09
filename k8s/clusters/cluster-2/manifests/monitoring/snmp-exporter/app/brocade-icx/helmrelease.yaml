@@ -1,0 +1,47 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: &app snmp-exporter-brocade-icx
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: prometheus-snmp-exporter
+      version: 5.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community-charts
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  dependsOn:
+    - name: kube-prometheus-stack
+      namespace: monitoring
+  values:
+    fullnameOverride: *app
+    extraArgs: ["--config.file=/config/snmp.yaml"]
+    extraConfigmapMounts:
+      - name: &name brocade-icx-snmp-configmap
+        mountPath: /config/snmp.yaml
+        subPath: snmp.yaml
+        configMap: *name
+        readOnly: true
+        defaultMode: 420
+    serviceMonitor:
+      enabled: true
+      params:
+        - name: brocade-icx-0
+          module: ["brocade-icx"]
+          target: 10.255.253.2
+          auth: ["public_v1"]
+      path: /snmp
+      scrapeTimeout: 10s
+      relabelings:
+        - { sourceLabels: ["__param_target"], targetLabel: instance }
