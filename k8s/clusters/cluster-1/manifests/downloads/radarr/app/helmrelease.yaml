@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -44,7 +45,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
 
     controllers:
-      main:
+      radarr:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
@@ -57,13 +58,9 @@ spec:
               - 34
               - 100
             fsGroupChangePolicy: "OnRootMismatch"
-          hostAliases:
-            - ip: "10.200.1.50"
-              hostnames:
-                - "autoscan.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/onedr0p/radarr-develop
               tag: 5.4.1.8654
@@ -74,6 +71,16 @@ spec:
               RADARR__PORT: &port 7878
               RADARR__APPLICATION_URL: &host-cluster "radarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
               RADARR__LOG_LEVEL: info
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 memory: "256M"
@@ -81,7 +88,8 @@ spec:
                 memory: "6G"
 
     service:
-      main:
+      app:
+        controller: *app
         ports:
           http:
             port: *port
@@ -90,36 +98,30 @@ spec:
       config:
         enabled: true
         existingClaim: radarr-config-cluster-2
-        # existingClaim: radarr-config-nvme
-      config-new:
-        enabled: false
-        existingClaim: radarr-config-cluster-2
       movies:
         enabled: true
         existingClaim: cephfs-hdd-downloads-movies
         advancedMounts:
-          main:
-            main:
+          radarr:
+            app:
               - path: /mnt/unionfs/Media/Movies/
-        accessMode: ReadWriteMany
       downloads:
         enabled: true
         existingClaim: ceph-filesystem-downloads-downloads
         advancedMounts:
-          main:
-            main:
+          radarr:
+            app:
               - path: /mnt/unionfs/downloads
-        accessMode: ReadWriteMany
       backup:
         enabled: true
         existingClaim: ceph-filesystem-backups-radarr
         advancedMounts:
-          main:
-            main:
+          radarr:
+            app:
               - path: /config/Backups
 
     ingress:
-      main:
+      app:
         enabled: true
         className: "traefik"
         annotations:
@@ -136,13 +138,13 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
           - host: &host "radarr.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - secretName: tls.radarr

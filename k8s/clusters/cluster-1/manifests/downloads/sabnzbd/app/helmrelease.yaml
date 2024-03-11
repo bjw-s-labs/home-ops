@@ -1,8 +1,9 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
-  name: sabnzbd
+  name: &app sabnzbd
 spec:
   interval: 15m
   chart:
@@ -26,7 +27,7 @@ spec:
     keepHistory: false
   values:
     controllers:
-      main:
+      sabnzbd:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
@@ -42,7 +43,7 @@ spec:
 
 
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/onedr0p/sabnzbd
               tag: 4.2.3
@@ -84,7 +85,8 @@ spec:
                 memory: "8G"
 
     service:
-      main:
+      app:
+        controller: *app
         ports:
           http:
             port: *port
@@ -96,72 +98,65 @@ spec:
       incomplete:
         enabled: true
         existingClaim: ceph-blockpool-sabnzbd-incomplete
-        # type: emptyDir
       backup:
         enabled: true
         existingClaim: ceph-filesystem-backups-sabnzbd
         advancedMounts:
-          main:
-            main:
+          sabnzbd:
+            app:
               - path: /config/Backups
       4kmovies:
         enabled: false
         existingClaim: ceph-filesystem-downloads-4kmovies
         advancedMounts:
-          main:
-            main:
+          sabnzbd:
+            app:
               - path: /mnt/unionfs/Media/4KMovies/
-        accessMode: ReadWriteMany
       4ktv:
         enabled: false
         existingClaim: ceph-filesystem-downloads-4ktv
         advancedMounts:
-          main:
-            main:
+          sabnzbd:
+            app:
               - path: /mnt/unionfs/Media/4KTV/
-        accessMode: ReadWriteMany
       music:
         enabled: false
         existingClaim: ceph-filesystem-downloads-music
         advancedMounts:
-          main:
-            main:
+          sabnzbd:
+            app:
               - path: /mnt/unionfs/Media/Music/
-        accessMode: ReadWriteMany
       movies:
         enabled: false
         existingClaim: cephfs-hdd-downloads-movies
         advancedMounts:
-          main:
-            main:
+          sabnzbd:
+            app:
               - path: /mnt/unionfs/Media/Movies/
-        accessMode: ReadWriteMany
       tv:
         enabled: false
         existingClaim: cephfs-hdd-downloads-tv
         advancedMounts:
-          main:
-            main:
+          sabnzbd:
+            app:
               - path: /mnt/unionfs/Media/TV
-        accessMode: ReadWriteMany
       downloads:
         enabled: true
         existingClaim: ceph-filesystem-downloads-downloads
         advancedMounts:
-          main:
-            main:
+          sabnzbd:
+            app:
               - path: /mnt/unionfs/downloads
-        accessMode: ReadWriteMany
       downloads-ssd:
         enabled: false
         existingClaim: sabnzbd-nvme-cache
         advancedMounts:
-          main:
-            main:
+          sabnzbd:
+            app:
               - path: /mnt/unionfs/downloads
 
     ingress:
-      main:
+      app:
         enabled: true
         className: "traefik"
         annotations:
@@ -179,16 +174,9 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
-          # - host: &host "sabnzbd.${INGRESS_DOMAIN}"
-          #   paths:
-          #     - path: /
-          #       service:
-          #         name: main
-          #         port: http
         tls:
           - secretName: tls.sabnzbd
             hosts:
               - *host-cluster
-              # - *host
