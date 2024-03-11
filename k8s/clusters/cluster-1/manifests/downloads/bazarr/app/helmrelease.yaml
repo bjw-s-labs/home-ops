@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
-  name: bazarr
+  name: &app bazarr
 spec:
   interval: 15m
   chart:
@@ -27,7 +27,7 @@ spec:
     keepHistory: false
   values:
     controllers:
-      main:
+      bazarr:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
@@ -42,7 +42,7 @@ spec:
             fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/onedr0p/bazarr
               tag: 1.4.2
@@ -53,6 +53,16 @@ spec:
               BAZARR__PORT: &port 6767
               BAZARR__APPLICATION_URL: &host-cluster "bazarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
               BAZARR__LOG_LEVEL: info
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 cpu: "0.04"
@@ -61,7 +71,8 @@ spec:
                 memory: "6000M"
 
     service:
-      main:
+      app:
+        controller: *app
         ports:
           http:
             port: *port
@@ -78,15 +89,15 @@ spec:
         enabled: true
         existingClaim: ceph-filesystem-backups-bazarr
         advancedMounts:
-          main:
-            main:
+          bazarr:
+            app:
               - path: /config/backup
       4kmovies:
         enabled: true
         existingClaim: ceph-filesystem-downloads-4kmovies
         advancedMounts:
-          main:
-            main:
+          bazarr:
+            app:
               - path: /mnt/unionfs/Media/4KMovies/
         accessMode: ReadWriteMany
       4ktv:
@@ -94,45 +105,45 @@ spec:
         # existingClaim: cephfs-hdd-downloads-4ktv
         existingClaim: ceph-filesystem-downloads-4ktv
         advancedMounts:
-          main:
-            main:
+          bazarr:
+            app:
               - path: /mnt/unionfs/Media/4KTV/
         accessMode: ReadWriteMany
       music:
         enabled: true
         existingClaim: ceph-filesystem-downloads-music
         advancedMounts:
-          main:
-            main:
+          bazarr:
+            app:
               - path: /mnt/unionfs/Media/Music/
         accessMode: ReadWriteMany
       movies:
         enabled: true
         existingClaim: cephfs-hdd-downloads-movies
         advancedMounts:
-          main:
-            main:
+          bazarr:
+            app:
               - path: /mnt/unionfs/Media/Movies/
         accessMode: ReadWriteMany
       tv:
         enabled: true
         existingClaim: cephfs-hdd-downloads-tv
         advancedMounts:
-          main:
-            main:
+          bazarr:
+            app:
               - path: /mnt/unionfs/Media/TV
         accessMode: ReadWriteMany
       downloads:
         enabled: true
         existingClaim: ceph-filesystem-downloads-downloads
         advancedMounts:
-          main:
-            main:
+          bazarr:
+            app:
               - path: /mnt/unionfs/downloads
         accessMode: ReadWriteMany
 
     ingress:
-      main:
+      app:
         enabled: true
         className: "traefik"
         annotations:
@@ -150,14 +161,14 @@ spec:
               - path: /
                 pathType: Prefix
                 service:
-                  name: main
+                  identifier: app
                   port: http
           - host: &host "bazarr.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - secretName: tls.bazarr
