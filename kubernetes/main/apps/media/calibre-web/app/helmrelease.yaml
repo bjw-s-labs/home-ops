@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -17,12 +17,11 @@ spec:
   interval: 30m
   values:
     controllers:
-      main:
+      calibre-web:
         annotations:
           reloader.stakater.com/auto: "true"
 
         pod:
-          enableServiceLinks: false
           labels:
             egress.home.arpa/internet: allow
             egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
@@ -36,12 +35,22 @@ spec:
               - 65542 # gladius:external-services
 
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/bjw-s/calibre-web
               tag: 0.6.21@sha256:646e3f9c0158d57b3ffdf031d14d68e31a40f89be6bb63be7dd9ed84173ff043
             env:
               CACHE_DIR: /cache
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 cpu: 5m
@@ -50,14 +59,14 @@ spec:
                 memory: 470M
 
     service:
-      main:
+      app:
+        controller: calibre-web
         ports:
           http:
             port: 8083
 
     ingress:
-      main:
-        enabled: true
+      app:
         className: internal-nginx
         annotations:
           nginx.ingress.kubernetes.io/auth-method: GET
@@ -70,7 +79,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
@@ -78,11 +87,10 @@ spec:
 
     persistence:
       config:
-        enabled: true
         existingClaim: "${VOLSYNC_CLAIM}"
         advancedMounts:
-          main:
-            main:
+          calibre-web:
+            app:
               - path: /config
 
       media:
@@ -90,8 +98,8 @@ spec:
         server: gladius.bjw-s.casa
         path: /tank/Media
         advancedMounts:
-          main:
-            main:
+          calibre-web:
+            app:
               - path: /data/nas-media
       cache:
         type: emptyDir

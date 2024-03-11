@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,12 +18,11 @@ spec:
 
   values:
     controllers:
-      main:
+      tandoor:
         annotations:
           reloader.stakater.com/auto: "true"
 
         pod:
-          enableServiceLinks: false
           labels:
             egress.home.arpa/internet: allow
             db.home.arpa/pg: postgres
@@ -37,7 +36,7 @@ spec:
             fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/tandoorrecipes/recipes
               tag: 1.5.14
@@ -96,14 +95,14 @@ spec:
               tag: 1.25.4
 
     service:
-      main:
+      app:
+        controller: tandoor
         ports:
           http:
             port: 8080
 
     ingress:
-      main:
-        enabled: true
+      app:
         className: "external-nginx"
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
@@ -112,7 +111,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
@@ -122,8 +121,8 @@ spec:
       files:
         existingClaim: "${VOLSYNC_CLAIM}"
         advancedMounts:
-          main:
-            main:
+          tandoor:
+            app:
               - path: /opt/recipes/mediafiles
                 subPath: mediafiles
               - path: /opt/recipes/staticfiles
@@ -137,7 +136,7 @@ spec:
         type: configMap
         name: tandoor-nginx
         advancedMounts:
-          main:
+          tandoor:
             nginx:
               - path: /etc/nginx/nginx.conf
                 subPath: nginx-config
@@ -145,8 +144,8 @@ spec:
       temp:
         type: emptyDir
         advancedMounts:
-          main:
-            main:
+          tandoor:
+            app:
               - path: /tmp
                 subPath: app-tmp
               - path: /opt/recipes/cookbook/static/django_js_reverse

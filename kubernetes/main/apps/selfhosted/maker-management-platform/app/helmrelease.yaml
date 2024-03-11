@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,12 +18,11 @@ spec:
 
   values:
     controllers:
-      main:
+      maker-management-platform:
         annotations:
           reloader.stakater.com/auto: "true"
 
         pod:
-          enableServiceLinks: false
           securityContext:
             runAsUser: ${APP_UID}
             runAsGroup: ${APP_GID}
@@ -31,8 +30,6 @@ spec:
             fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
-          main:
-            enabled: false
           agent:
             image:
               repository: ghcr.io/maker-management-platform/agent
@@ -72,21 +69,21 @@ spec:
                   - ALL
 
     service:
-      main:
+      app:
+        controller: app
         ports:
           http:
             port: 8081
 
     ingress:
-      main:
-        enabled: true
+      app:
         className: "internal-nginx"
         hosts:
           - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
@@ -94,10 +91,9 @@ spec:
 
     persistence:
       data:
-        enabled: true
         existingClaim: "${VOLSYNC_CLAIM}"
         advancedMounts:
-          main:
+          maker-management-platform:
             agent:
               - path: /library
                 subPath: library
@@ -108,7 +104,7 @@ spec:
         enabled: true
         type: emptyDir
         advancedMounts:
-          main:
+          maker-management-platform:
             agent:
               - path: /app/temp
                 subPath: agent-tmp
