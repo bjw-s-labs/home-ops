@@ -34,12 +34,12 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           securityContext:
-            runAsUser: 568
-            runAsGroup: 100
-            fsGroup: 100
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GID}
+            fsGroup: ${APP_GID}
             supplementalGroups:
               - 34
-              - 100
+              - ${APP_GID}
             fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
@@ -81,7 +81,7 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: bazarr-config-cluster-2
+        existingClaim: ${VOLSYNC_CLAIM}
         advancedMounts:
           bazarr:
             app:
