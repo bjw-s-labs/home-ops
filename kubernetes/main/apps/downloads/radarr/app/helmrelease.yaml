@@ -78,21 +78,21 @@ spec:
                   - ALL
 
     service:
-      main:
+      app:
         controller: radarr
         ports:
           http:
             port: *port
 
     ingress:
-      main:
+      app:
         className: "internal-nginx"
         hosts:
           - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
-                  identifier: main
+                  identifier: app
                   port: http
         tls:
           - hosts:

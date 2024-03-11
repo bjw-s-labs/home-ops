@@ -110,21 +110,21 @@ spec:
                   - ALL
 
     service:
-      main:
+      app:
         controller: qbittorrent
         ports:
           http:
             port: *port
 
     ingress:
-      main:
+      app:
         className: "internal-nginx"
         hosts:
           - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
-                  identifier: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
@@ -135,16 +135,16 @@ spec:
         enabled: true
         existingClaim: "${VOLSYNC_CLAIM}"
         advancedMounts:
-          main:
-            main:
+          qbittorrent:
+            app:
               - path: /config
       scripts:
         type: configMap
         name: qbittorrent-scripts
         defaultMode: 0775
         advancedMounts:
-          main:
-            main:
+          qbittorrent:
+            app:
               - path: /scripts
                 readOnly: true
       media:
@@ -152,6 +152,6 @@ spec:
         server: gladius.bjw-s.casa
         path: /tank/Media
         advancedMounts:
-          main:
-            main:
+          qbittorrent:
+            app:
               - path: /data/nas-media

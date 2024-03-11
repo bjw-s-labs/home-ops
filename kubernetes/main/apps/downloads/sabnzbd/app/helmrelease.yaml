@@ -80,21 +80,21 @@ spec:
                   - ALL
 
     service:
-      main:
+      app:
         controller: sabnzbd
         ports:
           http:
             port: *port
 
     ingress:
-      main:
+      app:
         className: "internal-nginx"
         hosts:
           - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
-                  identifier: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
@@ -104,8 +104,8 @@ spec:
       config:
         existingClaim: "${VOLSYNC_CLAIM}"
         advancedMounts:
-          main:
-            main:
+          sabnbzd:
+            app:
               - path: /config
       media:
         type: nfs
@@ -117,6 +117,6 @@ spec:
       temp:
         type: emptyDir
         advancedMounts:
-          main:
-            main:
+          sabnbzd:
+            app:
               - path: /tmp

@@ -18,7 +18,7 @@ spec:
 
   values:
     controllers:
-      tagging:
+      prune:
         type: cronjob
 
         cronjob:
@@ -35,7 +35,7 @@ spec:
             runAsNonRoot: true
 
         initContainers:
-          main:
+          tagging:
             image: &image
               repository: ghcr.io/buroa/qbtools
               tag: v0.15.0
@@ -67,7 +67,7 @@ spec:
                   - ALL
 
         containers:
-          unregistered:
+          app:
             image: *image
             args:
               - prune
@@ -87,7 +87,7 @@ spec:
         pod:
           securityContext: *podSecurityContext
         containers:
-          main:
+          app:
             image: *image
             args:
               - reannounce
