@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.0/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,7 +18,7 @@ spec:
 
   values:
     controllers:
-      main:
+      qbittorrent:
         annotations:
           configmap.reloader.stakater.com/reload: qbittorrent-scripts,qbittorrent-dnsdist
           secret.reloader.stakater.com/reload: qbittorrent-secret
@@ -31,7 +31,7 @@ spec:
               - 65542 # gladius:external-services
 
         containers:
-          main:
+          app:
             nameOverride: qbittorrent
             image:
               repository: ghcr.io/onedr0p/qbittorrent
@@ -101,20 +101,20 @@ spec:
 
     service:
       main:
+        controller: qbittorrent
         ports:
           http:
             port: *port
 
     ingress:
       main:
-        enabled: true
         className: "internal-nginx"
         hosts:
           - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: main
                   port: http
         tls:
           - hosts:

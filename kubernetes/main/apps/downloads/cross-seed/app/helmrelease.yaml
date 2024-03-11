@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.0/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -19,7 +19,7 @@ spec:
     - name: qbittorrent
   values:
     controllers:
-      main:
+      cross-seed:
         annotations:
           secret.reloader.stakater.com/reload: cross-seed-secret
 
@@ -34,7 +34,7 @@ spec:
               - 65542 # gladius:external-services
 
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/cross-seed/cross-seed
               tag: 5.9.2
@@ -55,6 +55,7 @@ spec:
 
     service:
       main:
+        controller: cross-seed
         ports:
           http:
             port: 2468

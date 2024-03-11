@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.0/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,7 +18,7 @@ spec:
 
   values:
     controllers:
-      main:
+      sonarr:
         annotations:
           reloader.stakater.com/auto: "true"
 
@@ -37,7 +37,7 @@ spec:
               - 65542 # gladius:external-services
 
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/onedr0p/sonarr
               tag: 4.0.2.1183@sha256:27ffdcc8a93714d379ecd4cf0fcf23ef4452b18e0eb59cd4f966a67185f86284
@@ -69,20 +69,20 @@ spec:
 
     service:
       main:
+        controller: sonarr
         ports:
           http:
             port: *port
 
     ingress:
       main:
-        enabled: true
         className: "internal-nginx"
         hosts:
           - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: main
                   port: http
         tls:
           - hosts:
@@ -90,7 +90,6 @@ spec:
 
     persistence:
       config:
-        enabled: true
         existingClaim: "${VOLSYNC_CLAIM}"
       media:
         type: nfs

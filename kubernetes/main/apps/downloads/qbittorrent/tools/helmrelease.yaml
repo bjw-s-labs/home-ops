@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.0/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,9 +18,6 @@ spec:
 
   values:
     controllers:
-      main:
-        enabled: false
-
       tagging:
         type: cronjob
 
@@ -110,7 +107,3 @@ spec:
           - path: /config/config.yaml
             subPath: config.yaml
             readOnly: true
-
-    service:
-      main:
-        enabled: false
