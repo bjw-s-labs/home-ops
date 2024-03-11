@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -28,8 +29,14 @@ spec:
   values:
     global:
       nameOverride: *app
+
+    # defaultPodOptions:
+    #   hostAliases:
+    #     - ip: "10.200.1.50"
+    #       hostnames:
+    #         - "autoscan.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
     controllers:
-      main:
+      sonarr-4k:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
@@ -44,7 +51,7 @@ spec:
             fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/onedr0p/sonarr-develop
               tag: 4.0.2.1312
@@ -55,18 +62,25 @@ spec:
               SONARR__PORT: &port 8989
               SONARR__APPLICATION_URL: &host-cluster "sonarr-4k.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
               SONARR__LOG_LEVEL: info
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 memory: "2500M"
               limits:
                 memory: "6G"
-            hostAliases:
-              - ip: "10.200.1.50"
-                hostnames:
-                  - "autoscan.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
     service:
-      main:
+      app:
+        controller: *app
         ports:
           http:
             port: *port
@@ -79,29 +93,27 @@ spec:
         enabled: true
         existingClaim: ceph-filesystem-backups-sonarr-4k
         advancedMounts:
-          main:
-            main:
+          sonarr-4k:
+            app:
               - path: /config/Backups
       4ktv:
         enabled: true
         # existingClaim: cephfs-hdd-downloads-4ktv
         existingClaim: ceph-filesystem-downloads-4ktv
         advancedMounts:
-          main:
-            main:
+          sonarr-4k:
+            app:
               - path: /mnt/unionfs/Media/4KTV/
-        accessMode: ReadWriteMany
       downloads:
         enabled: true
         existingClaim: ceph-filesystem-downloads-downloads
         advancedMounts:
-          main:
-            main:
+          sonarr-4k:
+            app:
               - path: /mnt/unionfs/downloads
-        accessMode: ReadWriteMany
 
     ingress:
-      main:
+      app:
         enabled: true
         className: "traefik"
         annotations:
@@ -118,13 +130,13 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
           - host: &host "sonarr-4k.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - secretName: tls.sonarr-4k

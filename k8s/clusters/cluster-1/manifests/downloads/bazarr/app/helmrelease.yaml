@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -81,10 +82,10 @@ spec:
       config:
         enabled: true
         existingClaim: bazarr-config-cluster-2
-        # existingClaim: bazarr-config
-      config-new:
-        enabled: false
-        existingClaim: bazarr-config-cluster-2
+        advancedMounts:
+          bazarr:
+            app:
+              - path: /config
       backup:
         enabled: true
         existingClaim: ceph-filesystem-backups-bazarr
@@ -99,16 +100,13 @@ spec:
           bazarr:
             app:
               - path: /mnt/unionfs/Media/4KMovies/
-        accessMode: ReadWriteMany
       4ktv:
         enabled: true
-        # existingClaim: cephfs-hdd-downloads-4ktv
         existingClaim: ceph-filesystem-downloads-4ktv
         advancedMounts:
           bazarr:
             app:
               - path: /mnt/unionfs/Media/4KTV/
-        accessMode: ReadWriteMany
       music:
         enabled: true
         existingClaim: ceph-filesystem-downloads-music
@@ -116,7 +114,6 @@ spec:
           bazarr:
             app:
               - path: /mnt/unionfs/Media/Music/
-        accessMode: ReadWriteMany
       movies:
         enabled: true
         existingClaim: cephfs-hdd-downloads-movies
@@ -124,7 +121,6 @@ spec:
           bazarr:
             app:
               - path: /mnt/unionfs/Media/Movies/
-        accessMode: ReadWriteMany
       tv:
         enabled: true
         existingClaim: cephfs-hdd-downloads-tv
@@ -132,7 +128,6 @@ spec:
           bazarr:
             app:
               - path: /mnt/unionfs/Media/TV
-        accessMode: ReadWriteMany
       downloads:
         enabled: true
         existingClaim: ceph-filesystem-downloads-downloads
@@ -140,7 +135,6 @@ spec:
           bazarr:
             app:
               - path: /mnt/unionfs/downloads
-        accessMode: ReadWriteMany
 
     ingress:
       app:
