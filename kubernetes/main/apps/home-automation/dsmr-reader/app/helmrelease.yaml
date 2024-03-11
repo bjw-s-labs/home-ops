@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.0/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,7 +18,7 @@ spec:
 
   values:
     controllers:
-      main:
+      dsmr-reader:
         annotations:
           reloader.stakater.com/auto: "true"
 
@@ -28,18 +28,12 @@ spec:
             egress.home.arpa/lan: allow
             db.home.arpa/pg: postgres
             egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
-          enableServiceLinks: false
 
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/xirixiz/dsmr-reader-docker
               tag: 5.11.0-2024.02.21
-            # command:
-            #   - /bin/sh
-            #   - -c
-            # args:
-            #   - "while true; do echo hello; sleep 10;done"
             env:
               DJANGO_TIME_ZONE: "Europe/Amsterdam"
               DSMRREADER_REMOTE_DATALOGGER_INPUT_METHOD: ipv4
@@ -50,6 +44,16 @@ spec:
                   name: dsmr-reader-secret
               - secretRef:
                   name: dsmr-reader-db-secret
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 cpu: 47m
@@ -58,21 +62,21 @@ spec:
                 memory: 662M
 
     service:
-      main:
+      app:
+        controller: dsmr-reader
         ports:
           http:
             port: 80
 
     ingress:
-      main:
-        enabled: true
+      app:
         className: "internal-nginx"
         hosts:
           - host: "${HOSTNAME}"
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
