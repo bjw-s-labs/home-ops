@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -17,12 +17,11 @@ spec:
   interval: 30m
   values:
     controllers:
-      main:
+      plex:
         annotations:
           reloader.stakater.com/auto: "true"
 
         pod:
-          enableServiceLinks: false
           labels:
             egress.home.arpa/internet: allow
             ingress.home.arpa/lan: allow
@@ -41,13 +40,23 @@ spec:
               - 65542 # gladius:external-services
 
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/onedr0p/plex
               tag: 1.40.0.7998-c29d4c0c8@sha256:7c4501799f0d5f4f94fcb95a8a47b883528354c779a182a9ae4af118a1fc6b10
             env:
               PLEX_ADVERTISE_URL: https://10.45.0.20:32400,https://plex.bjw-s.dev:443
               PLEX_NO_AUTH_NETWORKS: 10.244.0.0/16
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 cpu: 100m
@@ -58,7 +67,8 @@ spec:
                 memory: 9248M
 
     service:
-      main:
+      app:
+        controller: plex
         type: LoadBalancer
         externalTrafficPolicy: Cluster
         annotations:
@@ -68,8 +78,7 @@ spec:
             port: 32400
 
     ingress:
-      main:
-        enabled: true
+      app:
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
           nginx.ingress.kubernetes.io/backend-protocol: HTTPS
@@ -79,7 +88,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
@@ -87,19 +96,17 @@ spec:
 
     persistence:
       config:
-        enabled: true
         existingClaim: "${VOLSYNC_CLAIM}"
         advancedMounts:
-          main:
-            main:
+          plex:
+            app:
               - path: /config
 
       plex-cache:
-        enabled: true
         existingClaim: plex-cache
         advancedMounts:
-          main:
-            main:
+          plex:
+            app:
               - path: /config/Library/Application Support/Plex Media Server/Cache
 
       nfs-nas-media:
@@ -107,12 +114,12 @@ spec:
         server: gladius.bjw-s.casa
         path: /tank/Media
         advancedMounts:
-          main:
-            main:
+          plex:
+            app:
               - path: /data/nas-media
       transcode:
         type: emptyDir
         advancedMounts:
-          main:
-            main:
+          plex:
+            app:
               - path: /transcode

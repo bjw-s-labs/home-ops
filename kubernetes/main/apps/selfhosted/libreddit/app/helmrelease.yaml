@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,16 +18,13 @@ spec:
 
   values:
     controllers:
-      main:
+      libreddit:
         strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"
 
-        pod:
-          enableServiceLinks: false
-
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/auricom/libreddit
               tag: 0.30.1
@@ -60,14 +57,14 @@ spec:
                 memory: 256M
 
     service:
-      main:
+      app:
+        controller: libreddit
         ports:
           http:
             port: 8080
 
     ingress:
-      main:
-        enabled: true
+      app:
         className: "external-nginx"
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
@@ -81,7 +78,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:

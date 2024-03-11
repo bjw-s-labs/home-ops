@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -17,7 +17,7 @@ spec:
   interval: 30m
   values:
     controllers:
-      main:
+      fstrim:
         type: cronjob
 
         cronjob:
@@ -36,7 +36,7 @@ spec:
                   app.kubernetes.io/name: fstrim
 
         containers:
-          main:
+          app:
             image:
               repository: docker.io/library/alpine
               tag: 3.19
@@ -62,14 +62,6 @@ spec:
                 memory: 128Mi
             securityContext:
               privileged: true
-
-    service:
-      main:
-        enabled: false
-
-    ingress:
-      main:
-        enabled: false
 
     persistence:
       procfs:
