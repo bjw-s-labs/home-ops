@@ -39,6 +39,16 @@ spec:
             env:
               UMASK: "022"
               QBITTORRENT__PORT: &port 8080
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 cpu: 49m
