@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -17,7 +17,7 @@ spec:
   interval: 30m
   values:
     controllers:
-      main:
+      vector-aggregator:
         replicas: 1
         strategy: Recreate
 
@@ -51,13 +51,23 @@ spec:
                   name: vector-aggregator-secret
 
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/onedr0p/vector
               tag: 0.34.1-debian
             args:
               - "--config"
               - "/etc/vector/vector.yaml"
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             # resources:
             #   requests:
             #     cpu: 35m
@@ -66,7 +76,8 @@ spec:
             #     memory: 726M
 
     service:
-      main:
+      app:
+        controller: vector-aggregator
         type: LoadBalancer
         annotations:
           external-dns.alpha.kubernetes.io/hostname: "vector.bjw-s.dev"
@@ -76,18 +87,14 @@ spec:
           http:
             port: 8686
           kubernetes-logs:
-            enabled: true
             port: 6000
           vyos-syslog:
-            enabled: true
             port: 6001
           journald-logs:
-            enabled: true
             port: 6002
 
     persistence:
       config:
-        enabled: true
         type: configMap
         name: vector-aggregator-configmap
         globalMounts:

@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,7 +18,7 @@ spec:
 
   values:
     controllers:
-      main:
+      obsidian-couchdb:
         annotations:
           reloader.stakater.com/auto: "true"
 
@@ -41,7 +41,7 @@ spec:
               - "cp /tmp/config/*.ini /opt/couchdb/etc/default.d/; ls -lrt /opt/couchdb/etc/default.d;"
 
         containers:
-          main:
+          app:
             image:
               repository: public.ecr.aws/docker/library/couchdb
               tag: 3.3.3
@@ -56,6 +56,16 @@ spec:
                   secretKeyRef:
                     name: obsidian-couchdb-secret
                     key: couchdb-password
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 cpu: 48m
@@ -64,14 +74,14 @@ spec:
                 memory: 146M
 
     service:
-      main:
+      app:
+        controller: obsidian-couchdb
         ports:
           http:
             port: 5984
 
     ingress:
-      main:
-        enabled: true
+      app:
         className: "external-nginx"
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
@@ -80,7 +90,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
@@ -92,15 +102,15 @@ spec:
         type: configMap
         name: obsidian-couchdb-configmap
         advancedMounts:
-          main:
+          obsidian-couchdb:
             init-config:
               - path: /tmp/config
       data:
         enabled: true
         existingClaim: "${VOLSYNC_CLAIM}"
         advancedMounts:
-          main:
-            main:
+          obsidian-couchdb:
+            app:
               - path: /opt/couchdb/data
       config-storage:
         enabled: true

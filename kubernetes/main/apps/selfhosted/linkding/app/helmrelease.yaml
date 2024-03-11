@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,13 +18,12 @@ spec:
 
   values:
     controllers:
-      main:
+      linkding:
         strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"
 
         pod:
-          enableServiceLinks: false
           labels:
             ingress.home.arpa/nginx-external: allow
             egress.home.arpa/internet: allow
@@ -32,7 +31,7 @@ spec:
             egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
 
         containers:
-          main:
+          app:
             image:
               repository: sissbruecker/linkding
               tag: 1.24.0
@@ -43,6 +42,16 @@ spec:
             envFrom:
               - secretRef:
                   name: linkding-db-secret
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 cpu: 12m
@@ -51,14 +60,14 @@ spec:
                 memory: 256M
 
     service:
-      main:
+      app:
+        controller: linkding
         ports:
           http:
             port: 9090
 
     ingress:
-      main:
-        enabled: true
+      app:
         className: "external-nginx"
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
@@ -72,7 +81,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
