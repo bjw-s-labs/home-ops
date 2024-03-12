@@ -28,6 +28,14 @@ spec:
       ports:
         - port: 8080
           protocol: TCP
+    # prowlarr
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prowlarr
+      ports:
+        - port: 9696
+          protocol: TCP
     # kube-dns
     - to:
         - namespaceSelector:
