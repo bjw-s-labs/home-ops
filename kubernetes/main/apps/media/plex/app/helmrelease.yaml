@@ -101,14 +101,18 @@ spec:
           plex:
             app:
               - path: /config
-
       plex-cache:
         existingClaim: plex-cache
         advancedMounts:
           plex:
             app:
               - path: /config/Library/Application Support/Plex Media Server/Cache
-
+      logs:
+        type: emptyDir
+        advancedMounts:
+          plex:
+            app:
+              - path: /config/Library/Application Support/Plex Media Server/Logs
       nfs-nas-media:
         type: nfs
         server: gladius.bjw-s.casa
