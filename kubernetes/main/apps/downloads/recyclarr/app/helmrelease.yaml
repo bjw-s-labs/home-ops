@@ -32,10 +32,10 @@ spec:
             egress.home.arpa/world: allow
             egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
           securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
+            runAsUser: 568
+            runAsGroup: 568
             runAsNonRoot: true
-            fsGroup: ${APP_GID}
+            fsGroup: 568
             fsGroupChangePolicy: OnRootMismatch
 
         containers:
@@ -65,7 +65,7 @@ spec:
 
     persistence:
       config:
-        existingClaim: "${VOLSYNC_CLAIM}"
+        existingClaim: recyclarr-config
         advancedMounts:
           recyclarr:
             app:

@@ -31,9 +31,9 @@ spec:
             egress.home.arpa/internet: allow
             egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
           securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
-            fsGroup: ${APP_GID}
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
             fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
@@ -69,7 +69,7 @@ spec:
 
     persistence:
       config:
-        existingClaim: "${VOLSYNC_CLAIM}"
+        existingClaim: plex-meta-manager-config
       config-file:
         type: configMap
         name: plex-meta-manager-configmap

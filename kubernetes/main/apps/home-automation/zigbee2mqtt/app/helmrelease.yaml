@@ -28,9 +28,9 @@ spec:
             egress.home.arpa/world: allow
             egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
           securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
-            fsGroup: ${APP_GID}
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
             fsGroupChangePolicy: OnRootMismatch
 
         containers:
@@ -65,7 +65,7 @@ spec:
               ZIGBEE2MQTT_CONFIG_DEVICE_OPTIONS_RETAIN: "true"
               ZIGBEE2MQTT_CONFIG_EXPERIMENTAL_NEW_API: "true"
               ZIGBEE2MQTT_CONFIG_FRONTEND_PORT: 8080
-              ZIGBEE2MQTT_CONFIG_FRONTEND_URL: https://${HOSTNAME}
+              ZIGBEE2MQTT_CONFIG_FRONTEND_URL: https://zigbee2mqtt.bjw-s.dev
               ZIGBEE2MQTT_CONFIG_HOMEASSISTANT: "true"
               ZIGBEE2MQTT_CONFIG_MQTT_BASE_TOPIC: zigbee2mqtt
               ZIGBEE2MQTT_CONFIG_MQTT_INCLUDE_DEVICE_INFORMATION: "true"
@@ -118,7 +118,7 @@ spec:
       app:
         className: "internal-nginx"
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName zigbee2mqtt.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -126,11 +126,11 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName
 
     persistence:
       data:
-        existingClaim: "${VOLSYNC_CLAIM}"
+        existingClaim: zigbee2mqtt-data
         advancedMounts:
           zigbee2mqtt:
             app:

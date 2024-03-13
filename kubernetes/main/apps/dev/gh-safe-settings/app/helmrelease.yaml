@@ -30,8 +30,8 @@ spec:
             egress.home.arpa/world: allow
             ingress.home.arpa/nginx-external: allow
           securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
+            runAsUser: 1000
+            runAsGroup: 1000
 
         containers:
           app:
@@ -89,7 +89,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         className: "external-nginx"
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName gh-safe-settings.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -97,7 +97,7 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName
 
     persistence:
       config:

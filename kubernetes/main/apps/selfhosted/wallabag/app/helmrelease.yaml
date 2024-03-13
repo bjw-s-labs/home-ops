@@ -37,7 +37,7 @@ spec:
               repository: wallabag/wallabag
               tag: 2.6.8
             env:
-              SYMFONY__ENV__DOMAIN_NAME: https://${HOSTNAME}
+              SYMFONY__ENV__DOMAIN_NAME: https://wallabag.bjw-s.dev
               SYMFONY__ENV__SERVER_NAME: Wallabag
               SYMFONY__ENV__FOSUSER_REGISTRATION: "false"
               SYMFONY__ENV__FOSUSER_CONFIRMATION: "false"
@@ -75,7 +75,7 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName wallabag.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -83,4 +83,4 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName

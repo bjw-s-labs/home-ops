@@ -32,10 +32,10 @@ spec:
             egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
             ingress.home.arpa/nginx-external: allow
           securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
+            runAsUser: 568
+            runAsGroup: 568
             runAsNonRoot: true
-            fsGroup: ${APP_GID}
+            fsGroup: 568
             fsGroupChangePolicy: "OnRootMismatch"
           topologySpreadConstraints:
             - maxSkew: 1
@@ -117,7 +117,7 @@ spec:
             add_header X-Frame-Options "SAMEORIGIN";
             add_header X-XSS-Protection "1; mode=block";
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName auth.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -125,7 +125,7 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName
 
     persistence:
       config:

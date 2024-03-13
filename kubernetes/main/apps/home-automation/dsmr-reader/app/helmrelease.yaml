@@ -72,7 +72,7 @@ spec:
       app:
         className: "internal-nginx"
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName dsmr-reader.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -80,4 +80,4 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName

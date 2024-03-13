@@ -81,7 +81,7 @@ spec:
         enabled: true
         className: "internal-nginx"
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName atuin.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -89,7 +89,7 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName
 
     persistence:
       config:
