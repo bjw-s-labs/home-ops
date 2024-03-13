@@ -40,7 +40,7 @@ spec:
               repository: ghcr.io/miniflux/miniflux
               tag: 2.0.50-distroless
             env:
-              BASE_URL: https://${HOSTNAME}
+              BASE_URL: https://miniflux.bjw-s.dev
               CREATE_ADMIN: "1"
               DEBUG: "1"
               LOG_DATE_TIME: "1"
@@ -48,7 +48,7 @@ spec:
               OAUTH2_USER_CREATION: "1"
               OAUTH2_OIDC_DISCOVERY_ENDPOINT: https://auth.bjw-s.dev
               OAUTH2_PROVIDER: oidc
-              OAUTH2_REDIRECT_URL: https://${HOSTNAME}/oauth2/oidc/callback
+              OAUTH2_REDIRECT_URL: https://miniflux.bjw-s.dev/oauth2/oidc/callback
               POLLING_SCHEDULER: "entry_frequency"
               POLLING_FREQUENCY: "15"
               RUN_MIGRATIONS: "1"
@@ -89,7 +89,7 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName miniflux.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -97,4 +97,4 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName

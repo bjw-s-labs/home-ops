@@ -65,7 +65,7 @@ spec:
       app:
         className: "internal-nginx"
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName esphome.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -73,11 +73,11 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName
 
     persistence:
       config:
-        existingClaim: "${VOLSYNC_CLAIM}"
+        existingClaim: esphome-config
         advancedMounts:
           esphome:
             app:

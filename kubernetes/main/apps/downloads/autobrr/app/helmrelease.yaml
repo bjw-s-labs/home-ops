@@ -19,7 +19,7 @@ spec:
     controllers:
       autobrr:
         annotations:
-          secret.reloader.stakater.com/reload: autobrr-secret,${APP}-pguser-${DB_USER}
+          secret.reloader.stakater.com/reload: autobrr-secret,autobrr-db-secret
           configmap.reloader.stakater.com/reload: autobrr-configmap
 
         pod:
@@ -29,8 +29,8 @@ spec:
             egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
             ingress.home.arpa/nginx-internal: allow
           securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
+            runAsUser: 568
+            runAsGroup: 568
             runAsNonRoot: true
 
         containers:
@@ -82,7 +82,7 @@ spec:
       app:
         className: internal-nginx
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName autobrr.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -90,4 +90,4 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName

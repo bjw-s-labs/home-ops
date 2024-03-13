@@ -24,10 +24,10 @@ spec:
 
         pod:
           securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
+            runAsUser: 568
+            runAsGroup: 568
             runAsNonRoot: true
-            fsGroup: ${APP_GID}
+            fsGroup: 568
             fsGroupChangePolicy: OnRootMismatch
             supplementalGroups:
               - 65542 # gladius:external-services
@@ -45,7 +45,7 @@ spec:
                 sabnzbd.downloads.svc,
                 sabnzbd.downloads.svc.cluster,
                 sabnzbd.downloads.svc.cluster.local,
-                ${HOSTNAME}
+                sabnzbd.bjw-s.dev
               SABNZBD__API_KEY:
                 valueFrom:
                   secretKeyRef:
@@ -90,7 +90,7 @@ spec:
       app:
         className: "internal-nginx"
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName sabnzbd.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -98,11 +98,11 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName
 
     persistence:
       config:
-        existingClaim: "${VOLSYNC_CLAIM}"
+        existingClaim: sabnzbd-config
         advancedMounts:
           sabnzbd:
             app:
