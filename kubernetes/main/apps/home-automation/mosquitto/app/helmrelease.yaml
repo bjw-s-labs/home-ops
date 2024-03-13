@@ -27,9 +27,9 @@ spec:
             ingress.home.arpa/lan: allow
             egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
           securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
-            fsGroup: ${APP_GID}
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
             fsGroupChangePolicy: OnRootMismatch
 
         initContainers:
@@ -72,7 +72,7 @@ spec:
         controller: mosquitto
         type: LoadBalancer
         annotations:
-          external-dns.alpha.kubernetes.io/hostname: "${HOSTNAME}."
+          external-dns.alpha.kubernetes.io/hostname: "mqtt.bjw-s.dev."
           io.cilium/lb-ipam-ips: "10.45.0.10"
         externalTrafficPolicy: Local
         ports:
@@ -82,7 +82,7 @@ spec:
 
     persistence:
       data:
-        existingClaim: "${VOLSYNC_CLAIM}"
+        existingClaim: mosquitto-data
         advancedMounts:
           mosquitto:
             app:

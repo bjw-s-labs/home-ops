@@ -30,9 +30,9 @@ spec:
           nodeSelector:
             intel.feature.node.kubernetes.io/gpu: "true"
           securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
-            fsGroup: ${APP_GID}
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 44
@@ -84,7 +84,7 @@ spec:
           nginx.ingress.kubernetes.io/backend-protocol: HTTPS
         className: "external-nginx"
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName plex.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -92,11 +92,11 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName
 
     persistence:
       config:
-        existingClaim: "${VOLSYNC_CLAIM}"
+        existingClaim: plex-config
         advancedMounts:
           plex:
             app:

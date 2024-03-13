@@ -24,9 +24,9 @@ spec:
 
         pod:
           securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
-            fsGroup: ${APP_GID}
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
             fsGroupChangePolicy: "OnRootMismatch"
 
         initContainers:
@@ -86,7 +86,7 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName obsidian-db.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -94,7 +94,7 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName
 
     persistence:
       config:
@@ -107,7 +107,7 @@ spec:
               - path: /tmp/config
       data:
         enabled: true
-        existingClaim: "${VOLSYNC_CLAIM}"
+        existingClaim: obsidian-couchdb-data
         advancedMounts:
           obsidian-couchdb:
             app:

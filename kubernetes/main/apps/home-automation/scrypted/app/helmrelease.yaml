@@ -80,7 +80,7 @@ spec:
       app:
         className: "internal-nginx"
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName scrypted.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -88,11 +88,11 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName
 
     persistence:
       config:
-        existingClaim: "${VOLSYNC_CLAIM}"
+        existingClaim: scrypted-config
         advancedMounts:
           scrypted:
             app:

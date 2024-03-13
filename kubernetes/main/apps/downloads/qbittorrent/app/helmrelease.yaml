@@ -25,7 +25,7 @@ spec:
 
         pod:
           securityContext:
-            fsGroup: ${APP_GID}
+            fsGroup: 568
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 65542 # gladius:external-services
@@ -56,8 +56,8 @@ spec:
               limits:
                 memory: 8192Mi
             securityContext:
-              runAsUser: ${APP_UID}
-              runAsGroup: ${APP_GID}
+              runAsUser: 568
+              runAsGroup: 568
               runAsNonRoot: true
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -100,8 +100,8 @@ spec:
               CRON_SCHEDULE: "*/5 * * * *"
               LOG_TIMESTAMP: false
             securityContext:
-              runAsUser: ${APP_UID}
-              runAsGroup: ${APP_GID}
+              runAsUser: 568
+              runAsGroup: 568
               runAsNonRoot: true
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: false
@@ -120,7 +120,7 @@ spec:
       app:
         className: "internal-nginx"
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName qbittorrent.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -128,12 +128,12 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName
 
     persistence:
       config:
         enabled: true
-        existingClaim: "${VOLSYNC_CLAIM}"
+        existingClaim: qbittorrent-config
         advancedMounts:
           qbittorrent:
             app:

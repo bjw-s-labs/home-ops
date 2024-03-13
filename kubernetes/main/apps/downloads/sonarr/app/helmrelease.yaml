@@ -28,10 +28,10 @@ spec:
             egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
             ingress.home.arpa/nginx-internal: allow
           securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
+            runAsUser: 568
+            runAsGroup: 568
             runAsNonRoot: true
-            fsGroup: ${APP_GID}
+            fsGroup: 568
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 65542 # gladius:external-services
@@ -88,7 +88,7 @@ spec:
       app:
         className: "internal-nginx"
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName sonarr.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -96,11 +96,11 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName
 
     persistence:
       config:
-        existingClaim: "${VOLSYNC_CLAIM}"
+        existingClaim: sonarr-config
       media:
         type: nfs
         server: gladius.bjw-s.casa

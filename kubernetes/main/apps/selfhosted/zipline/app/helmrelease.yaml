@@ -113,7 +113,7 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName s.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -121,4 +121,4 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - s.bjw-s.dev

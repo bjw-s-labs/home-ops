@@ -24,9 +24,9 @@ spec:
 
         pod:
           securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
-            fsGroup: ${APP_GID}
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
             fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
@@ -64,7 +64,7 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         hosts:
-          - host: "${HOSTNAME}"
+          - host: &hostName radicale.bjw-s.dev
             paths:
               - path: /
                 service:
@@ -72,7 +72,7 @@ spec:
                   port: http
         tls:
           - hosts:
-              - "${HOSTNAME}"
+              - *hostName
 
     persistence:
       config:
@@ -83,7 +83,7 @@ spec:
             subPath: config.cfg
             readOnly: true
       data:
-        existingClaim: "${VOLSYNC_CLAIM}"
+        existingClaim: radicale-data
         advancedMounts:
           radicale:
             app:
