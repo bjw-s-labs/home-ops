@@ -97,7 +97,7 @@ jobs:
             echo 'diff<<EOF'
             cat diff.patch
             echo EOF
-          } >> $GITHUB_OUTPUT;
+          } >> "$GITHUB_OUTPUT";
 
       - if: ${{ steps.diff.outputs.diff != '' }}
         name: Add comment
