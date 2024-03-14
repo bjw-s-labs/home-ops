@@ -31,7 +31,7 @@ jobs:
           private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
 
       - name: MegaLinter
-        uses: oxsecurity/megalinter@v7.10.0
+        uses: oxsecurity/megalinter/flavors/terraform@v7.10.0
         env:
           GITHUB_TOKEN: "${{ steps.app-token.outputs.token }}"
           PRINT_ALPACA: false
@@ -44,7 +44,6 @@ jobs:
                     "ACTION_ACTIONLINT",
                     "ANSIBLE_ANSIBLE_LINT",
                     "COPYPASTE_JSCPD",
-                    "KUBERNETES_KUBEVAL",
                     "MARKDOWN_MARKDOWNLINT",
                     "PYTHON_FLAKE8",
                     "PYTHON_PYLINT",
@@ -58,13 +57,11 @@ jobs:
                 ','
               )
             }}
+          ACTION_ACTIONLINT_CONFIG_FILE: .ci/actionlint/actionlint.yml
           COPYPASTE_JSCPD_CONFIG_FILE: .ci/jscpd/jscpd.json
-          KUBERNETES_DIRECTORY: k8s
-          KUBERNETES_KUBEVAL_ARGUMENTS: --ignore-missing-schemas
-          KUBERNETES_KUBEVAL_FILTER_REGEX_INCLUDE: "(kubernetes)"
-          MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .github/linters/markdownlint.config.yaml
-          MARKDOWN_MARKDOWNLINT_RULES_PATH: .github/
-          PYTHON_FLAKE8_CONFIG_FILE: .github/linters/.flake8
+          MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .ci/markdownlint/markdownlint.config.yaml
+          MARKDOWN_MARKDOWNLINT_RULES_PATH: .ci/markdownlint/
+          PYTHON_FLAKE8_CONFIG_FILE: .ci/flake8/.flake8
           YAML_YAMLLINT_CONFIG_FILE: .ci/yamllint/.yamllint.yaml
           YAML_PRETTIER_CONFIG_FILE: .ci/prettier/.prettierrc.yaml
           YAML_PRETTIER_ARGUMENTS: --ignore-path .ci/prettier/.prettierignore
