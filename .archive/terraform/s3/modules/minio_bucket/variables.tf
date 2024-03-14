@@ -3,7 +3,7 @@ variable "bucket_name" {
 }
 
 variable "is_public" {
-  type = bool
+  type    = bool
   default = false
 }
 

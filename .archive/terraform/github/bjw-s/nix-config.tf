@@ -1,10 +1,10 @@
 module "nix_config" {
   source = "github.com/bjw-s/terraform-github-repository?ref=v1.2.0"
 
-  name         = "nix-config"
-  description  = "My nix systems configuration"
-  topics       = ["nix", "nixos", "nix-darwin", "home-manager"]
-  visibility   = "public"
+  name        = "nix-config"
+  description = "My nix systems configuration"
+  topics      = ["nix", "nixos", "nix-darwin", "home-manager"]
+  visibility  = "public"
 
   auto_init              = var.defaults.auto_init
   allow_merge_commit     = var.defaults.allow_merge_commit
