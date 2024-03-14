@@ -7,8 +7,8 @@ tasks:
     desc: Run pg_dump on the master instance of a CrunchyData Postgres cluster.
     dir: "{{.USER_WORKING_DIR}}"
     vars:
-      db_cluster: '{{.db_cluster | default "postgres"}}' #postgres cluster name
-      ns: '{{.ns | default "database"}}' #database namespace
+      db_cluster: '{{.db_cluster | default "postgres"}}' # postgres cluster name
+      ns: '{{.ns | default "database"}}' # database namespace
       crunchy_primary:
         sh: |-
           kubectl --context {{.cluster}} get pods -n {{.ns}} -l postgres-operator.crunchydata.com/role=master,postgres-operator.crunchydata.com/cluster={{.db_cluster}} -o jsonpath='{.items[0].metadata.name}'
@@ -34,8 +34,8 @@ tasks:
     desc: Restore a pg_dump to a CrunchyData Postgres cluster, writing to the master instance.
     dir: "{{.USER_WORKING_DIR}}"
     vars:
-      db_cluster: '{{.db_cluster | default "postgres"}}' #postgres cluster name
-      ns: '{{.ns | default "database"}}' #database namespace
+      db_cluster: '{{.db_cluster | default "postgres"}}' # postgres cluster name
+      ns: '{{.ns | default "database"}}' # database namespace
       crunchy_primary:
         sh: |-
           kubectl --context {{.cluster}} get pods -n {{.ns}} -l postgres-operator.crunchydata.com/role=master,postgres-operator.crunchydata.com/cluster={{.db_cluster}} -o jsonpath='{.items[0].metadata.name}'
@@ -64,8 +64,8 @@ tasks:
     desc: Exec in to the master instance of a CrunchyData Postgres cluster.
     dir: "{{.USER_WORKING_DIR}}"
     vars:
-      db_cluster: '{{.db_cluster | default "postgres"}}' #postgres cluster name
-      ns: '{{.ns | default "database"}}' #database namespace
+      db_cluster: '{{.db_cluster | default "postgres"}}' # postgres cluster name
+      ns: '{{.ns | default "database"}}' # database namespace
       crunchy_primary:
         sh: |-
           kubectl --context {{.cluster}} get pods -n {{.ns}} -l postgres-operator.crunchydata.com/role=master,postgres-operator.crunchydata.com/cluster={{.db_cluster}} -o jsonpath='{.items[0].metadata.name}'
