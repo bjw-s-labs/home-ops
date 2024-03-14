@@ -182,7 +182,7 @@ spec:
           egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
       config:
         global:
-          pool_mode: "transaction" #pgBouncer is set to transaction for Authentik. Grafana requires session https://github.com/grafana/grafana/issues/74260#issuecomment-1702795311. Everything else is happy with transaction
+          pool_mode: "transaction" # pgBouncer is set to transaction for Authentik. Grafana requires session https://github.com/grafana/grafana/issues/74260#issuecomment-1702795311. Everything else is happy with transaction
           client_tls_sslmode: prefer
       topologySpreadConstraints:
         - maxSkew: 1
