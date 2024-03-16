@@ -96,22 +96,22 @@ spec:
                 enabled: true
                 spec:
                   failureThreshold: 30
-                  periodSeconds: 5
+                  periodSeconds: 10
             resources:
               requests:
                 cpu: 8m
-                memory: 212M
+                memory: 384Mi
               limits:
-                memory: 256M
+                memory: 384Mi
 
     service:
       app:
         controller: zigbee2mqtt
         ports:
           http:
+            primary: true
             port: 8080
           metrics:
-            enabled: true
             port: 9000
 
     ingress:
