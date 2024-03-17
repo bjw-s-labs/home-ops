@@ -1,6 +1,6 @@
 clusterName: cluster-2
 
-talosVersion: v1.6.4
+talosVersion: v1.6.6
 kubernetesVersion: v1.29.1
 
 # Image URL rendered on https://factory.talos.dev
@@ -51,52 +51,23 @@ nodes:
               vlanId: 2002
               dhcp: true
 
-
-    # - hostname: cp1.cluster-2.${secret_domain}
-    #   ipAddress: cp1.cluster-2.${secret_domain}
-    #   controlPlane: true
-    #   # Image URL rendered on https://factory.talos.dev
-    #   # customization:
-    #   #     extraKernelArgs:
-    #   #         - net.ifnames=0
-    #   #     systemExtensions:
-    #   #         officialExtensions:
-    #   #             - siderolabs/gvisor
-    #   #             - siderolabs/qemu-guest-agent
-    #   #             - siderolabs/intel-ucode    
-    #   talosImageURL: factory.talos.dev/installer/25a0f1b6a0d9395a006be275f1dd7137ddb2105c57c5d226baae9eace262cf09
-    #   disableSearchDomain: true
-    #   installDiskSelector:
-    #     size: <= 50GB
-    #   nameservers:
-    #     - 10.0.0.4
-    #   networkInterfaces:
-    #     - deviceSelector:
-    #         hardwareAddr: "f6:ce:9a:7b:a7:b3"
-    #       dhcp: true
-    #       # mtu: 9000
-
     - hostname: cp2.cluster-2.${secret_domain}
       ipAddress: cp2.cluster-2.${secret_domain}
       controlPlane: true
-      # Image URL rendered on https://factory.talos.dev
-      # customization:
-      #     extraKernelArgs:
-      #         - net.ifnames=0
-      #     systemExtensions:
-      #         officialExtensions:
-      #             - siderolabs/qemu-guest-agent
-      talosImageURL: factory.talos.dev/installer/f683308f6e49ec36d715bd41c90d800910552d8cbc015c8363ec350594535fa1
       disableSearchDomain: true
       installDiskSelector:
-        size: <= 50GB
+        type: nvme
       nameservers:
         - 10.0.0.4
       networkInterfaces:
+        # 1G Internal Port
         - deviceSelector:
-            hardwareAddr: "06:5e:c2:d2:3f:c3"
-          dhcp: true
+            driver: bcmgenet
+          dhcp: false
           # mtu: 9000
+          vlans:
+            - *vlan2002
+
 
     - hostname: cp3.cluster-2.${secret_domain}
       ipAddress: cp3.cluster-2.${secret_domain}
@@ -366,7 +337,7 @@ nodes:
       controlPlane: false
       disableSearchDomain: true
       installDiskSelector:
-        size: <= 50GB
+        type: nvme
       nameservers:
         - 10.0.0.4
       networkInterfaces:
@@ -374,13 +345,11 @@ nodes:
         - deviceSelector:
             driver: bcmgenet
           dhcp: false
-          # mtu: 9000
           vlans:
             - *vlan2002
             - &vlan2040-noMTU
               vlanId: 2040
               dhcp: true
-              # mtu: 9000
               dhcpOptions:
                 routeMetric: 2048
 

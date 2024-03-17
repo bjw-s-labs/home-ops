@@ -119,6 +119,10 @@ spec:
                   - key: node-role.kubernetes.io/rook-osd-node
                     operator: DoesNotExist
         mon: *placement
+        osd: 
+          tolerations:
+          - key: storage-node
+            operator: Exists
       resources:
         mgr:
           limits:
