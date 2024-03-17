@@ -118,6 +118,11 @@ spec:
                 - matchExpressions:
                   - key: node-role.kubernetes.io/rook-mon-node
                     operator: Exist
+        prepareosd: 
+          tolerations:
+          - key: storage-node
+            operator: Exists
+            effect: "NoSchedule"
         osd: 
           tolerations:
           - key: storage-node
