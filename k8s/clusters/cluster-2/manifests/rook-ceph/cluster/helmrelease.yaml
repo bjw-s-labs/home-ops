@@ -111,14 +111,13 @@ spec:
         multiClusterService:
           enabled: false
       placement:
-        mgr: &placement
+        mon:
           nodeAffinity:
             requiredDuringSchedulingIgnoredDuringExecution:
               nodeSelectorTerms:
                 - matchExpressions:
-                  - key: node-role.kubernetes.io/rook-osd-node
-                    operator: DoesNotExist
-        mon: *placement
+                  - key: node-role.kubernetes.io/rook-mon-node
+                    operator: Exist
         osd: 
           tolerations:
           - key: storage-node
