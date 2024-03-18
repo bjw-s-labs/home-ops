@@ -33,13 +33,13 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           securityContext:
-            runAsUser: 568
-            runAsGroup: 100
-            fsGroup: 100
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GID}
+            runAsNonRoot: true
+            fsGroup: ${APP_GID}
+            fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 34
-              - 100
-            fsGroupChangePolicy: "OnRootMismatch"
 
 
         containers:
@@ -94,7 +94,7 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: sabnzbd-config-cluster-2
+        existingClaim: ${VOLSYNC_CLAIM}
       incomplete:
         enabled: true
         existingClaim: ceph-blockpool-sabnzbd-incomplete
