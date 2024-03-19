@@ -47,7 +47,7 @@ spec:
               }]
             # k8s.v1.cni.cncf.io/networks: macvlan-conf-dhcp
           securityContext:
-            runAsUser: ${APP_UID}
+            runAsUser: 0       # ${APP_UID}   # Must be run as root user
             runAsGroup: ${APP_GID}
             runAsNonRoot: false               # Must be run as root user
             fsGroup: ${APP_GID}
