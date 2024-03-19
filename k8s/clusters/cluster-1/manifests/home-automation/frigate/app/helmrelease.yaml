@@ -51,17 +51,16 @@ spec:
           nodeSelector:
             google.feature.node.kubernetes.io/coral: "true"
             # intel.feature.node.kubernetes.io/gpu: "true"
-        # pod:
-        #   securityContext:
-        #     # runAsUser: ${APP_UID}
-        #     # runAsGroup: ${APP_GID}
-        #     # runAsNonRoot: true
-        #     fsGroup: ${APP_GID}
-        #     fsGroupChangePolicy: "OnRootMismatch"
-        #     supplementalGroups:
-        #       - 34
-        #       - 100
-        #       - 1000
+          securityContext:
+            # runAsUser: ${APP_UID}
+            # runAsGroup: ${APP_GID}
+            # runAsNonRoot: true
+            fsGroup: ${APP_GID}
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 34
+              - 100
+              - 1000
 
 
           # #runAsUser: 1000
