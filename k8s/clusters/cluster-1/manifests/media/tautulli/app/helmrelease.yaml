@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.4
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -21,57 +21,53 @@ spec:
     remediation:
       retries: 3
   upgrade:
+    crds: CreateReplace
     cleanupOnFail: true
     remediation:
       retries: 3
+      strategy: uninstall
+  rollback:
+    recreate: true
+    cleanupOnFail: true
   uninstall:
     keepHistory: false
   values:
     global:
       nameOverride: *app
 
-    defaultPodOptions:
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: app.kubernetes.io/name
-                      operator: In
-                      values:
-                        - plex
-                topologyKey: kubernetes.io/hostname
-
     controllers:
-      main:
+      tautulli:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
           securityContext:
-            runAsUser: 568
-            runAsGroup: 100
-            fsGroup: 100
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GID}
+            runAsNonRoot: true
+            fsGroup: ${APP_GID}
+            fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 34
-              - 100
-            fsGroupChangePolicy: "OnRootMismatch"
-          hostAliases:
-            - ip: "10.200.1.50"
-              hostnames:
-                - "plex.${INGRESS_DOMAIN}"
-                - "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/onedr0p/tautulli
               tag: 2.13.4
               pullPolicy: IfNotPresent
             env:
               TZ: "${TIMEZONE}"
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 memory: "128M"
@@ -79,7 +75,8 @@ spec:
                 memory: "500M"
 
     service:
-      main:
+      app:
+        controller: *app
         ports:
           http:
             port: 8181
@@ -92,13 +89,13 @@ spec:
         enabled: true
         existingClaim: ceph-filesystem-backups-media
         advancedMounts:
-          main:
-            main:
+          tautulli:
+            app:
               - path: /config/backups
                 subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/tautulli
 
     ingress:
-      main:
+      app:
         enabled: true
         className: "traefik"
         annotations:
@@ -114,13 +111,13 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
           - host: &host "tautulli.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - secretName: tls.tautulli

@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.4
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -21,9 +21,14 @@ spec:
     remediation:
       retries: 3
   upgrade:
+    crds: CreateReplace
     cleanupOnFail: true
     remediation:
       retries: 3
+      strategy: uninstall
+  rollback:
+    recreate: true
+    cleanupOnFail: true
   uninstall:
     keepHistory: false
   values:
@@ -32,27 +37,13 @@ spec:
       fullnameOverride: *app
 
     controllers:
-      main:
+      autoscan:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
-        pod:
-          # securityContext:
-          #   runAsUser: 568
-          #   runAsGroup: 100
-          #   fsGroup: 100
-          #   supplementalGroups:
-          #     - 34
-          #     - 100
-          #   fsGroupChangePolicy: "OnRootMismatch"
-          hostAliases:
-            - ip: "10.200.1.50"
-              hostnames:
-                - "plex.${INGRESS_DOMAIN}"
-                - "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
         containers:
-          main:
+          app:
             image:
               repository: cloudb0x/autoscan
               tag: "1.4.0"
@@ -86,7 +77,8 @@ spec:
                   timeoutSeconds: 10
 
     service:
-      main:
+      app:
+        controller: *app
         ports:
           http:
             port: 3030
@@ -104,61 +96,55 @@ spec:
           - key: config.yml
             path: config.yml
         advancedMounts:
-          main:
-            main:
+          autoscan:
+            app:
               - path: /test/
-        readOnly: true
+                readOnly: true
       4kmovies:
         enabled: true
         existingClaim: ceph-filesystem-media-4kmovies
         advancedMounts:
-          main:
-            main:
+          autoscan:
+            app:
               - path: /mnt/unionfs/Media/4KMovies/
-        accessMode: ReadWriteMany
       4ktv:
         enabled: true
         existingClaim: ceph-filesystem-media-4ktv
         advancedMounts:
-          main:
-            main:
+          autoscan:
+            app:
               - path: /mnt/unionfs/Media/4KTV/
-        accessMode: ReadWriteMany
       music:
         enabled: true
         existingClaim: ceph-filesystem-media-music
         advancedMounts:
-          main:
-            main:
+          autoscan:
+            app:
               - path: /mnt/unionfs/Media/Music/
-        accessMode: ReadWriteMany
       movies:
         enabled: true
         existingClaim: cephfs-hdd-media-movies
         advancedMounts:
-          main:
-            main:
+          autoscan:
+            app:
               - path: /mnt/unionfs/Media/Movies/
-        accessMode: ReadWriteMany
       tv:
         enabled: true
         existingClaim: cephfs-hdd-media-tv
         advancedMounts:
-          main:
-            main:
+          autoscan:
+            app:
               - path: /mnt/unionfs/Media/TV
-        accessMode: ReadWriteMany
       downloads:
         enabled: true
         existingClaim: ceph-filesystem-media-downloads
         advancedMounts:
-          main:
-            main:
+          autoscan:
+            app:
               - path: /mnt/unionfs/downloads
-        accessMode: ReadWriteMany
 
     ingress:
-      main:
+      app:
         enabled: true
         className: "traefik"
         annotations:
@@ -176,13 +162,13 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
           - host: &host "autoscan.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - secretName: tls.autoscan

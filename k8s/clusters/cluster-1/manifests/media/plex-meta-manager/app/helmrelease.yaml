@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.4
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -21,9 +21,14 @@ spec:
     remediation:
       retries: 3
   upgrade:
+    crds: CreateReplace
     cleanupOnFail: true
     remediation:
       retries: 3
+      strategy: uninstall
+  rollback:
+    recreate: true
+    cleanupOnFail: true
   uninstall:
     keepHistory: false
   values:
@@ -32,27 +37,13 @@ spec:
       fullnameOverride: *app
 
     controllers:
-      main:
+      plex-meta-manager:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
-        pod:
-          # securityContext:
-          #   runAsUser: 568
-          #   runAsGroup: 100
-          #   fsGroup: 100
-          #   supplementalGroups:
-          #     - 34
-          #     - 100
-          #   fsGroupChangePolicy: "OnRootMismatch"
-          hostAliases:
-            - ip: "10.200.1.50"
-              hostnames:
-                - "plex.${INGRESS_DOMAIN}"
-                - "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
         containers:
-          main:
+          app:
             image:
               repository: meisnate12/plex-meta-manager
               tag: nightly
@@ -65,6 +56,16 @@ spec:
               PMM_RUN: true
               PMM_DEBUG: true
               PMM_READ_ONLY_CONFIG: true
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 memory: "100M"
@@ -72,7 +73,8 @@ spec:
                 memory: "6G"
 
     service:
-      main:
+      app:
+        controller: *app
         enabled: false
         ports:
           http:
@@ -87,49 +89,48 @@ spec:
         type: configMap
         name: pmm-config
         advancedMounts:
-          main:
-            main:
+          plex-meta-manager:
+            app:
               - path: /config/config.yml
                 subPath: config.yaml
-        mountPath: 
-        readOnly: false
+                readOnly: false
       pmm-tv:
         enabled: true
         type: configMap
         name: pmm-tv
         advancedMounts:
-          main:
-            main:
+          plex-meta-manager:
+            app:
               - path: config/tv.yaml
                 subPath: tv.yaml
-        readOnly: false
+                readOnly: false
       pmm-tv-overlay:
         enabled: true
         type: configMap
         name: pmm-tv-overlay
         advancedMounts:
-          main:
-            main:
+          plex-meta-manager:
+            app:
               - path: config/tv_overlay.yaml
                 subPath: tv_overlay.yaml
-        readOnly: false
+                readOnly: false
       pmm-movies:
         enabled: true
         type: configMap
         name: pmm-movies
         advancedMounts:
-          main:
-            main:
+          plex-meta-manager:
+            app:
               - path: config/movies.yaml
                 subPath: movies.yaml
-        readOnly: false
+                readOnly: false
       pmm-movies-overlay:
         enabled: true
         type: configMap
         name: pmm-movies-overlay
         advancedMounts:
-          main:
-            main:
+          plex-meta-manager:
+            app:
               - path: config/movies_overlay.yaml
                 subPath: movies_overlay.yaml
-        readOnly: false
+                readOnly: false

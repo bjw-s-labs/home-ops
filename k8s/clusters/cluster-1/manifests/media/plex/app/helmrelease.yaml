@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.4
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -23,9 +23,14 @@ spec:
     remediation:
       retries: 3
   upgrade:
+    crds: CreateReplace
     cleanupOnFail: true
     remediation:
       retries: 3
+      strategy: uninstall
+  rollback:
+    recreate: true
+    cleanupOnFail: true
   uninstall:
     keepHistory: false
   values:
@@ -36,19 +41,20 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           securityContext:
-            runAsUser: 568
-            runAsGroup: 100
-            fsGroup: 100
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GID}
+            runAsNonRoot: true
+            fsGroup: ${APP_GID}
+            fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 34 # backup
               - 44 # videro
               - 109 # render
               - 100 # users
               - 1000
-            fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/onedr0p/plex-beta
               tag: 1.40.1.8227-c0dd5a73e
@@ -67,6 +73,16 @@ spec:
               # PLEX_PREFERENCE_6: "TranscoderQuality=2"
               # PLEX_PREFERENCE_7: "TreatWanIpAsLocal=0"
               # PLEX_PREFERENCE_8: "TranscoderH264BackgroundPreset=fast"
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 # cpu: 35m
@@ -79,25 +95,19 @@ spec:
                 memory: 32Gi
 
     service:
-      main:
-        controller: main
+      app:
+        controller: *app
         type: LoadBalancer
         annotations:
           traefik.ingress.kubernetes.io/service.serversscheme: https
           io.cilium/lb-ipam-ips: ${LB_PLEX}
-        # loadBalancerIP: ${LB_PLEX}
         ports:
           http:
             port: 32400
-        #   ssh:
-        #     enabled: true
-        #     port: 22
-        #     protocol: TCP
-        #     targetPort: 22
         externalTrafficPolicy: Cluster
       webtools:
         enabled: true
-        controller: main
+        controller: *app
         type: NodePort
         ports:
           webtools:
@@ -117,61 +127,61 @@ spec:
         existingClaim: plex-cache-cluster-2
         globalMounts:
           - path: "/config/Library/Application Support/Plex Media Server/Cache"
+      logs:
+        type: emptyDir
+        globalMounts:
+          - path: "/config/Library/Application Support/Plex Media Server/Logs"
+      tmp:
+        type: emptyDir
       transcode:
         enabled: true
         type: emptyDir
-        # medium: Memory
       backup:
         enabled: true
         existingClaim: ceph-filesystem-backups-media
         advancedMounts:
-          main:
-            main:
+          plex:
+            app:
               - path: /config/Backups
                 subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/plex
       4kmovies:
         enabled: true
         existingClaim: ceph-filesystem-media-4kmovies
         advancedMounts:
-          main:
-            main:
+          plex:
+            app:
               - path: /mnt/unionfs/Media/4KMovies/
-        accessMode: ReadWriteMany
       4ktv:
         enabled: true
         existingClaim: ceph-filesystem-media-4ktv
         advancedMounts:
-          main:
-            main:
+          plex:
+            app:
               - path: /mnt/unionfs/Media/4KTV/
-        accessMode: ReadWriteMany
       music:
         enabled: true
         existingClaim: ceph-filesystem-media-music
         advancedMounts:
-          main:
-            main:
+          plex:
+            app:
               - path: /mnt/unionfs/Media/Music/
-        accessMode: ReadWriteMany
       movies:
         enabled: true
         existingClaim: cephfs-hdd-media-movies
         advancedMounts:
-          main:
-            main:
+          plex:
+            app:
               - path: /mnt/unionfs/Media/Movies/
-        accessMode: ReadWriteMany
       tv:
         enabled: true
         existingClaim: cephfs-hdd-media-tv
         advancedMounts:
-          main:
-            main:
+          plex:
+            app:
               - path: /mnt/unionfs/Media/TV
-        accessMode: ReadWriteMany
 
     ingress:
-      main:
+      app:
         enabled: true
         className: "traefik"
         annotations:
@@ -188,14 +198,14 @@ spec:
               - path: /
                 pathType: Prefix
                 service:
-                  name: main
+                  identifier: app
                   port: http
           - host: &host-cluster "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - secretName: tls.plex
