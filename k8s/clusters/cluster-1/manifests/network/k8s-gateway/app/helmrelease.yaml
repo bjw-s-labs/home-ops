@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.4
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -21,7 +21,7 @@ spec:
       nameOverride: *app
 
     controllers:
-      main:
+      k8s-gateway:
         # type: statefulset
         # annotations:
         #   reloader.stakater.com/auto: "true"
@@ -32,7 +32,7 @@ spec:
             configmap.reloader.stakater.com/reload: "k8s-gateway-config"
 
         containers:
-          main:
+          app:
             image:
               repository: quay.io/oriedge/k8s_gateway
               tag: v0.4.0
@@ -96,12 +96,11 @@ spec:
             }
 
     service:
-      main:
+      app:
         type: LoadBalancer
         externalTrafficPolicy: Cluster
         annotations:
           io.cilium/lb-ipam-ips: "${LB_K8S_GATEWAY}"
-          # loadBalancerIP: ${LB_K8S_GATEWAY}
         ports:
           http:
             enabled: false
@@ -117,7 +116,7 @@ spec:
         type: configMap
         name: k8s-gateway-config
         advancedMounts:
-          main:
-            main:
+          k8s-gateway:
+            app:
               - path: /etc/coredns
                 readOnly: true
