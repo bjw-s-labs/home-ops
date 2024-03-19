@@ -47,14 +47,24 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
-          #runAsUser: 1000
-          #runAsGroup: 100
-          fsGroup: 100
-          supplementalGroups:
-            - 1000
-            - 100
-          # - 568
-          fsGroupChangePolicy: "OnRootMismatch"
+          securityContext:
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GID}
+            runAsNonRoot: true
+            fsGroup: ${APP_GID}
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 34
+
+
+          # #runAsUser: 1000
+          # #runAsGroup: 100
+          # fsGroup: 100
+          # supplementalGroups:
+          #   - 1000
+          #   - 100
+          # # - 568
+          # fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
           app:
@@ -128,16 +138,16 @@ spec:
           http:
             port: *port
           rtsp:
-            enabled: "true"
+            enabled: true
             port: 8554
           api:
-            enabled: "false"
+            enabled: false
             port: 1984
           srtp:
-            enabled: "false"
+            enabled: false
             port: 8443
           webrtc:
-            enabled: "false"
+            enabled: false
             port: 8555
 
     persistence:
@@ -150,7 +160,7 @@ spec:
             app:
               - path: /config/config.yml
                 subPath: config.yaml
-        readOnly: true
+                readOnly: true
       data:
         enabled: true
         existingClaim: ${VOLSYNC_CLAIM}
