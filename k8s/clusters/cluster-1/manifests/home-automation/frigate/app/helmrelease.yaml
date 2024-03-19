@@ -46,6 +46,7 @@ spec:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
+          configmap.reloader.stakater.com/reload: "frigate-config"
         pod:
           securityContext:
             runAsUser: ${APP_UID}
@@ -91,8 +92,6 @@ spec:
                 memory: 1000Mi
             securityContext:
                   privileged: true
-            annotations:
-              configmap.reloader.stakater.com/reload: "frigate-config"
             # nodeSelector:
             #   google.feature.node.kubernetes.io/coral: "true"
             probes:
