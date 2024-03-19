@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.4
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -20,35 +20,19 @@ spec:
     global:
       nameOverride: *app
 
-    defaultPodOptions:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node-role.kubernetes.io/rook-osd-node
-                operator: DoesNotExist
-
     controllers:
-      main:
+      k8s-gateway:
         # type: statefulset
         # annotations:
         #   reloader.stakater.com/auto: "true"
         replicas: 3
         strategy: RollingUpdate
-        affinity:
-          nodeAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              nodeSelectorTerms:
-                - matchExpressions:
-                  - key: node-role.kubernetes.io/rook-osd-node
-                    operator: DoesNotExist
         pod:
           annotations:
             configmap.reloader.stakater.com/reload: "k8s-gateway-config"
 
         containers:
-          main:
+          app:
             image:
               repository: quay.io/oriedge/k8s_gateway
               tag: v0.4.0
@@ -112,15 +96,13 @@ spec:
             }
 
     service:
-      main:
+      app:
+        controller: *app
         type: LoadBalancer
         externalTrafficPolicy: Cluster
         annotations:
           io.cilium/lb-ipam-ips: "${LB_K8S_GATEWAY}"
-          # loadBalancerIP: ${LB_K8S_GATEWAY}
         ports:
-          http:
-            enabled: false
           dns:
             enabled: true
             port: 53
