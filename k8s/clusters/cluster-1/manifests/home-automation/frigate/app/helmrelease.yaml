@@ -49,13 +49,15 @@ spec:
           configmap.reloader.stakater.com/reload: "frigate-config"
         pod:
           securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
-            runAsNonRoot: true
+            # runAsUser: ${APP_UID}
+            # runAsGroup: ${APP_GID}
+            # runAsNonRoot: true
             fsGroup: ${APP_GID}
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 34
+              - 100
+              - 1000
 
 
           # #runAsUser: 1000

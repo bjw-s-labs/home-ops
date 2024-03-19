@@ -46,14 +46,14 @@ spec:
                 "namespace": "network",
                 "ips": ["10.10.100.13/24"]
               }]
-          securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
-            runAsNonRoot: false               # Must be run as root user or it fails to start
-            fsGroup: ${APP_GID}
-            fsGroupChangePolicy: "OnRootMismatch"
-            supplementalGroups:
-              - 34
+          # securityContext:
+          #   runAsUser: ${APP_UID}
+          #   runAsGroup: ${APP_GID}
+          #   runAsNonRoot: false               # Must be run as root user or it fails to start
+          #   fsGroup: ${APP_GID}
+          #   fsGroupChangePolicy: "OnRootMismatch"
+          #   supplementalGroups:
+          #     - 34
 
         containers:
           app:
