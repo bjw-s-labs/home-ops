@@ -95,24 +95,13 @@ spec:
     service:
       app:
         controller: *app
-        type: LoadBalancer
+        primary: true
         annotations:
           traefik.ingress.kubernetes.io/service.serversscheme: https
           io.cilium/lb-ipam-ips: ${LB_PLEX}
         ports:
           http:
             port: 32400
-        externalTrafficPolicy: Cluster
-      webtools:
-        enabled: false
-        controller: *app
-        type: NodePort
-        ports:
-          webtools:
-            enabled: true
-            port: 33400
-            protocol: TCP
-            targetPort: 33400
         externalTrafficPolicy: Cluster
 
     persistence:

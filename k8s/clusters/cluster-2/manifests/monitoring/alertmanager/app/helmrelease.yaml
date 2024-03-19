@@ -3,30 +3,21 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
-  name: alertmanager
+  name: &app alertmanager
 spec:
   interval: 30m
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.4
       interval: 30m
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
   values:
-    defaultPodOptions:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                - key: node-role.kubernetes.io/rook-osd-node
-                  operator: DoesNotExist
-
     controllers:
-      main:
+      alertmanager:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
@@ -41,13 +32,23 @@ spec:
         #         - path: /alertmanager
 
         containers:
-          main:
+          app:
             image:
               repository: quay.io/prometheus/alertmanager
               tag: v0.27.0
             ports:
               - name: http
                 containerPort: 9093
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 cpu: 11m
@@ -56,13 +57,14 @@ spec:
                 memory: 99M
 
     service:
-      main:
+      app:
+        controller: *app
         ports:
           http:
             port: 9093
 
     ingress:
-      main:
+      app:
         enabled: true
         className: internal-nginx
         hosts:
@@ -70,7 +72,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
