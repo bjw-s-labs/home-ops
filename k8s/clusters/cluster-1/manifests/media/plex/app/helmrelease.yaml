@@ -95,7 +95,7 @@ spec:
     service:
       app:
         controller: *app
-        primary: true
+        type: LoadBalancer
         annotations:
           traefik.ingress.kubernetes.io/service.serversscheme: https
           io.cilium/lb-ipam-ips: ${LB_PLEX}
