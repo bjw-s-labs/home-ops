@@ -97,13 +97,12 @@ spec:
 
     service:
       app:
+        controller: *app
         type: LoadBalancer
         externalTrafficPolicy: Cluster
         annotations:
           io.cilium/lb-ipam-ips: "${LB_K8S_GATEWAY}"
         ports:
-          http:
-            enabled: false
           dns:
             enabled: true
             port: 53
