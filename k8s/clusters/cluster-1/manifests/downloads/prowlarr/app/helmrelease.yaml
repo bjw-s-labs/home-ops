@@ -90,15 +90,15 @@ spec:
         enabled: true
         type: emptyDir
         advancedMounts:
-          main:
-            main:
+          prowlarr:
+            app:
               - path: /shared
       backup:
         enabled: true
         existingClaim: ceph-filesystem-backups-prowlarr
         advancedMounts:
-          main:
-            main:
+          prowlarr:
+            app:
               - path: /config/Backups
 
     ingress:
