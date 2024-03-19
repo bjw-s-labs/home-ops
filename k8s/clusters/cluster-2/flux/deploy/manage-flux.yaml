@@ -134,14 +134,7 @@ spec:
             metadata:
               annotations:
                 cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
-            spec:
-              affinity:
-                nodeAffinity:
-                  requiredDuringSchedulingIgnoredDuringExecution:
-                    nodeSelectorTerms:
-                      - matchExpressions:
-                        - key: node-role.kubernetes.io/rook-osd-node
-                          operator: DoesNotExist    
+
       target:
         kind: Deployment
         labelSelector: app.kubernetes.io/part-of=flux

@@ -156,13 +156,6 @@ spec:
             memory: 3760M
           limits:
             memory: 3760M
-        affinity:
-          nodeAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              nodeSelectorTerms:
-                - matchExpressions:
-                  - key: node-role.kubernetes.io/rook-osd-node
-                    operator: DoesNotExist
         retention: 2d
         retentionSize: "15GB"
         ruleSelectorNilUsesHelmValues: false

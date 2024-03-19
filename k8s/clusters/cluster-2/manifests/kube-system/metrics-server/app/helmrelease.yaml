@@ -34,13 +34,5 @@ spec:
       - --metric-resolution=15s
     metrics:
       enabled: true
-    # serviceMonitor:
-    #   enabled: true
-
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-          - matchExpressions:
-            - key: node-role.kubernetes.io/rook-osd-node
-              operator: DoesNotExist
+    serviceMonitor:
+      enabled: true

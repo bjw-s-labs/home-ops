@@ -347,13 +347,6 @@ spec:
 
     imageRenderer:
       enabled: true
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                - key: node-role.kubernetes.io/rook-osd-node
-                  operator: DoesNotExist
 
     ingress:
       enabled: true
@@ -420,11 +413,3 @@ spec:
         labelSelector:
           matchLabels:
             app.kubernetes.io/name: grafana
-
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-              - key: node-role.kubernetes.io/rook-osd-node
-                operator: DoesNotExist

@@ -30,15 +30,8 @@ spec:
     keepHistory: false
   values:
     controller:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node-role.kubernetes.io/rook-osd-node
-                operator: DoesNotExist
       serviceMonitor:
-        create: false   # Enable when prometheus is installed
+        create: true
       replicaCount: 3
     webhook:
       enabled: true

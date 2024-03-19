@@ -33,17 +33,6 @@ spec:
           memory: 64M
         # limits:
         #   memory: 99M
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                - key: node-role.kubernetes.io/rook-osd-node
-                  operator: DoesNotExist
-                - key: kubernetes.io/arch
-                  operator: In
-                  values: 
-                    - amd64
 
     queryFrontend:
       enabled: true
@@ -52,17 +41,6 @@ spec:
         hostname: "thanos.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
         ingressClassName: "internal-nginx"
         tls: true
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                - key: node-role.kubernetes.io/rook-osd-node
-                  operator: DoesNotExist
-                - key: kubernetes.io/arch
-                  operator: In
-                  values: 
-                    - amd64
 
     bucketweb:
       enabled: true
@@ -72,17 +50,6 @@ spec:
           memory: 64M
         # limits:
         #   memory: 64M
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                - key: node-role.kubernetes.io/rook-osd-node
-                  operator: DoesNotExist
-                - key: kubernetes.io/arch
-                  operator: In
-                  values: 
-                    - amd64
 
     compactor:
       enabled: true
@@ -102,17 +69,6 @@ spec:
         enabled: true
         storageClass: "ceph-block"
         size: 2Gi
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                - key: node-role.kubernetes.io/rook-osd-node
-                  operator: DoesNotExist
-                - key: kubernetes.io/arch
-                  operator: In
-                  values: 
-                    - amd64
 
     storegateway:
       enabled: true
@@ -126,17 +82,6 @@ spec:
         enabled: true
         storageClass: "ceph-block"
         size: 1Gi
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                - key: node-role.kubernetes.io/rook-osd-node
-                  operator: DoesNotExist
-                - key: kubernetes.io/arch
-                  operator: In
-                  values: 
-                    - amd64
 
     ruler:
       enabled: true
@@ -161,31 +106,8 @@ spec:
           memory: 128M
         limits:
           memory: 256M
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                - key: node-role.kubernetes.io/rook-osd-node
-                  operator: DoesNotExist
-                - key: kubernetes.io/arch
-                  operator: In
-                  values: 
-                    - amd64
 
     metrics:
       enabled: true
       serviceMonitor:
         enabled: true
-
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-              - key: node-role.kubernetes.io/rook-osd-node
-                operator: DoesNotExist
-              - key: kubernetes.io/arch
-                operator: In
-                values: 
-                  - amd64
