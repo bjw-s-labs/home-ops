@@ -19,9 +19,14 @@ spec:
     remediation:
       retries: 3
   upgrade:
+    crds: CreateReplace
     cleanupOnFail: true
     remediation:
       retries: 3
+      strategy: uninstall
+  rollback:
+    recreate: true
+    cleanupOnFail: true
   uninstall:
     keepHistory: false
   values:

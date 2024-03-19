@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -20,9 +20,11 @@ spec:
     remediation:
       retries: 3
   upgrade:
+    crds: CreateReplace
     cleanupOnFail: true
     remediation:
       retries: 3
+      strategy: uninstall
   uninstall:
     keepHistory: false
   values:
@@ -31,7 +33,7 @@ spec:
       fullnameOverride: *app
 
     controllers:
-      main:
+      hyperhdr:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
@@ -45,27 +47,32 @@ spec:
                 "ips": ["10.10.100.13/24"]
               }]
           securityContext:
-            runAsUser: 0
-            runAsGroup: 100
-            fsGroup: 100
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GID}
+            runAsNonRoot: false               # Must be run as root user or it fails to start
+            fsGroup: ${APP_GID}
+            fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 34
-              - 100
-              - 568
-            fsGroupChangePolicy: "OnRootMismatch"
-          hostAliases:
-            - ip: "10.200.1.50"
-              hostnames:
-                - "home.${INGRESS_DOMAIN}"
 
         containers:
-          main:
+          app:
             image:
               repository: nocturno/hyper-hdr
               tag: "18.0.0.0"
               pullPolicy: IfNotPresent
             env:
               TZ: "${TIMEZONE}"
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 memory: "1024M"
@@ -73,12 +80,11 @@ spec:
                 memory: "6000M"
 
     service:
-      main:
+      app:
         type: LoadBalancer
         annotations:
           traefik.ingress.kubernetes.io/service.serversscheme: https
         io.cilium/lb-ipam-ips: "${LB_HYPERHDR}"
-        # loadBalancerIP: ${LB_HYPERHDR}
         ports:
           http:
             port: 8090
@@ -90,10 +96,10 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: hyperhdr-config-cluster-2
+        existingClaim: ${VOLSYNC_CLAIM}
 
     ingress:
-      main:
+      app:
         enabled: true
         className: "traefik"
         annotations:
@@ -109,13 +115,13 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
           - host: &host "hyperhdr.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - secretName: tls.hyperhdr

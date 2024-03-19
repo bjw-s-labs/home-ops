@@ -21,9 +21,14 @@ spec:
     remediation:
       retries: 3
   upgrade:
+    crds: CreateReplace
     cleanupOnFail: true
     remediation:
       retries: 3
+      strategy: uninstall
+  rollback:
+    recreate: true
+    cleanupOnFail: true
   uninstall:
     keepHistory: false
   values:
@@ -36,11 +41,11 @@ spec:
           securityContext:
             runAsUser: ${APP_UID}
             runAsGroup: ${APP_GID}
+            runAsNonRoot: true
             fsGroup: ${APP_GID}
+            fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 34
-              - ${APP_GID}
-            fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
           app:

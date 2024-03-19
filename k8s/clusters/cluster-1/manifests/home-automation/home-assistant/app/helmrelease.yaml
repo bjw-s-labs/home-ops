@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.1
       interval: 15m
       sourceRef:
         kind: HelmRepository
@@ -20,9 +20,11 @@ spec:
     remediation:
       retries: 3
   upgrade:
+    crds: CreateReplace
     cleanupOnFail: true
     remediation:
       retries: 3
+      strategy: uninstall
   uninstall:
     keepHistory: false
   values:
@@ -30,7 +32,7 @@ spec:
       nameOverride: *app
 
     controllers:
-      main:
+      home-assistant:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
@@ -45,21 +47,16 @@ spec:
             # k8s.v1.cni.cncf.io/networks: home-automation-iot-dhcp
             secret.reloader.stakater.com/reload: home-assistant-secrets
           securityContext:
-            runAsUser: 568
-            runAsGroup: 100
-            fsGroup: 100
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GID}
+            runAsNonRoot: true
+            fsGroup: ${APP_GID}
+            fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 34
-              - 100
-              - 568
-            fsGroupChangePolicy: "OnRootMismatch"
-          hostAliases:
-            - ip: "10.200.1.50"
-              hostnames:
-                - "home.${INGRESS_DOMAIN}"
 
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/onedr0p/home-assistant
               tag: 2024.3.1@sha256:2a5531471db90664df50d4aec488f340a74a1f18de6dd2a4a7c53335ad9b6e0e
@@ -73,6 +70,16 @@ spec:
             envFrom:
               - secretRef:
                   name: home-assistant-secrets
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 memory: "512M"
@@ -80,11 +87,10 @@ spec:
                 memory: "6000M"
 
     service:
-      main:
+      app:
         type: LoadBalancer
         annotations:
           io.cilium/lb-ipam-ips: "${LB_HASS}"
-        # loadBalancerIP: "${LB_HASS}"
         externalTrafficPolicy: Cluster
         ports:
           http:
@@ -103,13 +109,13 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: home-assistant-config-cluster-2
+        existingClaim: ${VOLSYNC_CLAIM}
       backup:
         enabled: true
         existingClaim: ceph-filesystem-backups-home-automation
         advancedMounts:
-          main:
-            main:
+          home-assistant:
+            app:
                 # HASS backups to lowercase folder
               - path: /config/backups
                 subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/home-assistant
@@ -117,12 +123,12 @@ spec:
         enabled: true
         type: emptyDir
         advancedMounts:
-          main:
-            main:
+          home-assistant:
+            app:
               - path: /data
 
     ingress:
-      main:
+      app:
         enabled: true
         className: "traefik"
         annotations:
@@ -138,13 +144,13 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
           - host: &host "home.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - secretName: tls.home-assistant-frontend

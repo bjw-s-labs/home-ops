@@ -11,12 +11,28 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.1
       interval: 15m
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      strategy: uninstall
+  rollback:
+    recreate: true
+    cleanupOnFail: true
+  uninstall:
+    keepHistory: false
   values:
     global:
       nameOverride: *app
@@ -26,7 +42,7 @@ spec:
         google.feature.node.kubernetes.io/coral: "true"
 
     controllers:
-      main:
+      frigate:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
@@ -39,14 +55,9 @@ spec:
             - 100
           # - 568
           fsGroupChangePolicy: "OnRootMismatch"
-          hostAliases:
-            - ip: "10.200.1.50"
-              hostnames:
-                - "plex.${INGRESS_DOMAIN}"
-                - "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
 
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/blakeblackshear/frigate
               tag: 0.13.0-rc1
@@ -108,7 +119,7 @@ spec:
                   periodSeconds: 10
 
     service:
-      main:
+      app:
         type: LoadBalancer
         annotations:
           io.cilium/lb-ipam-ips: "${LB_FRIGATE}"
@@ -134,14 +145,14 @@ spec:
         type: configMap
         name: frigate-config
         advancedMounts:
-          main:
-            main:
+          frigate:
+            app:
               - path: /config/config.yml
                 subPath: config.yaml
         readOnly: true
       data:
         enabled: true
-        existingClaim: frigate-config-cluster-2
+        existingClaim: ${VOLSYNC_CLAIM}
       media:
         enabled: true
         existingClaim: ceph-filesystem-security-home-automation
@@ -151,8 +162,8 @@ spec:
         hostPath: /dev/bus/usb
         hostPathType: Directory
         advancedMounts:
-          main:
-            main:
+          frigate:
+            app:
               - path: /dev/bus/usb
       cache:
         enabled: true
@@ -160,12 +171,12 @@ spec:
         medium: Memory
         sizeLimit: 2Gi
         advancedMounts:
-          main:
-            main:
+          frigate:
+            app:
               - path: /dev/shm
 
     ingress:
-      main:
+      app:
         enabled: true
         className: "traefik"
         annotations:
@@ -181,13 +192,13 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
           - host: *host-cluster
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - secretName: tls.frigate

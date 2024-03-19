@@ -21,9 +21,14 @@ spec:
     remediation:
       retries: 3
   upgrade:
+    crds: CreateReplace
     cleanupOnFail: true
     remediation:
       retries: 3
+      strategy: uninstall
+  rollback:
+    recreate: true
+    cleanupOnFail: true
   uninstall:
     keepHistory: false
   values:
@@ -51,13 +56,13 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           securityContext:
-            runAsUser: 568
-            runAsGroup: 100   # was 568 before app template upgrade
-            fsGroup: 100
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GID}
+            runAsNonRoot: true
+            fsGroup: ${APP_GID}
+            fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 34
-              - 100
-            fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
           app:
@@ -97,7 +102,7 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: sonarr-config-cluster-2
+        existingClaim: ${VOLSYNC_CLAIM}
       tv:
         enabled: true
         existingClaim: cephfs-hdd-downloads-tv

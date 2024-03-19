@@ -2,13 +2,13 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
-  name: esphome
+  name: &app esphome
 spec:
   interval: 15m
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.1
       interval: 15m
       sourceRef:
         kind: HelmRepository
@@ -20,14 +20,19 @@ spec:
     remediation:
       retries: 3
   upgrade:
+    crds: CreateReplace
     cleanupOnFail: true
     remediation:
       retries: 3
+      strategy: uninstall
+  rollback:
+    recreate: true
+    cleanupOnFail: true
   uninstall:
     keepHistory: false
   values:
     controllers:
-      main:
+      esphome:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
@@ -42,7 +47,7 @@ spec:
               }]
 
         containers:
-          main:
+          app:
             image:
               repository: esphome/esphome
               tag: 2024.2.2
@@ -54,6 +59,16 @@ spec:
               ESPHOME__PORT: &port 6052
               ESPHOME__APPLICATION_URL: &host-cluster "esphome.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
               ESPHOME__LOG_LEVEL: info
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 memory: "256M"
@@ -61,11 +76,11 @@ spec:
                 memory: "8G"
 
     service:
-      main:
+      app:
+        controller: *app
         type: LoadBalancer
         annotations:
           io.cilium/lb-ipam-ips: "${LB_ESPHOME}"
-          # loadBalancerIP: "${LB_ESPHOME}"
         externalTrafficPolicy: Cluster
         ports:
           http:
@@ -74,10 +89,10 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: esphome-config-cluster-2
+        existingClaim: ${VOLSYNC_CLAIM}
 
     ingress:
-      main:
+      app:
         enabled: true
         className: "traefik"
         annotations:
@@ -93,13 +108,13 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
           - host: &host "esphome.${INGRESS_DOMAIN}"
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - secretName: tls.esphome
