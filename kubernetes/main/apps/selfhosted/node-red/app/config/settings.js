@@ -16,7 +16,7 @@ module.exports = {
         authorizationURL: "https://auth.bjw-s.dev/api/oidc/authorization",
         tokenURL: "https://auth.bjw-s.dev/api/oidc/token",
         userInfoURL: "https://auth.bjw-s.dev/api/oidc/userinfo",
-        clientID: "nodered",
+        clientID: process.env.NODE_RED_OAUTH_CLIENT_ID,
         clientSecret: process.env.NODE_RED_OAUTH_CLIENT_SECRET,
         callbackURL: "https://nodered.bjw-s.dev/auth/strategy/callback",
         scope: ["email", "profile", "openid"],

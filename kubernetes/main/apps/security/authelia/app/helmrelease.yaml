@@ -22,7 +22,6 @@ spec:
         strategy: RollingUpdate
 
         annotations:
-          configmap.reloader.stakater.com/reload: authelia-configmap
           secret.reloader.stakater.com/reload: authelia-secret,authelia-db-secret,authelia-redis-secret
 
         pod:
@@ -59,8 +58,6 @@ spec:
               X_AUTHELIA_CONFIG: /config/configuration.yaml
               X_AUTHELIA_CONFIG_FILTERS: expand-env
             envFrom:
-              - secretRef:
-                  name: authelia-secret
               - secretRef:
                   name: authelia-db-secret
             probes:
@@ -129,8 +126,8 @@ spec:
 
     persistence:
       config:
-        type: configMap
-        name: authelia-configmap
+        type: secret
+        name: authelia-secret
         globalMounts:
           - path: /config/configuration.yaml
             subPath: configuration.yaml
