@@ -22,11 +22,12 @@ spec:
         strategy: RollingUpdate
 
         annotations:
-          secret.reloader.stakater.com/reload: authelia-secret,authelia-db-secret,authelia-redis-secret
+          secret.reloader.stakater.com/reload: authelia-secret,authelia-db-secret
 
         pod:
           labels:
             db.home.arpa/pg: postgres
+            db.home.arpa/dragonfly: dragonfly
             egress.home.arpa/internet: allow
             egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
             ingress.home.arpa/nginx-external: allow
