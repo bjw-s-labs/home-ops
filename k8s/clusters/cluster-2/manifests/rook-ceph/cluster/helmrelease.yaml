@@ -51,13 +51,6 @@ spec:
     toolbox:
       enabled: true
       image: quay.io/ceph/ceph:v18.2.2
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node-role.kubernetes.io/rook-osd-node
-                operator: DoesNotExist
     configOverride: |
       [global]
       bdev_enable_discard = true
@@ -111,13 +104,13 @@ spec:
         multiClusterService:
           enabled: false
       placement:
-        mon:
-          nodeAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              nodeSelectorTerms:
-                - matchExpressions:
-                  - key: node-role.kubernetes.io/rook-mon-node
-                    operator: Exist
+        # mon:
+        #   nodeAffinity:
+        #     requiredDuringSchedulingIgnoredDuringExecution:
+        #       nodeSelectorTerms:
+        #         - matchExpressions:
+        #           - key: node-role.kubernetes.io/rook-mon-node
+        #             operator: Exist
         prepareosd: 
           tolerations:
           - key: storage-node
@@ -297,12 +290,7 @@ spec:
                             - rook-ceph-mds
                     # topologyKey: kubernetes.io/hostname will place MDS across different hosts
                     topologyKey: kubernetes.io/hostname
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                      - key: node-role.kubernetes.io/rook-osd-node
-                        operator: DoesNotExist
+
             resources:
               requests:
                 cpu: 100m
@@ -366,12 +354,6 @@ spec:
                             - rook-ceph-rgw
                     # topologyKey: kubernetes.io/hostname will place RGW across different hosts
                     topologyKey: kubernetes.io/hostname
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                      - key: node-role.kubernetes.io/rook-osd-node
-                        operator: DoesNotExist
           healthCheck:
             bucket:
               interval: 60s
