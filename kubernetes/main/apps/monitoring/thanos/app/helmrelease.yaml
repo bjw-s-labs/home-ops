@@ -37,11 +37,19 @@ spec:
 
     queryFrontend:
       enabled: true
+      networkPolicy.enabled: true
+      podLabels:
+        db.home.arpa/dragonfly: "dragonfly"
       ingress:
         enabled: true
         hostname: "thanos.bjw-s.dev"
         ingressClassName: "internal-nginx"
         tls: true
+      config: &config |-
+        type: REDIS
+        config:
+          addr: dragonfly.database.svc.cluster.local:6379
+          db: 2
 
     bucketweb:
       enabled: true
@@ -69,6 +77,10 @@ spec:
 
     storegateway:
       enabled: true
+      networkPolicy.enabled: true
+      config: *config
+      podLabels:
+        db.home.arpa/dragonfly: "dragonfly"
       resources:
         requests:
           cpu: 23m
