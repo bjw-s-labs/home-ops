@@ -9,134 +9,106 @@ spec:
   chart:
     spec:
       chart: thanos
-      version: 14.0.2
+      version: 1.16.1
       sourceRef:
         kind: HelmRepository
-        name: bitnami
+        name: stevehipwell
         namespace: flux-system
       interval: 30m
-  values:
-    objstoreConfig:
-      type: s3
-      config:
-        insecure: true
-
-    query:
-      enabled: true
-      dnsDiscovery:
-        sidecarsService: kube-prometheus-stack-thanos-discovery
-        sidecarsNamespace: monitoring
-      stores:
-        - thanos-svc-nas.bjw-s.dev:10901
-      replicaLabels:
-        - "__replica__" # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.replicaExternalLabelName`
-      resources:
-        requests:
-          cpu: 15m
-          memory: 64M
-
-    queryFrontend:
-      enabled: true
-      networkPolicy.enabled: true
-      podLabels:
-        db.home.arpa/dragonfly: "dragonfly"
-      ingress:
-        enabled: true
-        hostname: "thanos.bjw-s.dev"
-        ingressClassName: "internal-nginx"
-        tls: true
-      config: &config |-
-        type: REDIS
-        config:
-          addr: dragonfly.database.svc.cluster.local:6379
-          db: 2
-
-    bucketweb:
-      enabled: true
-      resources:
-        requests:
-          cpu: 15m
-          memory: 64M
-
-    compactor:
-      enabled: true
-      extraFlags:
-        - "--compact.concurrency=4"
-        - --delete-delay=30m
-      retentionResolutionRaw: 14d
-      retentionResolution5m: 30d
-      retentionResolution1h: 90d
-      resources:
-        requests:
-          cpu: 15m
-          memory: 204M
-      persistence:
-        enabled: true
-        storageClass: "openebs-hostpath"
-        size: 15Gi
-
-    storegateway:
-      enabled: true
-      networkPolicy.enabled: true
-      config: *config
-      podLabels:
-        db.home.arpa/dragonfly: "dragonfly"
-      resources:
-        requests:
-          cpu: 23m
-          memory: 204M
-      persistence:
-        enabled: true
-        storageClass: "openebs-hostpath"
-        size: 1Gi
-
-    ruler:
-      enabled: true
-      alertmanagers:
-        - http://alertmanager.monitoring.svc.cluster.local:9093
-      clusterName: ${CLUSTER_NAME} # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.externalLabels.cluster`
-      config: |-
-        groups:
-          - name: "PrometheusWatcher"
-            rules:
-              - alert: "PrometheusDown"
-                expr: absent(up{job="kube-prometheus-stack-prometheus"})
-      dnsDiscovery:
-        enabled: true
-      persistence:
-        enabled: true
-        storageClass: "openebs-hostpath"
-        size: 512Mi
-      resources:
-        requests:
-          cpu: 23m
-          memory: 128M
-        limits:
-          memory: 256M
-
-    metrics:
-      enabled: true
-      serviceMonitor:
-        enabled: true
-
   valuesFrom:
-    - targetPath: objstoreConfig.config.bucket
+    - targetPath: objstoreConfig.value.config.bucket
       kind: Secret
       name: thanos-secret
       valuesKey: S3_BUCKET
-    - targetPath: objstoreConfig.config.endpoint
+    - targetPath: objstoreConfig.value.config.endpoint
       kind: Secret
       name: thanos-secret
       valuesKey: S3_HOST
-    - targetPath: objstoreConfig.config.region
+    - targetPath: objstoreConfig.value.config.region
       kind: Secret
       name: thanos-secret
       valuesKey: S3_REGION
-    - targetPath: objstoreConfig.config.access_key
+    - targetPath: objstoreConfig.value.config.access_key
       kind: Secret
       name: thanos-secret
       valuesKey: S3_ACCESS_KEY
-    - targetPath: objstoreConfig.config.secret_key
+    - targetPath: objstoreConfig.value.config.secret_key
       kind: Secret
       name: thanos-secret
       valuesKey: S3_SECRET_KEY
+  values:
+    objstoreConfig:
+      value:
+        type: s3
+        config:
+          insecure: true
+    additionalEndpoints:
+      - dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery.monitoring.svc.cluster.local
+    additionalReplicaLabels: ["__replica__"]
+    serviceMonitor:
+      enabled: true
+    compact:
+      enabled: true
+      extraArgs:
+        - --compact.concurrency=4
+        - --delete-delay=30m
+        - --retention.resolution-raw=14d
+        - --retention.resolution-5m=30d
+        - --retention.resolution-1h=60d
+      persistence:
+        enabled: true
+        storageClass: openebs-hostpath
+        size: 15Gi
+    query:
+      replicas: 2
+      additionalStores:
+        - thanos-svc-nas.bjw-s.dev:10901
+      extraArgs:
+        - --alert.query-url=http://thanos.bjw-s.dev
+    queryFrontend:
+      enabled: true
+      replicas: 2
+      podAnnotations:
+        configmap.reloader.stakater.com/reload: thanos-cache-configmap
+      ingress:
+        enabled: true
+        ingressClassName: internal-nginx
+        hosts:
+          - &queryFrontendhost thanos.bjw-s.dev
+        tls:
+          - hosts:
+              - *queryFrontendhost
+    rule:
+      enabled: true
+      replicas: 2
+      extraArgs: ["--web.prefix-header=X-Forwarded-Prefix"]
+      alertmanagersConfig:
+        value: |-
+          alertmanagers:
+            - api_version: v2
+              static_configs:
+                - dnssrv+_http-web._tcp.alertmanager-operated.monitoring.svc.cluster.local
+      rules:
+        value: |-
+          groups:
+            - name: PrometheusWatcher
+              rules:
+                - alert: PrometheusDown
+                  annotations:
+                    summary: A Prometheus has disappeared from Prometheus target discovery
+                  expr: absent(up{job="kube-prometheus-stack-prometheus"})
+                  for: 5m
+                  labels:
+                    severity: critical
+      persistence:
+        enabled: true
+        storageClass: openebs-hostpath
+        size: 15Gi
+    storeGateway:
+      replicas: 2
+      podAnnotations:
+        configmap.reloader.stakater.com/reload: thanos-cache-configmap
+      persistence:
+        enabled: true
+        storageClass: openebs-hostpath
+        size: 15Gi
