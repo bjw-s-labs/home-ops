@@ -280,7 +280,7 @@ spec:
           - access: proxy
             name: Prometheus
             type: prometheus
-            url: http://thanos-query.monitoring:9090
+            url: http://thanos-query.monitoring.svc.luster.local:10902
             isDefault: true
             jsonData:
               prometheusType: Thanos
@@ -289,13 +289,6 @@ spec:
             name: Loki
             type: loki
             url: http://loki-gateway.monitoring.svc.cluster.local:80
-          - access: proxy
-            name: Quickwit
-            type: quickwit-quickwit-datasource
-            url: http://quickwit-searcher.monitoring.svc.cluster.local:7280/api/v1
-            jsonData:
-              index: otel-logs-v0_7
-              logMessageField: body.message
           - name: Alertmanager
             type: alertmanager
             access: proxy
