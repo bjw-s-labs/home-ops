@@ -289,6 +289,13 @@ spec:
             name: Loki
             type: loki
             url: http://loki-gateway.monitoring.svc.cluster.local:80
+          - access: proxy
+            name: Quickwit
+            type: quickwit-quickwit-datasource
+            url: http://quickwit-searcher.monitoring.svc.cluster.local:7280/api/v1
+            jsonData:
+              index: otel-logs-v0_7
+              logMessageField: body.message
           - name: Alertmanager
             type: alertmanager
             access: proxy
@@ -358,6 +365,7 @@ spec:
       - grafana-worldmap-panel
       - natel-discrete-panel
       - pr0ps-trackmap-panel
+      - https://github.com/quickwit-oss/quickwit-datasource/releases/download/v0.4.1/quickwit-quickwit-datasource-0.4.1.zip;quickwit-quickwit-datasource
       - vonage-status-panel
 
     rbac:
