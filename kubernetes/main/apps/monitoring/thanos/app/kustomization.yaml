@@ -5,4 +5,10 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
-  # - ./dashboard
+  - ./networkpolicy.yaml
+configMapGenerator:
+  - name: thanos-cache-configmap
+    files:
+      - cache.yaml=./config/cache.yaml
+generatorOptions:
+  disableNameSuffixHash: true
