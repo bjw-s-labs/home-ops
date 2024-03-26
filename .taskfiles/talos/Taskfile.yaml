@@ -92,6 +92,7 @@ tasks:
           talhelper genurl iso \
             --env-file {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talenv.sops.yaml \
             --config-file {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talconfig.yaml \
+          | grep "https://" \
           | head -n 1 \
           | awk '{split($0,u," "); print u[2]}' \
           | sed -E 's/\/metal-amd64.iso//'
