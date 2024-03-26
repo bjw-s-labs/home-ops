@@ -49,6 +49,10 @@ spec:
       enabled: true
     compact:
       enabled: true
+      podLabels:
+        prom.home.arpa/kps: allow
+        egress.home.arpa/minio: allow
+        egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
       extraArgs:
         - --compact.concurrency=4
         - --delete-delay=30m
@@ -60,6 +64,12 @@ spec:
         storageClass: openebs-hostpath
         size: 15Gi
     query:
+      podLabels:
+        db.home.arpa/dragonfly: "dragonfly"
+        prom.home.arpa/kps: allow
+        egress.home.arpa/lan: allow
+        egress.home.arpa/minio: allow
+        egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
       replicas: 2
       additionalStores:
         - thanos-svc-nas.bjw-s.dev:10901
@@ -68,6 +78,19 @@ spec:
     queryFrontend:
       enabled: true
       replicas: 2
+      extraEnv:
+        - name: THANOS_CACHE_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              name: thanos-cache-configmap
+              key: cache.yaml
+      extraArgs:
+        - --query-range.response-cache-config=$(THANOS_CACHE_CONFIG)
+      podLabels:
+        db.home.arpa/dragonfly: "dragonfly"
+        prom.home.arpa/kps: allow
+        ingress.home.arpa/nginx-internal: allow
+        egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
       podAnnotations:
         configmap.reloader.stakater.com/reload: thanos-cache-configmap
       ingress:
@@ -81,6 +104,9 @@ spec:
     rule:
       enabled: true
       replicas: 2
+      podLabels:
+        prom.home.arpa/kps: allow
+        egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
       extraArgs: ["--web.prefix-header=X-Forwarded-Prefix"]
       alertmanagersConfig:
         value: |-
@@ -106,6 +132,19 @@ spec:
         size: 15Gi
     storeGateway:
       replicas: 2
+      extraEnv:
+        - name: THANOS_CACHE_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              name: &configMap thanos-cache-configmap
+              key: cache.yaml
+      extraArgs:
+        - --index-cache.config=$(THANOS_CACHE_CONFIG)
+      podLabels:
+        db.home.arpa/dragonfly: "dragonfly"
+        prom.home.arpa/kps: allow
+        egress.home.arpa/minio: allow
+        egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
       podAnnotations:
         configmap.reloader.stakater.com/reload: thanos-cache-configmap
       persistence:
