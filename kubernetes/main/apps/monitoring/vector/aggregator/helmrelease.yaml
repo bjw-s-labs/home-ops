@@ -18,8 +18,8 @@ spec:
   values:
     controllers:
       vector-aggregator:
-        replicas: 1
-        strategy: Recreate
+        replicas: 2
+        strategy: RollingUpdate
 
         annotations:
           reloader.stakater.com/auto: "true"
@@ -40,12 +40,9 @@ spec:
               tag: v6.1
               pullPolicy: IfNotPresent
             env:
-              - name: GEOIPUPDATE_EDITION_IDS
-                value: GeoLite2-City
-              - name: GEOIPUPDATE_FREQUENCY
-                value: "0"
-              - name: GEOIPUPDATE_VERBOSE
-                value: "true"
+              GEOIPUPDATE_EDITION_IDS: GeoLite2-City
+              GEOIPUPDATE_FREQUENCY: "0"
+              GEOIPUPDATE_VERBOSE: "true"
             envFrom:
               - secretRef:
                   name: vector-aggregator-secret
@@ -53,8 +50,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/onedr0p/vector
-              tag: 0.34.1-debian
+              repository: docker.io/timberio/vector
+              tag: 0.36.1-alpine
             args:
               - "--config"
               - "/etc/vector/vector.yaml"
