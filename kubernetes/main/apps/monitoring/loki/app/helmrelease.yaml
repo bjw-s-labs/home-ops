@@ -17,7 +17,12 @@ spec:
         namespace: flux-system
       interval: 30m
   values:
+    deploymentMode: SimpleScalable
+
     loki:
+      ingester:
+        chunk_encoding: snappy
+
       schemaConfig:
         configs:
           - from: "2024-04-01"
@@ -45,9 +50,6 @@ spec:
           grpc_server_max_recv_msg_size: 8388608
           grpc_server_max_send_msg_size: 8388608
 
-        memberlist:
-          join_members: ["loki-memberlist"]
-
         limits_config:
           ingestion_burst_size_mb: 128
           ingestion_rate_mb: 64
@@ -67,13 +69,6 @@ spec:
         frontend:
           max_outstanding_per_tenant: 4096
 
-        common:
-          path_prefix: /var/loki
-          replication_factor: 3
-          ring:
-            kvstore:
-              store: memberlist
-
         ruler:
           enable_api: true
           enable_alertmanager_v2: true
@@ -83,21 +78,6 @@ spec:
             local:
               directory: /rules
           rule_path: /rules
-          ring:
-            kvstore:
-              store: memberlist
-
-        distributor:
-          ring:
-            kvstore:
-              store: memberlist
-
-        ingester:
-          max_chunk_age: 1h
-          lifecycler:
-            ring:
-              kvstore:
-                store: memberlist
 
         analytics:
           reporting_enabled: false
@@ -165,7 +145,15 @@ spec:
     - kind: Secret
       name: loki-secret
       valuesKey: S3_BUCKET_NAME
-      targetPath: loki.storage.bucketnames
+      targetPath: loki.storage.bucketnames.chunks
+    - kind: Secret
+      name: loki-secret
+      valuesKey: S3_BUCKET_NAME
+      targetPath: loki.storage.bucketnames.ruler
+    - kind: Secret
+      name: loki-secret
+      valuesKey: S3_BUCKET_NAME
+      targetPath: loki.storage.bucketnames.admin
     - kind: Secret
       name: loki-secret
       valuesKey: S3_BUCKET_HOST
