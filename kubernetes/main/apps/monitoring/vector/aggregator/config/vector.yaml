@@ -6,7 +6,7 @@ api:
   address: 0.0.0.0:8686
 
 enrichment_tables:
-  geoip_table:
+  mmdb:
     type: geoip
     path: /usr/share/GeoIP/GeoLite2-City.mmdb
 
@@ -86,7 +86,7 @@ transforms:
       - vyos_firewall_wan_route.from_wan
     source: |
       .geoip = get_enrichment_table_record!(
-          "geoip_table", {
+          "mmdb", {
               "ip": .message.SRC
           }
       )
