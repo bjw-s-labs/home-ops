@@ -28,17 +28,17 @@ spec:
             egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
             ingress.home.arpa/nginx-internal: allow
           securityContext:
-            runAsUser: 568
-            runAsGroup: 568
+            runAsUser: 2000
+            runAsGroup: 2000
             runAsNonRoot: true
-            fsGroup: 568
+            fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
 
         containers:
           app:
             image:
               repository: ghcr.io/onedr0p/prowlarr-nightly
-              tag: 1.16.0.4401@sha256:c4c2aa360b9766873594dff1a3fef5f1c0e2e9c591d53c1a974858de353ac37c
+              tag: 1.16.1.4404@sha256:23fac9c142bb1a30f30b13afd1ec06ceefd7488ff7e416cd729c3fd3a84ddb0d
             env:
               COMPlus_EnableDiagnostics: "0"
               PROWLARR__INSTANCE_NAME: Prowlarr
