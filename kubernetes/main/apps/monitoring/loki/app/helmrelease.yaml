@@ -18,6 +18,22 @@ spec:
       interval: 30m
   values:
     loki:
+      schemaConfig:
+        configs:
+          - from: "2024-04-01"
+            store: tsdb
+            object_store: s3
+            schema: v13
+            index:
+              prefix: loki_index_
+              period: 24h
+
+      storage:
+        type: s3
+        s3:
+          s3ForcePathStyle: true
+          insecure: true
+
       structuredConfig:
         auth_enabled: false
 
@@ -51,24 +67,9 @@ spec:
         frontend:
           max_outstanding_per_tenant: 4096
 
-        schema_config:
-          configs:
-            - from: "2024-01-01"
-              store: boltdb-shipper
-              object_store: s3
-              schema: v13
-              index:
-                prefix: loki_index_
-                period: 24h
-
         common:
           path_prefix: /var/loki
           replication_factor: 3
-          storage:
-            s3:
-              s3: null
-              insecure: true
-              s3forcepathstyle: true
           ring:
             kvstore:
               store: memberlist
@@ -90,14 +91,6 @@ spec:
           ring:
             kvstore:
               store: memberlist
-
-        compactor:
-          working_directory: /var/loki/boltdb-shipper-compactor
-          shared_store: s3
-          compaction_interval: 10m
-          retention_enabled: true
-          retention_delete_delay: 2h
-          retention_delete_worker_count: 150
 
         ingester:
           max_chunk_age: 1h
@@ -161,8 +154,10 @@ spec:
         enabled: false
         grafanaAgent:
           installOperator: false
-      lokiCanary:
-        enabled: false
+
+    lokiCanary:
+      enabled: false
+
     test:
       enabled: false
 
@@ -170,20 +165,20 @@ spec:
     - kind: Secret
       name: loki-secret
       valuesKey: S3_BUCKET_NAME
-      targetPath: loki.structuredConfig.common.storage.s3.bucketnames
+      targetPath: loki.storage.bucketnames
     - kind: Secret
       name: loki-secret
       valuesKey: S3_BUCKET_HOST
-      targetPath: loki.structuredConfig.common.storage.s3.endpoint
+      targetPath: loki.storage.s3.endpoint
     - kind: Secret
       name: loki-secret
       valuesKey: S3_BUCKET_REGION
-      targetPath: loki.structuredConfig.common.storage.s3.region
+      targetPath: loki.storage.s3.region
     - kind: Secret
       name: loki-secret
       valuesKey: S3_ACCESS_KEY
-      targetPath: loki.structuredConfig.common.storage.s3.access_key_id
+      targetPath: loki.storage.s3.access_key_id
     - kind: Secret
       name: loki-secret
       valuesKey: S3_SECRET_KEY
-      targetPath: loki.structuredConfig.common.storage.s3.secret_access_key
+      targetPath: loki.storage.s3.secret_access_key
