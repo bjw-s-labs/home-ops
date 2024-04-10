@@ -289,14 +289,6 @@ spec:
             name: Loki
             type: loki
             url: http://loki-gateway.monitoring.svc.cluster.local:80
-          - access: proxy
-            name: Parseable
-            type: parseable-parseable-datasource
-            url: http://parseable.monitoring.svc.cluster.local:8000
-            basicAuth: true
-            basicAuthUser: parseable
-            secureJsonData:
-              basicAuthPassword: parseable
           - name: Alertmanager
             type: alertmanager
             access: proxy
@@ -367,7 +359,6 @@ spec:
       - natel-discrete-panel
       - pr0ps-trackmap-panel
       - vonage-status-panel
-      - https://grafana.com/api/plugins/parseable-parseable-datasource/versions/1.1.0/download;parseable-parseable-datasource
 
     rbac:
       pspEnabled: false
