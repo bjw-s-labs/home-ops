@@ -59,6 +59,11 @@ spec:
         enable_api: true
         enable_alertmanager_v2: true
         alertmanager_url: http://alertmanager.monitoring.svc.cluster.local:9093
+        storage:
+          type: local
+          local:
+            directory: /rules
+        rule_path: /rules/fake
 
       schemaConfig:
         configs:
@@ -149,6 +154,13 @@ spec:
         enabled: false
         grafanaAgent:
           installOperator: false
+
+    sidecar:
+      image:
+        repository: ghcr.io/kiwigrid/k8s-sidecar
+      rules:
+        searchNamespace: ALL
+        folder: /rules/fake
 
     lokiCanary:
       enabled: false
