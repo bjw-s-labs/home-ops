@@ -35,18 +35,31 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/onedr0p/tautulli
-              tag: 2.13.4@sha256:633a57b2f8634feb67811064ec3fa52f40a70641be927fdfda6f5d91ebbd5d73
+              repository: ghcr.io/tautulli/tautulli
+              tag: v2.13.4
+            command:
+              - /usr/local/bin/python
+              - Tautulli.py
+            args:
+              - --config
+              - /config/config.ini
+              - --datadir
+              - /config
+              - --port
+              - "8181"
             probes:
-              liveness:
+              liveness: &probes
                 enabled: true
-              readiness:
-                enabled: true
-              startup:
-                enabled: true
+                custom: true
                 spec:
-                  failureThreshold: 30
-                  periodSeconds: 5
+                  httpGet:
+                    path: /status
+                    port: 8181
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
             resources:
               requests:
                 cpu: 5m
