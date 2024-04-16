@@ -1,0 +1,28 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: snapshot-controller-webhook-selfsign
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: snapshot-controller-webhook-ca
+spec:
+  secretName: snapshot-controller-webhook-ca
+  duration: 43800h # 5y
+  issuerRef:
+    name: snapshot-controller-webhook-selfsign
+    kind: Issuer
+  commonName: "ca.k8s-ycl.cert-manager"
+  isCA: true
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: snapshot-controller-webhook-ca
+spec:
+  ca:
+    secretName: snapshot-controller-webhook-ca
