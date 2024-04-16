@@ -21,6 +21,9 @@ spec:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists
         effect: NoSchedule
+      - key: storage-node
+        operator: Exists
+        effect: "NoSchedule"
       containers:
         - name: ubuntu
           image: ubuntu
