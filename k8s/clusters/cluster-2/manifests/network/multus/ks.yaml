@@ -3,9 +3,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: 
+  name: &appname multus
   namespace: flux-system
 spec:
+  targetNamespace: network
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   path: ./k8s/clusters/cluster-2/manifests/network/multus/app
   prune: true
 #   dependsOn:
@@ -26,16 +30,25 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: multus-components
+  name: &appname multus-components
   namespace: flux-system
 spec:
+  targetNamespace: network
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   path: ./k8s/clusters/cluster-2/manifests/network/multus/components
   prune: true
-#   dependsOn:
-#     - name: network-namespace
+  dependsOn:
+    - name: multus
   sourceRef:
     kind: GitRepository
     name: home-ops
+#   healthChecks:
+#     - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+#       kind: HelmRelease
+#       name: multus
+#       namespace: network
   interval: 30m
   retryInterval: 1m
   timeout: 3m
