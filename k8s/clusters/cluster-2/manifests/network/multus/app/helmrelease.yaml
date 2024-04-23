@@ -16,9 +16,7 @@ spec:
       interval: 30m
   values:
     image:
-      # Has arm builds
-      repository: ghcr.io/fishgrimsby/multus-cni
-      # repository: ghcr.io/k8snetworkplumbingwg/multus-cni
+      repository: ghcr.io/k8snetworkplumbingwg/multus-cni
       tag: v4.0.2-thick
 
     cni:
@@ -39,3 +37,8 @@ spec:
 
     hostPaths:
       netns: /var/run/netns
+
+    # Mutlus does not work with ARM devices
+    nodeSelector:
+      kubernetes.io/arch: amd64
+      kubernetes.io/os: linux
