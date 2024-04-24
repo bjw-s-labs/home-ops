@@ -4,7 +4,7 @@ clusterName: ${clusterName}
 endpoint: "https://${clusterEndpointIP}:6443"
 
 # renovate: depName=ghcr.io/siderolabs/installer datasource=docker extractVersion=^(?<version>.*)$
-talosVersion: v1.6.7
+talosVersion: v1.7.0
 # renovate: depName=kubernetes/kubernetes datasource=github-releases extractVersion=^v(?<version>.*)$
 kubernetesVersion: 1.29.3
 
@@ -110,6 +110,8 @@ nodes:
 controlPlane:
   schematic:
     customization:
+      extraKernelArgs:
+        - net.ifnames=1
       systemExtensions:
         officialExtensions:
           - siderolabs/intel-ucode
@@ -127,7 +129,7 @@ controlPlane:
       machine:
         network:
           nameservers:
-            - 10.5.0.4
+            - 10.1.1.11
 
     # Configure NTP
     - |-
@@ -198,7 +200,6 @@ controlPlane:
       machine:
         kubelet:
           extraArgs:
-            feature-gates: GracefulNodeShutdown=true,NewVolumeManagerReconstruction=false
             rotate-server-certificates: "true"
           extraConfig:
             maxPods: 150
