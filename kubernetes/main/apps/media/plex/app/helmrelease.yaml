@@ -45,7 +45,7 @@ spec:
               repository: ghcr.io/onedr0p/plex
               tag: 1.40.2.8395-c67dce28e@sha256:a2a3149c1326e7777bfe9def135c687d884652f78d34e92264b0dab765908215
             env:
-              PLEX_ADVERTISE_URL: https://10.45.0.20:32400,https://plex.bjw-s.dev:443
+              PLEX_ADVERTISE_URL: https://10.1.1.136:32400,https://plex.bjw-s.dev:443
               PLEX_NO_AUTH_NETWORKS: 10.244.0.0/16
             probes:
               liveness:
@@ -72,7 +72,7 @@ spec:
         type: LoadBalancer
         externalTrafficPolicy: Cluster
         annotations:
-          io.cilium/lb-ipam-ips: "10.45.0.20"
+          io.cilium/lb-ipam-ips: 10.1.1.136
         ports:
           http:
             port: 32400
