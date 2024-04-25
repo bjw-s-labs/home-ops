@@ -39,13 +39,13 @@ spec:
       logLevel: 4
       kubeletDirPath: /var/lib/kubelet
       enableCSIHostNetwork: true
-      pluginTolerations:
-        - effect: "NoExecute"
-          operator: "Exists"
-        - effect: "NoSchedule"
-          operator: "Exists"
-      # provisionerNodeAffinity: "node-role.kubernetes.io/rook-mgr-node=true"
-      # pluginNodeAffinity: "node-role.kubernetes.io/rook-mgr-node=true"
+      # pluginTolerations:
+      #   - effect: "NoExecute"
+      #     operator: "Exists"
+      #   - effect: "NoSchedule"
+      #     operator: "Exists"
+      provisionerNodeAffinity: "node-role.kubernetes.io/rook-mgr-node=true"
+      pluginNodeAffinity: "node-role.kubernetes.io/rook-mgr-node=true"
     monitoring:
       enabled: true
 
