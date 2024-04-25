@@ -38,8 +38,8 @@ nodes:
         vip:
           ip: ${clusterEndpointIP}
         vlans:
-          - &vlan40
-            vlanId: 40
+          - &vlan303
+            vlanId: 303
             mtu: 1500
             dhcp: true
             dhcpOptions:
@@ -78,7 +78,7 @@ nodes:
         vip:
           ip: ${clusterEndpointIP}
         vlans:
-          - *vlan40
+          - *vlan303
     patches:
       - *kubelet_extra_mounts
 
@@ -103,7 +103,7 @@ nodes:
         vip:
           ip: ${clusterEndpointIP}
         vlans:
-          - *vlan40
+          - *vlan303
     patches:
       - *kubelet_extra_mounts
 
@@ -137,7 +137,7 @@ controlPlane:
         time:
           disabled: false
           servers:
-            - 10.1.1.1
+            - time.cloudflare.com
 
     # Enable KubePrism
     - |-
