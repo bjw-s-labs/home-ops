@@ -10,7 +10,6 @@ on:
     paths:
       - .github/workflows/flux-ks-sync.yaml
       - kubernetes/main/**
-      - kubernetes/nas/**
 
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}
@@ -26,7 +25,6 @@ jobs:
       matrix:
         cluster:
           - main
-          - nas
     steps:
       - name: Install Flux
         uses: fluxcd/flux2/action@main
