@@ -272,17 +272,17 @@ spec:
           metadataServer:
             activeCount: 1
             activeStandby: true
-            # placement:
-            #   podAntiAffinity:
-            #     requiredDuringSchedulingIgnoredDuringExecution:
-            #       - labelSelector:
-            #           matchExpressions:
-            #             - key: app
-            #               operator: In
-            #               values:
-            #                 - rook-ceph-mds
-            #         # topologyKey: kubernetes.io/hostname will place MDS across different hosts
-            #         topologyKey: kubernetes.io/hostname
+            placement:
+              podAntiAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  - labelSelector:
+                      matchExpressions:
+                        - key: app
+                          operator: In
+                          values:
+                            - rook-ceph-mds
+                    # topologyKey: kubernetes.io/hostname will place MDS across different hosts
+                    topologyKey: kubernetes.io/hostname
 
             resources:
               requests:
@@ -336,17 +336,17 @@ spec:
               limits:
                 memory: 2Gi
             instances: 1
-            # placement:
-            #   podAntiAffinity:
-            #     requiredDuringSchedulingIgnoredDuringExecution:
-            #       - labelSelector:
-            #           matchExpressions:
-            #             - key: app
-            #               operator: In
-            #               values:
-            #                 - rook-ceph-rgw
-            #         # topologyKey: kubernetes.io/hostname will place RGW across different hosts
-            #         topologyKey: kubernetes.io/hostname
+            placement:
+              podAntiAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  - labelSelector:
+                      matchExpressions:
+                        - key: app
+                          operator: In
+                          values:
+                            - rook-ceph-rgw
+                    # topologyKey: kubernetes.io/hostname will place RGW across different hosts
+                    topologyKey: kubernetes.io/hostname
           healthCheck:
             bucket:
               interval: 60s
