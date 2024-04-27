@@ -1,0 +1,26 @@
+---
+apiVersion: monitoring.giantswarm.io/v1alpha1
+kind: Silence
+metadata:
+  name: cephnodediskspacewarning-nfs
+spec:
+  matchers:
+    - name: alertname
+      value: CephNodeDiskspaceWarning
+      isRegex: false
+    - name: mountpoint
+      value: /etc/nfsmount.conf
+      isRegex: false
+---
+apiVersion: monitoring.giantswarm.io/v1alpha1
+kind: Silence
+metadata:
+  name: cephnodediskspacewarning-local
+spec:
+  matchers:
+    - name: alertname
+      value: CephNodeDiskspaceWarning
+      isRegex: false
+    - name: device
+      value: /dev/sda6
+      isRegex: false

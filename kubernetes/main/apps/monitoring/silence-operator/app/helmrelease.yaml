@@ -1,0 +1,100 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: silence-operator
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.1.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    configMaps:
+      config:
+        enabled: true
+        data:
+          config.yml: |
+            server:
+              enable:
+                debug:
+                  server: true
+              listen:
+                address: 'http://0.0.0.0:8000'
+            service:
+              alertmanager:
+                address: http://alertmanager.monitoring.svc.cluster.local:9093
+              kubernetes:
+                address: ''
+                inCluster: true
+                tls:
+                  caFile: ''
+                  crtFile: ''
+                  keyFile: ''
+
+    controllers:
+      silence-operator:
+        pod:
+          securityContext:
+            runAsGroup: 1000
+            runAsUser: 1000
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+
+        containers:
+          app:
+            image:
+              repository: quay.io/giantswarm/silence-operator
+              tag: 0.11.2
+            args:
+              - daemon
+              - --config.dirs=/var/run/silence-operator/configmap/
+              - --config.files=config
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: &port 8000
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - "ALL"
+              seccompProfile:
+                type: RuntimeDefault
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        identifier: config
+        globalMounts:
+          - path: /var/run/silence-operator/configmap
+
+    serviceAccount:
+      create: true
+      name: silence-operator
