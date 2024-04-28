@@ -24,12 +24,6 @@ spec:
           reloader.stakater.com/auto: "true"
 
         pod:
-          labels:
-            egress.home.arpa/internet: allow
-            db.home.arpa/pg: postgres
-            egress.home.arpa/nginx-external: allow
-            ingress.home.arpa/nginx-external: allow
-            egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
           securityContext:
             runAsUser: 2000
             runAsGroup: 2000

@@ -22,12 +22,6 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
-          labels:
-            db.home.arpa/dragonfly: "dragonfly"
-            ingress.home.arpa/nginx-internal: allow
-            egress.home.arpa/nginx-external: allow
-            egress.home.arpa/world: allow
-            egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
           securityContext:
             supplementalGroups:
               - 65542 # gladius:external-services

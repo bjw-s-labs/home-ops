@@ -22,9 +22,6 @@ spec:
     controllers:
       dragonfly-operator:
         pod:
-          labels:
-            egress.home.arpa/apiserver: allow
-            egress.home.arpa/kubedns: allow # TODO: Remove when clusterNetworkPolicy is in place
           topologySpreadConstraints:
             - maxSkew: 1
               topologyKey: kubernetes.io/hostname
