@@ -44,7 +44,7 @@ jobs:
         shell: bash
         run: |
           flux \
-            --context "${{ matrix.cluster }}" \
+            --context "flux@${{ matrix.cluster }}" \
             --namespace flux-system \
             reconcile ks cluster \
             --with-source
