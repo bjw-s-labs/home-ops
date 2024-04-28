@@ -26,15 +26,9 @@ spec:
 
     cainjector:
       enabled: true
-      podLabels:
-        egress.home.arpa/apiserver: allow
-        egress.home.arpa/kubedns: allow # TODO: Remove when clusterNetworkPolicy is in place
 
     webhook:
       enabled: true
-      podLabels:
-        egress.home.arpa/apiserver: allow
-        egress.home.arpa/kubedns: allow # TODO: Remove when clusterNetworkPolicy is in place
 
     extraArgs:
       - --dns01-recursive-nameservers=1.1.1.1:53,9.9.9.9:53
@@ -48,11 +42,6 @@ spec:
       nameservers:
         - "1.1.1.1"
         - "9.9.9.9"
-    podLabels:
-      prom.home.arpa/kps: allow
-      egress.home.arpa/apiserver: allow
-      egress.home.arpa/world: allow
-      egress.home.arpa/kubedns: allow # TODO: Remove when clusterNetworkPolicy is in place
 
     prometheus:
       enabled: true

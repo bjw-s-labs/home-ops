@@ -26,9 +26,6 @@ spec:
           reloader.stakater.com/auto: "true"
 
         pod:
-          labels:
-            egress.home.arpa/internet: allow
-            egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
           topologySpreadConstraints:
             - maxSkew: 1
               topologyKey: kubernetes.io/hostname

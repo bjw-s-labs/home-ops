@@ -36,9 +36,6 @@ spec:
       metadata:
         labels:
           app.kubernetes.io/name: arc-assets-listener
-          egress.home.arpa/world: allow
-          egress.home.arpa/apiserver: allow
-          egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
       spec:
         containers: []
 
@@ -46,8 +43,6 @@ spec:
       metadata:
         labels:
           app.kubernetes.io/name: arc-assets-runner
-          egress.home.arpa/world: allow
-          egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
       spec:
         containers:
           - name: runner

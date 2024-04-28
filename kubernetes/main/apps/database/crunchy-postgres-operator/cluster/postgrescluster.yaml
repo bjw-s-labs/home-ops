@@ -32,10 +32,6 @@ spec:
       metadata:
         labels:
           app.kubernetes.io/name: crunchy-postgres
-          ingress.home.arpa/lan: allow
-          egress.home.arpa/apiserver: allow
-          egress.home.arpa/minio: allow
-          egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
       replicas: &replica 3
       dataVolumeClaimSpec:
         storageClassName: openebs-hostpath
@@ -149,9 +145,6 @@ spec:
       metadata:
         labels:
           app.kubernetes.io/name: crunchy-postgres-backup
-          egress.home.arpa/apiserver: allow
-          egress.home.arpa/minio: allow
-          egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
       repos:
         - name: repo1 # Minio
           s3: &minio
@@ -179,7 +172,6 @@ spec:
       metadata:
         labels:
           app.kubernetes.io/name: crunchy-postgres-pgbouncer
-          egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
       config:
         global:
           pool_mode: "transaction" # pgBouncer is set to transaction for Authentik. Grafana requires session https://github.com/grafana/grafana/issues/74260#issuecomment-1702795311. Everything else is happy with transaction

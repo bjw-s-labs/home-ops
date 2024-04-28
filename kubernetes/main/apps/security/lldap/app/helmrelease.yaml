@@ -25,10 +25,6 @@ spec:
           secret.reloader.stakater.com/reload: lldap-secret, lldap-db-secret
 
         pod:
-          labels:
-            db.home.arpa/pg: postgres
-            egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
-            ingress.home.arpa/nginx-internal: allow
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000

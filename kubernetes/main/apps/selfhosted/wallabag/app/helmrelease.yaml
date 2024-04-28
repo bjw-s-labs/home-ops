@@ -24,13 +24,6 @@ spec:
 
         strategy: RollingUpdate
 
-        pod:
-          labels:
-            ingress.home.arpa/nginx-external: allow
-            egress.home.arpa/internet: allow
-            db.home.arpa/pg: postgres
-            egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
-
         containers:
           app:
             image:
