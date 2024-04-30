@@ -35,21 +35,21 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/onedr0p/sonarr
-              tag: 4.0.4.1491@sha256:9c78b3a37af6e814062e4a631c25ad181c800ae11d21acdfd26c843da9e4a42e
+              repository: ghcr.io/onedr0p/sonarr-develop
+              tag: 4.0.4.1572@sha256:d81502f65a47f88525c90a9eb933e5f92bb608b1910f0c63aeff5c723340be97
             env:
               COMPlus_EnableDiagnostics: "0"
-              SONARR__INSTANCE_NAME: Sonarr
-              SONARR__PORT: &port 8989
-              SONARR__AUTHENTICATION_METHOD: External
-              SONARR__AUTHENTICATION_REQUIRED: DisabledForLocalAddresses
-              SONARR__APPLICATION_URL: "https://sonarr.bjw-s.dev"
-              SONARR__LOG_LEVEL: info
-              SONARR__API_KEY:
+              SONARR__APP__INSTANCENAME: Sonarr
+              SONARR__AUTH__APIKEY:
                 valueFrom:
                   secretKeyRef:
                     name: sonarr-secret
                     key: api_key
+              SONARR__AUTH__METHOD: External
+              SONARR__AUTH__REQUIRED: DisabledForLocalAddresses
+              SONARR__LOG__LEVEL: info
+              SONARR__SERVER__PORT: &port 8989
+              SONARR__UPDATE__BRANCH: develop
             probes:
               liveness:
                 enabled: true
