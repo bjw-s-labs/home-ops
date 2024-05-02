@@ -30,7 +30,7 @@ spec:
         # Duration to keep metrics
         retentionPeriod: "2" # this is months unless a character prefix is added (1d, 1w, etc)
         extraArgs:
-          dedup.minScrapeInterval: "60s"
+          dedup.minScrapeInterval: 30s
         replicationFactor: 3
         # Storage backend
         vmstorage:
@@ -51,8 +51,7 @@ spec:
                 matchLabels:
                   app.kubernetes.io/name: vmstorage
           extraArgs:
-            dedup.minScrapeInterval: 60s
-            search.maxConcurrentRequests: "6"
+            dedup.minScrapeInterval: 30s
           storage:
             volumeClaimTemplate:
               spec:
@@ -79,10 +78,9 @@ spec:
                   app.kubernetes.io/name: vmselect
           cacheMountPath: /select-cache
           extraArgs:
-            dedup.minScrapeInterval: "60s" # should be equal to VMAgent's scrapeInterval (default 30s)
-            search.minStalenessInterval: "5m"
-            search.maxConcurrentRequests: "6"
-            vmalert.proxyURL: https://vmalert.bjw-s.dev
+            dedup.minScrapeInterval: 30s
+            search.minStalenessInterval: 5m
+            vmalert.proxyURL: http://vmalert-victoria-metrics:8080
           storage:
             volumeClaimTemplate:
               spec:
@@ -109,7 +107,6 @@ spec:
                   app.kubernetes.io/name: vminsert
           extraArgs:
             maxLabelsPerTimeseries: "90" # More needed if you are scraping a LOT of stuff and having issues
-            # insert.maxConcurrentRequests: 10
 
     # VM Alerting (however, this just watches & passes alerts to alertmanager)
     vmalert:
@@ -130,7 +127,6 @@ spec:
             labelSelector:
               matchLabels:
                 app.kubernetes.io/name: vmalert
-        evaluationInterval: "60s"
         notifiers:
           - url: http://alertmanager.monitoring.svc.cluster.local:9093
       ingress:
@@ -148,6 +144,9 @@ spec:
       spec:
         replicaCount: 1
         shardCount: 2
+        scrapeInterval: 30s
+        externalLabels:
+          cluster: "main"
         resources:
           requests:
             cpu: 50m
@@ -162,7 +161,6 @@ spec:
             labelSelector:
               matchLabels:
                 app.kubernetes.io/name: vmagent
-
         additionalScrapeConfigs:
           name: vm-additional-scrape-configs
           key: prometheus-additional.yaml
