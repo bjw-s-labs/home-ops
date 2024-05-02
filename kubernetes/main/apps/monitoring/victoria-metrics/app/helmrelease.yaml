@@ -43,6 +43,13 @@ spec:
             limits:
               cpu: 500m
               memory: 1536Mi
+          topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: vmstorage
           extraArgs:
             dedup.minScrapeInterval: 60s
             search.maxConcurrentRequests: "6"
@@ -63,6 +70,13 @@ spec:
             limits:
               cpu: 750m
               memory: 256Mi
+          topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: vmselect
           cacheMountPath: /select-cache
           extraArgs:
             dedup.minScrapeInterval: "60s" # should be equal to VMAgent's scrapeInterval (default 30s)
@@ -86,6 +100,13 @@ spec:
             limits:
               cpu: 500m
               memory: 256Mi
+          topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: vminsert
           extraArgs:
             maxLabelsPerTimeseries: "90" # More needed if you are scraping a LOT of stuff and having issues
             # insert.maxConcurrentRequests: 10
@@ -102,6 +123,13 @@ spec:
           limits:
             cpu: 100m
             memory: 256Mi
+        topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: vmalert
         evaluationInterval: "60s"
         notifiers:
           - url: http://alertmanager.monitoring.svc.cluster.local:9093
@@ -127,6 +155,14 @@ spec:
           limits:
             cpu: 400m
             memory: 512Mi
+        topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: vmagent
+
         additionalScrapeConfigs:
           name: vm-additional-scrape-configs
           key: prometheus-additional.yaml
