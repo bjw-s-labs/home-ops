@@ -7,13 +7,13 @@ tasks:
     desc: Bootstrap Talos
     summary: |
       Args:
-        cluster: Cluster to run command against (required)
+        cluster: Cluster to run command against (default: main)
         controller: Controller node to run command against (required)
     prompt: Bootstrap Talos on the '{{.cluster}}' cluster... continue?
     cmds:
       - task: bootstrap-etcd
         vars: &vars
-          cluster: "{{.cluster}}"
+          cluster: '{{.cluster | default "main"}}'
           controller: "{{.controller}}"
       - task: fetch-kubeconfig
         vars: *vars
@@ -21,7 +21,6 @@ tasks:
         vars: *vars
     requires:
       vars:
-        - cluster
         - controller
 
   bootstrap-etcd:

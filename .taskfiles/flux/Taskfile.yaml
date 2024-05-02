@@ -11,8 +11,9 @@ tasks:
     desc: Bootstrap Flux into a Kubernetes cluster
     summary: |
       Args:
-        cluster: Cluster to run command against (required)
-    # prompt: Bootstrap Flux into the '{{.cluster}}' cluster... continue?
+        cluster: Cluster to run command against (default: main)
+    vars:
+      cluster: '{{.cluster | default "main"}}'
     cmds:
       # Install essential Prometheus Operator CRDs
       - kubectl --context {{.cluster}} apply --server-side --filename https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/{{.PROMETHEUS_OPERATOR_VERSION}}/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
@@ -38,16 +39,13 @@ tasks:
       - sops --decrypt {{.KUBERNETES_DIR}}/{{.cluster}}/flux/vars/cluster-secrets.sops.yaml
       - kustomize build {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/flux
       - kustomize build {{.KUBERNETES_DIR}}/{{.cluster}}/flux/config
-    requires:
-      vars:
-        - cluster
 
   apply:
     desc: Apply a Flux Kustomization resource for a cluster
     summary: |
       Args:
-        cluster: Cluster to run command against (required)
         path: Path to the Flux Kustomization resource (required)
+        cluster: Cluster to run command against (default: main)
         name: Name of the Flux Kustomization to apply (default: last segment of <path> variable)
         ns: Namespace the Flux Kustomization exists in (default: flux-system)
     cmds:
@@ -62,7 +60,7 @@ tasks:
     vars:
       kustomization_path: "{{.KUBERNETES_DIR}}/{{.cluster}}/apps/{{.path}}"
       kustomization_file: "{{.kustomization_path}}/ks.yaml"
-      cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
+      cluster: '{{.cluster | default "main"}}'
       path: '{{ or .path (fail "Argument (path) is required") }}'
       ks_name: '{{ .name | default (splitList "/" .path | last) }}'
       ns: '{{.ns | default "flux-system"}}'
