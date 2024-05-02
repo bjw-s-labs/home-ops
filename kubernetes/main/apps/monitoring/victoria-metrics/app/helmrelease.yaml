@@ -30,7 +30,7 @@ spec:
         # Duration to keep metrics
         retentionPeriod: "2" # this is months unless a character prefix is added (1d, 1w, etc)
         extraArgs:
-          dedup.minScrapeInterval: 30s
+          dedup.minScrapeInterval: 60s
         replicationFactor: 3
         # Storage backend
         vmstorage:
@@ -51,7 +51,7 @@ spec:
                 matchLabels:
                   app.kubernetes.io/name: vmstorage
           extraArgs:
-            dedup.minScrapeInterval: 30s
+            dedup.minScrapeInterval: 60s
           storage:
             volumeClaimTemplate:
               spec:
@@ -78,7 +78,7 @@ spec:
                   app.kubernetes.io/name: vmselect
           cacheMountPath: /select-cache
           extraArgs:
-            dedup.minScrapeInterval: 30s
+            dedup.minScrapeInterval: 60s
             search.minStalenessInterval: 5m
             vmalert.proxyURL: http://vmalert-victoria-metrics:8080
           storage:
@@ -144,7 +144,7 @@ spec:
       spec:
         replicaCount: 1
         shardCount: 2
-        scrapeInterval: 30s
+        scrapeInterval: 60s
         resources:
           requests:
             cpu: 50m
