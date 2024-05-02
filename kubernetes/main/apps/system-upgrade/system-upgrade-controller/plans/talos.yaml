@@ -14,8 +14,6 @@ spec:
   exclusive: true
   nodeSelector:
     matchExpressions:
-      - key: apple.feature.node.kubernetes.io/t2
-        operator: Exists
       - key: feature.node.kubernetes.io/system-os_release.ID
         operator: In
         values:
@@ -46,6 +44,6 @@ spec:
     args:
       - --nodes=$(NODE_IP)
       - upgrade
-      - --image=ghcr.io/buroa/installer:$(SYSTEM_UPGRADE_PLAN_LATEST_VERSION)
+      - --image=factory.talos.dev/installer/665020c0ef83ef66fd7df6df98eed9a34fc4c13b0b824b3c04b633cf3794a4c5:$(SYSTEM_UPGRADE_PLAN_LATEST_VERSION)
       - --preserve=true
       - --wait=false
