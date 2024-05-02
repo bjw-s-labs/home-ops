@@ -133,42 +133,11 @@ spec:
 
     # Single-binary vm cluster alternative (liteweight, non-HA)
     vmsingle:
-      enabled: false
+      enabled: &vmSingleEnabled false
 
     # Extra slack templates
     monzoTemplate:
       enabled: false
-
-    # Prepared sets of default rules
-    # Adjust to what scraping functions you have enabled
-    # i.e. if you dont have kubeapisever setup & enabled, disable
-    #   the kubeApiserver rules below
-    defaultRules:
-      create: true
-      rules:
-        etcd: false
-        general: true
-        k8s: true
-        kubeApiserver: true
-        kubeApiserverAvailability: true
-        kubeApiserverBurnrate: true
-        kubeApiserverHistogram: true
-        kubeApiserverSlos: true
-        kubelet: true
-        kubePrometheusGeneral: true
-        kubePrometheusNodeRecording: true
-        kubernetesApps: true
-        kubernetesResources: true
-        kubernetesStorage: true
-        kubernetesSystem: true
-        kubeScheduler: false
-        kubeStateMetrics: true
-        network: true
-        node: true
-        vmagent: true
-        vmsingle: true
-        vmhealth: true
-        alertmanager: &alertManagerEnabled false
 
     # Add Kubelet scrape
     kubelet:
@@ -207,7 +176,7 @@ spec:
 
     # Add kubeEtcd scrape
     kubeEtcd:
-      enabled: false
+      enabled: &kubeEtcdEnabled false
 
     # Enable deployment of kube state metrics contianers
     kube-state-metrics:
@@ -224,4 +193,35 @@ spec:
 
     # Enable deployment of alertmanager
     alertmanager:
-      enabled: *alertManagerEnabled
+      enabled: &alertManagerEnabled false
+
+    # Prepared sets of default rules
+    # Adjust to what scraping functions you have enabled
+    # i.e. if you dont have kubeapisever setup & enabled, disable
+    #   the kubeApiserver rules below
+    defaultRules:
+      create: true
+      rules:
+        etcd: *kubeEtcdEnabled
+        general: true
+        k8s: true
+        kubeApiserver: true
+        kubeApiserverAvailability: true
+        kubeApiserverBurnrate: true
+        kubeApiserverHistogram: true
+        kubeApiserverSlos: true
+        kubelet: true
+        kubePrometheusGeneral: true
+        kubePrometheusNodeRecording: true
+        kubernetesApps: true
+        kubernetesResources: true
+        kubernetesStorage: true
+        kubernetesSystem: true
+        kubeScheduler: false
+        kubeStateMetrics: true
+        network: true
+        node: true
+        vmagent: true
+        vmsingle: *vmSingleEnabled
+        vmhealth: true
+        alertmanager: *alertManagerEnabled
