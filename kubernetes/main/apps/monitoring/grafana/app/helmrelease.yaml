@@ -67,14 +67,6 @@ spec:
             editable: true
             options:
               path: /var/lib/grafana/dashboards/nginx
-          - name: thanos
-            orgId: 1
-            folder: Thanos
-            type: file
-            disableDeletion: false
-            editable: true
-            options:
-              path: /var/lib/grafana/dashboards/thanos
           - name: unpoller
             disableDeletion: false
             editable: true
@@ -86,15 +78,15 @@ spec:
 
     dashboards:
       default:
-        blocky:
-          # renovate: dashboardName="blocky"
-          gnetId: 13768
-          revision: 3
-          datasource:
-            - name: "DS_PROMETHEUS"
-              value: Prometheus
-            - name: "VAR_BLOCKY_URL"
-              value: 'http:\\/\\/10.1.1.11:4000'
+        # blocky:
+        #   # renovate: dashboardName="blocky"
+        #   gnetId: 13768
+        #   revision: 3
+        #   datasource:
+        #     - name: "DS_PROMETHEUS"
+        #       value: Prometheus
+        #     - name: "VAR_BLOCKY_URL"
+        #       value: 'http:\\/\\/10.1.1.11:4000'
 
         cert-manager:
           url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/cert-manager/dashboards/cert-manager.json
@@ -210,35 +202,6 @@ spec:
           url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/request-handling-performance.json
           datasource: Prometheus
 
-      thanos:
-        thanos-bucket-replicate:
-          url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/thanos/dashboards/bucket-replicate.json
-          datasource: Prometheus
-        thanos-compact:
-          url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/thanos/dashboards/compact.json
-          datasource: Prometheus
-        thanos-overview:
-          url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/thanos/dashboards/overview.json
-          datasource: Prometheus
-        thanos-query:
-          url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/thanos/dashboards/query.json
-          datasource: Prometheus
-        thanos-query-frontend:
-          url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/thanos/dashboards/query-frontend.json
-          datasource: Prometheus
-        thanos-receieve:
-          url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/thanos/dashboards/receive.json
-          datasource: Prometheus
-        thanos-rule:
-          url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/thanos/dashboards/rule.json
-          datasource: Prometheus
-        thanos-sidecar:
-          url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/thanos/dashboards/sidecar.json
-          datasource: Prometheus
-        thanos-store:
-          url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/thanos/dashboards/store.json
-          datasource: Prometheus
-
       unpoller:
         unifi-insights:
           # renovate: dashboardName="UniFi-Poller: Client Insights - Prometheus"
@@ -272,11 +235,10 @@ spec:
           - access: proxy
             name: Prometheus
             type: prometheus
-            url: http://thanos-query-frontend.monitoring.svc.cluster.local:10902
+            url: http://vmselect-victoria-metrics.monitoring.svc.cluster.local:8481/select/0/prometheus
             isDefault: true
             jsonData:
-              prometheusType: Thanos
-              timeInterval: 1m
+              prometheusType: Prometheus
           - access: proxy
             name: Loki
             type: loki
@@ -287,12 +249,15 @@ spec:
             url: http://alertmanager.monitoring.svc.cluster.local:9093
             jsonData:
               implementation: prometheus
+
         deleteDatasources:
           - name: Alertmanager
             orgId: 1
           - name: Prometheus
             orgId: 1
           - name: Loki
+            orgId: 1
+          - name: Victoria-Metrics
             orgId: 1
 
     env:
