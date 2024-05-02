@@ -3,7 +3,7 @@
 version: "3"
 
 rook-task-vars: &task-vars
-  cluster: "{{.cluster}}"
+  cluster: '{{.cluster | default "main"}}'
   node: "{{.node}}"
   ceph_disk: "{{.ceph_disk}}"
   ts: "{{.ts}}"
@@ -64,7 +64,7 @@ tasks:
       - kubectl --context {{.cluster}} -n default logs job/{{.wipeCephDiskJobName}} --container list
       - kubectl --context {{.cluster}} -n default delete job {{.wipeCephDiskJobName}}
     vars:
-      cluster: '{{ or .cluster (fail "`cluster` is required") }}'
+      cluster: '{{.cluster | default "main"}}'
       node: '{{ or .node (fail "`node` is required") }}'
       ceph_disk: '{{ or .ceph_disk (fail "`ceph_disk` is required") }}'
       jobName: "wipe-disk-{{- .node -}}"
@@ -85,7 +85,7 @@ tasks:
       - kubectl --context {{.cluster}} -n default logs job/{{.wipeRookDataJobName}} --container list
       - kubectl --context {{.cluster}} -n default delete job {{.wipeRookDataJobName}}
     vars:
-      cluster: '{{ or .cluster (fail "`cluster` is required") }}'
+      cluster: '{{.cluster | default "main"}}'
       node: '{{ or .node (fail "`node` is required") }}'
       jobName: "wipe-rook-data-{{- .node -}}"
       wipeRookDataJobTemplate: "WipeRookDataJob.tmpl.yaml"

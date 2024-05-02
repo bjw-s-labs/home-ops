@@ -28,7 +28,7 @@ tasks:
     desc: List all snapshots
     summary: |
       Args:
-        cluster: Cluster to run command against (required)
+        cluster: Cluster to run command against (default: main)
         ns: Namespace the PVC is in (default: default)
         app: Application to list snapshots for (required)
     cmds:
@@ -38,7 +38,7 @@ tasks:
       - kubectl --context {{.cluster}} -n {{.ns}} logs job/{{.app}}-list-snapshots-{{.ts}} --container list
       - kubectl --context {{.cluster}} -n {{.ns}} delete job {{.app}}-list-snapshots-{{.ts}}
     vars:
-      cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
+      cluster: '{{.cluster | default "main"}}'
       app: '{{ or .app (fail "Argument (app) is required") }}'
       ns: '{{.ns | default "default"}}'
     env: *env
@@ -53,7 +53,7 @@ tasks:
     desc: Unlock a Restic repository
     summary: |
       Args:
-        cluster: Cluster to run command against (required)
+        cluster: Cluster to run command against (default: main)
         ns: Namespace the PVC is in (default: default)
         app: Application to list snapshots for (required)
     cmds:
@@ -64,7 +64,7 @@ tasks:
       - kubectl --context {{.cluster}} -n {{.ns}} logs job/{{.app}}-unlock-snapshots-{{.ts}} --container unlock-r2
       - kubectl --context {{.cluster}} -n {{.ns}} delete job {{.app}}-unlock-snapshots-{{.ts}}
     vars:
-      cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
+      cluster: '{{.cluster | default "main"}}'
       app: '{{ or .app (fail "Argument (app) is required") }}'
       ns: '{{.ns | default "default"}}'
     env: *env
@@ -81,7 +81,7 @@ tasks:
     desc: Trigger a Restic ReplicationSource snapshot
     summary: |
       Args:
-        cluster: Cluster to run command against (required)
+        cluster: Cluster to run command against (default: main)
         ns: Namespace the PVC is in (default: default)
         app: Application to list snapshots for (required)
     cmds:
@@ -93,7 +93,7 @@ tasks:
       - bash {{.scriptsDir}}/wait-for-k8s-job.sh volsync-src-{{.app}} {{.ns}} {{.cluster}}
       - kubectl --context {{.cluster}} -n {{.ns}} wait job/volsync-src-{{.app}} --for condition=complete --timeout=120m
     vars:
-      cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
+      cluster: '{{.cluster | default "main"}}'
       app: '{{ or .app (fail "Argument (app) is required") }}'
       ns: '{{.ns | default "default"}}'
       # Query to find the controller associated with the app
@@ -117,7 +117,7 @@ tasks:
     desc: Trigger a Restic ReplicationSource restore
     summary: |
       Args:
-        cluster: Cluster to run command against (required)
+        cluster: Cluster to run command against (default: main)
         ns: Namespace the PVC is in (default: default)
         app: Application to list snapshots for (required)
         previous: Previous number of snapshots to restore (default: 2)
@@ -131,7 +131,7 @@ tasks:
       - task: .resume
         vars: *env
     vars:
-      cluster: '{{ or .cluster (fail "Argument (cluster) is required") }}'
+      cluster: '{{.cluster | default "main"}}'
       app: '{{ or .app (fail "Argument (app) is required") }}'
       ns: '{{.ns | default "default"}}'
       previous: "{{.previous | default 2}}"
@@ -169,7 +169,7 @@ tasks:
     silent: true
     summary: |
       Args:
-        cluster: Cluster to run command against (required)
+        cluster: Cluster to run command against (default: main)
     requires:
       vars:
         - cluster
