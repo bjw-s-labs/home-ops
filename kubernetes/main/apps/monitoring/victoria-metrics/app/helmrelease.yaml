@@ -36,6 +36,13 @@ spec:
         vmstorage:
           replicaCount: 3
           # required for HA vmagents
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1536Mi
           extraArgs:
             dedup.minScrapeInterval: 60s
             search.maxConcurrentRequests: "6"
@@ -49,6 +56,13 @@ spec:
         # Query backend
         vmselect:
           replicaCount: 2 # HA
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
           cacheMountPath: /select-cache
           extraArgs:
             dedup.minScrapeInterval: "60s" # should be equal to VMAgent's scrapeInterval (default 30s)
@@ -65,21 +79,29 @@ spec:
         # Data ingestion backend
         vminsert:
           replicaCount: 2 # HA
-          extraArgs:
-            maxLabelsPerTimeseries: "90" # More needed if you are scraping a LOT of stuff and having issues
-            # insert.maxConcurrentRequests: 10
           resources:
             requests:
               cpu: 100m
-              memory: 300Mi
+              memory: 256Mi
             limits:
-              memory: 600Mi
+              cpu: 500m
+              memory: 256Mi
+          extraArgs:
+            maxLabelsPerTimeseries: "90" # More needed if you are scraping a LOT of stuff and having issues
+            # insert.maxConcurrentRequests: 10
 
     # VM Alerting (however, this just watches & passes alerts to alertmanager)
     vmalert:
       enabled: true
       spec:
         replicaCount: 2
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 100m
+            memory: 256Mi
         evaluationInterval: "60s"
         notifiers:
           - url: http://alertmanager.monitoring.svc.cluster.local:9093
@@ -98,6 +120,13 @@ spec:
       spec:
         replicaCount: 1
         shardCount: 2
+        resources:
+          requests:
+            cpu: 50m
+            memory: 256Mi
+          limits:
+            cpu: 400m
+            memory: 512Mi
         additionalScrapeConfigs:
           name: vm-additional-scrape-configs
           key: prometheus-additional.yaml
