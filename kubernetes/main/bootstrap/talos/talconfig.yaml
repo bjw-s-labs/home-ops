@@ -3,9 +3,9 @@
 clusterName: ${clusterName}
 endpoint: "https://${clusterEndpointIP}:6443"
 
-# renovate: depName=ghcr.io/siderolabs/installer datasource=docker extractVersion=^(?<version>.*)$
+# renovate: depName=ghcr.io/siderolabs/installer datasource=docker
 talosVersion: v1.7.0
-# renovate: depName=kubernetes/kubernetes datasource=github-releases extractVersion=^v(?<version>.*)$
+# renovate: depName=ghcr.io/siderolabs/kubelet datasource=docker
 kubernetesVersion: 1.29.3
 
 cniConfig:
@@ -194,6 +194,17 @@ controlPlane:
     - |-
       - op: remove
         path: /cluster/apiServer/admissionControl
+
+    # Enable K8s Talos API Access
+    - |-
+      machine:
+        features:
+          kubernetesTalosAPIAccess:
+            enabled: true
+            allowedRoles:
+              - os:admin
+            allowedKubernetesNamespaces:
+              - system-upgrade
 
     # Kubelet configuration
     - |-
