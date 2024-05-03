@@ -118,7 +118,7 @@ spec:
             cpu: 50m
             memory: 128Mi
           limits:
-            cpu: 100m
+            cpu: 150m
             memory: 256Mi
         topologySpreadConstraints:
           - maxSkew: 1
@@ -127,6 +127,8 @@ spec:
             labelSelector:
               matchLabels:
                 app.kubernetes.io/name: vmalert
+        extraArgs:
+          external.url: https://vmalert.bjw-s.dev
         notifiers:
           - url: http://alertmanager.monitoring.svc.cluster.local:9093
       ingress:
