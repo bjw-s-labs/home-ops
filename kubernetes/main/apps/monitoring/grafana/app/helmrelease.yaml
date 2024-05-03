@@ -124,10 +124,6 @@ spec:
           revision: 36
           datasource: Prometheus
 
-        node-feature-discovery:
-          url: https://raw.githubusercontent.com/kubernetes-sigs/node-feature-discovery/master/examples/grafana-dashboard.json
-          datasource: Prometheus
-
         spegel:
           # renovate: dashboardName="Spegel"
           gnetId: 18089
@@ -311,6 +307,7 @@ spec:
       GF_AUTH_GENERIC_OAUTH_TOKEN_URL: https://auth.bjw-s.dev/api/oidc/token
       GF_AUTH_OAUTH_AUTO_LOGIN: true
       GF_DATE_FORMATS_USE_BROWSER_LOCALE: true
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /tmp/dashboards/home.json
       GF_EXPLORE_ENABLED: true
       GF_FEATURE_TOGGLES_ENABLE: publicDashboards
       GF_LOG_MODE: console
