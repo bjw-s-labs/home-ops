@@ -1,0 +1,132 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: ocis
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.1.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controllers:
+      ocis:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+            supplementalGroups:
+              - 65542 # gladius:external-services
+
+        initContainers:
+          init-config:
+            image:
+              repository: docker.io/owncloud/ocis
+              tag: 5.0.3
+            command:
+              - /bin/sh
+              - -c
+            args:
+              - "[ ! -f /etc/ocis/ocis.yaml ] && ocis init"
+            env:
+              OCIS_INSECURE: true
+
+        containers:
+          ocis:
+            image:
+              repository: docker.io/owncloud/ocis
+              tag: 5.0.3
+            env:
+              DEMO_USERS: false
+              OCIS_LOG_COLOR: true
+              OCIS_LOG_LEVEL: info
+              OCIS_LOG_PRETTY: true
+              OCIS_OIDC_ISSUER: https://auth.bjw-s.dev
+              OCIS_URL: https://files.bjw-s.dev
+              PROXY_AUTOPROVISION_ACCOUNTS: true
+              PROXY_TLS: false
+              PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD: none
+              PROXY_OIDC_REWRITE_WELLKNOWN: true
+              PROXY_ROLE_ASSIGNMENT_DRIVER: oidc
+              PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM: groups
+              PROXY_USER_OIDC_CLAIM: preferred_username
+              WEB_OIDC_CLIENT_ID: ocis
+              WEB_OIDC_METADATA_URL: https://auth.bjw-s.dev/.well-known/openid-configuration
+              WEB_OIDC_SCOPE: "openid profile email groups"
+            envFrom:
+              - secretRef:
+                  name: ocis-secret
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+
+    service:
+      app:
+        controller: ocis
+        ports:
+          http:
+            port: 9200
+
+    ingress:
+      app:
+        className: "internal-nginx"
+        hosts:
+          - host: &hostName files.bjw-s.dev
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *hostName
+
+    persistence:
+      config:
+        type: configMap
+        name: ocis-configmap
+        globalMounts:
+          - path: /etc/ocis/proxy.yaml
+            subPath: proxy.yaml
+            readOnly: true
+          - path: /etc/ocis/web.yaml
+            subPath: web.yaml
+            readOnly: true
+      data:
+        existingClaim: ocis-data
+        globalMounts:
+          - path: /var/lib/ocis
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+            subPath: tmp
+          - path: /etc/ocis
+            subPath: config
