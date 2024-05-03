@@ -30,7 +30,7 @@ spec:
         # Duration to keep metrics
         retentionPeriod: "2" # this is months unless a character prefix is added (1d, 1w, etc)
         extraArgs:
-          dedup.minScrapeInterval: 60s
+          dedup.minScrapeInterval: 30s
         replicationFactor: 3
         # Storage backend
         vmstorage:
@@ -51,7 +51,7 @@ spec:
                 matchLabels:
                   app.kubernetes.io/name: vmstorage
           extraArgs:
-            dedup.minScrapeInterval: 60s
+            dedup.minScrapeInterval: 30s
           storage:
             volumeClaimTemplate:
               spec:
@@ -78,7 +78,7 @@ spec:
                   app.kubernetes.io/name: vmselect
           cacheMountPath: /select-cache
           extraArgs:
-            dedup.minScrapeInterval: 60s
+            dedup.minScrapeInterval: 30s
             search.minStalenessInterval: 5m
             vmalert.proxyURL: http://vmalert-victoria-metrics:8080
           storage:
@@ -144,7 +144,7 @@ spec:
       spec:
         replicaCount: 1
         shardCount: 2
-        scrapeInterval: 60s
+        scrapeInterval: 30s
         resources:
           requests:
             cpu: 50m
@@ -162,59 +162,67 @@ spec:
         additionalScrapeConfigs:
           name: vm-additional-scrape-configs
           key: prometheus-additional.yaml
+      ingress:
+        enabled: true
+        ingressClassName: internal-nginx
+        hosts:
+          - &hostagent vmagent.bjw-s.dev
+        tls:
+          - hosts:
+              - *hostagent
 
     # Single-binary vm cluster alternative (liteweight, non-HA)
     vmsingle:
-      enabled: &vmSingleEnabled false
+      enabled: false
 
     # Extra slack templates
     monzoTemplate:
       enabled: false
 
-    # Add Kubelet scrape
+    # Scrape configs
     kubelet:
       enabled: true
       spec:
+        interval: 30s
+        # drop high cardinality label and useless metrics for cadvisor and kubelet
         metricRelabelConfigs:
-          # Drop high cardinality labels
           - action: labeldrop
-            regex: (uid)
+            regex: (uid|pod_uid|id)
           - action: labeldrop
-            regex: (id|name)
+            regex: (name)
           - action: drop
-            source_labels: ["__name__"]
+            source_labels: [__name__]
             regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
-
-    # Add Kubeapi scrape
+          - action: drop
+            source_labels: [__name__]
+            regex: (container_tasks_state|container_memory_failures_total)
+          - action: drop
+            source_labels: [__name__]
+            regex: (container_blkio_device_usage_total)
+          - action: drop
+            source_labels: [__name__]
+            regex: (prober_probe_duration_seconds_bucket)
+        relabelConfigs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - sourceLabels: [__metrics_path__]
+            targetLabel: metrics_path
+          - targetLabel: "job"
+            replacement: "kubelet"
     kubeApiServer:
-      enabled: true
-      spec:
-        metricRelabelConfigs:
-          # Drop high cardinality labels
-          - sourceLabels: ["__name__"]
-            regex: (apiserver|etcd|rest_client)_request(|_sli|_slo)_duration_seconds_bucket
-            action: drop
-          - sourceLabels: ["__name__"]
-            regex: (apiserver_response_sizes_bucket|apiserver_watch_events_sizes_bucket)
-            action: drop
-
-    # Add kubeControllerManager scrape
+      enabled: false
     kubeControllerManager:
       enabled: false
-
-    # Add kubeScheduler scrape
     kubeScheduler:
       enabled: false
-
-    # Add kubeEtcd scrape
     kubeEtcd:
-      enabled: &kubeEtcdEnabled false
+      enabled: false
 
-    # Enable deployment of kube state metrics contianers
+    # Enable deployment of kube-state-metrics
     kube-state-metrics:
       enabled: false
 
-    # Enable deployment of prom-note-exporter contianers
+    # Enable deployment of prometheus-node-exporter
     prometheus-node-exporter:
       enabled: false
 
@@ -225,7 +233,7 @@ spec:
 
     # Enable deployment of alertmanager
     alertmanager:
-      enabled: &alertManagerEnabled false
+      enabled: false
 
     # Prepared sets of default rules
     # Adjust to what scraping functions you have enabled
@@ -234,7 +242,7 @@ spec:
     defaultRules:
       create: true
       rules:
-        etcd: *kubeEtcdEnabled
+        etcd: false
         general: true
         k8s: true
         kubeApiserver: true
@@ -254,6 +262,6 @@ spec:
         network: true
         node: true
         vmagent: true
-        vmsingle: *vmSingleEnabled
+        vmsingle: false
         vmhealth: true
-        alertmanager: *alertManagerEnabled
+        alertmanager: false
