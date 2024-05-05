@@ -1,6 +1,6 @@
 clusterName: cluster-2
 
-talosVersion: v1.6.6
+talosVersion: v1.7.1
 kubernetesVersion: v1.29.1
 
 # Image URL rendered on https://factory.talos.dev
@@ -13,6 +13,11 @@ kubernetesVersion: v1.29.1
 #             - siderolabs/util-linux-tools
 #             # - siderolabs/nut-client
 #             # - siderolabs/stargz-snapshotter
+
+
+# Raspi Hash
+# talosImageURL:factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54:v1.7.0
+
 talosImageURL: factory.talos.dev/installer/25a0f1b6a0d9395a006be275f1dd7137ddb2105c57c5d226baae9eace262cf09
 
 endpoint: https://cluster-2.${secret_domain}:6443
@@ -33,6 +38,8 @@ clusterSvcNets:
 nodes:
     - hostname: cp1.cluster-2.${secret_domain}
       ipAddress: cp1.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
       controlPlane: true
       disableSearchDomain: true
       installDiskSelector:
@@ -52,6 +59,26 @@ nodes:
 
     - hostname: cp2.cluster-2.${secret_domain}
       ipAddress: cp2.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
+      controlPlane: true
+      disableSearchDomain: true
+      installDiskSelector:
+        type: nvme
+      nameservers:
+        - 10.0.0.4
+      networkInterfaces:
+        # 1G Internal Port
+        - deviceSelector:
+            driver: bcmgenet
+          dhcp: false
+          vlans:
+            - *vlan2002
+
+    - hostname: cp3.cluster-2.${secret_domain}
+      ipAddress: cp3.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
       controlPlane: true
       disableSearchDomain: true
       installDiskSelector:
@@ -67,31 +94,10 @@ nodes:
             - *vlan2002
 
 
-    - hostname: cp3.cluster-2.${secret_domain}
-      ipAddress: cp3.cluster-2.${secret_domain}
-      controlPlane: true
-      # Image URL rendered on https://factory.talos.dev
-      # customization:
-      #     extraKernelArgs:
-      #         - net.ifnames=0
-      #     systemExtensions:
-      #         officialExtensions:
-      #             - siderolabs/gvisor
-      #             - siderolabs/qemu-guest-agent
-      #             - siderolabs/intel-ucode    
-      talosImageURL: factory.talos.dev/installer/25a0f1b6a0d9395a006be275f1dd7137ddb2105c57c5d226baae9eace262cf09
-      disableSearchDomain: true
-      installDiskSelector:
-        size: <= 50GB
-      nameservers:
-        - 10.0.0.4
-      networkInterfaces:
-        - deviceSelector:
-            hardwareAddr: "da:82:bd:f5:37:5f"
-          dhcp: true
-
     - hostname: work1.cluster-2.${secret_domain}
       ipAddress: work1.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
@@ -125,6 +131,8 @@ nodes:
 
     - hostname: work2.cluster-2.${secret_domain}
       ipAddress: work2.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
@@ -155,6 +163,8 @@ nodes:
 
     - hostname: work3.cluster-2.${secret_domain}
       ipAddress: work3.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
@@ -185,6 +195,8 @@ nodes:
 
     - hostname: work4.cluster-2.${secret_domain}
       ipAddress: work4.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
@@ -215,6 +227,8 @@ nodes:
 
     - hostname: work5.cluster-2.${secret_domain}
       ipAddress: work5.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
@@ -245,6 +259,8 @@ nodes:
 
     - hostname: work6.cluster-2.${secret_domain}
       ipAddress: work6.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
@@ -275,6 +291,8 @@ nodes:
 
     - hostname: work7.cluster-2.${secret_domain}
       ipAddress: work7.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
@@ -305,6 +323,8 @@ nodes:
 
     - hostname: work8.cluster-2.${secret_domain}
       ipAddress: work8.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
       controlPlane: false
       disableSearchDomain: true
       nodeLabels:
@@ -335,6 +355,8 @@ nodes:
 
     - hostname: mon1.cluster-2.${secret_domain}
       ipAddress: mon1.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
       controlPlane: false
       disableSearchDomain: true
       installDiskSelector:
@@ -345,6 +367,31 @@ nodes:
         # 1G Internal Port
         - deviceSelector:
             driver: bcmgenet
+          dhcp: false
+          vlans:
+            - *vlan2002
+            - &vlan2040-noMTU
+              vlanId: 2040
+              dhcp: true
+              dhcpOptions:
+                routeMetric: 2048
+
+    - hostname: work20.cluster-2.${secret_domain}
+      ipAddress: work20.cluster-2.${secret_domain}
+      # Awok AK10 x86 Specific factory.talos.dev 
+      talosImageURL: factory.talos.dev/installer/113ad3295f062f011ee027e6e69d503a708caf7f706bcadcd2515fa3884279a8
+      controlPlane: false
+      disableSearchDomain: true
+      installDiskSelector:
+        #type: nvme
+        size: '>= 128GB'
+      nameservers:
+        - 10.0.0.4
+      networkInterfaces:
+        # 1G Internal Port
+        - deviceSelector:
+            # driver: r8169
+            hardwareAddr: "00:e0:4c:08:07:30"
           dhcp: false
           vlans:
             - *vlan2002
