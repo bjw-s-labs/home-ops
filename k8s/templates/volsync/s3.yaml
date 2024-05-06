@@ -54,10 +54,10 @@ spec:
     repository: "${APP}-volsync-secret"
     copyMethod: Snapshot # must be Snapshot
     volumeSnapshotClassName: "${VOLSYNC_SNAPSHOTCLASS:-csi-ceph-blockpool}"
-    cacheStorageClassName: "${VOLSYNC_SNAPSHOTCLASS:-ceph-blockpool-discard}"
+    cacheStorageClassName: "${VOLSYNC_SNAPSHOTCLASS:-ceph-block}"
     cacheAccessModes: ["${VOLSYNC_CACHE_ACCESSMODES:-ReadWriteOnce}"]
     cacheCapacity: "${VOLSYNC_CACHE_CAPACITY:-8Gi}"
-    storageClassName: "${VOLSYNC_STORAGECLASS:-ceph-blockpool-discard}"
+    storageClassName: "${VOLSYNC_STORAGECLASS:-ceph-block}"
     accessModes: ["${VOLSYNC_ACCESSMODES:-ReadWriteOnce}"]
     capacity: "${VOLSYNC_CAPACITY}"
     # moverSecurityContext:
