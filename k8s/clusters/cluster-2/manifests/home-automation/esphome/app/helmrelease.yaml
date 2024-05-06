@@ -74,6 +74,18 @@ spec:
               limits:
                 memory: "8G"
 
+    defaultPodOptions:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - multus
+              topologyKey: kubernetes.io/hostname
+
     service:
       app:
         controller: *app
