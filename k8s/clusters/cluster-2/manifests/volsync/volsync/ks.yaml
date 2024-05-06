@@ -6,7 +6,7 @@ metadata:
   name: &app volsync
   namespace: flux-system
 spec:
-  targetNamespace: volsync
+  targetNamespace: &namespace volsync
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
@@ -22,5 +22,5 @@ spec:
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2beta1
       kind: HelmRelease
-      name: volsync
-      namespace: volsync
+      name: *app
+      namespace: *namespace
