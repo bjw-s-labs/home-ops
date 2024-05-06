@@ -394,6 +394,12 @@ nodes:
           vlans:
             - *vlan2002
             - *vlan2040-noMTU
+            - &vlan100
+              vlanId: 100
+              dhcp: false
+              dhcpOptions:
+                routeMetric: 2048
+
 
     - hostname: n100-01.cluster-2.${secret_domain}
       ipAddress: n100-01.cluster-2.${secret_domain}
@@ -413,6 +419,7 @@ nodes:
           dhcp: false
           vlans:
             - *vlan2002
+            - *vlan100
         # Port #2
         - deviceSelector:
             busPath: 0000:03:00.0
