@@ -33,7 +33,6 @@ spec:
   values:
     controllers:
       esphome:
-        type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
@@ -91,11 +90,11 @@ spec:
       app:
         enabled: true
         className: "internal-nginx"
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
-          external-dns/is-public: "false"
-          external-dns/powerdns: "true"
+        # annotations:
+        #   cert-manager.io/cluster-issuer: letsencrypt-production
+        #   external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
+        #   external-dns/is-public: "false"
+        #   external-dns/powerdns: "true"
         hosts:
           - host: *host-cluster
             paths:
