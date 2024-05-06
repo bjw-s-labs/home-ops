@@ -4,7 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: volsync
-  namespace: volsync
 spec:
   interval: 15m
   chart:
@@ -16,12 +15,17 @@ spec:
         name: backube-charts
         namespace: flux-system
   install:
-    createNamespace: true
     remediation:
       retries: 3
   upgrade:
+    cleanupOnFail: true
     remediation:
       retries: 3
+  uninstall:
+    keepHistory: false
+  dependsOn:
+    - name: snapshot-controller
+      namespace: volsync
   values:
     manageCRDs: true
     metrics:
