@@ -123,10 +123,8 @@ spec:
             requiredDuringSchedulingIgnoredDuringExecution:
               nodeSelectorTerms:
               - matchExpressions:
-                - key: role
-                  operator: In
-                  values:
-                  - node-role.kubernetes.io/control-plane
+                - key: node-role.kubernetes.io/control-plane
+                  operator: Exists
       resources:
         mgr:
           limits:
