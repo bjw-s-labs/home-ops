@@ -35,15 +35,15 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/hostname: "ingress-int.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
           io.cilium/lb-ipam-ips: ${LB_INGRESS_INTERNAL}
-        externalTrafficPolicy: Cluster
+        # externalTrafficPolicy: Cluster
 
       publishService:
         enabled: true
 
       ingressClassResource:
-        name: internal-nginx
+        name: internal
         default: true
-        controllerValue: k8s.io/ingress-nginx-internal
+        controllerValue: k8s.io/internal
 
       admissionWebhooks:
         objectSelector:
@@ -51,7 +51,7 @@ spec:
             - key: ingress-class
               operator: In
               values:
-                - internal-nginx
+                - internal
 
       config:
         block-user-agents: "GPTBot,~*GPTBot*,ChatGPT-User,~*ChatGPT-User*,Google-Extended,~*Google-Extended*,CCBot,~*CCBot*,Omgilibot,~*Omgilibot*,FacebookBot,~*FacebookBot*" # taken from https://github.com/superseriousbusiness/gotosocial/blob/main/internal/web/robots.go
