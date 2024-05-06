@@ -114,6 +114,19 @@ spec:
           - key: storage-node
             operator: Exists
             effect: "NoSchedule"
+        mon: 
+          tolerations:
+          - key: control-plane
+            operator: Exists
+            effect: "NoSchedule"
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: role
+                  operator: In
+                  values:
+                  - control-plane
       resources:
         mgr:
           limits:
