@@ -376,30 +376,49 @@ nodes:
               dhcpOptions:
                 routeMetric: 2048
 
-    - hostname: work20.cluster-2.${secret_domain}
-      ipAddress: work20.cluster-2.${secret_domain}
-      # Awok AK10 x86 Specific factory.talos.dev 
-      talosImageURL: factory.talos.dev/installer/113ad3295f062f011ee027e6e69d503a708caf7f706bcadcd2515fa3884279a8
+    - hostname: cm4-01.cluster-2.${secret_domain}
+      ipAddress: cm4-01.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
       controlPlane: false
       disableSearchDomain: true
       installDiskSelector:
-        #type: nvme
-        size: '>= 128GB'
+        type: nvme
       nameservers:
         - 10.0.0.4
       networkInterfaces:
         # 1G Internal Port
         - deviceSelector:
-            # driver: r8169
-            hardwareAddr: "00:e0:4c:08:07:30"
+            driver: bcmgenet
           dhcp: false
           vlans:
             - *vlan2002
-            - &vlan2040-noMTU
-              vlanId: 2040
-              dhcp: true
-              dhcpOptions:
-                routeMetric: 2048
+            - *vlan2040-noMTU
+
+    - hostname: n100-01.cluster-2.${secret_domain}
+      ipAddress: n100-01.cluster-2.${secret_domain}
+      # Awok AK10 x86 Specific factory.talos.dev 
+      talosImageURL: factory.talos.dev/installer/dbe6aa7d6560b266a02d3b2eb047a55ad42041ea0e4dd24bd8fdbd23d65c48d6
+      controlPlane: false
+      disableSearchDomain: true
+      installDiskSelector:
+        # size: '>= 500GB'
+        busPath: /pci0000:00/0000:00:1d.0/0000:04:00.0/nvme/nvme0/nvme0n1
+      nameservers:
+        - 10.0.0.4
+      networkInterfaces:
+        # Port #1
+        - deviceSelector:
+            busPath: 0000:01:00.0
+          dhcp: false
+          vlans:
+            - *vlan2002
+        # Port #2
+        - deviceSelector:
+            busPath: 0000:03:00.0
+          dhcp: false
+          vlans:
+            - *vlan2040-noMTU
 
     - hostname: temp1.cluster-2.${secret_domain}
       ipAddress: temp1.cluster-2.${secret_domain}
