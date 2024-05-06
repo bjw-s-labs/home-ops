@@ -6,10 +6,10 @@ metadata:
 spec:
   accessModes: ["${VOLSYNC_ACCESSMODES:-ReadWriteOnce}"]
   dataSourceRef:
-    kind: ReplicationDestination
+    kind: ReplicationD-estination
     apiGroup: volsync.backube
     name: "${APP}-dst"
   resources:
     requests:
       storage: "${VOLSYNC_CAPACITY}"
-  storageClassName: "${VOLSYNC_STORAGECLASS:-ceph-blockpool}"
+  storageClassName: "${VOLSYNC_STORAGECLASS:-ceph-block}"
