@@ -43,9 +43,9 @@ spec:
         enabled: true
 
       ingressClassResource:
-        name: internal
-        default: true
-        controllerValue: k8s.io/internal
+        name: internal-nginx
+        default: false
+        controllerValue: k8s.io/ingress-nginx-internal
 
       admissionWebhooks:
         objectSelector:
@@ -53,7 +53,7 @@ spec:
             - key: ingress-class
               operator: In
               values:
-                - internal
+                - internal-nginx
 
       config:
         block-user-agents: "GPTBot,~*GPTBot*,ChatGPT-User,~*ChatGPT-User*,Google-Extended,~*Google-Extended*,CCBot,~*CCBot*,Omgilibot,~*Omgilibot*,FacebookBot,~*FacebookBot*" # taken from https://github.com/superseriousbusiness/gotosocial/blob/main/internal/web/robots.go

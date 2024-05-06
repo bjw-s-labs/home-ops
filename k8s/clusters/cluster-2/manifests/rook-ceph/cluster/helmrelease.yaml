@@ -37,7 +37,7 @@ spec:
       createPrometheusRules: true
     ingress:
       dashboard:
-        ingressClassName: "internal"
+        ingressClassName: "internal-nginx"
         annotations:
           nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
           nginx.ingress.kubernetes.io/configuration-snippet: |
@@ -369,7 +369,7 @@ spec:
             region: us-east-1
         ingress: 
           enabled: true
-          ingressClassName: "internal"
+          ingressClassName: "internal-nginx"
           host:
             name: &host-s3 "s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             path: "/"
