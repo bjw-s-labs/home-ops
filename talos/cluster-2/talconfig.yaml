@@ -370,6 +370,11 @@ nodes:
           dhcp: false
           vlans:
             - *vlan2002
+            - &vlan100
+              vlanId: 100
+              dhcp: false
+              dhcpOptions:
+                routeMetric: 2048
             - &vlan2040-noMTU
               vlanId: 2040
               dhcp: true
@@ -394,12 +399,7 @@ nodes:
           vlans:
             - *vlan2002
             - *vlan2040-noMTU
-            - &vlan100
-              vlanId: 100
-              dhcp: false
-              dhcpOptions:
-                routeMetric: 2048
-
+            - *vlan100
 
     - hostname: n100-01.cluster-2.${secret_domain}
       ipAddress: n100-01.cluster-2.${secret_domain}
