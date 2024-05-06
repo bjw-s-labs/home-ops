@@ -101,14 +101,14 @@ spec:
     ingress:
       app:
         enabled: true
-        className: "internal-nginx"
+        className: "internal"
         # annotations:
         #   cert-manager.io/cluster-issuer: letsencrypt-production
         #   external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
         #   external-dns/is-public: "false"
         #   external-dns/powerdns: "true"
         hosts:
-          - host: &host-cluster
+          - host: *host-cluster
             paths:
               - path: /
                 service:
