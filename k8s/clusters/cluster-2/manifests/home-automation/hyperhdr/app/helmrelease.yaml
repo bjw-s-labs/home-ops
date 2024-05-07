@@ -95,9 +95,9 @@ spec:
       app:
         controller: *app
         type: LoadBalancer
-        annotations:
-          traefik.ingress.kubernetes.io/service.serversscheme: https
-          io.cilium/lb-ipam-ips: "${LB_HYPERHDR}"
+        # annotations:
+        #   traefik.ingress.kubernetes.io/service.serversscheme: https
+        #   io.cilium/lb-ipam-ips: "${LB_HYPERHDR}"
         ports:
           http:
             port: 8090
@@ -137,7 +137,6 @@ spec:
                   identifier: app
                   port: http
         tls:
-          - secretName: tls.hyperhdr
             hosts:
               - *host-cluster
               - *host
