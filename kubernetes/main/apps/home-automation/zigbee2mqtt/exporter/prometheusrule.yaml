@@ -1,0 +1,70 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: zigbee2mqtt-exporter
+  namespace: home-automation
+spec:
+  groups:
+    - name: zigbee2mqtt-exporter
+      rules:
+        - alert: MqttExporterAbsent
+          expr: absent(up{job="zigbee2mqtt-exporter"} == 1)
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            summary: The zigbee2mqtt-exporter exporter job is absent
+            description: The zigbee2mqtt-exporter exporter job is absent
+        - alert: Zigbee2MqttUnavailable
+          expr: mqtt_zigbee_availability == 0
+          for: 30m
+          labels:
+            severity: critical
+          annotations:
+            summary: The zigbee device connection is lost
+            description: connection on topic {{$labels.topic}} is down
+        # - alert: Zigbee2MqttLinkqualityLow
+        #   expr: mqtt_linkquality < 15
+        #   for: 60m
+        #   labels:
+        #     severity: warning
+        #   annotations:
+        #     summary: The zigbee device link quality is low
+        #     description: link quality on topic {{$labels.topic}} is at {{$value}}
+        # - alert: Zigbee2MqttBatteryLow
+        #   expr: mqtt_battery < 40
+        #   for: 60m
+        #   labels:
+        #     severity: warning
+        #   annotations:
+        #     summary: The zigbee device battery level is low
+        #     description: battery level on topic {{$labels.topic}} is at {{$value}}%
+        # - alert: Zigbee2MqttTemperatureHigh
+        #   expr: mqtt_temperature > 50
+        #   labels:
+        #     severity: warning
+        #   annotations:
+        #     summary: Temperature high (>50c)
+        #     description: temperature on topic {{$labels.topic}} is {{$value}}c
+        # - alert: Zigbee2MqttTemperatureLow
+        #   expr: mqtt_temperature < 10
+        #   labels:
+        #     severity: warning
+        #   annotations:
+        #     summary: Temperature low (<10c)
+        #     description: temperature on topic {{$labels.topic}} is {{$value}}c
+        # - alert: Zigbee2MqttSmokeDetectorAlert
+        #   expr: mqtt_smoke > 0
+        #   labels:
+        #     severity: critical
+        #   annotations:
+        #     summary: A smoke detector is in state alarm
+        #     description: smoke detector on topic {{$labels.topic}} is reporting smoke
+        # - alert: Zigbee2MqttWaterLeakAlert
+        #   expr: mqtt_water_leak > 0
+        #   labels:
+        #     severity: critical
+        #   annotations:
+        #     summary: A water leak detector is in state alarm
+        #     description: water leal detector on topic {{$labels.topic}} is reporting water
