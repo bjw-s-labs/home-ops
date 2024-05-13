@@ -8,10 +8,10 @@ spec:
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
-  commonName: "elcarpenter.com"
+  commonName: "*.${INGRESS_DOMAIN}"
   dnsNames:
-    - "*.${INGRESS_DOMAIN}"
-    # - "${INGRESS_DOMAIN}"
+    # - "*.${INGRESS_DOMAIN}"
+    - "${INGRESS_DOMAIN}"
     # - "*.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
     # - "${CLUSTER_NAME}.${INGRESS_DOMAIN}"
     # - "*.s3.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
