@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: ceph-filesystem-bazarr-4ktv
+  name: ceph-filesystem-${APP}-music
 spec:
   accessModes:
     - ReadWriteMany
@@ -22,17 +22,17 @@ spec:
       "fsName": "ceph-filesystem"
       "pool": "ceph-filesystem-erasurecoded"
       "staticVolume": "true"
-      "rootPath": /volumes/media/4KTV
+      "rootPath": /volumes/media/Music
     # volumeHandle can be anything, need not to be same
     # as PV name or volume name. keeping same for brevity
-    volumeHandle: ceph-filesystem-bazarr-4ktv
+    volumeHandle: ceph-filesystem-${APP}-music
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ceph-filesystem-bazarr-4ktv
+  name: ceph-filesystem-${APP}-music
   labels:
     backup: "false"
 spec:
@@ -44,4 +44,4 @@ spec:
       storage: 124T
   volumeMode: Filesystem
   # volumeName should be same as PV name
-  volumeName: ceph-filesystem-bazarr-4ktv
+  volumeName: ceph-filesystem-${APP}-music

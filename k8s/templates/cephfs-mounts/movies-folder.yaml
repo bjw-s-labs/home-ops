@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: ceph-filesystem-home-assistant-backups
+  name: ceph-filesystem-${APP}-movies
 spec:
   accessModes:
     - ReadWriteMany
   capacity:
-    storage: 5T
+    storage: 124T
   storageClassName: "ceph-filesystem"
   csi:
     driver: rook-ceph.cephfs.csi.ceph.com 
@@ -22,17 +22,17 @@ spec:
       "fsName": "ceph-filesystem"
       "pool": "ceph-filesystem-erasurecoded"
       "staticVolume": "true"
-      "rootPath": /volumes/backups/
+      "rootPath": /volumes/media/Movies
     # volumeHandle can be anything, need not to be same
     # as PV name or volume name. keeping same for brevity
-    volumeHandle: ceph-filesystem-home-assistant-backups
+    volumeHandle: ceph-filesystem-${APP}-movies
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ceph-filesystem-home-assistant-backups
+  name: ceph-filesystem-${APP}-movies
   labels:
     backup: "false"
 spec:
@@ -41,7 +41,7 @@ spec:
   storageClassName: "ceph-filesystem"
   resources:
     requests:
-      storage: 5T
+      storage: 124T
   volumeMode: Filesystem
   # volumeName should be same as PV name
-  volumeName: ceph-filesystem-home-assistant-backups
+  volumeName: ceph-filesystem-${APP}-movies

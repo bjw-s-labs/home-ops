@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: ceph-filesystem-bazarr-downloads
+  name: ceph-filesystem-${APP}-4ktv
 spec:
   accessModes:
     - ReadWriteMany
   capacity:
-    storage: 500G
+    storage: 124T
   storageClassName: "ceph-filesystem"
   csi:
     driver: rook-ceph.cephfs.csi.ceph.com 
@@ -20,19 +20,19 @@ spec:
       # Required options from storageclass parameters need to be added in volumeAttributes
       "clusterID": "rook-ceph"
       "fsName": "ceph-filesystem"
-      "pool": "ceph-filesystem-erasurecoded-ssd"
+      "pool": "ceph-filesystem-erasurecoded"
       "staticVolume": "true"
-      "rootPath": /volumes/downloads
+      "rootPath": /volumes/media/4KTV
     # volumeHandle can be anything, need not to be same
     # as PV name or volume name. keeping same for brevity
-    volumeHandle: ceph-filesystem-bazarr-downloads
+    volumeHandle: ceph-filesystem-${APP}-4ktv
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ceph-filesystem-bazarr-downloads
+  name: ceph-filesystem-${APP}-4ktv
   labels:
     backup: "false"
 spec:
@@ -41,7 +41,7 @@ spec:
   storageClassName: "ceph-filesystem"
   resources:
     requests:
-      storage: 500G
+      storage: 124T
   volumeMode: Filesystem
   # volumeName should be same as PV name
-  volumeName: ceph-filesystem-bazarr-downloads
+  volumeName: ceph-filesystem-${APP}-4ktv
