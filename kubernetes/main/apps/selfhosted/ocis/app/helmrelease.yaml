@@ -40,7 +40,8 @@ spec:
               - /bin/sh
               - -c
             args:
-              - "[ ! -f /etc/ocis/ocis.yaml ] && ocis init"
+              - |
+                if [ ! -f /etc/ocis/ocis.yaml ]; then ocis init; else exit 0; fi
             env:
               OCIS_INSECURE: true
 
@@ -123,10 +124,11 @@ spec:
         existingClaim: ocis-data
         globalMounts:
           - path: /var/lib/ocis
+            subPath: data
+          - path: /etc/ocis
+            subPath: config
       tmpfs:
         type: emptyDir
         globalMounts:
           - path: /tmp
             subPath: tmp
-          - path: /etc/ocis
-            subPath: config
