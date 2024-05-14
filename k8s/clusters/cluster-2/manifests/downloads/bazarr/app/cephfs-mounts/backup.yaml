@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: ceph-filesystem-bazarr-backups
+  name: ceph-filesystem-${APP}-backups
 spec:
   accessModes:
     - ReadWriteMany
@@ -22,17 +22,17 @@ spec:
       "fsName": "ceph-filesystem"
       "pool": "ceph-filesystem-erasurecoded"
       "staticVolume": "true"
-      "rootPath": /volumes/backups/
+      "rootPath": /volumes/backups/Kubernetes/${CLUSTER_NAME}/Applications/${APP}
     # volumeHandle can be anything, need not to be same
     # as PV name or volume name. keeping same for brevity
-    volumeHandle: ceph-filesystem-bazarr-backups
+    volumeHandle: ceph-filesystem-${APP}-backups
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ceph-filesystem-bazarr-backups
+  name: ceph-filesystem-${APP}-backups
   labels:
     backup: "false"
 spec:
@@ -44,4 +44,4 @@ spec:
       storage: 5T
   volumeMode: Filesystem
   # volumeName should be same as PV name
-  volumeName: ceph-filesystem-bazarr-backups
+  volumeName: ceph-filesystem-${APP}-backups
