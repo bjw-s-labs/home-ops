@@ -9,5 +9,8 @@ resources:
   - ./service-exports.yaml
   - ./ceph-bucket-backups.yaml
   - ./ceph-bucket-thanos-cluster-2.yaml
+  # Needed to allow cephFS mounts to span multiple namespaces. 
+  # https://rook.io/docs/rook/latest-release/Storage-Configuration/Shared-Filesystem-CephFS/filesystem-storage/#shared-volume-creation
+  - ./secret.sops.yaml
   # Cant seem to assign the user to a bucket yet. Need the Ceph UI
   # - ./ceph-bucket-users.yaml

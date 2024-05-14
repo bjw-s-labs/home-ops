@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: ceph-filesystem-backups-bazarr
+  name: ceph-filesystem-bazarr-backups
 spec:
   accessModes:
     - ReadWriteMany
@@ -25,14 +25,14 @@ spec:
       "rootPath": /volumes/backups/
     # volumeHandle can be anything, need not to be same
     # as PV name or volume name. keeping same for brevity
-    volumeHandle: ceph-filesystem-backups-bazarr
+    volumeHandle: ceph-filesystem-bazarr-backups
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ceph-filesystem-backups-bazarr
+  name: ceph-filesystem-bazarr-backups
   # namespace: home-automation
   labels:
     backup: "false"
@@ -45,4 +45,4 @@ spec:
       storage: 5T
   volumeMode: Filesystem
   # volumeName should be same as PV name
-  volumeName: ceph-filesystem-backups-bazarr
+  volumeName: ceph-filesystem-bazarr-backups
