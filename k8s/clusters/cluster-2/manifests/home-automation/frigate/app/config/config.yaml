@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://frigate.cluster-1.elcarpenter.com/api/config/schema
+# yaml-language-server: $schema=https://frigate.cluster-2.elcarpenter.com/api/config/schema
 logger:
   default: info
   # logs:
@@ -9,8 +9,8 @@ birdseye:
   enabled: false
 
 mqtt:
-  #host: "mqtt.${INGRESS_DOMAIN}"
-  host: 10.200.2.59
+  host: "mqtt.${INGRESS_DOMAIN}"
+  # host: 10.200.2.59
   port: 1883
   topic_prefix: frigate
   user: "{FRIGATE_MQTT_USERNAME}"
@@ -33,6 +33,7 @@ snapshots:
     default: 14
 
 record:
+  sync_recordings: true
   enabled: true
   retain:
     days: 3
@@ -46,7 +47,7 @@ objects:
   track:
     - person
     - dog
-    # - car
+    - car
     - cat
     - bird
     - bicycle
@@ -97,13 +98,6 @@ cameras:
     ffmpeg:
       output_args:
         record: preset-record-generic-audio-copy
-    objects:
-      track:
-        - person
-        - dog
-        - cat
-        - bird
-        - bicycle
       inputs:
         - path: rtsp://127.0.0.1:8554/front_door_hq?video=copy&audio=aac
           input_args: preset-rtsp-restream
@@ -117,15 +111,8 @@ cameras:
       width: 640
       height: 480
       fps: 15
-  outside_garage:
     objects:
-      track:
-        - person
-        - dog
-        - cat
-        - bird
-        - bicycle
-        - car
+  outside_garage:
     ffmpeg:
       output_args:
         record: preset-record-generic-audio-copy
