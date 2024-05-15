@@ -1,0 +1,47 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ceph-filesystem-${APP}-security-footage
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 1T
+  storageClassName: "ceph-filesystem"
+  csi:
+    driver: rook-ceph.cephfs.csi.ceph.com 
+    nodeStageSecretRef:
+      # node stage secret name
+      name: rook-csi-cephfs-node-user
+      # node stage secret namespace where above secret is created
+      namespace: rook-ceph
+    volumeAttributes:
+      # Required options from storageclass parameters need to be added in volumeAttributes
+      "clusterID": "rook-ceph"
+      "fsName": "ceph-filesystem"
+      "pool": "ceph-filesystem-erasurecoded"
+      "staticVolume": "true"
+      "rootPath": /volumes/security/
+    # volumeHandle can be anything, need not to be same
+    # as PV name or volume name. keeping same for brevity
+    volumeHandle: ceph-filesystem-${APP}-security-footage
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ceph-filesystem-${APP}-security-footage
+  labels:
+    backup: "false"
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: "ceph-filesystem"
+  resources:
+    requests:
+      storage: 1T
+  volumeMode: Filesystem
+  # volumeName should be same as PV name
+  volumeName: ceph-filesystem-${APP}-security-footage
