@@ -24,6 +24,10 @@ detectors:
     type: edgetpu
     device: usb
 
+ffmpeg:
+  global_args: ["-hide_banner", "-loglevel", "warning"]
+  hwaccel_args: ["-hwaccel", "vaapi", "-hwaccel_device", "/dev/dri/renderD128", "-hwaccel_output_format", "yuv420p"]
+
 # Global snapshots configuration
 snapshots:
   enabled: true
