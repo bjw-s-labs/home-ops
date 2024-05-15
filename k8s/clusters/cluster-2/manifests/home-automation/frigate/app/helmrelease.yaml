@@ -43,16 +43,6 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
           configmap.reloader.stakater.com/reload: "frigate-config"
-          securityContext:
-            # runAsUser: ${APP_UID}
-            # runAsGroup: ${APP_GID}
-            # runAsNonRoot: true
-            fsGroup: ${APP_GID}
-            fsGroupChangePolicy: "OnRootMismatch"
-            supplementalGroups:
-              - 34
-              - 100
-              - 1000
 
         containers:
           app:
