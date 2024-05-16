@@ -1,5 +1,7 @@
 ---
 repositories:
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
   - name: postfinance
     url: https://postfinance.github.io/kubelet-csr-approver
   - name: cilium
@@ -21,3 +23,9 @@ releases:
     wait: true
     values:
       - ../../../apps/system-controllers/kubelet-csr-approver/app/values.yaml
+
+  - name: prometheus-operator-crds
+    namespace: monitoring
+    chart: prometheus-community/prometheus-operator-crds
+    version: 11.0.0
+    wait: true
