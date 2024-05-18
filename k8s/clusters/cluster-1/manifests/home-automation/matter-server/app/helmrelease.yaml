@@ -1,5 +1,5 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app matter-server
@@ -59,7 +59,7 @@ spec:
           app:
             image:
               repository: ghcr.io/home-assistant-libs/python-matter-server
-              tag: 5.10.0
+              tag: 6.0.0
               pullPolicy: IfNotPresent
             env:
               TZ: "${TIMEZONE}"

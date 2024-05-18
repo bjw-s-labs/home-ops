@@ -1,5 +1,5 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app esphome
@@ -50,7 +50,7 @@ spec:
           app:
             image:
               repository: esphome/esphome
-              tag: 2024.4.2
+              tag: 2024.5.0
               pullPolicy: IfNotPresent
             env:
               TZ: "${TIMEZONE}"
