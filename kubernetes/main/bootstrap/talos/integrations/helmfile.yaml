@@ -1,4 +1,11 @@
 ---
+helmDefaults:
+  wait: true
+  waitForJobs: true
+  timeout: 600
+  recreatePods: true
+  force: true
+
 repositories:
   - name: prometheus-community
     url: https://prometheus-community.github.io/helm-charts
@@ -12,7 +19,6 @@ releases:
     namespace: kube-system
     chart: cilium/cilium
     version: 1.15.3
-    wait: true
     values:
       - ../../../apps/kube-system/cilium/app/values.yaml
 
@@ -23,9 +29,13 @@ releases:
     wait: true
     values:
       - ../../../apps/system-controllers/kubelet-csr-approver/app/values.yaml
+    needs:
+      - cilium
 
   - name: prometheus-operator-crds
     namespace: monitoring
     chart: prometheus-community/prometheus-operator-crds
     version: 11.0.0
-    wait: true
+    needs:
+      - cilium
+      - kubelet-csr-approver
