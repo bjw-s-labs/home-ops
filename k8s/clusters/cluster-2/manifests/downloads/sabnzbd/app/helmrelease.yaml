@@ -37,9 +37,8 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchExpressions:
-                  - key: app.kubernetes.io/name
-                    operator: In
-                    values: ["frigate"]
+                  - key: google.feature.node.kubernetes.io/coral
+                    operator: Exists
               topologyKey: kubernetes.io/hostname
         # podAntiAffinity:
         #   preferredDuringSchedulingIgnoredDuringExecution:
