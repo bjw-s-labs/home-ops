@@ -99,6 +99,12 @@ spec:
       config:
         enabled: true
         existingClaim: ${VOLSYNC_CLAIM}
+      logs:
+        type: emptyDir
+        globalMounts:
+          - path: /config/logs
+      tmp:
+        type: emptyDir
       incomplete:
         enabled: true
         existingClaim: ceph-block-sabnzbd-incomplete
