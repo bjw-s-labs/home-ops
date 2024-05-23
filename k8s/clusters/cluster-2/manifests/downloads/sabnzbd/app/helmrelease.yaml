@@ -31,6 +31,19 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    defaultPodOptions:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - frigate
+                topologyKey: kubernetes.io/hostname
     controllers:
       sabnzbd:
         annotations:
