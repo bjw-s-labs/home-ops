@@ -34,16 +34,25 @@ spec:
     defaultPodOptions:
       affinity:
         podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: app.kubernetes.io/name
-                      operator: In
-                      values:
-                        - frigate
-                topologyKey: kubernetes.io/hostname
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                - frigate
+            topologyKey: kubernetes.io/hostname
+        # podAntiAffinity:
+        #   preferredDuringSchedulingIgnoredDuringExecution:
+        #     - weight: 100
+        #       podAffinityTerm:
+        #         labelSelector:
+        #           matchExpressions:
+        #             - key: app.kubernetes.io/name
+        #               operator: In
+        #               values:
+        #                 - frigate
+        #         topologyKey: kubernetes.io/hostname
     controllers:
       sabnzbd:
         annotations:
@@ -99,7 +108,7 @@ spec:
               requests:
                 memory: "1G"
               limits:
-                memory: "6G"
+                memory: "4G"
 
     service:
       app:
