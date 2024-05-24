@@ -3,7 +3,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - helmrelease.yaml
+  # I dont back this up, so it must be defined
+  - ./pve.yaml
+  - ./helmrelease.yaml
   # No need to run a backup, only thing stored is cache data
   # - ../../../../../../templates/volsync
 labels:
