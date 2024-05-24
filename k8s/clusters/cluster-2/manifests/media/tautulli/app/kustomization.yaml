@@ -1,0 +1,12 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../../../../../templates/cephfs-mounts/backup.yaml
+  - ./helmrelease.yaml
+  - ../../../../../../templates/volsync
+labels:
+  - pairs:
+      app.kubernetes.io/name: tautulli
+      app.kubernetes.io/instance: tautulli
