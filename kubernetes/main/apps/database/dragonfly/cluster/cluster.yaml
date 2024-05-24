@@ -5,23 +5,28 @@ kind: Dragonfly
 metadata:
   name: dragonfly
 spec:
-  labels:
-    dragonflydb.io/cluster: dragonfly
   image: docker.dragonflydb.io/dragonflydb/dragonfly:v1.18.1
   replicas: 3
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      memory: 512Mi
+  args:
+    - "--maxmemory=$(MAX_MEMORY)Mi"
+    - "--proactor_threads=2"
+    - "--cluster_mode=emulated"
   env:
     - name: MAX_MEMORY
       valueFrom:
         resourceFieldRef:
           resource: limits.memory
           divisor: 1Mi
-  args:
-    - "--maxmemory=$(MAX_MEMORY)Mi"
-    - "--proactor_threads=2"
-    - "--cluster_mode=emulated"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 512Mi
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: "kubernetes.io/hostname"
+      whenUnsatisfiable: "DoNotSchedule"
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/part-of: dragonfly
