@@ -1,0 +1,218 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app plex
+  namespace: media
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+      interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      strategy: uninstall
+  rollback:
+    recreate: true
+    cleanupOnFail: true
+  uninstall:
+    keepHistory: false
+  dependsOn:
+    - name: intel-device-plugin-gpu
+      namespace: kube-system
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: volsync-system
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: ${APP_UID}
+        runAsGroup: ${APP_GID}
+        fsGroup: ${APP_GID}
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [34, 44, 100, 109, 10000]
+        seccompProfile: { type: RuntimeDefault }
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values: ["frigate"]
+              topologyKey: kubernetes.io/hostname
+      nodeSelector:
+        intel.feature.node.kubernetes.io/gpu: "true"
+
+    controllers:
+      plex:
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/onedr0p/plex-beta
+              tag: 1.40.2.8395-c67dce28e
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+              # PUID: "1000"
+              # PGID: "100"
+              ADVERTISE_IP: "https://plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}:443,https://plex.${INGRESS_DOMAIN}:443,https://plex.${CLUSTER_NAME}.${INGRESS_DOMAIN},https://plex.${INGRESS_DOMAIN},https://${LB_PLEX}:32400"
+              PLEX_NO_AUTH_NETWORKS: 10.0.0.0/8
+              # PLEX_PREFERENCE_1: "FriendlyName=plex-kubernetes"
+              # PLEX_PREFERENCE_2: "EnableIPv6=0"
+              # PLEX_PREFERENCE_3: "logDebug=0"
+              # PLEX_PREFERENCE_4: "DisableTLSv1_0=1"
+              # PLEX_PREFERENCE_5: "LanNetworksBandwidth=xxx.xxx.xxx.0/18\,xxx.xxx.xxx.0/24\,xxx.xxx.xxx.0/24"
+              # PLEX_PREFERENCE_6: "TranscoderQuality=2"
+              # PLEX_PREFERENCE_7: "TreatWanIpAsLocal=0"
+              # PLEX_PREFERENCE_8: "TranscoderH264BackgroundPreset=fast"
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /identity
+                    port: 32400
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                gpu.intel.com/i915: 1
+                memory: 10Gi
+
+    service:
+      app:
+        controller: *app
+        type: LoadBalancer
+        annotations:
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+          io.cilium/lb-ipam-ips: ${LB_PLEX}
+        ports:
+          http:
+            port: 32400
+        externalTrafficPolicy: Cluster
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: plex
+      # Separate PVC for cache to avoid backing up cache files
+      plex-cache:
+        enabled: true
+        existingClaim: plex-cache
+        globalMounts:
+          - path: "/config/Library/Application Support/Plex Media Server/Cache"
+      logs:
+        type: emptyDir
+        globalMounts:
+          - path: "/config/Library/Application Support/Plex Media Server/Logs"
+      tmp:
+        type: emptyDir
+      transcode:
+        enabled: true
+        type: emptyDir
+      backup:
+        enabled: true
+        existingClaim: ceph-filesystem-${APP}-backups
+        advancedMounts:
+          plex:
+            app:
+              - path: /config/Backups
+                subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/plex
+      4kmovies:
+        enabled: true
+        existingClaim: ceph-filesystem-${APP}-4kmovies
+        advancedMounts:
+          plex:
+            app:
+              - path: /mnt/unionfs/Media/4KMovies/
+      4ktv:
+        enabled: true
+        existingClaim: ceph-filesystem-${APP}-4ktv
+        advancedMounts:
+          plex:
+            app:
+              - path: /mnt/unionfs/Media/4KTV/
+      music:
+        enabled: true
+        existingClaim: ceph-filesystem-${APP}-music
+        advancedMounts:
+          plex:
+            app:
+              - path: /mnt/unionfs/Media/Music/
+      movies:
+        enabled: true
+        existingClaim: ceph-filesystem-${APP}-movies
+        advancedMounts:
+          plex:
+            app:
+              - path: /mnt/unionfs/Media/Movies/
+      tv:
+        enabled: true
+        existingClaim: ceph-filesystem-${APP}-tv
+        advancedMounts:
+          plex:
+            app:
+              - path: /mnt/unionfs/Media/TV
+
+    ingress:
+      app:
+        enabled: true
+        className: "external-nginx"
+        annotations:
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+          external-dns/is-public: "true"
+          external-dns.alpha.kubernetes.io/target: "ingress-ext.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+        hosts:
+          - host: &host "plex.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: app
+                  port: http
+          - host: &host-cluster "plex.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+              - *host-cluster
