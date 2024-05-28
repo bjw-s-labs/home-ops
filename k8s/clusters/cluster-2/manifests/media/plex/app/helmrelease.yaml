@@ -57,6 +57,10 @@ spec:
                     operator: In
                     values: ["frigate"]
               topologyKey: kubernetes.io/hostname
+              namespaceSelector:
+                - media
+                - home-automation
+                - downloads
       nodeSelector:
         intel.feature.node.kubernetes.io/gpu: "true"
 
@@ -119,7 +123,7 @@ spec:
         controller: *app
         type: LoadBalancer
         annotations:
-          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+          # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
           io.cilium/lb-ipam-ips: ${LB_PLEX}
         ports:
           http:
