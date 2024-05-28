@@ -122,7 +122,6 @@ spec:
         controller: *app
         type: LoadBalancer
         annotations:
-          # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
           io.cilium/lb-ipam-ips: ${LB_PLEX}
         ports:
           http:
@@ -198,7 +197,6 @@ spec:
         className: "external-nginx"
         annotations:
           nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-          external-dns/is-public: "true"
           external-dns.alpha.kubernetes.io/target: "ingress-ext.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
         hosts:
           - host: &host "plex.${INGRESS_DOMAIN}"
