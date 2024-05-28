@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -57,10 +58,8 @@ spec:
                     operator: In
                     values: ["frigate"]
               topologyKey: kubernetes.io/hostname
-              namespaceSelector:
-                - media
-                - home-automation
-                - downloads
+              # Blank selector selects all namespaces
+              namespaceSelector: {}
       nodeSelector:
         intel.feature.node.kubernetes.io/gpu: "true"
 
