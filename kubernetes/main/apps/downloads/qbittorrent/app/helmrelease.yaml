@@ -120,15 +120,12 @@ spec:
       app:
         className: "internal-nginx"
         hosts:
-          - host: &hostName qbittorrent.bjw-s.dev
+          - host: qbittorrent.bjw-s.dev
             paths:
               - path: /
                 service:
                   identifier: app
                   port: http
-        tls:
-          - hosts:
-              - *hostName
 
     persistence:
       config:

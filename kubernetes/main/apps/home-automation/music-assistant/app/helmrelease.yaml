@@ -70,15 +70,12 @@ spec:
       app:
         className: "internal-nginx"
         hosts:
-          - host: &hostName music-assistant.bjw-s.dev
+          - host: music-assistant.bjw-s.dev
             paths:
               - path: /
                 service:
                   identifier: app
                   port: http
-        tls:
-          - hosts:
-              - *hostName
 
     persistence:
       data:

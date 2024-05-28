@@ -82,12 +82,9 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
         hosts:
-          - host: &hostName miniflux.bjw-s.dev
+          - host: miniflux.bjw-s.dev
             paths:
               - path: /
                 service:
                   identifier: app
                   port: http
-        tls:
-          - hosts:
-              - *hostName

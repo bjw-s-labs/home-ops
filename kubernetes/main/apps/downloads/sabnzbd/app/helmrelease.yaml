@@ -90,15 +90,12 @@ spec:
       app:
         className: "internal-nginx"
         hosts:
-          - host: &hostName sabnzbd.bjw-s.dev
+          - host: sabnzbd.bjw-s.dev
             paths:
               - path: /
                 service:
                   identifier: app
                   port: http
-        tls:
-          - hosts:
-              - *hostName
 
     persistence:
       config:

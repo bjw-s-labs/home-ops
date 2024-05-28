@@ -61,15 +61,12 @@ spec:
       app:
         className: "internal-nginx"
         hosts:
-          - host: &hostName esphome.bjw-s.dev
+          - host: esphome.bjw-s.dev
             paths:
               - path: /
                 service:
                   identifier: app
                   port: http
-        tls:
-          - hosts:
-              - *hostName
 
     persistence:
       config:

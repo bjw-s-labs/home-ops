@@ -45,13 +45,10 @@ spec:
       enabled: true
       className: internal-nginx
       hosts:
-        - host: &host "blackbox-exporter.bjw-s.dev"
+        - host: blackbox-exporter.bjw-s.dev
           paths:
             - path: /
               pathType: Prefix
-      tls:
-        - hosts:
-            - *host
 
     prometheusRule:
       enabled: true

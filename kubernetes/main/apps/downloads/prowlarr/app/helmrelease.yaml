@@ -81,15 +81,12 @@ spec:
       app:
         className: "internal-nginx"
         hosts:
-          - host: &hostName prowlarr.bjw-s.dev
+          - host: prowlarr.bjw-s.dev
             paths:
               - path: /
                 service:
                   identifier: app
                   port: http
-        tls:
-          - hosts:
-              - *hostName
 
     persistence:
       config:
