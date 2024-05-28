@@ -9,18 +9,12 @@ spec:
   chart:
     spec:
       chart: spegel
-      version: v0.0.18
+      version: v0.0.22
       sourceRef:
         kind: HelmRepository
-        name: xenitab
+        name: spegel
         namespace: flux-system
       interval: 30m
-  values:
-    spegel:
-      containerdSock: /run/containerd/containerd.sock
-      containerdRegistryConfigPath: /etc/cri/conf.d/hosts
-    service:
-      registry:
-        hostPort: 29999
-    serviceMonitor:
-      enabled: true
+  valuesFrom:
+    - kind: ConfigMap
+      name: spegel-helm-values
