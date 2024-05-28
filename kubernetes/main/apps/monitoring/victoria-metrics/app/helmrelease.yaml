@@ -135,10 +135,7 @@ spec:
         enabled: true
         ingressClassName: internal-nginx
         hosts:
-          - &hostalert vmalert.bjw-s.dev
-        tls:
-          - hosts:
-              - *hostalert
+          - vmalert.bjw-s.dev
 
     # VM Data scraping
     vmagent:
@@ -170,10 +167,7 @@ spec:
         enabled: true
         ingressClassName: internal-nginx
         hosts:
-          - &hostagent vmagent.bjw-s.dev
-        tls:
-          - hosts:
-              - *hostagent
+          - vmagent.bjw-s.dev
 
     # Single-binary vm cluster alternative (liteweight, non-HA)
     vmsingle:

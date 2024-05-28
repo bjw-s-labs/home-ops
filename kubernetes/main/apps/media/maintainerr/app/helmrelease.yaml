@@ -61,16 +61,13 @@ spec:
       app:
         className: internal-nginx
         hosts:
-          - host: &hostName maintainerr.bjw-s.dev
+          - host: maintainerr.bjw-s.dev
             paths:
               - path: /
                 pathType: Prefix
                 service:
                   identifier: app
                   port: http
-        tls:
-          - hosts:
-              - *hostName
 
     persistence:
       data:

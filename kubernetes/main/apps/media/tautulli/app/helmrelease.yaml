@@ -74,16 +74,13 @@ spec:
       app:
         className: internal-nginx
         hosts:
-          - host: &hostName tautulli.bjw-s.dev
+          - host: tautulli.bjw-s.dev
             paths:
               - path: /
                 pathType: Prefix
                 service:
                   identifier: app
                   port: http
-        tls:
-          - hosts:
-              - *hostName
 
     persistence:
       config:
