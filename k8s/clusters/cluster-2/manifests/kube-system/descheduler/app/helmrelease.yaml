@@ -23,71 +23,42 @@ spec:
     remediation:
       retries: 5
   values:
+    replicas: 2
     kind: Deployment
-    replicas: 1   # Increase after more nodes are installed
-    leaderElection:
-      enabled: true
-      leaseDuration: 15s
-      renewDeadline: 10s
-      retryPeriod: 2s
-      resourceLock: "leases"
-      resourceName: "descheduler"
-      resourceNamescape: "kube-system"
-
+    deschedulerPolicyAPIVersion: descheduler/v1alpha2
     deschedulerPolicy:
-      strategies:
-        RemoveDuplicates:
-          enabled: true
-        RemovePodsViolatingNodeTaints:
-          enabled: true
-        RemovePodsViolatingNodeAffinity:
-          enabled: true
-          params:
-            nodeAffinityType:
-              - requiredDuringSchedulingIgnoredDuringExecution
-        RemovePodsViolatingTopologySpreadConstraint:
-          enabled: true
-          params:
-            includeSoftConstraints: true
-        RemovePodsViolatingInterPodAntiAffinity:
-          enabled: true
-          params:
-            nodeFit: true
-        LowNodeUtilization:
-          enabled: false
-        RemoveFailedPods:
-          enabled: true
-          params:
-            failedPods:
-              includingInitContainers: true
-              excludeOwnerKinds:
-                - "Job"
-              minPodLifetimeSeconds: 3600
-        RemovePodsHavingTooManyRestarts:
-          enabled: true
-          params:
-            podsHavingTooManyRestarts:
-              podRestartThreshold: 100
-              includingInitContainers: true
-
+      profiles:
+        - name: Default
+          pluginConfig:
+            - name: DefaultEvictor
+              args:
+                evictFailedBarePods: true
+                evictLocalStoragePods: true
+                evictSystemCriticalPods: true
+                nodeFit: true
+            - name: RemovePodsViolatingInterPodAntiAffinity
+            - name: RemovePodsViolatingNodeAffinity
+              args:
+                nodeAffinityType:
+                  - requiredDuringSchedulingIgnoredDuringExecution
+            - name: RemovePodsViolatingNodeTaints
+            - name: RemovePodsViolatingTopologySpreadConstraint
+              args:
+                constraints:
+                  - DoNotSchedule
+                  - ScheduleAnyway
+          plugins:
+            balance:
+              enabled:
+                - RemovePodsViolatingTopologySpreadConstraint
+            deschedule:
+              enabled:
+                - RemovePodsViolatingInterPodAntiAffinity
+                - RemovePodsViolatingNodeAffinity
+                - RemovePodsViolatingNodeTaints
     service:
       enabled: true
-
-    # serviceMonitor:
-    #   enabled: true
-
-    podAnnotations:
-      configmap.reloader.stakater.com/reload: *app
-
-    affinity:
-      podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                  - key: app.kubernetes.io/name
-                    operator: In
-                    values:
-                      - *app
-              topologyKey: kubernetes.io/hostname
+    serviceMonitor:
+      enabled: true
+    leaderElection:
+      enabled: true
