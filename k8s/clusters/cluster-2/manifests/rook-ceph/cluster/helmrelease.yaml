@@ -280,7 +280,7 @@ spec:
               quota:
                 maxSize: 500G
           metadataServer:
-            activeCount: 1
+            activeCount: 2
             activeStandby: true
             placement:
               podAntiAffinity:
@@ -293,13 +293,12 @@ spec:
                             - rook-ceph-mds
                     # topologyKey: kubernetes.io/hostname will place MDS across different hosts
                     topologyKey: kubernetes.io/hostname
-
             resources:
               requests:
-                cpu: 100m
-                memory: 64M
+                cpu: 1000m
+                memory: 512M
               limits:
-                cpu: 2000m
+                # cpu: 2000m
                 memory: 4Gi
         storageClass:
           enabled: true
