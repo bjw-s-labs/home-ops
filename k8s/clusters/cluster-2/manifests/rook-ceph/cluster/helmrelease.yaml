@@ -75,6 +75,8 @@ spec:
       osd_scrub_auto_repair_num_errors = 5
       # WPQ should help in cases where a few OSDs are more overloaded than others.
       osd_op_queue = wpq
+      # Increase deep scrub to allow HDDs time to get scrubbed. Default is 604800 (7 days)
+      osd deep scrub interval = 1209600
 
     cephClusterSpec:
       cephVersion:
