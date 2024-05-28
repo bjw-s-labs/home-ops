@@ -252,7 +252,7 @@ spec:
       deletionPolicy: Delete
 
     cephFileSystems:
-      - name: ceph-filesystem
+      - name: &cephFileSystemName ceph-filesystem
         spec:
           # Default is true. Setting to false will allow the ceph-operator to delete the pools when deleting the filesystem
           preservePoolsOnDelete: false
@@ -285,16 +285,14 @@ spec:
             activeCount: 2
             activeStandby: true
             placement:
-              podAntiAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchExpressions:
-                        - key: app
-                          operator: In
-                          values:
-                            - rook-ceph-mds
-                    # topologyKey: kubernetes.io/hostname will place MDS across different hosts
-                    topologyKey: kubernetes.io/hostname
+              topologySpreadConstraints:
+                - maxSkew: 1
+                  topologyKey: kubernetes.io/hostname
+                  whenUnsatisfiable: DoNotSchedule
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: ceph-mds
+                      app.kubernetes.io/part-of: *cephFileSystemName
             resources:
               requests:
                 cpu: 1000m
@@ -323,7 +321,7 @@ spec:
       isDefault: false
       deletionPolicy: Delete
     cephObjectStores:
-      - name: ceph-objectstore-1
+      - name: &cephObjectStoreName ceph-objectstore-1
         spec:
           deviceClass: ssd
           metadataPool:
@@ -348,16 +346,14 @@ spec:
                 memory: 3Gi
             instances: 2
             placement:
-              podAntiAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchExpressions:
-                        - key: app
-                          operator: In
-                          values:
-                            - rook-ceph-rgw
-                    # topologyKey: kubernetes.io/hostname will place RGW across different hosts
-                    topologyKey: kubernetes.io/hostname
+              topologySpreadConstraints:
+                - maxSkew: 1
+                  topologyKey: kubernetes.io/hostname
+                  whenUnsatisfiable: DoNotSchedule
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: ceph-rgw
+                      app.kubernetes.io/part-of: *cephObjectStoreName
           healthCheck:
             bucket:
               interval: 60s
