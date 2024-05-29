@@ -144,11 +144,18 @@ spec:
         existingClaim: ${VOLSYNC_CLAIM}
       media:
         enabled: true
-        existingClaim: ceph-filesystem-${APP}-security-footage
+        type: emptyDir
+        sizeLimit: 20Gi
         advancedMounts:
           frigate:
             app:
               - path: /media
+      #   enabled: true
+      #   existingClaim: ceph-filesystem-${APP}-security-footage
+      #   advancedMounts:
+      #     frigate:
+      #       app:
+      #         - path: /media
       usb:
         enabled: true
         type: hostPath
