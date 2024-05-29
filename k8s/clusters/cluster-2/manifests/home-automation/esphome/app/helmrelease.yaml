@@ -37,22 +37,14 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           annotations:
-            # k8s.v1.cni.cncf.io/networks: home-automation-iot-dhcp
-            k8s.v1.cni.cncf.io/networks: |
-              [{
-                "name":"multus-iot",
-                "namespace": "network",
-                "ips": ["10.10.100.12/24"],
-                "mac": "aa:e9:02:a4:7e:78"
-              }]
+            k8s.v1.cni.cncf.io/networks: home-automation-iot-dhcp
             # k8s.v1.cni.cncf.io/networks: |
             #   [{
             #     "name":"multus-iot",
             #     "namespace": "network",
             #     "ips": ["10.10.100.12/24"],
-            #     "mac": "5d:7c:d6:0e:bf:47"
+            #     "mac": "aa:e9:02:a4:7e:78"
             #   }]
-
 
         containers:
           app:
