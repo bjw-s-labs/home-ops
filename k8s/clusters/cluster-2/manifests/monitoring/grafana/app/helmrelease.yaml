@@ -21,7 +21,7 @@ spec:
       configmap.reloader.stakater.com/reload: grafana
       # secret.reloader.stakater.com/reload: grafana-secret
 
-    replicas: 1
+    replicas: 2
 
     dashboardProviders:
       dashboardproviders.yaml:
@@ -83,6 +83,17 @@ spec:
           #     path: /var/lib/grafana/dashboards/unpoller
           #   orgId: 1
           #   type: file
+          - name: temperature
+            orgId: 1
+            folder: ''
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/thanos
+
+    dashboardsConfigMaps:
+      temperature: "temperature-dashboard"
 
     dashboards:
       default:
