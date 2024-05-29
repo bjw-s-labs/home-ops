@@ -17,7 +17,7 @@ additionalApiServerCertSans: &san
 additionalMachineCertSans: *san
 
 nodes:
-  - hostname: delta.bjw-s.casa
+  - hostname: delta.bjw-s.internal
     ipAddress: 10.1.1.31
     controlPlane: true
     installDiskSelector:
@@ -57,7 +57,7 @@ nodes:
                   - rshared
                   - rw
 
-  - hostname: enigma.bjw-s.casa
+  - hostname: enigma.bjw-s.internal
     ipAddress: 10.1.1.32
     controlPlane: true
     installDiskSelector:
@@ -82,7 +82,7 @@ nodes:
     patches:
       - *kubelet_extra_mounts
 
-  - hostname: felix.bjw-s.casa
+  - hostname: felix.bjw-s.internal
     ipAddress: 10.1.1.33
     controlPlane: true
     installDiskSelector:
