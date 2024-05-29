@@ -44,6 +44,9 @@ spec:
             name: externaldns-internal-secrets
             key: bind_rndc_secret
 
+    extraArgs:
+      - --ignore-ingress-tls-spec
+
     podAnnotations:
       secret.reloader.stakater.com/reload: externaldns-internal-secrets
 
