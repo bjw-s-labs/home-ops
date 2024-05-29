@@ -202,7 +202,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "avg by(nodename) (node_thermal_zone_temp)",
+          "expr": "avg by(nodename) (node_thermal_zone_temp) or avg by(target) ((snChasActualTemperature)-32)*(5/9)",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
