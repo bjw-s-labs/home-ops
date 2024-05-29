@@ -48,7 +48,7 @@ spec:
           app:
             image:
               repository: ghcr.io/blakeblackshear/frigate
-              tag: 0.13.0-rc1
+              tag: 0.13.2@sha256:2906991ccad85035b176941f9dedfd35088ff710c39d45ef1baa9a49f2b16734
               # tag: 0.12.1
               pullPolicy: IfNotPresent
             env:
@@ -83,14 +83,14 @@ spec:
               readiness: *probes
 
     defaultPodOptions:
-      securityContext:
-        # runAsNonRoot: true
-        # runAsUser: ${APP_UID}
-        # runAsGroup: ${APP_GID}
-        fsGroup: ${APP_GID}
-        fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [34, 44, 100, 109, 10000]
-        seccompProfile: { type: RuntimeDefault }
+      # securityContext:
+      #   # runAsNonRoot: true
+      #   # runAsUser: ${APP_UID}
+      #   # runAsGroup: ${APP_GID}
+      #   fsGroup: ${APP_GID}
+      #   fsGroupChangePolicy: OnRootMismatch
+      #   supplementalGroups: [34, 44, 100, 109, 10000]
+      #   seccompProfile: { type: RuntimeDefault }
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
