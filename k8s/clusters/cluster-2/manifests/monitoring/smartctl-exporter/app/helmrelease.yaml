@@ -27,23 +27,19 @@ spec:
   values:
     fullnameOverride: *app
     image:
-      repository: ghcr.io/lildrunkensmurf/smartctl_exporter
-      tag: 0.11.0@sha256:433da1713768101c374a9af74452f65c352ad68aa5ff9a479ff8878f681d5aab
+      repository: ghcr.io/joryirving/smartctl_exporter
+      tag: 0.12.0@sha256:276917436a966f537755fcb7e145acad2c30dcb53d5841602b6c0545aac6cbd3
     config:
       devices:
         - /dev/sda
         - /dev/sdb
         - /dev/sdc
+        - /dev/sdd
+        - /dev/nvme0n1
     serviceMonitor:
       enabled: true
+      relabelings:
+        - action: labeldrop
+          regex: (pod)
     prometheusRules:
       enabled: false
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/arch
-                operator: In
-                values: 
-                  - arm64
