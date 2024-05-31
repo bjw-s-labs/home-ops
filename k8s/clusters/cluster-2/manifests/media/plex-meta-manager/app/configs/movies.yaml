@@ -1,0 +1,101 @@
+templates:
+  Holiday:
+    smart_label: title.asc
+    summary: |-
+      A timed collection of <<collection_name>> and other movies that may relate to the holiday.
+      
+      NOTE: this collection will only be around until <<end_date>>.
+    sort_title: +0_<<collection_name>>
+    schedule: range(<<start_date>>-<<end_date>>)
+    delete_not_scheduled: true
+    visible_home: true
+    visible_shared: true
+
+collections:
+  Trakt Popular:
+    trakt_popular: 200
+    collection_order: custom
+    sync_mode: sync
+    sort_title: Traktpopular
+    summary: The most popular movies for all time.
+    radarr_add_missing: true
+    radarr_search: true
+    radarr_monitor: true
+  Tautulli Most Popular Movies:
+    sync_mode: sync
+    collection_order: custom
+    tautulli_watched:
+      list_days: 180
+      list_size: 10
+      list_minimum: 1
+
+  IMDb Top 250:
+    imdb_list: https://www.imdb.com/search/title/?groups=top_250
+    sync_mode: sync
+
+  Valentine's Day Movies:
+    template:
+      name: Holiday
+      start_date: 02/01
+      end_date: 02/29
+    imdb_list:
+      - https://www.imdb.com/list/ls000094398/
+      - https://www.imdb.com/list/ls057783436/
+      - https://www.imdb.com/list/ls064427905/
+
+  St. Patrick's Day Movies:
+    template:
+      name: Holiday
+      start_date: 03/01
+      end_date: 03/18
+    imdb_list: https://www.imdb.com/list/ls063934595/
+
+  Thanksgiving Movies:
+    template:
+      name: Holiday
+      start_date: 11/01
+      end_date: 11/30
+    imdb_list: 
+      - https://www.imdb.com/list/ls000835734/
+      - https://www.imdb.com/list/ls091597850/
+
+  Halloween Movies:
+    template: 
+      name: Holiday
+      start_date: 10/01
+      end_date: 10/31
+    imdb_list:
+      - https://www.imdb.com/list/ls023118929/
+      - https://www.imdb.com/list/ls000099714/
+    trakt_list:
+      - https://trakt.tv/users/kairbear08/lists/halloween
+      - https://trakt.tv/users/mybicycle/lists/halloween
+      - https://trakt.tv/users/jayinftl/lists/halloween
+      - https://trakt.tv/users/roswellgeek/lists/halloween
+    tmdb_collection:
+      - 91361    # Halloween Collection
+      - 8581     # A Nightmare on Elm Street Collection
+      - 1733     # The Mummy Collection
+      - 8091     # Alien Collection
+    tmdb_movie:
+      - 23437    # A Nightmare on Elm Street (2010)
+
+  Christmas Movies:
+    template:
+      name: Holiday
+      start_date: 12/01
+      end_date: 12/31
+    imdb_list:
+      - https://www.imdb.com/list/ls025976544/
+      - https://www.imdb.com/list/ls003863000/
+      - https://www.imdb.com/list/ls027454200/
+      - https://www.imdb.com/list/ls027886673/
+      - https://www.imdb.com/list/ls097998599/
+      - https://www.imdb.com/list/ls000096828/
+
+  New Year's Day Movies:
+    template:
+      name: Holiday
+      start_date: 12/26
+      end_date: 01/04
+    imdb_list: https://www.imdb.com/list/ls066838460/

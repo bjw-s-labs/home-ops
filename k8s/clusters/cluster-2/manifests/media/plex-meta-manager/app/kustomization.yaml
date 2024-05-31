@@ -1,0 +1,32 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - pvc.yaml
+  - helmrelease.yaml
+  - ../../../../../../templates/volsync
+configMapGenerator:
+  - name: pmm-config
+    files:
+      - configs/config.yaml
+  - name: pmm-tv
+    files:
+      - configs/tv.yaml
+  - name: pmm-tv-overlay
+    files:
+      - configs/tv_overlay.yaml
+  - name: pmm-movies
+    files:
+      - configs/movies.yaml
+  - name: pmm-movies-overlay
+    files:
+      - configs/movies_overlay.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: enabled
+labels:
+  - pairs:
+      app.kubernetes.io/name: plex-meta-manager
+      app.kubernetes.io/instance: plex-meta-manager
