@@ -78,11 +78,12 @@ spec:
         proxy-buffer-size: "16k"
         ssl-protocols: "TLSv1.3 TLSv1.2"
         use-forwarded-headers: "true"
+        use-geoip2: true
 
       metrics:
         enabled: true
         serviceMonitor:
-          enabled: true  #Enable after prometheus is installed
+          enabled: true
           namespace: network
           namespaceSelector:
             any: true
