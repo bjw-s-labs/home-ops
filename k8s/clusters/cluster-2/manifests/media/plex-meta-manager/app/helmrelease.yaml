@@ -44,17 +44,17 @@ spec:
         containers:
           app:
             image:
-              repository: meisnate12/plex-meta-manager
-              tag: nightly
+              repository: kometateam/kometa
+              tag: v2.0.2
               pullPolicy: IfNotPresent
             env:
               TZ: "${TIMEZONE}"
-              PMM_CONFIG: /config/config.yml
-              PMM_TIME: "06:00, 18:00"
+              KOMETA_CONFIG: /config/config.yml
+              KOMETA_TIMES: "06:00, 18:00"
               # Runs PMM immediately. Used to test
-              PMM_RUN: true
-              PMM_DEBUG: true
-              PMM_READ_ONLY_CONFIG: true
+              KOMETA_RUN: true
+              KOMETA_DEBUG: true
+              KOMETA_READ_ONLY_CONFIG: true
             probes:
               liveness:
                 enabled: true
