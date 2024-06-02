@@ -5,8 +5,7 @@ metadata:
 type: Opaque
 stringData:
     # The repository url
-    # RESTIC_REPOSITORY: s3:https://s3.cluster-2.${INGRESS_DOMAIN}:443/backups/clusters/${CLUSTER_NAME}/pvcs/${NAMESPACE}/${APP}
-    RESTIC_REPOSITORY: s3:https://s3.cluster-2.${INGRESS_DOMAIN}:443/backups/clusters/cluster-1/pvcs/${NAMESPACE}/${APP}
+    RESTIC_REPOSITORY: s3:https://s3.cluster-2.${INGRESS_DOMAIN}:443/backups/clusters/${CLUSTER_NAME}/pvcs/${NAMESPACE}/${APP}
     # The repository encryption key
     RESTIC_PASSWORD: ${RESTIC_PASSWORD}
     # ENV vars specific to the chosen back end
@@ -20,7 +19,7 @@ kind: ReplicationSource
 metadata:
   name: "${APP}"
 spec:
-  sourcePVC: "${APP}-config-cluster-2"
+  sourcePVC: "${APP}"
   trigger:
     schedule: "0 8 * * *"
   restic:
