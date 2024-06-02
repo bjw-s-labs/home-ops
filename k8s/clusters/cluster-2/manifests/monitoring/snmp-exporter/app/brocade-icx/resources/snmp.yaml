@@ -20,9 +20,13 @@ modules:
     - 1.3.6.1.4.1.1991.1.1.1.4.1.1.4
     - 1.3.6.1.4.1.1991.1.1.2.13.1
     - 1.3.6.1.4.1.1991.1.1.2.13.3
+    - 1.3.6.1.4.1.1991.1.1.2.14.2.2.1.6
+    - 1.3.6.1.4.1.1991.1.1.3.3.1.1.66
     get:
     - 1.3.6.1.4.1.1991.1.1.1.1.18.0
     - 1.3.6.1.4.1.1991.1.1.1.1.19.0
+    - 1.3.6.1.4.1.1991.1.1.2.14.1.1.0
+    - 1.3.6.1.4.1.1991.1.1.2.14.1.2.0
     metrics:
     - name: snChasActualTemperature
       oid: 1.3.6.1.4.1.1991.1.1.1.1.18
@@ -173,4 +177,21 @@ modules:
       - labelname: snAgentTemp2SlotNum
         type: gauge
       - labelname: snAgentTemp2SensorId
+        type: gauge
+    - name: snAgentPoeGblPowerCapacityTotal
+      oid: 1.3.6.1.4.1.1991.1.1.2.14.1.1
+      type: gauge
+      help: This object shows the total inline power capacity available in the device,
+        measured in mWatts. - 1.3.6.1.4.1.1991.1.1.2.14.1.1
+    - name: snAgentPoeGblPowerCapacityFree
+      oid: 1.3.6.1.4.1.1991.1.1.2.14.1.2
+      type: gauge
+      help: This object shows the inline power capacity currently available in the
+        device which is unallocated, measured in mWatts. - 1.3.6.1.4.1.1991.1.1.2.14.1.2
+    - name: snSwPortInLinePowerConsumed
+      oid: 1.3.6.1.4.1.1991.1.1.3.3.1.1.66
+      type: gauge
+      help: Inline power consumed by the port - 1.3.6.1.4.1.1991.1.1.3.3.1.1.66
+      indexes:
+      - labelname: snSwPortInfoPortNum
         type: gauge
