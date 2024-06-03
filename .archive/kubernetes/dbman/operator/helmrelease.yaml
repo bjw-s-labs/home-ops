@@ -23,20 +23,3 @@ spec:
     env:
       - name: RUST_LOG
         value: info
-  postRenderers:
-    - kustomize:
-        patches:
-          - target:
-              version: v1
-              kind: DaemonSet
-              name: spegel
-            patch: |
-              - op: add
-                path: /spec/template/metadata/labels/egress.home.arpa~1apiserver
-                value: allow
-              - op: add
-                path: /spec/template/metadata/labels/db.home.arpa~1pg
-                value: postgres
-              - op: add
-                path: /spec/template/metadata/labels/egress.home.arpa~1kubedns
-                value: allow
