@@ -19,12 +19,6 @@ spec:
     global:
       podAnnotations:
         secret.reloader.stakater.com/reload: authentik-secret, authentik-db-secret
-      podLabels:
-        db.home.arpa/pg: postgres
-        egress.home.arpa/apiserver: allow
-        egress.home.arpa/internet: allow
-        egress.home.arpa/kubedns: allow # FIXME: Remove when clusterNetworkPolicy is in place
-        ingress.home.arpa/nginx-internal: allow
       deploymentStrategy:
         type: RollingUpdate
       envFrom:
@@ -53,9 +47,6 @@ spec:
     server:
       podAnnotations:
         secret.reloader.stakater.com/reload:
-      podLabels:
-        ingress.home.arpa/nginx-external: allow
-        prom.home.arpa/kps: allow
       autoscaling:
         enabled: true
         minReplicas: 1
