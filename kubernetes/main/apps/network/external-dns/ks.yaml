@@ -24,27 +24,6 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname externaldns-internal
-  namespace: flux-system
-spec:
-  targetNamespace: network
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: *appname
-  interval: 10m
-  path: "./kubernetes/main/apps/network/external-dns/internal"
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops-kubernetes
-  wait: true
-  dependsOn:
-    - name: external-secrets-stores
----
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
   name: &appname externaldns-unifi
   namespace: flux-system
 spec:
@@ -58,6 +37,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-ops-kubernetes
-  wait: true
+  wait: false
   dependsOn:
     - name: external-secrets-stores
