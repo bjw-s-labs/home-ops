@@ -1,0 +1,80 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: externaldns-unifi
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: external-dns
+      version: 1.14.4
+      sourceRef:
+        kind: HelmRepository
+        name: kubernetes-sigs-external-dns
+        namespace: flux-system
+      interval: 30m
+
+  values:
+    fullnameOverride: &name externaldns-unifi
+    domainFilters:
+      - bjw-s.dev
+    extraArgs:
+      - --ignore-ingress-tls-spec
+    podAnnotations:
+      secret.reloader.stakater.com/reload: externaldns-unifi-secret
+    policy: sync
+    provider:
+      name: webhook
+      webhook:
+        image:
+          repository: ghcr.io/kashalls/external-dns-unifi-webhook
+          tag: v0.1.0
+        env:
+          - name: UNIFI_HOST
+            value: https://10.1.0.1
+          - name: UNIFI_USER
+            value: external-dns
+          - name: UNIFI_PASS
+            valueFrom:
+              secretKeyRef:
+                name: external-dns-unifi-secret
+                key: external_dns_password
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http-wh-metrics
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: http-wh-metrics
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+    resources:
+      requests:
+        cpu: 16m
+        memory: 90M
+      limits:
+        memory: 90M
+    serviceMonitor:
+      enabled: true
+    sources:
+      - ingress
+      - service
+    txtOwnerId: main
+    txtPrefix: "k8s."
+
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              version: v1
+              kind: Deployment
+              name: *name
+            patch: |
+              - op: add
+                path: /spec/template/spec/enableServiceLinks
+                value: false
