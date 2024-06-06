@@ -1,0 +1,11 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: workhorse
+spec:
+  staticConfigs:
+    - targets:
+        - workhorse.mgmt.${INGRESS_DOMAIN}:9100
+  metricsPath: /metrics
