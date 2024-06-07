@@ -206,15 +206,19 @@ spec:
         useAllDevices: false
         config:
           osdsPerDevice: "1"
+          metadataDevice: "config-should-override"
         nodes:
           - name: work1
-            config:
-              # metadataDevice: "/dev/disk/by-id/ata-OCZ_INTREPID_3800_A22L7061515001100"
-              metadataDevice: "sdd"
             devices:
                 # HDDs
               - name: "/dev/disk/by-id/ata-TOSHIBA_MG08ACA16TE_6180A056FVGG"
+                config:
+                  # metadataDevice: "/dev/disk/by-id/ata-OCZ_INTREPID_3800_A22L7061515001100"
+                  metadataDevice: "/dev/sdd"
               - name: "/dev/disk/by-id/ata-TOSHIBA_MG08ACA16TE_71K0A0Q4FVGG"
+                config:
+                  # metadataDevice: "/dev/disk/by-id/ata-OCZ_INTREPID_3800_A22L7061515001100"
+                  metadataDevice: "/dev/sdd"
                 # SSDs
               - name: "/dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S598NJ0NA65759X"
           - name: work2
