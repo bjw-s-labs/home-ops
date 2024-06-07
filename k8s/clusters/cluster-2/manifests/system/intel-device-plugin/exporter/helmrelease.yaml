@@ -1,11 +1,11 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/helm.toolkit.fluxcd.io/helmrelease_v2beta1.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: intel-gpu-exporter
 spec:
-  interval: 30m
+  interval: 15m
   chart:
     spec:
       chart: app-template
@@ -25,22 +25,37 @@ spec:
       retries: 3
   uninstall:
     keepHistory: false
-  dependsOn:
-    - name: intel-device-plugin-gpu
-      namespace: system
   values:
-    controller:
-      type: daemonset
-    image:
-      repository: ghcr.io/onedr0p/intel-gpu-exporter
-      tag: rolling@sha256:db18b372824a3940b7733d11286070439d47eb22bc4bc1471a4c754ba977f665
+    controllers:
+      main:
+        type: daemonset
+        pod:
+          nodeSelector:
+            intel.feature.node.kubernetes.io/gpu: "true"
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/intel-gpu-exporter
+              tag: rolling@sha256:db18b372824a3940b7733d11286070439d47eb22bc4bc1471a4c754ba977f665
+            securityContext:
+              privileged: true
+            resources:
+              requests:
+                gpu.intel.com/i915_monitoring: 1
+                cpu: 100m
+                memory: 100Mi
+              limits:
+                gpu.intel.com/i915_monitoring: 1
+                memory: 500Mi
     service:
       main:
+        controller: main
         ports:
           http:
             port: 8080
     serviceMonitor:
       main:
+        serviceName: intel-gpu-exporter
         enabled: true
         endpoints:
           - port: http
@@ -51,15 +66,3 @@ spec:
             relabelings:
               - sourceLabels: [__meta_kubernetes_pod_node_name]
                 targetLabel: node
-    securityContext:
-      privileged: true
-    nodeSelector:
-      intel.feature.node.kubernetes.io/gpu: "true"
-    resources:
-      requests:
-        gpu.intel.com/i915_monitoring: 1
-        cpu: 100m
-        memory: 100Mi
-      limits:
-        gpu.intel.com/i915_monitoring: 1
-        memory: 500Mi
