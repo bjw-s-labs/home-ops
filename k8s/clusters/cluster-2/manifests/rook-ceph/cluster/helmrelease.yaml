@@ -206,37 +206,34 @@ spec:
         useAllDevices: false
         config:
           osdsPerDevice: "1"
-          metadataDevice: "config-should-override"
         nodes:
-        - name: work1
-          devices:
-          # HDDs
-          - name: "/dev/disk/by-id/ata-TOSHIBA_MG08ACA16TE_6180A056FVGG"
-            config:
-              metadataDevice: "/dev/disk/by-id/ata-OCZ_INTREPID_3800_A22L7061515001100"
-          - name: "/dev/disk/by-id/ata-TOSHIBA_MG08ACA16TE_71K0A0Q4FVGG"
-            config:
-              metadataDevice: "/dev/disk/by-id/ata-OCZ_INTREPID_3800_A22L7061515001100"
-          # SSDs
-          - name: "/dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S598NJ0NA65759X"
-            config:
-              # Should have no metadata device since this is an SSD
-              # I override it here so we dont create HDD OSDs without metadata devices
-              metadataDevice: ""
-        - name: work2
-          deviceFilter: ^sd[a-c]
-        - name: work3
-          deviceFilter: ^sd[a-c]
-        - name: work4
-          deviceFilter: ^sd[a-d]
-        - name: work5
-          deviceFilter: ^sd[a-c]
-        - name: work6
-          deviceFilter: ^sd[a-c]
-        - name: work7
-          deviceFilter: ^sd[a-c]
-        - name: work8
-          deviceFilter: ^sd[a-c]
+          - name: work1
+            devices:
+            # HDDs
+              - name: "/dev/disk/by-id/ata-TOSHIBA_MG08ACA16TE_6180A056FVGG"
+                config:
+                  # metadataDevice: "/dev/disk/by-id/ata-OCZ_INTREPID_3800_A22L7061515001100"
+                  metadataDevice: /dev/sdd
+              - name: "/dev/disk/by-id/ata-TOSHIBA_MG08ACA16TE_71K0A0Q4FVGG"
+                config:
+                  # metadataDevice: "/dev/disk/by-id/ata-OCZ_INTREPID_3800_A22L7061515001100"
+                  metadataDevice: /dev/sdd
+              # SSDs
+              - name: "/dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S598NJ0NA65759X"
+          - name: work2
+            deviceFilter: ^sd[a-c]
+          - name: work3
+            deviceFilter: ^sd[a-c]
+          - name: work4
+            deviceFilter: ^sd[a-d]
+          - name: work5
+            deviceFilter: ^sd[a-c]
+          - name: work6
+            deviceFilter: ^sd[a-c]
+          - name: work7
+            deviceFilter: ^sd[a-c]
+          - name: work8
+            deviceFilter: ^sd[a-c]
     cephBlockPools:
       - name: ceph-blockpool
         spec:
