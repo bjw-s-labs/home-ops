@@ -42,5 +42,11 @@ spec:
       relabelings:
         - action: labeldrop
           regex: (pod)
+        - action: replace
+          regex: (.*)
+          replacement: $1.${CLUSTER_NAME}.${INGRESS_DOMAIN}:9100
+          sourceLabels:
+            - kubernetes_node
+          targetLabel: instance
     prometheusRules:
       enabled: false
