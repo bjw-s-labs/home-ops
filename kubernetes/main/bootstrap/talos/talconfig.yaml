@@ -17,8 +17,8 @@ additionalApiServerCertSans: &san
 additionalMachineCertSans: *san
 
 nodes:
-  - hostname: delta.bjw-s.internal
-    ipAddress: 10.1.1.31
+  - hostname: delta.nickeson.net
+    ipAddress: 10.28.1.31
     controlPlane: true
     installDiskSelector:
       size: "<= 256GB"
@@ -57,56 +57,6 @@ nodes:
                   - rshared
                   - rw
 
-  - hostname: enigma.bjw-s.internal
-    ipAddress: 10.1.1.32
-    controlPlane: true
-    installDiskSelector:
-      size: "<= 256GB"
-      model: "TS240GMTS420S"
-    machineDisks:
-      - device: /dev/disk/by-id/ata-CT500MX500SSD1_2149E5EC1D31
-        partitions:
-          - mountpoint: /var/mnt/sata
-    networkInterfaces:
-      - interface: bond0
-        bond:
-          mode: active-backup
-          deviceSelectors:
-            - hardwareAddr: 48:21:0b:55:dc:7b
-              driver: igc
-        dhcp: true
-        vip:
-          ip: ${clusterEndpointIP}
-        vlans:
-          - *vlan303
-    patches:
-      - *kubelet_extra_mounts
-
-  - hostname: felix.bjw-s.internal
-    ipAddress: 10.1.1.33
-    controlPlane: true
-    installDiskSelector:
-      size: "<= 256GB"
-      model: "TS240GMTS420S"
-    machineDisks:
-      - device: /dev/disk/by-id/ata-KINGSTON_SA400S37480G_50026B77825B2170
-        partitions:
-          - mountpoint: /var/mnt/sata
-    networkInterfaces:
-      - interface: bond0
-        bond:
-          mode: active-backup
-          deviceSelectors:
-            - hardwareAddr: 48:21:0b:56:09:47
-              driver: igc
-        dhcp: true
-        vip:
-          ip: ${clusterEndpointIP}
-        vlans:
-          - *vlan303
-    patches:
-      - *kubelet_extra_mounts
-
 controlPlane:
   schematic:
     customization:
@@ -144,7 +94,7 @@ controlPlane:
       cluster:
         etcd:
           advertisedSubnets:
-            - 10.1.1.0/24
+            - 10.28.1.0/24
 
     # Configure containerd
     - |-
@@ -201,7 +151,7 @@ controlPlane:
             maxPods: 150
           nodeIP:
             validSubnets:
-                - 10.1.1.0/24
+                - 10.28.1.0/24
 
     # Custom sysctls
     - |-
