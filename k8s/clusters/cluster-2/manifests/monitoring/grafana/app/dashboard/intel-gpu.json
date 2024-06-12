@@ -1,0 +1,1149 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 2,
+    "id": 15,
+    "links": [
+      {
+        "asDropdown": true,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [
+          "transcoding_user"
+        ],
+        "targetBlank": false,
+        "title": "Services",
+        "tooltip": "",
+        "type": "dashboards",
+        "url": ""
+      }
+    ],
+    "panels": [
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "id": 6,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_engines_render_3d_0_busy{instance=~\"${Instance}\"}",
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_engines_render_3d_0_sema{instance=~\"${Instance}\"}",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_engines_render_3d_0_wait{instance=~\"${Instance}\"}",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "C"
+          }
+        ],
+        "title": "Render 3D",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": [
+            {
+              "__systemRef": "hideSeriesFrom",
+              "matcher": {
+                "id": "byNames",
+                "options": {
+                  "mode": "exclude",
+                  "names": [
+                    "igpu_engines_blitter_0_busy"
+                  ],
+                  "prefix": "All except:",
+                  "readOnly": true
+                }
+              },
+              "properties": [
+                {
+                  "id": "custom.hideFrom",
+                  "value": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": true
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        },
+        "id": 7,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_engines_blitter_0_busy{instance=~\"${Instance}\"}",
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_engines_blitter_0_sema{instance=~\"${Instance}\"}",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_engines_blitter_0_wait{instance=~\"${Instance}\"}",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "C"
+          }
+        ],
+        "title": "Blitter",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        },
+        "id": 8,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_engines_video_0_busy{instance=~\"${Instance}\"}",
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_engines_video_0_sema{instance=~\"${Instance}\"}",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_engines_video_0_wait{instance=~\"${Instance}\"}",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "C"
+          }
+        ],
+        "title": "Video",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        },
+        "id": 9,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_engines_video_enhance_0_busy{instance=~\"${Instance}\"}",
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_engines_video_enhance_0_sema{instance=~\"${Instance}\"}",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_engines_video_enhance_0_wait{instance=~\"${Instance}\"}",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "C"
+          }
+        ],
+        "title": "Video enhance",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "rotmhz"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 16
+        },
+        "id": 10,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_frequency_actual{instance=~\"${Instance}\"}",
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_frequency_requested{instance=~\"${Instance}\"}",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "B"
+          }
+        ],
+        "title": "Frequency",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "MiBs"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 16
+        },
+        "id": 11,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_imc_bandwidth_reads{instance=~\"${Instance}\"}",
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "editorMode": "code",
+            "expr": "igpu_imc_bandwidth_writes{instance=~\"${Instance}\"}",
+            "hide": false,
+            "instant": false,
+            "legendFormat": "{{__name__}}",
+            "range": true,
+            "refId": "B"
+          }
+        ],
+        "title": "Bandwith",
+        "type": "timeseries"
+      },
+      {
+        "collapsed": true,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 24
+        },
+        "id": 4,
+        "panels": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "drawStyle": "line",
+                  "fillOpacity": 0,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "auto",
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "off"
+                  }
+                },
+                "mappings": [],
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green"
+                    },
+                    {
+                      "color": "red",
+                      "value": 80
+                    }
+                  ]
+                },
+                "unit": "watt"
+              },
+              "overrides": []
+            },
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 0,
+              "y": 25
+            },
+            "id": 1,
+            "options": {
+              "legend": {
+                "calcs": [],
+                "displayMode": "list",
+                "placement": "bottom",
+                "showLegend": true
+              },
+              "tooltip": {
+                "mode": "single",
+                "sort": "none"
+              }
+            },
+            "targets": [
+              {
+                "datasource": {
+                  "type": "prometheus",
+                  "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+                },
+                "editorMode": "code",
+                "expr": "igpu_power_package{instance=~\"${Instance}\"}",
+                "instant": false,
+                "legendFormat": "{{__name__}}",
+                "range": true,
+                "refId": "A"
+              },
+              {
+                "datasource": {
+                  "type": "prometheus",
+                  "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+                },
+                "editorMode": "code",
+                "expr": "igpu_power_gpu{instance=~\"${Instance}\"}",
+                "hide": false,
+                "instant": false,
+                "legendFormat": "{{__name__}}",
+                "range": true,
+                "refId": "B"
+              }
+            ],
+            "title": "iGPU Power",
+            "type": "timeseries"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "drawStyle": "line",
+                  "fillOpacity": 0,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "auto",
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "off"
+                  }
+                },
+                "mappings": [],
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green"
+                    },
+                    {
+                      "color": "red",
+                      "value": 80
+                    }
+                  ]
+                },
+                "unit": "none"
+              },
+              "overrides": [
+                {
+                  "matcher": {
+                    "id": "byName",
+                    "options": "igpu_rc6"
+                  },
+                  "properties": [
+                    {
+                      "id": "unit",
+                      "value": "percent"
+                    }
+                  ]
+                },
+                {
+                  "matcher": {
+                    "id": "byName",
+                    "options": "igpu_interrupts"
+                  },
+                  "properties": [
+                    {
+                      "id": "unit",
+                      "value": "recps"
+                    }
+                  ]
+                }
+              ]
+            },
+            "gridPos": {
+              "h": 8,
+              "w": 8,
+              "x": 12,
+              "y": 25
+            },
+            "id": 3,
+            "options": {
+              "legend": {
+                "calcs": [],
+                "displayMode": "list",
+                "placement": "bottom",
+                "showLegend": true
+              },
+              "tooltip": {
+                "mode": "single",
+                "sort": "none"
+              }
+            },
+            "targets": [
+              {
+                "datasource": {
+                  "type": "prometheus",
+                  "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+                },
+                "editorMode": "code",
+                "expr": "igpu_rc6{instance=~\"${Instance}\"}",
+                "instant": false,
+                "legendFormat": "{{__name__}}",
+                "range": true,
+                "refId": "A"
+              },
+              {
+                "datasource": {
+                  "type": "prometheus",
+                  "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+                },
+                "editorMode": "code",
+                "expr": "igpu_interrupts{instance=~\"${Instance}\"}",
+                "hide": false,
+                "instant": false,
+                "legendFormat": "{{__name__}}",
+                "range": true,
+                "refId": "C"
+              }
+            ],
+            "title": "R6 & Interrupts ",
+            "type": "timeseries"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+            },
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "mappings": [],
+                "thresholds": {
+                  "mode": "percentage",
+                  "steps": [
+                    {
+                      "color": "green"
+                    },
+                    {
+                      "color": "orange",
+                      "value": 70
+                    },
+                    {
+                      "color": "red",
+                      "value": 85
+                    }
+                  ]
+                },
+                "unit": "ms"
+              },
+              "overrides": []
+            },
+            "gridPos": {
+              "h": 8,
+              "w": 4,
+              "x": 20,
+              "y": 25
+            },
+            "id": 12,
+            "options": {
+              "colorMode": "value",
+              "graphMode": "none",
+              "justifyMode": "auto",
+              "orientation": "auto",
+              "reduceOptions": {
+                "calcs": [
+                  "lastNotNull"
+                ],
+                "fields": "",
+                "values": false
+              },
+              "showPercentChange": false,
+              "textMode": "auto",
+              "wideLayout": true
+            },
+            "pluginVersion": "10.4.2",
+            "targets": [
+              {
+                "datasource": {
+                  "type": "prometheus",
+                  "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+                },
+                "editorMode": "code",
+                "expr": "igpu_period{instance=~\"${Instance}\"}",
+                "instant": false,
+                "legendFormat": "__auto",
+                "range": true,
+                "refId": "A"
+              }
+            ],
+            "title": "Period",
+            "type": "stat"
+          }
+        ],
+        "title": "Misc",
+        "type": "row"
+      }
+    ],
+    "refresh": "5s",
+    "schemaVersion": 39,
+    "tags": [
+      "igpu",
+      "intel",
+      "transcoding"
+    ],
+    "templating": {
+      "list": [
+        {
+          "current": {
+            "selected": false,
+            "text": "cloud.host.jhofer.local:8081",
+            "value": "cloud.host.jhofer.local:8081"
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "f9422c25-b9ee-4376-8bd2-6a67029728ce"
+          },
+          "definition": "label_values({job=\"intel-gpu_exporter\"},instance)",
+          "hide": 0,
+          "includeAll": false,
+          "multi": false,
+          "name": "Instance",
+          "options": [],
+          "query": {
+            "qryType": 1,
+            "query": "label_values({job=\"intel-gpu_exporter\"},instance)",
+            "refId": "PrometheusVariableQueryEditor-VariableQuery"
+          },
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "type": "query"
+        }
+      ]
+    },
+    "time": {
+      "from": "now-12h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Intel iGPU",
+    "uid": "ddittat0n2i9se",
+    "version": 9,
+    "weekStart": ""
+  }
