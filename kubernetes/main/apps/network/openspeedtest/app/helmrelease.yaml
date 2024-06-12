@@ -56,6 +56,8 @@ spec:
     ingress:
       app:
         className: "internal-nginx"
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
         hosts:
           - host: openspeedtest.bjw-s.dev
             paths:
