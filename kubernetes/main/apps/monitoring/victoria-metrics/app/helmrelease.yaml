@@ -134,6 +134,8 @@ spec:
       ingress:
         enabled: true
         ingressClassName: internal-nginx
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
         hosts:
           - vmalert.bjw-s.dev
 
@@ -166,6 +168,8 @@ spec:
       ingress:
         enabled: true
         ingressClassName: internal-nginx
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
         hosts:
           - vmagent.bjw-s.dev
 
