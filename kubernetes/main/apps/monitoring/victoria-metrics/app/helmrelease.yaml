@@ -23,90 +23,30 @@ spec:
         disable_prometheus_converter: false # Ensure we keep enabled the converter to sync prom rules to VM rules
         enable_converter_ownership: true # Required to allow VM to remove VM rules it imports if a prometheus rule is deleted
 
-    # Main VM Cluster in HA mode.
-    vmcluster:
+    # Single-binary vm cluster
+    vmsingle:
       enabled: true
       spec:
-        # Duration to keep metrics
-        retentionPeriod: "2" # this is months unless a character prefix is added (1d, 1w, etc)
         extraArgs:
           dedup.minScrapeInterval: 30s
-        replicationFactor: 3
-        # Storage backend
-        vmstorage:
-          replicaCount: 3
-          # required for HA vmagents
+          maxLabelsPerTimeseries: "90"
+          search.minStalenessInterval: 5m
+          vmalert.proxyURL: http://vmalert-victoria-metrics.monitoring.svc.cluster.local:8080
+      ingress:
+        enabled: true
+        ingressClassName: internal-nginx
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
+        hosts:
+          - victoria-metrics.bjw-s.dev
+        retentionPeriod: 1y
+        storage:
+          storageClassName: "ceph-block"
           resources:
             requests:
-              cpu: 100m
-              memory: 512Mi
-            limits:
-              cpu: 500m
-              memory: 1536Mi
-          topologySpreadConstraints:
-            - maxSkew: 1
-              topologyKey: kubernetes.io/hostname
-              whenUnsatisfiable: DoNotSchedule
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: vmstorage
-          extraArgs:
-            dedup.minScrapeInterval: 30s
-          storage:
-            volumeClaimTemplate:
-              spec:
-                storageClassName: openebs-hostpath
-                resources:
-                  requests:
-                    storage: 10Gi
-        # Query backend
-        vmselect:
-          replicaCount: 2 # HA
-          resources:
-            requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
-              cpu: 750m
-              memory: 256Mi
-          topologySpreadConstraints:
-            - maxSkew: 1
-              topologyKey: kubernetes.io/hostname
-              whenUnsatisfiable: DoNotSchedule
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: vmselect
-          cacheMountPath: /select-cache
-          extraArgs:
-            dedup.minScrapeInterval: 30s
-            search.minStalenessInterval: 5m
-            vmalert.proxyURL: http://vmalert-victoria-metrics:8080
-          storage:
-            volumeClaimTemplate:
-              spec:
-                storageClassName: openebs-hostpath
-                resources:
-                  requests:
-                    storage: 2Gi
-        # Data ingestion backend
-        vminsert:
-          replicaCount: 2 # HA
-          resources:
-            requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
-              cpu: 500m
-              memory: 256Mi
-          topologySpreadConstraints:
-            - maxSkew: 1
-              topologyKey: kubernetes.io/hostname
-              whenUnsatisfiable: DoNotSchedule
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: vminsert
-          extraArgs:
-            maxLabelsPerTimeseries: "90" # More needed if you are scraping a LOT of stuff and having issues
+              storage: "50Gi"
+          accessModes:
+            - ReadWriteOnce
 
     # VM Alerting (however, this just watches & passes alerts to alertmanager)
     vmalert:
@@ -172,10 +112,6 @@ spec:
           external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
         hosts:
           - vmagent.bjw-s.dev
-
-    # Single-binary vm cluster alternative (liteweight, non-HA)
-    vmsingle:
-      enabled: false
 
     # Extra slack templates
     monzoTemplate:
