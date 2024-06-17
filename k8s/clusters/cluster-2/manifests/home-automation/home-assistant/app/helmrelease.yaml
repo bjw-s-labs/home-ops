@@ -47,6 +47,8 @@ spec:
                 "ips": ["10.10.100.11/24"],
                 "mac": "48:c3:71:7c:c5:27"
               }]
+            # DO NOT ENABLE
+            # Enabling this adds an extra default route to the container. My IoT network is locked down tight and results in failed external DNS lookups
             # k8s.v1.cni.cncf.io/networks: home-automation-iot-dhcp
             secret.reloader.stakater.com/reload: home-assistant-secrets
           securityContext:
