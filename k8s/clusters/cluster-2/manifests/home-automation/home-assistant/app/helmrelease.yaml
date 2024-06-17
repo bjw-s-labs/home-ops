@@ -16,17 +16,20 @@ spec:
         namespace: flux-system
   maxHistory: 3
   install:
-    createNamespace: true
     remediation:
       retries: 3
   upgrade:
-    crds: CreateReplace
     cleanupOnFail: true
     remediation:
+      strategy: rollback
       retries: 3
-      strategy: uninstall
   uninstall:
     keepHistory: false
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: volsync-system
   values:
     global:
       nameOverride: *app
@@ -67,7 +70,7 @@ spec:
               HASS__PORT: &port 8123
               HASS__APPLICATION_URL: &host-cluster "home.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
               HASS__LOG_LEVEL: info
-              # HASS_HTTP_TRUSTED_PROXY_1: 10.0.0.0/8
+              HASS_HTTP_TRUSTED_PROXY_1: 10.0.0.0/8
               # HASS_HTTP_TRUSTED_PROXY_2: 10.42.0.0/16
             envFrom:
               - secretRef:
@@ -104,10 +107,10 @@ spec:
     service:
       app:
         controller: *app
-        type: LoadBalancer
-        annotations:
-          io.cilium/lb-ipam-ips: "${LB_HASS}"
-        externalTrafficPolicy: Cluster
+        # type: LoadBalancer
+        # annotations:
+        #   io.cilium/lb-ipam-ips: "${LB_HASS}"
+        # externalTrafficPolicy: Cluster
         ports:
           http:
             port: *port
