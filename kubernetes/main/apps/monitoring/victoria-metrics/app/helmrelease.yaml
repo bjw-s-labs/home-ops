@@ -32,13 +32,6 @@ spec:
           maxLabelsPerTimeseries: "90"
           search.minStalenessInterval: 5m
           vmalert.proxyURL: http://vmalert-victoria-metrics.monitoring.svc.cluster.local:8080
-      ingress:
-        enabled: true
-        ingressClassName: internal-nginx
-        annotations:
-          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
-        hosts:
-          - victoria-metrics.bjw-s.dev
         retentionPeriod: 1y
         storage:
           storageClassName: "ceph-block"
@@ -47,6 +40,13 @@ spec:
               storage: "50Gi"
           accessModes:
             - ReadWriteOnce
+      ingress:
+        enabled: true
+        ingressClassName: internal-nginx
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
+        hosts:
+          - victoria-metrics.bjw-s.dev
 
     # VM Alerting (however, this just watches & passes alerts to alertmanager)
     vmalert:
