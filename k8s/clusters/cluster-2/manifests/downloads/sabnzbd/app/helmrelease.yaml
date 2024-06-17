@@ -40,17 +40,17 @@ spec:
                   - key: google.feature.node.kubernetes.io/coral
                     operator: Exists
               topologyKey: kubernetes.io/hostname
-        # podAntiAffinity:
-        #   preferredDuringSchedulingIgnoredDuringExecution:
-        #     - weight: 100
-        #       podAffinityTerm:
-        #         labelSelector:
-        #           matchExpressions:
-        #             - key: app.kubernetes.io/name
-        #               operator: In
-        #               values:
-        #                 - frigate
-        #         topologyKey: kubernetes.io/hostname
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values: ["plex"]
+              topologyKey: kubernetes.io/hostname
+              # Blank selector selects all namespaces. Null namespace selector locks it to the same namespace as the HR
+              namespaces: ["media", "downloads", "home-automation"]
     controllers:
       sabnzbd:
         annotations:
