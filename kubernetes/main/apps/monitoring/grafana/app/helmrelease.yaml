@@ -137,8 +137,10 @@ spec:
           gnetId: 21356
           revision: 2
           datasource:
-            - { name: DS_PROMETHEUS, value: Prometheus }
-            - { name: VAR_REPLICATIONDESTNAME, value: '.*-bootstrap'}
+            - name: DS_PROMETHEUS
+              value: Prometheus
+            - name: VAR_REPLICATIONDESTNAME
+              value: '.*-bootstrap'
 
         zfs:
           # renovate: dashboardName="ZFS"
@@ -276,7 +278,7 @@ spec:
           - access: proxy
             name: Prometheus
             type: prometheus
-            url: http://vmselect-victoria-metrics.monitoring.svc.cluster.local:8481/select/0/prometheus
+            url: http://vmsingle-victoria-metrics.monitoring.svc.cluster.local:8429
             isDefault: true
             jsonData:
               prometheusType: Prometheus
