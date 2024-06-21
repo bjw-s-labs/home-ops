@@ -1,0 +1,78 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: fluent-bit
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: fluent-bit
+      version: 0.46.11
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: fluent
+  values:
+    ## https://docs.fluentbit.io/manual/administration/configuring-fluent-bit/classic-mode/configuration-file
+    config:
+      service: |
+        [SERVICE]
+          Daemon Off
+          Flush {{ .Values.flush }}
+          Log_Level {{ .Values.logLevel }}
+          Parsers_File /fluent-bit/etc/parsers.conf
+          Parsers_File /fluent-bit/etc/conf/custom_parsers.conf
+          HTTP_Server On
+          HTTP_Listen 0.0.0.0
+          HTTP_Port {{ .Values.metricsPort }}
+          Health_Check On
+
+      ## https://docs.fluentbit.io/manual/pipeline/inputs
+      inputs: |
+        [INPUT]
+          name tail
+          alias kubernetes
+          path /var/log/containers/*.log
+          parser containerd
+          tag kubernetes.*
+
+      ## https://docs.fluentbit.io/manual/pipeline/filters
+      filters: |
+        [FILTER]
+          name kubernetes
+          alias kubernetes
+          match kubernetes.*
+          buffer_size 0
+          merge_log on
+
+          kube_tag_prefix kubernetes.var.log.containers.
+          k8s-logging.parser on
+          k8s-logging.exclude on
+          namespace_labels off
+          annotations off
+
+        [FILTER]
+          name modify
+          match kubernetes.*
+          add source kubernetes
+          remove logtag
+
+        [FILTER]
+          name nest
+          match *
+          wildcard pod_name
+          operation lift
+          nested_under kubernetes
+          add_prefix kubernetes_
+
+      ## https://docs.fluentbit.io/manual/pipeline/outputs
+      outputs: |
+        [OUTPUT]
+          Name loki
+          Match kubernetes.*
+          host loki-gateway.monitoring.svc.cluster.local
+          port 80
+          line_format json
+          labels job=fluent-bit, source=$source, namespace=$kubernetes_namespace_name
