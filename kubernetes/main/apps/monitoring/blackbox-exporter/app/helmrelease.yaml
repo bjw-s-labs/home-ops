@@ -81,7 +81,7 @@ spec:
             severity: critical
           annotations:
             summary: |-
-              The host {{ $labels.target }} is currently unreachable
+              The host {{ $labels.instance }} is currently unreachable
 
     pspEnabled: false
 
@@ -100,12 +100,14 @@ spec:
         scrapeTimeout: 30s
       targets:
         # PiKVM
-        # - module: http_2xx
-        #   name: pikvm-http
-        #   url: "http://pikvm.bjw-s.internal"
-        # - module: icmp
-        #   name: pikvm-icmp
-        #   url: diego.bjw-s.internal
+        - module: http_2xx
+          name: pikvm-http
+          url: "https://pikvm.bjw-s.internal"
+          tls_config:
+            insecure_skip_verify: true
+        - module: icmp
+          name: pikvm-icmp
+          url: pikvm.bjw-s.internal
 
         # Robot vacuums
         - module: icmp
