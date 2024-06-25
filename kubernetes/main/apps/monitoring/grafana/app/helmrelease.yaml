@@ -241,35 +241,6 @@ spec:
           datasource:
             - name: "DS_PROMETHEUS"
               value: Prometheus
-      victoriametrics:
-        vm-cluster:
-          # renovate: dashboardName="VictoriaMetrics - cluster"
-          gnetId: 11176
-          revision: 37
-          datasource:
-            - name: "DS_PROMETHEUS"
-              value: Prometheus
-        vm-operator:
-          # renovate: dashboardName="VictoriaMetrics - operator"
-          gnetId: 17869
-          revision: 2
-          datasource:
-            - name: "DS_PROMETHEUS"
-              value: Prometheus
-        vm-vmalert:
-          # renovate: dashboardName="VictoriaMetrics - vmalert"
-          gnetId: 14950
-          revision: 11
-          datasource:
-            - name: "DS_PROMETHEUS"
-              value: Prometheus
-        vm-vmagent:
-          # renovate: dashboardName="VictoriaMetrics - vmagent"
-          gnetId: 12683
-          revision: 18
-          datasource:
-            - name: "DS_PROMETHEUS"
-              value: Prometheus
 
     datasources:
       datasources.yaml:
@@ -278,7 +249,7 @@ spec:
           - access: proxy
             name: Prometheus
             type: prometheus
-            url: http://vmsingle-victoria-metrics.monitoring.svc.cluster.local:8429
+            url: http://prometheus-operated.monitoring.svc.cluster.local:9090
             isDefault: true
             jsonData:
               prometheusType: Prometheus
