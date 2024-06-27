@@ -493,6 +493,78 @@ nodes:
         #   vlans:
         #     - *vlan2040-noMTU
 
+    - hostname: work9.cluster-2.${secret_domain}
+      ipAddress: work9.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
+      controlPlane: false
+      disableSearchDomain: true
+      nodeLabels:
+        node-role.kubernetes.io/rook-osd-node: "true"
+        node-type: "CM4008032-SOQuartz-Blade"
+      nodeTaints:
+        storage-node: true:NoSchedule
+      installDiskSelector:
+        size: <= 50GB
+      nameservers:
+        - 10.0.0.4
+      networkInterfaces:
+        # 1G Internal Port
+        - deviceSelector:
+            driver: bcmgenet
+          dhcp: false
+          vlans:
+            - *vlan2002
+            - *vlan2040-noMTU
+
+    - hostname: work10.cluster-2.${secret_domain}
+      ipAddress: work10.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
+      controlPlane: false
+      disableSearchDomain: true
+      nodeLabels:
+        node-role.kubernetes.io/rook-osd-node: "true"
+        node-type: "CM4008032-SOQuartz-Blade"
+      nodeTaints:
+        storage-node: true:NoSchedule
+      installDiskSelector:
+        size: <= 50GB
+      nameservers:
+        - 10.0.0.4
+      networkInterfaces:
+        # 1G Internal Port
+        - deviceSelector:
+            driver: bcmgenet
+          dhcp: false
+          vlans:
+            - *vlan2002
+            - *vlan2040-noMTU
+
+    - hostname: work11.cluster-2.${secret_domain}
+      ipAddress: work11.cluster-2.${secret_domain}
+      # Rasp Pi Specific factory.talos.dev overlay included
+      talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
+      controlPlane: false
+      disableSearchDomain: true
+      nodeLabels:
+        node-role.kubernetes.io/rook-osd-node: "true"
+        node-type: "CM4008032-SOQuartz-Blade"
+      nodeTaints:
+        storage-node: true:NoSchedule
+      installDiskSelector:
+        size: <= 50GB
+      nameservers:
+        - 10.0.0.4
+      networkInterfaces:
+        # 1G Internal Port
+        - deviceSelector:
+            driver: bcmgenet
+          dhcp: false
+          vlans:
+            - *vlan2002
+            - *vlan2040-noMTU
+
 controlPlane:
   schematic:
     customization:
