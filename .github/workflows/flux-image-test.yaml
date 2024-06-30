@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: "Flux Helm Release Image Test"
+name: "Flux Image Test"
 
 on:
   pull_request:
@@ -128,7 +128,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Test Images
-        run: docker pull ${{ matrix.images }}
+        run: docker buildx imagetools inspect ${{ matrix.images }}
 
   test-images-success:
     if: ${{ always() }}
