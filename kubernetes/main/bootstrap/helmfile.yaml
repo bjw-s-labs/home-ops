@@ -19,23 +19,23 @@ releases:
   - name: prometheus-operator-crds
     namespace: monitoring
     chart: prometheus-community/prometheus-operator-crds
-    version: 12.0.0
+    version: 13.0.1
 
   - name: cilium
     namespace: kube-system
     chart: cilium/cilium
-    version: 1.15.3
+    version: 1.15.6
     values:
-      - ../../../apps/kube-system/cilium/app/values.yaml
+      - ../apps/kube-system/cilium/app/values.yaml
     needs:
       - monitoring/prometheus-operator-crds
 
   - name: kubelet-csr-approver
     namespace: system-controllers
     chart: postfinance/kubelet-csr-approver
-    version: 1.2.1
+    version: 1.2.2
     values:
-      - ../../../apps/system-controllers/kubelet-csr-approver/app/values.yaml
+      - ../apps/system-controllers/kubelet-csr-approver/app/values.yaml
     needs:
       - kube-system/cilium
       - monitoring/prometheus-operator-crds
@@ -43,9 +43,9 @@ releases:
   - name: spegel
     namespace: system
     chart: oci://ghcr.io/spegel-org/helm-charts/spegel
-    version: v0.0.22
+    version: v0.0.23
     values:
-      - ../../../apps/system/spegel/app/values.yaml
+      - ../apps/system/spegel/app/values.yaml
     needs:
       - kube-system/cilium
       - system-controllers/kubelet-csr-approver

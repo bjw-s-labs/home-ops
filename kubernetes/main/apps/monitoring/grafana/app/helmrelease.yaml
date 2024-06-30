@@ -13,7 +13,7 @@ spec:
         kind: HelmRepository
         name: grafana
         namespace: flux-system
-      version: 8.0.1
+      version: 8.2.0
   interval: 30m
   timeout: 20m
   values:
@@ -132,6 +132,16 @@ spec:
             - name: DS_PROMETHEUS
               value: Prometheus
 
+        volsync:
+          # removate: dashboardName="VolSync Dashboard"
+          gnetId: 21356
+          revision: 2
+          datasource:
+            - name: DS_PROMETHEUS
+              value: Prometheus
+            - name: VAR_REPLICATIONDESTNAME
+              value: '.*-bootstrap'
+
         zfs:
           # renovate: dashboardName="ZFS"
           gnetId: 7845
@@ -170,7 +180,7 @@ spec:
         k8s-system-api-server:
           # renovate: dashboardName="Kubernetes / System / API Server"
           gnetId: 15761
-          revision: 16
+          revision: 17
           datasource: Prometheus
         k8s-views-global:
           # renovate: dashboardName="Kubernetes / Views / Global"
@@ -231,35 +241,6 @@ spec:
           datasource:
             - name: "DS_PROMETHEUS"
               value: Prometheus
-      victoriametrics:
-        vm-cluster:
-          # renovate: dashboardName="VictoriaMetrics - cluster"
-          gnetId: 11176
-          revision: 37
-          datasource:
-            - name: "DS_PROMETHEUS"
-              value: Prometheus
-        vm-operator:
-          # renovate: dashboardName="VictoriaMetrics - operator"
-          gnetId: 17869
-          revision: 2
-          datasource:
-            - name: "DS_PROMETHEUS"
-              value: Prometheus
-        vm-vmalert:
-          # renovate: dashboardName="VictoriaMetrics - vmalert"
-          gnetId: 14950
-          revision: 11
-          datasource:
-            - name: "DS_PROMETHEUS"
-              value: Prometheus
-        vm-vmagent:
-          # renovate: dashboardName="VictoriaMetrics - vmagent"
-          gnetId: 12683
-          revision: 18
-          datasource:
-            - name: "DS_PROMETHEUS"
-              value: Prometheus
 
     datasources:
       datasources.yaml:
@@ -268,7 +249,7 @@ spec:
           - access: proxy
             name: Prometheus
             type: prometheus
-            url: http://vmselect-victoria-metrics.monitoring.svc.cluster.local:8481/select/0/prometheus
+            url: http://prometheus-operated.monitoring.svc.cluster.local:9090
             isDefault: true
             jsonData:
               prometheusType: Prometheus
@@ -332,6 +313,8 @@ spec:
     ingress:
       enabled: true
       ingressClassName: internal-nginx
+      annotations:
+        external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
       hosts:
         - grafana.bjw-s.dev
 

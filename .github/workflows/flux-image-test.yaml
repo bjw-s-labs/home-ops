@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: "Flux Helm Release Image Test"
+name: "Flux Image Test"
 
 on:
   pull_request:
@@ -73,7 +73,7 @@ jobs:
           path: pull
 
       - name: Gather Images in Default Branch
-        uses: docker://ghcr.io/allenporter/flux-local:v5.3.1
+        uses: docker://ghcr.io/allenporter/flux-local:v5.4.0
         with:
           args: >-
             get cluster
@@ -83,7 +83,7 @@ jobs:
             --output-file default.yaml
 
       - name: Gather Images in Pull Request Branch
-        uses: docker://ghcr.io/allenporter/flux-local:v5.3.1
+        uses: docker://ghcr.io/allenporter/flux-local:v5.4.0
         with:
           args: >-
             get cluster
@@ -128,7 +128,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Test Images
-        run: docker pull ${{ matrix.images }}
+        run: docker buildx imagetools inspect ${{ matrix.images }}
 
   test-images-success:
     if: ${{ always() }}

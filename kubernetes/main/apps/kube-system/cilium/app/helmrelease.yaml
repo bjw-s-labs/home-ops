@@ -13,7 +13,7 @@ spec:
         kind: HelmRepository
         name: cilium
         namespace: flux-system
-      version: 1.15.3
+      version: 1.15.6
   interval: 30m
 
   valuesFrom:
@@ -39,6 +39,8 @@ spec:
         ingress:
           enabled: true
           className: "internal-nginx"
+          annotations:
+            external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
           hosts:
             - hubble-main.bjw-s.dev
 

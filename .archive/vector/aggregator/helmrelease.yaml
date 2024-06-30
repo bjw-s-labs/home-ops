@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -51,7 +51,7 @@ spec:
           vector-aggregator:
             image:
               repository: docker.io/timberio/vector
-              tag: 0.38.0-alpine
+              tag: 0.39.0-alpine
             args:
               - "--config"
               - "/etc/vector/vector.yaml"
@@ -73,7 +73,6 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/hostname: "vector.bjw-s.dev"
           io.cilium/lb-ipam-ips: "10.1.1.133"
-        externalTrafficPolicy: Cluster
         ports:
           http:
             port: 8686

@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: rook-ceph-cluster
-      version: v1.14.5
+      version: v1.14.7
       sourceRef:
         kind: HelmRepository
         name: rook-ceph
@@ -21,6 +21,8 @@ spec:
     ingress:
       dashboard:
         ingressClassName: "internal-nginx"
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
         host:
           name: rook-main.bjw-s.dev
           path: "/"
@@ -38,7 +40,7 @@ spec:
         enabled: true
         urlPrefix: /
         ssl: false
-        prometheusEndpoint: http://vmselect-victoria-metrics.monitoring.svc.cluster.local:8481/select/0/prometheus
+        prometheusEndpoint: http://prometheus-operated.monitoring.svc.cluster.local:9090
       mgr:
         modules:
           - name: pg_autoscaler
