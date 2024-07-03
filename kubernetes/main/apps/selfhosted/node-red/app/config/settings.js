@@ -3,32 +3,6 @@ module.exports = {
   credentialSecret: process.env.NODE_RED_CREDENTIAL_SECRET,
   flowFilePretty: true,
 
-  adminAuth: {
-    type: "strategy",
-    strategy: {
-      name: "openidconnect",
-      autoLogin: true,
-      label: "Sign in",
-      icon: "fa-cloud",
-      strategy: require("passport-openidconnect").Strategy,
-      options: {
-        issuer: "https://auth.bjw-s.dev",
-        authorizationURL: "https://auth.bjw-s.dev/api/oidc/authorization",
-        tokenURL: "https://auth.bjw-s.dev/api/oidc/token",
-        userInfoURL: "https://auth.bjw-s.dev/api/oidc/userinfo",
-        clientID: process.env.NODE_RED_OAUTH_CLIENT_ID,
-        clientSecret: process.env.NODE_RED_OAUTH_CLIENT_SECRET,
-        callbackURL: "https://nodered.bjw-s.dev/auth/strategy/callback",
-        scope: ["email", "profile", "openid"],
-        proxy: true,
-        verify: function (issuer, profile, done) {
-          done(null, profile)
-        },
-      },
-    },
-    users: [{username: "bernd", permissions: ["*"]}],
-  },
-
   uiPort: process.env.PORT || 1880,
 
   diagnostics: {
