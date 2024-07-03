@@ -56,7 +56,7 @@ spec:
               PAPERLESS_OCR_LANGUAGES: nld
               PAPERLESS_OCR_LANGUAGE: nld
               # Configure redis integration
-              PAPERLESS_REDIS: redis://dragonfly.database.svc.cluster.local:6379/0
+              PAPERLESS_REDIS: redis://paperless-redis.selfhosted.svc.cluster.local:6379
               # Configure user permissions
               USERMAP_GID: "65542" # gladius:external-services
               # Configure admin user
@@ -87,12 +87,30 @@ spec:
               limits:
                 memory: 6Gi
 
+      redis:
+        containers:
+          redis:
+            image:
+              repository: public.ecr.aws/docker/library/redis
+              tag: 7.2.5
+            resources:
+              requests:
+                cpu: 5m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+
     service:
       app:
         controller: paperless
         ports:
           http:
             port: 8000
+      redis:
+        controller: redis
+        ports:
+          http:
+            port: 6379
 
     ingress:
       app:
@@ -118,5 +136,7 @@ spec:
         type: nfs
         server: gladius.bjw-s.internal
         path: /tank/Apps/paperless
-        globalMounts:
-          - path: /data/nas
+        advancedMounts:
+          paperless:
+            app:
+              - path: /data/nas
