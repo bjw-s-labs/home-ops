@@ -33,7 +33,6 @@ spec:
               tag: 2.10.2
             env:
               # Configure application
-              PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
               PAPERLESS_SECRET_KEY:
                 valueFrom:
                   secretKeyRef:
@@ -44,14 +43,6 @@ spec:
               PAPERLESS_TIME_ZONE: "Europe/Amsterdam"
               PAPERLESS_WEBSERVER_WORKERS: "2"
               PAPERLESS_TASK_WORKERS: "2"
-              # Configure Remote User auth
-              PAPERLESS_ACCOUNT_ALLOW_SIGNUPS: "false"
-              PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS: "false"
-              PAPERLESS_SOCIALACCOUNT_PROVIDERS:
-                valueFrom:
-                  secretKeyRef:
-                    name: paperless-secret
-                    key: PAPERLESS_SOCIALACCOUNT_PROVIDERS
               # Configure folders
               PAPERLESS_CONSUMPTION_DIR: /data/nas/incoming
               PAPERLESS_DATA_DIR: /data/local/data
