@@ -55,18 +55,8 @@ spec:
               OCIS_LOG_COLOR: true
               OCIS_LOG_LEVEL: info
               OCIS_LOG_PRETTY: true
-              OCIS_OIDC_ISSUER: https://auth.bjw-s.dev
               OCIS_URL: https://files.bjw-s.dev
-              PROXY_AUTOPROVISION_ACCOUNTS: true
               PROXY_TLS: false
-              PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD: none
-              PROXY_OIDC_REWRITE_WELLKNOWN: true
-              PROXY_ROLE_ASSIGNMENT_DRIVER: oidc
-              PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM: groups
-              PROXY_USER_OIDC_CLAIM: preferred_username
-              WEB_OIDC_CLIENT_ID: ocis
-              WEB_OIDC_METADATA_URL: https://auth.bjw-s.dev/.well-known/openid-configuration
-              WEB_OIDC_SCOPE: "openid profile email groups"
             envFrom:
               - secretRef:
                   name: ocis-secret
@@ -113,9 +103,6 @@ spec:
         type: configMap
         name: ocis-configmap
         globalMounts:
-          - path: /etc/ocis/proxy.yaml
-            subPath: proxy.yaml
-            readOnly: true
           - path: /etc/ocis/web.yaml
             subPath: web.yaml
             readOnly: true
