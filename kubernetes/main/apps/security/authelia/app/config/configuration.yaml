@@ -110,17 +110,6 @@ identity_providers:
           - https://grafana.bjw-s.dev/login/generic_oauth
         userinfo_signed_response_alg: none
 
-      - client_id: "{{ .miniflux_oauth_client_id }}"
-        client_name: Miniflux
-        client_secret: "{{ .miniflux_oauth_client_secret }}"
-        public: false
-        authorization_policy: one_factor
-        pre_configured_consent_duration: 1y
-        scopes: ["openid", "profile", "groups", "email"]
-        redirect_uris:
-          - https://miniflux.bjw-s.dev/oauth2/oidc/callback
-        userinfo_signed_response_alg: none
-
       - client_id: "{{ .nodered_oauth_client_id }}"
         client_name: Node-RED
         client_secret: "{{ .nodered_oauth_client_secret }}"
