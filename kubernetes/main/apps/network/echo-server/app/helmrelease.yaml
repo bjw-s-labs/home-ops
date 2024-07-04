@@ -57,14 +57,9 @@ spec:
 
     ingress:
       app:
-        className: "external-nginx"
+        className: "internal-nginx"
         annotations:
-          external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
-          nginx.ingress.kubernetes.io/auth-method: GET
-          nginx.ingress.kubernetes.io/auth-url: https://auth.bjw-s.dev/api/verify
-          nginx.ingress.kubernetes.io/auth-signin: https://auth.bjw-s.dev/?rm=$request_method
-          nginx.ingress.kubernetes.io/auth-response-headers: Remote-User,Remote-Name,Remote-Groups,Remote-Email
-          nginx.ingress.kubernetes.io/auth-snippet: proxy_set_header X-Forwarded-Method $request_method;
+          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
         hosts:
           - host: echo-server.bjw-s.dev
             paths:

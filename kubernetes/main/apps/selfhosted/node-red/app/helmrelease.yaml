@@ -33,7 +33,7 @@ spec:
           app:
             image:
               repository: docker.io/nodered/node-red
-              tag: 4.0.1
+              tag: 4.0.2
             envFrom:
               - secretRef:
                   name: node-red-secret
@@ -53,9 +53,9 @@ spec:
 
     ingress:
       app:
-        className: "external-nginx"
+        className: "internal-nginx"
         annotations:
-          external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
+          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
         hosts:
           - host: nodered.bjw-s.dev
             paths:

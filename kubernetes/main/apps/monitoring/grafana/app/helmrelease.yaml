@@ -13,13 +13,16 @@ spec:
         kind: HelmRepository
         name: grafana
         namespace: flux-system
-      version: 8.2.1
+      version: 8.3.1
   interval: 30m
   timeout: 20m
   values:
+    admin:
+      existingSecret: grafana-admin-secret
+
     annotations:
       configmap.reloader.stakater.com/reload: grafana
-      secret.reloader.stakater.com/reload: grafana-secret
+      secret.reloader.stakater.com/reload: grafana-admin-secret
 
     replicas: 1
 
@@ -278,15 +281,6 @@ spec:
       GF_ANALYTICS_REPORTING_ENABLED: false
       GF_AUTH_ANONYMOUS_ENABLED: false
       GF_AUTH_BASIC_ENABLED: false
-      GF_AUTH_GENERIC_OAUTH_ENABLED: true
-      GF_AUTH_GENERIC_OAUTH_API_URL: https://auth.bjw-s.dev/api/oidc/userinfo
-      GF_AUTH_GENERIC_OAUTH_AUTH_URL: https://auth.bjw-s.dev/api/oidc/authorization
-      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: grafana
-      GF_AUTH_GENERIC_OAUTH_EMPTY_SCOPES: false
-      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups[*], 'bjws_admins') && 'Admin' || 'Viewer'"
-      GF_AUTH_GENERIC_OAUTH_SCOPES: openid profile email groups
-      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: https://auth.bjw-s.dev/api/oidc/token
-      GF_AUTH_OAUTH_AUTO_LOGIN: true
       GF_DATE_FORMATS_USE_BROWSER_LOCALE: true
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /tmp/dashboards/home.json
       GF_EXPLORE_ENABLED: true
@@ -296,16 +290,6 @@ spec:
       GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: natel-discrete-panel,pr0ps-trackmap-panel,panodata-map-panel
       GF_SECURITY_COOKIE_SAMESITE: grafana
       GF_SERVER_ROOT_URL: https://grafana.bjw-s.dev
-
-    envFromSecret: grafana-secret
-
-    # grafana.ini:
-    #   auth.generic_oauth:
-    #     icon: signin
-    #     login_attribute_path: preferred_username
-    #     groups_attribute_path: groups
-    #     name_attribute_path: name
-    #     use_pkce: true
 
     imageRenderer:
       enabled: true
