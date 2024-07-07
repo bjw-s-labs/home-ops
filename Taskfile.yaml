@@ -4,8 +4,13 @@ version: "3"
 vars:
   KUBERNETES_DIR: "{{.ROOT_DIR}}/kubernetes"
   TERRAFORM_DIR: "{{.ROOT_DIR}}/infrastructure/terraform"
+  ANSIBLE_DIR: "{{.ROOT_DIR}}/ansible"
+  VIRTUAL_ENV: "{{.ROOT_DIR}}/.venv"
 
 includes:
+  ansible:
+    dir: .taskfiles/ansible
+    taskfile: .taskfiles/ansible
   flux:
     dir: .taskfiles/flux
     taskfile: .taskfiles/flux
