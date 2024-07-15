@@ -397,14 +397,14 @@ spec:
     cephObjectStores:
       - name: &cephObjectStoreName ceph-objectstore-1
         spec:
-          deviceClass: ssd
+          deviceClass: nvme
           metadataPool:
-            deviceClass: ssd
+            deviceClass: nvme
             failureDomain: host
             replicated:
               size: 3
           dataPool:
-            deviceClass: ssd
+            deviceClass: nvme
             failureDomain: host
             erasureCoded:
               dataChunks: 2
