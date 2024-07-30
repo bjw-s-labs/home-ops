@@ -145,6 +145,16 @@ spec:
         name: "repo1"
         s3: *minio
 
+  monitoring:
+    pgmonitor:
+      exporter:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64M
+          limits:
+            memory: 512M
+
   proxy:
     pgBouncer:
       port: 5432
