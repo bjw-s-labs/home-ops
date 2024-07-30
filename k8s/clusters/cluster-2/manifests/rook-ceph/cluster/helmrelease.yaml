@@ -256,7 +256,11 @@ spec:
             devices:
             # HDDs
               - name: "/dev/disk/by-id/ata-ST16000NM001G-2KK103_ZL2N7J9V"
+                config:
+                  metadataDevice: "/dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S598NJ0NA65749Z"
               - name: "/dev/disk/by-id/ata-TOSHIBA_MG08ACA16TE_6180A067FVGG"
+                config:
+                  metadataDevice: "/dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S598NJ0NA65749Z"
           - name: work6
             deviceFilter: ^sd[a-c]
           - name: work7
@@ -350,14 +354,14 @@ spec:
               erasureCoded:
                 dataChunks: 6
                 codingChunks: 2
-            - name: erasurecoded-ssd
-              failureDomain: host
-              deviceClass: ssd
-              erasureCoded:
-                dataChunks: 6
-                codingChunks: 2
-              quota:
-                maxSize: 500G
+            # - name: erasurecoded-ssd
+            #   failureDomain: host
+            #   deviceClass: ssd
+            #   erasureCoded:
+            #     dataChunks: 6
+            #     codingChunks: 2
+            #   quota:
+            #     maxSize: 500G
           metadataServer:
             activeCount: 2
             activeStandby: true
