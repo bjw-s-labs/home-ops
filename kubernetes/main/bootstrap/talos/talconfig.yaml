@@ -21,10 +21,11 @@ nodes:
     ipAddress: 10.28.1.31
     controlPlane: true
     installDiskSelector:
-      size: "<= 256GB"
-      model: "TS240GMTS420S"
+      size: "<= 2560GB"
+      model: "Samsung*"
     machineDisks:
-      - device: /dev/disk/by-id/ata-CT500MX500SSD1_2149E5EC1D9D
+      #- device: /dev/disk/by-id/ata-CT500MX500SSD1_2149E5EC1D9D
+      - device: /dev/sdb
         partitions:
           - mountpoint: /var/mnt/sata
     networkInterfaces:
@@ -32,7 +33,7 @@ nodes:
         bond:
           mode: active-backup
           deviceSelectors:
-            - hardwareAddr: 48:21:0b:55:c4:8a
+            - hardwareAddr: e8:ff:1e:d2:b0:be
               driver: igc
         dhcp: true
         vip:
