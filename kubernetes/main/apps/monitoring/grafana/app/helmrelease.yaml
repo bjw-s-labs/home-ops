@@ -70,6 +70,14 @@ spec:
             editable: true
             options:
               path: /var/lib/grafana/dashboards/nginx
+          - name: postgres
+            orgId: 1
+            folder: Postgres
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/postgres
           - name: unpoller
             disableDeletion: false
             editable: true
@@ -199,6 +207,29 @@ spec:
           datasource: Prometheus
         nginx-request-handling-performance:
           url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/request-handling-performance.json
+          datasource: Prometheus
+
+      postgres:
+        crunchy-pgbackrest:
+          url: https://raw.githubusercontent.com/CrunchyData/postgres-operator-examples/main/kustomize/monitoring/grafana/dashboards/pgbackrest.json
+          datasource: Prometheus
+        crunchy-pod-details:
+          url: https://raw.githubusercontent.com/CrunchyData/postgres-operator-examples/main/kustomize/monitoring/grafana/dashboards/pod_details.json
+          datasource: Prometheus
+        crunchy-postgresql-details:
+          url: https://raw.githubusercontent.com/CrunchyData/postgres-operator-examples/main/kustomize/monitoring/grafana/dashboards/postgresql_details.json
+          datasource: Prometheus
+        crunchy-postgresql-overview:
+          url: https://raw.githubusercontent.com/CrunchyData/postgres-operator-examples/main/kustomize/monitoring/grafana/dashboards/postgresql_overview.json
+          datasource: Prometheus
+        crunchy-postgresql-service_health:
+          url: https://raw.githubusercontent.com/CrunchyData/postgres-operator-examples/main/kustomize/monitoring/grafana/dashboards/postgresql_service_health.json
+          datasource: Prometheus
+        crunchy-prometheus-alerts:
+          url: https://raw.githubusercontent.com/CrunchyData/postgres-operator-examples/main/kustomize/monitoring/grafana/dashboards/prometheus_alerts.json
+          datasource: Prometheus
+        crunchy-query-statistics:
+          url: https://raw.githubusercontent.com/CrunchyData/postgres-operator-examples/main/kustomize/monitoring/grafana/dashboards/query_statistics.json
           datasource: Prometheus
 
       unpoller:
