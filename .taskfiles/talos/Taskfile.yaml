@@ -3,8 +3,8 @@
 version: "3"
 
 tasks:
-  bootstrap:
-    desc: Bootstrap Talos
+  generate:
+    desc: Generate Talos
     summary: |
       Args:
         cluster: Cluster to run command against (default: main)
@@ -14,14 +14,16 @@ tasks:
       - task: bootstrap-etcd
         vars: &vars
           cluster: '{{.cluster | default "main"}}'
-          controller: "{{.controller}}"
-      - task: fetch-kubeconfig
-        vars: *vars
-      - task: bootstrap-integrations
-        vars: *vars
-    requires:
-      vars:
-        - controller
+  genconfig:
+    desc: Generate Talos Config
+    summary: |
+      Args:
+        cluster: Cluster to run command against (default: main)
+    prompt: Generate Talos Config on the '{{.cluster}}' cluster... continue?
+    cmds:
+      - task: generate-clusterconfig
+        vars: &vars
+          cluster: '{{.cluster | default "main"}}'
 
   bootstrap-etcd:
     desc: Bootstrap Etcd
@@ -65,6 +67,7 @@ tasks:
         --secret-file {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talsecret.sops.yaml
         --config-file {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/talconfig.yaml
         --out-dir {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/clusterconfig
+        
     requires:
       vars:
         - cluster
