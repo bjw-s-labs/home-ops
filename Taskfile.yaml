@@ -5,6 +5,11 @@ vars:
   KUBERNETES_DIR: "{{.ROOT_DIR}}/kubernetes"
   TERRAFORM_DIR: "{{.ROOT_DIR}}/infrastructure/terraform"
 
+env:
+  KUBECONFIG: "{{.KUBERNETES_DIR}}/kubernetes/main/kubeconfig"
+  #SOPS_AGE_KEY_FILE: "{{.ROOT_DIR}}/age.key"
+  SOPS_AGE_KEY_FILE: "/Users/brian/.config/sops/age/keys.txt"
+
 includes:
   flux:
     dir: .taskfiles/flux
@@ -27,6 +32,9 @@ includes:
   talos:
     taskfile: ".taskfiles/talos"
     dir: .taskfiles/talos
+  ta:
+    taskfile: ".taskfiles/ta"
+    dir: .taskfiles/ta
   volsync:
     taskfile: ".taskfiles/volsync"
     dir: .taskfiles/volsync
