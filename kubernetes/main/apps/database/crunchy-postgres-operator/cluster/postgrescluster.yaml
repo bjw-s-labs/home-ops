@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/postgres-operator.crunchydata.com/postgrescluster_v1beta1.json
 apiVersion: postgres-operator.crunchydata.com/v1beta1
 kind: PostgresCluster
 metadata:
@@ -22,6 +23,7 @@ spec:
     dynamicConfiguration:
       synchronous_mode: true
       postgresql:
+        max_wal_size: 5GB
         synchronous_commit: "on"
         pg_hba:
           - hostnossl all all 10.244.0.0/16 md5 # Needed because dbman does not support SSL yet
@@ -90,24 +92,22 @@ spec:
         - secret:
             name: crunchy-postgres-secret
       global: &backupFlag
-        archive-timeout: "60"
         compress-type: "bz2"
         compress-level: "9"
-        delta: "y"
+        # Minio
+        repo1-block: "y"
+        repo1-bundle: "y"
+        repo1-path: /crunchy-pgo
+        repo1-retention-full: "30" # days
         repo1-retention-full-type: "time"
-        repo1-retention-full: "14"
-        repo1-retention-diff: "30"
-        repo1-path: "/crunchy-pgo"
         repo1-s3-uri-style: path
-        # repo2-bundle: "y"
-        # repo2-block: "y"
-        # repo2-path: "/crunchy-pgo"
-        # repo2-s3-uri-style: "path"
-        # repo2-retention-full-type: "time"
-        # repo2-retention-full: "2"
-        # repo2-retention-diff: "7"
-        # repo2-cipher-type: "aes-256-cbc"
-        archive-push-queue-max: 4GiB
+        # R2
+        repo2-block: "y"
+        repo2-bundle: "y"
+        repo2-path: /crunchy-pgo
+        repo2-retention-full: "7" # days
+        repo2-retention-full-type: time
+        repo2-s3-uri-style: path
       manual:
         repoName: repo1
         options:
@@ -125,6 +125,14 @@ spec:
             full: "0 1 * * 0" # Sunday at 01:00
             differential: "0 1 * * 1-6" # Mon-Sat at 01:00
             incremental: "0 2-23 * * *" # Every hour except 01:00
+        - name: repo2 # R2
+          s3: &r2
+            bucket: "crunchy-postgres"
+            endpoint: ${CLUSTER_SECRET_CPGO_R2_ENDPOINT}
+            region: "us-east-1"
+          schedules:
+            full: "0 2 * * 0" # Sunday at 02:00
+            incremental: "0 2 * * 1-6/2" # Mon-Sat at 02:00, every 2nd day
 
   dataSource:
     pgbackrest:
@@ -134,6 +142,16 @@ spec:
       repo:
         name: "repo1"
         s3: *minio
+
+  monitoring:
+    pgmonitor:
+      exporter:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64M
+          limits:
+            memory: 512M
 
   proxy:
     pgBouncer:

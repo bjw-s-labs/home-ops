@@ -13,7 +13,7 @@ spec:
         kind: HelmRepository
         name: grafana
         namespace: flux-system
-      version: 8.3.2
+      version: 8.3.7
   interval: 30m
   timeout: 20m
   values:
@@ -78,27 +78,9 @@ spec:
               path: /var/lib/grafana/dashboards/unpoller
             orgId: 1
             type: file
-          - name: victoriametrics
-            disableDeletion: false
-            editable: true
-            folder: "VictoriaMetrics"
-            options:
-              path: /var/lib/grafana/dashboards/victoria-metrics
-            orgId: 1
-            type: file
 
     dashboards:
       default:
-        blocky:
-          # renovate: dashboardName="blocky"
-          gnetId: 13768
-          revision: 4
-          datasource:
-            - name: "DS_PROMETHEUS"
-              value: Prometheus
-            - name: "VAR_BLOCKY_URL"
-              value: 'http:\/\/10.1.1.11:4000'
-
         cert-manager:
           url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/cert-manager/dashboards/cert-manager.json
           datasource: Prometheus
@@ -198,7 +180,7 @@ spec:
         k8s-views-namespaces:
           # renovate: dashboardName="Kubernetes / Views / Namespaces"
           gnetId: 15758
-          revision: 34
+          revision: 35
           datasource: Prometheus
         k8s-views-pods:
           # renovate: dashboardName="Kubernetes / Views / Pods"
