@@ -1,15 +1,15 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: frigate
-  namespace: home-automation
 spec:
   interval: 30m
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 3.3.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -17,117 +17,111 @@ spec:
         namespace: flux-system
 
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+    controllers:
+      frigate:
+        annotations:
+          reloader.stakater.com/auto: "true"
 
-    image:
-      repository: ghcr.io/blakeblackshear/frigate
-      tag: 0.12.1
+        pod:
+          annotations:
+            k8s.v1.cni.cncf.io/networks: |
+              [{
+                "name":"multus-iot",
+                "namespace": "network",
+                "ips": ["10.1.3.155/24"],
+                "mac": "6a:0f:16:aa:4e:28"
+              }]
+          nodeSelector:
+            google.feature.node.kubernetes.io/coral: "true"
+            intel.feature.node.kubernetes.io/gpu: "true"
+          securityContext:
+            supplementalGroups:
+              - 65542 # gladius:external-services
 
-    envFrom:
-      - secretRef:
-          name: frigate-secret
+        containers:
+          app:
+            image:
+              repository: ghcr.io/blakeblackshear/frigate
+              tag: 0.14.0-rc1
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
+            resources:
+              requests:
+                gpu.intel.com/i915: 1
+                cpu: 100m
+                memory: 1024Mi
+              limits:
+                gpu.intel.com/i915: 1
+                memory: 8192Mi
+            securityContext:
+              privileged: true
 
     service:
-      main:
+      app:
+        controller: frigate
         ports:
           http:
-            port: &port 5000
+            port: 5000
+          rtmp:
+            port: 1935
           rtsp:
-            enabled: true
             port: 8554
 
-    probes:
-      liveness: &probe
-        enabled: true
-        custom: true
-        spec:
-          httpGet:
-            path: /api/version
-            port: *port
-          initialDelaySeconds: 0
-          periodSeconds: 10
-          timeoutSeconds: 1
-          failureThreshold: 3
-      readiness:
-        enabled: true
-        custom: true
-        spec:
-          httpGet:
-            path: /api/version
-            port: *port
-          initialDelaySeconds: 0
-          periodSeconds: 10
-          timeoutSeconds: 1
-          failureThreshold: 3
-      startup:
-        enabled: true
-        custom: true
-        spec:
-          httpGet:
-            path: /api/version
-            port: *port
-          failureThreshold: 30
-          periodSeconds: 10
+    ingress:
+      app:
+        className: "internal-nginx"
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
+        hosts:
+          - host: frigate.bjw-s.dev
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
 
     persistence:
       config:
-        enabled: true
-        type: configMap
-        name: frigate-configmap
-        subPath: config.yaml
-        mountPath: /config/config.yml
-        readOnly: true
-      media:
-        enabled: true
-        type: nfs
-        server: "nas.bjw-s.casa"
-        path: /volume1/IPCams/frigate
-        mountPath: /media
-      usb:
-        enabled: true
-        type: hostPath
-        hostPath: /dev/bus/usb
-      cache:
-        enabled: true
-        type: emptyDir
-        medium: Memory
-        sizeLimit: 512Mi
-        mountPath: /dev/shm
-
-    ingress:
-      main:
-        enabled: true
-        ingressClassName: "internal-nginx"
-        hosts:
-          - host: &host "frigate.bjw-s.dev"
-            paths:
-              - path: /
-        tls:
-          - hosts:
-              - *host
-
-    securityContext:
-      privileged: true
-
-    nodeSelector:
-      google.feature.node.kubernetes.io/coral: "true"
-      intel.feature.node.kubernetes.io/gpu: "true"
-
-    resources:
-      requests:
-        gpu.intel.com/i915: 1
-        cpu: 454m
-        memory: 1552Mi
-      limits:
-        gpu.intel.com/i915: 1
-        memory: 1552Mi
-
-    volumeClaimTemplates:
-      - name: data
-        mountPath: /data
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClass: ceph-block
+        existingClaim: frigate-config
+        advancedMounts:
+          frigate:
+            app:
+              - path: /config
+      configfile:
+        type: secret
+        name: frigate-secret
+        advancedMounts:
+          frigate:
+            app:
+              - path: /config/config.yml
+                subPath: config.yml
+    #   cache:
+    #     type: emptyDir
+    #     globalMounts:
+    #       - path: /.cache
+    #   cache-npm:
+    #     type: emptyDir
+    #     globalMounts:
+    #       - path: /.npm
+    #   dev-bus-usb:
+    #     type: hostPath
+    #     hostPath: /dev/bus/usb
+    #     hostPathType: Directory
+    #   sys-bus-usb:
+    #     type: hostPath
+    #     hostPath: /sys/bus/usb
+    #     hostPathType: Directory
+    #   recs:
+    #     type: nfs
+    #     server: gladius.bjw-s.internal
+    #     path: /tank/Apps/frigate
+    #     globalMounts:
+    #       - path: /recs
