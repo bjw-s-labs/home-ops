@@ -1,19 +1,8 @@
 ---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: home-automation
 resources:
-  - ./helmrelease.yaml
-  - ./volsync.yaml
   - ./externalsecret.yaml
-configMapGenerator:
-  - name: frigate-configmap
-    files:
-      - config/config.yaml
-generatorOptions:
-  disableNameSuffixHash: true
-  annotations:
-    kustomize.toolkit.fluxcd.io/substitute: disabled
-commonLabels:
-  app.kubernetes.io/name: frigate
-  app.kubernetes.io/instance: frigate
+  - ./helmrelease.yaml
+  - ../../../../templates/volsync

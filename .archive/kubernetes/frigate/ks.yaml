@@ -1,17 +1,30 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-frigate
+  name: &appname frigate
   namespace: flux-system
 spec:
+  targetNamespace: home-automation
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
   interval: 10m
-  path: "./kubernetes/cluster-0/apps/home-automation/frigate/app"
+  path: "./kubernetes/main/apps/home-automation/frigate/app"
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-ops-kubernetes
-  wait: false # no flux ks dependents
+  wait: false
   dependsOn:
-    - name: cluster-apps-external-secrets-stores
-    - name: cluster-apps-rook-ceph-cluster
+    - name: multus-config
+    - name: rook-ceph-cluster
+    - name: external-secrets-stores
+  postBuild:
+    substitute:
+      APP: *appname
+      APP_UID: "0"
+      APP_GID: "0"
+      VOLSYNC_CLAIM: frigate-config
+      VOLSYNC_CAPACITY: 5Gi
