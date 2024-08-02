@@ -44,22 +44,14 @@ radarr:
       - template: radarr-quality-definition-sqp-streaming
       # 1080p
       - template: radarr-custom-formats-sqp-1-1080p
-      # - template: radarr-quality-profile-sqp-1-1080p
+      - template: radarr-quality-profile-sqp-1-1080p
       # 2160p
       - template: radarr-custom-formats-sqp-1-2160p
       - template: radarr-quality-profile-sqp-1-2160p-4k-only-default
 
     quality_profiles:
       - name: SQP-1 (1080p)
-        reset_unmatched_scores:
-          enabled: true
-        upgrade:
-          allowed: true
-          until_quality: Bluray|WEB-1080p
-          until_score: 10000
-        min_format_score: 1000
-        score_set: sqp-1-1080p
-        quality_sort: top
+        min_format_score: 10
         qualities:
           - name: Bluray|WEB-1080p
             qualities:
