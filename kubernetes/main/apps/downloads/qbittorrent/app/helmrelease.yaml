@@ -39,6 +39,11 @@ spec:
             env:
               UMASK: "022"
               QBITTORRENT__PORT: &port 8080
+              CROSS_SEED__API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: qbittorrent-secret
+                    key: cross_seed_api_key
             probes:
               liveness:
                 enabled: true
@@ -151,3 +156,11 @@ spec:
           qbittorrent:
             app:
               - path: /data/nas-media
+      scripts:
+        type: configMap
+        name: qbittorrent-scripts
+        defaultMode: 0775
+        advancedMounts:
+          qbittorrent:
+            app:
+              - path: /config/scripts
