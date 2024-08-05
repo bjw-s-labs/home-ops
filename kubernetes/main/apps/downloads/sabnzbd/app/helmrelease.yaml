@@ -56,6 +56,11 @@ spec:
                   secretKeyRef:
                     name: sabnzbd-secret
                     key: nzb_key
+              CROSS_SEED__API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: sabnzbd-secret
+                    key: cross_seed_api_key
             probes:
               liveness:
                 enabled: true
@@ -112,10 +117,17 @@ spec:
         path: /tank/Media
         globalMounts:
           - path: /data/nas-media
-
       temp:
         type: emptyDir
         advancedMounts:
           sabnzbd:
             app:
               - path: /tmp
+      scripts:
+        type: configMap
+        name: sabnzbd-scripts
+        defaultMode: 0775
+        advancedMounts:
+          sabnzbd:
+            app:
+              - path: /config/scripts
