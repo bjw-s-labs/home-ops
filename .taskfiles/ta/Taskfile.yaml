@@ -23,7 +23,7 @@ tasks:
   apply-first:
     desc: Apply first Talos configuration to a node
     cmd: |
-      sops --decrypt {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/clusterconfig/{{.hostname}}.yaml | \
+      sops --decrypt {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/clusterconfig/{{.cluster}}-{{.hostname}}.yaml | \
           $GOPATH/bin/envsubst | \
               talosctl --context {{.cluster}} apply-config --insecure --mode={{.mode}} --nodes {{.hostname}} --file /dev/stdin
     env: *vars
@@ -32,8 +32,8 @@ tasks:
     requires:
       vars: ["cluster", "hostname"]
     preconditions:
-      - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/talosconfig
-      - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/clusterconfig/{{.hostname}}.yaml
+      - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/clusterconfig/talosconfig
+      - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/clusterconfig/{{.cluster}}-{{.hostname}}.yaml
       #- talosctl --context {{.cluster}} --nodes {{.hostname}} get machineconfig >/dev/null 2>&1
 
   apply-config:

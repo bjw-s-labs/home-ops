@@ -1,94 +1,129 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
-clusterName: ${clusterName}
-endpoint: "https://${clusterEndpointIP}:6443"
-
+clusterName: main
 # renovate: depName=ghcr.io/siderolabs/installer datasource=docker
 talosVersion: v1.7.5
 # renovate: depName=ghcr.io/siderolabs/kubelet datasource=docker
 kubernetesVersion: v1.30.3
+endpoint: https://main.${NET_DOMAIN_NAME}:6443
 
 cniConfig:
   name: none
 
 additionalApiServerCertSans: &san
-  - ${clusterName}.${clusterDNSSuffix}
-  - "127.0.0.1" # KubePrism
+  - ${clusterEndpointIP}
+  - main.${NET_DOMAIN_NAME}
+  - 127.0.0.1
+
 additionalMachineCertSans: *san
 
+domain: cluster.local
+
+clusterSvcNets:
+  - ${clusterServiceNets}
+clusterPodNets:
+  - ${clusterPodNets}
+
 nodes:
-  - hostname: delta.nickeson.net
+  - hostname: delta.${NET_DOMAIN_NAME}
     ipAddress: 10.28.1.31
     controlPlane: true
     installDiskSelector:
       size: "<= 2560GB"
       model: "Samsung*"
+    nameservers: 
+      - 10.28.1.1
     machineDisks:
-      #- device: /dev/disk/by-id/ata-CT500MX500SSD1_2149E5EC1D9D
       - device: /dev/sdb
         partitions:
-          - mountpoint: /var/mnt/sata
+          - mountpoint: /var/mnt/ssd
     networkInterfaces:
-      - interface: bond0
-        bond:
-          mode: active-backup
-          deviceSelectors:
-            - hardwareAddr: e8:ff:1e:d2:b0:be
-              driver: igc
+      - deviceSelector:
+          hardwareAddr: e8:ff:1e:d2:b0:be
+          driver: igc
+        mtu: 1500
         dhcp: true
-        vip:
-          ip: ${clusterEndpointIP}
-        vlans:
-          - &vlan303
-            vlanId: 303
-            mtu: 1500
-            dhcp: true
-            dhcpOptions:
-              routeMetric: 4096
-    patches:
-      - &kubelet_extra_mounts |-
-        machine:
-          kubelet:
-            extraMounts:
-              - destination: /var/mnt/sata
-                type: bind
-                source: /var/mnt/sata
-                options:
-                  - rbind
-                  - rshared
-                  - rw
+        #vip:
+        #  ip: ${clusterEndpointIP}
+
+  #- hostname: k8s-2.${NET_DOMAIN_NAME}
+  #  ipAddress: 10.11.0.17
+  #  controlPlane: true
+  #  installDisk: /dev/sda
+  #  networkInterfaces:
+  #    - deviceSelector:
+  #        hardwareAddr: 7c:83:34:b1:fe:32
+  #        driver: r8169
+  #      mtu: 1500
+  #      dhcp: true
+
+  #- hostname: k8s-3.${NET_DOMAIN_NAME}
+  #  ipAddress: 10.11.0.18
+  #  controlPlane: true
+  #  installDisk: /dev/sda
+  #  networkInterfaces:
+  #    - deviceSelector:
+  #        hardwareAddr: 7c:83:34:b1:7b:8b
+  #        driver: r8169
+  #      mtu: 1500
+  #      dhcp: true
 
 controlPlane:
   schematic:
     customization:
-      extraKernelArgs:
-        - net.ifnames=1
       systemExtensions:
         officialExtensions:
           - siderolabs/intel-ucode
           - siderolabs/i915-ucode
 
   patches:
+    # Custom Talos installer patch
+    #- &customTalosPatch |-
+    #  machine:
+    #    install:
+    #      extraKernelArgs:
+    #        - talos.logging.kernel=udp://${CONFIG_MAIN_SVC_VECTOR_AGGREGATOR_ADDR}:6001/
+
+    # Enable logging
+    #- &loggingPatch |-
+    #  machine:
+    #    logging:
+    #      destinations:
+    #        - endpoint: udp://${CONFIG_MAIN_SVC_VECTOR_AGGREGATOR_ADDR}:6002/
+    #          format: json_lines
+
     # Disable search domain everywhere
-    - |-
+    - &disableSearchDomainPatch |-
       machine:
         network:
           disableSearchDomain: true
 
-    ## Enable KubePrism
-    #- |-
+    # Configure NTP
+    #- &ntpPatch |-
     #  machine:
-    #    features:
-    #      kubePrism:
-    #        enabled: true
-    #        port: 7445
+    #    time:
+    #      disabled: false
+    #      servers:
+    #        - 10.28.1.1
 
-    # Cluster configuration
-    - |-
-      cluster:
-        allowSchedulingOnMasters: true
-        proxy:
-          disabled: true
+    # Enable KubePrism
+    - &kubePrismPatch |-
+      machine:
+        features:
+          kubePrism:
+            enabled: true
+            port: 7445
+
+    # Configure kubelet
+    - &kubeletPatch |-
+      machine:
+        kubelet:
+          extraArgs:
+            rotate-server-certificates: true
+          extraConfig:
+            maxPods: 150
+          nodeIP:
+            validSubnets:
+                - 10.28.1.0/24
 
     # ETCD configuration
     - |-
@@ -96,35 +131,21 @@ controlPlane:
         etcd:
           advertisedSubnets:
             - 10.28.1.0/24
+          extraArgs:
+            listen-metrics-urls: http://0.0.0.0:2381
 
-    # Configure containerd
+    # Cluster configuration
     - |-
-      machine:
-        files:
-          - op: create
-            path: /etc/cri/conf.d/20-customization.part
-            content: |
-              [plugins]
-                [plugins."io.containerd.grpc.v1.cri"]
-                  enable_unprivileged_ports = true
-                  enable_unprivileged_icmp = true
-
-    # Configure nfs mount options
-    - |
-      machine:
-        files:
-          - op: overwrite
-            path: /etc/nfsmount.conf
-            permissions: 0o644
-            content: |
-              [ NFSMount_Global_Options ]
-              nfsvers=4.2
-              hard=True
-              noatime=True
-              nodiratime=True
-              rsize=131072
-              wsize=131072
-              nconnect=8
+      cluster:
+        controllerManager:
+          extraArgs:
+            bind-address: 0.0.0.0
+        allowSchedulingOnMasters: true
+        proxy:
+          disabled: true
+        scheduler:
+          extraArgs:
+            bind-address: 0.0.0.0
 
     # Disable default API server admission plugins.
     - |-
@@ -142,24 +163,78 @@ controlPlane:
             allowedKubernetesNamespaces:
               - system-upgrade
 
-    # Kubelet configuration
-    - |-
+    # Configure containerd
+    - &containerdPatch |-
       machine:
-        kubelet:
-          extraArgs:
-            rotate-server-certificates: "true"
-          extraConfig:
-            maxPods: 150
-          nodeIP:
-            validSubnets:
-                - 10.28.1.0/24
+        files:
+          - op: create
+            path: /etc/cri/conf.d/20-customization.part
+            content: |-
+              [plugins."io.containerd.grpc.v1.cri"]
+                enable_unprivileged_ports = true
+                enable_unprivileged_icmp = true
+              [plugins."io.containerd.grpc.v1.cri".containerd]
+                discard_unpacked_layers = false
+              [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+                discard_unpacked_layers = false
+          - op: overwrite
+            path: /etc/nfsmount.conf
+            permissions: 420
+            content: |-
+              [ NFSMount_Global_Options ]
+              nfsvers=4.2
+              hard=True
+              noatime=True
+              nodiratime=True
+              rsize=131072
+              wsize=131072
+              nconnect=8
 
-    # Custom sysctls
-    - |-
+    # Custom sysctl settings
+    - &sysctlPatch |-
       machine:
         sysctls:
           fs.inotify.max_queued_events: "65536"
-          fs.inotify.max_user_instances: "8192"
-          fs.inotify.max_user_watches: "524288"
-          net.core.rmem_max: "2500000"
-          net.core.wmem_max: "2500000"
+          fs.inotify.max_user_watches: 1048576
+          fs.inotify.max_user_instances: 8192
+
+    # Static host entries
+    - &staticHostEntriesPatch |-
+      machine:
+        network:
+          extraHostEntries:
+            - ip: ${clusterEndpointIP}
+              aliases:
+                - main.${NET_DOMAIN_NAME}
+
+worker:
+  schematic:
+    customization:
+      systemExtensions:
+        officialExtensions:
+          - siderolabs/intel-ucode
+          - siderolabs/i915-ucode
+
+  patches:
+    #- *customTalosPatch
+    #- *loggingPatch
+    - *disableSearchDomainPatch
+    #- *ntpPatch
+    - *kubePrismPatch
+    - *kubeletPatch
+    - *containerdPatch
+    - *sysctlPatch
+    - *staticHostEntriesPatch
+
+    # Extra SSD to mount
+    - |-
+      machine:
+        kubelet:
+          extraMounts:
+            - destination: /var/mnt/ssd
+              type: bind
+              source: /var/mnt/ssd
+              options:
+                - rbind
+                - rshared
+                - rw

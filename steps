@@ -1,0 +1,16 @@
+
+talhelper gensecret > talsecret.sops.yaml
+sops -e -i talsecret.sops.yaml
+
+task talos:generate-clusterconfig cluster=main
+task talos:genconfig
+#temp fix for talos config env var not working
+cp talosconfig ~/.talos/config
+#end temp fix
+
+task talos:apply-clusterconfig cluster=main #maybe use apply-config here instead??
+
+
+
+
+
