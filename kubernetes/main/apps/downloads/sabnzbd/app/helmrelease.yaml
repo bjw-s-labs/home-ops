@@ -118,3 +118,21 @@ spec:
           sabnzbd:
             app:
               - path: /tmp
+      ephemeral:
+        type: custom
+        volumeSpec:
+          name: scratch-volume
+          ephemeral:
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                storageClassName: "openebs-hostpath"
+                resources:
+                  requests:
+                    storage: 100Gi
+        advancedMounts:
+          sabnzbd:
+            app:
+              - path: /incomplete
+                subPath: incomplete
