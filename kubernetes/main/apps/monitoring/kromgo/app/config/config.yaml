@@ -1,38 +1,38 @@
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/kashalls/kromgo/main/config.schema.json
 metrics:
-  - name: main_cluster_node_count
-    query: count(count by (node) (kube_node_status_condition{cluster="main",condition="Ready"}))
+  - name: cluster_node_count
+    query: count(count by (node) (kube_node_status_condition{condition="Ready"}))
 
-  - name: main_cluster_pod_count
-    query: sum(kube_pod_status_phase{cluster="main", phase="Running"})
+  - name: cluster_pod_count
+    query: sum(kube_pod_status_phase{phase="Running"})
 
-  - name: main_cluster_cpu_usage
-    query: round(avg(instance:node_cpu_utilisation:rate5m{cluster="main"}) * 100, 0.1)
+  - name: cluster_cpu_usage
+    query: round(avg(instance:node_cpu_utilisation:rate5m) * 100, 0.1)
     suffix: "%"
     colors:
       - {color: "green", min: 0, max: 35}
       - {color: "orange", min: 36, max: 75}
       - {color: "red", min: 76, max: 9999}
 
-  - name: main_cluster_memory_usage
-    query: round(sum(node_memory_MemTotal_bytes{cluster="main"} - node_memory_MemAvailable_bytes{cluster="main"}) / sum(node_memory_MemTotal_bytes{cluster="main"}) * 100, 0.1)
+  - name: cluster_memory_usage
+    query: round(sum(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / sum(node_memory_MemTotal_bytes) * 100, 0.1)
     suffix: "%"
     colors:
       - {color: green, min: 0, max: 35}
       - {color: orange, min: 36, max: 75}
       - {color: red, min: 76, max: 9999}
 
-  - name: main_cluster_age_days
-    query: round((time() - max(kube_node_created{cluster="main"}) ) / 86400)
+  - name: cluster_age_days
+    query: round((time() - max(kube_node_created) ) / 86400)
     suffix: "d"
     colors:
       - {color: "green", min: 0, max: 180}
       - {color: "orange", min: 181, max: 360}
       - {color: "red", min: 361, max: 9999}
 
-  - name: main_cluster_uptime_days
-    query: round(avg(node_time_seconds{cluster="main"} - node_boot_time_seconds{cluster="main"}) / 86400)
+  - name: cluster_uptime_days
+    query: round(avg(node_time_seconds - node_boot_time_seconds) / 86400)
     suffix: "d"
     colors:
       - {color: "green", min: 0, max: 180}
