@@ -50,13 +50,6 @@ spec:
                   secretKeyRef:
                     name: radarr-secret
                     key: api_key
-              XSEED_HOST: cross-seed.downloads.svc.cluster.local
-              XSEED_PORT: 2468
-              XSEED_APIKEY:
-                valueFrom:
-                  secretKeyRef:
-                    name: radarr-secret
-                    key: XSEED_APIKEY
             probes:
               liveness:
                 enabled: true
@@ -73,27 +66,6 @@ spec:
                 memory: 384Mi
               limits:
                 memory: 1Gi
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
-
-          starr-scripts:
-            image:
-              repository: registry.k8s.io/git-sync/git-sync
-              tag: v4.2.4
-            env:
-              GITSYNC_REPO: https://github.com/bakerboy448/StarrScripts
-              GITSYNC_REF: main
-              GITSYNC_PERIOD: 24h
-              GITSYNC_ROOT: /add-ons
-            resources:
-              requests:
-                cpu: 10m
-              limits:
-                memory: 128Mi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true

@@ -56,6 +56,13 @@ spec:
                   secretKeyRef:
                     name: sabnzbd-secret
                     key: nzb_key
+              XSEED_HOST: cross-seed.downloads.svc.cluster.local
+              XSEED_PORT: 2468
+              XSEED_APIKEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: sabnzbd-secret
+                    key: xseed_api_key
             probes:
               liveness:
                 enabled: true
@@ -135,3 +142,11 @@ spec:
             app:
               - path: /incomplete
                 subPath: incomplete
+      scripts:
+        type: configMap
+        name: sabnzbd-scripts
+        defaultMode: 0775
+        advancedMounts:
+          sabnzbd:
+            app:
+              - path: /config/scripts
