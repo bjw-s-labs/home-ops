@@ -1,1 +1,58 @@
-a
+---
+name: "Renovate"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dryRun:
+        description: "Dry-Run"
+        default: "false"
+        required: false
+      logLevel:
+        description: "Log-Level"
+        default: "debug"
+        required: false
+  schedule:
+    - cron: "0 * * * *"
+  push:
+    branches: ["main"]
+    paths:
+      - .github/renovate.json5
+      - .github/renovate/**.json5
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  LOG_LEVEL: "${{ inputs.logLevel || 'debug' }}"
+  RENOVATE_AUTODISCOVER: true
+  RENOVATE_AUTODISCOVER_FILTER: "${{ github.repository }}"
+  RENOVATE_DRY_RUN: "${{ inputs.dryRun == true }}"
+  RENOVATE_PLATFORM: github
+  RENOVATE_PLATFORM_COMMIT: true
+  WORKFLOW_RENOVATE_VERSION: "${{ inputs.version || 'latest' }}"
+
+jobs:
+  renovate:
+    name: Renovate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Token
+        uses: actions/create-github-app-token@v1
+        id: generate-token
+        with:
+          app_id: "${{ secrets.DCPLAYA_APP_ID }}"
+          private_key: "${{ secrets.DCPLAYA_APP_PRIVATE_KEY }}"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: "${{ steps.generate-token.outputs.token }}"
+
+      - name: Renovate
+        uses: renovatebot/github-action@v40.2.5
+        with:
+          configurationFile: .github/renovate.json5
+          token: "${{ steps.generate-token.outputs.token }}"
+          renovate-version: "${{ env.WORKFLOW_RENOVATE_VERSION }}"
