@@ -73,27 +73,6 @@ spec:
                 drop:
                   - ALL
 
-          starr-scripts:
-            image:
-              repository: registry.k8s.io/git-sync/git-sync
-              tag: v4.2.4
-            env:
-              GITSYNC_REPO: https://github.com/bakerboy448/StarrScripts
-              GITSYNC_REF: main
-              GITSYNC_PERIOD: 24h
-              GITSYNC_ROOT: /add-ons
-            resources:
-              requests:
-                cpu: 10m
-              limits:
-                memory: 128Mi
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
-
     service:
       app:
         controller: sonarr
