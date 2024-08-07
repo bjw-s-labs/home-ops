@@ -1,10 +1,12 @@
 ---
 clusterName: main
 # renovate: depName=ghcr.io/siderolabs/installer datasource=docker
-talosVersion: v1.7.5
+talosVersion: v1.7.6
 # renovate: depName=ghcr.io/siderolabs/kubelet datasource=docker
 kubernetesVersion: v1.30.3
 endpoint: https://main.${NET_DOMAIN_NAME}:6443
+#endpoint: https://10.28.28.62:6443
+#endpoint: https://${clusterEndpointIP}:6443
 
 cniConfig:
   name: none
@@ -16,60 +18,82 @@ additionalApiServerCertSans: &san
 
 additionalMachineCertSans: *san
 
-domain: cluster.local
+#domain: cluster.local
 
-clusterSvcNets:
-  - ${clusterServiceNets}
-clusterPodNets:
-  - ${clusterPodNets}
+#clusterSvcNets:
+#  - ${clusterServiceNets}
+#clusterPodNets:
+#  - ${clusterPodNets}
 
 nodes:
   - hostname: delta.${NET_DOMAIN_NAME}
-    ipAddress: 10.28.1.31
+    ipAddress: 10.28.28.61
     controlPlane: true
     installDiskSelector:
-      size: "<= 2560GB"
+    #  size: "<= 2560GB"
       model: "Samsung*"
-    nameservers: 
-      - 10.28.1.1
-    machineDisks:
-      - device: /dev/sdb
-        partitions:
-          - mountpoint: /var/mnt/ssd
+    #nameservers: 
+    #  - 10.28.1.1
+    #machineDisks:
+    #  - device: /dev/sdb
+    #    partitions:
+    #      - mountpoint: /var/mnt/ssd
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: e8:ff:1e:d2:b0:be
           driver: igc
         mtu: 1500
         dhcp: true
-        #vip:
-        #  ip: ${clusterEndpointIP}
-
-  #- hostname: k8s-2.${NET_DOMAIN_NAME}
-  #  ipAddress: 10.11.0.17
-  #  controlPlane: true
-  #  installDisk: /dev/sda
-  #  networkInterfaces:
-  #    - deviceSelector:
-  #        hardwareAddr: 7c:83:34:b1:fe:32
-  #        driver: r8169
-  #      mtu: 1500
-  #      dhcp: true
-
-  #- hostname: k8s-3.${NET_DOMAIN_NAME}
-  #  ipAddress: 10.11.0.18
-  #  controlPlane: true
-  #  installDisk: /dev/sda
-  #  networkInterfaces:
-  #    - deviceSelector:
-  #        hardwareAddr: 7c:83:34:b1:7b:8b
-  #        driver: r8169
-  #      mtu: 1500
-  #      dhcp: true
+        vip:
+          ip: ${clusterEndpointIP}
+  - hostname: enigma.${NET_DOMAIN_NAME}
+    ipAddress: 10.28.28.62
+    controlPlane: true
+    installDisk: /dev/sda
+    #installDiskSelector:
+    #  size: "<= 2560GB"
+    #  model: "Samsung*"
+    #nameservers: 
+    #  - 10.28.1.1
+    #machineDisks:
+    #  - device: /dev/sdb
+    #    partitions:
+    #      - mountpoint: /var/mnt/ssd
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: BC:24:11:0E:02:A9
+          driver: virtio
+        mtu: 1500
+        dhcp: true
+        vip:
+          ip: ${clusterEndpointIP}
+  - hostname: felix.${NET_DOMAIN_NAME}
+    ipAddress: 10.28.28.63
+    controlPlane: true
+    installDisk: /dev/sda
+    #installDiskSelector:
+    #  size: "<= 2560GB"
+    #  model: "Samsung*"
+  #  nameservers: 
+  #    - 10.28.1.1
+  #  machineDisks:
+  #    - device: /dev/sdb
+  #      partitions:
+  #        - mountpoint: /var/mnt/ssd
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: BC:24:11:83:23:B5
+          driver: virtio
+        mtu: 1500
+        dhcp: true
+        vip:
+          ip: ${clusterEndpointIP}
 
 controlPlane:
   schematic:
     customization:
+      extraKernelArgs:
+        - net.ifnames=1
       systemExtensions:
         officialExtensions:
           - siderolabs/intel-ucode
@@ -119,33 +143,25 @@ controlPlane:
         kubelet:
           extraArgs:
             rotate-server-certificates: true
-          extraConfig:
-            maxPods: 150
           nodeIP:
             validSubnets:
-                - 10.28.1.0/24
+                - 10.28.28.0/24
 
     # ETCD configuration
     - |-
       cluster:
         etcd:
           advertisedSubnets:
-            - 10.28.1.0/24
+            - 10.28.28.0/24
           extraArgs:
             listen-metrics-urls: http://0.0.0.0:2381
 
     # Cluster configuration
     - |-
       cluster:
-        controllerManager:
-          extraArgs:
-            bind-address: 0.0.0.0
-        allowSchedulingOnMasters: true
+        allowSchedulingOnControlPlanes: true
         proxy:
           disabled: true
-        scheduler:
-          extraArgs:
-            bind-address: 0.0.0.0
 
     # Disable default API server admission plugins.
     - |-
@@ -173,22 +189,22 @@ controlPlane:
               [plugins."io.containerd.grpc.v1.cri"]
                 enable_unprivileged_ports = true
                 enable_unprivileged_icmp = true
-              [plugins."io.containerd.grpc.v1.cri".containerd]
-                discard_unpacked_layers = false
-              [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-                discard_unpacked_layers = false
-          - op: overwrite
-            path: /etc/nfsmount.conf
-            permissions: 420
-            content: |-
-              [ NFSMount_Global_Options ]
-              nfsvers=4.2
-              hard=True
-              noatime=True
-              nodiratime=True
-              rsize=131072
-              wsize=131072
-              nconnect=8
+    #          [plugins."io.containerd.grpc.v1.cri".containerd]
+    #            discard_unpacked_layers = false
+    #          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+    #            discard_unpacked_layers = false
+    #      - op: overwrite
+    #        path: /etc/nfsmount.conf
+    #        permissions: 420
+    #        content: |-
+    #          [ NFSMount_Global_Options ]
+    #          nfsvers=4.2
+    #          hard=True
+    #          noatime=True
+    #          nodiratime=True
+    #          rsize=131072
+    #          wsize=131072
+    #          nconnect=8
 
     # Custom sysctl settings
     - &sysctlPatch |-
@@ -199,42 +215,10 @@ controlPlane:
           fs.inotify.max_user_instances: 8192
 
     # Static host entries
-    - &staticHostEntriesPatch |-
-      machine:
-        network:
-          extraHostEntries:
-            - ip: ${clusterEndpointIP}
-              aliases:
-                - main.${NET_DOMAIN_NAME}
-
-worker:
-  schematic:
-    customization:
-      systemExtensions:
-        officialExtensions:
-          - siderolabs/intel-ucode
-          - siderolabs/i915-ucode
-
-  patches:
-    #- *customTalosPatch
-    #- *loggingPatch
-    - *disableSearchDomainPatch
-    #- *ntpPatch
-    - *kubePrismPatch
-    - *kubeletPatch
-    - *containerdPatch
-    - *sysctlPatch
-    - *staticHostEntriesPatch
-
-    # Extra SSD to mount
-    - |-
-      machine:
-        kubelet:
-          extraMounts:
-            - destination: /var/mnt/ssd
-              type: bind
-              source: /var/mnt/ssd
-              options:
-                - rbind
-                - rshared
-                - rw
+    #- &staticHostEntriesPatch |-
+    #  machine:
+    #    network:
+    #      extraHostEntries:
+    #        - ip: ${clusterEndpointIP}
+    #          aliases:
+    #            - main.${NET_DOMAIN_NAME}

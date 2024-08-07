@@ -112,7 +112,7 @@ tasks:
       - echo {{.KUBECONFIG}}
       - kubectl config view
       - until kubectl --context {{.cluster}} wait --for=condition=Ready=False nodes --all --timeout=10m; do sleep 10; done
-      - helmfile --quiet --kube-context {{.cluster}} --file {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/apps/helmfile.yaml apply --skip-diff-on-install --suppress-diff
+      - helmfile --quiet --kube-context {{.cluster}} --file {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/helmfile.yaml apply --skip-diff-on-install --suppress-diff
       - until kubectl --context {{.cluster}} wait --for=condition=Ready=True nodes --all --timeout=10m; do sleep 10; done
     requires:
       vars:
@@ -120,7 +120,8 @@ tasks:
     preconditions:
       - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/talosconfig
       - talosctl --talosconfig {{.KUBERNETES_DIR}}/{{.cluster}}/talosconfig --context {{.cluster}} config info >/dev/null 2>&1
-      - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/apps/helmfile.yaml
+      #- test -f {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/apps/helmfile.yaml
+      - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/helmfile.yaml
 
   fetch-kubeconfig:
     desc: Fetch kubeconfig from Talos controllers
@@ -261,3 +262,31 @@ tasks:
         sh: 'test -n "{{.KUBERNETES_VERSION}}"'
       - msg: "Control plane node could not be determined for cluster {{.cluster}}"
         sh: 'test -n "{{.CONTROLPLANE_NODE}}"'
+
+  reset-node:
+    desc: Reset a Talos node and shut it down
+    prompt: Reset Talos '{{.hostname}}' node on the '{{.cluster}}' cluster ... continue?
+    cmd: talosctl --context {{.cluster}} reset --nodes {{.node}} --graceful=false
+    requires:
+      vars: 
+        - cluster
+        - node
+    preconditions:
+      - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/talosconfig
+      - talosctl --context {{.cluster}} config info >/dev/null 2>&1
+      - talosctl --context {{.cluster}} --nodes {{.hostname}} get machineconfig >/dev/null 2>&1
+
+  reset-cluster:
+    desc: Reset all the Talos nodes and shut 'em down
+    prompt: Reset Talos on the '{{.cluster}}' cluster ... continue?
+    cmd: talosctl --context {{.cluster}} reset --nodes {{.nodes}} --graceful=false
+    vars:
+      nodes:
+        sh: talosctl --context {{.cluster}} config info --output json | jq --join-output '[.nodes[]] | join(",")'
+    requires:
+      vars: 
+        - cluster
+    preconditions:
+      - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/talosconfig
+      - talosctl --context {{.cluster}} config info >/dev/null 2>&1
+      - talosctl --context {{.cluster}} --nodes {{.nodes}} get machineconfig >/dev/null 2>&1
