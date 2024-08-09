@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.3.1
+      version: 3.3.2
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -17,26 +17,34 @@ spec:
         namespace: flux-system
 
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 2000
+        fsGroupChangePolicy: "OnRootMismatch"
+        runAsUser: 2000
+        runAsGroup: 2000
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+        supplementalGroups:
+          - 65542 # gladius:external-services
+
     controllers:
       prune:
         type: cronjob
 
-        cronjob:
+        cronjob: &cronJobSpec
           schedule: "@hourly"
           concurrencyPolicy: Forbid
-          successfulJobsHistory: 1
+          successfulJobsHistory: 0
           failedJobsHistory: 1
 
         pod:
           restartPolicy: OnFailure
-          securityContext: &podSecurityContext
-            runAsUser: 2000
-            runAsGroup: 2000
-            runAsNonRoot: true
 
         initContainers:
-          tagging:
-            image: &image
+          tagging: &container
+            image:
               repository: ghcr.io/buroa/qbtools
               tag: v0.15.4
             args:
@@ -44,22 +52,21 @@ spec:
               - --added-on
               - --expired
               - --last-activity
-              - --not-working
               - --sites
               - --unregistered
               - --server
-              - qbittorrent.downloads.svc.cluster.local
+              - &qbittorrent_host qbittorrent.downloads.svc.cluster.local
               - --port
-              - "8080"
+              - &qbittorrent_port "8080"
               - --config
               - /config/config.yaml
-            resources: &resources
+            resources:
               requests:
                 memory: 128Mi
                 cpu: 25m
               limits:
                 memory: 256Mi
-            securityContext: &containerSecurityContext
+            securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities:
@@ -67,37 +74,72 @@ spec:
                   - ALL
 
         containers:
-          app:
-            image: *image
+          expired:
+            <<: *container
             args:
               - prune
               - --exclude-category
               - manual
+              - --exclude-category
+              - cross-seed
+              - --include-tag
+              - added:7d
+              - --include-tag
+              - expired
+              - --server
+              - *qbittorrent_host
+              - --port
+              - *qbittorrent_port
+
+          unregistered:
+            <<: *container
+            args:
+              - prune
+              - --exclude-category
+              - manual
+              - --exclude-category
+              - cross-seed
+              - --exclude-tag
+              - added:24h
               - --include-tag
               - unregistered
-              # - --dry-run
               - --server
-              - qbittorrent.downloads.svc.cluster.local
+              - *qbittorrent_host
               - --port
-              - "8080"
-            resources: *resources
-            securityContext: *containerSecurityContext
+              - *qbittorrent_port
 
-      reannounce:
+      orphaned:
+        type: cronjob
+        cronjob:
+          <<: *cronJobSpec
+          schedule: "@daily"
         pod:
-          securityContext: *podSecurityContext
+          restartPolicy: OnFailure
         containers:
           app:
-            image: *image
+            <<: *container
+            args:
+              - orphaned
+              - --exclude-pattern
+              - "*/manual/*"
+              - --exclude-pattern
+              - "*/cross-seed/*"
+              - --server
+              - *qbittorrent_host
+              - --port
+              - *qbittorrent_port
+
+      reannounce:
+        containers:
+          app:
+            <<: *container
             args:
               - reannounce
               - --process-seeding
               - --server
-              - qbittorrent.downloads.svc.cluster.local
+              - *qbittorrent_host
               - --port
-              - "8080"
-            resources: *resources
-            securityContext: *containerSecurityContext
+              - *qbittorrent_port
 
     persistence:
       config-file:
@@ -107,3 +149,11 @@ spec:
           - path: /config/config.yaml
             subPath: config.yaml
             readOnly: true
+      media:
+        type: nfs
+        server: gladius.bjw-s.internal
+        path: /tank/Media
+        advancedMounts:
+          orphaned:
+            app:
+              - path: /data/nas-media

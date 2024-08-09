@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.3.1
+      version: 3.3.2
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -36,7 +36,7 @@ spec:
           app:
             image:
               repository: ghcr.io/home-assistant/home-assistant
-              tag: 2024.7.4
+              tag: 2024.8.0
             envFrom:
               - secretRef:
                   name: home-assistant-secret
@@ -64,9 +64,9 @@ spec:
     ingress:
       app:
         enabled: true
-        className: "external-nginx"
+        className: "internal-nginx"
         annotations:
-          external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
+          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
         hosts:
           - host: hass.bjw-s.dev
             paths:

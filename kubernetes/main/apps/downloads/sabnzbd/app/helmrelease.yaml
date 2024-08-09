@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.3.1
+      version: 3.3.2
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -56,6 +56,13 @@ spec:
                   secretKeyRef:
                     name: sabnzbd-secret
                     key: nzb_key
+              XSEED_HOST: cross-seed.downloads.svc.cluster.local
+              XSEED_PORT: 2468
+              XSEED_APIKEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: sabnzbd-secret
+                    key: xseed_api_key
             probes:
               liveness:
                 enabled: true
@@ -112,10 +119,34 @@ spec:
         path: /tank/Media
         globalMounts:
           - path: /data/nas-media
-
       temp:
         type: emptyDir
         advancedMounts:
           sabnzbd:
             app:
               - path: /tmp
+      ephemeral:
+        type: custom
+        volumeSpec:
+          ephemeral:
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                storageClassName: "openebs-hostpath"
+                resources:
+                  requests:
+                    storage: 100Gi
+        advancedMounts:
+          sabnzbd:
+            app:
+              - path: /incomplete
+                subPath: incomplete
+      scripts:
+        type: configMap
+        name: sabnzbd-scripts
+        defaultMode: 0775
+        advancedMounts:
+          sabnzbd:
+            app:
+              - path: /config/scripts

@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.3.1
+      version: 3.3.2
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -36,7 +36,7 @@ spec:
           app:
             image:
               repository: ghcr.io/onedr0p/sonarr-develop
-              tag: 4.0.8.1988@sha256:d8404510500ffe8ed804ac37bc5a56040228eb632458d6771d9c7dab40f6f61a
+              tag: 4.0.8.2008@sha256:737662938d4373ec8b5d80ac37bb96c24637cb1871bc55c74c54ad66af43fafd
             env:
               COMPlus_EnableDiagnostics: "0"
               SONARR__APP__INSTANCENAME: Sonarr
@@ -63,9 +63,9 @@ spec:
             resources:
               requests:
                 cpu: 20m
-                memory: 512M
+                memory: 384Mi
               limits:
-                memory: 768M
+                memory: 1Gi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -96,6 +96,10 @@ spec:
     persistence:
       config:
         existingClaim: sonarr-config
+      add-ons:
+        type: emptyDir
+      tmp:
+        type: emptyDir
       media:
         type: nfs
         server: gladius.bjw-s.internal

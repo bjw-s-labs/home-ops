@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.3.1
+      version: 3.3.2
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -62,10 +62,10 @@ spec:
                   periodSeconds: 5
             resources:
               requests:
-                cpu: 14m
-                memory: 431M
+                cpu: 20m
+                memory: 384Mi
               limits:
-                memory: 431M
+                memory: 1Gi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -96,6 +96,10 @@ spec:
     persistence:
       config:
         existingClaim: radarr-config
+      add-ons:
+        type: emptyDir
+      tmp:
+        type: emptyDir
       media:
         type: nfs
         server: gladius.bjw-s.internal
