@@ -81,3 +81,9 @@ spec:
         existingClaim: *app
         globalMounts:
           - path: /var/lib/pgadmin
+      server-json:
+        type: configMap
+        name: pgadmin-configmap
+        globalMounts:
+          - path: /pgadmin4/servers.json
+            subPath: servers.json

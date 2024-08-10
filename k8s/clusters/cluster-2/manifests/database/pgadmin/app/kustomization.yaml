@@ -10,6 +10,10 @@ generatorOptions:
   disableNameSuffixHash: true
   annotations:
     kustomize.toolkit.fluxcd.io/substitute: disabled
+configMapGenerator:
+  - name: pgadmin-configmap
+    files:
+      - servers.json=./resources/servers.json
 labels:
   - pairs:
       app.kubernetes.io/name: pgadmin
