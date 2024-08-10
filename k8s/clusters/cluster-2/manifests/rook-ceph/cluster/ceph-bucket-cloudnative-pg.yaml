@@ -1,0 +1,14 @@
+#################################################################################################################
+# Create an object store user for access to the s3 endpoint.
+#################################################################################################################
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: ceph-bucket-cloudnative-pg
+spec:
+  bucketName: cloudnative-pg
+  storageClassName: ceph-bucket
+  additionalConfig:
+    maxObjects: "100000"
+    maxSize: "300G"
