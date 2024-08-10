@@ -5,7 +5,7 @@ kind: Cluster
 metadata:
   name: postgres16
 spec:
-  instances: 2
+  instances: 3
   imageName: ghcr.io/cloudnative-pg/postgresql:16.3-10
   primaryUpdateStrategy: unsupervised
   storage:
@@ -23,9 +23,9 @@ spec:
     reusePVC: true
   resources:
     requests:
-      cpu: 500m
+      cpu: 100m #500m
     limits:
-      memory: 4Gi
+      memory: 2Gi #4Gi
   monitoring:
     enablePodMonitor: true
   backup:
