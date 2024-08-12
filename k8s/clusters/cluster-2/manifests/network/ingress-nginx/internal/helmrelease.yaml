@@ -108,5 +108,14 @@ spec:
         limits:
           memory: 768Mi
 
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/instance: nginx-internal
+          topologyKey: "kubernetes.io/hostname"
+
     defaultBackend:
       enabled: false
