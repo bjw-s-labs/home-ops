@@ -49,10 +49,11 @@ nodes:
   - hostname: enigma.${NET_DOMAIN_NAME}
     ipAddress: 10.28.28.62
     controlPlane: true
-    installDisk: /dev/sda
-    #installDiskSelector:
+    #installDisk: /dev/sda
+    installDiskSelector:
     #  size: "<= 2560GB"
     #  model: "Samsung*"
+      serial: "22293BED94F5"
     #nameservers: 
     #  - 10.28.1.1
     #machineDisks:
@@ -61,8 +62,9 @@ nodes:
     #      - mountpoint: /var/mnt/ssd
     networkInterfaces:
       - deviceSelector:
-          hardwareAddr: BC:24:11:0E:02:A9
-          driver: virtio
+          #hardwareAddr: BC:24:11:0E:02:A9
+          #driver: virtio
+          hardwareAddr: 58:47:ca:74:f2:59
         mtu: 1500
         dhcp: true
         vip:
