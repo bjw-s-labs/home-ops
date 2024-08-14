@@ -266,7 +266,7 @@ tasks:
   reset-node:
     desc: Reset a Talos node and shut it down
     prompt: Reset Talos '{{.hostname}}' node on the '{{.cluster}}' cluster ... continue?
-    cmd: talosctl --context {{.cluster}} reset --nodes {{.node}} --graceful=false
+    cmd: talosctl --context {{.cluster}} reset --nodes {{.node}} --graceful=false --reboot
     requires:
       vars: 
         - cluster
@@ -279,7 +279,7 @@ tasks:
   reset-cluster:
     desc: Reset all the Talos nodes and shut 'em down
     prompt: Reset Talos on the '{{.cluster}}' cluster ... continue?
-    cmd: talosctl --context {{.cluster}} reset --nodes {{.nodes}} --graceful=false
+    cmd: talosctl --context {{.cluster}} reset --nodes {{.nodes}} --graceful=false --reboot
     vars:
       nodes:
         sh: talosctl --context {{.cluster}} config info --output json | jq --join-output '[.nodes[]] | join(",")'
