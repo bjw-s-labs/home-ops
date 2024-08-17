@@ -89,7 +89,7 @@ spec:
                 cpu: "5m"
                 memory: "96Mi"
               limits:
-                memory: "96Mi"
+                memory: "512Mi"
             securityContext:
               privileged: true
 
@@ -116,7 +116,7 @@ spec:
               - -c
             args: |
               set -x
-              cp /usr/src/multus-cni/bin/multus-shim /host/opt/cni/bin/multus-shim
+              cp -f /usr/src/multus-cni/bin/multus-shim /host/opt/cni/bin/multus-shim
             resources:
               requests:
                 cpu: "10m"

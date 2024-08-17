@@ -41,23 +41,32 @@ spec:
           kromgo:
             image:
               repository: ghcr.io/kashalls/kromgo
-              tag: 0.3.1
+              tag: v0.4.1
             env:
               PROMETHEUS_URL: http://prometheus-operated.monitoring.svc.cluster.local:9090
+              SERVER_HOST: 0.0.0.0
+              SERVER_PORT: &port 8080
+              HEALTH_HOST: 0.0.0.0
+              HEALTH_PORT: &hport 8888
             probes:
-              liveness:
+              liveness: &probes
                 enabled: true
-              readiness:
-                enabled: true
-              startup:
-                enabled: true
+                custom: true
                 spec:
-                  failureThreshold: 30
-                  periodSeconds: 5
+                  httpGet:
+                    path: /readyz
+                    port: *hport
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              capabilities:
+                drop:
+                  - "ALL"
             resources:
               requests:
                 cpu: 5m
@@ -70,8 +79,10 @@ spec:
         controller: kromgo
         ports:
           http:
-            port: 8080
-
+            primary: true
+            port: *port
+          health:
+            port: *hport
     ingress:
       app:
         className: "external-nginx"
