@@ -5,7 +5,6 @@ talosVersion: v1.7.6
 # renovate: depName=ghcr.io/siderolabs/kubelet datasource=docker
 kubernetesVersion: v1.30.3
 endpoint: https://main.${NET_DOMAIN_NAME}:6443
-#endpoint: https://10.28.28.62:6443
 #endpoint: https://${clusterEndpointIP}:6443
 
 cniConfig:
@@ -49,7 +48,6 @@ nodes:
   - hostname: enigma.${NET_DOMAIN_NAME}
     ipAddress: 10.28.28.62
     controlPlane: true
-    #installDisk: /dev/sda
     installDiskSelector:
     #  size: "<= 2560GB"
     #  model: "Samsung*"
@@ -72,10 +70,9 @@ nodes:
   - hostname: felix.${NET_DOMAIN_NAME}
     ipAddress: 10.28.28.63
     controlPlane: true
-    installDisk: /dev/sda
-    #installDiskSelector:
+    installDiskSelector:
     #  size: "<= 2560GB"
-    #  model: "Samsung*"
+      serial: "2231402813ED"
   #  nameservers: 
   #    - 10.28.1.1
   #  machineDisks:
@@ -84,8 +81,8 @@ nodes:
   #        - mountpoint: /var/mnt/ssd
     networkInterfaces:
       - deviceSelector:
-          hardwareAddr: BC:24:11:83:23:B5
-          driver: virtio
+          hardwareAddr: 58:47:ca:74:ff:71
+          #driver: virtio
         mtu: 1500
         dhcp: true
         vip:
