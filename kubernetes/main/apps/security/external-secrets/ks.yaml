@@ -19,27 +19,27 @@ spec:
   wait: true
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
-#apiVersion: kustomize.toolkit.fluxcd.io/v1
-#kind: Kustomization
-#metadata:
-#  name: &appname external-secrets-stores
-#  namespace: flux-system
-#spec:
-#  targetNamespace: security
-#  commonMetadata:
-#    labels:
-#      app.kubernetes.io/name: *appname
-#  interval: 10m
-#  retryInterval: 1m
-#  timeout: 5m
-#  path: "./kubernetes/main/apps/security/external-secrets/stores"
-#  prune: true
-#  sourceRef:
-#    kind: GitRepository
-#    name: home-ops-kubernetes
-#  wait: true
-#  dependsOn:
-#    - name: external-secrets
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &appname external-secrets-stores
+  namespace: flux-system
+spec:
+  targetNamespace: security
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
+  interval: 10m
+  retryInterval: 1m
+  timeout: 5m
+  path: "./kubernetes/main/apps/security/external-secrets/stores"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  wait: true
+  dependsOn:
+    - name: external-secrets
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
