@@ -2,13 +2,18 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: "bjw-s-dev"
+  #name: "bjw-s-dev"
+  name: "nickeson-net"
 spec:
-  secretName: "bjw-s-dev-tls"
+  #secretName: "bjw-s-dev-tls"
+  secretName: "nickeson-net-tls"
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
-  commonName: "bjw-s.dev"
+  #commonName: "bjw-s.dev"
+  commonName: "nickeson.net"
   dnsNames:
-    - "bjw-s.dev"
-    - "*.bjw-s.dev"
+    #- "bjw-s.dev"
+    #- "*.bjw-s.dev"
+    - "nickeson.net"
+    - "*.nickeson.net"
