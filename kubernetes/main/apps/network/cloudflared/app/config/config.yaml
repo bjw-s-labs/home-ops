@@ -1,11 +1,13 @@
 ---
 ingress:
-  - hostname: "bjw-s.dev"
+  #- hostname: "bjw-s.dev"
+  - hostname: "nickeson.net"
     service: https://nginx-external-controller.network.svc.cluster.local:443
     originRequest:
-      originServerName: ingress-ext.bjw-s.dev
-  - hostname: "*.bjw-s.dev"
+      originServerName: ingress-ext.nickeson.net
+  #- hostname: "*.bjw-s.dev"
+  - hostname: "*.nickeson.net"
     service: https://nginx-external-controller.network.svc.cluster.local:443
     originRequest:
-      originServerName: ingress-ext.bjw-s.dev
+      originServerName: ingress-ext.nickeson.net
   - service: http_status:404
