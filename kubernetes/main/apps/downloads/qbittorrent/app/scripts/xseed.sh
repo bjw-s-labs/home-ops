@@ -30,7 +30,6 @@ xseed_resp=$(cross_seed_request "webhook" "path=${SEARCH_PATH}")
 
 if [[ "${xseed_resp}" == "204" ]]; then
   log_message "INFO" "Process completed successfully."
-  sleep 30
 else
   log_message "ERROR" "Process failed with API response: ${xseed_resp}"
   exit 1
