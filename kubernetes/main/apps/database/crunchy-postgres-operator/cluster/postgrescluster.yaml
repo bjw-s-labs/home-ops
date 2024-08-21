@@ -16,7 +16,7 @@ spec:
     type: LoadBalancer
     metadata:
       annotations:
-        external-dns.alpha.kubernetes.io/hostname: postgres.bjw-s.dev
+        external-dns.alpha.kubernetes.io/hostname: postgres.nickeson.net
         io.cilium/lb-ipam-ips: 10.28.28.164
 
   patroni: # turn on sync writes to at least 1 other replica
@@ -119,7 +119,7 @@ spec:
         - name: repo1 # Minio
           s3: &minio
             bucket: "crunchy-postgres"
-            endpoint: "s3.bjw-s.dev"
+            endpoint: "s3.nickeson.net"
             region: "us-east-1"
           schedules:
             full: "0 1 * * 0" # Sunday at 01:00
