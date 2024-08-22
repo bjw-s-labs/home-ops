@@ -4,9 +4,18 @@
       "owner": "prettier",
       "pattern": [
         {
-          "regexp": "\\[warn\\] (.+) (File is not properly formatted.)",
-          "file": 1,
-          "message": 2
+          "regexp": "\\[(warn)\\] (.+) (File is not properly formatted.)",
+          "severity": 1,
+          "file": 2,
+          "message": 3
+        },
+        {
+          "regexp": "\\[(error)\\] (.+?): (.+) \\((\\d+):(\\d+)\\)",
+          "severity": 1,
+          "file": 2,
+          "message": 3,
+          "line": 4,
+          "column": 5
         }
       ]
     }
