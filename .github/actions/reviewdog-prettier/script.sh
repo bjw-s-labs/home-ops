@@ -42,4 +42,4 @@ export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
 
 exit_code=$?
 echo "::endgroup::"
-exit ${exit_code}
+exit "${exit_code}"
