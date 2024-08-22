@@ -30,11 +30,6 @@ jobs:
       #       **.yml
       #       **.yaml
 
-      - name: Install actionlint
-        # if: steps.changed-files.outputs.any_changed == 'true'
-        run: |
-          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-
       - name: Add actionlint problem matcher
         # if: steps.changed-files.outputs.any_changed == 'true'
         run: |
@@ -44,6 +39,7 @@ jobs:
       - name: Run actionlint
         # if: steps.changed-files.outputs.any_changed == 'true'
         run: |
+          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
           actionlint -color --config-file .ci/actionlint/actionlint.yml
 
   yamllint:
