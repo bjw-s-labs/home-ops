@@ -44,6 +44,6 @@ runs:
       shell: bash
       run: |
         echo "::group::📝 Running prettier ..."
-        prettier --check --config "${{ inputs.prettier_config }}" --ignore-path "${{ inputs.prettier_ignore }}" ${{ inputs.file_pattern }} ; exit_code=$?
+        prettier --check --config "${{ inputs.prettier_config }}" --ignore-path "${{ inputs.prettier_ignore }}" ${{ inputs.file_pattern }} 2>&1 ; exit_code=$?
         echo "::endgroup::"
         exit ${exit_code}
