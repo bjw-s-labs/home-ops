@@ -12,8 +12,8 @@ inputs:
   filter_mode:
     description: |
       Filtering mode for the reviewdog command [added,diff_context,file,nofilter].
-      Default is `diff_context`.
-    default: 'diff_context'
+      Default is `added`.
+    default: 'added'
     required: false
   fail_level:
     description: |
@@ -50,6 +50,8 @@ runs:
   steps:
     - name: Set up reviewdog
       uses: reviewdog/action-setup@v1
+      with:
+        reviewdog_version: nightly
 
     - name: Run markdownlint with reviewdog
       shell: bash
