@@ -27,9 +27,23 @@ jobs:
       - name: Run yamllint
         run: yamllint --config-file .ci/yamllint/.yamllint.yaml --format github .
 
+  markdownlint:
+    name: markdownlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add problem matcher
+        uses: xt0rted/markdownlint-problem-matcher@v3
+
+      - name: Run markdownlint
+        run: markdownlint "**/*.md" --config ".ci/markdownlint/.markdownlint.yaml"
+
   lint_success:
     needs:
       - yamllint
+      - markdownlint
     if: |
       always()
     name: Lint successful
