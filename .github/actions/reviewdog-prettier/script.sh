@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
+INPUT_PRETTIER_VERSION=${INPUT_PRETTIER_VERSION:=latest}
+INPUT_PRETTIER_FLAGS=${INPUT_PRETTIER_FLAGS:=.}
+INPUT_FAIL_ON_ERROR=${INPUT_FAIL_ON_ERROR:=false}
+INPUT_FILTER_MODE=${INPUT_FILTER_MODE:=nofilter}
+INPUT_LEVEL=${INPUT_LEVEL:=error}
+INPUT_REPORTER=${INPUT_REPORTER:=local}
+
 # Install prettier
 if [[ ! -f "$(npm root)"/.bin/prettier ]]; then
   echo "::group::🔄 Running npm install to install prettier..."
@@ -30,7 +37,8 @@ export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
   -name="prettier" \
   -reporter="${INPUT_REPORTER}" \
   -filter-mode="${INPUT_FILTER_MODE}" \
-  -fail-on-error="${INPUT_FAIL_ON_ERROR}"
+  -fail-on-error="${INPUT_FAIL_ON_ERROR}" \
+  -level="${INPUT_LEVEL}"
 
 exit_code=$?
 echo "::endgroup::"

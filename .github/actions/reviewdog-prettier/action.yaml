@@ -21,6 +21,12 @@ inputs:
       Default is `false`.
     default: 'false'
     required: false
+  level:
+    description: |
+      Report level for reviewdog [info,warning,error].
+      Default is `error`.
+    default: 'error'
+    required: false
   reporter:
     description: |
       Reporter of reviewdog command [github-check,github-pr-check,github-pr-review].
@@ -51,6 +57,7 @@ runs:
         INPUT_GITHUB_TOKEN: ${{ inputs.github_token }}
         INPUT_FILTER_MODE: ${{ inputs.filter_mode }}
         INPUT_FAIL_ON_ERROR: ${{ inputs.fail_on_error }}
+        INPUT_LEVEL: ${{ inputs.level }}
         INPUT_PRETTIER_VERSION: ${{ inputs.prettier_version }}
         INPUT_PRETTIER_FLAGS: ${{ inputs.prettier_flags }}
         INPUT_REPORTER: ${{ inputs.reporter }}
