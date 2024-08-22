@@ -1,6 +1,6 @@
 ---
-name: Run Prettier with reviewdog
-description: Run Prettier with reviewdog.
+name: Run markdownlint with reviewdog
+description: Run markdownlint with reviewdog.
 
 inputs:
   github_token:
@@ -34,13 +34,13 @@ inputs:
     default: 'github-pr-check'
     required: false
 
-  ### Flags for prettier ###
-  prettier_version:
-    description: 'The version of prettier to install'
+  ### Flags for markdownlint ###
+  markdownlint_version:
+    description: 'The version of markdownlint to install'
     default: 'latest'
     required: false
-  prettier_flags:
-    description: 'Flags to pass to the prettier command'
+  markdownlint_flags:
+    description: 'Flags to pass to the markdownlint command'
     required: false
     default: '.'
 
@@ -51,14 +51,14 @@ runs:
     - name: Set up reviewdog
       uses: reviewdog/action-setup@v1
 
-    - name: Run prettier with reviewdog
+    - name: Run markdownlint with reviewdog
       shell: bash
       env:
         INPUT_GITHUB_TOKEN: ${{ inputs.github_token }}
         INPUT_FILTER_MODE: ${{ inputs.filter_mode }}
         INPUT_FAIL_ON_ERROR: ${{ inputs.fail_on_error }}
         INPUT_LEVEL: ${{ inputs.level }}
-        INPUT_PRETTIER_VERSION: ${{ inputs.prettier_version }}
-        INPUT_PRETTIER_FLAGS: ${{ inputs.prettier_flags }}
+        INPUT_MARKDOWNLINT_VERSION: ${{ inputs.markdownlint_version }}
+        INPUT_MARKDOWNLINT_FLAGS: ${{ inputs.markdownlint_flags }}
         INPUT_REPORTER: ${{ inputs.reporter }}
       run: $GITHUB_ACTION_PATH/script.sh

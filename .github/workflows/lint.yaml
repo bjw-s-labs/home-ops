@@ -34,8 +34,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run markdownlint with reviewdog
-        uses: reviewdog/action-markdownlint@v0.24.0
+      - name: Run prettier with reviewdog
+        uses: ./.github/actions/reviewdog-markdownlint-cli2
         with:
           fail_on_error: true
           # filter_mode: nofilter #TODO: make dependent on trigger

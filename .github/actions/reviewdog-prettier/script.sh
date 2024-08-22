@@ -16,7 +16,7 @@ if [[ ! -f "$(npm root)"/.bin/prettier ]]; then
 fi
 
 if [[ ! -f "$(npm root)"/.bin/prettier ]]; then
-  echo "❌ Unable to locate or install prettier. Did you provide a workdir which contains a valid package.json?"
+  echo "❌ Unable to locate or install prettier."
   exit 1
 else
   echo ℹ️ prettier version: "$("$(npm root)"/.bin/prettier --version)"
@@ -42,4 +42,4 @@ export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
 
 exit_code=$?
 echo "::endgroup::"
-exit "${exit_code}"
+exit ${exit_code}
