@@ -34,19 +34,12 @@ runs:
           echo "::endgroup::"
         fi
 
-    - name: Add problem matcher
-      shell: bash
-      run: |
-        cp $GITHUB_ACTION_PATH/matcher.json "${PWD}/matcher.json"
-        echo "::add-matcher::matcher.json"
-
     - name: Run prettier
       shell: bash
       run: |
         echo "::group::📝 Running prettier ..."
         set -o pipefail
         prettier --list-different --config "${{ inputs.prettier_config }}" --ignore-path "${{ inputs.prettier_ignore }}" ${{ inputs.file_pattern }} 2>&1 \
-          | grep -Ev "\[error\]" \
-          | sed --regexp-extended 's/(.*)$/\1: File is not properly formatted/'; exit_code=$?
-        echo "::endgroup::"
-        exit ${exit_code}
+          | grep -Ev "\[error\]" | while read -r line ; do
+          echo "::error file=${line},line=1,endLine=1,title=prettier::File is not properly formatted"
+        done
