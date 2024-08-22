@@ -1,6 +1,20 @@
 #!/bin/bash
 set -e
 
+# Install prettier
+if [[ ! -f "$(npm root)"/.bin/prettier ]]; then
+  echo "::group::🔄 Running npm install to install prettier..."
+  npm install "prettier@${INPUT_PRETTIER_VERSION}"
+  echo "::endgroup::"
+fi
+
+if [[ ! -f "$(npm root)"/.bin/prettier ]]; then
+  echo "❌ Unable to locate or install prettier. Did you provide a workdir which contains a valid package.json?"
+  exit 1
+else
+  echo ℹ️ prettier version: "$("$(npm root)"/.bin/prettier --version)"
+fi
+
 echo "::group::📝 Running prettier with reviewdog 🐶 ..."
 
 export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
@@ -20,4 +34,4 @@ prettier --check ${INPUT_PRETTIER_FLAGS} 2>&1 | sed --regexp-extended 's/(\[warn
 
 exit_code=$?
 echo "::endgroup::"
-exit $exit_code
+exit "${exit_code}"

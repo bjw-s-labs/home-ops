@@ -39,15 +39,12 @@ runs:
     - name: Set up reviewdog
       uses: reviewdog/action-setup@v1
 
-    - name: Install Prettier
-      shell: bash
-      run: npm install --global prettier@${{ inputs.prettier_version }}
-
     - name: Run prettier with reviewdog
       shell: bash
       env:
         INPUT_GITHUB_TOKEN: ${{ inputs.github_token }}
         INPUT_FILTER_MODE: ${{ inputs.filter_mode }}
         INPUT_FAIL_ON_ERROR: ${{ inputs.fail_on_error }}
+        INPUT_PRETTIER_VERSION: ${{ inputs.prettier_version }}
         INPUT_PRETTIER_FLAGS: ${{ inputs.prettier_flags }}
       run: $GITHUB_ACTION_PATH/script.sh
