@@ -9,22 +9,17 @@ INPUT_LEVEL=${INPUT_LEVEL:=error}
 INPUT_REPORTER=${INPUT_REPORTER:=local}
 
 # Install markdownlint-cli2
-if [[ ! -f "$(npm root)"/.bin/markdownlint-cli2 ]]; then
+if [[ ! -f "$(which markdownlint-cli2)" ]]; then
   echo "::group::🔄 Running npm install to install markdownlint-cli2..."
-  npm install "markdownlint-cli2@${INPUT_MARKDOWNLINT_VERSION}"
+  npm install "markdownlint-cli2@${INPUT_MARKDOWNLINT_VERSION}" --global
   echo "::endgroup::"
-fi
-
-if [[ ! -f "$(npm root)"/.bin/markdownlint-cli2 ]]; then
-  echo "❌ Unable to locate or install markdownlint-cli2."
-  exit 1
 fi
 
 echo "::group::📝 Running markdownlint-cli2 with reviewdog 🐶 ..."
 
 export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
 
-"$(npm root)"/.bin/markdownlint-cli2 ${INPUT_MARKDOWNLINT_FLAGS} 2>&1 \
+markdownlint-cli2 ${INPUT_MARKDOWNLINT_FLAGS} 2>&1 \
 | reviewdog \
       -efm="%f:%l:%c %m" \
       -efm="%f:%l %m" \

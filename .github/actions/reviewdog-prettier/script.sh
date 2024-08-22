@@ -9,24 +9,17 @@ INPUT_LEVEL=${INPUT_LEVEL:=error}
 INPUT_REPORTER=${INPUT_REPORTER:=local}
 
 # Install prettier
-if [[ ! -f "$(npm root)"/.bin/prettier ]]; then
+if [[ ! -f "$(which prettier)" ]]; then
   echo "::group::🔄 Running npm install to install prettier..."
   npm install "prettier@${INPUT_PRETTIER_VERSION}"
   echo "::endgroup::"
-fi
-
-if [[ ! -f "$(npm root)"/.bin/prettier ]]; then
-  echo "❌ Unable to locate or install prettier."
-  exit 1
-else
-  echo ℹ️ prettier version: "$("$(npm root)"/.bin/prettier --version)"
 fi
 
 echo "::group::📝 Running prettier with reviewdog 🐶 ..."
 
 export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
 
-"$(npm root)"/.bin/prettier --check ${INPUT_PRETTIER_FLAGS} 2>&1 | sed --regexp-extended 's/(\[warn\].*)$/\1 File is not properly formatted./' \
+prettier --check ${INPUT_PRETTIER_FLAGS} 2>&1 | sed --regexp-extended 's/(\[warn\].*)$/\1 File is not properly formatted./' \
 | reviewdog \
   -efm="%-G[warn] Code style issues found in the above file(s). Forgot to run Prettier%. File is not properly formatted." \
   -efm="[%tarn] %f %m" \
