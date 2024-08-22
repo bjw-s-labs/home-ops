@@ -34,11 +34,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Get changed markdown files
+        id: changed-markdown-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+             **.md
+
       - name: Run markdownlint-cli2
+        if: steps.changed-markdown-files.outputs.any_changed == 'true'
         uses: ./.github/actions/lint-markdownlint-cli2
         with:
           markdownlint_config: .ci/markdownlint/.markdownlint.yaml
-          file_pattern: "**/*.md"
+          file_pattern: ${{ steps.changed-markdown-files.outputs.all_changed_files }}
 
   # prettier:
   #   name: prettier
