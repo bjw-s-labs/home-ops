@@ -27,7 +27,6 @@ markdownlint-cli2 ${INPUT_MARKDOWNLINT_FLAGS} 2>&1 \
       -reporter="${INPUT_REPORTER:-github-pr-check}" \
       -filter-mode="${INPUT_FILTER_MODE}" \
       -fail-on-error="${INPUT_FAIL_ON_ERROR}" \
-      -log-level="debug" \
       -level="${INPUT_LEVEL}" || EXIT_CODE=$?
 
 echo "::endgroup::"
