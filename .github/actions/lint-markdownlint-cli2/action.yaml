@@ -40,6 +40,6 @@ runs:
       shell: bash
       run: |
         echo "::group::📝 Running markdownlint-cli2 ..."
-        markdownlint-cli2 ${{ inputs.file_pattern }} --config "${{ inputs.markdownlint_config }}" ; exit_code=$?
+        markdownlint-cli2 ${{ inputs.file_pattern }} --config "${{ inputs.markdownlint_config }}" && exit_code=$?
         echo "::endgroup::"
         exit ${exit_code}

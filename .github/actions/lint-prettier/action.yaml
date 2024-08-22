@@ -45,7 +45,7 @@ runs:
       run: |
         set -x
         echo "::group::📝 Running prettier ..."
-        output=$(prettier --check --config "${{ inputs.prettier_config }}" --ignore-path "${{ inputs.prettier_ignore }}" ${{ inputs.file_pattern }} 2>&1) ; exit_code=$?
+        output=$(prettier --check --config "${{ inputs.prettier_config }}" --ignore-path "${{ inputs.prettier_ignore }}" ${{ inputs.file_pattern }} 2>&1) && exit_code=$?
         echo "${output}" | sed --regexp-extended 's/(\[warn\].*)$/\1 File is not properly formatted./'
         echo "::endgroup::"
         exit ${exit_code}
