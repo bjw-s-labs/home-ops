@@ -53,8 +53,7 @@ jobs:
       - name: Run prettier with reviewdog
         uses: ./.github/actions/reviewdog-prettier
         with:
-          prettier_config_path: ./.ci/prettier/.prettierrc.yml
-          prettier_ignore_path: ./.ci/prettier/.prettierignore
+          prettier_flags: --config "./.ci/prettier/.prettierrc.yaml" --ignore-path "./.ci/prettier/.prettierignore" "."
 
   lint_success:
     needs:
