@@ -42,7 +42,7 @@ jobs:
           fail_level: warning
           filter_mode: nofilter #TODO: make dependent on trigger
           reporter: github-pr-check
-          markdownlint_flags: |
+          markdownlint_flags: |-
             **/*.md --config .ci/markdownlint/.markdownlint.yaml
 
   prettier:
@@ -60,7 +60,7 @@ jobs:
           fail_level: warning
           filter_mode: nofilter #TODO: make dependent on trigger
           reporter: github-pr-check
-          prettier_flags: |
+          prettier_flags: |-
             --config ./.ci/prettier/.prettierrc.yaml --ignore-path ./.ci/prettier/.prettierignore .
 
   # lint_success:
