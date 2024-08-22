@@ -50,12 +50,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run Prettier
-        uses: EPMatt/reviewdog-action-prettier@v1.2.0
+      - name: Run prettier with reviewdog
+        uses: ./.github/workflows/reviewdog-prettier
         with:
-          fail_on_error: true
-          prettier_flags: --config .ci/prettier/.prettierrc.yaml --ignore-path .ci/prettier/.prettierignore .
-
+          prettier_config_path: ./.ci/prettier/.prettierrc.yml
+          prettier_ignore_path: ./.ci/prettier/.prettierignore
 
   lint_success:
     needs:
