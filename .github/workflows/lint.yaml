@@ -22,27 +22,27 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Get changed files
-      #   id: changed-files
-      #   uses: tj-actions/changed-files@v45
-      #   with:
-      #     files: |
-      #       **.yml
-      #       **.yaml
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            .github/**.yml
+            .github/**.yaml
 
       - name: Install actionlint
-        # if: steps.changed-files.outputs.any_changed == 'true'
+        if: steps.changed-files.outputs.any_changed == 'true'
         run: |
           bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
 
       - name: Add actionlint problem matcher
-        # if: steps.changed-files.outputs.any_changed == 'true'
+        if: steps.changed-files.outputs.any_changed == 'true'
         run: |
           curl "https://raw.githubusercontent.com/rhysd/actionlint/main/.github/actionlint-matcher.json" -o actionlint-matcher.json
           echo "::add-matcher::actionlint-matcher.json"
 
       - name: Run actionlint
-        # if: steps.changed-files.outputs.any_changed == 'true'
+        if: steps.changed-files.outputs.any_changed == 'true'
         run: |
           ./actionlint -color --config-file .ci/actionlint/actionlint.yml
 
