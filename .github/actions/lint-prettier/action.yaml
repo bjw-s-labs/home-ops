@@ -38,8 +38,7 @@ runs:
       shell: bash
       run: |
         echo "::group::📝 Running prettier ..."
-        set -o pipefail
         prettier --list-different --config "${{ inputs.prettier_config }}" --ignore-path "${{ inputs.prettier_ignore }}" ${{ inputs.file_pattern }} 2>&1 \
           | grep -Ev "\[error\]" | while read -r line ; do
-          echo "::error file=${line},line=1,endLine=1,title=prettier::File is not properly formatted"
+          echo "::error file=${line},line=1,title=prettier::File is not properly formatted"
         done
