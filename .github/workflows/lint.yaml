@@ -44,7 +44,7 @@ jobs:
       - name: Run actionlint
         if: steps.changed-files.outputs.any_changed == 'true'
         run: |
-          ./actionlint -color --config-file .ci/actionlint/actionlint.yml
+          ./actionlint -color --config-file .ci/actionlint/actionlint.yml ${{ steps.changed-files.outputs.all_changed_files }}
 
   yamllint:
     name: yamllint
