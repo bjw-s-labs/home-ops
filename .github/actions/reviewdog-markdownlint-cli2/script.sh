@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 INPUT_MARKDOWNLINT_VERSION=${INPUT_MARKDOWNLINT_VERSION:=latest}
 INPUT_MARKDOWNLINT_FLAGS=${INPUT_MARKDOWNLINT_FLAGS:=.}
@@ -24,7 +24,7 @@ echo "::group::📝 Running markdownlint-cli2 with reviewdog 🐶 ..."
 
 export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
 
-"$(npm root)"/.bin/markdownlint ${INPUT_MARKDOWNLINT_FLAGS} 2>&1 \
+"$(npm root)"/.bin/markdownlint-cli2 ${INPUT_MARKDOWNLINT_FLAGS} 2>&1 \
 | reviewdog \
       -efm="%f:%l:%c %m" \
       -efm="%f:%l %m" \
