@@ -48,27 +48,23 @@ jobs:
           markdownlint_config: .ci/markdownlint/.markdownlint.yaml
           file_pattern: ${{ steps.changed-markdown-files.outputs.all_changed_files }}
 
-  # prettier:
-  #   name: prettier
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
+  prettier:
+    name: prettier
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  #     - name: Run prettier with reviewdog
-  #       uses: ./.github/actions/reviewdog-prettier
-  #       with:
-  #         fail_level: warning
-  #         filter_mode: nofilter #TODO: make dependent on trigger
-  #         reporter: github-pr-check
-  #         prettier_flags: |-
-  #           --config ./.ci/prettier/.prettierrc.yaml --ignore-path ./.ci/prettier/.prettierignore .
+      - name: Run prettier
+        uses: ./.github/actions/lint-prettier
+        with:
+          prettier_ignore: .ci/prettier/.prettierignore
+          prettier_config: .ci/prettier/.prettierrc.yaml
+          # file_pattern: ${{ steps.changed-markdown-files.outputs.all_changed_files }}
 
   lint_success:
     needs:
-      # - prettier
+      - prettier
       - yamllint
       - markdownlint
     if: |

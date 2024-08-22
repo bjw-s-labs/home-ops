@@ -1,0 +1,49 @@
+---
+name: Run prettier and set annotations
+description: Run prettier and set annotations.
+
+inputs:
+  ### Flags for prettier ###
+  prettier_version:
+    description: 'The version of prettier to install'
+    default: 'latest'
+    required: false
+  prettier_config:
+    description: 'Config file to pass to the prettier command'
+    required: false
+    default: '.prettierrc.yaml'
+  prettier_ignore:
+    description: 'Ignore file to pass to the prettier command'
+    required: false
+    default: '.prettierignore'
+  file_pattern:
+    description: 'Files to lint'
+    required: false
+    default: '.'
+
+runs:
+  using: 'composite'
+
+  steps:
+    - name: Install prettier
+      shell: bash
+      run: |
+        if [[ ! -f "$(which prettier)" ]]; then
+          echo "::group:: Installing prettier ..."
+          npm install "prettier@${{ inputs.prettier_version }}" --global
+          echo "::endgroup::"
+        fi
+
+    - name: Add problem matcher
+      shell: bash
+      run: |
+        cp $GITHUB_ACTION_PATH/matcher.json "${PWD}/matcher.json"
+        echo "::add-matcher::matcher.json"
+
+    - name: Run prettier
+      shell: bash
+      run: |
+        echo "::group::📝 Running prettier ..."
+        prettier --check --config "${{ inputs.prettier_config }}" --ignore-path "${{ inputs.prettier_ignore }}" ${{ inputs.file_pattern }} ; exit_code=$?
+        echo "::endgroup::"
+        exit ${exit_code}
