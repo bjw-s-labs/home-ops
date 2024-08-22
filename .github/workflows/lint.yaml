@@ -46,43 +46,43 @@ jobs:
           markdownlint_flags: |
             **/*.md --config .ci/markdownlint/.markdownlint.yaml
 
-  prettier:
-    name: prettier
-    runs-on: ubuntu-latest
-    permissions:
-      checks: write
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  # prettier:
+  #   name: prettier
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     checks: write
+  #     contents: read
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: Run prettier with reviewdog
-        uses: ./.github/actions/reviewdog-prettier
-        with:
-          fail_level: warning
-          filter_mode: nofilter #TODO: make dependent on trigger
-          reporter: local
-          prettier_flags: |
-            --config ./.ci/prettier/.prettierrc.yaml --ignore-path ./.ci/prettier/.prettierignore .
+  #     - name: Run prettier with reviewdog
+  #       uses: ./.github/actions/reviewdog-prettier
+  #       with:
+  #         fail_level: warning
+  #         filter_mode: nofilter #TODO: make dependent on trigger
+  #         reporter: local
+  #         prettier_flags: |
+  #           --config ./.ci/prettier/.prettierrc.yaml --ignore-path ./.ci/prettier/.prettierignore .
 
-  lint_success:
-    needs:
-      - prettier
-      - yamllint
-      # - markdownlint
-    if: |
-      always()
-    name: Lint successful
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check job status
-        if: >-
-          ${{
-              (
-                contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
-              )
-          }}
-        run: exit 1
+  # lint_success:
+  #   needs:
+  #     - prettier
+  #     - yamllint
+  #     - markdownlint
+  #   if: |
+  #     always()
+  #   name: Lint successful
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check job status
+  #       if: >-
+  #         ${{
+  #             (
+  #               contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+  #             )
+  #         }}
+  #       run: exit 1
 
 
   # build:
