@@ -19,13 +19,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+             **.{yml,yaml}
 
       - name: Install yamllint
         run: |
           pip install yamllint
 
       - name: Run yamllint
-        run: yamllint --config-file .ci/yamllint/.yamllint.yaml --format github .
+        run: yamllint --config-file .ci/yamllint/.yamllint.yaml --format github ${{ steps.changed-files.outputs.all_changed_files }}
 
   markdownlint:
     name: markdownlint
@@ -37,7 +46,7 @@ jobs:
           fetch-depth: 0
 
       - name: Get changed markdown files
-        id: changed-markdown-files
+        id: changed-files
         uses: tj-actions/changed-files@v45
         with:
           files: |
@@ -48,7 +57,7 @@ jobs:
         uses: ./.github/actions/lint-markdownlint-cli2
         with:
           markdownlint_config: .ci/markdownlint/.markdownlint.yaml
-          file_pattern: ${{ steps.changed-markdown-files.outputs.all_changed_files }}
+          file_pattern: ${{ steps.changed-files.outputs.all_changed_files }}
 
   prettier:
     name: prettier
