@@ -45,7 +45,7 @@ runs:
       run: |
         echo "::group::📝 Running prettier ..."
         set -o pipefail
-        prettier --check --config "${{ inputs.prettier_config }}" --ignore-path "${{ inputs.prettier_ignore }}" ${{ inputs.file_pattern }} 2>&1 \
+        prettier --list-different --config "${{ inputs.prettier_config }}" --ignore-path "${{ inputs.prettier_ignore }}" ${{ inputs.file_pattern }} 2>&1 \
           | grep -Ev "\[error\]" \
           | sed --regexp-extended 's/(.*)$/\1: File is not properly formatted/'; exit_code=$?
         echo "::endgroup::"
