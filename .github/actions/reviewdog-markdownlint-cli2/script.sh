@@ -27,6 +27,7 @@ markdownlint-cli2 ${INPUT_MARKDOWNLINT_FLAGS} 2>&1 \
       -reporter="${INPUT_REPORTER}" \
       -filter-mode="${INPUT_FILTER_MODE}" \
       -fail-level="${INPUT_FAIL_LEVEL}" \
+      -log-level=debug \
       -level="${INPUT_LEVEL}" ; exit_code=$?
 
 echo "::endgroup::"
