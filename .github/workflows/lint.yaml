@@ -27,21 +27,24 @@ jobs:
       - name: Run yamllint
         run: yamllint --config-file .ci/yamllint/.yamllint.yaml --format github .
 
-  # markdownlint:
-  #   name: markdownlint
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
+  markdownlint:
+    name: markdownlint
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  #     - name: Run markdownlint-cli2 with reviewdog
-  #       uses: ./.github/actions/reviewdog-markdownlint-cli2
-  #       with:
-  #         fail_level: warning
-  #         filter_mode: nofilter #TODO: make dependent on trigger
-  #         reporter: github-pr-check
-  #         markdownlint_flags: |
-  #           **/*.md --config .ci/markdownlint/.markdownlint.yaml
+      - name: Run markdownlint-cli2 with reviewdog
+        uses: ./.github/actions/reviewdog-markdownlint-cli2
+        with:
+          fail_level: warning
+          filter_mode: nofilter #TODO: make dependent on trigger
+          reporter: github-pr-check
+          markdownlint_flags: |
+            **/*.md --config .ci/markdownlint/.markdownlint.yaml
 
   prettier:
     name: prettier
