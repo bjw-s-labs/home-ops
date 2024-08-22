@@ -34,11 +34,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Add problem matcher
-        uses: xt0rted/markdownlint-problem-matcher@v3
-
       - name: Run markdownlint
-        run: markdownlint "**/*.md" --config ".ci/markdownlint/.markdownlint.yaml"
+        uses: DavidAnson/markdownlint-cli2-action@v9
+        with:
+          config: .ci/markdownlint/.markdownlint.yaml
+          fix: false
+          globs: '**/*.md'
 
   lint_success:
     needs:
