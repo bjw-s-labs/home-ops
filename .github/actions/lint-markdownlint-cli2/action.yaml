@@ -8,8 +8,12 @@ inputs:
     description: 'The version of markdownlint to install'
     default: 'latest'
     required: false
-  markdownlint_flags:
-    description: 'Flags to pass to the markdownlint command'
+  markdownlint_config:
+    description: 'Config file to pass to the markdownlint command'
+    required: false
+    default: '.markdownlint.yaml'
+  file_pattern:
+    description: 'Files to lint'
     required: false
     default: '.'
 
@@ -21,7 +25,9 @@ runs:
       shell: bash
       run: |
         if [[ ! -f "$(which markdownlint-cli2)" ]]; then
+          echo "::group:: Installing markdownlint-cli2 ..."
           npm install "markdownlint-cli2@${{ inputs.markdownlint_version }}" --global
+          echo "::endgroup::"
         fi
 
     - name: Add problem matcher
@@ -32,6 +38,8 @@ runs:
 
     - name: Run markdownlint with reviewdog
       shell: bash
-      env:
-        INPUT_MARKDOWNLINT_FLAGS: ${{ inputs.markdownlint_flags }}
-      run: $GITHUB_ACTION_PATH/script.sh
+      run: |
+        echo "::group::📝 Running markdownlint-cli2 ..."
+        markdownlint-cli2 "${{ inputs.file_pattern }}" --config "${{ inputs.markdownlint_config }}" ; exit_code=$?
+        echo "::endgroup::"
+        exit ${exit_code}

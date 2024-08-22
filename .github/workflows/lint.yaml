@@ -37,8 +37,8 @@ jobs:
       - name: Run markdownlint-cli2
         uses: ./.github/actions/lint-markdownlint-cli2
         with:
-          markdownlint_flags: |-
-            **/*.md --config ./.ci/markdownlint/.markdownlint.yaml
+          markdownlint_config: .ci/markdownlint/.markdownlint.yaml
+          file_pattern: "**/*.md"
 
   # prettier:
   #   name: prettier
