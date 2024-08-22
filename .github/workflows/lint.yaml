@@ -55,12 +55,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+
       - name: Run prettier
         uses: ./.github/actions/lint-prettier
         with:
           prettier_ignore: .ci/prettier/.prettierignore
           prettier_config: .ci/prettier/.prettierrc.yaml
-          # file_pattern: ${{ steps.changed-markdown-files.outputs.all_changed_files }}
+          file_pattern: ${{ steps.changed-markdown-files.outputs.all_changed_files }}
 
   lint_success:
     needs:
