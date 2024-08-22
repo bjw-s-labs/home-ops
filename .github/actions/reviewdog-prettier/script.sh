@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 # Install prettier
 if [[ ! -f "$(npm root)"/.bin/prettier ]]; then
@@ -28,7 +28,7 @@ export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
   -efm="%Z[error]%r" \
   -efm="%-G%r" \
   -name="prettier" \
-  -reporter="github-check" \
+  -reporter="github-pr-check" \
   -filter-mode="${INPUT_FILTER_MODE}" \
   -fail-on-error="${INPUT_FAIL_ON_ERROR}"
 
