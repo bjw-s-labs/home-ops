@@ -36,6 +36,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Run markdownlint-cli2 with reviewdog
         uses: ./.github/actions/reviewdog-markdownlint-cli2
@@ -46,24 +48,26 @@ jobs:
           markdownlint_flags: |
             **/*.md --config .ci/markdownlint/.markdownlint.yaml
 
-  # prettier:
-  #   name: prettier
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     checks: write
-  #     contents: read
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
+  prettier:
+    name: prettier
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-  #     - name: Run prettier with reviewdog
-  #       uses: ./.github/actions/reviewdog-prettier
-  #       with:
-  #         fail_level: warning
-  #         filter_mode: nofilter #TODO: make dependent on trigger
-  #         reporter: local
-  #         prettier_flags: |
-  #           --config ./.ci/prettier/.prettierrc.yaml --ignore-path ./.ci/prettier/.prettierignore .
+      - name: Run prettier with reviewdog
+        uses: ./.github/actions/reviewdog-prettier
+        with:
+          fail_level: warning
+          filter_mode: nofilter #TODO: make dependent on trigger
+          reporter: github-pr-check
+          prettier_flags: |
+            --config ./.ci/prettier/.prettierrc.yaml --ignore-path ./.ci/prettier/.prettierignore .
 
   # lint_success:
   #   needs:
