@@ -18,7 +18,6 @@ fi
 echo "::group::📝 Running markdownlint-cli2 with reviewdog 🐶 ..."
 
 export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
-export REVIEWDOG_SKIP_DOGHOUSE="true"
 
 markdownlint-cli2 ${INPUT_MARKDOWNLINT_FLAGS} 2>&1 \
 | reviewdog \
