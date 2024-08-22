@@ -24,10 +24,10 @@ markdownlint-cli2 ${INPUT_MARKDOWNLINT_FLAGS} 2>&1 \
       -efm="%f:%l:%c %m" \
       -efm="%f:%l %m" \
       -name="markdownlint" \
-      -reporter="${INPUT_REPORTER:-github-pr-check}" \
+      -reporter="${INPUT_REPORTER}" \
       -filter-mode="${INPUT_FILTER_MODE}" \
       -fail-on-error="${INPUT_FAIL_ON_ERROR}" \
-      -level="${INPUT_LEVEL}" || EXIT_CODE=$?
+      -level="${INPUT_LEVEL}" ; exit_code=$?
 
 echo "::endgroup::"
-exit ${EXIT_CODE}
+exit ${exit_code}

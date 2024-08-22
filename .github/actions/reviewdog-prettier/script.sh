@@ -31,8 +31,7 @@ prettier --check ${INPUT_PRETTIER_FLAGS} 2>&1 | sed --regexp-extended 's/(\[warn
   -reporter="${INPUT_REPORTER}" \
   -filter-mode="${INPUT_FILTER_MODE}" \
   -fail-on-error="${INPUT_FAIL_ON_ERROR}" \
-  -level="${INPUT_LEVEL}"
+  -level="${INPUT_LEVEL}" ; exit_code=$?
 
-exit_code=$?
 echo "::endgroup::"
 exit "${exit_code}"
