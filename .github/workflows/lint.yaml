@@ -34,20 +34,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Generate Token
-        uses: actions/create-github-app-token@v1
-        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
-        id: app-token
+      - name: Run markdownlint-cli2
+        uses: ./.github/actions/lint-markdownlint-cli2
         with:
-          app-id: ${{ secrets.BJWS_APP_ID }}
-          private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
-
-      - name: Run markdownlint-cli2 with reviewdog
-        uses: ./.github/actions/reviewdog-markdownlint-cli2
-        with:
-          github_token: "${{ steps.app-token.outputs.token }}"
-          fail_level: warning
-          reporter: github-pr-check
           markdownlint_flags: |-
             **/*.md --config .ci/markdownlint/.markdownlint.yaml
 
