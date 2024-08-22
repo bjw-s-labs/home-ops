@@ -66,24 +66,24 @@ jobs:
   #         prettier_flags: |-
   #           --config ./.ci/prettier/.prettierrc.yaml --ignore-path ./.ci/prettier/.prettierignore .
 
-  # lint_success:
-  #   needs:
-  #     - prettier
-  #     - yamllint
-  #     - markdownlint
-  #   if: |
-  #     always()
-  #   name: Lint successful
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Check job status
-  #       if: >-
-  #         ${{
-  #             (
-  #               contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
-  #             )
-  #         }}
-  #       run: exit 1
+  lint_success:
+    needs:
+      # - prettier
+      - yamllint
+      - markdownlint
+    if: |
+      always()
+    name: Lint successful
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check job status
+        if: >-
+          ${{
+              (
+                contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+              )
+          }}
+        run: exit 1
 
 
   # build:
