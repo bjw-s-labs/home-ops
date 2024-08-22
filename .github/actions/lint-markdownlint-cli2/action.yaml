@@ -5,20 +5,20 @@ description: Run markdownlint and set annotations.
 inputs:
   ### Flags for markdownlint ###
   markdownlint_version:
-    description: 'The version of markdownlint to install'
-    default: 'latest'
+    description: "The version of markdownlint to install"
+    default: "latest"
     required: false
   markdownlint_config:
-    description: 'Config file to pass to the markdownlint command'
+    description: "Config file to pass to the markdownlint command"
     required: false
-    default: '.markdownlint.yaml'
+    default: ".markdownlint.yaml"
   file_pattern:
-    description: 'Files to lint'
+    description: "Files to lint"
     required: false
-    default: '**/*.md'
+    default: "**/*.md"
 
 runs:
-  using: 'composite'
+  using: "composite"
 
   steps:
     - name: Install markdownlint-cli2
