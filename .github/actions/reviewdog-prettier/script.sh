@@ -28,7 +28,7 @@ export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
   -efm="%Z[error]%r" \
   -efm="%-G%r" \
   -name="prettier" \
-  -reporter="github-pr-check" \
+  -reporter="${INPUT_REPORTER}" \
   -filter-mode="${INPUT_FILTER_MODE}" \
   -fail-on-error="${INPUT_FAIL_ON_ERROR}"
 

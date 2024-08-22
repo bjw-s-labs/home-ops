@@ -21,6 +21,12 @@ inputs:
       Default is `false`.
     default: 'false'
     required: false
+  reporter:
+    description: |
+      Reporter of reviewdog command [github-check,github-pr-check,github-pr-review].
+      Default is `github-pr-check`.
+    default: 'github-pr-check'
+    required: false
 
   ### Flags for prettier ###
   prettier_version:
@@ -47,4 +53,5 @@ runs:
         INPUT_FAIL_ON_ERROR: ${{ inputs.fail_on_error }}
         INPUT_PRETTIER_VERSION: ${{ inputs.prettier_version }}
         INPUT_PRETTIER_FLAGS: ${{ inputs.prettier_flags }}
+        INPUT_REPORTER: ${{ inputs.reporter }}
       run: $GITHUB_ACTION_PATH/script.sh
