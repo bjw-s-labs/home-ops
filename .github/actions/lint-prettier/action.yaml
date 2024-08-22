@@ -1,0 +1,44 @@
+---
+name: Run prettier and set annotations
+description: Run prettier and set annotations.
+
+inputs:
+  ### Flags for prettier ###
+  prettier_version:
+    description: "The version of prettier to install"
+    default: "latest"
+    required: false
+  prettier_config:
+    description: "Config file to pass to the prettier command"
+    required: false
+    default: ".prettierrc.yaml"
+  prettier_ignore:
+    description: "Ignore file to pass to the prettier command"
+    required: false
+    default: ".prettierignore"
+  file_pattern:
+    description: "Files to lint"
+    required: false
+    default: "."
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Install prettier
+      shell: bash
+      run: |
+        if [[ ! -f "$(which prettier)" ]]; then
+          echo "::group:: Installing prettier ..."
+          npm install "prettier@${{ inputs.prettier_version }}" --global
+          echo "::endgroup::"
+        fi
+
+    - name: Run prettier
+      shell: bash
+      run: |
+        echo "::group::📝 Running prettier ..."
+        prettier --list-different --ignore-unknown --config "${{ inputs.prettier_config }}" --ignore-path "${{ inputs.prettier_ignore }}" ${{ inputs.file_pattern }} 2>&1 \
+          | { grep -Ev "\[error\]" || true; } | while read -r line ; do
+          echo "::error file=${line},line=1,title=prettier::File is not properly formatted"
+        done

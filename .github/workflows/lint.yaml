@@ -13,8 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Lint
+  actionlint:
+    name: actionlint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,46 +22,116 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Generate Token
-        uses: actions/create-github-app-token@v1
-        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
-        id: app-token
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
         with:
-          app-id: ${{ secrets.BJWS_APP_ID }}
-          private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
+          files: |
+            .github/workflows/**/*.yml
+            .github/workflows/**/*.yaml
 
-      - name: MegaLinter
-        uses: oxsecurity/megalinter/flavors/terraform@v8.0.0
-        env:
-          GITHUB_TOKEN: "${{ steps.app-token.outputs.token }}"
-          PRINT_ALPACA: false
-          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'workflow_dispatch' }}
-          ENABLE_LINTERS: |-
-            ${{
-              join(
-                fromJSON('
-                  [
-                    "ACTION_ACTIONLINT",
-                    "ANSIBLE_ANSIBLE_LINT",
-                    "COPYPASTE_JSCPD",
-                    "MARKDOWN_MARKDOWNLINT",
-                    "PYTHON_FLAKE8",
-                    "PYTHON_PYLINT",
-                    "REPOSITORY_GIT_DIFF",
-                    "REPOSITORY_SECRETLINT",
-                    "TERRAFORM_TERRAFORM_FMT",
-                    "YAML_PRETTIER",
-                    "YAML_YAMLLINT"
-                  ]
-                '),
-                ','
+      - name: Install actionlint
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+
+      - name: Add actionlint problem matcher
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          curl "https://raw.githubusercontent.com/rhysd/actionlint/main/.github/actionlint-matcher.json" -o actionlint-matcher.json
+          echo "::add-matcher::actionlint-matcher.json"
+
+      - name: Run actionlint
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          ./actionlint -color --config-file .ci/actionlint/actionlint.yml ${{ steps.changed-files.outputs.all_changed_files }}
+
+  yamllint:
+    name: yamllint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            **.yml
+            **.yaml
+
+      - name: Install yamllint
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          pip install yamllint
+
+      - name: Run yamllint
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: yamllint --config-file .ci/yamllint/.yamllint.yaml --format github ${{ steps.changed-files.outputs.all_changed_files }}
+
+  markdownlint:
+    name: markdownlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            **.md
+
+      - name: Run markdownlint-cli2
+        if: steps.changed-files.outputs.any_changed == 'true'
+        uses: ./.github/actions/lint-markdownlint-cli2
+        with:
+          markdownlint_config: .ci/markdownlint/.markdownlint.yaml
+          file_pattern: ${{ steps.changed-files.outputs.all_changed_files }}
+
+  prettier:
+    name: prettier
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+
+      - name: Run prettier
+        if: steps.changed-files.outputs.any_changed == 'true'
+        uses: ./.github/actions/lint-prettier
+        with:
+          prettier_ignore: .ci/prettier/.prettierignore
+          prettier_config: .ci/prettier/.prettierrc.yaml
+          file_pattern: ${{ steps.changed-files.outputs.all_changed_files }}
+
+  lint_success:
+    needs:
+      - actionlint
+      - prettier
+      - yamllint
+      - markdownlint
+    if: |
+      always()
+    name: Lint successful
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check job status
+        if: >-
+          ${{
+              (
+                contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
               )
-            }}
-          ACTION_ACTIONLINT_CONFIG_FILE: .ci/actionlint/actionlint.yml
-          COPYPASTE_JSCPD_CONFIG_FILE: .ci/jscpd/jscpd.json
-          MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .ci/markdownlint/markdownlint.config.yaml
-          MARKDOWN_MARKDOWNLINT_RULES_PATH: .ci/markdownlint/
-          PYTHON_FLAKE8_CONFIG_FILE: .ci/flake8/.flake8
-          YAML_YAMLLINT_CONFIG_FILE: .ci/yamllint/.yamllint.yaml
-          YAML_PRETTIER_CONFIG_FILE: .ci/prettier/.prettierrc.yaml
-          YAML_PRETTIER_ARGUMENTS: --ignore-path .ci/prettier/.prettierignore
+          }}
+        run: exit 1
