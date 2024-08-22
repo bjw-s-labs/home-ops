@@ -3,7 +3,7 @@ set -e
 
 INPUT_MARKDOWNLINT_VERSION=${INPUT_MARKDOWNLINT_VERSION:=latest}
 INPUT_MARKDOWNLINT_FLAGS=${INPUT_MARKDOWNLINT_FLAGS:=.}
-INPUT_FAIL_ON_ERROR=${INPUT_FAIL_ON_ERROR:=false}
+INPUT_FAIL_LEVEL=${INPUT_FAIL_LEVEL:=warning}
 INPUT_FILTER_MODE=${INPUT_FILTER_MODE:=nofilter}
 INPUT_LEVEL=${INPUT_LEVEL:=error}
 INPUT_REPORTER=${INPUT_REPORTER:=local}
@@ -26,7 +26,7 @@ markdownlint-cli2 ${INPUT_MARKDOWNLINT_FLAGS} 2>&1 \
       -name="markdownlint" \
       -reporter="${INPUT_REPORTER}" \
       -filter-mode="${INPUT_FILTER_MODE}" \
-      -fail-on-error="${INPUT_FAIL_ON_ERROR}" \
+      -fail-level="${INPUT_FAIL_LEVEL}" \
       -level="${INPUT_LEVEL}" ; exit_code=$?
 
 echo "::endgroup::"

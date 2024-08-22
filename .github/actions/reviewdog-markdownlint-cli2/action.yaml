@@ -15,11 +15,11 @@ inputs:
       Default is `diff_context`.
     default: 'diff_context'
     required: false
-  fail_on_error:
+  fail_level:
     description: |
-      Exit code for reviewdog when errors are found [true,false].
-      Default is `false`.
-    default: 'false'
+      Return exit code 1 from this level onward.
+      Default is `warning`.
+    default: 'warning'
     required: false
   level:
     description: |
@@ -56,7 +56,7 @@ runs:
       env:
         INPUT_GITHUB_TOKEN: ${{ inputs.github_token }}
         INPUT_FILTER_MODE: ${{ inputs.filter_mode }}
-        INPUT_FAIL_ON_ERROR: ${{ inputs.fail_on_error }}
+        INPUT_FAIL_LEVEL: ${{ inputs.fail_level }}
         INPUT_LEVEL: ${{ inputs.level }}
         INPUT_MARKDOWNLINT_VERSION: ${{ inputs.markdownlint_version }}
         INPUT_MARKDOWNLINT_FLAGS: ${{ inputs.markdownlint_flags }}
