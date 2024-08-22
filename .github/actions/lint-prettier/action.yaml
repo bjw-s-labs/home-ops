@@ -39,6 +39,6 @@ runs:
       run: |
         echo "::group::📝 Running prettier ..."
         prettier --list-different --ignore-unknown --config "${{ inputs.prettier_config }}" --ignore-path "${{ inputs.prettier_ignore }}" ${{ inputs.file_pattern }} 2>&1 \
-          | grep -Ev "\[error\]" | while read -r line ; do
+          | { grep -Ev "\[error\]" || true; } | while read -r line ; do
           echo "::error file=${line},line=1,title=prettier::File is not properly formatted"
         done
