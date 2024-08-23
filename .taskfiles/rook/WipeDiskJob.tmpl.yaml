@@ -13,14 +13,15 @@ spec:
       nodeName: ${node}
       containers:
         - name: disk-wipe
-          image: ghcr.io/onedr0p/alpine:rolling
-          command: ["/bin/sh", "-c"]
-          args:
-            - apk add --no-cache sgdisk util-linux parted;
-              sgdisk --zap-all ${ceph_disk};
-              blkdiscard ${ceph_disk};
-              dd if=/dev/zero bs=1M count=10000 oflag=direct of=${ceph_disk};
-              partprobe ${ceph_disk};
+          image: docker.io/library/alpine:latest@sha256:0a4eaa0eecf5f8c050e5bba433f58c052be7587ee8af3e8b3910ef9ab5fbe9f5
           securityContext:
             privileged: true
           resources: {}
+          command: ["/bin/sh", "-c"]
+          args:
+            - apk add --no-cache sgdisk util-linux util-linux-misc parted device-mapper;
+              sgdisk --zap-all ${ceph_disk};
+              dd if=/dev/zero of=${ceph_disk} bs=1M count=100 oflag=direct;
+              blkdiscard ${ceph_disk};
+              partprobe ${ceph_disk};
+
