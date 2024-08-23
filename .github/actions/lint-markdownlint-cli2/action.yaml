@@ -1,0 +1,45 @@
+---
+name: Run markdownlint and set annotations
+description: Run markdownlint and set annotations.
+
+inputs:
+  ### Flags for markdownlint ###
+  markdownlint_version:
+    description: "The version of markdownlint to install"
+    default: "latest"
+    required: false
+  markdownlint_config:
+    description: "Config file to pass to the markdownlint command"
+    required: false
+    default: ".markdownlint.yaml"
+  file_pattern:
+    description: "Files to lint"
+    required: false
+    default: "**/*.md"
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Install markdownlint-cli2
+      shell: bash
+      run: |
+        if [[ ! -f "$(which markdownlint-cli2)" ]]; then
+          echo "::group:: Installing markdownlint-cli2 ..."
+          npm install "markdownlint-cli2@${{ inputs.markdownlint_version }}" --global
+          echo "::endgroup::"
+        fi
+
+    - name: Add problem matcher
+      shell: bash
+      run: |
+        cp $GITHUB_ACTION_PATH/matcher.json "${PWD}/matcher.json"
+        echo "::add-matcher::matcher.json"
+
+    - name: Run markdownlint
+      shell: bash
+      run: |
+        echo "::group::📝 Running markdownlint-cli2 ..."
+        markdownlint-cli2 ${{ inputs.file_pattern }} --config "${{ inputs.markdownlint_config }}" ; exit_code=$?
+        echo "::endgroup::"
+        exit ${exit_code}
