@@ -30,21 +30,12 @@ jobs:
             .github/workflows/**/*.yml
             .github/workflows/**/*.yaml
 
-      - name: Install actionlint
-        if: steps.changed-files.outputs.any_changed == 'true'
-        run: |
-          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-
-      - name: Add actionlint problem matcher
-        if: steps.changed-files.outputs.any_changed == 'true'
-        run: |
-          curl "https://raw.githubusercontent.com/rhysd/actionlint/main/.github/actionlint-matcher.json" -o actionlint-matcher.json
-          echo "::add-matcher::actionlint-matcher.json"
-
       - name: Run actionlint
         if: steps.changed-files.outputs.any_changed == 'true'
-        run: |
-          ./actionlint -color --config-file .ci/actionlint/actionlint.yml ${{ steps.changed-files.outputs.all_changed_files }}
+        uses: bjw-s/action-actionlint@v0.1
+        with:
+          actionlint_config: .ci/actionlint/actionlint.yml
+          file_pattern: ${{ steps.changed-files.outputs.all_changed_files }}
 
   yamllint:
     name: yamllint
