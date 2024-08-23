@@ -28,16 +28,17 @@ nodes:
   - hostname: delta.${NET_DOMAIN_NAME}
     ipAddress: 10.28.28.61
     controlPlane: true
-    installDiskSelector:
-    #  size: "<= 2560GB"
-    #  model: "Samsung*"
-      model: "512GB SSD"
+    installDisk: /dev/disk/by-id/usb-FORESEE_512GB_SSD_012938002E42-0:0
+    #installDiskSelector:
+    ##  size: "<= 2560GB"
+    ##  model: "Samsung*"
+    #  model: "512GB SSD"
     #nameservers: 
     #  - 10.28.1.1
-    machineDisks:
-      - device: /dev/disk/by-id/ata-Micron_5300_MTFDDAK3T8TDT_203229DB5636
-        partitions:
-          - mountpoint: /var/mnt/sata
+    #machineDisks:
+    #  - device: /dev/disk/by-id/ata-Micron_5300_MTFDDAK3T8TDT_203229DB5636
+    #    partitions:
+    #      - mountpoint: /var/mnt/sata
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: e8:ff:1e:d2:b0:be
