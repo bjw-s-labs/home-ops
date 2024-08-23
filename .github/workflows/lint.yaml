@@ -90,7 +90,7 @@ jobs:
 
       - name: Run markdownlint-cli2
         if: steps.changed-files.outputs.any_changed == 'true'
-        uses: ./.github/actions/lint-markdownlint-cli2
+        uses: bjw-s/action-markdownlint-cli2@main
         with:
           markdownlint_config: .ci/markdownlint/.markdownlint.yaml
           file_pattern: ${{ steps.changed-files.outputs.all_changed_files }}
