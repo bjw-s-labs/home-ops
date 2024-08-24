@@ -85,6 +85,28 @@ tasks:
     preconditions:
       - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/talosconfig
 
+  apply-config-secure:
+    desc: Apply Talos configurations
+    summary: |
+      Args:
+        cluster: Cluster to run command against (required)
+        nodes: List of hostnames in the cluster to configure
+    cmds:
+      - for: {var: nodes}
+        cmd: |
+          talosctl apply-config -n {{.ITEM}} \
+            --talosconfig {{.KUBERNETES_DIR}}/{{.cluster}}/talosconfig \
+            --context {{.cluster}} \
+            -f {{.CONFIG_ROOT}}/{{.cluster}}-{{.ITEM}}.nickeson.net.yaml
+    vars:
+      CONFIG_ROOT: "{{.KUBERNETES_DIR}}/{{.cluster}}/bootstrap/talos/clusterconfig"
+    requires:
+      vars:
+        - cluster
+        - nodes
+    preconditions:
+      - test -f {{.KUBERNETES_DIR}}/{{.cluster}}/talosconfig
+
   bootstrap-etcd:
     desc: Bootstrap Etcd
     summary: |
