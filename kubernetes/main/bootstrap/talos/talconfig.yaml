@@ -215,6 +215,18 @@ controlPlane:
           fs.inotify.max_user_watches: 1048576
           fs.inotify.max_user_instances: 8192
 
+    # Extra SSD to mount
+    - &kubelet_extra_mounts |-
+      machine:
+        kubelet:
+          extraMounts:
+            - destination: /var/mnt/sata
+              type: bind
+              source: /var/mnt/sata
+              options:
+                - rbind
+                - rshared
+                - rw
     # Static host entries
     #- &staticHostEntriesPatch |-
     #  machine:
