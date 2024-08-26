@@ -14,14 +14,25 @@ vars:
   ts: '{{now | date "150405"}}'
 
 tasks:
+  toolbox:
+    desc: Exec into the Rook Ceph toolbox
+    interactive: true
+    cmds:
+      - kubectl -n rook-ceph exec -it $(kubectl -n rook-ceph get pod -l "app=rook-direct-mount" -o jsonpath='{.items[0].metadata.name}') -- bash
+
+  password:
+    desc: Retrieve the rook-ceph password
+    cmds:
+      - kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o jsonpath="{['data']['password']}" | base64 --decode | pbcopy && echo "Copied to clipboard"
+
   wipe-node-delta:
     desc: Trigger a wipe of Rook-Ceph data on node "delta"
     cmds:
       - task: wipe-disk
         vars:
           node: "{{.node}}"
-          ceph_disk: "/dev/disk/by-id/nvme-Samsung_SSD_990_PRO_2TB_S73WNJ0W100594W"
-          #ceph_disk: "/dev/sdc"
+          #ceph_disk: "/dev/disk/by-id/nvme-Samsung_SSD_990_PRO_2TB_S73WNJ0W100594W"
+          ceph_disk: "/dev/nvme0n1"
       - task: wipe-data
         vars:
           node: "{{.node}}"
@@ -34,7 +45,8 @@ tasks:
       - task: wipe-disk
         vars:
           node: "{{.node}}"
-          ceph_disk: "/dev/disk/by-id/nvme-Micron_7450_MTFDKCB3T2TFS_232441DE2949"
+          #ceph_disk: "/dev/disk/by-id/nvme-Micron_7450_MTFDKCB3T2TFS_232441DE2949"
+          ceph_disk: "/dev/nvme0n1"
       - task: wipe-data
         vars:
           node: "{{.node}}"
@@ -47,7 +59,8 @@ tasks:
       - task: wipe-disk
         vars:
           node: "{{.node}}"
-          ceph_disk: "/dev/disk/by-id/nvme-Micron_7450_MTFDKCB3T2TFS_23103F12B4D2"
+          #ceph_disk: "/dev/disk/by-id/nvme-Micron_7450_MTFDKCB3T2TFS_23103F12B4D2"
+          ceph_disk: "/dev/nvme2n1"
       - task: wipe-data
         vars:
           node: "{{.node}}"

@@ -194,26 +194,26 @@ controlPlane:
     #            discard_unpacked_layers = false
     #          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
     #            discard_unpacked_layers = false
-    #      - op: overwrite
-    #        path: /etc/nfsmount.conf
-    #        permissions: 420
-    #        content: |-
-    #          [ NFSMount_Global_Options ]
-    #          nfsvers=4.2
-    #          hard=True
-    #          noatime=True
-    #          nodiratime=True
-    #          rsize=131072
-    #          wsize=131072
-    #          nconnect=8
+          - op: overwrite
+            path: /etc/nfsmount.conf
+            permissions: 0o644
+            content: |-
+              [ NFSMount_Global_Options ]
+              nfsvers=4.2
+              hard=True
+              noatime=True
+              nodiratime=True
+              rsize=131072
+              wsize=131072
+              nconnect=8
 
     # Custom sysctl settings
     - &sysctlPatch |-
       machine:
         sysctls:
           fs.inotify.max_queued_events: "65536"
-          fs.inotify.max_user_watches: 1048576
-          fs.inotify.max_user_instances: 8192
+          fs.inotify.max_user_instances: "8192"
+          fs.inotify.max_user_watches: "524288"
 
     # Extra SSD to mount
     - &kubelet_extra_mounts |-
