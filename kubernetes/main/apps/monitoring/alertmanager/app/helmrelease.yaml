@@ -22,14 +22,14 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
 
-        statefulset:
-          volumeClaimTemplates:
-            - name: storage
-              accessMode: ReadWriteOnce
-              size: 50Mi
-              storageClass: ceph-block
-              globalMounts:
-                - path: /alertmanager
+        #statefulset:
+        #  volumeClaimTemplates:
+        #    - name: storage
+        #      accessMode: ReadWriteOnce
+        #      size: 50Mi
+        #      storageClass: ceph-block
+        #      globalMounts:
+        #        - path: /alertmanager
 
         containers:
           alertmanager:
