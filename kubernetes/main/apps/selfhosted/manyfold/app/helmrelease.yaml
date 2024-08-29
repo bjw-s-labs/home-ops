@@ -37,6 +37,7 @@ spec:
             env:
               DATABASE_URL: sqlite3:/data/database/manyfold.sqlite3
               MULTIUSER: false
+              PORT: &httpPort 3214
               REDIS_URL: redis://manyfold-redis.selfhosted.svc.cluster.local:6379
               REGISTRATION: false
               SECRET_KEY_BASE:
@@ -44,6 +45,19 @@ spec:
                   secretKeyRef:
                     name: manyfold-secret
                     key: MANYFOLD_SECRET_KEY
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *httpPort
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
             resources:
               requests:
                 cpu: 20m
@@ -75,7 +89,7 @@ spec:
         controller: manyfold
         ports:
           http:
-            port: 3214
+            port: *httpPort
       redis:
         controller: redis
         ports:
