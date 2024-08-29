@@ -29,11 +29,25 @@ spec:
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"
 
+        initContainers:
+          chown-tmpdirs:
+            image:
+              repository: docker.io/library/alpine
+              tag: 3.20
+            command:
+              - /bin/sh
+              - -c
+            args:
+              - |
+                chmod o-rwx /app/tmp /app/log /tmp
+            securityContext:
+              runAsUser: 0
+
         containers:
           main:
             image:
               repository: ghcr.io/bjw-s/manyfold
-              tag: 0.76.1
+              tag: 0.76.1@sha256:b61e63ca1e56090c8f17c3d973c98cf8fcbc6ea34c5c584e38eebde609aab35f
             env:
               DATABASE_URL: sqlite3:/data/database/manyfold.sqlite3
               MULTIUSER: false
@@ -72,17 +86,33 @@ spec:
                   - ALL
 
       redis:
+        pod:
+          securityContext:
+            runAsUser: 65534
+            runAsGroup: 65534
+        strategy: RollingUpdate
         containers:
           redis:
             image:
               repository: docker.io/valkey/valkey
               tag: 7.2.6
+            args:
+              - --save
+              - ""
+              - --appendonly
+              - "no"
             resources:
               requests:
                 cpu: 5m
                 memory: 32Mi
               limits:
                 memory: 128Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
 
     service:
       app:
@@ -124,5 +154,11 @@ spec:
         type: emptyDir
         advancedMounts:
           manyfold:
-            main:
+            main: &tmpdirs
+              - path: /tmp
+                subPath: host-tmp
               - path: /app/tmp
+                subPath: app-tmp
+              - path: /app/log
+                subPath: app-log
+            chown-tmpdirs: *tmpdirs
