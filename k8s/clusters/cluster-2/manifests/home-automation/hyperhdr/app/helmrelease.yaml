@@ -38,22 +38,16 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           annotations:
-            k8s.v1.cni.cncf.io/networks: home-automation-iot-dhcp
-            # k8s.v1.cni.cncf.io/networks: |
-            #   [{
-            #     "name":"multus-iot",
-            #     "namespace": "network",
-            #     "ips": ["10.10.100.13/24"],
-            #     "mac": "aa:e9:02:a4:7e:79"
-            #   }]
-          # securityContext:
-          #   runAsUser: ${APP_UID}
-          #   runAsGroup: ${APP_GID}
-          #   runAsNonRoot: false               # Must be run as root user or it fails to start
-          #   fsGroup: ${APP_GID}
-          #   fsGroupChangePolicy: "OnRootMismatch"
-          #   supplementalGroups:
-          #     - 34
+            # DO NOT ENABLE
+            # Enabling this adds an extra default route to the container. My IoT network is locked down tight and results in failed external DNS lookups
+            # k8s.v1.cni.cncf.io/networks: home-automation-iot-dhcp
+            k8s.v1.cni.cncf.io/networks: |
+              [{
+                "name":"multus-iot",
+                "namespace": "network",
+                "ips": ["10.10.100.13/24"],
+                "mac": "aa:e9:02:a4:7e:78"
+              }]
 
         containers:
           app:
@@ -116,14 +110,6 @@ spec:
       app:
         enabled: true
         className: "internal-nginx"
-        # annotations:
-        #   cert-manager.io/cluster-issuer: letsencrypt-production
-        #   traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        #   traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
-        #   external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
-        #   # external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
-        #   external-dns/is-public: "false"
-        #   external-dns/powerdns: "true"
         hosts:
           - host: &host-cluster "hyperhdr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
             paths:
