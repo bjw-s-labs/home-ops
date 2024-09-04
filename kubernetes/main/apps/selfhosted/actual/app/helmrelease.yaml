@@ -34,16 +34,22 @@ spec:
             image:
               repository: ghcr.io/actualbudget/actual-server
               tag: 24.9.0
+            env:
+              ACTUAL_PORT: &httpPort 5006
             probes:
               liveness:
                 enabled: true
               readiness:
                 enabled: true
-              startup:
-                enabled: true
+                custom: true
                 spec:
-                  failureThreshold: 30
-                  periodSeconds: 5
+                  httpGet:
+                    path: /
+                    port: *httpPort
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
             resources:
               requests:
                 cpu: 12m
@@ -56,7 +62,7 @@ spec:
         controller: actual
         ports:
           http:
-            port: 5006
+            port: *httpPort
 
     ingress:
       app:
