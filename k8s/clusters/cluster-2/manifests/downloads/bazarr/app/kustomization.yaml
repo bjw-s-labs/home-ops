@@ -12,6 +12,10 @@ resources:
   - ../../../../../../templates/cephfs-mounts/tv-folder.yaml
   - ./helmrelease.yaml
   - ../../../../../../templates/volsync
+configMapGenerator:
+  - name: bazarr-scripts
+    files:
+      - subcleaner.sh=./resources/subcleaner.sh
 generatorOptions:
   disableNameSuffixHash: true
   annotations:

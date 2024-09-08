@@ -105,6 +105,12 @@ spec:
             port: *port
 
     persistence:
+      add-ons:
+        type: emptyDir
+      cache:
+        type: emptyDir
+        globalMounts:
+          - path: /config/cache
       config:
         enabled: true
         existingClaim: ${VOLSYNC_CLAIM}
@@ -112,6 +118,18 @@ spec:
           bazarr:
             app:
               - path: /config
+      log:
+        type: emptyDir
+        globalMounts:
+          - path: /config/log
+      scripts:
+        type: configMap
+        name: bazarr-scripts
+        defaultMode: 0775
+        globalMounts:
+          - readOnly: true
+      tmp:
+        type: emptyDir
       backup:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-backups
