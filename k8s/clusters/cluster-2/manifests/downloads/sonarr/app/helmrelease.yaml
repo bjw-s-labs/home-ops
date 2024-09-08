@@ -73,10 +73,12 @@ spec:
               pullPolicy: IfNotPresent
             env:
               TZ: "${TIMEZONE}"
-              SONARR_INSTANCE_NAME: Sonarr
-              SONARR__PORT: &port 8989
+              SONARR__APP__INSTANCENAME: Sonarr
+              SONARR__APP__THEME: dark
+              SONARR__SERVER__PORT: &port 8989
               SONARR__APPLICATION_URL: &host-cluster "sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
               SONARR__LOG_LEVEL: info
+              SONARR__UPDATE__BRANCH: develop
             probes:
               liveness:
                 enabled: true

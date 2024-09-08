@@ -12,8 +12,8 @@ spec:
       app.kubernetes.io/name: *app
   path: ./k8s/clusters/cluster-2/manifests/downloads/sonarr/app
   prune: true
-#   dependsOn:
-#     - name: network-namespace
+  dependsOn:
+    - name: cloudnative-pg-cluster
   sourceRef:
     kind: GitRepository
     name: home-ops

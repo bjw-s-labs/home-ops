@@ -73,8 +73,9 @@ spec:
               pullPolicy: IfNotPresent
             env:
               TZ: "${TIMEZONE}"
-              RADARR_INSTANCE_NAME: Radarr-4k
-              RADARR__PORT: &port 7878
+              RADARR__APP__INSTANCENAME: Radarr-4K
+              RADARR__APP__THEME: dark
+              RADARR__SERVER__PORT: &port 7878
               RADARR__APPLICATION_URL: &host-cluster "radarr-4k.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
               RADARR__LOG_LEVEL: info
             probes:
