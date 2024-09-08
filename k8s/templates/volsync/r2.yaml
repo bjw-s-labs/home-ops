@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: "${APP}-volsync-secret-r2"
+type: Opaque
+stringData:
+    # The repository url
+    RESTIC_REPOSITORY: s3:https://${CLOUDFLARE_RESTIC_REPO}/${CLUSTER_NAME}/pvcs/${NAMESPACE}/${APP}
+    # The repository encryption key
+    RESTIC_PASSWORD: ${RESTIC_PASSWORD}
+    # ENV vars specific to the chosen back end
+    # https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html
+    AWS_ACCESS_KEY_ID: ${CLOUDFLARE_AWS_ACCESS_KEY_ID}
+    AWS_SECRET_ACCESS_KEY: ${CLOUDFLARE_AWS_SECRET_ACCESS_KEY}
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationsource_v1alpha1.json
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: "${APP}-r2"
+spec:
+  sourcePVC: "${APP}"
+  trigger:
+    schedule: "0 8 * * *"
+  restic:
+    unlock: "02"
+    copyMethod: "${VOLSYNC_COPYMETHOD:-Snapshot}"
+    pruneIntervalDays: 7
+    repository: "${APP}-volsync-secret-r2"
+    volumeSnapshotClassName: "${VOLSYNC_SNAPSHOTCLASS:-csi-ceph-blockpool}"
+    cacheCapacity: "${VOLSYNC_CACHE_CAPACITY:-4Gi}"
+    cacheStorageClassName: "${VOLSYNC_SNAPSHOTCLASS:-ceph-blockpool-nvme}"
+    cacheAccessModes: ["${VOLSYNC_CACHE_ACCESSMODES:-ReadWriteOnce}"]
+    storageClassName: "${VOLSYNC_STORAGECLASS:-ceph-blockpool-nvme}"
+    accessModes: ["${VOLSYNC_ACCESSMODES:-ReadWriteOnce}"]
+    moverSecurityContext:
+      runAsUser: 568
+      runAsGroup: 100
+      fsGroup: 100
+    retain:
+      daily: 7
