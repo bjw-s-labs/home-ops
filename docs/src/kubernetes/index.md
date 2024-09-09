@@ -1,6 +1,6 @@
 # Kubernetes
 
-My main cluster is [Talos](http://talos.dev/) provisioned on bare-metal using the official `talosctl` CLI tool. I render my [Talos configuration](https://github.com/bjw-s/home-ops/tree/main/infrastructure/talos/main) using the [talhelper](https://github.com/budimanjojo/talhelper) CLI tool. This allows me to keep the Talos configuration as DRY as possible.
+My main cluster is [Talos](http://talos.dev/) provisioned on bare-metal using the official `talosctl` CLI tool. I render my [Talos configuration](https://github.com/bjw-s-labs/home-ops/tree/main/infrastructure/talos/main) using the [talhelper](https://github.com/budimanjojo/talhelper) CLI tool. This allows me to keep the Talos configuration as DRY as possible.
 
 This is a semi hyper-converged cluster, workloads and block storage are sharing the same available resources on my nodes while I have a separate server for (NFS) file storage.
 

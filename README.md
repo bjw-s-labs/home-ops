@@ -7,7 +7,7 @@
 _... managed by Flux, Renovate and GitHub Actions_ :robot:
 
 [![Discord](https://img.shields.io/discord/673534664354430999?style=for-the-badge&label&logo=discord&logoColor=white&color=blue)](https://discord.gg/home-operations)&nbsp;
-[![Renovate](https://img.shields.io/github/actions/workflow/status/bjw-s/.github/schedule-renovate.yaml?branch=main&label=&logo=renovatebot&style=for-the-badge&color=blue)](https://github.com/bjw-s/home-ops/actions/workflows/schedule-renovate.yaml)
+[![Renovate](https://img.shields.io/github/actions/workflow/status/bjw-s/.github/schedule-renovate.yaml?branch=main&label=&logo=renovatebot&style=for-the-badge&color=blue)](https://github.com/bjw-s-labs/home-ops/actions/workflows/schedule-renovate.yaml)
 
 Main k8s cluster stats:
 
@@ -48,4 +48,4 @@ Thanks to all the people who donate their time to the [Kubernetes @Home](https:/
 
 ### 🔏 License
 
-See [LICENSE](https://github.com/bjw-s/home-ops/blob/main/LICENSE)
+See [LICENSE](https://github.com/bjw-s-labs/home-ops/blob/main/LICENSE)
