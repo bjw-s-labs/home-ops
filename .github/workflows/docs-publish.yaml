@@ -22,8 +22,8 @@ jobs:
         uses: actions/create-github-app-token@v1
         id: app-token
         with:
-          app-id: ${{ secrets.BJWS_APP_ID }}
-          private-key: ${{ secrets.BJWS_APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.LAB_ASSISTANT_APP_ID }}
+          private-key: ${{ secrets.LAB_ASSISTANT_APP_KEY }}
 
       - name: Checkout main branch
         uses: actions/checkout@v4
@@ -41,5 +41,3 @@ jobs:
         with:
           github_token: ${{ steps.app-token.outputs.token }}
           publish_dir: ./docs/book/html
-          user_name: "bjw-s-bot[bot]"
-          user_email: "bjw-s-bot <87358111+bjw-s-bot[bot]@users.noreply.github.com>"
