@@ -5,7 +5,7 @@ The in-cluster storage is provided by a [rook](https://github.com/rook/rook) Cep
 
 ## rook-ceph block storage
 
-The bulk of my cluster storage relies on [my `CephBlockPool`](https://github.com/bjw-s/home-ops/tree/main/kubernetes/main/apps/rook-ceph/rook-ceph/cluster]). This ensures that my data is replicated across my storage nodes.
+The bulk of my cluster storage relies on [my `CephBlockPool`](https://github.com/bjw-s-labs/home-ops/tree/main/kubernetes/main/apps/rook-ceph/rook-ceph/cluster]). This ensures that my data is replicated across my storage nodes.
 
 ## NFS storage
 

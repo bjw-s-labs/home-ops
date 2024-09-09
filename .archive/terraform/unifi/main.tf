@@ -20,7 +20,7 @@ terraform {
 }
 
 data "http" "bjws_common_networks" {
-  url = "https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/_shared/networks.yaml"
+  url = "https://raw.githubusercontent.com/bjw-s-labs/home-ops/main/infrastructure/_shared/networks.yaml"
 }
 
 module "onepassword_item_unifi_controller" {
