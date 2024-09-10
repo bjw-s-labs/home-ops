@@ -101,11 +101,6 @@ spec:
                   timeoutSeconds: 1
                   failureThreshold: 3
               readiness: *probes
-            resources:
-              requests:
-                cpu: 10m
-              limits:
-                memory: "1G"
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -114,7 +109,7 @@ spec:
               requests:
                 cpu: 100m
               limits:
-                memory: 4Gi
+                memory: 2Gi
 
     service:
       app:
