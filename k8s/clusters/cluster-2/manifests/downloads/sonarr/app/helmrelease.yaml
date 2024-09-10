@@ -36,6 +36,14 @@ spec:
       nameOverride: *app
 
     defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: ${APP_UID}
+        runAsGroup: ${APP_GID}
+        fsGroup: ${APP_GID}
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [34,10000]
+        seccompProfile: { type: RuntimeDefault }
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -51,19 +59,19 @@ spec:
       #   google.feature.node.kubernetes.io/coral: "true"
       #   intel.feature.node.kubernetes.io/gpu: "true"
 
+
     controllers:
       sonarr:
         annotations:
           reloader.stakater.com/auto: "true"
-        pod:
-          securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
-            runAsNonRoot: true
-            fsGroup: ${APP_GID}
-            fsGroupChangePolicy: "OnRootMismatch"
-            supplementalGroups:
-              - 34
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16
+            envFrom: &envFrom
+              - secretRef:
+                  name: sonarr-secret
 
         containers:
           app:
@@ -79,22 +87,30 @@ spec:
               SONARR__APPLICATION_URL: &host-cluster "sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
               SONARR__LOG_LEVEL: info
               SONARR__UPDATE__BRANCH: develop
+              SONARR__LOG__DBENABLED: "False"
+            envFrom: *envFrom
             probes:
-              liveness:
-                enabled: true
-              readiness:
-                enabled: true
-              startup:
-                enabled: true
+              liveness: &probes
+                enabled: false
+                custom: true
                 spec:
-                  failureThreshold: 30
-                  periodSeconds: 5
+                  httpGet:
+                    path: /ping
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
-                cpu: 10m
-                memory: "3G"
+                cpu: 100m
               limits:
-                memory: "5G"
+                memory: 2Gi
 
     service:
       app:
@@ -107,6 +123,8 @@ spec:
       config:
         enabled: true
         existingClaim: ${VOLSYNC_CLAIM}
+      tmp:
+        type: emptyDir
       tv:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-tv
