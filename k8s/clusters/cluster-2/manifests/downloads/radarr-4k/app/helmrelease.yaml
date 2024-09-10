@@ -36,6 +36,14 @@ spec:
       nameOverride: *app
 
     defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: ${APP_UID}
+        runAsGroup: ${APP_GID}
+        fsGroup: ${APP_GID}
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [34,10000]
+        seccompProfile: { type: RuntimeDefault }
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -117,15 +125,6 @@ spec:
                 cpu: 100m
               limits:
                 memory: 4Gi
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: ${APP_UID}
-        runAsGroup: ${APP_GID}
-        fsGroup: ${APP_GID}
-        fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [34,10000]
-        seccompProfile: { type: RuntimeDefault }
 
     service:
       app:
