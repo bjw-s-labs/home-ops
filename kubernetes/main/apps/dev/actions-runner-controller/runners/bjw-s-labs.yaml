@@ -3,8 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: arc-assets
-  namespace: dev
+  name: arc-bjw-s-labs
 spec:
   interval: 30m
   chart:
@@ -18,12 +17,13 @@ spec:
       interval: 30m
 
   values:
-    runnerScaleSetName: arc-runner-set-assets
+    runnerGroup: arc-bjw-s-labs
+    runnerScaleSetName: arc-bjw-s-labs
 
-    githubConfigUrl: https://github.com/bjw-s/assets
+    githubConfigUrl: https://github.com/bjw-s-labs
 
-    minRunners: 0
-    maxRunners: 2
+    minRunners: 1
+    maxRunners: 6
 
     containerMode:
       type: "dind"
@@ -35,14 +35,14 @@ spec:
     listenerTemplate:
       metadata:
         labels:
-          app.kubernetes.io/name: arc-assets-listener
+          app.kubernetes.io/name: arc-bjw-s-labs-listener
       spec:
         containers: []
 
     template:
       metadata:
         labels:
-          app.kubernetes.io/name: arc-assets-runner
+          app.kubernetes.io/name: arc-bjw-s-labs-runner
       spec:
         containers:
           - name: runner
