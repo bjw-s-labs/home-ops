@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/recyclarr/recyclarr/master/schemas/config-schema.json
 sonarr:
   sonarr:
-    base_url: http://sonarr.downloads.svc.cluster.local
+    base_url: http://sonarr.downloads.svc.cluster.local:8989
     api_key: !env_var SONARR_API_KEY
     delete_old_custom_formats: true
     replace_existing_custom_formats: true
@@ -28,24 +28,49 @@ sonarr:
 
 radarr:
   radarr:
-    base_url: http://radarr.downloads.svc.cluster.local
+    base_url: http://radarr.downloads.svc.cluster.local:7878
     api_key: !env_var RADARR_API_KEY
     delete_old_custom_formats: true
     replace_existing_custom_formats: true
     quality_profiles:
       - name: SQP-1 (2160p)
     include:
-      - template: radarr-quality-definition-sqp-streaming
-      - template: radarr-quality-profile-sqp-1-2160p-default
-      - template: radarr-custom-formats-sqp-1-2160p
+      - template: radarr-quality-definition-sqp-uhd
+      - template: radarr-quality-profile-sqp-4
+      - template: radarr-custom-formats-sqp-4
     custom_formats:
+      # Movie Versions
       - trash_ids:
-          - 7a0d1ad358fee9f5b074af3ef3f9d9ef # hallowed
+          - 9f6cbff8cfe4ebbc1bde14c7b7bec0de # IMAX Enhanced
+        assign_scores_to:
+          - name: SQP-4
+            score: 0 # Uncomment this line to disable prioritised IMAX Enhanced releases
+      # Misc
+      - trash_ids:
+          - 2899d84dc9372de3408e6d8cc18e9666 # x264
+        assign_scores_to:
+          - name: SQP-4
+            score: 0 # Uncomment this line to enable x264 releases
+
+      # Optional
+      - trash_ids:
+          # Uncomment the next two lines if you have a setup that supports HDR10+
+          # - b17886cb4158d9fea189859409975758 # HDR10+ Boost
+          # - 55a5b50cb416dea5a50c4955896217ab # DV HDR10+ Boost
+
+          # Comment out the next line if you and all of your users' setups are fully DV compatible
+          - 923b6abef9b17f937fab56cfcf89e1f1 # DV (WEBDL)
+
           - b6832f586342ef70d9c128d40c07b872 # Bad Dual Groups
           - 90cedc1fea7ea5d11298bebd3d1d3223 # EVO (no WEBDL)
           - ae9b7c9ebde1f3bd336a8cbd1ec4c5e5 # No-RlsGroup
           - 7357cf5161efbf8c4d5d0c30b4815ee2 # Obfuscated
           - 5c44f52a8714fdd79bb4d98e2673be1f # Retags
           - f537cf427b64c38c8e36298f657e4828 # Scene
+          - f700d29429c023a5734505e77daeaea7 # DV (Disk)
         assign_scores_to:
-          - name: SQP-1 (2160p)
+          - name: SQP-4
+      - trash_ids:
+          - 9c38ebb7384dada637be8899efa68e6f # SDR
+        assign_scores_to:
+          - name: SQP-4
