@@ -39,8 +39,12 @@ radarr:
         upgrade:
           allowed: true
           until_quality: WEBRip-2160p
-          until_score: 10
+          until_score: 200
         qualities:
+          - name: WEB 720p
+            qualities:
+              - name: WEBRip-720p
+              - name: WEBDL-720p
           - name: Bluray-720p
           - name: HDTV-1080p
           - name: WEBDL-1080p
@@ -64,7 +68,7 @@ radarr:
           - 2899d84dc9372de3408e6d8cc18e9666 # x264
         assign_scores_to:
           - name: SQP-4
-            score: 0 # Uncomment this line to enable x264 releases
+            # score: 0 # Uncomment this line to enable x264 releases
 
       # Optional
       - trash_ids:
