@@ -1,0 +1,81 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: invidious
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 3.4.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 30m
+  values:
+    controllers:
+      invidious:
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        pod:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: "OnRootMismatch"
+
+        containers:
+          app:
+            image:
+              repository: quay.io/invidious/invidious
+              tag: latest@sha256:8ea514c132b6a805328891f99b7aeef201523ff7ba28e38fd3c01ec4e14498da
+            envFrom:
+              - secretRef:
+                  name: invidious-secret
+              - secretRef:
+                  name: invidious-db-secret
+            env:
+              INVIDIOUS_CHECK_TABLES: true
+              INVIDIOUS_PORT: &port 3000
+              INVIDIOUS_DOMAIN: &hostname invidious.bjw-s.dev
+              INVIDIOUS_EXTERNAL_PORT: 443
+              INVIDIOUS_REGISTRATION_ENABLED: false
+              INVIDIOUS_ADMINS: "[bjw-s]"
+              INVIDIOUS_CHANNEL_THREADS: 2
+              INVIDIOUS_FULL_REFRESH: false
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+
+    service:
+      app:
+        controller: invidious
+        ports:
+          http:
+            port: *port
+
+    ingress:
+      app:
+        className: internal-nginx
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
+        hosts:
+          - host: *hostname
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: app
+                  port: http
