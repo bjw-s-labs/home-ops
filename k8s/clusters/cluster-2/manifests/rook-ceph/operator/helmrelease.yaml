@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -24,13 +23,16 @@ spec:
       enabled: true
     pspEnable: false
 
+    # -- The timeout for ceph commands in seconds
+    cephCommandsTimeoutSeconds: "30"
+
     csi:
       enableRbdDriver: true
       enableCephfsDriver: true
 
       # -- Enable discovery daemon
       enableDiscoveryDaemon: true
-      
+
       csiAddons:
         enabled: false
       # Indicate whether or not they support modifying a volume's ownership or permissions when the volume is being mounted.
