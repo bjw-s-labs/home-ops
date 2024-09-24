@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -16,6 +15,9 @@ spec:
         namespace: flux-system
       interval: 30m
   values:
+    image:
+      repository: ghcr.io/deedee-ops/spegel-hack
+      digest: "sha256:7de27625da39e0524982c3075c1bc724224dedd2f6b2f3cf51535a943a3a8586"
     spegel:
       containerdSock: /run/containerd/containerd.sock
       containerdRegistryConfigPath: /etc/cri/conf.d/hosts
