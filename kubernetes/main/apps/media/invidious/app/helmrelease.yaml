@@ -39,14 +39,15 @@ spec:
               - secretRef:
                   name: invidious-db-secret
             env:
-              INVIDIOUS_CHECK_TABLES: true
-              INVIDIOUS_PORT: &port 3000
-              INVIDIOUS_DOMAIN: &hostname invidious.bjw-s.dev
-              INVIDIOUS_EXTERNAL_PORT: 443
-              INVIDIOUS_REGISTRATION_ENABLED: false
               INVIDIOUS_ADMINS: "[bjw-s]"
               INVIDIOUS_CHANNEL_THREADS: 2
+              INVIDIOUS_CHECK_TABLES: true
+              INVIDIOUS_DOMAIN: &hostname invidious.bjw-s.dev
+              INVIDIOUS_EXTERNAL_PORT: 443
               INVIDIOUS_FULL_REFRESH: false
+              INVIDIOUS_HTTPS_ONLY: true
+              INVIDIOUS_PORT: &port 3000
+              INVIDIOUS_REGISTRATION_ENABLED: false
             probes:
               liveness:
                 enabled: false
