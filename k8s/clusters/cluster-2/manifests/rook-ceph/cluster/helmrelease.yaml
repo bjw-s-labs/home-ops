@@ -37,10 +37,10 @@ spec:
     ingress:
       dashboard:
         ingressClassName: "internal-nginx"
-        annotations:
-          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-          nginx.ingress.kubernetes.io/configuration-snippet: |
-            proxy_ssl_protocols TLSv1.3;
+        # annotations:
+        #   nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        #   nginx.ingress.kubernetes.io/configuration-snippet: |
+        #     proxy_ssl_protocols TLSv1.3;
         host:
           name: &host "rook.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
           path: "/"
@@ -197,7 +197,7 @@ spec:
       dashboard:
         enabled: true
         urlPrefix: /
-        ssl: true
+        ssl: false
         prometheusEndpoint: http://kube-prometheus-stack-prometheus.monitoring.svc:9090
       # The option to automatically remove OSDs that are out and are safe to destroy.
       removeOSDsIfOutAndSafeToRemove: true
