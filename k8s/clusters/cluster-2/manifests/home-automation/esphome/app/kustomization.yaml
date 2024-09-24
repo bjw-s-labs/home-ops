@@ -1,11 +1,11 @@
----
 # yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./helmrelease.yaml
-  - ../../../../../../templates/volsync
+- ./helmrelease.yaml
+- ../../../../../../templates/volsync
+- ./restore.yaml
 labels:
-  - pairs:
-      app.kubernetes.io/name: esphome
-      app.kubernetes.io/instance: esphome
+- pairs:
+    app.kubernetes.io/name: esphome
+    app.kubernetes.io/instance: esphome
