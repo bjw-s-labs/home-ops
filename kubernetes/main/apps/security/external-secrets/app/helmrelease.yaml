@@ -16,23 +16,21 @@ spec:
         name: external-secrets
         namespace: flux-system
   values:
+    image:
+      repository: ghcr.io/external-secrets/external-secrets
     installCRDs: true
-    replicaCount: 1
-    leaderElect: true
-    grafana:
-      enabled: true
     serviceMonitor:
       enabled: true
       interval: 1m
-    backgroundController:
+    certController:
+      image:
+        repository: ghcr.io/external-secrets/external-secrets
       serviceMonitor:
         enabled: true
         interval: 1m
-    cleanupController:
-      serviceMonitor:
-        enabled: true
-        interval: 1m
-    reportsController:
+    webhook:
+      image:
+        repository: ghcr.io/external-secrets/external-secrets
       serviceMonitor:
         enabled: true
         interval: 1m
