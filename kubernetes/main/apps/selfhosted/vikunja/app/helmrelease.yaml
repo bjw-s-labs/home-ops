@@ -1,0 +1,92 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: vikunja
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.4.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controllers:
+      vikunja:
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        pod:
+          securityContext:
+            runAsUser: 2000
+            runAsGroup: 2000
+            fsGroup: 2000
+            fsGroupChangePolicy: "OnRootMismatch"
+
+        containers:
+          app:
+            image:
+              repository: docker.io/vikunja/vikunja
+              tag: 0.24.3
+            env:
+              VIKUNJA_DATABASE_TYPE: sqlite
+              VIKUNJA_DATABASE_PATH: /db/vikunja.db
+              VIKUNJA_FILES_BASEPATH: /files
+              VIKUNJA_SERVICE_ENABLECALDAV: false
+              VIKUNJA_SERVICE_ENABLELINKSHARING: false
+              VIKUNJA_SERVICE_ENABLEREGISTRATION: false
+              VIKUNJA_SERVICE_PUBLICURL: https://vikunja.bjw-s.dev/
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+            resources:
+              requests:
+                cpu: 5m
+                memory: 192Mi
+              limits:
+                memory: 1024Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+
+    service:
+      app:
+        controller: vikunja
+        ports:
+          http:
+            port: 3456
+
+    ingress:
+      app:
+        className: "external-nginx"
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
+        hosts:
+          - host: vikunja.bjw-s.dev
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+
+    persistence:
+      data:
+        existingClaim: vikunja-data
+        advancedMounts:
+          vikunja:
+            app:
+              - path: /db
+                subPath: db
+              - path: /files
+                subPath: files
