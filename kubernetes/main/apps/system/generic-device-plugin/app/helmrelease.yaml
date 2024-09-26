@@ -21,16 +21,13 @@ spec:
   values:
     defaultPodOptions:
       priorityClassName: system-node-critical
-      tolerations:
-        - operator: "Exists"
-          effect: "NoExecute"
-        - operator: "Exists"
-          effect: "NoSchedule"
 
     controllers:
       recyclarr:
         type: daemonset
         strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
 
         containers:
           app:
@@ -38,31 +35,38 @@ spec:
               repository: ghcr.io/squat/generic-device-plugin
               tag: 36bfc606bba2064de6ede0ff2764cbb52edff70d@sha256:ba6f0b4cf6c858d6ad29ba4d32e4da11638abbc7d96436bf04f582a97b2b8821
             args:
-              - --device
-              - |
-                name: tun
-                groups:
-                  - count: 1000
-                    paths:
-                      - path: /dev/net/tun
+              - --log-level=info
+              - --config=/config/config.yaml
             resources:
               requests:
-                cpu: 20m
-                memory: 48Mi
+                cpu: 10m
               limits:
-                memory: 48Mi
+                memory: 64Mi
             securityContext:
-              privileged: true
+              allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
 
     persistence:
+      config:
+        type: configMap
+        name: generic-device-plugin-configmap
+        globalMounts:
+          - path: /config/config.yaml
+            subPath: config.yaml
+            readOnly: true
       dev:
         type: hostPath
         hostPath: /dev
         globalMounts:
-          - path: /dev
-      device-plugin:
+          - readOnly: true
+      sys:
+        type: hostPath
+        hostPath: /sys
+        globalMounts:
+          - readOnly: true
+      var-lib-kubelet-device-plugins:
         type: hostPath
         hostPath: /var/lib/kubelet/device-plugins
-        globalMounts:
-          - path: /var/lib/kubelet/device-plugins
