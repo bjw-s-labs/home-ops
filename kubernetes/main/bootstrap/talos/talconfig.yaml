@@ -124,6 +124,15 @@ controlPlane:
         network:
           disableSearchDomain: true
 
+    # Disable Host DNS
+    - |-
+      machine:
+        features:
+          hostDNS:
+            enabled: true
+            resolveMemberNames: true
+            forwardKubeDNSToHost: false
+
     # Enable KubePrism
     - |-
       machine:
@@ -138,6 +147,8 @@ controlPlane:
         allowSchedulingOnMasters: true
         proxy:
           disabled: true
+        coreDNS:
+            disabled: true
         discovery:
           enabled: true
           registries:
