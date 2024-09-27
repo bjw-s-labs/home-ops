@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: kube-prometheus-stack
-      version: 62.7.0
+      version: 63.0.0
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
@@ -126,8 +126,9 @@ spec:
           - auto-gomaxprocs
           - memory-snapshot-on-shutdown
           - new-service-discovery-manager
-        podMonitorSelectorNilUsesHelmValues: false
-        probeSelectorNilUsesHelmValues: false
+        podMonitorSelector: &selector
+          matchLabels: null
+        probeSelector: *selector
         replicas: 1
         replicaExternalLabelName: "__replica__" # must match with thanos value `.query.replicaLabel[0]`
         resources:
@@ -137,10 +138,10 @@ spec:
             memory: 2000M
         retention: 14d
         retentionSize: 50GB
-        ruleSelectorNilUsesHelmValues: false
-        scrapeConfigSelectorNilUsesHelmValues: false
+        ruleSelector: *selector
+        scrapeConfigSelector: *selector
         scrapeInterval: 1m # Must match interval in Grafana Helm chart
-        serviceMonitorSelectorNilUsesHelmValues: false
+        serviceMonitorSelector: *selector
         storageSpec:
           volumeClaimTemplate:
             spec:
