@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -25,31 +24,28 @@ spec:
         operator: Exists
         effect: "NoSchedule"
       containers:
-        - name: ubuntu
-          image: ubuntu
-          command: ["/bin/sh","-c"]
-          args:
-            - >
-              apt-get update &&
-              apt-get install -y gdisk smartmontools hdparm sysstat iperf3 &&
-              echo "Go to sleep now!" &&
-              sleep infinity
-          volumeMounts:
-            - mountPath: /hostRoot
-              name: root
-              readOnly: true
-          securityContext:
-            privileged: true
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "250m"
-            limits:
-              memory: "1024Mi"
-              # cpu: "2000m"
+      - name: ubuntu
+        image: ubuntu
+        command: ["/bin/sh", "-c"]
+        args:
+        - >
+          apt-get update && apt-get install -y gdisk smartmontools hdparm sysstat iperf3 lvm2 && echo "Go to sleep now!" && sleep infinity
+        volumeMounts:
+        - mountPath: /hostRoot
+          name: root
+          readOnly: true
+        securityContext:
+          privileged: true
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "1024Mi"
+            # cpu: "2000m"
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: root
-          hostPath:
-            path: /
-            type: Directory
+      - name: root
+        hostPath:
+          path: /
+          type: Directory
