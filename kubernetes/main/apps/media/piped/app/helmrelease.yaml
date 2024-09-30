@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -6,98 +7,171 @@ metadata:
 spec:
   chart:
     spec:
-      chart: piped
-      version: 6.0.2
+      chart: app-template
+      version: 3.4.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
-        name: piped
+        name: bjw-s
+        namespace: flux-system
   interval: 30m
   values:
-    automountServiceAccountToken: false
+    defaultPodOptions:
+      automountServiceAccountToken: false
 
-    postgresql:
-      enabled: false
+    controllers:
+      backend:
+        strategy: RollingUpdate
 
-    backend:
-      annotations:
-        configmap.reloader.stakater.com/reload: piped-backend-config
-      config:
-        PORT: 8080
-        HTTP_WORKERS: 4
-        API_URL: https://piped-api.bjw-s.dev
-        PROXY_PART: "https://piped-proxy.bjw-s.dev"
-        DISABLE_REGISTRATION: true
-        database:
-          connection_url: jdbc:postgresql://postgres-primary.database.svc.cluster.local:5432/piped
-          driver_class: org.postgresql.Driver
-          secret:
-            name: piped-db-secret
-            username: user
-            password: password
-      podSecurityContext:
-        runAsUser: &uid 1000
-        runAsGroup: *uid
-        fsGroup: *uid
-        fsGroupChangePolicy: Always
-      resources:
-        requests:
-          cpu: 10m
-          memory: 500Mi
-        limits:
-          memory: 2000Mi
+        annotations:
+          secret.reloader.stakater.com/reload: piped-secret
 
-    frontend:
-      env:
-        BACKEND_HOSTNAME: piped-api.bjw-s.dev
-      args:
-        - -c
-        - |
-            sed -i s/pipedapi.kavin.rocks/$BACKEND_HOSTNAME/g /usr/share/nginx/html/assets/* &&
-            sed -i 's/80;/8080;/g' /etc/nginx/conf.d/default.conf &&
-            /docker-entrypoint.sh nginx -g 'daemon off;'
-      service:
-        main:
-          ports:
-            http:
-              port: 8080
-      resources:
-        requests:
-          cpu: 10m
-          memory: 32Mi
-        limits:
-          memory: 256Mi
+        pod:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: "OnRootMismatch"
+
+        containers:
+          app:
+            image:
+              repository: 1337kavin/piped
+              tag: latest
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+            resources:
+              requests:
+                cpu: 10m
+                memory: 500Mi
+              limits:
+                memory: 2000Mi
+
+      frontend:
+        strategy: RollingUpdate
+        containers:
+          app:
+            image:
+              repository: 1337kavin/piped-frontend
+              tag: latest
+            command:
+              - /bin/ash
+              - -c
+            args:
+              - |
+                  sed -i s/pipedapi.kavin.rocks/$BACKEND_HOSTNAME/g /usr/share/nginx/html/assets/* &&
+                  sed -i 's/80;/8080;/g' /etc/nginx/conf.d/default.conf &&
+                  /docker-entrypoint.sh nginx -g 'daemon off;'
+            env:
+              BACKEND_HOSTNAME: piped-api.bjw-s.dev
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 256Mi
+
+      ytproxy:
+        strategy: RollingUpdate
+        pod:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: "OnRootMismatch"
+
+        containers:
+          app:
+            image:
+              repository: 1337kavin/piped-proxy
+              tag: latest
+            command:
+              - /app/piped-proxy
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+            resources:
+              requests:
+                cpu: 10m
+                memory: 500Mi
+              limits:
+                memory: 2000Mi
+
+    service:
+      backend:
+        controller: backend
+        ports:
+          http:
+            port: 8080
+      frontend:
+        controller: frontend
+        ports:
+          http:
+            port: 8080
+      ytproxy:
+        controller: ytproxy
+        ports:
+          http:
+            port: 8080
 
     ingress:
-      main:
-        ingressClassName: "internal-nginx"
-        annotations:
-          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
-          nginx.ingress.kubernetes.io/enable-cors: "true"
-          nginx.ingress.kubernetes.io/cors-allow-origin: "https://piped.bjw-s.dev, https://piped-api.bjw-s.dev, https://piped-proxy.bjw-s.dev"
-        hosts:
-          - host: piped.bjw-s.dev
-            paths:
-              - path: "/"
-
       backend:
-        ingressClassName: "internal-nginx"
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
           nginx.ingress.kubernetes.io/enable-cors: "true"
           nginx.ingress.kubernetes.io/cors-allow-origin: "https://piped.bjw-s.dev, https://piped-api.bjw-s.dev, https://piped-proxy.bjw-s.dev"
+        className: "internal-nginx"
         hosts:
           - host: piped-api.bjw-s.dev
             paths:
-              - path: "/"
-
-      ytproxy:
-        ingressClassName: "internal-nginx"
+              - path: /
+                service:
+                  identifier: backend
+                  port: http
+      frontend:
         annotations:
           external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
           nginx.ingress.kubernetes.io/enable-cors: "true"
           nginx.ingress.kubernetes.io/cors-allow-origin: "https://piped.bjw-s.dev, https://piped-api.bjw-s.dev, https://piped-proxy.bjw-s.dev"
+        className: "internal-nginx"
+        hosts:
+          - host: piped.bjw-s.dev
+            paths:
+              - path: /
+                service:
+                  identifier: frontend
+                  port: http
+      ytproxy:
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
+          nginx.ingress.kubernetes.io/enable-cors: "true"
+          nginx.ingress.kubernetes.io/cors-allow-origin: "https://piped.bjw-s.dev, https://piped-api.bjw-s.dev, https://piped-proxy.bjw-s.dev"
+        className: "internal-nginx"
         hosts:
           - host: piped-proxy.bjw-s.dev
             paths:
-              - path: "/"
+              - path: /
+                service:
+                  identifier: ytproxy
+                  port: http
+
+    persistence:
+      config:
+        type: secret
+        name: piped-secret
+        advancedMounts:
+          backend:
+            app:
+              - path: /app/config.properties
+                subPath: config.properties
+                readOnly: true
