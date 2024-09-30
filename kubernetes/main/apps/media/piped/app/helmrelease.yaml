@@ -22,7 +22,6 @@ spec:
     controllers:
       backend:
         strategy: RollingUpdate
-
         annotations:
           secret.reloader.stakater.com/reload: piped-secret
 
@@ -49,6 +48,13 @@ spec:
                 memory: 500Mi
               limits:
                 memory: 2000Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+              seccompProfile:
+                type: RuntimeDefault
 
       frontend:
         strategy: RollingUpdate
@@ -64,6 +70,7 @@ spec:
               - |
                   sed -i s/pipedapi.kavin.rocks/$BACKEND_HOSTNAME/g /usr/share/nginx/html/assets/* &&
                   sed -i 's/80;/8080;/g' /etc/nginx/conf.d/default.conf &&
+                  sed -i 's/worker_processes  auto;/worker_processes  4;/g' /etc/nginx/nginx.conf &&
                   /docker-entrypoint.sh nginx -g 'daemon off;'
             env:
               BACKEND_HOSTNAME: piped-api.bjw-s.dev
@@ -106,6 +113,13 @@ spec:
                 memory: 500Mi
               limits:
                 memory: 2000Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+              seccompProfile:
+                type: RuntimeDefault
 
     service:
       backend:
