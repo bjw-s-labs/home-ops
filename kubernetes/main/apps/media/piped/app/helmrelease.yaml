@@ -141,10 +141,10 @@ spec:
     ingress:
       backend:
         annotations:
-          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
+          external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
           nginx.ingress.kubernetes.io/enable-cors: "true"
           nginx.ingress.kubernetes.io/cors-allow-origin: "https://piped.bjw-s.dev, https://piped-api.bjw-s.dev, https://piped-proxy.bjw-s.dev"
-        className: "internal-nginx"
+        className: "external-nginx"
         hosts:
           - host: piped-api.bjw-s.dev
             paths:
