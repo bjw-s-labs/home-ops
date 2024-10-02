@@ -82,6 +82,8 @@ spec:
               - manual
               - --exclude-category
               - cross-seed
+              - --exclude-tag
+              - added:24h
               - --include-tag
               - expired
               - --server
@@ -133,6 +135,7 @@ spec:
             <<: *container
             args:
               - reannounce
+              - --process-seeding
               - --server
               - *qbittorrent_host
               - --port
