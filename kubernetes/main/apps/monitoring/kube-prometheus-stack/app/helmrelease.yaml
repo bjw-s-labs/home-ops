@@ -126,9 +126,8 @@ spec:
           - auto-gomaxprocs
           - memory-snapshot-on-shutdown
           - new-service-discovery-manager
-        podMonitorSelector: &selector
-          matchLabels: null
-        probeSelector: *selector
+        podMonitorSelectorNilUsesHelmValues: false
+        probeSelectorNilUsesHelmValues: false
         replicas: 1
         replicaExternalLabelName: "__replica__" # must match with thanos value `.query.replicaLabel[0]`
         resources:
@@ -138,10 +137,10 @@ spec:
             memory: 2000M
         retention: 14d
         retentionSize: 50GB
-        ruleSelector: *selector
-        scrapeConfigSelector: *selector
+        ruleselectorniluseshelmvalues: false
+        scrapeConfigSelectorNilUsesHelmValues: false
         scrapeInterval: 1m # Must match interval in Grafana Helm chart
-        serviceMonitorSelector: *selector
+        serviceMonitorSelectorNilUsesHelmValues: false
         storageSpec:
           volumeClaimTemplate:
             spec:
