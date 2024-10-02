@@ -61,31 +61,6 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname plex-auto-languages
-  namespace: flux-system
-spec:
-  targetNamespace: media
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: *appname
-  interval: 10m
-  path: "./kubernetes/main/apps/media/plex/plex-auto-languages"
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: home-ops-kubernetes
-  wait: false
-  dependsOn:
-    - name: external-secrets-stores
-    - name: plex
-  postBuild:
-    substitute:
-      APP: *appname
----
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
   name: &appname plex-image-cleanup
   namespace: flux-system
 spec:
