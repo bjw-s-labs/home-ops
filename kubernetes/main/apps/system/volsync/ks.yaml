@@ -10,7 +10,8 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  interval: 10m
+  interval: 30m
+  timeout: 5m
   path: "./kubernetes/main/apps/system/volsync/app"
   prune: true
   sourceRef:
@@ -19,4 +20,3 @@ spec:
   dependsOn:
     - name: snapshot-controller
   wait: false
-  timeout: 2m
