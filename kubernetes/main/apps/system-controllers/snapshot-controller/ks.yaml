@@ -10,13 +10,13 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  interval: 10m
+  interval: 30m
+  timeout: 5m
   path: "./kubernetes/main/apps/system-controllers/snapshot-controller/app"
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-ops-kubernetes
   wait: true
-  timeout: 2m
   dependsOn:
     - name: cert-manager
