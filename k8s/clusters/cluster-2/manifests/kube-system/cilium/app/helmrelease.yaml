@@ -9,7 +9,7 @@ metadata:
   # labels:
   #   app.kubernetes.io/managed-by: Helm
 spec:
-  interval: 5m
+  interval: 30m
   chart:
     spec:
       chart: cilium
@@ -20,13 +20,13 @@ spec:
         namespace: flux-system
       interval: 5m
   install:
-    remediation: # perform remediation when helm install fails
-      retries: 100
+    remediation:
+      retries: 3
   upgrade:
-    remediation: # perform remediation when helm upgrade fails
-      retries: 100
-      remediateLastFailure: true # remediate the last failure, when no retries remain
     cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
   values:
     securityContext:
       capabilities:
