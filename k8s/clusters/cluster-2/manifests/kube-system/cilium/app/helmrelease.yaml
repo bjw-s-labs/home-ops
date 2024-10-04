@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -20,7 +19,7 @@ spec:
         name: cilium-charts
         namespace: flux-system
       interval: 5m
-  install:  
+  install:
     remediation: # perform remediation when helm install fails
       retries: 100
   upgrade:
@@ -32,21 +31,21 @@ spec:
     securityContext:
       capabilities:
         ciliumAgent:
-          - CHOWN
-          - KILL
-          - NET_ADMIN
-          - NET_RAW
-          - IPC_LOCK
-          - SYS_ADMIN
-          - SYS_RESOURCE
-          - DAC_OVERRIDE
-          - FOWNER
-          - SETGID
-          - SETUID
+        - CHOWN
+        - KILL
+        - NET_ADMIN
+        - NET_RAW
+        - IPC_LOCK
+        - SYS_ADMIN
+        - SYS_RESOURCE
+        - DAC_OVERRIDE
+        - FOWNER
+        - SETGID
+        - SETUID
         cleanCiliumState:
-          - NET_ADMIN
-          - SYS_ADMIN
-          - SYS_RESOURCE
+        - NET_ADMIN
+        - SYS_ADMIN
+        - SYS_RESOURCE
     cgroup:
       autoMount:
         enabled: false
@@ -57,7 +56,7 @@ spec:
       id: "${CLUSTER_ID}"
 
     cni:
-      exclusive: false   # Needed to allow Cillium to work properly with Multus
+      exclusive: false # Needed to allow Cillium to work properly with Multus
 
     rollOutCiliumPods: true
     localRedirectPolicy: true
@@ -90,8 +89,8 @@ spec:
       loadBalancerIP: "${LB_INGRESS}"
 
     # tunnel: "disabled"
-    tunnelProtocol: ""   #Disables tunnel
-    routingMode: "native" 
+    tunnelProtocol: "" #Disables tunnel
+    routingMode: "native"
 
     autoDirectNodeRoutes: true
 
@@ -109,9 +108,6 @@ spec:
     operator:
       rollOutPods: true
 
-    containerRuntime:
-      integration: containerd
-
     hubble:
       enabled: true
       serviceMonitor:
@@ -121,16 +117,16 @@ spec:
         label: grafana_dashboard
         namespace: system-monitoring
         labelValue: "1"
-        annotations: { }
+        annotations: {}
       metrics:
         enabled:
-          - dns:query;ignoreAAAA
-          - drop
-          - tcp
-          - flow
-          - port-distribution
-          - icmp
-          - http
+        - dns:query;ignoreAAAA
+        - drop
+        - tcp
+        - flow
+        - port-distribution
+        - icmp
+        - http
       relay:
         enabled: true
         rollOutPods: true
@@ -141,10 +137,10 @@ spec:
           enabled: true
           className: "internal-nginx"
           hosts:
-            - &host "hubble.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+          - &host "hubble.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
           tls:
-            - hosts:
-                - *host
+          - hosts:
+            - *host
 
     bgpControlPlane:
       enabled: true
