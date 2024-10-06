@@ -29,6 +29,7 @@ spec:
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 65542 # gladius:external-services
+          terminationGracePeriodSeconds: 120
 
         containers:
           app:
@@ -38,7 +39,7 @@ spec:
               tag: 4.6.7@sha256:5391f94b321d563c3b44136a5e799b7e4e4888926c1c31d3081a1cf3e74a9aec
             env:
               UMASK: "022"
-              QBITTORRENT__PORT: &port 8080
+              QBT_WEBUI_PORT: &port 8080
               XSEED_HOST: cross-seed.downloads.svc.cluster.local
               XSEED_PORT: 2468
               XSEED_APIKEY:
