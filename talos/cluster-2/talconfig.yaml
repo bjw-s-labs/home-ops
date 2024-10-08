@@ -2,9 +2,9 @@
 clusterName: &cluster cluster-2
 
 # renovate: depName=ghcr.io/siderolabs/installer datasource=docker
-talosVersion: v1.8.0
+talosVersion: v1.8.1
 # renovate: depName=ghcr.io/siderolabs/kubelet datasource=docker
-kubernetesVersion: v1.30.1
+kubernetesVersion: v1.30.4
 
 # Image URL rendered on https://factory.talos.dev
 # customization:
@@ -54,7 +54,7 @@ nodes:
       mode: active-backup
       deviceSelectors:
       - driver: bcmgenet
-        hardwareAddr: d8:3a:dd:92:0c:96
+        hardwareAddr: "d8:3a:dd:*"
     dhcp: false
     vlans:
     - &vlan2002
@@ -83,7 +83,6 @@ nodes:
       mode: active-backup
       deviceSelectors:
       - driver: bcmgenet
-        hardwareAddr: d8:3a:dd:92:0e:37
     dhcp: false
     vlans:
     - *vlan2002
@@ -397,75 +396,6 @@ nodes:
       dhcpOptions:
         routeMetric: 2048
 
-- hostname: cm4-01.cluster-2.${secret_domain}
-  ipAddress: cm4-01.cluster-2.${secret_domain}
-  # Rasp Pi Specific factory.talos.dev overlay included
-  talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
-  controlPlane: false
-  disableSearchDomain: true
-  installDiskSelector:
-    type: nvme
-  nameservers:
-  - 10.0.0.4
-  networkInterfaces:
-  - interface: bond0
-    bond:
-      mode: active-backup
-      deviceSelectors:
-      - driver: bcmgenet
-        hardwareAddr: d8:3a:dd:bb:19:d4
-    dhcp: false
-    vlans:
-    - *vlan2002
-    - *vlan100
-    - *vlan2040
-
-- hostname: cm4-02.cluster-2.${secret_domain}
-  ipAddress: cm4-02.cluster-2.${secret_domain}
-  # Rasp Pi Specific factory.talos.dev overlay included
-  talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
-  controlPlane: false
-  disableSearchDomain: true
-  installDiskSelector:
-    type: nvme
-  nameservers:
-  - 10.0.0.4
-  networkInterfaces:
-  - interface: bond0
-    bond:
-      mode: active-backup
-      deviceSelectors:
-      - driver: bcmgenet
-        hardwareAddr: d8:3a:dd:ba:df:12
-    dhcp: false
-    vlans:
-    - *vlan2002
-    - *vlan100
-    - *vlan2040
-
-- hostname: cm4-03.cluster-2.${secret_domain}
-  ipAddress: cm4-03.cluster-2.${secret_domain}
-  # Rasp Pi Specific factory.talos.dev overlay included
-  talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
-  controlPlane: false
-  disableSearchDomain: true
-  installDiskSelector:
-    type: nvme
-  nameservers:
-  - 10.0.0.4
-  networkInterfaces:
-  - interface: bond0
-    bond:
-      mode: active-backup
-      deviceSelectors:
-      - driver: bcmgenet
-        hardwareAddr: d8:3a:dd:ba:df:48
-    dhcp: false
-    vlans:
-    - *vlan2002
-    - *vlan100
-    - *vlan2040
-
 - hostname: n100-01.cluster-2.${secret_domain}
   ipAddress: n100-01.cluster-2.${secret_domain}
   # Awok AK10 x86 Specific factory.talos.dev 
@@ -595,6 +525,54 @@ nodes:
 
 - hostname: work11.cluster-2.${secret_domain}
   ipAddress: work11.cluster-2.${secret_domain}
+  # Rasp Pi Specific factory.talos.dev overlay included
+  talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
+  controlPlane: false
+  disableSearchDomain: true
+  nodeLabels:
+    node-role.kubernetes.io/rook-osd-node: "true"
+    node-type: "CM4008032-SOQuartz-Blade"
+  nodeTaints:
+    storage-node: true:NoSchedule
+  installDiskSelector:
+    size: <= 50GB
+  nameservers:
+  - 10.0.0.4
+  networkInterfaces:
+  # 1G Internal Port
+  - deviceSelector:
+      driver: bcmgenet
+    dhcp: false
+    vlans:
+    - *vlan2002
+    - *vlan2040
+
+- hostname: work12.cluster-2.${secret_domain}
+  ipAddress: work12.cluster-2.${secret_domain}
+  # Rasp Pi Specific factory.talos.dev overlay included
+  talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
+  controlPlane: false
+  disableSearchDomain: true
+  nodeLabels:
+    node-role.kubernetes.io/rook-osd-node: "true"
+    node-type: "CM4008032-SOQuartz-Blade"
+  nodeTaints:
+    storage-node: true:NoSchedule
+  installDiskSelector:
+    size: <= 50GB
+  nameservers:
+  - 10.0.0.4
+  networkInterfaces:
+  # 1G Internal Port
+  - deviceSelector:
+      driver: bcmgenet
+    dhcp: false
+    vlans:
+    - *vlan2002
+    - *vlan2040
+
+- hostname: work13.cluster-2.${secret_domain}
+  ipAddress: work13.cluster-2.${secret_domain}
   # Rasp Pi Specific factory.talos.dev overlay included
   talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
   controlPlane: false

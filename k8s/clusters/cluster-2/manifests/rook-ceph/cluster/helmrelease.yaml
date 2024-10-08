@@ -295,6 +295,10 @@ spec:
           devices:
           # NVMe
           - name: "/dev/disk/by-id/nvme-ADATA_SX8200PNP_2K1020024662"
+        - name: work13
+          devices:
+          # NVMe
+          - name: "/dev/disk/by-id/nvme-ADATA_SX8200PNP_2K1020026193"
     cephBlockPools:
     # - name: ceph-blockpool
     #   spec:
@@ -357,7 +361,7 @@ spec:
           failureDomain: host
           deviceClass: nvme
           replicated:
-            size: 2
+            size: 3
         dataPools:
         - name: data0
           failureDomain: host
