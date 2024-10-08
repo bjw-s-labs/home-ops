@@ -49,12 +49,43 @@ tasks:
         kubectl --context {{.cluster}} apply --server-side
         --field-manager=kustomize-controller -f -
     vars:
-      kustomization_path: "{{.KUBERNETES_DIR}}/{{.cluster}}/apps/{{.path}}"
-      kustomization_file: "{{.kustomization_path}}/ks.yaml"
       cluster: '{{.cluster | default "main"}}'
       path: '{{ or .path (fail "Argument (path) is required") }}'
-      ks_name: '{{ .name | default (splitList "/" .path | last) }}'
       ns: '{{.ns | default "flux-system"}}'
+      kustomization_path: "{{.KUBERNETES_DIR}}/{{.cluster}}/apps/{{.path}}"
+      kustomization_file: "{{.kustomization_path}}/ks.yaml"
+      ks_name: '{{ .name | default (splitList "/" .path | last) }}'
+      kustomization_found:
+        sh: flux --context {{.cluster}} --namespace {{.ns}} get kustomization {{.ks_name}} 2>&1
+    preconditions:
+      - sh: "test -f {{.kustomization_file}}"
+        msg: "Kustomization file {{.kustomization_file}} not found"
+      - sh: kubectl config get-contexts {{.cluster}}
+        msg: "Kubectl context {{.cluster}} not found"
+
+  delete:
+    desc: Delete a Flux Kustomization resource for a cluster
+    summary: |
+      Args:
+        path: Path to the Flux Kustomization resource (required)
+        cluster: Cluster to run command against (default: main)
+        name: Name of the Flux Kustomization to apply (default: last segment of <path> variable)
+        ns: Namespace the Flux Kustomization exists in (default: flux-system)
+    cmds:
+      - flux --context {{.cluster}} build ks {{.ks_name}}
+        --namespace {{.ns}}
+        --kustomization-file {{.kustomization_file}}
+        --path {{.kustomization_path}}
+        --dry-run
+        |
+        kubectl --context {{.cluster}} delete -f -
+    vars:
+      cluster: '{{.cluster | default "main"}}'
+      path: '{{ or .path (fail "Argument (path) is required") }}'
+      ns: '{{.ns | default "flux-system"}}'
+      kustomization_path: "{{.KUBERNETES_DIR}}/{{.cluster}}/apps/{{.path}}"
+      kustomization_file: "{{.kustomization_path}}/ks.yaml"
+      ks_name: '{{ .name | default (splitList "/" .path | last) }}'
       kustomization_found:
         sh: flux --context {{.cluster}} --namespace {{.ns}} get kustomization {{.ks_name}} 2>&1
     preconditions:
