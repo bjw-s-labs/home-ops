@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -81,13 +80,13 @@ spec:
       affinity:
         podAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: app.kubernetes.io/name
-                    operator: In
-                    values: ["multus"]
-              topologyKey: kubernetes.io/hostname
-              namespaceSelector: {}
+          - labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values: ["multus"]
+            topologyKey: kubernetes.io/hostname
+            namespaceSelector: {}
 
     service:
       app:
@@ -100,6 +99,10 @@ spec:
       config:
         enabled: true
         existingClaim: ${VOLSYNC_CLAIM}
+      esphome-cache:
+        type: emptyDir
+        globalMounts:
+        - path: /config/.esphome
 
     ingress:
       app:
@@ -111,19 +114,19 @@ spec:
         #   external-dns/is-public: "false"
         #   external-dns/powerdns: "true"
         hosts:
-          - host: *host-cluster
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-          - host: &host "esphome.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        - host: *host-cluster
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
+        - host: &host "esphome.${INGRESS_DOMAIN}"
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
         tls:
-            - hosts:
-              - *host-cluster
-              - *host
+        - hosts:
+          - *host-cluster
+          - *host
