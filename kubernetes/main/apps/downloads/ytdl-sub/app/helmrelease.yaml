@@ -1,0 +1,103 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ytdl-sub
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 3.5.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 30m
+  values:
+    controllers:
+      ytdl-sub:
+        type: cronjob
+
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        pod:
+          restartPolicy: Never
+          securityContext:
+            runAsUser: 2000
+            runAsGroup: 2000
+            runAsNonRoot: true
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
+            supplementalGroups:
+              - 44
+              - 109
+              - 65542 # gladius:external-services
+
+        cronjob:
+          suspend: true
+          schedule: "0 23 * * *"
+          concurrencyPolicy: Forbid
+          successfulJobsHistory: 0
+          failedJobsHistory: 1
+          backoffLimit: 0
+          # activeDeadlineSeconds: 14400
+          # ttlSecondsAfterFinished: 86400
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/jmbannon/ytdl-sub
+              tag: 2024.10.06
+            command:
+              - bash
+              - -c
+            args:
+              - |
+                ytdl-sub --log-level=debug --config=/config/config.yaml sub /media/youtube/subscriptions.yaml
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 10m
+                memory: 256Mi
+              limits:
+                gpu.intel.com/i915: 1
+                memory: 2Gi
+
+    persistence:
+      config:
+        name: ytdl-sub-configmap
+        type: configMap
+        advancedMounts:
+          ytdl-sub:
+            app:
+              - path: /config/config.yaml
+                subPath: config.yaml
+                readOnly: true
+      media:
+        type: nfs
+        server: gladius.bjw-s.internal
+        path: /tank/Media
+        advancedMounts:
+          ytdl-sub:
+            app:
+              - path: /media/youtube
+                subPath: Library/Main/Youtube
+      tmp:
+        type: emptyDir
+        advancedMounts:
+          ytdl-sub:
+            app:
+              - path: /tmp
+                subPath: tmp
+              - path: /config
+                subPath: config
+              - path: /workdir
+                subPath: workdir

@@ -1,0 +1,27 @@
+---
+configuration:
+  working_directory: "/workdir/"
+
+presets:
+  Youtube Music Mixes:
+    preset:
+      - "_music_base"
+
+    download:
+      - url: "{url}"
+        include_sibling_metadata: true
+
+    overrides:
+      track_file_name: "{upload_date_standardized} - {track_title_sanitized}.{ext}"
+      track_album: "{channel}"
+      track_total: 0
+      track_year: "{playlist_max_upload_year}"
+
+    match_filters:
+      filters:
+        - "duration > 600"
+
+    audio_extract:
+      codec: "m4a"
+
+    embed_thumbnail: true
