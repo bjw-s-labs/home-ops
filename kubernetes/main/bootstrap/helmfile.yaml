@@ -21,7 +21,7 @@ releases:
   - name: prometheus-operator-crds
     namespace: monitoring
     chart: prometheus-community/prometheus-operator-crds
-    version: 14.0.0
+    version: 15.0.0
 
   - name: cilium
     namespace: kube-system
@@ -39,8 +39,8 @@ releases:
     values:
       - ../apps/kube-system/coredns/app/values.yaml
     needs:
-      # - monitoring/prometheus-operator-crds
-      # - kube-system/cilium
+      - monitoring/prometheus-operator-crds
+      - kube-system/cilium
 
   - name: kubelet-csr-approver
     namespace: system-controllers
