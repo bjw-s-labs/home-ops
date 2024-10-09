@@ -17,171 +17,60 @@ spec:
         namespace: flux-system
       interval: 30m
   values:
-    deploymentMode: SimpleScalable
+    deploymentMode: SingleBinary
 
     loki:
-      podAnnotations:
-        secret.reloader.stakater.com/reload: loki-secret
-
-      auth_enabled: false
-
       analytics:
         reporting_enabled: false
-
+      auth_enabled: false
+      commonConfig:
+        replication_factor: 1
       compactor:
         working_directory: /var/loki/compactor/retention
-        delete_request_store: s3
+        delete_request_store: filesystem
         retention_enabled: true
-
-      frontend:
-        max_outstanding_per_tenant: 4096
-
       ingester:
         chunk_encoding: snappy
-
-      commonConfig:
-        replication_factor: 2
-
       limits_config:
-        ingestion_burst_size_mb: 128
-        ingestion_rate_mb: 64
-        max_query_parallelism: 100
-        per_stream_rate_limit: 64M
-        per_stream_rate_limit_burst: 128M
-        reject_old_samples: true
-        reject_old_samples_max_age: 168h
-        retention_period: 30d
-        shard_streams:
-          enabled: true
-        split_queries_by_interval: 1h
-
-      query_scheduler:
-        max_outstanding_requests_per_tenant: 4096
-
-      rulerConfig:
-        enable_api: true
-        enable_alertmanager_v2: true
-        alertmanager_url: http://alertmanager.monitoring.svc.cluster.local:9093
-        storage:
-          type: local
-          local:
-            directory: /rules
-        rule_path: /rules/fake
-
+        retention_period: 14d
       schemaConfig:
         configs:
           - from: "2024-04-01"
             store: tsdb
-            object_store: s3
+            object_store: filesystem
             schema: v13
             index:
               prefix: loki_index_
               period: 24h
-
       server:
         log_level: info
-        grpc_server_max_recv_msg_size: 8388608
-        grpc_server_max_send_msg_size: 8388608
-
       storage:
-        type: s3
-        bucketNames:
-          chunks: loki-chunks
-          ruler: loki-ruler
-          admin: loki-admin
-        s3:
-          s3ForcePathStyle: true
-          insecure: false
-
-    gateway:
-      replicas: 2
-      enabled: true
-      image:
-        registry: ghcr.io
-        repository: nginxinc/nginx-unprivileged
-        tag: 1.27.2-alpine
-      deploymentStrategy:
-        type: RollingUpdate
-        rollingUpdate:
-          maxUnavailable: 50%
-          maxSurge: 50%
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: DoNotSchedule
-          labelSelector:
-            matchLabels:
-              app.kubernetes.io/name: loki
-              app.kubernetes.io/component: gateway
-      ingress:
-        enabled: true
-        ingressClassName: "internal-nginx"
-        annotations:
-          external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
-          nginx.ingress.kubernetes.io/whitelist-source-range: |
-            10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
-        hosts:
-          - host: loki.bjw-s.dev
-            paths:
-              - path: /
-                pathType: Prefix
-        tls: []
-    write:
-      replicas: 2
-      persistence:
-        storageClass: openebs-hostpath
-        size: 20Gi
-
-    read:
-      replicas: 2
+        type: filesystem
 
     backend:
-      replicas: 2
-      persistence:
-        storageClass: openebs-hostpath
-        size: 20Gi
-
-    monitoring:
-      dashboards:
-        annotations:
-          grafana_folder: Loki
-      rules:
-        enabled: false
-      serviceMonitor:
-        enabled: false
-        metricsInstance:
-          enabled: false
-      selfMonitoring:
-        enabled: false
-        grafanaAgent:
-          installOperator: false
-
+      replicas: 0
+    chunksCache:
+      enabled: false
+    gateway:
+      replicas: 0
+    lokiCanary:
+      enabled: false
+    read:
+      replicas: 0
+    resultsCache:
+      enabled: false
     sidecar:
       image:
         repository: ghcr.io/kiwigrid/k8s-sidecar
       rules:
         searchNamespace: ALL
-
-    lokiCanary:
-      enabled: false
-
+    singleBinary:
+      replicas: 1
+      persistence:
+        enabled: true
+        storageClass: openebs-hostpath
+        size: 30Gi
     test:
       enabled: false
-
-  valuesFrom:
-    - kind: Secret
-      name: loki-secret
-      valuesKey: S3_BUCKET_HOST
-      targetPath: loki.storage.s3.endpoint
-    - kind: Secret
-      name: loki-secret
-      valuesKey: S3_BUCKET_REGION
-      targetPath: loki.storage.s3.region
-    - kind: Secret
-      name: loki-secret
-      valuesKey: S3_ACCESS_KEY
-      targetPath: loki.storage.s3.accessKeyId
-    - kind: Secret
-      name: loki-secret
-      valuesKey: S3_SECRET_KEY
-      targetPath: loki.storage.s3.secretAccessKey
+    write:
+      replicas: 0
