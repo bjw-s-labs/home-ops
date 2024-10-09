@@ -123,6 +123,50 @@ spec:
               seccompProfile:
                 type: RuntimeDefault
 
+      update-subscriptions:
+        type: cronjob
+
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        pod:
+          securityContext:
+            runAsUser: 2000
+            runAsGroup: 2000
+            fsGroup: 2000
+            fsGroupChangePolicy: "OnRootMismatch"
+
+        cronjob:
+          schedule: "@daily"
+          concurrencyPolicy: Forbid
+          successfulJobsHistory: 0
+          failedJobsHistory: 1
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/bjw-s-labs/piped-scripts
+              tag: 0.0.1@sha256:343cc4deb000cdae58a532cd38cb144bdee031415d028c065f66707a5a6cf965
+            env:
+              SCRIPT_NAME: update_subscriptions.sh
+              PIPED_BACKEND: http://piped-backend.media.svc.cluster.local:8080
+            envFrom:
+              - secretRef:
+                  name: piped-db-secret
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 128Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+              seccompProfile:
+                type: RuntimeDefault
+
     service:
       backend:
         controller: backend
