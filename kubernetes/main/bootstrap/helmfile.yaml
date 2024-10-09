@@ -39,8 +39,8 @@ releases:
     values:
       - ../apps/kube-system/coredns/app/values.yaml
     needs:
-      # - monitoring/prometheus-operator-crds
-      # - kube-system/cilium
+      - monitoring/prometheus-operator-crds
+      - kube-system/cilium
 
   - name: kubelet-csr-approver
     namespace: system-controllers
