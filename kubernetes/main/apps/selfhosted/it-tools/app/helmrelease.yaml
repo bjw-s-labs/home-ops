@@ -27,16 +27,16 @@ spec:
 
         pod:
           securityContext:
-            runAsUser: 101
-            runAsGroup: 101
-            fsGroup: 101
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
             fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
           app:
             image:
               repository: ghcr.io/bjw-s-labs/it-tools
-              tag: 2024.5.13@sha256:bd39050c281a31a7402c1d73a777ccec7e56ad40b36df9f0fa2eab4adb94899d
+              tag: 2024.5.13@sha256:3eeb8d63662df76fa89639fb54e4f33aa90d1164ef3782b135e5c06cc7e8147d
             resources:
               requests:
                 cpu: 5m
@@ -46,9 +46,6 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
 
     service:
       app:
