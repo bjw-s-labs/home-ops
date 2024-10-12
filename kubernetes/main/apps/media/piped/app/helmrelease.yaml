@@ -60,19 +60,17 @@ spec:
         strategy: RollingUpdate
         pod:
           securityContext:
-            runAsUser: 101
-            runAsGroup: 101
-            fsGroup: 101
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
             fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
           app:
             image:
               repository: ghcr.io/bjw-s-labs/piped-frontend
-              tag: 2024.10.11@sha256:5afa5a82b567f1708ab3d5bc0d8e6fd193d32e35fffe4cf3ee8927911cacd96b
+              tag: 2024.10.12@sha256:d9bcfa5f98214003d1c6b614c7b922159cdd321489d02502920b7d8e18fc96cf
             env:
-              HTTP_PORT: 8080
-              HTTP_WORKERS: 4
               BACKEND_HOSTNAME: piped-api.bjw-s.dev
             probes:
               liveness:
@@ -87,6 +85,7 @@ spec:
                 memory: 256Mi
             securityContext:
               allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
 
       ytproxy:
         strategy: RollingUpdate
