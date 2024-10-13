@@ -7,85 +7,84 @@ tasks:
     desc: Bootstrap Flux into a Kubernetes cluster
     cmds:
       # Install Flux
-      - kubectl apply --server-side --kustomize {{.kubernetes_dir}}/{{.k8s_cluster}}/bootstrap/flux
+      - kubectl apply --server-side --kustomize {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/flux
       # Install secrets and configmaps
-      - sops --decrypt {{.kubernetes_dir}}/{{.k8s_cluster}}/bootstrap/flux/age-key.sops.yaml | kubectl apply -f -
-      - sops --decrypt {{.kubernetes_dir}}/{{.k8s_cluster}}/flux/vars/cluster-secrets.sops.yaml | kubectl apply -f -
-      - kubectl apply --server-side --filename {{.kubernetes_dir}}/{{.k8s_cluster}}/flux/vars/cluster-settings.yaml
+      - sops --decrypt {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/flux/age-key.sops.yaml | kubectl apply -f -
+      - sops --decrypt {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/flux/vars/cluster-secrets.sops.yaml | kubectl apply -f -
+      - kubectl apply --server-side --filename {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/flux/vars/cluster-settings.yaml
       # Install Flux Kustomization resources
-      - kubectl apply --server-side --kustomize {{.kubernetes_dir}}/{{.k8s_cluster}}/flux/config
+      - kubectl apply --server-side --kustomize {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/flux/config
     requires:
       vars:
-        - k8s_cluster
+        - K8S_CLUSTER
     preconditions:
-      - sh: kubectl config get-contexts {{.k8s_cluster}}
-        msg: "Kubectl context {{.k8s_cluster}} not found"
+      - sh: kubectl config get-contexts {{.K8S_CLUSTER}}
+        msg: "Kubectl context {{.K8S_CLUSTER}} not found"
       - test -f $HOME/.config/age/keys.txt
-      - test -f {{.kubernetes_dir}}/{{.k8s_cluster}}/bootstrap/flux/age-key.sops.yaml
-      - test -f {{.kubernetes_dir}}/{{.k8s_cluster}}/flux/vars/cluster-settings.yaml
-      - test -f {{.kubernetes_dir}}/{{.k8s_cluster}}/flux/vars/cluster-secrets.sops.yaml
-      - sops --decrypt {{.kubernetes_dir}}/{{.k8s_cluster}}/bootstrap/flux/age-key.sops.yaml
-      - sops --decrypt {{.kubernetes_dir}}/{{.k8s_cluster}}/flux/vars/cluster-secrets.sops.yaml
-      - kustomize build {{.kubernetes_dir}}/{{.k8s_cluster}}/bootstrap/flux
-      - kustomize build {{.kubernetes_dir}}/{{.k8s_cluster}}/flux/config
+      - test -f {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/flux/age-key.sops.yaml
+      - test -f {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/flux/vars/cluster-settings.yaml
+      - test -f {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/flux/vars/cluster-secrets.sops.yaml
+      - sops --decrypt {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/flux/age-key.sops.yaml
+      - sops --decrypt {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/flux/vars/cluster-secrets.sops.yaml
+      - kustomize build {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/flux
+      - kustomize build {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/flux/config
 
   apply-ks:
     desc: Apply a Flux Kustomization resource for a cluster
     summary: |
       Args:
-        path: Path to the Flux Kustomization resource (required)
-        name: Name of the Flux Kustomization to apply (default: last segment of <path> variable)
-        ns: Namespace the Flux Kustomization exists in (default: flux-system)
+        PATH: Path to the Flux Kustomization resource (required)
+        NAME: Name of the Flux Kustomization to apply (default: last segment of <path> variable)
+        NS: Namespace the Flux Kustomization exists in (default: flux-system)
     cmds:
-      - flux build ks {{.ks_name}}
-        --namespace {{.ns}}
-        --kustomization-file {{.kustomization_file}}
-        --path {{.kustomization_path}}
-        {{ if contains "not found" .kustomization_found }}--dry-run{{ end }}
+      - flux build ks {{.KS_NAME}}
+        --namespace {{.NS}}
+        --kustomization-file {{.KUSTOMIZATION_FILE}}
+        --path {{.KUSTOMIZATION_PATH}}
+        {{ if contains "not found" .KUSTOMIZATION_FOUND }}--dry-run{{ end }}
         |
-        kubectl apply --server-side
-        --field-manager=kustomize-controller -f -
+        kubectl apply --server-side --field-manager=kustomize-controller -f -
     vars:
-      ns: '{{.ns | default "flux-system"}}'
-      kustomization_path: "{{.kubernetes_dir}}/{{.k8s_cluster}}/apps/{{.path}}"
-      kustomization_file: "{{.kustomization_path}}/ks.yaml"
-      ks_name: '{{ .name | default (base .path) }}'
-      kustomization_found:
-        sh: flux --namespace {{.ns}} get kustomization {{.ks_name}} 2>&1
+      NS: '{{.NS | default "flux-system"}}'
+      KUSTOMIZATION_PATH: "{{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/apps/{{.PATH}}"
+      KUSTOMIZATION_FILE: "{{.KUSTOMIZATION_PATH}}/ks.yaml"
+      KS_NAME: '{{ .name | default (base .PATH) }}'
+      KUSTOMIZATION_FOUND:
+        sh: flux --namespace {{.NS}} get kustomization {{.KS_NAME}} 2>&1
     requires:
       vars:
-        - k8s_cluster
-        - path
+        - K8S_CLUSTER
+        - PATH
     preconditions:
-      - sh: "test -f {{.kustomization_file}}"
-        msg: "Kustomization file {{.kustomization_file}} not found"
+      - sh: "test -f {{.KUSTOMIZATION_FILE}}"
+        msg: "Kustomization file {{.KUSTOMIZATION_FILE}} not found"
 
   delete-ks:
     desc: Delete a Flux Kustomization resource for a cluster
     summary: |
       Args:
-        path: Path to the Flux Kustomization resource (required)
-        name: Name of the Flux Kustomization to apply (default: last segment of <path> variable)
-        ns: Namespace the Flux Kustomization exists in (default: flux-system)
+        PATH: Path to the Flux Kustomization resource (required)
+        NAME: Name of the Flux Kustomization to apply (default: last segment of <path> variable)
+        NS: Namespace the Flux Kustomization exists in (default: flux-system)
     cmds:
-      - flux build ks {{.ks_name}}
-        --namespace {{.ns}}
-        --kustomization-file {{.kustomization_file}}
-        --path {{.kustomization_path}}
+      - flux build ks {{.KS_NAME}}
+        --namespace {{.NS}}
+        --kustomization-file {{.KUSTOMIZATION_FILE}}
+        --path {{.KUSTOMIZATION_PATH}}
         --dry-run
         |
         kubectl delete -f -
     vars:
-      ns: '{{.ns | default "flux-system"}}'
-      kustomization_path: "{{.kubernetes_dir}}/{{.k8s_cluster}}/apps/{{.path}}"
-      kustomization_file: "{{.kustomization_path}}/ks.yaml"
-      ks_name: '{{ .name | default (splitList "/" .path | last) }}'
-      kustomization_found:
-        sh: flux --namespace {{.ns}} get kustomization {{.ks_name}} 2>&1
+      NS: '{{.NS | default "flux-system"}}'
+      KUSTOMIZATION_PATH: "{{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/apps/{{.PATH}}"
+      KUSTOMIZATION_FILE: "{{.KUSTOMIZATION_PATH}}/ks.yaml"
+      KS_NAME: '{{ .name | default (splitList "/" .PATH | last) }}'
+      KUSTOMIZATION_FOUND:
+        sh: flux --namespace {{.NS}} get kustomization {{.KS_NAME}} 2>&1
     requires:
       vars:
-        - k8s_cluster
-        - path
+        - K8S_CLUSTER
+        - PATH
     preconditions:
-      - sh: "test -f {{.kustomization_file}}"
-        msg: "Kustomization file {{.kustomization_file}} not found"
+      - sh: "test -f {{.KUSTOMIZATION_FILE}}"
+        msg: "Kustomization file {{.KUSTOMIZATION_FILE}} not found"
