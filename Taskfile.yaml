@@ -2,12 +2,12 @@
 version: "3"
 
 vars:
-  kubernetes_dir: "{{.ROOT_DIR}}/kubernetes"
-  k8s_cluster: '{{.k8s_cluster | default "main"}}'
+  KUBERNETES_DIR: "{{.ROOT_DIR}}/kubernetes"
+  K8S_CLUSTER: '{{.K8S_CLUSTER | default "main"}}'
 
 env:
-  KUBECONFIG: '{{.KUBERNETES_DIR}}/{{.k8s_cluster}}/kubeconfig'
-  TALOSCONFIG: '{{.KUBERNETES_DIR}}/{{.k8s_cluster}}/bootstrap/talos/clusterconfig/talosconfig'
+  KUBECONFIG: '{{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/kubeconfig'
+  TALOSCONFIG: '{{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/clusterconfig/talosconfig'
 
 includes:
   flux:

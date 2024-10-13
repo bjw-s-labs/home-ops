@@ -55,7 +55,7 @@ tasks:
         app: Application to list snapshots for (required)
     cmds:
       - envsubst < <(cat {{.templatesDir}}/unlock.tmpl.yaml) | kubectl apply -f -
-      - bash {{.scriptsDir}}/wait-for-k8s-job.sh {{.app}}-unlock-snapshots-{{.ts}} {{.ns}} {{.k8s_cluster}}
+      - bash {{.scriptsDir}}/wait-for-k8s-job.sh {{.app}}-unlock-snapshots-{{.ts}} {{.ns}} {{.K8S_CLUSTER}}
       - kubectl --namespace {{.ns}} wait job/{{.app}}-unlock-snapshots-{{.ts}} --for condition=complete --timeout=1m
       - kubectl --namespace {{.ns}} logs job/{{.app}}-unlock-snapshots-{{.ts}} --container unlock-minio
       - kubectl --namespace {{.ns}} logs job/{{.app}}-unlock-snapshots-{{.ts}} --container unlock-r2
@@ -85,7 +85,7 @@ tasks:
       # - task: .suspend
       #   vars: *env
       - kubectl --namespace {{.ns}} patch replicationsources {{.app}} --type merge -p '{"spec":{"trigger":{"manual":"{{.ts}}"}}}'
-      - bash {{.scriptsDir}}/wait-for-k8s-job.sh volsync-src-{{.app}} {{.ns}} {{.k8s_cluster}}
+      - bash {{.scriptsDir}}/wait-for-k8s-job.sh volsync-src-{{.app}} {{.ns}} {{.K8S_CLUSTER}}
       - kubectl --namespace {{.ns}} wait job/volsync-src-{{.app}} --for condition=complete --timeout=120m
     vars:
       app: '{{ or .app (fail "Argument (app) is required") }}'
@@ -196,7 +196,7 @@ tasks:
     internal: true
     cmds:
       - envsubst < <(cat {{.templatesDir}}/wipe.tmpl.yaml) | kubectl apply -f -
-      - bash {{.scriptsDir}}/wait-for-k8s-job.sh {{.app}}-wipe-{{.ts}} {{.ns}} {{.k8s_cluster}}
+      - bash {{.scriptsDir}}/wait-for-k8s-job.sh {{.app}}-wipe-{{.ts}} {{.ns}} {{.K8S_CLUSTER}}
       - kubectl --namespace {{.ns}} wait job/{{.app}}-wipe-{{.ts}} --for condition=complete --timeout=120m
       - kubectl --namespace {{.ns}} logs job/{{.app}}-wipe-{{.ts}} --container wipe
       - kubectl --namespace {{.ns}} delete job {{.app}}-wipe-{{.ts}}
@@ -207,7 +207,7 @@ tasks:
     internal: true
     cmds:
       - envsubst < <(cat {{.templatesDir}}/replicationdestination.tmpl.yaml) | kubectl apply -f -
-      - bash {{.scriptsDir}}/wait-for-k8s-job.sh volsync-dst-{{.app}}-{{.ts}} {{.ns}} {{.k8s_cluster}}
+      - bash {{.scriptsDir}}/wait-for-k8s-job.sh volsync-dst-{{.app}}-{{.ts}} {{.ns}} {{.K8S_CLUSTER}}
       - kubectl --namespace {{.ns}} wait job/volsync-dst-{{.app}}-{{.ts}} --for condition=complete --timeout=120m
       - kubectl --namespace {{.ns}} delete replicationdestination {{.app}}-{{.ts}}
     env: *env

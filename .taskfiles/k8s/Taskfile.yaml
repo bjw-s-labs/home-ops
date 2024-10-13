@@ -8,31 +8,31 @@ tasks:
     cmds:
       - task: _delete_pods_in_phase
         vars:
-          phase: Failed
+          PHASE: Failed
 
   delete-succeeded-pods:
     desc: Deletes pods with Succeeded phase
     cmds:
       - task: _delete_pods_in_phase
         vars:
-          phase: Succeeded
+          PHASE: Succeeded
 
   delete-pending-pods:
     desc: Deletes pods with Pending phase
     cmds:
       - task: _delete_pods_in_phase
         vars:
-          phase: Pending
+          PHASE: Pending
 
   _delete_pods_in_phase:
     desc: Deletes pods with a specific phase
     internal: true
     requires:
       vars:
-        - phase
+        - PHASE
     cmds:
       - for:
-          var: phase
+          var: PHASE
           split: ','
         cmd: kubectl delete pods --field-selector status.phase={{.ITEM}} -A --ignore-not-found=true
 
@@ -40,20 +40,20 @@ tasks:
     desc: Sync ExternalSecret resource
     summary: |
       Args:
-        ns: Namespace the PVC is in (default: default)
-        name: ExternalSecret to sync (default: all secrets)
+        NS: Namespace the PVC is in (default: default)
+        NAME: ExternalSecret to sync (default: all secrets)
     silent: true
     vars:
-      ns: '{{.ns | default "default"}}'
-      name: '{{ .name | default "" }}'
+      NS: '{{.NS | default "default"}}'
+      NAME: '{{ .NAME | default "" }}'
     cmds:
       - |
-        {{if eq .name ""}}
+        {{if eq .NAME ""}}
         kubectl get externalsecret.external-secrets.io --all-namespaces --no-headers -A | awk '{print $1, $2}' \
           | xargs --max-procs=2 -l bash -c 'kubectl --namespace $0 annotate externalsecret.external-secrets.io $1 force-sync=$(date +%s) --overwrite'
         {{else}}
-        kubectl --namespace {{.ns}} annotate externalsecret.external-secrets.io {{.name}} force-sync=$(date +%s) --overwrite
+        kubectl --namespace {{.NS}} annotate externalsecret.external-secrets.io {{.NAME}} force-sync=$(date +%s) --overwrite
         {{end}}
     preconditions:
-      - sh: '{{if ne .name ""}}kubectl --namespace {{.ns}} get externalsecret {{.name}}{{end}}'
-        msg: "ExternalSecret {{.name}} not found in namespace {{.ns}}"
+      - sh: '{{if ne .NAME ""}}kubectl --namespace {{.NS}} get externalsecret {{.NAME}}{{end}}'
+        msg: "ExternalSecret {{.NAME}} not found in namespace {{.NS}}"
