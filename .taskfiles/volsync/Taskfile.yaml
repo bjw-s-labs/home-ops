@@ -34,9 +34,9 @@ tasks:
     cmds:
       - envsubst < <(cat {{.templatesDir}}/list.tmpl.yaml) | kubectl --context {{.cluster}} apply -f -
       - bash {{.scriptsDir}}/wait-for-k8s-job.sh {{.app}}-list-snapshots-{{.ts}} {{.ns}} {{.cluster}}
-      - kubectl --context {{.cluster}} -n {{.ns}} wait job/{{.app}}-list-snapshots-{{.ts}} --for condition=complete --timeout=1m
-      - kubectl --context {{.cluster}} -n {{.ns}} logs job/{{.app}}-list-snapshots-{{.ts}} --container list
-      - kubectl --context {{.cluster}} -n {{.ns}} delete job {{.app}}-list-snapshots-{{.ts}}
+      - kubectl --context {{.cluster}} --namespace {{.ns}} wait job/{{.app}}-list-snapshots-{{.ts}} --for condition=complete --timeout=1m
+      - kubectl --context {{.cluster}} --namespace {{.ns}} logs job/{{.app}}-list-snapshots-{{.ts}} --container list
+      - kubectl --context {{.cluster}} --namespace {{.ns}} delete job {{.app}}-list-snapshots-{{.ts}}
     vars:
       cluster: '{{.cluster | default "main"}}'
       app: '{{ or .app (fail "Argument (app) is required") }}'
@@ -59,10 +59,10 @@ tasks:
     cmds:
       - envsubst < <(cat {{.templatesDir}}/unlock.tmpl.yaml) | kubectl --context {{.cluster}} apply -f -
       - bash {{.scriptsDir}}/wait-for-k8s-job.sh {{.app}}-unlock-snapshots-{{.ts}} {{.ns}} {{.cluster}}
-      - kubectl --context {{.cluster}} -n {{.ns}} wait job/{{.app}}-unlock-snapshots-{{.ts}} --for condition=complete --timeout=1m
-      - kubectl --context {{.cluster}} -n {{.ns}} logs job/{{.app}}-unlock-snapshots-{{.ts}} --container unlock-minio
-      - kubectl --context {{.cluster}} -n {{.ns}} logs job/{{.app}}-unlock-snapshots-{{.ts}} --container unlock-r2
-      - kubectl --context {{.cluster}} -n {{.ns}} delete job {{.app}}-unlock-snapshots-{{.ts}}
+      - kubectl --context {{.cluster}} --namespace {{.ns}} wait job/{{.app}}-unlock-snapshots-{{.ts}} --for condition=complete --timeout=1m
+      - kubectl --context {{.cluster}} --namespace {{.ns}} logs job/{{.app}}-unlock-snapshots-{{.ts}} --container unlock-minio
+      - kubectl --context {{.cluster}} --namespace {{.ns}} logs job/{{.app}}-unlock-snapshots-{{.ts}} --container unlock-r2
+      - kubectl --context {{.cluster}} --namespace {{.ns}} delete job {{.app}}-unlock-snapshots-{{.ts}}
     vars:
       cluster: '{{.cluster | default "main"}}'
       app: '{{ or .app (fail "Argument (app) is required") }}'
@@ -89,9 +89,9 @@ tasks:
       # # https://github.com/go-task/task/issues/608
       # - task: .suspend
       #   vars: *env
-      - kubectl --context {{.cluster}} -n {{.ns}} patch replicationsources {{.app}} --type merge -p '{"spec":{"trigger":{"manual":"{{.ts}}"}}}'
+      - kubectl --context {{.cluster}} --namespace {{.ns}} patch replicationsources {{.app}} --type merge -p '{"spec":{"trigger":{"manual":"{{.ts}}"}}}'
       - bash {{.scriptsDir}}/wait-for-k8s-job.sh volsync-src-{{.app}} {{.ns}} {{.cluster}}
-      - kubectl --context {{.cluster}} -n {{.ns}} wait job/volsync-src-{{.app}} --for condition=complete --timeout=120m
+      - kubectl --context {{.cluster}} --namespace {{.ns}} wait job/volsync-src-{{.app}} --for condition=complete --timeout=120m
     vars:
       cluster: '{{.cluster | default "main"}}'
       app: '{{ or .app (fail "Argument (app) is required") }}'
@@ -99,7 +99,7 @@ tasks:
       # Query to find the controller associated with the app
       controller:
         sh: |
-          if kubectl --context {{.cluster}} -n {{.ns}} get deployment.apps/{{.app}} >/dev/null 2>&1 ; then
+          if kubectl --context {{.cluster}} --namespace {{.ns}} get deployment.apps/{{.app}} >/dev/null 2>&1 ; then
             echo "deployment.apps/{{.app}}"
           else
             echo "statefulset.apps/{{.app}}"
@@ -108,7 +108,7 @@ tasks:
     preconditions:
       - sh: test -f {{.scriptsDir}}/wait-for-k8s-job.sh
         msg: "Wait script not found"
-      - sh: kubectl --context {{.cluster}} -n {{.ns}} get replicationsources {{.app}}
+      - sh: kubectl --context {{.cluster}} --namespace {{.ns}} get replicationsources {{.app}}
         msg: "ReplicationSource '{{.app}}' not found in namespace '{{.ns}}'"
 
   # To run restore jobs in parallel for all replicationdestinations:
@@ -138,22 +138,22 @@ tasks:
       # Query to find the controller associated with the app
       controller:
         sh: |
-          if kubectl --context {{.cluster}} -n {{.ns}} get deployment.apps/{{.app}} >/dev/null 2>&1 ; then
+          if kubectl --context {{.cluster}} --namespace {{.ns}} get deployment.apps/{{.app}} >/dev/null 2>&1 ; then
             echo "deployment.apps/{{.app}}"
           else
             echo "statefulset.apps/{{.app}}"
           fi
       claim:
         sh: |
-          kubectl --context {{.cluster}} -n {{.ns}} get replicationsources/{{.app}} \
+          kubectl --context {{.cluster}} --namespace {{.ns}} get replicationsources/{{.app}} \
             -o jsonpath="{.spec.sourcePVC}"
       app_uid:
         sh: |
-          kubectl --context {{.cluster}} -n {{.ns}} get replicationsources/{{.app}} \
+          kubectl --context {{.cluster}} --namespace {{.ns}} get replicationsources/{{.app}} \
             -o jsonpath="{.spec.restic.moverSecurityContext.runAsUser}"
       app_gid:
         sh: |
-          kubectl --context {{.cluster}} -n {{.ns}} get replicationsources/{{.app}} \
+          kubectl --context {{.cluster}} --namespace {{.ns}} get replicationsources/{{.app}} \
             -o jsonpath="{.spec.restic.moverSecurityContext.runAsGroup}"
     env: *env
     preconditions:
@@ -200,9 +200,9 @@ tasks:
     internal: true
     cmds:
       - flux --context {{.cluster}} -n flux-system suspend kustomization {{.app}}
-      - flux --context {{.cluster}} -n {{.ns}} suspend helmrelease {{.app}}
-      - kubectl --context {{.cluster}} -n {{.ns}} scale {{.controller}} --replicas 0
-      - kubectl --context {{.cluster}} -n {{.ns}} wait pod --for delete --selector="app.kubernetes.io/name={{.app}}" --timeout=2m
+      - flux --context {{.cluster}} --namespace {{.ns}} suspend helmrelease {{.app}}
+      - kubectl --context {{.cluster}} --namespace {{.ns}} scale {{.controller}} --replicas 0
+      - kubectl --context {{.cluster}} --namespace {{.ns}} wait pod --for delete --selector="app.kubernetes.io/name={{.app}}" --timeout=2m
     env: *env
 
   # Wipe the PVC of all data
@@ -211,9 +211,9 @@ tasks:
     cmds:
       - envsubst < <(cat {{.templatesDir}}/wipe.tmpl.yaml) | kubectl --context {{.cluster}} apply -f -
       - bash {{.scriptsDir}}/wait-for-k8s-job.sh {{.app}}-wipe-{{.ts}} {{.ns}} {{.cluster}}
-      - kubectl --context {{.cluster}} -n {{.ns}} wait job/{{.app}}-wipe-{{.ts}} --for condition=complete --timeout=120m
-      - kubectl --context {{.cluster}} -n {{.ns}} logs job/{{.app}}-wipe-{{.ts}} --container wipe
-      - kubectl --context {{.cluster}} -n {{.ns}} delete job {{.app}}-wipe-{{.ts}}
+      - kubectl --context {{.cluster}} --namespace {{.ns}} wait job/{{.app}}-wipe-{{.ts}} --for condition=complete --timeout=120m
+      - kubectl --context {{.cluster}} --namespace {{.ns}} logs job/{{.app}}-wipe-{{.ts}} --container wipe
+      - kubectl --context {{.cluster}} --namespace {{.ns}} delete job {{.app}}-wipe-{{.ts}}
     env: *env
 
   # Create VolSync replicationdestination CR to restore data
@@ -222,14 +222,14 @@ tasks:
     cmds:
       - envsubst < <(cat {{.templatesDir}}/replicationdestination.tmpl.yaml) | kubectl --context {{.cluster}} apply -f -
       - bash {{.scriptsDir}}/wait-for-k8s-job.sh volsync-dst-{{.app}}-{{.ts}} {{.ns}} {{.cluster}}
-      - kubectl --context {{.cluster}} -n {{.ns}} wait job/volsync-dst-{{.app}}-{{.ts}} --for condition=complete --timeout=120m
-      - kubectl --context {{.cluster}} -n {{.ns}} delete replicationdestination {{.app}}-{{.ts}}
+      - kubectl --context {{.cluster}} --namespace {{.ns}} wait job/volsync-dst-{{.app}}-{{.ts}} --for condition=complete --timeout=120m
+      - kubectl --context {{.cluster}} --namespace {{.ns}} delete replicationdestination {{.app}}-{{.ts}}
     env: *env
 
   # Resume Flux ks and hr
   .resume:
     internal: true
     cmds:
-      - flux --context {{.cluster}} -n {{.ns}} resume helmrelease {{.app}}
+      - flux --context {{.cluster}} --namespace {{.ns}} resume helmrelease {{.app}}
       - flux --context {{.cluster}} -n flux-system resume kustomization {{.app}}
     env: *env
