@@ -5,48 +5,28 @@ version: "3"
 tasks:
   delete-failed-pods:
     desc: Deletes pods with Failed phase
-    summary: |
-      Args:
-        cluster: Cluster to run command against (default: main)
-    vars:
-      cluster: '{{.cluster | default "main"}}'
     cmds:
       - task: _delete_pods_in_phase
         vars:
-          cluster: '{{.cluster}}'
           phase: Failed
 
   delete-succeeded-pods:
     desc: Deletes pods with Succeeded phase
-    summary: |
-      Args:
-        cluster: Cluster to run command against (default: main)
-    vars:
-      cluster: '{{.cluster | default "main"}}'
     cmds:
       - task: _delete_pods_in_phase
         vars:
-          cluster: '{{.cluster}}'
           phase: Succeeded
 
   delete-pending-pods:
     desc: Deletes pods with Pending phase
-    summary: |
-      Args:
-        cluster: Cluster to run command against (default: main)
-    vars:
-      cluster: '{{.cluster | default "main"}}'
     cmds:
       - task: _delete_pods_in_phase
         vars:
-          cluster: '{{.cluster}}'
           phase: Pending
 
   _delete_pods_in_phase:
     desc: Deletes pods with a specific phase
     internal: true
-    vars:
-      cluster: '{{.cluster | default "main"}}'
     requires:
       vars:
         - phase
@@ -54,28 +34,26 @@ tasks:
       - for:
           var: phase
           split: ','
-        cmd: kubectl --context {{.cluster}} delete pods --field-selector status.phase={{.ITEM}} -A --ignore-not-found=true
+        cmd: kubectl delete pods --field-selector status.phase={{.ITEM}} -A --ignore-not-found=true
 
   sync-externalsecret:
     desc: Sync ExternalSecret resource
     summary: |
       Args:
-        cluster: Cluster to run command against (default: main)
         ns: Namespace the PVC is in (default: default)
-        secret: ExternalSecret to sync (default: all secrets)
+        name: ExternalSecret to sync (default: all secrets)
     silent: true
     vars:
-      cluster: '{{.cluster | default "main"}}'
       ns: '{{.ns | default "default"}}'
-      secret: '{{ .secret | default "" }}'
+      name: '{{ .name | default "" }}'
     cmds:
       - |
-        {{if eq .secret ""}}
-        kubectl --context {{.cluster}} get externalsecret.external-secrets.io --all-namespaces --no-headers -A | awk '{print $1, $2}' \
-          | xargs --max-procs=2 -l bash -c 'kubectl --context {{.cluster}} --namespace $0 annotate externalsecret.external-secrets.io $1 force-sync=$(date +%s) --overwrite'
+        {{if eq .name ""}}
+        kubectl get externalsecret.external-secrets.io --all-namespaces --no-headers -A | awk '{print $1, $2}' \
+          | xargs --max-procs=2 -l bash -c 'kubectl --namespace $0 annotate externalsecret.external-secrets.io $1 force-sync=$(date +%s) --overwrite'
         {{else}}
-        kubectl --context {{.cluster}} --namespace {{.ns}} annotate externalsecret.external-secrets.io {{.secret}} force-sync=$(date +%s) --overwrite
+        kubectl --namespace {{.ns}} annotate externalsecret.external-secrets.io {{.name}} force-sync=$(date +%s) --overwrite
         {{end}}
     preconditions:
-      - sh: '{{if ne .secret ""}}kubectl --namespace {{.ns}} get externalsecret {{.secret}}{{end}}'
-        msg: "ExternalSecret {{.secret}} not found in namespace {{.ns}}"
+      - sh: '{{if ne .name ""}}kubectl --namespace {{.ns}} get externalsecret {{.name}}{{end}}'
+        msg: "ExternalSecret {{.name}} not found in namespace {{.ns}}"

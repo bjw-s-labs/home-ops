@@ -3,7 +3,6 @@
 version: "3"
 
 rook-task-vars: &task-vars
-  cluster: '{{.cluster | default "main"}}'
   node: "{{.node}}"
   ceph_disk: "{{.ceph_disk}}"
   ts: "{{.ts}}"
@@ -58,13 +57,12 @@ tasks:
     silent: true
     internal: true
     cmds:
-      - envsubst < <(cat {{.wipeRookDiskJobTemplate}}) | kubectl --context {{.cluster}} apply -f -
-      - bash {{.waitForJobScript}} {{.wipeCephDiskJobName}} default {{.cluster}}
-      - kubectl --context {{.cluster}} -n default wait job/{{.wipeCephDiskJobName}} --for condition=complete --timeout=1m
-      - kubectl --context {{.cluster}} -n default logs job/{{.wipeCephDiskJobName}} --container list
-      - kubectl --context {{.cluster}} -n default delete job {{.wipeCephDiskJobName}}
+      - envsubst < <(cat {{.wipeRookDiskJobTemplate}}) | kubectl apply -f -
+      - bash {{.waitForJobScript}} {{.wipeCephDiskJobName}} default
+      - kubectl -n default wait job/{{.wipeCephDiskJobName}} --for condition=complete --timeout=1m
+      - kubectl -n default logs job/{{.wipeCephDiskJobName}} --container list
+      - kubectl -n default delete job {{.wipeCephDiskJobName}}
     vars:
-      cluster: '{{.cluster | default "main"}}'
       node: '{{ or .node (fail "`node` is required") }}'
       ceph_disk: '{{ or .ceph_disk (fail "`ceph_disk` is required") }}'
       jobName: "wipe-disk-{{- .node -}}"
@@ -79,13 +77,12 @@ tasks:
     silent: true
     internal: true
     cmds:
-      - envsubst < <(cat {{.wipeRookDataJobTemplate}}) | kubectl --context {{.cluster}} apply -f -
-      - bash {{.waitForJobScript}} {{.wipeRookDataJobName}} default {{.cluster}}
-      - kubectl --context {{.cluster}} -n default wait job/{{.wipeRookDataJobName}} --for condition=complete --timeout=1m
-      - kubectl --context {{.cluster}} -n default logs job/{{.wipeRookDataJobName}} --container list
-      - kubectl --context {{.cluster}} -n default delete job {{.wipeRookDataJobName}}
+      - envsubst < <(cat {{.wipeRookDataJobTemplate}}) | kubectl apply -f -
+      - bash {{.waitForJobScript}} {{.wipeRookDataJobName}} default
+      - kubectl -n default wait job/{{.wipeRookDataJobName}} --for condition=complete --timeout=1m
+      - kubectl -n default logs job/{{.wipeRookDataJobName}} --container list
+      - kubectl -n default delete job {{.wipeRookDataJobName}}
     vars:
-      cluster: '{{.cluster | default "main"}}'
       node: '{{ or .node (fail "`node` is required") }}'
       jobName: "wipe-rook-data-{{- .node -}}"
       wipeRookDataJobTemplate: "WipeRookDataJob.tmpl.yaml"

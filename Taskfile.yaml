@@ -2,8 +2,12 @@
 version: "3"
 
 vars:
-  KUBERNETES_DIR: "{{.ROOT_DIR}}/kubernetes"
-  TERRAFORM_DIR: "{{.ROOT_DIR}}/infrastructure/terraform"
+  kubernetes_dir: "{{.ROOT_DIR}}/kubernetes"
+  k8s_cluster: '{{.k8s_cluster | default "main"}}'
+
+env:
+  KUBECONFIG: '{{.KUBERNETES_DIR}}/{{.k8s_cluster}}/kubeconfig'
+  TALOSCONFIG: '{{.KUBERNETES_DIR}}/{{.k8s_cluster}}/bootstrap/talos/clusterconfig/talosconfig'
 
 includes:
   flux:
