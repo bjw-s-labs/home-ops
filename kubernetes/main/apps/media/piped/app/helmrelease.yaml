@@ -18,19 +18,17 @@ spec:
   values:
     defaultPodOptions:
       automountServiceAccountToken: false
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: "OnRootMismatch"
 
     controllers:
       backend:
         strategy: RollingUpdate
         annotations:
           secret.reloader.stakater.com/reload: piped-secret
-
-        pod:
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-            fsGroup: 1000
-            fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
           app:
@@ -58,12 +56,6 @@ spec:
 
       frontend:
         strategy: RollingUpdate
-        pod:
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-            fsGroup: 1000
-            fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
           app:
@@ -92,12 +84,6 @@ spec:
 
       ytproxy:
         strategy: RollingUpdate
-        pod:
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-            fsGroup: 1000
-            fsGroupChangePolicy: "OnRootMismatch"
 
         containers:
           app:
@@ -127,16 +113,6 @@ spec:
 
       update-subscriptions:
         type: cronjob
-
-        annotations:
-          reloader.stakater.com/auto: "true"
-
-        pod:
-          securityContext:
-            runAsUser: 2000
-            runAsGroup: 2000
-            fsGroup: 2000
-            fsGroupChangePolicy: "OnRootMismatch"
 
         cronjob:
           schedule: "@daily"
