@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -18,38 +17,39 @@ spec:
   install:
     crds: CreateReplace
   upgrade:
+    timeout: 15m
     crds: CreateReplace
   values:
     master:
-    #   config:
-    #     enableTaints: true          # Allows NFD to taint worker nodes
+      #   config:
+      #     enableTaints: true          # Allows NFD to taint worker nodes
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 1
-              preference:
-                matchExpressions:
-                  - key: "node-role.kubernetes.io/master"
-                    operator: In
-                    values: [""]
-            - weight: 1
-              preference:
-                matchExpressions:
-                  - key: "node-role.kubernetes.io/control-plane"
-                    operator: In
-                    values: [""]
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: "node-role.kubernetes.io/master"
+                operator: In
+                values: [""]
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: "node-role.kubernetes.io/control-plane"
+                operator: In
+                values: [""]
 
     worker:
       config:
         core:
           sources:
-            - "pci"
-            - "system"
-            - "usb"
+          - "pci"
+          - "system"
+          - "usb"
       tolerations:
-        - key: storage-node
-          operator: Exists
-          effect: "NoSchedule"
+      - key: storage-node
+        operator: Exists
+        effect: "NoSchedule"
       resources:
         requests:
           cpu: 150m
