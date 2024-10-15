@@ -33,7 +33,7 @@ tasks:
     desc: Bootstrap core integrations needed for Talos
     cmds:
       - until kubectl wait --for=condition=Ready=False nodes --all --timeout=600s; do sleep 10; done
-      - helmfile --kube-context {{.K8S_CLUSTER}} --file {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/helmfile.yaml apply --skip-diff-on-install --suppress-diff
+      - helmfile --kube-context {{.K8S_CLUSTER}} --file {{.K8S_CLUSTER_DIR}}/bootstrap/helmfile.yaml apply --skip-diff-on-install --suppress-diff
       - until kubectl wait --for=condition=Ready nodes --all --timeout=600s; do sleep 10; done
     requires:
       vars:
@@ -42,13 +42,13 @@ tasks:
       - which helmfile
       - sh: kubectl config get-contexts {{.K8S_CLUSTER}}
         msg: "Kubectl context {{.K8S_CLUSTER}} not found"
-      - test -f {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/helmfile.yaml
+      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/helmfile.yaml
 
   fetch-kubeconfig:
     desc: Fetch kubeconfig from Talos controllers
     cmd: |
       talosctl kubeconfig --nodes {{.CONTROLLER}} \
-        --force --force-context-name {{.K8S_CLUSTER}} {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}
+        --force --force-context-name {{.K8S_CLUSTER}} {{.K8S_CLUSTER_DIR}}
     requires:
       vars:
         - K8S_CLUSTER
@@ -57,29 +57,29 @@ tasks:
     desc: Generate clusterconfig for Talos
     cmds:
       - talhelper genconfig
-        --env-file {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/talenv.sops.yaml
-        --secret-file {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/talsecret.sops.yaml
-        --config-file {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/talconfig.yaml
-        --out-dir {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/clusterconfig
+        --env-file {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talenv.sops.yaml
+        --secret-file {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talsecret.sops.yaml
+        --config-file {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talconfig.yaml
+        --out-dir {{.K8S_CLUSTER_DIR}}/bootstrap/talos/clusterconfig
     requires:
       vars:
         - K8S_CLUSTER
     preconditions:
-      - test -f {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/talenv.sops.yaml
-      - test -f {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/talsecret.sops.yaml
-      - test -f {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/talconfig.yaml
+      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talenv.sops.yaml
+      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talsecret.sops.yaml
+      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talconfig.yaml
 
   upgrade:
     desc: Upgrade Talos version for a node
     vars:
       TALOS_VERSION:
         sh: |
-          yq -r ".talosVersion" {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/talconfig.yaml
+          yq -r ".talosVersion" {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talconfig.yaml
       TALOS_IMAGE:
         sh: |
           talhelper genurl installer \
-            --env-file {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/talenv.sops.yaml \
-            --config-file {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/talconfig.yaml \
+            --env-file {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talenv.sops.yaml \
+            --config-file {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talconfig.yaml \
           | grep {{.NODE}} \
           | awk '{split($0,u," "); print u[2]}'
     cmds:
@@ -89,8 +89,8 @@ tasks:
         - K8S_CLUSTER
         - NODE
     preconditions:
-      - test -f {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/talenv.sops.yaml
-      - test -f {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/talconfig.yaml
+      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talenv.sops.yaml
+      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talconfig.yaml
       - msg: "Talos image could not be determined for node={{.NODE}}"
         sh: 'test -n "{{.TALOS_IMAGE}}"'
 
@@ -100,7 +100,7 @@ tasks:
     vars:
       KUBERNETES_VERSION:
         sh: |
-          yq -r ".kubernetesVersion" {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/talconfig.yaml
+          yq -r ".kubernetesVersion" {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talconfig.yaml
       TALOS_CONTROLLER:
         sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | shuf -n 1
     cmds:
@@ -117,7 +117,7 @@ tasks:
     desc: Apply clusterconfig for a Talos cluster
     vars:
       CLUSTERCONFIG_FILES:
-        sh: find {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/clusterconfig -type f -name '*.yaml' -printf '%f\n'
+        sh: find {{.K8S_CLUSTER_DIR}}/bootstrap/talos/clusterconfig -type f -name '*.yaml' -printf '%f\n'
     cmds:
       - for:
           var: CLUSTERCONFIG_FILES
@@ -137,7 +137,7 @@ tasks:
     cmds:
       - talosctl apply-config
         --nodes "{{.hostname}}"
-        --file "{{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/clusterconfig/{{.filename}}"
+        --file "{{.K8S_CLUSTER_DIR}}/bootstrap/talos/clusterconfig/{{.filename}}"
         {{ if eq "true" .DRY_RUN }}--dry-run{{ end }}
     requires:
       vars:
@@ -145,4 +145,4 @@ tasks:
         - hostname
         - filename
     preconditions:
-      - test -f {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/talos/clusterconfig/{{.filename}}
+      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/talos/clusterconfig/{{.filename}}

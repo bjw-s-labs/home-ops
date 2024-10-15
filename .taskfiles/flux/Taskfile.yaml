@@ -7,13 +7,13 @@ tasks:
     desc: Bootstrap Flux into a Kubernetes cluster
     cmds:
       # Install Flux
-      - kubectl apply --server-side --kustomize {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/flux
+      - kubectl apply --server-side --kustomize {{.K8S_CLUSTER_DIR}}/bootstrap/flux
       # Install secrets and configmaps
-      - sops --decrypt {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/flux/age-key.sops.yaml | kubectl apply -f -
-      - sops --decrypt {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/flux/vars/cluster-secrets.sops.yaml | kubectl apply -f -
-      - kubectl apply --server-side --filename {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/flux/vars/cluster-settings.yaml
+      - sops --decrypt {{.K8S_CLUSTER_DIR}}/bootstrap/flux/age-key.sops.yaml | kubectl apply -f -
+      - sops --decrypt {{.K8S_CLUSTER_DIR}}/flux/vars/cluster-secrets.sops.yaml | kubectl apply -f -
+      - kubectl apply --server-side --filename {{.K8S_CLUSTER_DIR}}/flux/vars/cluster-settings.yaml
       # Install Flux Kustomization resources
-      - kubectl apply --server-side --kustomize {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/flux/config
+      - kubectl apply --server-side --kustomize {{.K8S_CLUSTER_DIR}}/flux/config
     requires:
       vars:
         - K8S_CLUSTER
@@ -21,13 +21,13 @@ tasks:
       - sh: kubectl config get-contexts {{.K8S_CLUSTER}}
         msg: "Kubectl context {{.K8S_CLUSTER}} not found"
       - test -f $HOME/.config/age/keys.txt
-      - test -f {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/flux/age-key.sops.yaml
-      - test -f {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/flux/vars/cluster-settings.yaml
-      - test -f {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/flux/vars/cluster-secrets.sops.yaml
-      - sops --decrypt {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/flux/age-key.sops.yaml
-      - sops --decrypt {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/flux/vars/cluster-secrets.sops.yaml
-      - kustomize build {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/bootstrap/flux
-      - kustomize build {{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/flux/config
+      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/flux/age-key.sops.yaml
+      - test -f {{.K8S_CLUSTER_DIR}}/flux/vars/cluster-settings.yaml
+      - test -f {{.K8S_CLUSTER_DIR}}/flux/vars/cluster-secrets.sops.yaml
+      - sops --decrypt {{.K8S_CLUSTER_DIR}}/bootstrap/flux/age-key.sops.yaml
+      - sops --decrypt {{.K8S_CLUSTER_DIR}}/flux/vars/cluster-secrets.sops.yaml
+      - kustomize build {{.K8S_CLUSTER_DIR}}/bootstrap/flux
+      - kustomize build {{.K8S_CLUSTER_DIR}}/flux/config
 
   apply-ks:
     desc: Apply a Flux Kustomization resource for a cluster
@@ -46,7 +46,7 @@ tasks:
         kubectl apply --server-side --field-manager=kustomize-controller -f -
     vars:
       NS: '{{.NS | default "flux-system"}}'
-      KUSTOMIZATION_PATH: "{{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/apps/{{.PATH}}"
+      KUSTOMIZATION_PATH: "{{.K8S_CLUSTER_DIR}}/apps/{{.PATH}}"
       KUSTOMIZATION_FILE: "{{.KUSTOMIZATION_PATH}}/ks.yaml"
       KS_NAME: '{{ .name | default (base .PATH) }}'
       KUSTOMIZATION_FOUND:
@@ -76,7 +76,7 @@ tasks:
         kubectl delete -f -
     vars:
       NS: '{{.NS | default "flux-system"}}'
-      KUSTOMIZATION_PATH: "{{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}/apps/{{.PATH}}"
+      KUSTOMIZATION_PATH: "{{.K8S_CLUSTER_DIR}}/apps/{{.PATH}}"
       KUSTOMIZATION_FILE: "{{.KUSTOMIZATION_PATH}}/ks.yaml"
       KS_NAME: '{{ .name | default (splitList "/" .PATH | last) }}'
       KUSTOMIZATION_FOUND:
