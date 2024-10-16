@@ -56,12 +56,15 @@ jobs:
 
       - name: Install yamllint
         if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
         run: |
-          pip install yamllint
+          pip install --user yamllint
 
       - name: Run yamllint
         if: steps.changed-files.outputs.any_changed == 'true'
-        run: yamllint --config-file .ci/yamllint/.yamllint.yaml --format github ${{ steps.changed-files.outputs.all_changed_files }}
+        shell: bash
+        run: |
+          yamllint --config-file .ci/yamllint/.yamllint.yaml --format github ${{ steps.changed-files.outputs.all_changed_files }}
 
   markdownlint:
     name: markdownlint
