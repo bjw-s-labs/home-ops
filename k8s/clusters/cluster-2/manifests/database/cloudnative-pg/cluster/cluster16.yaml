@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/postgresql.cnpg.io/cluster_v1.json
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
@@ -9,7 +8,7 @@ spec:
   imageName: ghcr.io/cloudnative-pg/postgresql:16.3-10
   primaryUpdateStrategy: unsupervised
   storage:
-    size: 20Gi
+    size: 60Gi
     storageClass: ceph-blockpool-nvme
   superuserSecret:
     name: cloudnative-pg-secret
@@ -59,7 +58,7 @@ spec:
       owner: app
       secret:
         name: cluster-app-user
-  
+
   # Note: externalClusters is needed when recovering from an existing cnpg cluster
   # externalClusters:
   #   - name: *previousCluster
