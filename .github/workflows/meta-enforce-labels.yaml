@@ -8,12 +8,23 @@ on:
       - opened
       - labeled
       - unlabeled
+      - synchronize
 
 jobs:
   enforce-label:
     name: Enforce PR labels
     runs-on: ubuntu-latest
     steps:
-      - uses: yogevbd/enforce-label-action@2.2.2
+      - name: Generate Token
+        uses: actions/create-github-app-token@v1
+        id: app-token
         with:
-          BANNED_LABELS: "do-not-merge"
+          app-id: ${{ secrets.LAB_ASSISTANT_APP_ID }}
+          private-key: ${{ secrets.LAB_ASSISTANT_APP_KEY }}
+
+      - uses: klaasnicolaas/action-pr-labels@v1
+        with:
+          repo-token: ${{ steps.app-token.outputs.token }}
+          pr-number: ${{ github.event.pull_request.number }}
+          invalid-labels: >-
+            do-not-merge
