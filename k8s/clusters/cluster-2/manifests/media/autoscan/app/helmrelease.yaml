@@ -84,32 +84,13 @@ spec:
         enabled: true
         existingClaim: ${VOLSYNC_CLAIM}
       configdata:
-        enabled: false
+        enabled: true
         type: secret
         name: autoscan-secret
-        defaultMode: 0550
-        items:
-        - key: config.yml
-          path: config.yml
-        advancedMounts:
-          autoscan:
-            app:
-            - path: /test/
-              readOnly: true
-      4kmovies:
-        enabled: false
-        existingClaim: ceph-filesystem-${APP}-4kmovies
-        advancedMounts:
-          autoscan:
-            app:
-            - path: /mnt/unionfs/Media/4KMovies/
-      4ktv:
-        enabled: false
-        existingClaim: ceph-filesystem-${APP}-4ktv
-        advancedMounts:
-          autoscan:
-            app:
-            - path: /mnt/unionfs/Media/4KTV/
+        globalMounts:
+        - path: /config/config.yml
+          subPath: config.yml
+          readOnly: true
       music:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-music
