@@ -22,7 +22,7 @@ spec:
     - name: rook-ceph-cluster
     - name: volsync
     - name: external-secrets-stores
-    - name: mosquitto
+    - name: emqx-cluster
   postBuild:
     substitute:
       APP: *appname
@@ -48,4 +48,4 @@ spec:
     name: home-ops-kubernetes
   wait: false
   dependsOn:
-    - name: mosquitto
+    - name: emqx-cluster
