@@ -1,0 +1,62 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/refs/heads/main/apps.emqx.io/emqx_v2beta1.json
+apiVersion: apps.emqx.io/v2beta1
+kind: EMQX
+metadata:
+  name: emqx
+spec:
+  image: public.ecr.aws/emqx/emqx:5.8.1
+  config:
+    data: |
+      authentication {
+        backend = "built_in_database"
+        mechanism = "password_based"
+        password_hash_algorithm {
+            name = "bcrypt"
+        }
+        user_id_type = "username"
+        bootstrap_file = "/opt/init-user.json"
+        bootstrap_type = "plain"
+      }
+      authorization {
+        sources = [
+          {
+            type = built_in_database
+            enable = true
+          }
+          {
+            type = file
+            path = "/opt/init-acl"
+          }
+        ]
+        no_match: "deny"
+      }
+  coreTemplate:
+    metadata:
+      annotations:
+        reloader.stakater.com/auto: "true"
+    spec:
+      replicas: 3
+      envFrom:
+        - secretRef:
+            name: emqx-secret
+      extraVolumeMounts:
+        - name: init-user
+          mountPath: /opt/init-user.json
+          subPath: init-user.json
+          readOnly: true
+        - name: init-user
+          mountPath: /opt/init-acl
+          subPath: init-acl
+          readOnly: true
+      extraVolumes:
+        - name: init-user
+          secret:
+            secretName: emqx-init-user-secret
+  listenersServiceTemplate:
+    metadata:
+      annotations:
+        external-dns.alpha.kubernetes.io/hostname: "mqtt.bjw-s.dev."
+        lbipam.cilium.io/ips: 10.1.1.135
+    spec:
+      type: LoadBalancer
