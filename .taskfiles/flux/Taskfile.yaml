@@ -34,57 +34,49 @@ tasks:
     summary: |
       Args:
         PATH: Path to the Flux Kustomization resource (required)
-        NAME: Name of the Flux Kustomization to apply (default: last segment of <path> variable)
+        NAME: Name of the Flux Kustomization to apply (default: last segment of <PATH> variable)
+        SRC: Path to the manifests location (default: Same as <PATH> variable)
         NS: Namespace the Flux Kustomization exists in (default: flux-system)
-    cmds:
-      - flux build ks {{.KS_NAME}}
-        --namespace {{.NS}}
-        --kustomization-file {{.KUSTOMIZATION_FILE}}
-        --path {{.KUSTOMIZATION_PATH}}
-        {{ if contains "not found" .KUSTOMIZATION_FOUND }}--dry-run{{ end }}
-        |
-        kubectl apply --server-side --field-manager=kustomize-controller -f -
     vars:
       NS: '{{.NS | default "flux-system"}}'
-      KUSTOMIZATION_PATH: "{{.K8S_CLUSTER_DIR}}/apps/{{.PATH}}"
-      KUSTOMIZATION_FILE: "{{.KUSTOMIZATION_PATH}}/ks.yaml"
-      KS_NAME: '{{ .name | default (base .PATH) }}'
-      KUSTOMIZATION_FOUND:
-        sh: flux --namespace {{.NS}} get kustomization {{.KS_NAME}} 2>&1
+      KS:
+        sh: flux --namespace {{.NS}} get kustomizations {{base .PATH}} 2>&1
+    cmd: >
+      flux build --namespace {{.NS}} ks {{ if .NAME }}{{.NAME}}{{ else }}{{base .PATH}}{{ end }}
+      --kustomization-file {{.K8S_CLUSTER_DIR}}/apps/{{.PATH}}/ks.yaml
+      --path {{.K8S_CLUSTER_DIR}}/apps/{{.PATH}}{{- if .SRC }}/{{.SRC}}{{ end }}
+      {{ if contains "not found" .KS }}--dry-run \{{ end }}
+      | yq 'with(select(.apiVersion == "kustomize.toolkit.fluxcd.io/v1" and .kind == "Kustomization"); .metadata.namespace = "{{.NS}}")' -
+      | kubectl apply --server-side --field-manager=kustomize-controller --filename -
     requires:
       vars:
         - K8S_CLUSTER
         - PATH
     preconditions:
-      - sh: "test -f {{.KUSTOMIZATION_FILE}}"
-        msg: "Kustomization file {{.KUSTOMIZATION_FILE}} not found"
+      - sh: "test -f {{.K8S_CLUSTER_DIR}}/apps/{{.PATH}}/ks.yaml"
 
   delete-ks:
     desc: Delete a Flux Kustomization resource for a cluster
     summary: |
       Args:
         PATH: Path to the Flux Kustomization resource (required)
-        NAME: Name of the Flux Kustomization to apply (default: last segment of <path> variable)
+        NAME: Name of the Flux Kustomization to apply (default: last segment of <PATH> variable)
+        SRC: Path to the manifests location (default: Same as <PATH> variable)
         NS: Namespace the Flux Kustomization exists in (default: flux-system)
-    cmds:
-      - flux build ks {{.KS_NAME}}
-        --namespace {{.NS}}
-        --kustomization-file {{.KUSTOMIZATION_FILE}}
-        --path {{.KUSTOMIZATION_PATH}}
-        --dry-run
-        |
-        kubectl delete -f -
     vars:
       NS: '{{.NS | default "flux-system"}}'
-      KUSTOMIZATION_PATH: "{{.K8S_CLUSTER_DIR}}/apps/{{.PATH}}"
-      KUSTOMIZATION_FILE: "{{.KUSTOMIZATION_PATH}}/ks.yaml"
-      KS_NAME: '{{ .name | default (splitList "/" .PATH | last) }}'
-      KUSTOMIZATION_FOUND:
-        sh: flux --namespace {{.NS}} get kustomization {{.KS_NAME}} 2>&1
+      KS:
+        sh: flux --namespace {{.NS}} get kustomizations {{base .PATH}} 2>&1
+    cmd: >
+      flux build --namespace {{.NS}} ks {{ if .NAME }}{{.NAME}}{{ else }}{{base .PATH}}{{ end }}
+      --kustomization-file {{.K8S_CLUSTER_DIR}}/apps/{{.PATH}}/ks.yaml
+      --path {{.K8S_CLUSTER_DIR}}/apps/{{.PATH}}{{- if .SRC }}/{{.SRC}}{{ end }}
+      {{ if contains "not found" .KS }}--dry-run \{{ end }}
+      | yq 'with(select(.apiVersion == "kustomize.toolkit.fluxcd.io/v1" and .kind == "Kustomization"); .metadata.namespace = "{{.NS}}")' -
+      | kubectl delete -f -
     requires:
       vars:
         - K8S_CLUSTER
         - PATH
     preconditions:
-      - sh: "test -f {{.KUSTOMIZATION_FILE}}"
-        msg: "Kustomization file {{.KUSTOMIZATION_FILE}} not found"
+      - sh: "test -f {{.K8S_CLUSTER_DIR}}/apps/{{.PATH}}/ks.yaml"
