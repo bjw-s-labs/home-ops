@@ -1,19 +1,16 @@
----
 apiVersion: v1
 kind: Pod
 metadata:
-  name: ubuntu-debug-work2
+  name: ubuntu-debug-work4
   namespace: rook-ceph
 spec:
   containers:
   - name: ubuntu
     image: ubuntu
-    command: ["/bin/sh","-c"]
+    command: ["/bin/sh", "-c"]
     args:
-      - >
-        apt-get update &&
-        apt-get install -y gdisk sysstat &&
-        sleep infinity
+    - >
+      apt-get update && apt-get install -y gdisk sysstat && sleep infinity
     volumeMounts:
     - mountPath: /hostRoot
       name: root
@@ -26,13 +23,13 @@ spec:
     #   readOnly: false
     securityContext:
       privileged: true
-    # resources:
-    #   requests:
-    #     memory: "640Mi"
-    #     cpu: "250m"
-    #   limits:
-    #     memory: "4096Mi"
-    #     cpu: "2000m"
+      # resources:
+      #   requests:
+      #     memory: "640Mi"
+      #     cpu: "250m"
+      #   limits:
+      #     memory: "4096Mi"
+      #     cpu: "2000m"
   volumes:
   - name: root
     hostPath:
@@ -52,4 +49,4 @@ spec:
           - key: kubernetes.io/hostname
             operator: In
             values:
-            - work2
+            - work4
