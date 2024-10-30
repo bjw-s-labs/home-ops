@@ -3,38 +3,13 @@
 version: "3"
 
 tasks:
-  delete-failed-pods:
-    desc: Deletes pods with Failed phase
-    cmds:
-      - task: _delete_pods_in_phase
-        vars:
-          PHASE: Failed
-
-  delete-succeeded-pods:
-    desc: Deletes pods with Succeeded phase
-    cmds:
-      - task: _delete_pods_in_phase
-        vars:
-          PHASE: Succeeded
-
-  delete-pending-pods:
-    desc: Deletes pods with Pending phase
-    cmds:
-      - task: _delete_pods_in_phase
-        vars:
-          PHASE: Pending
-
-  _delete_pods_in_phase:
-    desc: Deletes pods with a specific phase
-    internal: true
-    requires:
-      vars:
-        - PHASE
+  cleanup-pods:
+    desc: Clean up leftover Pods
     cmds:
       - for:
-          var: PHASE
-          split: ','
-        cmd: kubectl delete pods --field-selector status.phase={{.ITEM}} -A --ignore-not-found=true
+          matrix:
+            PHASE: [Failed, Succeeded, Pending]
+        cmd: kubectl delete pods --field-selector status.phase={{.ITEM.PHASE}} -A --ignore-not-found=true
 
   sync-externalsecret:
     desc: Sync ExternalSecret resource
