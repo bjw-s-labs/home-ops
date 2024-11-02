@@ -5,25 +5,153 @@ sonarr:
     api_key: !env_var SONARR_API_KEY
     delete_old_custom_formats: true
     replace_existing_custom_formats: true
-    include:
-    - template: sonarr-quality-definition-series
-    - template: sonarr-v4-quality-profile-web-1080p
-    - template: sonarr-v4-custom-formats-web-1080p
+
+    quality_definition:
+      type: series
+
     quality_profiles:
-    - name: WEB-1080p
+    - name: Web 720p
+      reset_unmatched_scores:
+        enabled: true
+      upgrade:
+        allowed: true
+        until_quality: Web-720p
+        until_score: 10000
+      min_format_score: 0
+      quality_sort: top
+      qualities:
+      - name: Web-720p
+        qualities:
+        - WEBDL-720p
+        - WEBRip-720p
+      - name: HDTV-720p
+      - name: Web-480p
+        qualities:
+        - WEBDL-480p
+        - WEBRip-480p
+      - name: DVD
+      - name: SDTV
+    - name: Web 1080p
+      reset_unmatched_scores:
+        enabled: true
+      upgrade:
+        allowed: true
+        until_quality: Web-1080p
+        until_score: 10000
+      min_format_score: 0
+      quality_sort: top
+      qualities:
+      - name: Web-1080p
+        qualities:
+        - WEBDL-1080p
+        - WEBRip-1080p
+      - name: HDTV-1080p
+      - name: Web-720p
+        qualities:
+        - WEBDL-720p
+        - WEBRip-720p
+      - name: HDTV-720p
+      - name: Web-480p
+        qualities:
+        - WEBDL-480p
+        - WEBRip-480p
+      - name: DVD
+      - name: SDTV
+    - name: WEB 2160p
+      reset_unmatched_scores:
+        enabled: true
+      upgrade:
+        allowed: true
+        until_quality: WEB 2160p
+        until_score: 10000
+      min_format_score: 0
+      quality_sort: top
+      qualities:
+      - name: WEB 2160p
+        qualities:
+        - WEBDL-2160p
+        - WEBRip-2160p
+      - name: HDTV-2160p
+      - name: WEB 1080p
+        qualities:
+        - WEBDL-1080p
+        - WEBRip-1080p
+      - name: HDTV-1080p
+      - name: WEB 720p
+        qualities:
+        - WEBDL-720p
+        - WEBRip-720p
+      - name: HDTV-720p
+      - name: WEB 480p
+        qualities:
+        - WEBDL-480p
+        - WEBRip-480p
+
     custom_formats:
     - trash_ids:
+      # Streaming Services
+      - d660701077794679fd59e8bdf4ce3a29 # AMZN
+      - f67c9ca88f463a48346062e8ad07713f # ATVP
+      - 4e9a630db98d5391aec1368a0256e2fe # CRAV
+      - 36b72f59f4ea20aad9316f475f2d9fbb # DCU
+      - 89358767a60cc28783cdc3d0be9388a4 # DSNP
+      - 7a235133c87f7da4c8cccceca7e3c7a6 # HBO
+      - a880d6abc21e7c16884f3ae393f84179 # HMAX
+      - f6cce30f1733d5c8194222a7507909bb # HULU
+      - 0ac24a2a68a9700bcb7eeca8e5cd644c # iT
+      - 81d1fbf600e2540cee87f3a23f9d3c1c # MAX
+      - d34870697c9db575f17700212167be23 # NF
+      - b2b980877494b560443631eb1f473867 # NLZ
+      - fb1a91cdc0f26f7ca0696e0e95274645 # OViD
+      - 1656adc6d7bb2c8cca6acfb6592db421 # PCOK
+      - c67a75ae4a1715f2bb4d492755ba4195 # PMTP
+      - 3ac5d84fce98bab1b531393e9c82f467 # QIBI
+      - c30d2958827d1867c73318a5a2957eb1 # RED
+      - ae58039e1319178e6be73caab5c42166 # SHO
+      - 1efe8da11bfd74fbbcd4d8117ddb9213 # STAN
+      - 5d2317d99af813b6529c7ebf01c83533 # VDL
+      - 77a7b25585c18af08f60b1547bb9b4fb # CC
+      - 43b3cf48cb385cd3eac608ee6bca7f09 # UHD Streaming Boost 
+      - d2d299244a92b8a52d4921ce3897a256 # UHD Streaming Cut
+      # Allowed Scene groups and tiered P2P groups
+      - d0c516558625b04b363fa6c5c2c7cfd4 # WEB Scene (allowed Scene groups)
+      - e6258996055b9fbab7e9cb2f75819294 # WEB Tier 01
+      - 58790d4e2fdcd9733aa7ae68ba2bb503 # WEB Tier 02
+      - d84935abd3f8556dcd51d4f27e22d0a6 # WEB Tier 03
+      # Repacks / Propers
+      - ec8fa7296b64e8cd390a1600981f3923 # Repack/Proper
+      - eb3d5cc0a2be0db205fb823640db6a3c # Repack v2
+      - 44e7c4de10ae50265753082e5dc76047 # Repack v3
+      # HDR Metadata
+      - 2b239ed870daba8126a53bd5dc8dc1c8 # DV HDR10+
+      - 7878c33f1963fefb3d6c8657d46c2f0a # DV HDR10
+      - 6d0d8de7b57e35518ac0308b0ddf404e # DV
+      - 1f733af03141f068a540eec352589a89 # DV HLG
+      - 27954b0a80aab882522a88a4d9eae1cd # DV SDR
+      - a3d82cbef5039f8d295478d28a887159 # HDR10+
+      - 3497799d29a085e2ac2df9d468413c94 # HDR10
+      - 3e2c4e748b64a1a1118e0ea3f4cf6875 # HDR
+      - bb019e1cd00f304f80971c965de064dc # HDR (undefined)
+      - 2a7e3be05d3861d6df7171ec74cad727 # PQ
+      - 17e889ce13117940092308f48b48b45b # HLG
+      - 9b27ab6498ec0f31a3353992e19434ca # DV (WEBDL)
+      - 0dad0a507451acddd754fe6dc3a7f5e7 # HDR10+Boost
+      - 385e9e8581d33133c3961bdcdeffb7b4 # DV HDR10+Boost
+      # Unwanted
+      - 85c61753df5da1fb2aab6f2a47426b09 # BR-DISK
+      - 9c11cd3f07101cdba90a2d81cf0e56b4 # LQ
+      - e2315f990da2e2cbfc9fa5b7a6fcfe48 # LQ (Release Title)
+      - 47435ece6b99a0b477caf360e79ba0bb # x265 (HD)
+      - fbcb31d8dabd2a319072b84fc0b7249c # Extras
       - 32b367365729d530ca1c124a0b180c64 # Bad Dual Groups
       - 82d40da2bc6923f41e14394075dd4b03 # No-RlsGroup
       - e1a997ddb54e3ecbfe06341ad323c458 # Obfuscated
       - 06d66ab109d4d2eddb2794d21526d140 # Retags
-      assign_scores_to:
-      - name: WEB-1080p
-    - trash_ids:
-      - 1b3994c551cbb92a2c781af061f4ab44 # Scene
-      assign_scores_to:
-      - name: WEB-1080p
-        score: 0
+      - 9c14d194486c4014d422adc64092d794 # Dubs Only
+      quality_profiles:
+      - name: WEB 1080p
+      - name: Ultra-HD
+      - name: Web 720p
 
 radarr:
   radarr:
