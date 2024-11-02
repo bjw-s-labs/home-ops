@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -39,8 +38,8 @@ spec:
         runAsGroup: ${APP_GID}
         fsGroup: ${APP_GID}
         fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [34,10000]
-        seccompProfile: { type: RuntimeDefault }
+        supplementalGroups: [34, 10000]
+        seccompProfile: {type: RuntimeDefault}
     controllers:
       bazarr:
         annotations:
@@ -56,7 +55,7 @@ spec:
               TZ: "${TIMEZONE}"
               BAZARR__INSTANCE_NAME: Bazarr
               BAZARR__PORT: &port 6767
-              BAZARR__APPLICATION_URL: &host-cluster "bazarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              BAZARR__APPLICATION_URL: &host "bazarr.${INGRESS_DOMAIN}"
               BAZARR__LOG_LEVEL: info
             probes:
               liveness: &probes
@@ -74,7 +73,7 @@ spec:
             securityContext: &securityContext
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: "0.04"
@@ -110,24 +109,24 @@ spec:
       cache:
         type: emptyDir
         globalMounts:
-          - path: /config/cache
+        - path: /config/cache
       config:
         enabled: true
         existingClaim: ${VOLSYNC_CLAIM}
         advancedMounts:
           bazarr:
             app:
-              - path: /config
+            - path: /config
       log:
         type: emptyDir
         globalMounts:
-          - path: /config/log
+        - path: /config/log
       scripts:
         type: configMap
         name: bazarr-scripts
         defaultMode: 0775
         globalMounts:
-          - readOnly: true
+        - readOnly: true
       tmp:
         type: emptyDir
       backup:
@@ -136,49 +135,35 @@ spec:
         advancedMounts:
           bazarr:
             app:
-              - path: /config/backup
-      4kmovies:
-        enabled: true
-        existingClaim: ceph-filesystem-${APP}-4kmovies
-        advancedMounts:
-          bazarr:
-            app:
-              - path: /mnt/unionfs/Media/4KMovies/
-      4ktv:
-        enabled: true
-        existingClaim: ceph-filesystem-${APP}-4ktv
-        advancedMounts:
-          bazarr:
-            app:
-              - path: /mnt/unionfs/Media/4KTV/
+            - path: /config/backup
       music:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-music
         advancedMounts:
           bazarr:
             app:
-              - path: /mnt/unionfs/Media/Music/
+            - path: /mnt/unionfs/Media/Music/
       movies:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-movies
         advancedMounts:
           bazarr:
             app:
-              - path: /mnt/unionfs/Media/Movies/
+            - path: /mnt/unionfs/Media/Movies/
       tv:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-tv
         advancedMounts:
           bazarr:
             app:
-              - path: /mnt/unionfs/Media/TV
+            - path: /mnt/unionfs/Media/TV
       downloads:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-downloads
         advancedMounts:
           bazarr:
             app:
-              - path: /mnt/unionfs/downloads
+            - path: /mnt/unionfs/downloads
 
     ingress:
       app:
@@ -194,23 +179,15 @@ spec:
         #   external-dns/is-public: "true"
         #   external-dns/powerdns: "true"
         hosts:
-          - host: *host-cluster
-            paths:
-              - path: /
-                pathType: Prefix
-                service:
-                  identifier: app
-                  port: http
-          - host: &host "bazarr.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-                pathType: Prefix
-                service:
-                  identifier: app
-                  port: http
+        - host: *host
+          paths:
+          - path: /
+            pathType: Prefix
+            service:
+              identifier: app
+              port: http
         tls:
-            - hosts:
-              - *host-cluster
-              - *host
+        - hosts:
+          - *host
 
 

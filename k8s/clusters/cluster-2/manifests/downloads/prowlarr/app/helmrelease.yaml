@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -44,7 +43,7 @@ spec:
             fsGroup: ${APP_GID}
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
-              - 34
+            - 34
 
         containers:
           app:
@@ -56,7 +55,7 @@ spec:
               TZ: "${TIMEZONE}"
               PROWLARR__INSTANCE_NAME: Prowlarr
               PROWLARR__PORT: &port 9696
-              PROWLARR__APPLICATION_URL: &host "prowlarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              PROWLARR__APPLICATION_URL: &host "prowlarr.${INGRESS_DOMAIN}"
               PROWLARR__LOG_LEVEL: info
             probes:
               liveness:
@@ -91,14 +90,14 @@ spec:
         advancedMounts:
           prowlarr:
             app:
-              - path: /shared
+            - path: /shared
       backup:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-backups
         advancedMounts:
           prowlarr:
             app:
-              - path: /config/Backups
+            - path: /config/Backups
 
     ingress:
       app:
@@ -114,12 +113,12 @@ spec:
         #   external-dns/is-public: "true"
         #   external-dns/powerdns: "true"
         hosts:
-          - host: *host
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        - host: *host
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
         tls:
-          - hosts:
-              - *host
+        - hosts:
+          - *host

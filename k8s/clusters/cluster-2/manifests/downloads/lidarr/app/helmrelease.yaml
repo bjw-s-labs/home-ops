@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -44,7 +43,7 @@ spec:
             fsGroup: ${APP_GID}
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
-              - 34
+            - 34
 
         containers:
           app:
@@ -56,7 +55,7 @@ spec:
               TZ: "${TIMEZONE}"
               LIDARR__INSTANCE_NAME: Lidarr
               LIDARR__PORT: &port 8686
-              LIDARR__APPLICATION_URL: &host-cluster "lidarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              LIDARR__APPLICATION_URL: &host "lidarr.${INGRESS_DOMAIN}"
               LIDARR__LOG_LEVEL: info
             probes:
               liveness:
@@ -91,21 +90,21 @@ spec:
         advancedMounts:
           lidarr:
             app:
-              - path: /mnt/unionfs/Media/Music/
+            - path: /mnt/unionfs/Media/Music/
       backup:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-backups
         advancedMounts:
           lidarr:
             app:
-              - path: /config/Backups
+            - path: /config/Backups
       downloads:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-downloads
         advancedMounts:
           lidarr:
             app:
-              - path: /mnt/unionfs/downloads
+            - path: /mnt/unionfs/downloads
 
     ingress:
       app:
@@ -117,19 +116,12 @@ spec:
         #   traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
         #   external-dns/powerdns: "true"
         hosts:
-          - host: *host-cluster
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-          - host: &host "music.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        - host: *host
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
         tls:
-          - hosts:
-              - *host-cluster
-              - *host
+        - hosts:
+          - *host
