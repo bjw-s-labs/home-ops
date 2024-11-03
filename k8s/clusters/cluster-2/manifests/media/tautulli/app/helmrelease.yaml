@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -47,7 +46,7 @@ spec:
             fsGroup: ${APP_GID}
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
-              - 34
+            - 34
 
         containers:
           app:
@@ -90,8 +89,8 @@ spec:
         advancedMounts:
           tautulli:
             app:
-              - path: /config/backups
-                subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/tautulli
+            - path: /config/backups
+              subPath: ./Kubernetes/${CLUSTER_NAME}/Applications/tautulli
 
     ingress:
       app:
@@ -101,19 +100,12 @@ spec:
           external-dns/is-public: "true"
           external-dns.alpha.kubernetes.io/target: "ingress-ext.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
         hosts:
-          - host: &host-cluster "tautulli.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-          - host: &host "tautulli.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        - host: &host "tautulli.${INGRESS_DOMAIN}"
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
         tls:
-          - hosts:
-              - *host-cluster
-              - *host
+        - hosts:
+          - *host

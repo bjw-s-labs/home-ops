@@ -58,7 +58,7 @@ spec:
               ESPHOME_DASHBOARD_USE_PING: true
               ESPHOME__INSTANCE_NAME: ESPHome
               ESPHOME__PORT: &port 6052
-              ESPHOME__APPLICATION_URL: &host-cluster "esphome.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              ESPHOME__APPLICATION_URL: &host "esphome.${INGRESS_DOMAIN}"
               ESPHOME__LOG_LEVEL: info
             probes:
               liveness:
@@ -114,13 +114,7 @@ spec:
         #   external-dns/is-public: "false"
         #   external-dns/powerdns: "true"
         hosts:
-        - host: *host-cluster
-          paths:
-          - path: /
-            service:
-              identifier: app
-              port: http
-        - host: &host "esphome.${INGRESS_DOMAIN}"
+        - host: *host
           paths:
           - path: /
             service:
@@ -128,5 +122,4 @@ spec:
               port: http
         tls:
         - hosts:
-          - *host-cluster
           - *host
