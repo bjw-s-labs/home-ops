@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -42,7 +41,7 @@ spec:
             image:
               repository: dpage/pgadmin4
               tag: 8.12@sha256:585350593e8b0483941fa9a2d5ebb04b88a66e83a7b5603c169f9446b271312f
-            env: 
+            env:
               PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
               PGADMIN_CONFIG_AUTHENTICATION_SOURCES: "['ldap', 'internal']"
               # PGADMIN_CONFIG_AUTHENTICATION_SOURCES: "['internal']"
@@ -54,15 +53,15 @@ spec:
               PGADMIN_CONFIG_LDAP_BIND_USER: "'uid=service_pgadmin,ou=people,dc=elcarpenter,dc=com'"
               PGADMIN_CONFIG_LDAP_BIND_PASSWORD: "'${PGADMIN_LLDAP_PASSWORD}'"
             envFrom:
-              - secretRef:
-                  name: pgadmin-secret
+            - secretRef:
+                name: pgadmin-secret
             resources:
               requests:
                 cpu: 50m
                 memory: 100Mi
               limits:
                 memory: 500Mi
-    service:    
+    service:
       app:
         controller: *app
         ports:
@@ -75,24 +74,24 @@ spec:
         annotations:
           hajimari.io/icon: mdi:database
         hosts:
-          - host: &host "{{ .Release.Name }}.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        - host: &host "{{ .Release.Name }}.${INGRESS_DOMAIN}"
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
         tls:
-          - hosts:
-              - *host
+        - hosts:
+          - *host
     persistence:
       config:
         enabled: true
         existingClaim: *app
         globalMounts:
-          - path: /var/lib/pgadmin
+        - path: /var/lib/pgadmin
       server-json:
         type: configMap
         name: pgadmin-configmap
         globalMounts:
-          - path: /pgadmin4/servers.json
-            subPath: servers.json
+        - path: /pgadmin4/servers.json
+          subPath: servers.json
