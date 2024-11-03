@@ -73,9 +73,9 @@ spec:
             env:
               TZ: "${TIMEZONE}"
               SABNZBD__PORT: &port 8080
-              NZBGET__APPLICATION_URL: &host-cluster "sabnzbd.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              NZBGET__APPLICATION_URL: &host "sabnzbd.${INGRESS_DOMAIN}"
               SABNZBD__HOST_WHITELIST_ENTRIES: >-
-                sabnzbd, sabnzbd.downloads, sabnzbd.downloads.svc, sabnzbd.downloads.svc.cluster, sabnzbd.downloads.svc.cluster.local, sabnzbd.${INGRESS_DOMAIN}, sabnzbd.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+                sabnzbd, sabnzbd.downloads, sabnzbd.downloads.svc, sabnzbd.downloads.svc.cluster, sabnzbd.downloads.svc.cluster.local, sabnzbd.${INGRESS_DOMAIN}
             envFrom:
             - secretRef:
                 name: sabnzbd-api-keys
@@ -141,13 +141,7 @@ spec:
           external-dns/is-public: "true"
           external-dns.alpha.kubernetes.io/target: "ingress-ext.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
         hosts:
-        - host: *host-cluster
-          paths:
-          - path: /
-            service:
-              identifier: app
-              port: http
-        - host: &host "sabnzbd.${INGRESS_DOMAIN}"
+        - host: *host
           paths:
           - path: /
             service:
@@ -155,5 +149,4 @@ spec:
               port: http
         tls:
         - hosts:
-          - *host-cluster
           - *host

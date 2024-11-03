@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -42,22 +41,22 @@ spec:
         runAsGroup: ${APP_GID}
         fsGroup: ${APP_GID}
         fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [34,10000]
-        seccompProfile: { type: RuntimeDefault }
-      # affinity:
-      #   podAntiAffinity:
-      #     requiredDuringSchedulingIgnoredDuringExecution:
-      #       - labelSelector:
-      #           matchExpressions:
-      #             - key: app.kubernetes.io/name
-      #               operator: In
-      #               values: ["plex"]
-      #         # Blank selector selects all namespaces. Null namespace selector locks it to the same namespace as the HR
-      #         namespaces: ["media", "downloads", "home-automation"]
-      #         topologyKey: kubernetes.io/hostname
-      # nodeSelector:
-      #   google.feature.node.kubernetes.io/coral: "true"
-      #   intel.feature.node.kubernetes.io/gpu: "true"
+        supplementalGroups: [34, 10000]
+        seccompProfile: {type: RuntimeDefault}
+        # affinity:
+        #   podAntiAffinity:
+        #     requiredDuringSchedulingIgnoredDuringExecution:
+        #       - labelSelector:
+        #           matchExpressions:
+        #             - key: app.kubernetes.io/name
+        #               operator: In
+        #               values: ["plex"]
+        #         # Blank selector selects all namespaces. Null namespace selector locks it to the same namespace as the HR
+        #         namespaces: ["media", "downloads", "home-automation"]
+        #         topologyKey: kubernetes.io/hostname
+        # nodeSelector:
+        #   google.feature.node.kubernetes.io/coral: "true"
+        #   intel.feature.node.kubernetes.io/gpu: "true"
 
 
     controllers:
@@ -70,8 +69,8 @@ spec:
               repository: ghcr.io/onedr0p/postgres-init
               tag: 16
             envFrom: &envFrom
-              - secretRef:
-                  name: sonarr-secret
+            - secretRef:
+                name: sonarr-secret
 
         containers:
           app:
@@ -84,7 +83,7 @@ spec:
               SONARR__APP__INSTANCENAME: Sonarr
               SONARR__APP__THEME: dark
               SONARR__SERVER__PORT: &port 8989
-              SONARR__APPLICATION_URL: &host-cluster "sonarr.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              SONARR__APPLICATION_URL: &host "sonarr.${INGRESS_DOMAIN}"
               SONARR_AUTH__METHOD: Forms
               SONARR_AUTH__REQUIRED: Enabled
               SONARR__LOG_LEVEL: info
@@ -107,7 +106,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 100m
@@ -133,21 +132,21 @@ spec:
         advancedMounts:
           sonarr:
             app:
-              - path: /mnt/unionfs/Media/TV
+            - path: /mnt/unionfs/Media/TV
       downloads:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-downloads
         advancedMounts:
           sonarr:
             app:
-              - path: /mnt/unionfs/downloads
+            - path: /mnt/unionfs/downloads
       backup:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-backups
         advancedMounts:
           sonarr:
             app:
-              - path: /config/Backups
+            - path: /config/Backups
 
     ingress:
       app:
@@ -157,20 +156,13 @@ spec:
           external-dns/is-public: "true"
           external-dns.alpha.kubernetes.io/target: "ingress-ext.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
         hosts:
-          - host: *host-cluster
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-          - host: &host "sonarr.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        - host: *host
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
         tls:
-          - hosts:
-              - *host-cluster
-              - *host
+        - hosts:
+          - *host
 
