@@ -86,6 +86,7 @@ spec:
         type: LoadBalancer
         annotations:
           io.cilium/lb-ipam-ips: ${LB_LLDAP}
+          external-dns.alpha.kubernetes.io/hostname: lldap.${INGRESS_DOMAIN}
         ports:
           http:
             port: *port
