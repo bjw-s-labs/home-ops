@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -42,25 +41,19 @@ spec:
       type: LoadBalancer
       annotations:
         io.cilium/lb-ipam-ips: ${LB_MQTT}
-      # loadBalancerIP: ${LB_MQTT}
       externalTrafficPolicy: Cluster
 
     ingress:
       dashboard:
         enabled: true
-        # annotations:
-        #   cert-manager.io/cluster-issuer: letsencrypt-production
-        #   traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        #   traefik.ingress.kubernetes.io/router.middlewares: network-chain-external@kubernetescrd
-        #   external-dns/powerdns: "true"
         ingressClassName: internal-nginx
         path: /
         pathType: Prefix
         hosts:
-          - &host1 "emqx.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+        - &host "emqx.${INGRESS_DOMAIN}"
         tls:
-          - hosts:
-              - *host1
+        - hosts:
+          - *host
 
     metrics:
       enabled: false
@@ -73,14 +66,14 @@ spec:
     affinity:
       podAntiAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                  - key: app.kubernetes.io/name
-                    operator: In
-                    values: ["emqx"]
-              topologyKey: kubernetes.io/hostname
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values: ["emqx"]
+            topologyKey: kubernetes.io/hostname
 
     resources:
       requests:
@@ -90,70 +83,70 @@ spec:
         memory: 512Mi
 
   valuesFrom:
-    - targetPath: emqxConfig.EMQX_DASHBOARD__DEFAULT_PASSWORD
-      kind: Secret
-      name: emqx-config
-      valuesKey: admin_password
+  - targetPath: emqxConfig.EMQX_DASHBOARD__DEFAULT_PASSWORD
+    kind: Secret
+    name: emqx-config
+    valuesKey: admin_password
 
-    - targetPath: emqxConfig.EMQX_AUTH__USER__1__USERNAME
-      kind: Secret
-      name: emqx-config
-      valuesKey: user_1_username
-    - targetPath: emqxConfig.EMQX_AUTH__USER__1__PASSWORD
-      kind: Secret
-      name: emqx-config
-      valuesKey: user_1_password
+  - targetPath: emqxConfig.EMQX_AUTH__USER__1__USERNAME
+    kind: Secret
+    name: emqx-config
+    valuesKey: user_1_username
+  - targetPath: emqxConfig.EMQX_AUTH__USER__1__PASSWORD
+    kind: Secret
+    name: emqx-config
+    valuesKey: user_1_password
 
-    - targetPath: emqxConfig.EMQX_AUTH__USER__2__USERNAME
-      kind: Secret
-      name: emqx-config
-      valuesKey: user_2_username
-    - targetPath: emqxConfig.EMQX_AUTH__USER__2__PASSWORD
-      kind: Secret
-      name: emqx-config
-      valuesKey: user_2_password
+  - targetPath: emqxConfig.EMQX_AUTH__USER__2__USERNAME
+    kind: Secret
+    name: emqx-config
+    valuesKey: user_2_username
+  - targetPath: emqxConfig.EMQX_AUTH__USER__2__PASSWORD
+    kind: Secret
+    name: emqx-config
+    valuesKey: user_2_password
 
-    - targetPath: emqxConfig.EMQX_AUTH__USER__3__USERNAME
-      kind: Secret
-      name: emqx-config
-      valuesKey: user_3_username
-    - targetPath: emqxConfig.EMQX_AUTH__USER__3__PASSWORD
-      kind: Secret
-      name: emqx-config
-      valuesKey: user_3_password
+  - targetPath: emqxConfig.EMQX_AUTH__USER__3__USERNAME
+    kind: Secret
+    name: emqx-config
+    valuesKey: user_3_username
+  - targetPath: emqxConfig.EMQX_AUTH__USER__3__PASSWORD
+    kind: Secret
+    name: emqx-config
+    valuesKey: user_3_password
 
-    - targetPath: emqxConfig.EMQX_AUTH__USER__4__USERNAME
-      kind: Secret
-      name: emqx-config
-      valuesKey: user_4_username
-    - targetPath: emqxConfig.EMQX_AUTH__USER__4__PASSWORD
-      kind: Secret
-      name: emqx-config
-      valuesKey: user_4_password
+  - targetPath: emqxConfig.EMQX_AUTH__USER__4__USERNAME
+    kind: Secret
+    name: emqx-config
+    valuesKey: user_4_username
+  - targetPath: emqxConfig.EMQX_AUTH__USER__4__PASSWORD
+    kind: Secret
+    name: emqx-config
+    valuesKey: user_4_password
 
-    - targetPath: emqxConfig.EMQX_AUTH__USER__5__USERNAME
-      kind: Secret
-      name: emqx-config
-      valuesKey: user_5_username
-    - targetPath: emqxConfig.EMQX_AUTH__USER__5__PASSWORD
-      kind: Secret
-      name: emqx-config
-      valuesKey: user_5_password
+  - targetPath: emqxConfig.EMQX_AUTH__USER__5__USERNAME
+    kind: Secret
+    name: emqx-config
+    valuesKey: user_5_username
+  - targetPath: emqxConfig.EMQX_AUTH__USER__5__PASSWORD
+    kind: Secret
+    name: emqx-config
+    valuesKey: user_5_password
 
-    - targetPath: emqxConfig.EMQX_AUTH__USER__6__USERNAME
-      kind: Secret
-      name: emqx-config
-      valuesKey: user_6_username
-    - targetPath: emqxConfig.EMQX_AUTH__USER__6__PASSWORD
-      kind: Secret
-      name: emqx-config
-      valuesKey: user_6_password
+  - targetPath: emqxConfig.EMQX_AUTH__USER__6__USERNAME
+    kind: Secret
+    name: emqx-config
+    valuesKey: user_6_username
+  - targetPath: emqxConfig.EMQX_AUTH__USER__6__PASSWORD
+    kind: Secret
+    name: emqx-config
+    valuesKey: user_6_password
 
-    - targetPath: emqxConfig.EMQX_AUTH__USER__7__USERNAME
-      kind: Secret
-      name: emqx-config
-      valuesKey: user_7_username
-    - targetPath: emqxConfig.EMQX_AUTH__USER__7__PASSWORD
-      kind: Secret
-      name: emqx-config
-      valuesKey: user_7_password
+  - targetPath: emqxConfig.EMQX_AUTH__USER__7__USERNAME
+    kind: Secret
+    name: emqx-config
+    valuesKey: user_7_username
+  - targetPath: emqxConfig.EMQX_AUTH__USER__7__PASSWORD
+    kind: Secret
+    name: emqx-config
+    valuesKey: user_7_password
