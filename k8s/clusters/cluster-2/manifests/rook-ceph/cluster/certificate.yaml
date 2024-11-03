@@ -3,11 +3,10 @@ kind: Certificate
 metadata:
   name: "${INGRESS_DOMAIN}"
 spec:
-  secretName: "lldap-cert"
+  secretName: "objectstore-cert"
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
-  commonName: "lldap.${INGRESS_DOMAIN}"
+  commonName: "s3.${INGRESS_DOMAIN}"
   dnsNames:
-  - "lldap.${INGRESS_DOMAIN}"
-  - "ldap.${INGRESS_DOMAIN}"
+  - "s3.${INGRESS_DOMAIN}"
