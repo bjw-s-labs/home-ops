@@ -420,54 +420,54 @@ spec:
       name: csi-ceph-filesystem
       isDefault: false
       deletionPolicy: Delete
-    cephObjectStores:
-    - name: &cephObjectStoreName ceph-objectstore-1
-      spec:
-        deviceClass: nvme
-        metadataPool:
-          deviceClass: nvme
-          failureDomain: host
-          replicated:
-            size: 1
-        dataPool:
-          deviceClass: nvme
-          failureDomain: host
-          replicated:
-            size: 1
-        preservePoolsOnDelete: false
-        gateway:
-          port: 80
-          resources:
-            requests:
-              cpu: 250m
-              memory: 1Gi
-            limits:
-              memory: 3Gi
-          instances: 2
-          placement:
-            topologySpreadConstraints:
-            - maxSkew: 1
-              topologyKey: kubernetes.io/hostname
-              whenUnsatisfiable: DoNotSchedule
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: ceph-rgw
-                  app.kubernetes.io/part-of: *cephObjectStoreName
-        healthCheck:
-          bucket:
-            interval: 60s
-      storageClass:
-        enabled: true
-        name: ceph-bucket
-        reclaimPolicy: Delete
-        parameters:
-          region: us-east-1
-      ingress:
-        enabled: true
-        ingressClassName: "internal-nginx"
-        host:
-          name: &host-s3 "s3.${INGRESS_DOMAIN}"
-          path: "/"
-        tls:
-        - hosts:
-          - *host-s3
+    cephObjectStores: {}
+    # - name: &cephObjectStoreName ceph-objectstore-1
+    #   spec:
+    #     deviceClass: nvme
+    #     metadataPool:
+    #       deviceClass: nvme
+    #       failureDomain: host
+    #       replicated:
+    #         size: 1
+    #     dataPool:
+    #       deviceClass: nvme
+    #       failureDomain: host
+    #       replicated:
+    #         size: 1
+    #     preservePoolsOnDelete: false
+    #     gateway:
+    #       port: 80
+    #       resources:
+    #         requests:
+    #           cpu: 250m
+    #           memory: 1Gi
+    #         limits:
+    #           memory: 3Gi
+    #       instances: 2
+    #       placement:
+    #         topologySpreadConstraints:
+    #         - maxSkew: 1
+    #           topologyKey: kubernetes.io/hostname
+    #           whenUnsatisfiable: DoNotSchedule
+    #           labelSelector:
+    #             matchLabels:
+    #               app.kubernetes.io/name: ceph-rgw
+    #               app.kubernetes.io/part-of: *cephObjectStoreName
+    #     healthCheck:
+    #       bucket:
+    #         interval: 60s
+    #   storageClass:
+    #     enabled: true
+    #     name: ceph-bucket
+    #     reclaimPolicy: Delete
+    #     parameters:
+    #       region: us-east-1
+    #   ingress:
+    #     enabled: true
+    #     ingressClassName: "internal-nginx"
+    #     host:
+    #       name: &host-s3 "s3.${INGRESS_DOMAIN}"
+    #       path: "/"
+    #     tls:
+    #     - hosts:
+    #       - *host-s3
