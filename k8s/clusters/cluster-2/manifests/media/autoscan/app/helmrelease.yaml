@@ -128,12 +128,6 @@ spec:
           external-dns/is-public: "true"
           external-dns.alpha.kubernetes.io/target: "ingress-ext.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
         hosts:
-        - host: &host-cluster "autoscan.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-          paths:
-          - path: /
-            service:
-              identifier: app
-              port: http
         - host: &host "autoscan.${INGRESS_DOMAIN}"
           paths:
           - path: /
@@ -142,5 +136,4 @@ spec:
               port: http
         tls:
         - hosts:
-          - *host-cluster
           - *host
