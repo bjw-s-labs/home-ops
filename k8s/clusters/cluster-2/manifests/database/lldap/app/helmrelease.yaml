@@ -32,7 +32,7 @@ spec:
     keepHistory: false
   values:
     controllers:
-      main:
+      lldap:
         replicas: 2
         strategy: RollingUpdate
         annotations:
@@ -46,7 +46,7 @@ spec:
             envFrom: &envFrom
             - secretRef:
                 name: lldap-secret
-          main:
+          app:
             image:
               repository: ghcr.io/lldap/lldap
               tag: v0.5.0
@@ -87,7 +87,8 @@ spec:
                 app.kubernetes.io/name: *app
 
     service:
-      main:
+      app:
+        controller: *app
         ports:
           http:
             port: *port
@@ -103,7 +104,7 @@ spec:
         name: lldap-cert
 
     ingress:
-      main:
+      app:
         enabled: true
         className: "internal-nginx"
         annotations:
@@ -114,7 +115,7 @@ spec:
           paths:
           - path: /
             service:
-              identifier: main
+              identifier: app
               port: http
         tls:
         - hosts:
