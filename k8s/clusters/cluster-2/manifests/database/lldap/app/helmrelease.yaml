@@ -56,7 +56,7 @@ spec:
             env:
               TZ: "${TIMEZONE}"
               LLDAP_HTTP_PORT: &port 80
-              LLDAP_HTTP_URL: https://lldap-test.elcarpenter.com
+              LLDAP_HTTP_URL: "https://lldap-test.${INGRESS_DOMAIN}"
               LLDAP_LDAP_PORT: &ldapPort 389
               LLDAP_LDAP_BASE_DN: dc=elcarpenter,dc=com
               LLDAP_IGNORED_USER_ATTRIBUTES: "[ enable, expire, comment, keys ]"
