@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ${VOLSYNC_CLAIM}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: ${VOLSYNC_CAPACITY}
+  storageClassName: ${VOLSYNC_STORAGECLASS}
