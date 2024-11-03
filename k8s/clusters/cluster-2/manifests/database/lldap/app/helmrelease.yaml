@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.5.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app lldap
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.5.1
+      interval: 15m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      strategy: uninstall
+  rollback:
+    recreate: true
+    cleanupOnFail: true
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      main:
+        replicas: 2
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16.2
+              pullPolicy: IfNotPresent
+            envFrom: &envFrom
+            - secretRef:
+                name: lldap-secret
+          main:
+            image:
+              repository: ghcr.io/lldap/lldap
+              tag: v0.5.0
+              pullPolicy: IfNotPresent
+            env:
+              TZ: "${TIMEZONE}"
+              LLDAP_HTTP_PORT: &port 80
+              LLDAP_HTTP_URL: https://lldap-test.elcarpenter.com
+              LLDAP_LDAP_PORT: &ldapPort 389
+              LLDAP_LDAP_BASE_DN: dc=elcarpenter,dc=com
+              LLDAP_IGNORED_USER_ATTRIBUTES: "[ enable, expire, comment, keys ]"
+              LLDAP_LDAPS_OPTIONS__CERT_FILE: a
+              LLDAP_LDAPS_OPTIONS__KEY_FILE: a
+              LLDAP_LDAPS_OPTIONS__ENABLED: "true"
+              LLDAP_LDAPS_OPTIONS__PORT: 636
+            envFrom: *envFrom
+            resources:
+              requests:
+                cpu: 5m
+                memory: 36M
+              limits:
+                memory: 128M
+        pod:
+          securityContext:
+            runAsUser: ${APP_UID}
+            runAsGroup: ${APP_GI0D}
+            runAsNonRoot: true
+            fsGroup: ${APP_GID}
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+            - 34
+          topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: *app
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+          ldap:
+            port: *ldapPort
+
+    persistence:
+      data:
+        type: emptyDir
+      cert:
+
+    ingress:
+      main:
+        enabled: true
+        className: "internal-nginx"
+        annotations:
+          nginx.ingress.kubernetes.io/whitelist-source-range: |
+            10.0.0.0/8,192.168.0.0/16
+        hosts:
+        - host: &host "lldap-test.${INGRESS_DOMAIN}"
+          paths:
+          - path: /
+            service:
+              identifier: main
+              port: http
+        tls:
+        - hosts:
+          - *host
