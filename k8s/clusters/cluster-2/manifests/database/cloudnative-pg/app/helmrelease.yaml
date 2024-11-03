@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -23,12 +22,12 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-    - name: rook-ceph-operator
-      namespace: rook-ceph
+  - name: rook-ceph-operator
+    namespace: rook-ceph
   values:
     crds:
       create: true
     monitoring:
-      podMonitorEnabled: false
+      podMonitorEnabled: true
       grafanaDashboard:
         create: true
