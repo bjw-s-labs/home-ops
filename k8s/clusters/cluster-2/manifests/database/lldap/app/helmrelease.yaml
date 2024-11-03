@@ -63,7 +63,7 @@ spec:
               LLDAP_LDAPS_OPTIONS__CERT_FILE: "/certs/tls.crt"
               LLDAP_LDAPS_OPTIONS__KEY_FILE: "/certs/tls.key"
               LLDAP_LDAPS_OPTIONS__ENABLED: "true"
-              LLDAP_LDAPS_OPTIONS__PORT: 636
+              LLDAP_LDAPS_OPTIONS__PORT: &ldapsPort 636
             envFrom: *envFrom
             resources:
               requests:
@@ -88,6 +88,8 @@ spec:
             port: *port
           ldap:
             port: *ldapPort
+          ldaps:
+            port: *ldapsPort
 
     persistence:
       data:
