@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -26,19 +25,19 @@ spec:
       # stores:
       #   - thanos-svc-nas.bjw-s.dev:10901
       replicaLabels:
-        - "__replica__" # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.replicaExternalLabelName`
+      - "__replica__" # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.replicaExternalLabelName`
       resources:
         requests:
           cpu: 15m
           memory: 64M
-        # limits:
-        #   memory: 99M
+          # limits:
+          #   memory: 99M
 
     queryFrontend:
       enabled: true
       ingress:
         enabled: true
-        hostname: "thanos.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+        hostname: "thanos.${INGRESS_DOMAIN}"
         ingressClassName: "internal-nginx"
         tls: true
 
@@ -48,14 +47,14 @@ spec:
         requests:
           cpu: 15m
           memory: 64M
-        # limits:
-        #   memory: 64M
+          # limits:
+          #   memory: 64M
 
     compactor:
       enabled: true
       extraFlags:
-        - "--compact.concurrency=4"
-        - --delete-delay=30m
+      - "--compact.concurrency=4"
+      - --delete-delay=30m
       retentionResolutionRaw: 14d
       retentionResolution5m: 30d
       retentionResolution1h: 90d
@@ -63,8 +62,8 @@ spec:
         requests:
           cpu: 15m
           memory: 204M
-        # limits:
-        #   memory: 270M
+          # limits:
+          #   memory: 270M
       persistence:
         enabled: true
         storageClass: "ceph-blockpool-nvme"
@@ -76,8 +75,8 @@ spec:
         requests:
           cpu: 23m
           memory: 204M
-        # limits:
-        #   memory: 226M
+          # limits:
+          #   memory: 226M
       persistence:
         enabled: true
         storageClass: "ceph-blockpool-nvme"
@@ -86,7 +85,7 @@ spec:
     ruler:
       enabled: true
       alertmanagers:
-        - http://alertmanager.monitoring.svc.cluster.local:9093
+      - http://alertmanager.monitoring.svc.cluster.local:9093
       clusterName: ${CLUSTER_NAME} # must match with kube-prometheus-stack value `.prometheus.prometheusSpec.externalLabels.cluster`
       config: |-
         groups:
