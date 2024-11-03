@@ -83,6 +83,9 @@ spec:
     service:
       app:
         controller: *app
+        type: LoadBalancer
+        annotations:
+          io.cilium/lb-ipam-ips: ${LB_LLDAP}
         ports:
           http:
             port: *port
@@ -115,10 +118,6 @@ spec:
             service:
               identifier: app
               port: http
-          - path: /
-            service:
-              identifier: app
-              port: ldaps
         tls:
         - hosts:
           - *host
