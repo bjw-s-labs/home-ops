@@ -56,7 +56,7 @@ spec:
             env:
               TZ: "${TIMEZONE}"
               LLDAP_HTTP_PORT: &port 80
-              LLDAP_HTTP_URL: "https://lldap-test.${INGRESS_DOMAIN}"
+              LLDAP_HTTP_URL: "https://lldap.${INGRESS_DOMAIN}"
               LLDAP_LDAP_PORT: &ldapPort 389
               LLDAP_LDAP_BASE_DN: dc=elcarpenter,dc=com
               LLDAP_IGNORED_USER_ATTRIBUTES: "[ enable, expire, comment, keys ]"
@@ -107,7 +107,7 @@ spec:
           nginx.ingress.kubernetes.io/whitelist-source-range: |
             10.0.0.0/8,192.168.0.0/16
         hosts:
-        - host: &host "lldap-test.${INGRESS_DOMAIN}"
+        - host: &host "lldap.${INGRESS_DOMAIN}"
           paths:
           - path: /
             service:
