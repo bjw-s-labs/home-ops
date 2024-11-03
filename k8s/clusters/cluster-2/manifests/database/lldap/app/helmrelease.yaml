@@ -60,9 +60,9 @@ spec:
               LLDAP_LDAP_PORT: &ldapPort 389
               LLDAP_LDAP_BASE_DN: dc=elcarpenter,dc=com
               LLDAP_IGNORED_USER_ATTRIBUTES: "[ enable, expire, comment, keys ]"
-              # LLDAP_LDAPS_OPTIONS__CERT_FILE: a
-              # LLDAP_LDAPS_OPTIONS__KEY_FILE: a
-              LLDAP_LDAPS_OPTIONS__ENABLED: "false"
+              LLDAP_LDAPS_OPTIONS__CERT_FILE: "/certs/tls.crt"
+              LLDAP_LDAPS_OPTIONS__KEY_FILE: "/certs/tls.key"
+              LLDAP_LDAPS_OPTIONS__ENABLED: "true"
               LLDAP_LDAPS_OPTIONS__PORT: 636
             envFrom: *envFrom
             resources:
