@@ -72,14 +72,6 @@ spec:
               limits:
                 memory: 128M
         pod:
-          securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
-            runAsNonRoot: true
-            fsGroup: ${APP_GID}
-            fsGroupChangePolicy: "OnRootMismatch"
-            supplementalGroups:
-            - 34
           topologySpreadConstraints:
           - maxSkew: 1
             topologyKey: kubernetes.io/hostname
