@@ -1,12 +1,11 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app frigate
 spec:
   dependsOn:
-    - name: emqx
-      namespace: home-automation
+  - name: emqx
+    namespace: home-automation
   interval: 15m
   chart:
     spec:
@@ -55,11 +54,11 @@ spec:
               TZ: "${TIMEZONE}"
               FRIGATE__INSTANCE_NAME: Frigate
               FRIGATE__PORT: &port 5000
-              FRIGATE__APPLICATION_URL: &host-cluster "frigate.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
+              FRIGATE__APPLICATION_URL: &host "frigate.${INGRESS_DOMAIN}"
               FRIGATE__LOG_LEVEL: info
             envFrom:
-              - secretRef:
-                  name: frigate-secrets
+            - secretRef:
+                name: frigate-secrets
             resources:
               requests:
                 memory: 1G
@@ -67,7 +66,7 @@ spec:
                 gpu.intel.com/i915: 1
                 memory: 3G
             securityContext:
-                  privileged: true
+              privileged: true
             probes:
               liveness: &probes
                 enabled: true
@@ -94,14 +93,14 @@ spec:
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: app.kubernetes.io/name
-                    operator: In
-                    values: ["plex"]
-              # Blank selector selects all namespaces. Null namespace selector locks it to the same namespace as the HR
-              namespaces: ["media", "downloads", "home-automation"]
-              topologyKey: kubernetes.io/hostname
+          - labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values: ["plex"]
+            # Blank selector selects all namespaces. Null namespace selector locks it to the same namespace as the HR
+            namespaces: ["media", "downloads", "home-automation"]
+            topologyKey: kubernetes.io/hostname
       nodeSelector:
         google.feature.node.kubernetes.io/coral: "true"
         intel.feature.node.kubernetes.io/gpu: "true"
@@ -136,9 +135,9 @@ spec:
         advancedMounts:
           frigate:
             app:
-              - path: /config/config.yml
-                subPath: config.yaml
-                readOnly: true
+            - path: /config/config.yml
+              subPath: config.yaml
+              readOnly: true
       data:
         enabled: true
         existingClaim: ${VOLSYNC_CLAIM}
@@ -155,7 +154,7 @@ spec:
         advancedMounts:
           frigate:
             app:
-              - path: /media
+            - path: /media
       usb:
         enabled: true
         type: hostPath
@@ -164,7 +163,7 @@ spec:
         advancedMounts:
           frigate:
             app:
-              - path: /dev/bus/usb
+            - path: /dev/bus/usb
       cache:
         enabled: true
         type: emptyDir
@@ -173,26 +172,19 @@ spec:
         advancedMounts:
           frigate:
             app:
-              - path: /dev/shm
+            - path: /dev/shm
 
     ingress:
       app:
         enabled: true
         className: "internal-nginx"
         hosts:
-          - host: &host "frigate.${INGRESS_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-          - host: *host-cluster
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        - host: *host
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
         tls:
-          - hosts:
-              - *host
-              - *host-cluster
+        - hosts:
+          - *host
