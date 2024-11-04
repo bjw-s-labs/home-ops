@@ -1,10 +1,9 @@
----
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
   name: cloudflare
 spec:
   endpoints:
-    - dnsName: "ingress-ext.${CLUSTER_NAME}.${INGRESS_DOMAIN}"
-      recordType: CNAME
-      targets: ["ipv4.${INGRESS_DOMAIN}"]
+  - dnsName: "ingress-ext.${INGRESS_DOMAIN}"
+    recordType: CNAME
+    targets: ["ipv4.${INGRESS_DOMAIN}"]
