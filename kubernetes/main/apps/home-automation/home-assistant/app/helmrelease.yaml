@@ -41,10 +41,7 @@ spec:
           app:
             image:
               repository: ghcr.io/onedr0p/home-assistant
-              tag: 2024.11.0@sha256:5cb437353c422a5c90045b8011ffa47d2eb24facda6ac8e6d4fab7f00cf2d74c
-            envFrom:
-              - secretRef:
-                  name: home-assistant-secret
+              tag: 2024.11.0@sha256:23a1ba70e7d5518527e6324d28ccb07f1cbf7c334dbb6326a0b413ef8fe5fafd
             resources:
               requests:
                 cpu: 47m
@@ -72,11 +69,6 @@ spec:
             ]
             env:
               HASS_SERVER: http://localhost:8123
-              HASS_TOKEN:
-                valueFrom:
-                  secretKeyRef:
-                    name: home-assistant-secret
-                    key: VSCODE_TOKEN
             resources:
               requests:
                 cpu: 10m
@@ -122,12 +114,3 @@ spec:
               - path: /config
       tmp:
         type: emptyDir
-      deploy-key:
-        type: secret
-        name: home-assistant-secret
-        defaultMode: 256
-        advancedMounts:
-          home-assistant:
-            code-server:
-              - path: /home/coder/.ssh/id_rsa
-                subPath: GH_DEPLOY_KEY
