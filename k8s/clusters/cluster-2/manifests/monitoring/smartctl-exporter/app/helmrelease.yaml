@@ -26,27 +26,29 @@ spec:
     keepHistory: false
   values:
     fullnameOverride: *app
-    image:
-      repository: ghcr.io/joryirving/smartctl_exporter
-      tag: 0.12.0@sha256:6073e6bb6663ec793c3df9c12baeb0fe5c1857ddc677cdc611a9456209980ee3
+    # image:
+    #   repository: ghcr.io/joryirving/smartctl_exporter
+    #   tag: 0.12.0@sha256:6073e6bb6663ec793c3df9c12baeb0fe5c1857ddc677cdc611a9456209980ee3
     config:
       devices:
-        - /dev/sda
-        - /dev/sdb
-        - /dev/sdc
-        - /dev/sdd
-        - /dev/sde
-        - /dev/nvme0n1
+      - /dev/sda
+      - /dev/sdb
+      - /dev/sdc
+      - /dev/sdd
+      - /dev/sde
+      - /dev/nvme0n1
+      - /dev/nvme1n1
+      - /dev/nvme2n1
     serviceMonitor:
       enabled: true
       relabelings:
-        - action: labeldrop
-          regex: (pod)
-        - action: replace
-          regex: (.*)
-          replacement: $1.${CLUSTER_NAME}.${INGRESS_DOMAIN}:9100
-          sourceLabels:
-            - kubernetes_node
-          targetLabel: instance
+      - action: labeldrop
+        regex: (pod)
+      - action: replace
+        regex: (.*)
+        replacement: $1.${CLUSTER_NAME}.${INGRESS_DOMAIN}:9100
+        sourceLabels:
+        - kubernetes_node
+        targetLabel: instance
     prometheusRules:
       enabled: false
