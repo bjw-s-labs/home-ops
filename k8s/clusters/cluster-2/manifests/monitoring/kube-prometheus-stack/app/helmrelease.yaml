@@ -54,12 +54,12 @@ spec:
             |scrape_series|serviceaccount_legacy|serviceaccount_stale|serviceac\
             count_valid|watch_cache|workqueue)_(.+)"
           action: keep
-        - sourceLabels: [ "__name__" ]
-          regex: (apiserver|etcd|rest_client)_request(|_sli|_slo)_duration_seconds_bucket
-          action: drop
-        - sourceLabels: [ "__name__" ]
-          regex: (apiserver_response_sizes_bucket|apiserver_watch_events_sizes_bucket)
-          action: drop
+        # - sourceLabels: [ "__name__" ]
+        #   regex: (apiserver|etcd|rest_client)_request(|_sli|_slo)_duration_seconds_bucket
+        #   action: drop
+        # - sourceLabels: [ "__name__" ]
+        #   regex: (apiserver_response_sizes_bucket|apiserver_watch_events_sizes_bucket)
+        #   action: drop
 
     kubeControllerManager: &kubeControllerManager
       service:
