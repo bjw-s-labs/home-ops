@@ -75,8 +75,8 @@ spec:
       # WPQ should help in cases where a few OSDs are more overloaded than others.
       osd_op_queue = wpq
       # Increase deep scrub to allow HDDs time to get scrubbed. Default is 604800 (7 days)
-      # Currently set to 3 weeks
-      osd deep scrub interval = 1814400
+      # Currently set to 4 weeks
+      osd deep scrub interval = 2419200
 
     cephClusterSpec:
       cephVersion:
@@ -335,7 +335,7 @@ spec:
         isDefault: true
         reclaimPolicy: Delete
         allowVolumeExpansion: true
-        mountOptions: ["discard"]
+        mountOptions: [ "discard" ]
         parameters:
           imageFormat: "2"
           imageFeatures: layering
