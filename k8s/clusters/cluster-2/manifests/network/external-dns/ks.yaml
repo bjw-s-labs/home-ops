@@ -32,15 +32,15 @@ spec:
   path: ./k8s/clusters/cluster-2/manifests/network/external-dns/external
   prune: true
   dependsOn:
-    - name: externaldns-shared
+  - name: externaldns-shared
   sourceRef:
     kind: GitRepository
     name: home-ops
   healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
-      kind: HelmRelease
-      name: externaldns-external
-      namespace: network
+  - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    kind: HelmRelease
+    name: externaldns-external
+    namespace: network
   interval: 30m
   retryInterval: 1m
   timeout: 3m
@@ -59,15 +59,43 @@ spec:
   path: ./k8s/clusters/cluster-2/manifests/network/external-dns/powerdns
   prune: true
   dependsOn:
-    - name: externaldns-shared
+  - name: externaldns-shared
   sourceRef:
     kind: GitRepository
     name: home-ops
   healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
-      kind: HelmRelease
-      name: externaldns-powerdns
-      namespace: network
+  - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    kind: HelmRelease
+    name: externaldns-powerdns
+    namespace: network
   interval: 30m
   retryInterval: 1m
   timeout: 3m
+
+# ---
+# # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+# apiVersion: kustomize.toolkit.fluxcd.io/v1
+# kind: Kustomization
+# metadata:
+#   name: &appname externaldns-unifi
+#   namespace: flux-system
+# spec:
+#   targetNamespace: network
+#   commonMetadata:
+#     labels:
+#       app.kubernetes.io/name: *appname
+#   path: ./k8s/clusters/cluster-2/manifests/network/external-dns/unifi
+#   prune: true
+#   dependsOn:
+#   - name: externaldns-shared
+#   sourceRef:
+#     kind: GitRepository
+#     name: home-ops
+#   healthChecks:
+#   - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+#     kind: HelmRelease
+#     name: external-dns-unifi
+#     namespace: network
+#   interval: 30m
+#   retryInterval: 1m
+#   timeout: 3m
