@@ -1,0 +1,47 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: irqbalance
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 3.5.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 30m
+  values:
+    controllers:
+      irqbalance:
+        type: daemonset
+
+        pod:
+          hostIPC: true
+          hostPID: true
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/buroa/irqbalance
+              tag: 1.9.4
+            env:
+              IRQBALANCE_BANNED_CPULIST: 8-15 # 8-15 are E-cores on Intel i5-1340P
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 128Mi
+            securityContext:
+              privileged: true
+
+    persistence:
+      run:
+        type: emptyDir
+        globalMounts:
+          - path: /run/irqbalance
