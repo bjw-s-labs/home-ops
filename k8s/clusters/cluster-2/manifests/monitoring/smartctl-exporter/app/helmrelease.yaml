@@ -50,5 +50,12 @@ spec:
         sourceLabels:
         - __meta_kubernetes_endpoint_node_name
         targetLabel: instance
+      - action: replace
+        regex: (.*)
+        replacement: "$1: $2"
+        sourceLabels:
+        - device
+        - __meta_kubernetes_endpoint_node_name
+        targetLabel: device
     prometheusRules:
       enabled: false
