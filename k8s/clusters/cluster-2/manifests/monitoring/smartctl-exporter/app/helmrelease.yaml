@@ -51,7 +51,7 @@ spec:
         - __meta_kubernetes_endpoint_node_name
         targetLabel: instance
       - action: replace
-        regex: (.*)
+        regex: \b((?:sd[a-z]+|nvme\d+n\d+))\b|\b((?:cp\d+|work\d+|n\d{3}-\d{2}))\b
         replacement: "$1: $2"
         sourceLabels:
         - device
