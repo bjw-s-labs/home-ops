@@ -41,14 +41,18 @@ spec:
       - /dev/nvme2n1
     serviceMonitor:
       enabled: true
-      # relabelings:
-      # - action: labeldrop
-      #   regex: (pod)
-      # - action: replace
-      #   regex: (.*)
-      #   replacement: $1.${CLUSTER_NAME}.${INGRESS_DOMAIN}:9100
-      #   sourceLabels:
-      #   - kubernetes_node
-      #   targetLabel: instance
+      relabelings:
+      - action: labeldrop
+        regex: (pod)
+      - action: replace
+        regex: (.*)
+        # regex: '(.*):.*'
+        replacement: $1.${CLUSTER_NAME}.${INGRESS_DOMAIN}
+        # replacement: '${1}'
+        # sourceLabels:
+        # - kubernetes_node
+        sourceLabels:
+        - __meta_kubernetes_endpoint_node_name
+        targetLabel: instance
     prometheusRules:
       enabled: false
