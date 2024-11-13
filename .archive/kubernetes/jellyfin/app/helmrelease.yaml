@@ -1,15 +1,14 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: jellyfin
-  namespace: media
 spec:
   chart:
     spec:
       chart: app-template
-      version: 2.2.0
+      version: 3.5.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,28 +17,17 @@ spec:
   interval: 30m
   values:
     controllers:
-      main:
-        type: statefulset
+      jellyfin:
         annotations:
           reloader.stakater.com/auto: "true"
 
-        statefulset:
-          volumeClaimTemplates:
-            - name: config
-              accessMode: ReadWriteOnce
-              size: 30Gi
-              storageClass: ceph-block
-              globalMounts:
-                - path: /config
-
         pod:
-          enableServiceLinks: false
           nodeSelector:
             intel.feature.node.kubernetes.io/gpu: "true"
           securityContext:
-            runAsUser: 568
-            runAsGroup: 568
-            fsGroup: 568
+            runAsUser: 2000
+            runAsGroup: 2000
+            fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 44
@@ -47,56 +35,81 @@ spec:
               - 65542 # gladius:external-services
 
         containers:
-          main:
+          app:
             image:
-              repository: ghcr.io/onedr0p/jellyfin
-              tag: 10.8.11@sha256:926e2a9f6677a0c7b12feba29f36c954154869318d6a52df72f72ff9c74cf494
+              repository: ghcr.io/jellyfin/jellyfin
+              tag: "10.10.1"
             env:
               DOTNET_SYSTEM_IO_DISABLEFILELOCKING: "true"
-              JELLYFIN_FFmpeg__probesize: 50000000
-              JELLYFIN_FFmpeg__analyzeduration: 500000000
+              JELLYFIN_PublishedServerUrl:
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: &port 8096
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: false
             resources:
               requests:
                 cpu: 100m
                 gpu.intel.com/i915: 1
-                memory: 9248M
+                memory: 512Mi
               limits:
                 gpu.intel.com/i915: 1
-                memory: 9248M
+                memory: 4Gi
 
     service:
-      main:
+      app:
+        controller: jellyfin
         type: LoadBalancer
-        externalTrafficPolicy: Cluster
         annotations:
-          io.cilium/lb-ipam-ips: "10.45.0.22"
+          lbipam.cilium.io/ips: 10.1.1.133
         ports:
           http:
             port: 8096
 
     ingress:
-      main:
-        enabled: true
-        className: internal-nginx
+      app:
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress-ext.bjw-s.dev
+        className: "external-nginx"
         hosts:
-          - host: &host jellyfin.bjw-s.dev
+          - host: jellyfin.bjw-s.dev
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
-        tls:
-          - hosts:
-              - *host
 
     persistence:
-      nfs-nas-media:
-        existingClaim: nas-media
+      config:
+        existingClaim: jellyfin-config
         advancedMounts:
-          main:
-            main:
-              - path: /data/nas-media
-      transcode:
+          jellyfin:
+            app:
+              - path: /config
+      nfs-nas-media-library:
+        type: nfs
+        server: gladius.bjw-s.internal
+        path: /tank/Media/Library
+        advancedMounts:
+          jellyfin:
+            app:
+              - path: /data/nas-media/Library
+      tmpfs:
         type: emptyDir
-        globalMounts:
-          - path: /transcode
+        advancedMounts:
+          jellyfin:
+            app:
+              - path: /cache
+                subPath: cache
+              - path: /transcode
+                subPath: transcode
