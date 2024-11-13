@@ -3,15 +3,27 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-apps-jellyfin
+  name: &appname jellyfin
   namespace: flux-system
 spec:
-  interval: 10m
-  path: "./kubernetes/cluster-0/apps/media/jellyfin/app"
+  targetNamespace: media
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
+  interval: 30m
+  timeout: 5m
+  path: "./kubernetes/main/apps/media/jellyfin/app"
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-ops-kubernetes
-  wait: false
+  wait: true
   dependsOn:
-    - name: cluster-apps-rook-ceph-cluster
+    - name: rook-ceph-cluster
+    - name: volsync
+    - name: external-secrets-stores
+  postBuild:
+    substitute:
+      APP: *appname
+      VOLSYNC_CLAIM: jellyfin-config
+      VOLSYNC_CAPACITY: 20Gi
