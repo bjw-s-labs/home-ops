@@ -77,6 +77,8 @@ spec:
       # Increase deep scrub to allow HDDs time to get scrubbed. Default is 604800 (7 days)
       # Currently set to 4 weeks
       osd deep scrub interval = 2419200
+      # Scrubbing does not happen when the system load, as defined by getloadavg() / number of online CPUs, is higher than this defined number.
+      osd_scrub_load_threshold = 0.75
 
     cephClusterSpec:
       cephVersion:
