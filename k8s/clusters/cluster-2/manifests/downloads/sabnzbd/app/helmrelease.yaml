@@ -30,25 +30,25 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    defaultPodOptions:
-      affinity:
-        # podAntiAffinity:
-        #   requiredDuringSchedulingIgnoredDuringExecution:
-        #   - labelSelector:
-        #       matchExpressions:
-        #       - key: google.feature.node.kubernetes.io/coral
-        #         operator: Exists
-        #     topologyKey: kubernetes.io/hostname
-        #   - labelSelector:
-        #       matchExpressions:
-        #       - key: app.kubernetes.io/name
-        #         operator: In
-        #         values: ["plex"]
-        #     topologyKey: kubernetes.io/hostname
-        #     # Blank selector selects all namespaces. Null namespace selector locks it to the same namespace as the HR
-        #     namespaces: ["media", "downloads", "home-automation"]
-        #     # nodeSelector:
-        #     #   kubernetes.io/arch: "amd64"
+    # defaultPodOptions:
+    #   affinity:
+    #     podAntiAffinity:
+    #       requiredDuringSchedulingIgnoredDuringExecution:
+    #       - labelSelector:
+    #           matchExpressions:
+    #           - key: google.feature.node.kubernetes.io/coral
+    #             operator: Exists
+    #         topologyKey: kubernetes.io/hostname
+    #       - labelSelector:
+    #           matchExpressions:
+    #           - key: app.kubernetes.io/name
+    #             operator: In
+    #             values: ["plex"]
+    #         topologyKey: kubernetes.io/hostname
+    #         # Blank selector selects all namespaces. Null namespace selector locks it to the same namespace as the HR
+    #         namespaces: ["media", "downloads", "home-automation"]
+    #         # nodeSelector:
+    #         #   kubernetes.io/arch: "amd64"
     controllers:
       sabnzbd:
         annotations:
