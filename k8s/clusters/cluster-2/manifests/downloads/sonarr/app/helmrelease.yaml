@@ -41,23 +41,8 @@ spec:
         runAsGroup: ${APP_GID}
         fsGroup: ${APP_GID}
         fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [34, 10000]
-        seccompProfile: {type: RuntimeDefault}
-        # affinity:
-        #   podAntiAffinity:
-        #     requiredDuringSchedulingIgnoredDuringExecution:
-        #       - labelSelector:
-        #           matchExpressions:
-        #             - key: app.kubernetes.io/name
-        #               operator: In
-        #               values: ["plex"]
-        #         # Blank selector selects all namespaces. Null namespace selector locks it to the same namespace as the HR
-        #         namespaces: ["media", "downloads", "home-automation"]
-        #         topologyKey: kubernetes.io/hostname
-        # nodeSelector:
-        #   google.feature.node.kubernetes.io/coral: "true"
-        #   intel.feature.node.kubernetes.io/gpu: "true"
-
+        supplementalGroups: [ 34, 10000 ]
+        seccompProfile: { type: RuntimeDefault }
 
     controllers:
       sonarr:
@@ -69,8 +54,8 @@ spec:
               repository: ghcr.io/onedr0p/postgres-init
               tag: 16
             envFrom: &envFrom
-            - secretRef:
-                name: sonarr-secret
+              - secretRef:
+                  name: sonarr-secret
 
         containers:
           app:
@@ -106,12 +91,12 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              capabilities: { drop: [ "ALL" ] }
             resources:
               requests:
                 cpu: 100m
-              limits:
-                memory: 2Gi
+              # limits:
+              #   memory: 2Gi
 
     service:
       app:
@@ -165,4 +150,3 @@ spec:
         tls:
         - hosts:
           - *host
-
