@@ -72,15 +72,14 @@ spec:
               matchExpressions:
               - key: app.kubernetes.io/name
                 operator: In
-                values: ["emqx"]
+                values: [ "emqx" ]
             topologyKey: kubernetes.io/hostname
-
-    resources:
-      requests:
-        cpu: 10m
-        memory: 150Mi
-      limits:
-        memory: 512Mi
+    # resources:
+    #   requests:
+    #     cpu: 10m
+    #     memory: 150Mi
+    #   limits:
+    #     memory: 512Mi
 
   valuesFrom:
   - targetPath: emqxConfig.EMQX_DASHBOARD__DEFAULT_PASSWORD
