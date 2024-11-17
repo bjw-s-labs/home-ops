@@ -6,4 +6,7 @@ spec:
   endpoints:
   - dnsName: "ingress-ext.${INGRESS_DOMAIN}"
     recordType: CNAME
-    targets: ["ipv4.${INGRESS_DOMAIN}"]
+    targets: [ "ipv4.${INGRESS_DOMAIN}" ]
+  - dnsName: "ipv4.${INGRESS_DOMAIN}"
+    recordType: CNAME
+    targets: [ "vpn.${INGRESS_DOMAIN}" ]
