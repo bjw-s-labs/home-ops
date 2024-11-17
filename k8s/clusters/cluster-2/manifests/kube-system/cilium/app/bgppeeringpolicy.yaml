@@ -1,37 +1,28 @@
-apiVersion: "cilium.io/v2alpha1"
-kind: CiliumBGPPeeringPolicy
-# comments courtesy of JJGadgets
-# MAKE SURE CRDs ARE INSTALLED IN CLUSTER VIA cilium-config ConfigMap OR Cilium HelmRelease/values.yaml (bgpControlPlane.enabled: true), BEFORE THIS IS APPLIED!
-# "CiliumBGPPeeringPolicy" Custom Resource will replace the old MetalLB BGP's "bgp-config" ConfigMap
-# "CiliumBGPPeeringPolicy" is used with `bgpControlPlane.enabled: true` which uses GoBGP, NOT the old `bgp.enabled: true` which uses MetalLB
-metadata:
-  name: 01-bgp-peering-policy
-  namespace: kube-system
-spec:
-  nodeSelector:
-    # matchLabels:
-    #   kubernetes.io/os: "linux" # match all Linux nodes, change this to match more granularly if more than 1 PeeringPolicy is to be used throughout cluster
-    matchExpressions:
-      - {key: node-role.kubernetes.io/control-plane, operator: NotIn, values: ['']}
-  virtualRouters:
-    - localASN: 64512
-      exportPodCIDR: true
-      # the "NotIn" operator makes all services anounced over BGP
-      serviceSelector:
-        matchExpressions:
-          - {key: allservices, operator: NotIn, values: ['will-match-and-announce-all-services']}
-      neighbors:
-        - peerAddress: "10.255.253.1/32"
-          peerASN: 64512
-    # - localASN: 64514
-    #   exportPodCIDR: true
-    #   # the "NotIn" operator makes all services anounced over BGP
-    #   serviceSelector:
-    #     matchExpressions:
-    #       - {key: allservices, operator: NotIn, values: ['will-match-and-announce-all-services']}
-    #   neighbors:
-    #     - peerAddress: "10.200.2.1/32"
-    #       peerASN: 64513
+# apiVersion: "cilium.io/v2alpha1"
+# kind: CiliumBGPPeeringPolicy
+# # comments courtesy of JJGadgets
+# # MAKE SURE CRDs ARE INSTALLED IN CLUSTER VIA cilium-config ConfigMap OR Cilium HelmRelease/values.yaml (bgpControlPlane.enabled: true), BEFORE THIS IS APPLIED!
+# # "CiliumBGPPeeringPolicy" Custom Resource will replace the old MetalLB BGP's "bgp-config" ConfigMap
+# # "CiliumBGPPeeringPolicy" is used with `bgpControlPlane.enabled: true` which uses GoBGP, NOT the old `bgp.enabled: true` which uses MetalLB
+# metadata:
+#   name: 01-bgp-peering-policy
+#   namespace: kube-system
+# spec:
+#   nodeSelector:
+#     # matchLabels:
+#     #   kubernetes.io/os: "linux" # match all Linux nodes, change this to match more granularly if more than 1 PeeringPolicy is to be used throughout cluster
+#     matchExpressions:
+#     - { key: node-role.kubernetes.io/control-plane, operator: NotIn, values: [ '' ] }
+#   virtualRouters:
+#   - localASN: 64512
+#     exportPodCIDR: true
+#     # the "NotIn" operator makes all services anounced over BGP
+#     serviceSelector:
+#       matchExpressions:
+#       - { key: allservices, operator: NotIn, values: [ 'will-match-and-announce-all-services' ] }
+#     neighbors:
+#     - peerAddress: "10.255.253.1/32"
+#       peerASN: 64512
 ---
 apiVersion: "cilium.io/v2alpha1"
 kind: CiliumLoadBalancerIPPool
@@ -39,4 +30,74 @@ metadata:
   name: main-pool
 spec:
   blocks:
-    - cidr: '${NETWORK_BGP_SVC_CIDR}'
+  - cidr: '${NETWORK_BGP_SVC_CIDR}'
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/cilium.io/ciliumbgpadvertisement_v2alpha1.json
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumBGPAdvertisement
+metadata:
+  name: cilium-bgp-advertisement
+  labels:
+    advertise: bgp
+spec:
+  advertisements:
+  - advertisementType: "PodCIDR"
+  - advertisementType: "Service"
+    service:
+      addresses:
+      - LoadBalancerIP
+    selector:
+      matchExpressions:
+      - { key: somekey, operator: NotIn, values: [ "never-used-value" ] }
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/cilium.io/ciliumbgppeerconfig_v2alpha1.json
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumBGPPeerConfig
+metadata:
+  name: cilium-bgp-peer-config-ipv4
+spec:
+  families:
+  - afi: ipv4
+    safi: unicast
+    advertisements:
+      matchLabels:
+        advertise: "bgp"
+
+# ---
+# # yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/cilium.io/ciliumbgppeerconfig_v2alpha1.json
+# apiVersion: "cilium.io/v2alpha1"
+# kind: CiliumBGPPeerConfig
+# metadata:
+#   name: cilium-bgp-peer-config-ipv6
+# spec:
+#   ebgpMultihop: 255
+#   families:
+#     - afi: ipv6
+#       safi: unicast
+#       advertisements:
+#         matchLabels:
+#           advertise: "bgp"
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/cilium.io/ciliumbgpclusterconfig_v2alpha1.json
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumBGPClusterConfig
+metadata:
+  name: cilium-bgp-cluster-config
+spec:
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/os: linux
+  bgpInstances:
+  - name: "instance-64514"
+    localASN: 64514
+    peers:
+    - name: "peer-64513-ipv4"
+      peerASN: 64513
+      peerAddress: "10.10.255.1"
+      peerConfigRef:
+        name: "cilium-bgp-peer-config-ipv4"
+    # - name: "peer-64513-ipv6"
+    #   peerASN: 64513
+    #   peerAddress: "2601:1c0:c685:2e11::1"
+    #   peerConfigRef:
+    #     name: "cilium-bgp-peer-config-ipv6"
