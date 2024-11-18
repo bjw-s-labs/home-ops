@@ -46,19 +46,19 @@ spec:
         runAsGroup: ${APP_GID}
         fsGroup: ${APP_GID}
         fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [34, 44, 100, 109, 10000]
-        seccompProfile: {type: RuntimeDefault}
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app.kubernetes.io/name
-                operator: In
-                values: ["frigate", "sabnzbd"]
-            topologyKey: kubernetes.io/hostname
-            # Blank selector selects all namespaces. Null namespace selector locks it to the same namespace as the HR
-            namespaces: ["media", "downloads", "home-automation"]
+        supplementalGroups: [ 34, 44, 100, 109, 10000 ]
+        seccompProfile: { type: RuntimeDefault }
+      # affinity:
+      #   podAntiAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #     - labelSelector:
+      #         matchExpressions:
+      #         - key: app.kubernetes.io/name
+      #           operator: In
+      #           values: ["frigate", "sabnzbd"]
+      #       topologyKey: kubernetes.io/hostname
+      #       # Blank selector selects all namespaces. Null namespace selector locks it to the same namespace as the HR
+      #       namespaces: ["media", "downloads", "home-automation"]
       nodeSelector:
         intel.feature.node.kubernetes.io/gpu: "true"
 
@@ -108,10 +108,10 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              capabilities: { drop: [ "ALL" ] }
             resources:
-              requests:
-                cpu: 100m
+              # requests:
+              #   cpu: 100m
               limits:
                 gpu.intel.com/i915: 1
                 #memory: 6Gi
