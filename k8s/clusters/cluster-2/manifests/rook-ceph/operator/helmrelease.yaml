@@ -19,35 +19,17 @@ spec:
     # Options: `ERROR`, `WARNING`, `INFO`, `DEBUG`
     logLevel: INFO
 
-    crds:
-      enabled: true
-    pspEnable: false
-
-    # -- The timeout for ceph commands in seconds
-    cephCommandsTimeoutSeconds: "30"
-
     csi:
-      enableRbdDriver: true
-      enableCephfsDriver: true
+      cephFSKernelMountOptions: ms_mode=prefer-crc
+      enableLiveness: true
+      serviceMonitor:
+        enabled: true
 
-      # -- Enable discovery daemon
-      enableDiscoveryDaemon: true
-
-      csiAddons:
-        enabled: false
-      # Indicate whether or not they support modifying a volume's ownership or permissions when the volume is being mounted.
-      # Default is "File". Other options are "None" and "ReadWriteOnceWithFSType"
-      # cephFSFSGroupPolicy: "None"
-      logLevel: 4
-      kubeletDirPath: /var/lib/kubelet
-      enableCSIHostNetwork: true
     monitoring:
       enabled: true
 
     resources:
       requests:
-        memory: 128Mi
-        cpu: 200m
-      limits:
-        memory: 512Mi
-        cpu: 2000m
+        memory: 128Mi # unchangable
+        cpu: 100m # unchangable
+      limits: {}
