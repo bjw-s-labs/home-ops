@@ -22,26 +22,26 @@ spec:
     remediation:
       retries: 3
   dependsOn:
-    - name: kube-prometheus-stack
-      namespace: monitoring
+  - name: kube-prometheus-stack
+    namespace: monitoring
   values:
     fullnameOverride: *app
-    extraArgs: ["--config.file=/config/snmp.yaml"]
+    extraArgs: [ "--config.file=/config/snmp.yaml" ]
     extraConfigmapMounts:
-      - name: &name brocade-icx-snmp-configmap
-        mountPath: /config/snmp.yaml
-        subPath: snmp.yaml
-        configMap: *name
-        readOnly: true
-        defaultMode: 420
+    - name: &name brocade-icx-snmp-configmap
+      mountPath: /config/snmp.yaml
+      subPath: snmp.yaml
+      configMap: *name
+      readOnly: true
+      defaultMode: 420
     serviceMonitor:
       enabled: true
       params:
-        - name: brocade-icx-0
-          module: ["brocade-icx"]
-          target: 10.255.253.2
-          auth: ["public_v2"]
+      - name: brocade-icx-0
+        module: [ "brocade-icx" ]
+        target: 10.200.0.44
+        auth: [ "public_v2" ]
       path: /snmp
       scrapeTimeout: 10s
       relabelings:
-        - { sourceLabels: ["__param_target"], targetLabel: instance }
+      - { sourceLabels: [ "__param_target" ], targetLabel: instance }
