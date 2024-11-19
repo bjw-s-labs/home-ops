@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: postgres-lb
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: postgres.${CLUSTER_NAME}.${INGRESS_DOMAIN},postgres.${INGRESS_DOMAIN}
+    external-dns.alpha.kubernetes.io/hostname: postgres.${INGRESS_DOMAIN}
     io.cilium/lb-ipam-ips: ${LB_POSTGRES}
 spec:
   type: LoadBalancer
