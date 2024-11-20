@@ -2,8 +2,8 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "${app}-list-snapshots-${ts}"
-  namespace: "${ns}"
+  name: list-snapshots-{{ ENV.APP }}
+  namespace: {{ ENV.NS }}
 spec:
   ttlSecondsAfterFinished: 3600
   template:
@@ -20,4 +20,4 @@ spec:
             - snapshots
           envFrom:
             - secretRef:
-                name: "${app}-volsync-minio"
+                name: {{ ENV.APP }}-volsync-minio

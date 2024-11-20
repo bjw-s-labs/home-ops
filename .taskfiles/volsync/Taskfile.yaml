@@ -2,220 +2,145 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
-# This taskfile is used to manage certain VolSync tasks for a given application, limitations are described below.
-#   1. Fluxtomization, HelmRelease, PVC, ReplicationSource all have the same name (e.g. plex)
-#   2. ReplicationSource and ReplicationDestination are a Restic repository
-#   3. Applications are deployed as either a Kubernetes Deployment or StatefulSet
-#   4. Each application only has one PVC that is being replicated
-
-x-env: &env
-  app: "{{.app}}"
-  controller: "{{.controller}}"
-  ns: "{{.ns}}"
-  previous: "{{.previous}}"
-  ts: "{{.ts}}"
-  claim: "{{.claim}}"
-  app_uid: "{{.app_uid}}"
-  app_gid: "{{.app_gid}}"
-
 vars:
-  scriptsDir: "{{.ROOT_DIR}}/.taskfiles/_scripts"
-  templatesDir: "{{.ROOT_DIR}}/.taskfiles/VolSync/templates"
-  ts: '{{now | date "150405"}}'
+  VOLSYNC_TASK_RESOURCES_DIR: "{{.ROOT_DIR}}/.taskfiles/volsync/resources"
 
 tasks:
-  list:
-    desc: List all snapshots
-    summary: |
-      Args:
-        ns: Namespace the PVC is in (default: default)
-        app: Application to list snapshots for (required)
-    cmds:
-      - envsubst < <(cat {{.templatesDir}}/list.tmpl.yaml) | kubectl apply -f -
-      - bash {{.scriptsDir}}/wait-for-k8s-job.sh {{.app}}-list-snapshots-{{.ts}} {{.ns}}
-      - kubectl --namespace {{.ns}} wait job/{{.app}}-list-snapshots-{{.ts}} --for condition=complete --timeout=1m
-      - kubectl --namespace {{.ns}} logs job/{{.app}}-list-snapshots-{{.ts}} --container list
-      - kubectl --namespace {{.ns}} delete job {{.app}}-list-snapshots-{{.ts}}
-    vars:
-      app: '{{ or .app (fail "Argument (app) is required") }}'
-      ns: '{{.ns | default "default"}}'
-    env: *env
-    preconditions:
-      - sh: test -f {{.scriptsDir}}/wait-for-k8s-job.sh
-        msg: "Wait script not found"
-      - sh: test -f {{.templatesDir}}/list.tmpl.yaml
-        msg: "List job template not found"
-    silent: true
-
   unlock:
-    desc: Unlock a Restic repository
-    summary: |
-      Args:
-        ns: Namespace the PVC is in (default: default)
-        app: Application to list snapshots for (required)
-    cmds:
-      - envsubst < <(cat {{.templatesDir}}/unlock.tmpl.yaml) | kubectl apply -f -
-      - bash {{.scriptsDir}}/wait-for-k8s-job.sh {{.app}}-unlock-snapshots-{{.ts}} {{.ns}} {{.K8S_CLUSTER}}
-      - kubectl --namespace {{.ns}} wait job/{{.app}}-unlock-snapshots-{{.ts}} --for condition=complete --timeout=1m
-      - kubectl --namespace {{.ns}} logs job/{{.app}}-unlock-snapshots-{{.ts}} --container unlock-minio
-      - kubectl --namespace {{.ns}} logs job/{{.app}}-unlock-snapshots-{{.ts}} --container unlock-r2
-      - kubectl --namespace {{.ns}} delete job {{.app}}-unlock-snapshots-{{.ts}}
-    vars:
-      app: '{{ or .app (fail "Argument (app) is required") }}'
-      ns: '{{.ns | default "default"}}'
-    env: *env
+    desc: Unlock all restic source repos [K8S_CLUSTER=main]
     preconditions:
-      - sh: test -f {{.scriptsDir}}/wait-for-k8s-job.sh
-        msg: "Wait script not found"
-      - sh: test -f {{.templatesDir}}/unlock.tmpl.yaml
-        msg: "Unlock job template not found"
-    silent: true
+      - which kubectl
+    requires:
+      vars:
+        - K8S_CLUSTER
+    vars:
+      SOURCES:
+        sh: kubectl get replicationsources --all-namespaces --no-headers --output=jsonpath='{range .items[*]}{.metadata.namespace},{.metadata.name}{"\n"}{end}'
+    cmds:
+      - for:
+          var: SOURCES
+          split: "\n"
+        cmd: kubectl --namespace {{splitList "," .ITEM | first}} patch --field-manager=flux-client-side-apply replicationsources {{splitList "," .ITEM | last}} --type merge --patch "{\"spec\":{\"restic\":{\"unlock\":\"{{now | unixEpoch}}\"}}}"
 
-  # To run backup jobs in parallel for all replicationsources:
-  #  - kubectl get replicationsources --all-namespaces --no-headers | awk '{print $2, $1}' | xargs --max-procs=4 -l bash -c 'task volsync:snapshot app=$0 ns=$1'
+  list:
+    desc: List snapshots for an app [K8S_CLUSTER=main] [NS=default] [APP=required]
+    preconditions:
+      - which kubectl minijinja-cli
+      - kubectl --namespace {{.NS}} get replicationsources {{.APP}}
+      - test -f "{{.VOLSYNC_TASK_RESOURCES_DIR}}/list-snapshots.yaml.j2"
+    requires:
+      vars:
+        - K8S_CLUSTER
+        - APP
+    vars:
+      NS: '{{.NS | default "default"}}'
+      JOB: "list-snapshots-{{ .APP }}"
+    env:
+      NS: "{{.NS}}"
+      APP: "{{.APP}}"
+    cmds:
+      - minijinja-cli {{.VOLSYNC_TASK_RESOURCES_DIR}}/list-snapshots.yaml.j2 | kubectl apply --server-side --filename -
+      - until kubectl --namespace {{.NS}} get job/{{ .JOB }} &>/dev/null; do sleep 5; done
+      - kubectl --namespace {{.NS}} wait job/{{ .JOB }} --for=condition=complete --timeout=5m
+      - stern --namespace {{.NS}} job/{{ .JOB }} --no-follow
+      - kubectl --namespace {{.NS}} delete job {{ .JOB }}
+
   snapshot:
-    desc: Trigger a Restic ReplicationSource snapshot
-    summary: |
-      Args:
-        ns: Namespace the PVC is in (default: default)
-        app: Application to list snapshots for (required)
-    cmds:
-      # # TODO: Only suspend when a arg is passed to the task
-      # # https://github.com/go-task/task/issues/608
-      # - task: .suspend
-      #   vars: *env
-      - kubectl --namespace {{.ns}} patch replicationsources {{.app}} --type merge -p '{"spec":{"trigger":{"manual":"{{.ts}}"}}}'
-      - bash {{.scriptsDir}}/wait-for-k8s-job.sh volsync-src-{{.app}} {{.ns}} {{.K8S_CLUSTER}}
-      - kubectl --namespace {{.ns}} wait job/volsync-src-{{.app}} --for condition=complete --timeout=120m
-    vars:
-      app: '{{ or .app (fail "Argument (app) is required") }}'
-      ns: '{{.ns | default "default"}}'
-      # Query to find the controller associated with the app
-      controller:
-        sh: |
-          if kubectl --namespace {{.ns}} get deployment.apps/{{.app}} >/dev/null 2>&1 ; then
-            echo "deployment.apps/{{.app}}"
-          else
-            echo "statefulset.apps/{{.app}}"
-          fi
-    env: *env
+    desc: Snapshot an app [K8S_CLUSTER=main] [NS=default] [APP=required]
     preconditions:
-      - sh: test -f {{.scriptsDir}}/wait-for-k8s-job.sh
-        msg: "Wait script not found"
-      - sh: kubectl --namespace {{.ns}} get replicationsources {{.app}}
-        msg: "ReplicationSource '{{.app}}' not found in namespace '{{.ns}}'"
+      - which kubectl
+      - kubectl --namespace {{.NS}} get replicationsources {{.APP}}
+    requires:
+      vars:
+        - K8S_CLUSTER
+        - APP
+    vars:
+      NS: '{{.NS | default "default"}}'
+      JOB: volsync-src-{{.APP}}
+    cmds:
+      - kubectl --namespace {{.NS}} patch replicationsources {{.APP}} --type merge -p '{"spec":{"trigger":{"manual":"{{now | unixEpoch}}"}}}'
+      - until kubectl --namespace {{.NS}} get job/{{.JOB}} &>/dev/null; do sleep 5; done
+      - kubectl --namespace {{.NS}} wait job/{{.JOB}} --for=condition=complete --timeout=120m
 
-  # To run restore jobs in parallel for all replicationdestinations:
-  #   - kubectl get replicationsources --all-namespaces --no-headers | awk '{print $2, $1}' | xargs --max-procs=4 -l bash -c 'task volsync:restore app=$0 ns=$1'
   restore:
-    desc: Trigger a Restic ReplicationSource restore
-    summary: |
-      Args:
-        ns: Namespace the PVC is in (default: default)
-        app: Application to list snapshots for (required)
-        previous: Previous number of snapshots to restore (default: 2)
-    cmds:
-      - task: .suspend
-        vars: *env
-      - task: .wipe
-        vars: *env
-      - task: .restore
-        vars: *env
-      - task: .resume
-        vars: *env
-    vars:
-      app: '{{ or .app (fail "Argument (app) is required") }}'
-      ns: '{{.ns | default "default"}}'
-      previous: "{{.previous | default 2}}"
-      # Query to find the controller associated with the app
-      controller:
-        sh: |
-          if kubectl --namespace {{.ns}} get deployment.apps/{{.app}} >/dev/null 2>&1 ; then
-            echo "deployment.apps/{{.app}}"
-          else
-            echo "statefulset.apps/{{.app}}"
-          fi
-      claim:
-        sh: |
-          kubectl --namespace {{.ns}} get replicationsources/{{.app}} \
-            -o jsonpath="{.spec.sourcePVC}"
-      app_uid:
-        sh: |
-          kubectl --namespace {{.ns}} get replicationsources/{{.app}} \
-            -o jsonpath="{.spec.restic.moverSecurityContext.runAsUser}"
-      app_gid:
-        sh: |
-          kubectl --namespace {{.ns}} get replicationsources/{{.app}} \
-            -o jsonpath="{.spec.restic.moverSecurityContext.runAsGroup}"
-    env: *env
+    desc: Restore an app [K8S_CLUSTER=main] [NS=default] [APP=required] [PREVIOUS=required]
     preconditions:
-      - sh: test -f {{.templatesDir}}/wipe.tmpl.yaml
-        msg: "Wipe template not found"
-      - sh: test -f {{.templatesDir}}/replicationdestination.tmpl.yaml
-        msg: "ReplicationDestination template not found"
-      - sh: test -f {{.scriptsDir}}/wait-for-k8s-job.sh
-        msg: "Wait script not found"
-
-  cleanup:
-    desc: Delete volume populator PVCs in all namespaces
-    silent: true
+      - which flux kubectl minijinja-cli
+      - test -f {{.VOLSYNC_TASK_RESOURCES_DIR}}/replicationdestination.yaml.j2
+    requires:
+      vars:
+        - K8S_CLUSTER
+        - APP
+        - PREVIOUS
     vars:
-      bootstrap_dest:
-        sh: kubectl get pvc --all-namespaces --no-headers | grep "bootstrap-dest" | awk '{print $1 "/" $2}'
-      bootstrap_cache:
-        sh: kubectl get pvc --all-namespaces --no-headers | grep "bootstrap-cache" | awk '{print $1 "/" $2}'
-      snaps:
-        sh: kubectl get volumesnapshot --all-namespaces --no-headers | grep "bootstrap-dest" | awk '{print $1 "/" $2}'
+      NS: '{{.NS | default "default"}}'
+      CONTROLLER:
+        sh: kubectl --namespace {{.NS}} get deployment {{.APP}} &>/dev/null && echo deployment || echo statefulset
+    env:
+      NS: "{{.NS}}"
+      APP: "{{.APP}}"
+      PREVIOUS: "{{.PREVIOUS}}"
+      CLAIM:
+        sh: kubectl --namespace {{.NS}} get replicationsources/{{.APP}} --output=jsonpath="{.spec.sourcePVC}"
+      ACCESS_MODES:
+        sh: kubectl --namespace {{.NS}} get replicationsources/{{.APP}} --output=jsonpath="{.spec.restic.accessModes}"
+      STORAGE_CLASS_NAME:
+        sh: kubectl --namespace {{.NS}} get replicationsources/{{.APP}} --output=jsonpath="{.spec.restic.storageClassName}"
+      PUID:
+        sh: kubectl --namespace {{.NS}} get replicationsources/{{.APP}} --output=jsonpath="{.spec.restic.moverSecurityContext.runAsUser}"
+      PGID:
+        sh: kubectl --namespace {{.NS}} get replicationsources/{{.APP}} --output=jsonpath="{.spec.restic.moverSecurityContext.runAsGroup}"
     cmds:
-      - for: {var: bootstrap_dest}
-        cmd: |
-          {{- $items := (split "/" .ITEM) }}
-          kubectl delete pvc -n {{ $items._0 }} {{ $items._1 }}
-      - for: {var: bootstrap_cache}
-        cmd: |
-          {{- $items := (split "/" .ITEM) }}
-          kubectl delete pvc -n {{ $items._0 }} {{ $items._1 }}
-      - for: {var: snaps}
-        cmd: |
-          {{- $items := (split "/" .ITEM) }}
-          kubectl delete volumesnapshot -n {{ $items._0 }} {{ $items._1 }}
-    env: *env
+      # Suspend
+      - flux --namespace flux-system suspend kustomization {{.APP}}
+      - flux --namespace {{.NS}} suspend helmrelease {{.APP}}
+      - kubectl --namespace {{.NS}} scale {{.CONTROLLER}}/{{.APP}} --replicas 0
+      - kubectl --namespace {{.NS}} wait pod --for=delete --selector="app.kubernetes.io/name={{.APP}}" --timeout=5m
+      # Restore
+      - minijinja-cli {{.VOLSYNC_TASK_RESOURCES_DIR}}/replicationdestination.yaml.j2 | kubectl apply --server-side --filename -
+      - until kubectl --namespace {{.NS}} get job/volsync-dst-{{.APP}}-manual &>/dev/null; do sleep 5; done
+      - kubectl --namespace {{.NS}} wait job/volsync-dst-{{.APP}}-manual --for=condition=complete --timeout=120m
+      - kubectl --namespace {{.NS}} delete replicationdestination {{.APP}}-manual
+      # Resume
+      - flux --namespace flux-system resume kustomization {{.APP}}
+      - flux --namespace {{.NS}} resume helmrelease {{.APP}}
+      - flux --namespace {{.NS}} reconcile helmrelease {{.APP}} --force
+      - kubectl --namespace {{.NS}} wait pod --for=condition=ready --selector="app.kubernetes.io/name={{.APP}}" --timeout=5m
+# x-env: &env
+#   app: "{{.app}}"
+#   controller: "{{.controller}}"
+#   ns: "{{.ns}}"
+#   previous: "{{.previous}}"
+#   ts: "{{.ts}}"
+#   claim: "{{.claim}}"
+#   app_uid: "{{.app_uid}}"
+#   app_gid: "{{.app_gid}}"
 
-  # Suspend the Flux ks and hr
-  .suspend:
-    internal: true
-    cmds:
-      - flux -n flux-system suspend kustomization {{.app}}
-      - flux --namespace {{.ns}} suspend helmrelease {{.app}}
-      - kubectl --namespace {{.ns}} scale {{.controller}} --replicas 0
-      - kubectl --namespace {{.ns}} wait pod --for delete --selector="app.kubernetes.io/name={{.app}}" --timeout=2m
-    env: *env
+# vars:
+#   scriptsDir: "{{.ROOT_DIR}}/.taskfiles/_scripts"
+#   templatesDir: "{{.ROOT_DIR}}/.taskfiles/VolSync/templates"
+#   ts: '{{now | date "150405"}}'
 
-  # Wipe the PVC of all data
-  .wipe:
-    internal: true
-    cmds:
-      - envsubst < <(cat {{.templatesDir}}/wipe.tmpl.yaml) | kubectl apply -f -
-      - bash {{.scriptsDir}}/wait-for-k8s-job.sh {{.app}}-wipe-{{.ts}} {{.ns}} {{.K8S_CLUSTER}}
-      - kubectl --namespace {{.ns}} wait job/{{.app}}-wipe-{{.ts}} --for condition=complete --timeout=120m
-      - kubectl --namespace {{.ns}} logs job/{{.app}}-wipe-{{.ts}} --container wipe
-      - kubectl --namespace {{.ns}} delete job {{.app}}-wipe-{{.ts}}
-    env: *env
-
-  # Create VolSync replicationdestination CR to restore data
-  .restore:
-    internal: true
-    cmds:
-      - envsubst < <(cat {{.templatesDir}}/replicationdestination.tmpl.yaml) | kubectl apply -f -
-      - bash {{.scriptsDir}}/wait-for-k8s-job.sh volsync-dst-{{.app}}-{{.ts}} {{.ns}} {{.K8S_CLUSTER}}
-      - kubectl --namespace {{.ns}} wait job/volsync-dst-{{.app}}-{{.ts}} --for condition=complete --timeout=120m
-      - kubectl --namespace {{.ns}} delete replicationdestination {{.app}}-{{.ts}}
-    env: *env
-
-  # Resume Flux ks and hr
-  .resume:
-    internal: true
-    cmds:
-      - flux --namespace {{.ns}} resume helmrelease {{.app}}
-      - flux -n flux-system resume kustomization {{.app}}
-    env: *env
+# tasks:
+#   list:
+#     desc: List all snapshots
+#     summary: |
+#       Args:
+#         ns: Namespace the PVC is in (default: default)
+#         app: Application to list snapshots for (required)
+#     cmds:
+#       - envsubst < <(cat {{.templatesDir}}/list.tmpl.yaml) | kubectl apply -f -
+#       - bash {{.scriptsDir}}/wait-for-k8s-job.sh {{.app}}-list-snapshots-{{.ts}} {{.ns}}
+#       - kubectl --namespace {{.ns}} wait job/{{.app}}-list-snapshots-{{.ts}} --for condition=complete --timeout=1m
+#       - kubectl --namespace {{.ns}} logs job/{{.app}}-list-snapshots-{{.ts}} --container list
+#       - kubectl --namespace {{.ns}} delete job {{.app}}-list-snapshots-{{.ts}}
+#     vars:
+#       app: '{{ or .app (fail "Argument (app) is required") }}'
+#       ns: '{{.ns | default "default"}}'
+#     env: *env
+#     preconditions:
+#       - sh: test -f {{.scriptsDir}}/wait-for-k8s-job.sh
+#         msg: "Wait script not found"
+#       - sh: test -f {{.templatesDir}}/list.tmpl.yaml
+#         msg: "List job template not found"
+#     silent: true

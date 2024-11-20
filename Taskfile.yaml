@@ -1,40 +1,37 @@
 ---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
+set:
+  - pipefail
+shopt:
+  - globstar
+
 vars:
-  KUBERNETES_DIR: "{{.ROOT_DIR}}/kubernetes"
   K8S_CLUSTER: '{{.K8S_CLUSTER | default "main"}}'
-  K8S_CLUSTER_DIR: '{{.KUBERNETES_DIR}}/{{.K8S_CLUSTER}}'
+  K8S_CLUSTER_DIR: "{{.ROOT_DIR}}/kubernetes/{{.K8S_CLUSTER}}"
 
 env:
-  KUBECONFIG: '{{.K8S_CLUSTER_DIR}}/kubeconfig'
-  TALOSCONFIG: '{{.K8S_CLUSTER_DIR}}/bootstrap/talos/clusterconfig/talosconfig'
+  KUBECONFIG: "{{.K8S_CLUSTER_DIR}}/kubeconfig"
+  MINIJINJA_CONFIG_FILE: "{{.ROOT_DIR}}/.minijinja.toml"
+  TALOSCONFIG: "{{.K8S_CLUSTER_DIR}}/talos/clusterconfig/talosconfig"
 
 includes:
-  flux:
-    dir: .taskfiles/flux
-    taskfile: .taskfiles/flux
-  k8s:
-    taskfile: .taskfiles/k8s
-    dir: .taskfiles/k8s
-  postgres:
-    taskfile: ".taskfiles/postgres"
-    dir: .taskfiles/postgres
-  rook:
-    taskfile: ".taskfiles/rook"
-    dir: .taskfiles/rook
-  sops:
-    taskfile: ".taskfiles/sops"
-    dir: .taskfiles/sops
-  talos:
-    taskfile: ".taskfiles/talos"
-    dir: .taskfiles/talos
-  volsync:
-    taskfile: ".taskfiles/volsync"
-    dir: .taskfiles/volsync
+  flux: .taskfiles/flux
+  k8s: .taskfiles/k8s
+  k8s-bootstrap: .taskfiles/k8s-bootstrap
+  postgres: .taskfiles/postgres
+  rook: .taskfiles/rook
+  sops: .taskfiles/sops
+  talos: .taskfiles/talos
+  volsync: .taskfiles/volsync
 
 tasks:
   default:
     silent: true
-    cmds:
-      - task -l
+    cmd: task --list
+
+  noop:
+    internal: true
+    silent: true
+    cmd: noop() { :; }
