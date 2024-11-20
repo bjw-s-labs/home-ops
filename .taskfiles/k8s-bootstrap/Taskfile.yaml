@@ -1,0 +1,80 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+tasks:
+  talos:
+    desc: Bootstrap Talos [K8S_CLUSTER={{.K8S_CLUSTER}}]
+    vars:
+      TALOS_CONTROLLER:
+        sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | shuf -n 1
+    preconditions:
+      - which ls minijinja-cli sops talosctl
+      - test -f "${TALOSCONFIG}"
+      - talosctl config info
+    requires:
+      vars:
+        - K8S_CLUSTER
+    cmds:
+      - task: :talos:apply-clusterconfig
+        vars:
+          INSECURE: "true"
+      - until talosctl --nodes {{.TALOS_CONTROLLER}} bootstrap; do sleep 5; done
+      - talosctl kubeconfig --nodes {{.TALOS_CONTROLLER}} --force --force-context-name {{.K8S_CLUSTER}} "${KUBECONFIG}"
+
+  # NOTE: Nodes must all be part of the Ceph cluster
+  rook:
+    desc: Bootstrap Rook-Ceph [K8S_CLUSTER={{.K8S_CLUSTER}}] [MODEL=required]
+    preconditions:
+      - which kubectl talosctl
+      - talosctl config info
+    requires:
+      vars:
+        - K8S_CLUSTER
+    vars:
+      BLUESTORE_DISKS_RAW:
+        sh: talosctl get discoveredvolumes -o json | jq -r 'select(.spec.type=="disk" and .spec.name=="bluestore") | {"node":.node, "disk":.spec.dev_dath}' | jq -crs '.'
+      BLUESTORE_DISKS:
+        ref: "fromJson .BLUESTORE_DISKS_RAW"
+    cmds:
+      - for:
+          var: BLUESTORE_DISKS
+        vars:
+          NODE:
+            sh: kubectl get nodes -o json | jq -r '.items[] | select(.status.addresses[].address=="{{.ITEM.node}}") | .metadata.name'
+          DISK: "{{ .ITEM.disk }}"
+        task: :rook:wipe-disk
+
+  apps:
+    desc: Bootstrap Apps [K8S_CLUSTER={{.K8S_CLUSTER}}]
+    preconditions:
+      - which helmfile kubectl
+      - test -f "${TALOSCONFIG}"
+      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/apps/helmfile.yaml
+      - talosctl config info
+    requires:
+      vars:
+        - K8S_CLUSTER
+    cmds:
+      - until kubectl wait nodes --for=condition=Ready=False --all --timeout=10m; do sleep 5; done
+      - helmfile --quiet --file {{.K8S_CLUSTER_DIR}}/bootstrap/apps/helmfile.yaml apply --skip-diff-on-install --suppress-diff
+      - until kubectl wait nodes --for=condition=Ready --all --timeout=10m; do sleep 5; done
+
+  flux:
+    desc: Bootstrap Flux [K8S_CLUSTER={{.K8S_CLUSTER}}]
+    preconditions:
+      - which curl flux kubectl ls op
+      - test -f "{{.K8S_CLUSTER_DIR}}/bootstrap/flux/kustomization.yaml"
+      - test -f "{{.K8S_CLUSTER_DIR}}/bootstrap/flux/flux-system.yaml.j2"
+      - test -f "{{.K8S_CLUSTER_DIR}}/flux/config/kustomization.yaml"
+      - op user get --me
+    requires:
+      vars:
+        - K8S_CLUSTER
+    env:
+      FLUX_GITHUB_PUBLIC_KEYS:
+        sh: curl -fsSL https://api.github.com/meta | jq --raw-output '"github.com "+.ssh_keys[]'
+    cmds:
+      - kubectl apply --server-side --kustomize {{.K8S_CLUSTER_DIR}}/bootstrap/apps
+      - op run --env-file {{.K8S_CLUSTER_DIR}}/bootstrap/bootstrap.env --no-masking -- minijinja-cli "{{.K8S_CLUSTER_DIR}}/bootstrap/flux/flux-system.yaml.j2" | kubectl apply --server-side --filename -
+      - kubectl apply --server-side --kustomize {{.K8S_CLUSTER_DIR}}/flux/config

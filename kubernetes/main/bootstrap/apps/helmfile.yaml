@@ -8,8 +8,6 @@ helmDefaults:
   force: true
 
 repositories:
-  - name: prometheus-community
-    url: https://prometheus-community.github.io/helm-charts
   - name: postfinance
     url: https://postfinance.github.io/kubelet-csr-approver
   - name: cilium
@@ -20,7 +18,7 @@ repositories:
 releases:
   - name: prometheus-operator-crds
     namespace: monitoring
-    chart: prometheus-community/prometheus-operator-crds
+    chart: oci://ghcr.io/prometheus-community/charts/prometheus-operator-crds
     version: 16.0.0
 
   - name: cilium
