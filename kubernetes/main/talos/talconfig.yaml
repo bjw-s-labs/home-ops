@@ -1,0 +1,276 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
+clusterName: &clusterName main
+
+endpoint: https://main.k8s.bjw-s.internal:6443
+
+# renovate: depName=ghcr.io/siderolabs/installer datasource=docker
+talosVersion: v1.8.3
+# renovate: depName=ghcr.io/siderolabs/kubelet datasource=docker
+kubernetesVersion: v1.31.2
+
+additionalApiServerCertSans: &sans
+  - main.k8s.bjw-s.internal
+  - &talosControlplaneVip 10.1.1.30
+  - 127.0.0.1 # KubePrism
+additionalMachineCertSans: *sans
+
+cniConfig:
+  name: none
+
+nodes:
+  - hostname: delta.bjw-s.internal
+    ipAddress: 10.1.1.31
+    controlPlane: true
+    installDiskSelector:
+      size: "<= 256GB"
+      model: "TS240GMTS420S"
+    machineDisks:
+      - device: /dev/disk/by-id/ata-CT500MX500SSD1_2149E5EC1D9D
+        partitions:
+          - mountpoint: /var/mnt/extra
+    networkInterfaces:
+      - interface: bond0
+        bond:
+          mode: active-backup
+          deviceSelectors:
+            - hardwareAddr: 48:21:0b:55:c4:8a
+              driver: igc
+        dhcp: true
+        vip:
+          ip: *talosControlplaneVip
+        vlans:
+          - &vlan303
+            vlanId: 303
+            mtu: 1500
+            dhcp: true
+            dhcpOptions:
+              routeMetric: 4096
+
+  - hostname: enigma.bjw-s.internal
+    ipAddress: 10.1.1.32
+    controlPlane: true
+    installDiskSelector:
+      size: "<= 256GB"
+      model: "TS240GMTS420S"
+    machineDisks:
+      - device: /dev/disk/by-id/ata-CT500MX500SSD1_2149E5EC1D31
+        partitions:
+          - mountpoint: /var/mnt/extra
+    networkInterfaces:
+      - interface: bond0
+        bond:
+          mode: active-backup
+          deviceSelectors:
+            - hardwareAddr: 48:21:0b:55:dc:7b
+              driver: igc
+        dhcp: true
+        vip:
+          ip: *talosControlplaneVip
+        vlans:
+          - *vlan303
+
+  - hostname: felix.bjw-s.internal
+    ipAddress: 10.1.1.33
+    controlPlane: true
+    installDiskSelector:
+      size: "<= 256GB"
+      model: "TS240GMTS420S"
+    machineDisks:
+      - device: /dev/disk/by-id/ata-KINGSTON_SA400S37480G_50026B77825B2170
+        partitions:
+          - mountpoint: /var/mnt/extra
+    networkInterfaces:
+      - interface: bond0
+        bond:
+          mode: active-backup
+          deviceSelectors:
+            - hardwareAddr: 48:21:0b:56:09:47
+              driver: igc
+        dhcp: true
+        vip:
+          ip: *talosControlplaneVip
+        vlans:
+          - *vlan303
+
+controlPlane:
+  nodeLabels:
+    topology.kubernetes.io/region: *clusterName
+    topology.kubernetes.io/zone: m
+
+  schematic:
+    customization:
+      extraKernelArgs:
+        - intel_iommu=on
+        - iommu=pt
+        - net.ifnames=1
+      systemExtensions:
+        officialExtensions:
+          - siderolabs/i915-ucode
+          - siderolabs/intel-ucode
+          - siderolabs/mei
+
+  patches:
+    # Configure containerd
+    - |-
+      machine:
+        files:
+          - op: create
+            path: /etc/cri/conf.d/20-customization.part
+            content: |
+              [plugins]
+                [plugins."io.containerd.grpc.v1.cri"]
+                  enable_unprivileged_ports = true
+                  enable_unprivileged_icmp = true
+              [plugins."io.containerd.grpc.v1.cri".containerd]
+                discard_unpacked_layers = false
+              [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+                discard_unpacked_layers = false
+
+    # Disable search domain everywhere
+    - |-
+      machine:
+        network:
+          disableSearchDomain: true
+
+    # Enable cluster discovery
+    - |-
+      cluster:
+        discovery:
+          enabled: true
+          registries:
+            kubernetes:
+              disabled: false
+            service:
+              disabled: true
+
+    # Disable Host DNS
+    - |-
+      machine:
+        features:
+          hostDNS:
+            enabled: true
+            resolveMemberNames: true
+            forwardKubeDNSToHost: false
+
+    # Configure kubelet
+    - |-
+      machine:
+        kubelet:
+          extraArgs:
+            rotate-server-certificates: "true"
+          extraConfig:
+            maxPods: 150
+          extraMounts:
+            - destination: /var/mnt/extra
+              type: bind
+              source: /var/mnt/extra
+              options:
+                - rbind
+                - rshared
+                - rw
+          nodeIP:
+            validSubnets:
+                - 10.1.1.0/24
+
+    # Enable KubePrism
+    - |-
+      machine:
+        features:
+          kubePrism:
+            enabled: true
+            port: 7445
+
+    # Configure cluster
+    - |-
+      cluster:
+        allowSchedulingOnMasters: true
+        coreDNS:
+            disabled: true
+        proxy:
+          disabled: true
+        scheduler:
+          config:
+            apiVersion: kubescheduler.config.k8s.io/v1
+            kind: KubeSchedulerConfiguration
+            profiles:
+              - schedulerName: default-scheduler
+                pluginConfig:
+                  - name: PodTopologySpread
+                    args:
+                      defaultingType: List
+                      defaultConstraints:
+                        - maxSkew: 1
+                          topologyKey: kubernetes.io/hostname
+                          whenUnsatisfiable: ScheduleAnyway
+
+    # Configure etcd
+    - |-
+      cluster:
+        etcd:
+          advertisedSubnets:
+            - 10.1.1.0/24
+
+    # Configure NFS mount options
+    - |
+      machine:
+        files:
+          - op: overwrite
+            path: /etc/nfsmount.conf
+            permissions: 0o644
+            content: |
+              [ NFSMount_Global_Options ]
+              nfsvers=4.2
+              hard=True
+              noatime=True
+              nconnect=16
+
+    # Configure static host entries
+    - |-
+      machine:
+        network:
+          extraHostEntries:
+            - ip: 10.1.1.30
+              aliases:
+                - main.k8s.bjw-s.internal
+
+    # Configure custom sysctls
+    - |-
+      machine:
+        sysctls:
+          fs.inotify.max_user_instances: 8192
+          fs.inotify.max_user_watches: 1048576
+          net.core.rmem_max: 67108864
+          net.core.wmem_max: 67108864
+          net.ipv4.tcp_rmem: 4096 87380 33554432
+          net.ipv4.tcp_wmem: 4096 65536 33554432
+          net.ipv4.tcp_tw_reuse: 1
+          net.ipv4.tcp_window_scaling: 1
+          net.ipv4.tcp_congestion_control: bbr
+
+    # Configure udev rules
+    - |-
+      machine:
+        udev:
+          rules:
+            # Intel GPU
+            - SUBSYSTEM=="drm", KERNEL=="renderD*", GROUP="44", MODE="0660"
+            # Google Coral USB Accelerator
+            - SUBSYSTEMS=="usb", ATTRS{idVendor}=="1a6e", ATTRS{idProduct}=="089a", GROUP="20", MODE="0660"
+            - SUBSYSTEMS=="usb", ATTRS{idVendor}=="18d1", ATTRS{idProduct}=="9302", GROUP="20", MODE="0660"
+
+    # Disable default API server admission plugins.
+    - |-
+      - op: remove
+        path: /cluster/apiServer/admissionControl
+
+    # Enable K8s Talos API Access
+    - |-
+      machine:
+        features:
+          kubernetesTalosAPIAccess:
+            enabled: true
+            allowedRoles:
+              - os:admin
+            allowedKubernetesNamespaces:
+              - system-upgrade

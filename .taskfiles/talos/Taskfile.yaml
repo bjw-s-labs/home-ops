@@ -3,146 +3,56 @@
 version: "3"
 
 tasks:
-  bootstrap:
-    desc: Bootstrap Talos
-    summary: |
-      Args:
-        CONTROLLER: Controller node to run command against (required)
-    prompt: Bootstrap Talos on the '{{.K8S_CLUSTER}}' cluster... continue?
-    cmds:
-      - task: bootstrap-etcd
-        vars: &vars
-          CONTROLLER: "{{.CONTROLER}}"
-      - task: fetch-kubeconfig
-        vars: *vars
-      - task: bootstrap-integrations
-        vars: *vars
-    requires:
-      vars:
-        - K8S_CLUSTER
-        - CONTROLLER
-
-  bootstrap-etcd:
-    desc: Bootstrap Etcd
-    cmd: until talosctl --nodes {{.CONTROLLER}} bootstrap; do sleep 10; done
-    requires:
-      vars:
-        - CONTROLLER
-
-  bootstrap-integrations:
-    desc: Bootstrap core integrations needed for Talos
-    cmds:
-      - until kubectl wait --for=condition=Ready=False nodes --all --timeout=600s; do sleep 10; done
-      - helmfile --kube-context {{.K8S_CLUSTER}} --file {{.K8S_CLUSTER_DIR}}/bootstrap/helmfile.yaml apply --skip-diff-on-install --suppress-diff
-      - until kubectl wait --for=condition=Ready nodes --all --timeout=600s; do sleep 10; done
-    requires:
-      vars:
-        - K8S_CLUSTER
-    preconditions:
-      - which helmfile
-      - sh: kubectl config get-contexts {{.K8S_CLUSTER}}
-        msg: "Kubectl context {{.K8S_CLUSTER}} not found"
-      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/helmfile.yaml
-
-  fetch-kubeconfig:
-    desc: Fetch kubeconfig from Talos controllers
-    cmd: |
-      talosctl kubeconfig --nodes {{.CONTROLLER}} \
-        --force --force-context-name {{.K8S_CLUSTER}} {{.K8S_CLUSTER_DIR}}
-    requires:
-      vars:
-        - K8S_CLUSTER
-
   generate-clusterconfig:
     desc: Generate clusterconfig for Talos
+    preconditions:
+      - which test talhelper
+      - test -f {{.K8S_CLUSTER_DIR}}/talos/talsecret.sops.yaml
+      - test -f {{.K8S_CLUSTER_DIR}}/talos/talconfig.yaml
+    requires:
+      vars:
+        - K8S_CLUSTER
     cmds:
       - talhelper genconfig
-        --env-file {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talenv.sops.yaml
-        --secret-file {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talsecret.sops.yaml
-        --config-file {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talconfig.yaml
-        --out-dir {{.K8S_CLUSTER_DIR}}/bootstrap/talos/clusterconfig
-    requires:
-      vars:
-        - K8S_CLUSTER
-    preconditions:
-      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talenv.sops.yaml
-      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talsecret.sops.yaml
-      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talconfig.yaml
-
-  upgrade:
-    desc: Upgrade Talos version for a node
-    vars:
-      TALOS_VERSION:
-        sh: |
-          yq -r ".talosVersion" {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talconfig.yaml
-      TALOS_IMAGE:
-        sh: |
-          talhelper genurl installer \
-            --env-file {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talenv.sops.yaml \
-            --config-file {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talconfig.yaml \
-          | grep {{.NODE}} \
-          | awk '{split($0,u," "); print u[2]}'
-    cmds:
-      - talosctl upgrade -n {{.NODE}} --image {{.TALOS_IMAGE }}
-    requires:
-      vars:
-        - K8S_CLUSTER
-        - NODE
-    preconditions:
-      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talenv.sops.yaml
-      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talconfig.yaml
-      - msg: "Talos image could not be determined for node={{.NODE}}"
-        sh: 'test -n "{{.TALOS_IMAGE}}"'
-
-  upgrade-k8s:
-    desc: Upgrade Kubernetes version for a Talos cluster
-    silent: false
-    vars:
-      KUBERNETES_VERSION:
-        sh: |
-          yq -r ".kubernetesVersion" {{.K8S_CLUSTER_DIR}}/bootstrap/talos/talconfig.yaml
-      TALOS_CONTROLLER:
-        sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | shuf -n 1
-    cmds:
-      - until kubectl wait --timeout=5m --for=condition=Complete jobs --all --all-namespaces; do sleep 10; done
-      - talosctl upgrade-k8s -n {{.TALOS_CONTROLLER}} --to {{.KUBERNETES_VERSION}}
-    requires:
-      vars:
-        - K8S_CLUSTER
-    preconditions:
-      - talosctl config info &>/dev/null
-      - talosctl --nodes {{.TALOS_CONTROLLER}} get machineconfig &>/dev/null
+        --secret-file {{.K8S_CLUSTER_DIR}}/talos/talsecret.sops.yaml
+        --config-file {{.K8S_CLUSTER_DIR}}/talos/talconfig.yaml
+        --out-dir {{.K8S_CLUSTER_DIR}}/talos/clusterconfig
 
   apply-clusterconfig:
     desc: Apply clusterconfig for a Talos cluster
     vars:
       CLUSTERCONFIG_FILES:
-        sh: find {{.K8S_CLUSTER_DIR}}/bootstrap/talos/clusterconfig -type f -name '*.yaml' -printf '%f\n'
+        sh: ls {{.K8S_CLUSTER_DIR}}/talos/clusterconfig/*.yaml
+    preconditions:
+      - which ls
+    requires:
+      vars:
+        - K8S_CLUSTER
     cmds:
       - for:
           var: CLUSTERCONFIG_FILES
         task: _apply-machineconfig
         vars:
-          filename: "{{.ITEM}}"
-          hostname: |-
-            {{ trimPrefix (printf "%s-" .K8S_CLUSTER) .ITEM | trimSuffix ".yaml" }}
+          FILENAME: "{{.ITEM}}"
+          HOSTNAME: |-
+            {{ trimPrefix (printf "%s-" .K8S_CLUSTER) (base .ITEM) | trimSuffix ".yaml" }}
           DRY_RUN: "{{ .DRY_RUN }}"
-    requires:
-      vars:
-        - K8S_CLUSTER
+          INSECURE: "{{ .INSECURE }}"
 
   _apply-machineconfig:
     internal: true
     desc: Apply a single Talos machineConfig to a Talos node
-    cmds:
-      - talosctl apply-config
-        --nodes "{{.hostname}}"
-        --file "{{.K8S_CLUSTER_DIR}}/bootstrap/talos/clusterconfig/{{.filename}}"
-        {{ if eq "true" .DRY_RUN }}--dry-run{{ end }}
+    preconditions:
+      - which talosctl
+      - test -f "{{.FILENAME}}"
     requires:
       vars:
         - K8S_CLUSTER
-        - hostname
-        - filename
-    preconditions:
-      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/talos/clusterconfig/{{.filename}}
+        - HOSTNAME
+        - FILENAME
+    cmds:
+      - talosctl apply-config
+        --nodes "{{.HOSTNAME}}"
+        --file "{{.FILENAME}}"
+        {{ if eq "true" .INSECURE }}--insecure{{ end }}
+        {{ if eq "true" .DRY_RUN }}--dry-run{{ end }}

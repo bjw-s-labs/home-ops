@@ -4,31 +4,33 @@ version: "3"
 
 tasks:
   cleanup-pods:
-    desc: Clean up leftover Pods
+    desc: Clean up pods with a Failed/Pending/Succeeded phase [K8S_CLUSTER=main]
+    preconditions:
+      - which kubectl
+    requires:
+      vars:
+        - K8S_CLUSTER
     cmds:
       - for:
           matrix:
-            PHASE: [Failed, Succeeded, Pending]
+            PHASE:
+              - Failed
+              - Pending
+              - Succeeded
         cmd: kubectl delete pods --field-selector status.phase={{.ITEM.PHASE}} -A --ignore-not-found=true
 
-  sync-externalsecret:
-    desc: Sync ExternalSecret resource
-    summary: |
-      Args:
-        NS: Namespace the PVC is in (default: default)
-        NAME: ExternalSecret to sync (default: all secrets)
-    silent: true
-    vars:
-      NS: '{{.NS | default "default"}}'
-      NAME: '{{ .NAME | default "" }}'
-    cmds:
-      - |
-        {{if eq .NAME ""}}
-        kubectl get externalsecret.external-secrets.io --all-namespaces --no-headers -A | awk '{print $1, $2}' \
-          | xargs --max-procs=2 -l bash -c 'kubectl --namespace $0 annotate externalsecret.external-secrets.io $1 force-sync=$(date +%s) --overwrite'
-        {{else}}
-        kubectl --namespace {{.NS}} annotate externalsecret.external-secrets.io {{.NAME}} force-sync=$(date +%s) --overwrite
-        {{end}}
+  sync-externalsecrets:
+    desc: Force sync all ExternalSecret resources
     preconditions:
-      - sh: '{{if ne .NAME ""}}kubectl --namespace {{.NS}} get externalsecret {{.NAME}}{{end}}'
-        msg: "ExternalSecret {{.NAME}} not found in namespace {{.NS}}"
+      - which kubectl
+    requires:
+      vars:
+        - K8S_CLUSTER
+    vars:
+      SECRETS:
+        sh: kubectl get externalsecret --all-namespaces --no-headers --output=jsonpath='{range .items[*]}{.metadata.namespace},{.metadata.name}{"\n"}{end}'
+    cmds:
+      - for:
+          var: SECRETS
+          split: "\n"
+        cmd: kubectl --namespace {{splitList "," .ITEM | first}} annotate externalsecret {{splitList "," .ITEM | last}} force-sync="{{now | unixEpoch}}" --overwrite
