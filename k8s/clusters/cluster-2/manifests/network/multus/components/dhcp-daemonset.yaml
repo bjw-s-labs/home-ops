@@ -28,8 +28,8 @@ spec:
       initContainers:
       - name: clean-up
         image: busybox
-        command: ["/bin/sh"]
-        args: ["-c", "rm -f /host/run/cni/dhcp.sock"]
+        command: [ "/bin/sh" ]
+        args: [ "-c", "rm -f /host/run/cni/dhcp.sock" ]
         securityContext:
           privileged: true
         volumeMounts:
@@ -46,10 +46,10 @@ spec:
         - /host
         resources:
           requests:
-            cpu: "100m"
+            cpu: "1m"
             memory: "50Mi"
           limits:
-            cpu: "100m"
+            cpu: "1m"
             memory: "50Mi"
         securityContext:
           privileged: true
