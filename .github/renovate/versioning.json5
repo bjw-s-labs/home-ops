@@ -16,6 +16,13 @@
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/mendhak/http-https-echo"],
       versioning: "regex:^(?<major>\\d+)$",
-    }
+    },
+    {
+      description: "Custom datasource for scrypted",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/koush/scrypted"],
+      overrideDatasource: "github-releases",
+      overridePackageName: "koush/scrypted"
+    },
   ],
 }
