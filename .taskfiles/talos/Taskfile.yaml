@@ -60,6 +60,25 @@ tasks:
           HOSTNAME: "{{.NODE}}"
       - talosctl --nodes {{.NODE}} health --wait-timeout=10m --server=false
 
+  upgrade-node:
+    desc: Upgrade Talos on a single node [NODE=required]
+    preconditions:
+      - which talosctl
+      - test -f "${TALOSCONFIG}"
+      - talosctl --nodes {{.NODE}} get machineconfig
+    requires:
+      vars:
+        - K8S_CLUSTER
+        - NODE
+    vars:
+      FILE:
+        sh: ls {{.K8S_CLUSTER_DIR}}/talos/clusterconfig/{{.K8S_CLUSTER}}-{{.NODE}}*.yaml
+      TALOS_IMAGE:
+        sh: yq '.machine.install.image' < "{{.FILE}}"
+    cmds:
+      - talosctl --nodes {{.NODE}} upgrade --image="{{.TALOS_IMAGE}}" --timeout=10m
+      - talosctl --nodes {{.NODE}} health --wait-timeout=10m --server=false
+
   _apply-machineconfig:
     internal: true
     desc: Apply a single Talos machineConfig to a Talos node
