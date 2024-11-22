@@ -106,6 +106,7 @@ controlPlane:
         - net.ifnames=1
       systemExtensions:
         officialExtensions:
+          - siderolabs/gasket-driver
           - siderolabs/i915-ucode
           - siderolabs/intel-ucode
           - siderolabs/mei
@@ -255,9 +256,8 @@ controlPlane:
           rules:
             # Intel GPU
             - SUBSYSTEM=="drm", KERNEL=="renderD*", GROUP="44", MODE="0660"
-            # Google Coral USB Accelerator
-            - SUBSYSTEMS=="usb", ATTRS{idVendor}=="1a6e", ATTRS{idProduct}=="089a", GROUP="20", MODE="0660"
-            - SUBSYSTEMS=="usb", ATTRS{idVendor}=="18d1", ATTRS{idProduct}=="9302", GROUP="20", MODE="0660"
+            # Coral Edge M.2 TPU
+            - SUBSYSTEM=="apex", KERNEL=="apex*", GROUP="44", MODE="0660"
 
     # Disable default API server admission plugins.
     - |-
