@@ -22,8 +22,6 @@ spec:
           reloader.stakater.com/auto: "true"
 
         pod:
-          nodeSelector:
-            intel.feature.node.kubernetes.io/gpu: "true"
           securityContext:
             runAsUser: 2000
             runAsGroup: 2000
@@ -55,7 +53,6 @@ spec:
             resources:
               requests:
                 cpu: 100m
-                gpu.intel.com/i915: 1
                 memory: 9248M
               limits:
                 gpu.intel.com/i915: 1
