@@ -18,3 +18,14 @@ spec:
   values:
     name: intel-gpu-plugin
     sharedDevNum: 3
+
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              version: v1
+              kind: GpuDevicePlugin
+              name: intel-gpu-plugin
+            patch: |
+              - op: remove
+                path: /spec/nodeSelector
