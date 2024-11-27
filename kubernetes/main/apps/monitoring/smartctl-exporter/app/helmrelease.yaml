@@ -1,0 +1,43 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: smartctl-exporter
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: prometheus-smartctl-exporter
+      version: 0.11.0
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+      interval: 30m
+  values:
+    fullnameOverride: smartctl-exporter
+
+    image:
+      registry: quay.io
+
+    config:
+      devices:
+        - /dev/sda
+        - /dev/sdb
+        - /dev/nvme0n1
+
+    serviceMonitor:
+      enabled: true
+      relabelings:
+        - action: labeldrop
+          regex: (pod)
+        - action: replace
+          regex: (.*)
+          replacement: $1.bjw-s.internal
+          sourceLabels:
+            - __meta_kubernetes_endpoint_node_name
+          targetLabel: instance
+
+    prometheusRules:
+      enabled: false
