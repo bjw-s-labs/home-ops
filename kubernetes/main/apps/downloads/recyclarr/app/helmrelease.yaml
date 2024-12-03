@@ -26,6 +26,10 @@ spec:
 
         cronjob:
           schedule: "@daily"
+          backoffLimit: 0
+          concurrencyPolicy: Forbid
+          failedJobsHistory: 1
+          successfulJobsHistory: 0
 
         pod:
           securityContext:
