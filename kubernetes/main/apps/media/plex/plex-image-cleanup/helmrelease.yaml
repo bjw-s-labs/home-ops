@@ -25,6 +25,10 @@ spec:
 
         cronjob:
           schedule: "30 8 * * 6"
+          backoffLimit: 0
+          concurrencyPolicy: Forbid
+          failedJobsHistory: 1
+          successfulJobsHistory: 0
 
         pod:
           affinity:

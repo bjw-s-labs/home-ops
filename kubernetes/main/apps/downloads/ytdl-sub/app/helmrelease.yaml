@@ -38,12 +38,10 @@ spec:
 
         cronjob:
           schedule: "0 */6 * * *"
-          concurrencyPolicy: Forbid
-          successfulJobsHistory: 0
-          failedJobsHistory: 1
           backoffLimit: 0
-          activeDeadlineSeconds: 14400
-          ttlSecondsAfterFinished: 86400
+          concurrencyPolicy: Forbid
+          failedJobsHistory: 1
+          successfulJobsHistory: 0
 
         containers:
           app:
