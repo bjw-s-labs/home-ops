@@ -1,0 +1,73 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mailbackup
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 3.5.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 30m
+  values:
+    controllers:
+      mailbackup:
+        type: cronjob
+
+        cronjob:
+          schedule: "0 2 * * *"
+          backoffLimit: 0
+          concurrencyPolicy: Forbid
+          failedJobsHistory: 1
+          successfulJobsHistory: 0
+
+        pod:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsUser: 65534
+            runAsGroup: 65534
+            runAsNonRoot: true
+            fsGroup: 65534
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 65542 # gladius:external-services
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/bjw-s-labs/getmail
+              tag: 6.19.5@sha256:5fea91dd1781f5d39dc8dbbee7cdeae3c3138b12ba7dd720bce3268b9e2a6506
+            command:
+              - "/scripts/mailbackup.sh"
+
+    persistence:
+      config:
+        type: secret
+        name: mailbackup-secrets
+        advancedMounts:
+          mailbackup:
+            app:
+              - path: /config
+      scripts:
+        type: configMap
+        name: mailbackup-script
+        defaultMode: 0775
+        advancedMounts:
+          mailbackup:
+            app:
+              - path: /scripts/mailbackup.sh
+                subPath: mailbackup.sh
+      backup:
+        type: nfs
+        server: gladius.bjw-s.internal
+        path: /tank/Backup
+        advancedMounts:
+          mailbackup:
+            app:
+              - path: /data/nas-backup
