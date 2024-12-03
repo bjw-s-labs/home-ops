@@ -8,7 +8,6 @@ vars:
 tasks:
   wipe-disk:
     desc: Wipe all remnants of rook-ceph from a given disk  [K8S_CLUSTER={{.K8S_CLUSTER}}] [NODE=required] [DISK=required]
-    internal: true
     preconditions:
       - which kubectl minijinja-cli stern
       - test -f {{.ROOK_TASK_RESOURCES_DIR}}/wipe-rook.yaml.j2
