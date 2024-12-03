@@ -23,6 +23,9 @@ spec:
         cronjob:
           schedule: "0 0 * * 1"
           parallelism: 3 # Set this to your number of nodes
+          backoffLimit: 0
+          failedJobsHistory: 1
+          successfulJobsHistory: 0
 
         pod:
           hostNetwork: true
