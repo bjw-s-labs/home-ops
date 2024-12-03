@@ -239,15 +239,10 @@ controlPlane:
     - |-
       machine:
         sysctls:
-          fs.inotify.max_user_instances: 8192
-          fs.inotify.max_user_watches: 1048576
-          net.core.rmem_max: 67108864
-          net.core.wmem_max: 67108864
-          net.ipv4.tcp_rmem: 4096 87380 33554432
-          net.ipv4.tcp_wmem: 4096 65536 33554432
-          net.ipv4.tcp_tw_reuse: 1
-          net.ipv4.tcp_window_scaling: 1
-          net.ipv4.tcp_congestion_control: bbr
+          fs.inotify.max_user_instances: 8192    # Watchdog
+          fs.inotify.max_user_watches: 1048576   # Watchdog
+          net.core.rmem_max: 67108864            # Cloudflared / QUIC
+          net.core.wmem_max: 67108864            # Cloudflared / QUIC
 
     # Configure udev rules
     - |-
