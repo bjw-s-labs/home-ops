@@ -50,14 +50,6 @@ spec:
             # Enabling this adds an extra default route to the container. My IoT network is locked down tight and results in failed external DNS lookups
             # k8s.v1.cni.cncf.io/networks: home-automation-iot-dhcp
             secret.reloader.stakater.com/reload: home-assistant-secrets
-          securityContext:
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
-            runAsNonRoot: true
-            fsGroup: ${APP_GID}
-            fsGroupChangePolicy: "OnRootMismatch"
-            supplementalGroups:
-            - 34
 
         containers:
           app:
@@ -78,24 +70,34 @@ spec:
             envFrom:
             - secretRef:
                 name: home-assistant-secrets
-            # probes:
-            #   liveness:
-            #     enabled: true
-            #   readiness:
-            #     enabled: true
-            #   startup:
-            #     enabled: true
-            #     spec:
-            #       failureThreshold: 30
-            #       periodSeconds: 5
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: [ "ALL" ] }
             resources:
               requests:
                 memory: "512M"
               limits:
                 memory: "6000M"
-
+          code-server:
+            image:
+              repository: ghcr.io/coder/code-server
+              tag: 4.95.3@sha256:6d74583d68179cbb6ddadc2518b450d2ac3eaec2d342474fe1941e03371cd2cf
+            args: [ "--auth", "none", "--user-data-dir", "/config/.vscode", "--extensions-dir", "/config/.vscode", "--port", "12321", "/config" ]
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 512Mi
 
     defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: ${APP_UID}
+        runAsGroup: ${APP_GID}
+        fsGroup: ${APP_GID}
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
       affinity:
         podAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -103,7 +105,7 @@ spec:
               matchExpressions:
               - key: app.kubernetes.io/name
                 operator: In
-                values: ["multus"]
+                values: [ "multus" ]
             topologyKey: kubernetes.io/hostname
             namespaceSelector: {}
 
