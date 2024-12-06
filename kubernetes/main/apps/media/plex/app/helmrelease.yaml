@@ -41,19 +41,32 @@ spec:
               PLEX_ADVERTISE_URL: https://10.1.1.136:32400,https://plex.bjw-s.dev:443
               PLEX_NO_AUTH_NETWORKS: 10.244.0.0/16
             probes:
-              liveness:
+              liveness: &probes
                 enabled: true
-              readiness:
-                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /identity
+                    port: 32400
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
               startup:
                 enabled: true
                 spec:
                   failureThreshold: 30
-                  periodSeconds: 5
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
             resources:
               requests:
                 cpu: 100m
-                memory: 9248M
               limits:
                 gpu.intel.com/i915: 1
                 memory: 9248M
