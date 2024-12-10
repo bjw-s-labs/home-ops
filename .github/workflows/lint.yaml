@@ -34,7 +34,7 @@ jobs:
         if: steps.changed-files.outputs.any_changed == 'true'
         uses: bjw-s/action-actionlint@v0.1
         with:
-          actionlint_config: .ci/actionlint/actionlint.yml
+          actionlint_config: .actionlint.yml
           file_pattern: ${{ steps.changed-files.outputs.all_changed_files }}
 
   yamllint:
@@ -64,7 +64,7 @@ jobs:
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
         run: |
-          yamllint --config-file .ci/yamllint/.yamllint.yaml --format github ${{ steps.changed-files.outputs.all_changed_files }}
+          yamllint --config-file .yamllint.yaml --format github ${{ steps.changed-files.outputs.all_changed_files }}
 
   markdownlint:
     name: markdownlint
@@ -86,7 +86,7 @@ jobs:
         if: steps.changed-files.outputs.any_changed == 'true'
         uses: bjw-s/action-markdownlint-cli2@v0.1
         with:
-          markdownlint_config: .ci/markdownlint/.markdownlint.yaml
+          markdownlint_config: .markdownlint.yaml
           file_pattern: ${{ steps.changed-files.outputs.all_changed_files }}
 
   prettier:
@@ -106,8 +106,8 @@ jobs:
         if: steps.changed-files.outputs.any_changed == 'true'
         uses: bjw-s/action-prettier-lint@v0.1
         with:
-          prettier_ignore: .ci/prettier/.prettierignore
-          prettier_config: .ci/prettier/.prettierrc.yaml
+          prettier_ignore: .prettierignore
+          prettier_config: .prettierrc.yaml
           file_pattern: ${{ steps.changed-files.outputs.all_changed_files }}
 
   lint_success:
