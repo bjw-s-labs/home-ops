@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: externaldns-external
+  name: externaldns-cloudflare
 spec:
   interval: 30m
   chart:
@@ -20,14 +20,14 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
-    fullnameOverride: &name externaldns-external
+    fullnameOverride: &name externaldns-cloudflare
     domainFilters:
       - bjw-s.dev
     env:
       - name: CF_API_TOKEN
         valueFrom:
           secretKeyRef:
-            name: externaldns-external-secrets
+            name: externaldns-cloudflare-secrets
             key: cloudflare_api_token
     extraArgs:
       - --cloudflare-dns-records-per-page=1000
@@ -38,7 +38,7 @@ spec:
       - --ignore-ingress-tls-spec
       - --ingress-class=external-nginx
     podAnnotations:
-      secret.reloader.stakater.com/reload: externaldns-external-secrets
+      secret.reloader.stakater.com/reload: externaldns-cloudflare-secrets
     policy: sync
     provider: cloudflare
     resources:
