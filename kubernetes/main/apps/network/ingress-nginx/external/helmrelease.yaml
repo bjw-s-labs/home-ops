@@ -31,11 +31,11 @@ spec:
         enabled: true
         type: LoadBalancer
         annotations:
-          external-dns.alpha.kubernetes.io/hostname: "ingress-ext.bjw-s.dev"
-          lbipam.cilium.io/ips: "10.1.1.132"
+          external-dns.alpha.kubernetes.io/hostname: &hostname ingress-ext.bjw-s.dev
+          lbipam.cilium.io/ips: 10.1.1.132
 
       publishService:
-        enabled: true
+        enabled: false
 
       ingressClassResource:
         name: external-nginx
@@ -87,6 +87,7 @@ spec:
 
       extraArgs:
         default-ssl-certificate: "network/bjw-s-dev-tls"
+        publish-status-address: *hostname
 
       topologySpreadConstraints:
         - maxSkew: 1
