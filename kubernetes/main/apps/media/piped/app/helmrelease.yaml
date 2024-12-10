@@ -129,6 +129,8 @@ spec:
             env:
               SCRIPT_NAME: update_subscriptions.sh
               PIPED_BACKEND: http://piped-backend.media.svc.cluster.local:8080
+              MIN_SLEEP_BETWEEN_FEEDS: 30
+              MAX_SLEEP_BETWEEN_FEEDS: 120
             envFrom:
               - secretRef:
                   name: piped-db-secret
