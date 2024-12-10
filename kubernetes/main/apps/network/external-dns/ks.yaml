@@ -3,7 +3,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname externaldns-external
+  name: &appname externaldns-cloudflare
   namespace: flux-system
 spec:
   targetNamespace: network
@@ -12,7 +12,7 @@ spec:
       app.kubernetes.io/name: *appname
   interval: 30m
   timeout: 5m
-  path: "./kubernetes/main/apps/network/external-dns/external"
+  path: "./kubernetes/main/apps/network/external-dns/cloudflare"
   prune: true
   sourceRef:
     kind: GitRepository
