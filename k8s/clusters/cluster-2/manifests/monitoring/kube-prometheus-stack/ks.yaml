@@ -18,8 +18,7 @@ spec:
     name: home-ops
   wait: true
   dependsOn:
-    - name: alertmanager
-    - name: rook-ceph-cluster
+  - name: rook-ceph-cluster
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -40,4 +39,4 @@ spec:
     name: home-ops
   wait: true
   dependsOn:
-    - name: kube-prometheus-stack
+  - name: kube-prometheus-stack
