@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/helmrelease_v2beta1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -33,19 +33,3 @@ spec:
       serviceMonitor:
         create: true
       replicaCount: 3
-    webhook:
-      enabled: true
-      tls:
-        certManagerIssuerRef:
-          name: snapshot-controller-webhook-ca
-          kind: Issuer
-      # volumeSnapshotClasses:
-      #   - name: csi-rbdplugin-snapclass
-      #     driver: rook-ceph.rbd.csi.ceph.com
-      #     annotations:
-      #       snapshot.storage.kubernetes.io/is-default-class: "true"
-      #     parameters:
-      #       clusterID: rook-ceph
-      #       csi.storage.k8s.io/snapshotter-secret-name: rook-csi-rbd-provisioner
-      #       csi.storage.k8s.io/snapshotter-secret-namespace: rook-ceph
-      #     deletionPolicy: Delete
