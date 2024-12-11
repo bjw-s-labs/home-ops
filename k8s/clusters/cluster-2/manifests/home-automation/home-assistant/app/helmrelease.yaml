@@ -55,7 +55,7 @@ spec:
           app:
             image:
               repository: ghcr.io/onedr0p/home-assistant
-              tag: 2024.12.0@sha256:c2f8786bcf5be715b7f9bd08446f015eef1d771bd4257cd53fa06e415a8b768c
+              tag: 2024.12.2@sha256:352d00833a6bb2a1a82e20e846c054bccb4a186c7f264d06b139ca406af288e1
               # repository: homeassistant/home-assistant
               # tag: 2024.12.0
               pullPolicy: IfNotPresent
@@ -168,3 +168,12 @@ spec:
         tls:
         - hosts:
           - *host
+      code-server:
+        className: internal
+        hosts:
+        - host: "hass-code.${INGRESS_DOMAIN}"
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: code-server
