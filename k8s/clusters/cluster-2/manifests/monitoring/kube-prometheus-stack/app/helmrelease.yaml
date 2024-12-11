@@ -29,7 +29,21 @@ spec:
     ### Component values
     ###
     alertmanager:
-      enabled: false
+      ingress:
+        enabled: true
+        ingressClassName: internal
+        hosts: [ "alertmanager.${INGRESS_DOMAIN}" ]
+        pathType: Prefix
+      alertmanagerSpec:
+        useExistingSecret: true
+        configSecret: alertmanager-secret
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: "ceph-blockpool-nvme"
+              resources:
+                requests:
+                  storage: 1Gi
 
     kubeApiServer:
       serviceMonitor:
