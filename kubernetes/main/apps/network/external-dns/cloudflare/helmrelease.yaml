@@ -34,7 +34,6 @@ spec:
       - --cloudflare-proxied
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
-      - --events
       - --ignore-ingress-tls-spec
       - --ingress-class=external-nginx
     podAnnotations:
@@ -52,6 +51,7 @@ spec:
     sources:
       - ingress
       - crd
+    triggerLoopOnEvent: true
     txtOwnerId: main
     txtPrefix: "k8s."
 
