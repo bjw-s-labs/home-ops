@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/probe_v1.json
+---
+kind: Probe
+apiVersion: monitoring.coreos.com/v1
+metadata:
+  name: devices
+spec:
+  module: icmp
+  prober:
+    url: blackbox-exporter.observability.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+      - canlight1.iot.${INGRESS_DOMAIN}
+      - canlight2.iot.${INGRESS_DOMAIN}
+      - canlight3.iot.${INGRESS_DOMAIN}
+      - canlight4.iot.${INGRESS_DOMAIN}
+      - canlight5.iot.${INGRESS_DOMAIN}
+      - canlight6.iot.${INGRESS_DOMAIN}
