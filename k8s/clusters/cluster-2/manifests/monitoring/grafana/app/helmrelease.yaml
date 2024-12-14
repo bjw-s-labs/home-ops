@@ -273,10 +273,13 @@ spec:
           url: http://prometheus-operated.monitoring.svc.cluster.local:9090
           jsonData:
             timeInterval: 1m
-        # - access: proxy
-        #   name: Loki
-        #   type: loki
-        #   url: http://loki-gateway.monitoring.svc.cluster.local:80
+        - name: Loki
+          type: loki
+          uid: loki
+          access: proxy
+          url: http://loki-headless.observability.svc.cluster.local:3100
+          jsonData:
+            maxLines: 250
         - name: Alertmanager
           type: alertmanager
           uid: alertmanager
@@ -289,8 +292,8 @@ spec:
           orgId: 1
         - name: Prometheus
           orgId: 1
-          # - name: Loki
-          #   orgId: 1
+        - name: Loki
+          orgId: 1
 
     env:
       GF_ANALYTICS_CHECK_FOR_UPDATES: false
