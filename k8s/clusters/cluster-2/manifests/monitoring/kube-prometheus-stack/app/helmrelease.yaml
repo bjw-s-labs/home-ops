@@ -192,29 +192,29 @@ spec:
             expr: (kube_pod_container_status_restarts_total - kube_pod_container_status_restarts_total offset 10m >= 1) and ignoring (reason) min_over_time(kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}[10m]) == 1
             labels:
               severity: critical
-      zfs-rules:
-        groups:
-        - name: zfs
-          rules:
-          - alert: ZfsUnexpectedPoolState
-            annotations:
-              summary: ZFS pool {{$labels.zpool}} on {{$labels.instance}} is in a unexpected state {{$labels.state}}
-            expr: node_zfs_zpool_state{state!="online"} > 0
-            labels:
-              severity: critical
+      # zfs-rules:
+      #   groups:
+      #   - name: zfs
+      #     rules:
+      #     - alert: ZfsUnexpectedPoolState
+      #       annotations:
+      #         summary: ZFS pool {{$labels.zpool}} on {{$labels.instance}} is in a unexpected state {{$labels.state}}
+      #       expr: node_zfs_zpool_state{state!="online"} > 0
+      #       labels:
+      #         severity: critical
 
-  postRenderers:
-  - kustomize:
-      patches:
-      - target:
-          version: v1
-          kind: ConfigMap
-          labelSelector: grafana_dashboard in (1)
-        patch: |-
-          apiVersion: v1
-          kind: ConfigMap
-          metadata:
-            name: not-used
-            namespace: not-used
-            annotations:
-              grafana_folder: Kubernetes
+      # postRenderers:
+      # - kustomize:
+      #     patches:
+      #     - target:
+      #         version: v1
+      #         kind: ConfigMap
+      #         labelSelector: grafana_dashboard in (1)
+      #       patch: |-
+      #         apiVersion: v1
+      #         kind: ConfigMap
+      #         metadata:
+      #           name: not-used
+      #           namespace: not-used
+      #           annotations:
+      #             grafana_folder: Kubernetes
