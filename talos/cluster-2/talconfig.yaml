@@ -2,7 +2,7 @@
 clusterName: &cluster cluster-2
 
 # renovate: depName=ghcr.io/siderolabs/installer datasource=docker
-talosVersion: v1.8.2
+talosVersion: v1.8.3
 # renovate: depName=ghcr.io/siderolabs/kubelet datasource=docker
 kubernetesVersion: v1.31.1
 
@@ -27,9 +27,9 @@ allowSchedulingOnMasters: false
 cniConfig:
   name: none
 additionalApiServerCertSans: &san
-- cluster-2
-- cluster-2.${secret_domain}
-- "127.0.0.1" # KubePrism
+  - cluster-2
+  - cluster-2.${secret_domain}
+  - "127.0.0.1" # KubePrism
 additionalMachineCertSans: *san
 clusterPodNets:
 - ${pod_cidr}
@@ -46,8 +46,6 @@ nodes:
   installDiskSelector:
     # size: '> 50GB'
     type: nvme
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   - interface: bond0
     bond:
@@ -75,8 +73,6 @@ nodes:
   disableSearchDomain: true
   installDiskSelector:
     type: nvme
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   - interface: bond0
     bond:
@@ -96,8 +92,6 @@ nodes:
   disableSearchDomain: true
   installDiskSelector:
     type: nvme
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   - interface: bond0
     bond:
@@ -122,8 +116,6 @@ nodes:
     storage-node: true:NoSchedule
   installDiskSelector:
     size: <= 50GB
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   # 1G Internal Port
   - deviceSelector:
@@ -153,8 +145,6 @@ nodes:
     storage-node: true:NoSchedule
   installDiskSelector:
     size: <= 50GB
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   # 1G Internal Port
   - deviceSelector:
@@ -185,8 +175,6 @@ nodes:
     storage-node: true:NoSchedule
   installDiskSelector:
     size: <= 50GB
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   # 1G Internal Port
   - deviceSelector:
@@ -217,8 +205,6 @@ nodes:
     storage-node: true:NoSchedule
   installDiskSelector:
     size: <= 50GB
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   # 1G Internal Port
   - deviceSelector:
@@ -249,8 +235,6 @@ nodes:
     storage-node: true:NoSchedule
   installDiskSelector:
     size: <= 50GB
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   # 1G Internal Port
   - deviceSelector:
@@ -281,8 +265,6 @@ nodes:
     storage-node: true:NoSchedule
   installDiskSelector:
     size: <= 50GB
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   # 1G Internal Port
   - deviceSelector:
@@ -313,8 +295,6 @@ nodes:
     storage-node: true:NoSchedule
   installDiskSelector:
     size: <= 50GB
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   # 1G Internal Port
   - deviceSelector:
@@ -345,8 +325,6 @@ nodes:
     storage-node: true:NoSchedule
   installDiskSelector:
     size: <= 50GB
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   # 1G Internal Port
   - deviceSelector:
@@ -373,8 +351,6 @@ nodes:
   disableSearchDomain: true
   installDiskSelector:
     type: nvme
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   - interface: bond0
     bond:
@@ -405,8 +381,6 @@ nodes:
   installDiskSelector:
     # size: '>= 500GB'
     busPath: /pci0000:00/0000:00:1d.0/0000:04:00.0/nvme/nvme0/nvme0n1
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   - interface: bond0
     bond:
@@ -431,8 +405,6 @@ nodes:
   installDiskSelector:
     # size: '>= 500GB'
     busPath: /pci0000:00/0000:00:1d.0/0000:04:00.0/nvme/nvme0/nvme0n1
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   - interface: bond0
     bond:
@@ -451,15 +423,12 @@ nodes:
 - hostname: n100-03.cluster-2.${secret_domain}
   ipAddress: n100-03.cluster-2.${secret_domain}
   # Awok AK10 x86 Specific factory.talos.dev 
-  talosImageURL: factory.talos.dev/installer/97bf8e92fc6bba0f03928b859c08295d7615737b29db06a97be51dc63004e403
+  talosImageURL: factory.talos.dev/installer/dbe6aa7d6560b266a02d3b2eb047a55ad42041ea0e4dd24bd8fdbd23d65c48d6
   controlPlane: false
   disableSearchDomain: true
   installDiskSelector:
-    # size: '>= 500GB'
-    # busPath: /pci0000:00/0000:00:17.0/ata2/host2/target2:0:0/2:0:0:0
-    model: NGFF 2280 512GB
-  nameservers:
-  - 10.0.0.4
+    size: '<= 500GB'
+    # busPath: /pci0000:00/0000:00:1d.0/0000:04:00.0/nvme/nvme0/nvme0n1
   networkInterfaces:
   - interface: bond0
     bond:
@@ -488,8 +457,6 @@ nodes:
     storage-node: true:NoSchedule
   installDiskSelector:
     size: <= 50GB
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   # 1G Internal Port
   - deviceSelector:
@@ -512,8 +479,6 @@ nodes:
     storage-node: true:NoSchedule
   installDiskSelector:
     size: <= 50GB
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   # 1G Internal Port
   - deviceSelector:
@@ -536,8 +501,6 @@ nodes:
     storage-node: true:NoSchedule
   installDiskSelector:
     size: <= 50GB
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   # 1G Internal Port
   - deviceSelector:
@@ -560,8 +523,6 @@ nodes:
     storage-node: true:NoSchedule
   installDiskSelector:
     size: <= 50GB
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   # 1G Internal Port
   - deviceSelector:
@@ -584,8 +545,6 @@ nodes:
     storage-node: true:NoSchedule
   installDiskSelector:
     size: <= 50GB
-  nameservers:
-  - 10.0.0.4
   networkInterfaces:
   # 1G Internal Port
   - deviceSelector:
@@ -605,33 +564,18 @@ controlPlane:
       - net.ifnames=0
       systemExtensions:
         officialExtensions: &extensions
-        - siderolabs/intel-ucode
-        - siderolabs/i915-ucode
-        # - siderolabs/tailscale
-        - siderolabs/util-linux-tools
-        # - siderolabs/nut-client
-        # - siderolabs/stargz-snapshotter
+          - siderolabs/intel-ucode
+          - siderolabs/i915-ucode
+          # - siderolabs/tailscale
+          - siderolabs/util-linux-tools
+          # - siderolabs/nut-client
+          # - siderolabs/stargz-snapshotter
   patches:
   # Disable search domain everywhere
   - &disableSearchDomainPatch |-
     machine:
       network:
         disableSearchDomain: true
-
-  # Configure NTP
-  - &ntpPatch |-
-    machine:
-      time:
-        disabled: false
-        servers:
-          - 10.255.253.1
-
-  # Force nameserver
-  - &nameserverPatch |-
-    machine:
-      network:
-        nameservers:
-          - 10.0.0.4
 
   # Enable host dns
   - &hostDnsPatch |-
@@ -776,13 +720,8 @@ worker:
   - *discoveryPatch
   - *kubeletPatch
   - *kubePrismPatch
-  - *nameserverPatch
-  - *ntpPatch
   - *sysctlPatch
   - *talosPatch
   # - *pullThroughCachePatch
   - *encryptedOSD
   - *hostDnsPatch
-
-
-

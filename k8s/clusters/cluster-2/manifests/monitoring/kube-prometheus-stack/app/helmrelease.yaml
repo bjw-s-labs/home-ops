@@ -35,8 +35,11 @@ spec:
         hosts: [ "alertmanager.${INGRESS_DOMAIN}" ]
         pathType: Prefix
       alertmanagerSpec:
-        useExistingSecret: true
-        configSecret: alertmanager-secret
+        alertmanagerConfiguration:
+          name: alertmanager
+          global:
+            resolveTimeout: 5m
+        externalUrl: https://alertmanager.${INGRESS_DOMAIN}
         storage:
           volumeClaimTemplate:
             spec:
