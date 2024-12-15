@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: rook-ceph-cluster
-      version: v1.14.8
+      version: v1.15.6
       sourceRef:
         kind: HelmRepository
         name: rook-ceph-charts
@@ -49,7 +49,7 @@ spec:
           - *host
     toolbox:
       enabled: true
-      image: quay.io/ceph/ceph:v18.2.2
+      image: quay.io/ceph/ceph:v19.2.0
     configOverride: |
       [global]
       bdev_enable_discard = true
@@ -82,7 +82,7 @@ spec:
 
     cephClusterSpec:
       cephVersion:
-        image: quay.io/ceph/ceph:v18.2.2
+        image: quay.io/ceph/ceph:v19.2.0
       mgr:
         count: 2
         allowMultiplePerNode: false
@@ -135,21 +135,6 @@ spec:
                 - key: node-role.kubernetes.io/control-plane
                   operator: Exists
       resources:
-        # Use default HR values for mgr resources
-        # mgr:
-        #   limits:
-        #     cpu: 1500m
-        #     memory: 1024Mi
-        #   requests:
-        #     cpu: 500m
-        #     memory: 256Mi
-        mon:
-          limits:
-            cpu: 1000m
-            memory: 1280Mi
-          requests:
-            cpu: 100m
-            memory: 256Mi
         osd:
           limits:
             # cpu: 1000m
@@ -157,50 +142,11 @@ spec:
           requests:
             cpu: 500m
             memory: 1024Mi
-        # prepareosd:
-        #   limits:
-        #     cpu: 1000m
-        #     memory: 400Mi
-        #   requests:
-        #     cpu: 100m
-        #     memory: 200Mi
-        mgr-sidecar:
-          limits:
-            cpu: 500m
-            memory: 100Mi
-          requests:
-            cpu: 100m
-            memory: 40Mi
-        crashcollector:
-          limits:
-            cpu: 100m
-            memory: 220M
-          requests:
-            cpu: 15m
-            memory: 64M
-        logcollector:
-          limits:
-            cpu: "500m"
-            memory: "1Gi"
-          requests:
-            cpu: "100m"
-            memory: "100Mi"
-        cleanup:
-          limits:
-            cpu: "500m"
-            memory: "1Gi"
-          requests:
-            cpu: "100m"
-            memory: "100Mi"
-        exporter:
-          limits:
-            cpu: "500m"
-            memory: "128Mi"
-          requests:
-            cpu: "50m"
-            memory: "50Mi"
       crashCollector:
         disable: false
+      csi:
+        readAffinity:
+          enabled: true
       dashboard:
         enabled: true
         urlPrefix: /
@@ -323,6 +269,7 @@ spec:
         parameters:
           imageFormat: "2"
           imageFeatures: layering
+          # imageFeatures: layering,exclusive-lock,object-map,fast-diff,deep-flatten
           csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
           csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
           csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
@@ -333,7 +280,7 @@ spec:
     cephBlockPoolsVolumeSnapshotClass:
       enabled: true
       name: csi-ceph-blockpool
-      isDefault: false
+      isDefault: true
       deletionPolicy: Delete
 
     cephFileSystems:
@@ -358,17 +305,10 @@ spec:
           erasureCoded:
             dataChunks: 6
             codingChunks: 2
-            # - name: erasurecoded-ssd
-            #   failureDomain: host
-            #   deviceClass: ssd
-            #   erasureCoded:
-            #     dataChunks: 6
-            #     codingChunks: 2
-            #   quota:
-            #     maxSize: 500G
         metadataServer:
           activeCount: 1
           activeStandby: true
+          priorityClassName: system-cluster-critical
           placement:
             topologySpreadConstraints:
             - maxSkew: 1
