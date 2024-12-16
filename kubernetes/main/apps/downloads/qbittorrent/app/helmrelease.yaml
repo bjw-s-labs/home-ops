@@ -164,14 +164,13 @@ spec:
           qbittorrent:
             port-forward:
               - path: /config
-      media:
+      downloads:
         type: nfs
         server: gladius.bjw-s.internal
-        path: /tank/Media
-        advancedMounts:
-          qbittorrent:
-            app:
-              - path: /data/nas-media
+        path: /mnt/tank/Media
+        globalMounts:
+          - path: /data/nas-media/Downloads/qbittorrent
+            subPath: Downloads/qbittorrent
       dnsdist:
         type: configMap
         name: qbittorrent-dnsdist
