@@ -111,12 +111,13 @@ spec:
           sabnzbd:
             app:
               - path: /config
-      media:
+      downloads:
         type: nfs
         server: gladius.bjw-s.internal
-        path: /tank/Media
+        path: /mnt/tank/Media
         globalMounts:
-          - path: /data/nas-media
+          - path: /data/nas-media/Downloads/sabnzbd
+            subPath: Downloads/sabnzbd
       temp:
         type: emptyDir
         advancedMounts:
