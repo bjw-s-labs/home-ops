@@ -150,11 +150,10 @@ spec:
           - path: /config/config.yaml
             subPath: config.yaml
             readOnly: true
-      media:
+      downloads:
         type: nfs
         server: gladius.bjw-s.internal
-        path: /tank/Media
-        advancedMounts:
-          orphaned:
-            app:
-              - path: /data/nas-media
+        path: /mnt/tank/Media
+        globalMounts:
+          - path: /data/nas-media/Downloads/qbittorrent
+            subPath: Downloads/qbittorrent
