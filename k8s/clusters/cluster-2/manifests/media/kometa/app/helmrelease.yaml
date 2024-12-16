@@ -55,17 +55,13 @@ spec:
         existingClaim: kometa
         globalMounts:
         - path: /config
-      config-secret:
-        type: secret
-        name: kometa-secret
-        globalMounts:
-        - path: /config/config.yml
-          subPath: config.yml
-          readOnly: true
       config-file:
         type: configMap
         name: kometa-configmap
         globalMounts:
+        - path: /config/config.yml
+          subPath: config.yml
+          readOnly: true
         - path: /config/1-moviecharts.yml
           subPath: 1-moviecharts.yml
           readOnly: true
