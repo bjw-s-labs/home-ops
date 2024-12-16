@@ -66,31 +66,6 @@ spec:
     kubeProxy:
       enabled: false
 
-    kube-state-metrics:
-      fullnameOverride: kube-state-metrics
-      metricLabelsAllowlist:
-      - pods=[*]
-      - deployments=[*]
-      - persistentvolumeclaims=[*]
-      prometheus:
-        monitor:
-          enabled: true
-          relabelings:
-          - action: replace
-            regex: (.*)
-            replacement: $1
-            sourceLabels: [ "__meta_kubernetes_pod_node_name" ]
-            targetLabel: kubernetes_node
-      resources:
-        requests:
-          cpu: 15m
-          memory: 127M
-        limits:
-          memory: 153M
-
-    nodeExporter:
-      enabled: false
-
     grafana:
       enabled: false
       forceDeployDashboards: true
@@ -134,11 +109,6 @@ spec:
           registry: quay.io
           repository: prometheus/prometheus
           tag: v3.0.1
-        # alertingEndpoints:
-        # - namespace: monitoring
-        #   name: alertmanager
-        #   port: 9093
-        #   apiVersion: v2
         enableAdminAPI: true
         enableFeatures:
         - auto-gomaxprocs
@@ -171,6 +141,34 @@ spec:
                 requests:
                   storage: 100Gi
 
+    prometheus-node-exporter:
+      fullnameOverride: node-exporter
+      prometheus:
+        monitor:
+          enabled: true
+          relabelings:
+          - action: replace
+            regex: (.*)
+            replacement: $1
+            sourceLabels: [ "__meta_kubernetes_pod_node_name" ]
+            targetLabel: kubernetes_node
+
+    kube-state-metrics:
+      fullnameOverride: kube-state-metrics
+      metricLabelsAllowlist:
+      - pods=[*]
+      - deployments=[*]
+      - persistentvolumeclaims=[*]
+      prometheus:
+        monitor:
+          enabled: true
+          relabelings:
+          - action: replace
+            regex: (.*)
+            replacement: $1
+            sourceLabels: [ "__meta_kubernetes_pod_node_name" ]
+            targetLabel: kubernetes_node
+
     additionalPrometheusRulesMap:
       dockerhub-rules:
         groups:
@@ -192,29 +190,3 @@ spec:
             expr: (kube_pod_container_status_restarts_total - kube_pod_container_status_restarts_total offset 10m >= 1) and ignoring (reason) min_over_time(kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}[10m]) == 1
             labels:
               severity: critical
-      # zfs-rules:
-      #   groups:
-      #   - name: zfs
-      #     rules:
-      #     - alert: ZfsUnexpectedPoolState
-      #       annotations:
-      #         summary: ZFS pool {{$labels.zpool}} on {{$labels.instance}} is in a unexpected state {{$labels.state}}
-      #       expr: node_zfs_zpool_state{state!="online"} > 0
-      #       labels:
-      #         severity: critical
-
-      # postRenderers:
-      # - kustomize:
-      #     patches:
-      #     - target:
-      #         version: v1
-      #         kind: ConfigMap
-      #         labelSelector: grafana_dashboard in (1)
-      #       patch: |-
-      #         apiVersion: v1
-      #         kind: ConfigMap
-      #         metadata:
-      #           name: not-used
-      #           namespace: not-used
-      #           annotations:
-      #             grafana_folder: Kubernetes
