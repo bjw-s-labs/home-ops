@@ -1,0 +1,483 @@
+templates:
+  Decade:
+    optional:
+      - collection
+      - movie
+    tmdb_collection_details: <<collection>>
+    tmdb_movie: <<movie>>
+    sort_title: ++++4.1_<<year>><<collection_name>>
+    sync_mode: sync
+
+######################################################
+#                      Decade                        #
+######################################################
+
+collections:
+  "1970s movies":
+    template: { name: Decade, year: 1970 }
+    plex_search:
+      any:
+        decade: 1970
+    summary: A collection of movies released in the 1970s
+    collection_mode: default
+  "'70s Comedies":
+    template: { name: Decade, year: 1970 }
+    summary: A collection of some of the top rated comedy movies from the 70s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/1970
+      release_date.lte: 12/31/1979
+      sort_by: vote_average.desc
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_original_language: English
+      with_genres: 35
+      limit: 500
+  "'70s Romance":
+    template: { name: Decade, year: 1970 }
+    summary: A collection of some of the top rated romance movies from the 70s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/1970
+      release_date.lte: 12/31/1979
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 10749
+      limit: 500
+      sort_by: vote_average.desc
+  "'70s Family":
+    template: { name: Decade, year: 1970 }
+    summary: A collection of some of the top rated family movies from the 70s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/1970
+      release_date.lte: 12/31/1979
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: PG-13
+      with_genres: 10751
+      sort_by: vote_average.desc
+      limit: 500
+  "'70s Drama":
+    template: { name: Decade, year: 1970 }
+    summary: A collection of some of the top rated drama movies from the 70s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/1970
+      release_date.lte: 12/31/1979
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 18
+      sort_by: vote_average.desc
+      limit: 500
+  "'70s Action":
+    template: { name: Decade, year: 1970 }
+    summary: A collection of some of the top rated action movies from the 70s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/1970
+      release_date.lte: 12/31/1979
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 28
+      sort_by: vote_average.desc
+      limit: 500
+
+
+  "1980s movies":
+    template: { name: Decade, year: 1980 }
+    plex_search:
+      any:
+        decade: 1980
+    summary: A collection of movies released in the 1980s
+    collection_mode: default
+  "'80s Comedies":
+    template: { name: Decade, year: 1980 }
+    summary: A collection of some of the top rated comedy movies from the 80s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/1980
+      release_date.lte: 12/31/1989
+      sort_by: vote_average.desc
+      with_genres: 35
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      limit: 500
+  "'80s Family":
+    template: { name: Decade, year: 1980 }
+    summary: A collection of some of the top rated family movies from the 80s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US    
+      release_date.gte: 01/01/1980
+      release_date.lte: 12/31/1989
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: PG-13
+      with_genres: 10751
+      sort_by: vote_average.desc
+      limit: 500
+  "'80s Romance":
+    template: { name: Decade, year: 1980 }
+    summary: A collection of some of the top rated romance movies from the 80s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/1980
+      release_date.lte: 12/31/1989
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 10749
+      sort_by: vote_average.desc
+      limit: 500
+  "'80s Drama":
+    template: { name: Decade, year: 1980 }
+    summary: A collection of some of the top rated drama movies from the 80s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/1980
+      release_date.lte: 12/31/1989
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 18
+      sort_by: vote_average.desc
+      limit: 500
+  "'80s Action":
+    template: { name: Decade, year: 1980 }
+    summary: A collection of some of the top rated action movies from the 80s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/1980
+      release_date.lte: 12/31/1989
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 28
+      sort_by: vote_average.desc
+      limit: 500
+  
+  
+  "1990s movies":
+    template: { name: Decade, year: 1990 }
+    plex_search:
+      any:
+        decade: 1990
+    summary: A collection of movies released in the 1990s
+    collection_mode: default
+  "'90s Comedies":
+    template: { name: Decade, year: 1990 }
+    summary: A collection of some of the top rated comedy movies from the 90s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/1990
+      release_date.lte: 12/31/1999
+      sort_by: vote_average.desc
+      with_genres: 35
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      limit: 500
+  "'90s Romance":
+    template: { name: Decade, year: 1990 }
+    summary: A collection of some of the top rated romance movies from the 90s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US    
+      release_date.gte: 01/01/1990
+      release_date.lte: 12/31/1999
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 10749
+      sort_by: vote_average.desc
+      limit: 500
+  "'90s Family":
+    template: { name: Decade, year: 1990 }
+    summary: A collection of some of the top rated family movies from the 90s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US    
+      release_date.gte: 01/01/1990
+      release_date.lte: 12/31/1999
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: PG-13
+      with_genres: 10751
+      sort_by: vote_average.desc
+      limit: 500
+  "'90s Drama":
+    template: { name: Decade, year: 1990 }
+    summary: A collection of some of the top rated drama movies from the 90s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US    
+      release_date.gte: 01/01/1990
+      release_date.lte: 12/31/1999
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 18
+      sort_by: vote_average.desc
+      limit: 500
+  "'90s Action":
+    sort_title: +++1990_<<collection_name>>
+    summary: A collection of some of the top rated action movies from the 90s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/1990
+      release_date.lte: 12/31/1999
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: PG-13
+      with_genres: 28
+      sort_by: vote_average.desc
+      limit: 500
+  
+  "2000s movies":
+    template: { name: Decade, year: 2000 }
+    plex_search:
+      any:
+        decade: 2000
+    summary: A collection of movies released in the 2000s
+    collection_mode: default  
+  "'2000s Comedies":
+    template: { name: Decade, year: 2000 }
+    summary: A collection of some of the top rated comedy movies from the 2000s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/2000
+      release_date.lte: 12/31/2009
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 35
+      sort_by: vote_average.desc
+      limit: 500
+  "'2000s Romance":
+    template: { name: Decade, year: 2000 }
+    summary: A collection of some of the top rated romance movies from the 2000s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US    
+      release_date.gte: 01/01/2000
+      release_date.lte: 12/31/2009
+      with_genres: 10749
+      sort_by: vote_average.desc
+      limit: 500
+  "2000s Family":
+    template: { name: Decade, year: 2000 }
+    summary: A collection of some of the top rated family movies from the 2000s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US    
+      release_date.gte: 01/01/2000
+      release_date.lte: 12/31/2009
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: PG-13
+      with_genres: 10751
+      sort_by: vote_average.desc
+      limit: 500
+  "2000s Drama":
+    template: { name: Decade, year: 2000 }
+    summary: A collection of some of the top rated drama movies from the 2000s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US    
+      release_date.gte: 01/01/2000
+      release_date.lte: 12/31/2009
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 18
+      sort_by: vote_average.desc
+      limit: 500
+  "2000s Action":
+    template: { name: Decade, year: 2000 }
+    summary: A collection of some of the top rated action movies from the 2000s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US    
+      release_date.gte: 01/01/2000
+      release_date.lte: 12/31/2009
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 28
+      sort_by: vote_average.desc
+      limit: 500
+      
+  "2010s movies":
+    template: { name: Decade, year: 2010 }
+    plex_search:
+      any:
+        decade: 2010
+    summary: A collection of movies released in the 2010s
+    collection_mode: default                          
+  "2010s Comedies":
+    template: { name: Decade, year: 2010 }
+    summary: A collection of some of the top rated comedy movies from the 2010s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US    
+      release_date.gte: 01/01/2010
+      release_date.lte: 12/31/2019
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 35
+      sort_by: vote_average.desc
+      limit: 500
+  "2010s Romance":
+    template: { name: Decade, year: 2010 }
+    summary: A collection of some of the top rated romance movies from the 2010s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US    
+      release_date.gte: 01/01/2010
+      release_date.lte: 12/31/2019
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 10749
+      sort_by: vote_average.desc
+      limit: 500
+  "2010s Family":
+    template: { name: Decade, year: 2010 }
+    summary: A collection of some of the top rated family movies from the 2010s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/2010
+      release_date.lte: 12/31/2019
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: PG-13
+      with_genres: 10751
+      sort_by: vote_average.desc
+      limit: 500
+  "2010s Drama":
+    template: { name: Decade, year: 2010 }
+    summary: A collection of some of the top rated drama movies from the 2010s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/2010
+      release_date.lte: 12/31/2019
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 18
+      sort_by: vote_average.desc
+      limit: 500
+  "2010s Action":
+    template: { name: Decade, year: 2010 }
+    summary: A collection of some of the top rated action movies from the 2010s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/2010
+      release_date.lte: 12/31/2019
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 28
+      sort_by: vote_average.desc
+      limit: 500
+              
+  "2020s movies":
+    template: { name: Decade, year: 2020 }
+    sync_mode: sync
+    plex_search:
+      any:
+        decade: 2020
+    summary: A collection of movies released in the 2020s
+    collection_mode: default         
+  "2020s Comedies":
+    template: { name: Decade, year: 2020 }
+    summary: A collection of some of the top rated comedy movies from the 2020s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US    
+      release_date.gte: 01/01/2020
+      release_date.lte: 12/31/2029
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 35
+      sort_by: vote_average.desc
+      limit: 500
+  "2020s Romance":
+    template: { name: Decade, year: 2020 }
+    summary: A collection of some of the top rated romance movies from the 2020s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US    
+      release_date.gte: 01/01/2020
+      release_date.lte: 12/31/2029
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 10749
+      sort_by: vote_average.desc
+      limit: 500
+  "2020s Family":
+    template: { name: Decade, year: 2020 }
+    summary: A collection of some of the top rated family movies from the 2020s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/2020
+      release_date.lte: 12/31/2029
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: PG-13
+      with_genres: 10751
+      sort_by: vote_average.desc
+      limit: 500
+  "2020s Drama":
+    template: { name: Decade, year: 2020 }
+    summary: A collection of some of the top rated drama movies from the 2020s compiled from TMDB
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/2020
+      release_date.lte: 12/31/2029
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 18
+      sort_by: vote_average.desc
+      limit: 500
+  "2020s Action":
+    template: { name: Decade, year: 2020 }
+    summary: A collection of some of the top rated action movies from the 2020s compiled from TMDB    
+    smart_label: critic_rating.desc
+    tmdb_discover:
+      region: US
+      release_date.gte: 01/01/2020
+      release_date.lte: 12/31/2029
+      with_runtime.gte: 75
+      certification_country: US
+      certification.lte: R
+      with_genres: 28
+      sort_by: vote_average.desc
+      limit: 500

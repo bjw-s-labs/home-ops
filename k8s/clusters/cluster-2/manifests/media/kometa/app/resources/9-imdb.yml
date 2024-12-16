@@ -1,0 +1,136 @@
+templates:
+  IMDb Genre:
+    default:
+      title: feature
+      limit: 100
+    imdb_list:
+      - url: https://www.imdb.com/search/title/?title_type=<<title>>&release_date=1990-01-01,&user_rating=5.0,10.0&num_votes=100000,&genres=<<genre>>
+        limit: <<limit>>
+      - url: https://www.imdb.com/search/title/?title_type=<<title>>&release_date=1990-01-01,&user_rating=5.0,10.0&num_votes=100000,&genres=<<genre>>&sort=user_rating,desc
+        limit: <<limit>>
+    sort_title: ++++9.1_<<collection_name>>
+    sync_mode: sync
+    smart_label: random
+  Other Genre:
+    sort_title: ++++9.2_<<collection_name>>
+    sync_mode: sync
+    smart_label: random
+    
+######################################################
+#                Genre Collections                   #
+######################################################
+
+collections:
+  Action:
+    template: { name: IMDb Genre, genre: action }
+    summary: Action film is a genre wherein physical action takes precedence in the storytelling. The film will often have continuous motion and action including physical stunts, chases, fights, battles, and races. The story usually revolves around a hero that has a goal, but is facing incredible odds to obtain it.
+  Adventure:
+    template: { name: IMDb Genre, genre: adventure }
+    summary: Adventure film is a genre that revolves around the conquests and explorations of a protagonist. The purpose of the conquest can be to retrieve a person or treasure, but often the main focus is simply the pursuit of the unknown. These films generally take place in exotic locations and play on historical myths. Adventure films incorporate suspenseful puzzles and intricate obstacles that the protagonist must overcome in order to achieve the end goal.
+  Animation:
+    template: { name: IMDb Genre, genre: animation }
+    summary: Animated film is a collection of illustrations that are photographed frame-by-frame and then played in a quick succession. Since its inception, animation has had a creative and imaginative tendency. Being able to bring animals and objects to life, this genre has catered towards fairy tales and children’s stories. However, animation has long been a genre enjoyed by all ages. As of recent, there has even been an influx of animation geared towards adults. Animation is commonly thought of as a technique, thus it’s ability to span over many different genres.
+  Comedy:
+    template: { name: IMDb Genre, genre: comedy }
+    summary: Comedy is a genre of film that uses humor as a driving force. The aim of a comedy film is to illicit laughter from the audience through entertaining stories and characters. Although the comedy film may take on some serious material, most have a happy ending. Comedy film has the tendency to become a hybrid sub-genre because humor can be incorporated into many other genres. Comedies are more likely than other films to fall back on the success and popularity of an individual star.
+  Crime:
+    template: { name: IMDb Genre, genre: crime }
+    summary: Crime film is a genre that revolves around the action of a criminal mastermind. A Crime film will often revolve around the criminal himself, chronicling his rise and fall. Some Crime films will have a storyline that follows the criminal's victim, yet others follow the person in pursuit of the criminal. This genre tends to be fast paced with an air of mystery – this mystery can come from the plot or from the characters themselves.
+  Documentary:
+    template: { name: IMDb Genre, genre: documentary, title: documentary }
+    summary: Documentary film is a non-fiction genre intended to document reality primarily for the purposes of instruction, education, or maintaining a historical record.
+  Drama:
+    template: { name: IMDb Genre, genre: drama }
+    summary: Drama film is a genre that relies on the emotional and relational development of realistic characters. While Drama film relies heavily on this kind of development, dramatic themes play a large role in the plot as well. Often, these dramatic themes are taken from intense, real life issues. Whether heroes or heroines are facing a conflict from the outside or a conflict within themselves, Drama film aims to tell an honest story of human struggles.
+  Family:
+    template: { name: IMDb Genre, genre: family }
+    summary: Family film is a genre that is contains appropriate content for younger viewers. Family film aims to appeal not only to children, but to a wide range of ages. While the storyline may appeal to a younger audience, there are components of the film that are geared towards adults- such as witty jokes and humor. This genre may fall into many other genres, including comedy, adventure, fantasy, and animated film.
+  Fantasy:
+    template: { name: IMDb Genre, genre: fantasy }
+    summary: Fantasy film is a genre that incorporates imaginative and fantastic themes. These themes usually involve magic, supernatural events, or fantasy worlds. Although it is its own distinct genre, these films can overlap into the horror and science fiction genres. Unlike science fiction, a fantasy film does not need to be rooted in fact. This element allows the audience to be transported into a new and unique world. Often, these films center on an ordinary hero in an extraordinary situation.
+  Gangster:
+    template: { name: Other Genre }
+    imdb_list:
+      - https://www.imdb.com/list/ls026270180/
+      - https://www.imdb.com/list/ls000093502/
+    summary: Gangster film is a sub-genre of crime films that center on organized crime or the mafia. Often the plot revolves around the rise and fall of an organized crime leader. Many Gangster films explore the destructive nature of organized crime, while others attempt to show the humanity of the individual characters.
+  Halloween.:
+    template: { name: Other Genre }
+    trakt_list:
+      - https://trakt.tv/users/kairbear08/lists/halloween
+      - https://trakt.tv/users/mybicycle/lists/halloween
+      - https://trakt.tv/users/jayinftl/lists/halloween
+      - https://trakt.tv/users/roswellgeek/lists/halloween
+    name_mapping: Halloween (Season)
+    summary: Halloween film is a genre that revolves around the plot involving Halloween.
+  History:
+    template: { name: IMDb Genre, genre: history }
+    summary: History film is a genre that takes historical events and people and interprets them in a larger scale. Historical accuracy is not the main focus, but rather the telling of a grandiose story. The drama of an History film is often accentuated by a sweeping musical score, lavish costumes, and high production value.
+  Horror:
+    template: { name: IMDb Genre, genre: horror }
+    summary: Horror film is a genre that aims to create a sense of fear, panic, alarm, and dread for the audience. These films are often unsettling and rely on scaring the audience through a portrayal of their worst fears and nightmares. Horror films usually center on the arrival of an evil force, person, or event. Many Horror films include mythical creatures such as ghosts, vampires, and zombies. Traditionally, Horror films incorporate a large amount of violence and gore into the plot. Though it has its own style, Horror film often overlaps into Fantasy, Thriller, and Science-Fiction genres.
+  LGBTQ+:
+    template: { name: Other Genre }
+    imdb_list: https://www.imdb.com/list/ls062688328/
+    summary: LGBTQ+ film is a genre of films where the characters decpict lesbian, gay, bisexual, transgender, queer and intersex people.
+  Martial Arts:
+    template: { name: Other Genre }
+    imdb_list:
+      - https://www.imdb.com/list/ls000099643/
+      - https://www.imdb.com/list/ls068611186/
+      - https://www.imdb.com/list/ls068378513/
+      - https://www.imdb.com/list/ls090404120/
+    summary: Martial Arts film is a sub-genre of action films that feature numerous martial arts combat between characters. These combats are usually the films' primary appeal and entertainment value, and often are a method of storytelling and character expression and development. Martial Arts are frequently featured in training scenes and other sequences in addition to fights. Martial Arts films commonly include other types of action, such as hand-to-hand combat, stuntwork, chases, and gunfights.
+  Music:
+    template: { name: IMDb Genre, genre: music, limit: 200 }
+    summary: Music film is genre that revolves around music being an integral part of the characters lives.
+  Musical:
+    template: { name: IMDb Genre, genre: musical, limit: 200 }
+    summary: A Musical interweaves vocal and dance performances into the narrative of the film. The songs of a film can either be used to further the story or simply enhance the experience of the audience. These films are often done on a grand scale and incorporate lavish costumes and sets. Traditional musicals center on a well-known star, famous for their dancing or singing skills (i.e. Fred Astaire, Gene Kelly, Judy Garland). These films explore concepts such are love and success, allowing the audience to escape from reality.
+  Mystery:
+    template: { name: IMDb Genre, genre: mystery }
+    summary: A Mystery film centers on a person of authority, usually a detective, that is trying to solve a mysterious crime. The main protagonist uses clues, investigation, and logical reasoning. The biggest element in these films is a sense of “whodunit” suspense, usually created through visual cues and unusual plot twists.
+  Pandemic:
+    template: { name: Other Genre }
+    imdb_list:
+      - url: https://www.imdb.com/search/keyword/?keywords=deadly-virus%2Chealth-crisis%2Cpandemic%2Cpublic-health-epidemic%2Cvirus%2Ccoronavirus&sort=moviemeter,asc&mode=detail&page=1&ref_=kw_ref_key
+        limit: 1000
+      - url: https://www.imdb.com/list/ls041901506/
+      - url: https://www.imdb.com/list/ls092321048/
+    summary: A Pandemic film resolves around widespread viruses, plagues, and diseases.
+  Romance:
+    template: { name: IMDb Genre, genre: romance, limit: 200 }
+    summary: "Romance film can be defined as a genre wherein the plot revolves around the love between two protagonists. This genre usually has a theme that explores an issue within love, including but not limited to: love at first sight, forbidden love, love triangles, and sacrificial love. The tone of Romance film can vary greatly. Whether the end is happy or tragic, Romance film aims to evoke strong emotions in the audience."
+  Romantic Comedy:
+    template: { name: IMDb Genre, genre: "romance,comedy", limit: 200 }
+    summary: Romantic Comedy is a genre that attempts to catch the viewer’s heart with the combination of love and humor. This sub-genre is light-hearted and usually places the two protagonists in humorus situation. Romantic-Comedy film revolves around a romantic ideal, such as true love. In the end, the ideal triumphs over the situation or obstacle, thus creating a happy ending.
+  Romantic Drama:
+    template: { name: IMDb Genre, genre: "romance,drama", limit: 200 }
+    summary: Romantic Drama film is a genre that explores the complex side of love. The plot usually centers around an obstacle that is preventing love between two people. The obstacles in Romantic Drama film can range from a family's disapproval, to forbidden love, to one's own psychological restraints. Many Romantic Dramas end with the lovers separating because of the enormity of the obstacle, the realization of incompatibility, or simply because of fate.
+  Sci-Fi:
+    template: { name: IMDb Genre, genre: sci-fi }
+    summary: Science Fiction (Sci-Fi) film is a genre that incorporates hypothetical, science-based themes into the plot of the film. Often, this genre incorporates futuristic elements and technologies to explore social, political, and philosophical issues. The film itself is usually set in the future, either on earth or in space. Traditionally, a Science Fiction film will incorporate heroes, villains, unexplored locations, fantastical quests, and advanced technology.
+  Sports:
+    template: { name: IMDb Genre, genre: sport, limit: 200 }
+    summary: A Sport Film revolves around a sport setting, event, or an athlete. Often, these films will center on a single sporting event that carries significant importance. Sports films traditionally have a simple plot that builds up to the significant sporting event. This genre is known for incorporating film techniques to build anticipation and intensity. Sport films have a large range of sub-genres, from comedies to dramas, and are more likely than other genres to be based true-life events.
+  Stand Up Comedy:
+    template: { name: Other Genre }
+    imdb_list:
+      - https://www.imdb.com/list/ls070221411/
+      - https://www.imdb.com/list/ls086584751/
+      - https://www.imdb.com/list/ls086022668/
+      - https://www.imdb.com/list/ls049792208/
+    summary: Stand-up comedy is a comedic style in which a comedian performs in front of a live audience, speaking directly to them through a microphone. Comedians give the illusion that they are dialoguing, but in actuality, they are monologuing a grouping of humorous stories, jokes and one-liners, typically called a shtick, routine, act, or set. Some stand-up comedians use props, music or magic tricks to enhance their acts. Stand-up comedians perform quasi-autobiographical and fictionalized extensions of their offstage selves.
+  Sword & Sorcery:
+    template: { name: Other Genre }
+    imdb_list: https://www.imdb.com/list/ls022909805
+    summary: Sword and Sorcery film is a sub-genre of Fantasy that tend to be more plot-driven. These films rely on heavy action and battle scenes. Common themes in Sword and Sorcery films include a rescue mission, saving a princess, and battling a fantastical monster. The worlds and characters in these films are often much less developed than in other fantasy sub-genres. Of all the Fantasy sub-genres, Sword and Sorcery is most likely to be geared towards a younger audience, as many of these films are animated.
+  Thriller:
+    template: { name: IMDb Genre, genre: thriller }
+    summary: Thriller Film is a genre that revolves around anticipation and suspense. The aim for Thrillers is to keep the audience alert and on the edge of their seats. The protagonist in these films is set against a problem – an escape, a mission, or a mystery. No matter what sub-genre a Thriller film falls into, it will emphasize the danger that the protagonist faces. The tension with the main problem is built on throughout the film and leads to a highly stressful climax.
+  War:
+    template: { name: IMDb Genre, genre: war, limit: 200 }
+    summary: War Film is a genre that looks at the reality of war on a grand scale. They often focus on landmark battles as well as political issues within war. This genre usually focuses on a main character and his team of support, giving the audience an inside look into the gritty reality of war.
+  Western:
+    template: { name: IMDb Genre, genre: western, limit: 200 }
+    summary: "Western Film is a genre that revolves around stories primarily set in the late 19th century in the American Old West. Most Westerns are set between the American Civil War (1865) and the early 1900s. Common themes within Western Film include: the conquest of the wild west, the cultural separation of the East and the West, the West’s resistance to modern change, the conflict between Cowboys and Indians, outlaws, and treasure/gold hunting. American Western Film usually revolves around a stoic hero and emphasizes the importance of honor and sacrifice."

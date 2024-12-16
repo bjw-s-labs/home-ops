@@ -1,0 +1,139 @@
+libraries:
+  Movies:
+    split_duplicates: true
+    schedule: hourly(1)
+    collection_files:
+    - file: config/1-moviecharts.yml
+    - file: config/3-bestof.yml
+    - file: config/4-decade.yml
+    - file: config/5-holliday.yml
+    - file: config/6-studios.yml
+    - file: config/9-imdb.yml
+    - file: config/98-movie.yml
+  TVShows:
+    schedule: hourly(0)
+    collection_files:
+    - file: config/2-tvcharts.yml
+    - file: config/7-networks.yml
+    - file: config/8-tv.yml
+  Movies-4K:
+    schedule: hourly(6),hourly(18)
+    overlay_files:
+    - remove_overlays: false
+    - file: config/99-overlays.yml
+      template_variables:
+        4K: true
+        4K-HDR: true
+        4K-Dolby: true
+        4K-Episode: false
+  TVShows-4K:
+    schedule: hourly(6),hourly(18)
+    overlay_files:
+    - remove_overlays: false
+    - file: config/99-overlays.yml
+      template_variables:
+        4K: true
+        4K-HDR: true
+        4K-Dolby: true
+        4K-Episode: true
+settings:
+  cache: true
+  cache_expiration: 60
+  sync_mode: sync
+  show_unmanaged: true
+  show_filtered: false
+  show_missing: true
+  save_missing: true
+  run_again_delay: 2
+  asset_directory: /config/assets
+  asset_folders: false
+  assets_for_all: false
+  released_missing_only: false
+  create_asset_folders: false
+  missing_only_released: false
+  delete_below_minimum: false
+  minimum_items: 1
+  asset_depth: 0
+  dimensional_asset_rename: false
+  download_url_assets: false
+  show_missing_season_assets: false
+  default_collection_order:
+  delete_not_scheduled: false
+  only_filter_missing: false
+  show_options: false
+  show_missing_assets: false
+  tvdb_language: default
+  ignore_ids:
+  ignore_imdb_ids:
+  verify_ssl: true
+  playlist_sync_to_users: all
+  show_missing_episode_assets: false
+  show_asset_not_needed: true
+  item_refresh_delay: 0
+  custom_repo:
+  prioritize_assets: false
+  playlist_report: false
+  check_nightly: false
+  show_unconfigured: true
+  playlist_exclude_users:
+  run_order:
+  - operations
+  - metadata
+  - collections
+  - overlays
+plex:
+  url: https://plex.${INGRESS_DOMAIN}
+  token: ${PLEX_TOKEN}
+  timeout: 120
+  clean_bundles: false
+  empty_trash: false
+  optimize: false
+  db_cache:
+  verify_ssl: false
+tmdb:
+  apikey: ${TMDB_API_KEY}
+  language: en
+  cache_expiration: 60
+  region:
+tautulli:
+  url: https://tautulli.${INGRESS_DOMAIN}
+  apikey: ${TAUTULLI_API_KEY}
+# omdb:
+#   apikey: "{{ .OMDB_API_KEY }}"
+#   cache_expiration: 60
+radarr:
+  url: https://radarr.${INGRESS_DOMAIN}
+  token: ${RADARR_API_KEY}
+  add_missing: false
+  root_folder_path: /mnt/unionfs/Media/Movies
+  monitor: true
+  availability: announced
+  quality_profile: Any
+  tag: pmm
+  add_existing: false
+  search: true
+sonarr:
+  url: https://sonarr.${INGRESS_DOMAIN}
+  token: ${SONARR_API_KEY}
+  add_missing: false
+  add_existing: true
+  root_folder_path: /mnt/unionfs/Media/TV/TV Shows
+  monitor: all
+  quality_profile: Any
+  language_profile: English
+  series_type: standard
+  season_folder: true
+  tag: pmm
+  search: true
+  cutoff_search: false
+trakt:
+  client_id: ${TRAKT_ID}
+  client_secret: ${TRAKT_SECRET}
+  authorization:
+    access_token: ${TRAKT_ACCESS_TOKEN}
+    token_type: Bearer
+    expires_in: 7889237
+    refresh_token: ${TRAKT_REFRESH_TOKEN}
+    scope: public
+    created_at: 1671803329
+  pin:

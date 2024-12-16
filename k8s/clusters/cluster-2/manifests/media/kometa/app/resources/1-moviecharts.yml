@@ -1,0 +1,118 @@
+templates:
+  Chart:
+    sort_title: ++++1.1_<<num>><<collection_name>>
+    sync_mode: sync
+    collection_order: release
+  Chart Alpha:
+    sort_title: ++++1.1_<<num>><<collection_name>>
+    sync_mode: sync
+    collection_order: alpha
+
+######################################################
+#                Chart Collections                   #
+######################################################
+
+collections:
+  Top 10 Pirated Films:
+    template: {name: Chart, num: 1.1 }
+    trakt_list:
+      - https://trakt.tv/users/linaspurinis/lists/top-10-pirated-movies-of-the-week?sort=rank,asc
+    summary: These are the top 10 most pirated movies in the last week according to https://trakt.tv/users/linaspurinis/lists/top-10-pirated-movies-of-the-week?sort=rank,asc
+  Plex Popular:
+    template: { name: Chart Alpha, num: 1.2 }
+    tautulli_popular:
+      list_days: 30
+      list_size: 20
+      list_buffer: 20
+    tautulli_watched:
+      list_days: 30
+      list_size: 20
+      list_buffer: 20
+    summary: Movies Popular on Plex
+  Trending:
+    sync_mode: sync
+    template: { name: Chart Alpha, num: 1.3 }
+    trakt_trending: 15
+    tmdb_trending_daily: 15
+    tmdb_trending_weekly: 15
+    summary: Movies Trending across the internet
+    url_background: https://i.imgur.com/SOVfrIq.png
+    url_poster: https://i.imgur.com/4vpMZoA.png
+  Popular:
+    template: { name: Chart, num: 1.4 }
+    tmdb_popular: 40
+    imdb_list:
+      url: https://www.imdb.com/search/title/?title_type=feature,tv_movie,documentary,short
+      limit: 40
+    summary: Popular Movies across the internet
+  Top Rated:
+    template: {name: Chart Alpha, num: 1.5 }
+    tmdb_top_rated: 250
+    summary: Top Rated Movies
+    url_background: https://i.imgur.com/b26VZ9y.jpg
+    url_poster: https://i.imgur.com/x7BhedD.png
+  Oscars:
+    template: { name: Chart Alpha, num: 1.6 }
+    imdb_list: https://www.imdb.com/search/title/?title_type=feature,documentary&groups=oscar_winner
+    summary: Oscar Winning Movies
+  Top Weihnachts Filme:
+    template: {name: Chart Alpha, num: 1.7 }
+    imdb_list:
+      url: https://www.imdb.com/list/ls000096828/
+      limit: 100
+    summary: Top 100 Christmas movies, accoring to https://www.imdb.com/list/ls000096828/.
+    radarr_add: true
+  Top Horror Filme:
+    template: {name: Chart Alpha, num: 1.8 }
+    trakt_list:
+      - https://trakt.tv/users/w1nt3r/lists/time-out-s-100-best-horror-films?sort=rank,asc
+    summary: Top horror movies, accoring to https://trakt.tv/users/w1nt3r/lists/time-out-s-100-best-horror-films?sort=rank,asc.
+    radarr_add: true
+  Disney Sunday Night Filme:
+    template: { name: Chart Alpha, num: 1.9 }
+    trakt_list: https://trakt.tv/users/twhiting9275/lists/disney-sunday-night-movies
+    summary: A collection of the Walt Disney Sunday Night movies over the years
+  TMDB Most Popular:
+    template: { name: Chart Alpha, num: 2.1 }
+    summary: A collection of the most popular movies as listed on TMDB
+    tmdb_popular: 100
+    radarr_add: true
+  Best of Netflix:
+    template: { name: Chart Alpha, num: 2.2 }
+    summary: Best movies available to stream via Netflix according to Rotten Tomatoes
+    trakt_list: https://trakt.tv/users/hdlists/lists/best-movies-on-netflix
+  Best of Superhero Movies:
+    template: { name: Chart Alpha, num: 2.3 }
+    summary: Some of the best superhero movies
+    trakt_list: https://trakt.tv/users/hdlists/lists/best-superhero-movies
+  Best of the Razzies:
+    template: { name: Chart Alpha, num: 2.4 }
+    summary: Razzie Award Winners
+    trakt_list: https://trakt.tv/users/hdlists/lists/razzie-awards-worst-picture-winners
+  True Stories:
+    template: { name: Chart Alpha, num: 2.5 }
+    summary: Movies based on or inspired by a true story
+    trakt_list: https://trakt.tv/users/hdlists/lists/based-on-or-inspired-by-a-true-story
+  Top Romantic Comedies:
+    template: { name: Chart Alpha, num: 2.6 }
+    summary: Top rated romantic comedies according to Rotten Tomatoes
+    trakt_list: https://trakt.tv/users/hdlists/lists/romantic-comedies-rotten-tomatoes-top-rated
+  Parody Movie Collection:
+    template: { name: Chart Alpha, num: 2.7 }
+    trakt_list: https://trakt.tv/users/twhiting9275/lists/a-list-of-parody-movies
+    summary: A collection of parody movies
+    url_poster: https://i.imgur.com/yFtJ5eV.png
+    url_background: https://i.imgur.com/eELv4eB.jpg
+  Another Holiday Movie Collection:
+    template: { name: Chart Alpha, num: 2.8 }
+    summary: NOT so sappy holiday movies
+    trakt_list: https://trakt.tv/users/twhiting9275/lists/another-holiday-movie-list
+    url_poster: https://theposterdb.com/api/assets/108552/view?
+    filters:
+      collection.not: "Sappy Holiday Movies"
+  Sappy Holiday Movies:
+    template: { name: Chart Alpha, num: 2.9 }
+    summary: "Hallmark and Lifetime seem to have a trademark, as it were on these movies. The formula works, and it's quite a successful one.
+    A collection of sappy Holiday movies. If they're not on Hallmark, or Lifetime, they probably should be!"
+    trakt_list: https://trakt.tv/users/twhiting9275/lists/sappy-holiday-list
+    url_poster: https://theposterdb.com/api/assets/48894/view?

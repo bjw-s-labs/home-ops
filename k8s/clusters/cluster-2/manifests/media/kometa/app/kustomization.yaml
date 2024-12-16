@@ -1,0 +1,23 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ./helmrelease.yaml
+- ../../../../../../templates/volsync
+configMapGenerator:
+- name: kometa-configmap
+  files:
+  - config.yml=./resources/config.yml
+  - 1-moviecharts.yml=./resources/1-moviecharts.yml
+  - 2-tvcharts.yml=./resources/2-tvcharts.yml
+  - 3-bestof.yml=./resources/3-bestof.yml
+  - 4-decade.yml=./resources/4-decade.yml
+  - 5-holliday.yml=./resources/5-holliday.yml
+  - 6-studios.yml=./resources/6-studios.yml
+  - 7-networks.yml=./resources/7-networks.yml
+  - 8-tv.yml=./resources/8-tv.yml
+  - 9-imdb.yml=./resources/9-imdb.yml
+  - 98-movie.yml=./resources/98-movie.yml
+  - 99-overlays.yml=./resources/99-overlays.yml
+generatorOptions:
+  disableNameSuffixHash: true
