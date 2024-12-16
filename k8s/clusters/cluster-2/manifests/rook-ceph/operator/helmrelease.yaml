@@ -21,6 +21,8 @@ spec:
 
     csi:
       # cephFSKernelMountOptions: ms_mode=prefer-crc
+      # needed to allow cephfs mounts to work reliably
+      cephFSKernelMountOptions: ms_mode=prefer-secure
       enableLiveness: true
       serviceMonitor:
         enabled: true
