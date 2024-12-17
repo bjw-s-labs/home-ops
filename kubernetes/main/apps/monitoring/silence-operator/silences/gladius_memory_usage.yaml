@@ -1,0 +1,13 @@
+---
+apiVersion: monitoring.giantswarm.io/v1alpha1
+kind: Silence
+metadata:
+  name: gladius-memory-usage
+spec:
+  matchers:
+    - name: alertname
+      value: NodeMemoryHighUtilization
+      isRegex: false
+    - name: instance
+      value: gladius.bjw-s.internal:9100
+      isRegex: false
