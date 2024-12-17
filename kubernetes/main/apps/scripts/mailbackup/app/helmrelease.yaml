@@ -33,10 +33,6 @@ spec:
             runAsUser: 65534
             runAsGroup: 65534
             runAsNonRoot: true
-            fsGroup: 65534
-            fsGroupChangePolicy: "OnRootMismatch"
-            supplementalGroups:
-              - 65542 # gladius:external-services
 
         containers:
           app:
@@ -66,8 +62,9 @@ spec:
       backup:
         type: nfs
         server: gladius.bjw-s.internal
-        path: /tank/Backup
+        path: /mnt/tank/Backup/Bernd
         advancedMounts:
           mailbackup:
             app:
-              - path: /data/nas-backup
+              - path: /data/nas-backup/Bernd/Email
+                subPath: Email
