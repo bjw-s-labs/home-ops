@@ -52,13 +52,13 @@ spec:
       serviceMonitor:
         selector:
           k8s-app: kube-apiserver
-        relabelings: &nodeRelabeling
-          - sourceLabels: [ __meta_kubernetes_pod_node_name ] # Add nodename label
-            separator: ;
-            regex: ^(.*)$
-            targetLabel: nodename
-            replacement: $1
-            action: replace
+        relabelings:
+        - sourceLabels: [ __meta_kubernetes_pod_node_name ] # Add nodename label
+          separator: ;
+          regex: ^(.*)$
+          targetLabel: nodename
+          replacement: $1
+          action: replace
         # metricRelabelings:
         # # Remove pod label
         # - action: labeldrop
@@ -68,13 +68,33 @@ spec:
         selector:
           k8s-app: kube-scheduler
       serviceMonitor:
-        <<: *nodeRelabeling
+        relabelings:
+        - sourceLabels: [ __meta_kubernetes_pod_node_name ] # Add nodename label
+          separator: ;
+          regex: ^(.*)$
+          targetLabel: nodename
+          replacement: $1
+          action: replace
+        # metricRelabelings:
+        # # Remove pod label
+        # - action: labeldrop
+        #   regex: pod
     kubeControllerManager: &kubeControllerManager
       service:
         selector:
           k8s-app: kube-controller-manager
       serviceMonitor:
-        <<: *nodeRelabeling
+        relabelings:
+        - sourceLabels: [ __meta_kubernetes_pod_node_name ] # Add nodename label
+          separator: ;
+          regex: ^(.*)$
+          targetLabel: nodename
+          replacement: $1
+          action: replace
+        # metricRelabelings:
+        # # Remove pod label
+        # - action: labeldrop
+        #   regex: pod
     kubeEtcd:
       <<: *kubeControllerManager # etcd runs on control plane nodes
 
