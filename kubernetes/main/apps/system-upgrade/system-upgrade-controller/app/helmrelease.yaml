@@ -27,6 +27,15 @@ spec:
             runAsGroup: 65534
             seccompProfile:
               type: RuntimeDefault
+          tolerations:
+            - key: CriticalAddonsOnly
+              operator: Exists
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+              effect: NoSchedule
+            - key: node-role.kubernetes.io/master
+              operator: Exists
+              effect: NoSchedule
 
         containers:
           app:
