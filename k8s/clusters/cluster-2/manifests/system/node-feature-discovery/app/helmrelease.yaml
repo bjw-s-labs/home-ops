@@ -31,13 +31,13 @@ spec:
               matchExpressions:
               - key: "node-role.kubernetes.io/master"
                 operator: In
-                values: [""]
+                values: [ "" ]
           - weight: 1
             preference:
               matchExpressions:
               - key: "node-role.kubernetes.io/control-plane"
                 operator: In
-                values: [""]
+                values: [ "" ]
 
     worker:
       config:
@@ -52,7 +52,7 @@ spec:
         effect: "NoSchedule"
       resources:
         requests:
-          cpu: 150m
+          # cpu: 150m
           memory: 64Mi
         limits:
           memory: 512Mi
