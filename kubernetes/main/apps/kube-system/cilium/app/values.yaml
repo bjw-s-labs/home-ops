@@ -28,26 +28,7 @@ endpointRoutes:
 envoy:
   enabled: false
 hubble:
-  enabled: true
-  metrics:
-    enabled:
-      - dns:query;ignoreAAAA
-      - drop
-      - tcp
-      - flow
-      - port-distribution
-      - icmp
-      - http
-  relay:
-    enabled: true
-    rollOutPods: true
-  serviceMonitor:
-    enabled: false
-  ui:
-    enabled: true
-    ingress:
-      enabled: false
-    rollOutPods: true
+  enabled: false
 ipam:
   mode: "kubernetes"
 ipv4NativeRoutingCIDR: 10.244.0.0/16
@@ -71,6 +52,7 @@ operator:
     enabled: true
     serviceMonitor:
       enabled: true
+  replicas: 2
   rollOutPods: true
 prometheus:
   enabled: true
