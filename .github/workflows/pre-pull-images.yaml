@@ -1,0 +1,119 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: "Pre-pull Images"
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - kubernetes/main/apps/**
+      - kubernetes/main/flux/**
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  extract-images:
+    name: Extract Images
+    runs-on: ubuntu-latest
+    needs:
+      - changed-clusters
+    permissions:
+      pull-requests: write
+    outputs:
+      matrix: ${{ steps.extract-images.outputs.images }}
+    steps:
+      - name: Setup Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Setup Workflow Tools
+        shell: bash
+        run: brew install jo yq
+
+      - name: Checkout Default Branch
+        uses: actions/checkout@v4
+        with:
+          ref: "${{ github.event.repository.default_branch }}"
+          path: default
+
+      - name: Checkout Pull Request Branch
+        uses: actions/checkout@v4
+        with:
+          path: pull
+
+      - name: Gather Images in Default Branch
+        uses: docker://ghcr.io/allenporter/flux-local:v6.1.1
+        with:
+          args: >-
+            get cluster
+            --path /github/workspace/default/kubernetes/main/flux
+            --enable-images
+            --output yaml
+            --output-file default.yaml
+
+      - name: Gather Images in Pull Request Branch
+        uses: docker://ghcr.io/allenporter/flux-local:v6.1.1
+        with:
+          args: >-
+            get cluster
+            --path /github/workspace/pull/kubernetes/main/flux
+            --enable-images
+            --output yaml
+            --output-file pull.yaml
+
+      - name: Filter Default Branch Results
+        shell: bash
+        run: |
+          yq -r '[.. | .images? | select(. != null)] | flatten | sort | unique | .[]' \
+              default.yaml > default.txt
+
+      - name: Filter Pull Request Branch Results
+        shell: bash
+        run: |
+          yq -r '[.. | .images? | select(. != null)] | flatten | sort | unique | .[]' \
+              pull.yaml > pull.txt
+
+      - name: Compare Default and Pull Request Images
+        id: extract-images
+        shell: bash
+        run: |
+          IFS=$'\n' read -r -d '' -a diff < <( (grep -vf default.txt pull.txt || true) && printf '\0' )
+          images=$(jo -a "${diff[@]}")
+          echo "images=${images}" >> "$GITHUB_OUTPUT"
+          echo "${images}"
+          echo "### Images" >> "$GITHUB_STEP_SUMMARY"
+          echo "${images}" | jq -r 'to_entries[] | "* \(.value)"' >> "$GITHUB_STEP_SUMMARY"
+
+  pre-pull-images:
+    if: ${{ needs.extract-images.outputs.matrix != '[]' }}
+    name: Pre-pull images
+    runs-on: arc-bjw-s-labs-home-ops
+    needs:
+      - extract-images
+    strategy:
+      matrix:
+        images: ${{ fromJSON(needs.extract-images.outputs.matrix) }}
+      max-parallel: 4
+      fail-fast: false
+    steps:
+      - name: Setup Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Setup Workflow Tools
+        run: brew install siderolabs/tap/talosctl
+
+      - name: Pre-pull Image
+        run: talosctl -n $NODE_IP image pull ${{ matrix.images }}
+
+  pre-pull-images-success:
+    if: ${{ always() }}
+    needs:
+      - pre-pull-images
+    name: Pre-pull Images Successful
+    runs-on: ubuntu-latest
+    steps:
+      - if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        name: Check matrix status
+        run: exit 1
