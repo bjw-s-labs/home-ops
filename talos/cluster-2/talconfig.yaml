@@ -118,20 +118,24 @@ nodes:
     size: <= 50GB
   networkInterfaces:
   # 1G Internal Port
-  - deviceSelector:
-      driver: bcmgenet
+  - interface: bond0
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: bcmgenet
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
+    dhcp: false
+    vlans:
+    - *vlan2040
+  - interface: bond1
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: r8169
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
     dhcp: false
     vlans:
     - *vlan2002
-  - deviceSelector:
-      # Talos cant detect MAC address at boot, so it assigns a random one.
-      # Using pciID to get a consistant naming scheme
-      driver: r8169
-    dhcp: false
-    dhcpOptions:
-      routeMetric: 4096
-    vlans:
-    - *vlan2040
 
 - hostname: work2.cluster-2.${secret_domain}
   ipAddress: work2.cluster-2.${secret_domain}
@@ -147,21 +151,24 @@ nodes:
     size: <= 50GB
   networkInterfaces:
   # 1G Internal Port
-  - deviceSelector:
-      driver: bcmgenet
+  - interface: bond0
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: bcmgenet
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
+    dhcp: false
+    vlans:
+    - *vlan2040
+  - interface: bond1
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: r8169
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
     dhcp: false
     vlans:
     - *vlan2002
-  # 2.5G PICe Port
-  - deviceSelector:
-      # Talos cant detect MAC address at boot, so it assigns a random one.
-      # Using pciID to get a consistant naming scheme
-      driver: r8169
-    dhcp: false
-    dhcpOptions:
-      routeMetric: 4096
-    vlans:
-    - *vlan2040
 
 - hostname: work3.cluster-2.${secret_domain}
   ipAddress: work3.cluster-2.${secret_domain}
@@ -177,22 +184,24 @@ nodes:
     size: <= 50GB
   networkInterfaces:
   # 1G Internal Port
-  - deviceSelector:
-      driver: bcmgenet
+  - interface: bond0
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: bcmgenet
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
+    dhcp: false
+    vlans:
+    - *vlan2040
+  - interface: bond1
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: r8169
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
     dhcp: false
     vlans:
     - *vlan2002
-  # 2.5G PICe Port
-  - deviceSelector:
-      # Talos cant detect MAC address at boot, so it assigns a random one.
-      # Using pciID to get a consistant naming scheme
-      driver: r8169
-    dhcp: false
-    dhcpOptions:
-      routeMetric: 4096
-    vlans:
-    - *vlan2040
-
 - hostname: work4.cluster-2.${secret_domain}
   ipAddress: work4.cluster-2.${secret_domain}
   # Rasp Pi Specific factory.talos.dev overlay included
@@ -207,21 +216,24 @@ nodes:
     size: <= 50GB
   networkInterfaces:
   # 1G Internal Port
-  - deviceSelector:
-      driver: bcmgenet
+  - interface: bond0
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: bcmgenet
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
+    dhcp: false
+    vlans:
+    - *vlan2040
+  - interface: bond1
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: r8169
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
     dhcp: false
     vlans:
     - *vlan2002
-  # 2.5G PICe Port
-  - deviceSelector:
-      # Talos cant detect MAC address at boot, so it assigns a random one.
-      # Using pciID to get a consistant naming scheme
-      driver: r8169
-    dhcp: false
-    dhcpOptions:
-      routeMetric: 4096
-    vlans:
-    - *vlan2040
 
 - hostname: work5.cluster-2.${secret_domain}
   ipAddress: work5.cluster-2.${secret_domain}
@@ -237,21 +249,24 @@ nodes:
     size: <= 50GB
   networkInterfaces:
   # 1G Internal Port
-  - deviceSelector:
-      driver: bcmgenet
+  - interface: bond0
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: bcmgenet
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
+    dhcp: false
+    vlans:
+    - *vlan2040
+  - interface: bond1
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: r8169
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
     dhcp: false
     vlans:
     - *vlan2002
-  # 2.5G PICe Port
-  - deviceSelector:
-      # Talos cant detect MAC address at boot, so it assigns a random one.
-      # Using pciID to get a consistant naming scheme
-      driver: r8169
-    dhcp: false
-    dhcpOptions:
-      routeMetric: 4096
-    vlans:
-    - *vlan2040
 
 - hostname: work6.cluster-2.${secret_domain}
   ipAddress: work6.cluster-2.${secret_domain}
@@ -267,21 +282,24 @@ nodes:
     size: <= 50GB
   networkInterfaces:
   # 1G Internal Port
-  - deviceSelector:
-      driver: bcmgenet
+  - interface: bond0
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: bcmgenet
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
+    dhcp: false
+    vlans:
+    - *vlan2040
+  - interface: bond1
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: r8169
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
     dhcp: false
     vlans:
     - *vlan2002
-  # 2.5G PICe Port
-  - deviceSelector:
-      # Talos cant detect MAC address at boot, so it assigns a random one.
-      # Using pciID to get a consistant naming scheme
-      driver: r8169
-    dhcp: false
-    dhcpOptions:
-      routeMetric: 4096
-    vlans:
-    - *vlan2040
 
 - hostname: work7.cluster-2.${secret_domain}
   ipAddress: work7.cluster-2.${secret_domain}
@@ -297,21 +315,24 @@ nodes:
     size: <= 50GB
   networkInterfaces:
   # 1G Internal Port
-  - deviceSelector:
-      driver: bcmgenet
+  - interface: bond0
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: bcmgenet
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
+    dhcp: false
+    vlans:
+    - *vlan2040
+  - interface: bond1
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: r8169
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
     dhcp: false
     vlans:
     - *vlan2002
-  # 2.5G PICe Port
-  - deviceSelector:
-      # Talos cant detect MAC address at boot, so it assigns a random one.
-      # Using pciID to get a consistant naming scheme
-      driver: r8169
-    dhcp: false
-    dhcpOptions:
-      routeMetric: 4096
-    vlans:
-    - *vlan2040
 
 - hostname: work8.cluster-2.${secret_domain}
   ipAddress: work8.cluster-2.${secret_domain}
@@ -327,21 +348,24 @@ nodes:
     size: <= 50GB
   networkInterfaces:
   # 1G Internal Port
-  - deviceSelector:
-      driver: bcmgenet
+  - interface: bond0
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: bcmgenet
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
+    dhcp: false
+    vlans:
+    - *vlan2040
+  - interface: bond1
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: r8169
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
     dhcp: false
     vlans:
     - *vlan2002
-  # 2.5G PICe Port
-  - deviceSelector:
-      # Talos cant detect MAC address at boot, so it assigns a random one.
-      # Using pciID to get a consistant naming scheme
-      driver: r8169
-    dhcp: false
-    dhcpOptions:
-      routeMetric: 4096
-    vlans:
-    - *vlan2040
 
 - hostname: mon1.cluster-2.${secret_domain}
   ipAddress: mon1.cluster-2.${secret_domain}
@@ -365,12 +389,8 @@ nodes:
       vlanId: 100
       dhcp: false
       dhcpOptions:
-        routeMetric: 2048
-    - &vlan2040
-      vlanId: 2040
-      dhcp: true
-      dhcpOptions:
-        routeMetric: 2048
+        routeMetric: 2049
+    - *vlan2040
 
 - hostname: n100-01.cluster-2.${secret_domain}
   ipAddress: n100-01.cluster-2.${secret_domain}
@@ -387,9 +407,7 @@ nodes:
       mode: active-backup
       deviceSelectors:
       - driver: r8169
-        hardwareAddr: 00:e0:4c:08:07:30
-      - driver: r8169
-        hardwareAddr: 00:e0:4c:08:07:31
+        hardwareAddr: 00:e0:4c:08:07:*
     dhcp: false
     vlans:
     - *vlan2002
@@ -411,9 +429,7 @@ nodes:
       mode: active-backup
       deviceSelectors:
       - driver: r8169
-        hardwareAddr: 00:e0:4c:08:06:34
-      - driver: r8169
-        hardwareAddr: 00:e0:4c:08:06:35
+        hardwareAddr: 00:e0:4c:08:06:*
     dhcp: false
     vlans:
     - *vlan2002
@@ -433,11 +449,14 @@ nodes:
   - interface: bond0
     bond:
       mode: 802.3ad
+      lacpRate: fast
+      xmitHashPolicy: layer3+4
+      miimon: 100
+      updelay: 200
+      downdelay: 200
       deviceSelectors:
       - driver: r8169
-        hardwareAddr: e8:ff:1e:d4:66:03
-      - driver: r8169
-        hardwareAddr: e8:ff:1e:d4:66:04
+        hardwareAddr: e8:ff:1e:d4:66:*
     dhcp: false
     vlans:
     - *vlan2002
@@ -459,8 +478,12 @@ nodes:
     size: <= 50GB
   networkInterfaces:
   # 1G Internal Port
-  - deviceSelector:
-      driver: bcmgenet
+  - interface: bond0
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: bcmgenet
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
     dhcp: false
     vlans:
     - *vlan2002
@@ -481,8 +504,12 @@ nodes:
     size: <= 50GB
   networkInterfaces:
   # 1G Internal Port
-  - deviceSelector:
-      driver: bcmgenet
+  - interface: bond0
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: bcmgenet
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
     dhcp: false
     vlans:
     - *vlan2002
@@ -503,8 +530,12 @@ nodes:
     size: <= 50GB
   networkInterfaces:
   # 1G Internal Port
-  - deviceSelector:
-      driver: bcmgenet
+  - interface: bond0
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: bcmgenet
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
     dhcp: false
     vlans:
     - *vlan2002
@@ -525,8 +556,12 @@ nodes:
     size: <= 50GB
   networkInterfaces:
   # 1G Internal Port
-  - deviceSelector:
-      driver: bcmgenet
+  - interface: bond0
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: bcmgenet
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
     dhcp: false
     vlans:
     - *vlan2002
@@ -547,8 +582,12 @@ nodes:
     size: <= 50GB
   networkInterfaces:
   # 1G Internal Port
-  - deviceSelector:
-      driver: bcmgenet
+  - interface: bond0
+    bond:
+      mode: active-backup
+      deviceSelectors:
+      - driver: bcmgenet
+    #        hardwareAddr: d8:3a:dd:bb:1d:77
     dhcp: false
     vlans:
     - *vlan2002
@@ -710,8 +749,6 @@ controlPlane:
 worker:
   schematic:
     customization:
-      extraKernelArgs:
-      - net.ifnames=0
       systemExtensions:
         officialExtensions: *extensions
   patches:
