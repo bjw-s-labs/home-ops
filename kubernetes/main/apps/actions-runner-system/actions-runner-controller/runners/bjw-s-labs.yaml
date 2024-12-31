@@ -27,7 +27,13 @@ spec:
     maxRunners: 6
 
     containerMode:
-      type: "dind"
+      type: kubernetes
+      kubernetesModeWorkVolumeClaim:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: ceph-block
+        resources:
+          requests:
+            storage: 2Gi
 
     controllerServiceAccount:
       name: actions-runner-controller-gha-rs-controller
@@ -49,6 +55,11 @@ spec:
           - name: runner
             image: ghcr.io/onedr0p/actions-runner:2.321.0
             command: ["/home/runner/run.sh"]
+            env:
+              - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
+                value: "false"
+        securityContext:
+          fsGroup: 123
 
   valuesFrom:
     - kind: Secret
