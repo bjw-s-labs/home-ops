@@ -26,7 +26,13 @@ spec:
     maxRunners: 2
 
     containerMode:
-      type: "dind"
+      type: kubernetes
+      kubernetesModeWorkVolumeClaim:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: ceph-block
+        resources:
+          requests:
+            storage: 2Gi
 
     controllerServiceAccount:
       name: actions-runner-controller-gha-rs-controller
@@ -50,6 +56,8 @@ spec:
             image: ghcr.io/onedr0p/actions-runner:2.321.0
             command: ["/home/runner/run.sh"]
             env:
+              - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
+                value: "false"
               - name: NODE_IP
                 valueFrom:
                   fieldRef:
@@ -58,6 +66,8 @@ spec:
               - mountPath: /var/run/secrets/talos.dev
                 name: talos
                 readOnly: true
+        securityContext:
+          fsGroup: 123
         serviceAccountName: actions-runner
         volumes:
           - name: talos
