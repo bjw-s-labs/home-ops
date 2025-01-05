@@ -89,7 +89,7 @@ jobs:
       - compare-images
     strategy:
       matrix:
-        images: ${{ fromJSON(needs.extract-images.outputs.matrix) }}
+        images: ${{ fromJSON(needs.compare-images.outputs.images) }}
       max-parallel: 4
       fail-fast: false
     steps:
