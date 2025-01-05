@@ -14,41 +14,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  changed-clusters:
-    name: Changed Clusters
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.changed-clusters.outputs.all_changed_and_modified_files }}
-    steps:
-      - name: Checkout Default Branch
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-
-      - name: Get Changed Clusters
-        id: changed-clusters
-        uses: tj-actions/changed-files@v45
-        with:
-          files: kubernetes/**
-          dir_names: true
-          dir_names_max_depth: 2
-          json: true
-          escape_json: false
-
-      - name: List All Changed Clusters
-        run: echo "${{ steps.changed-clusters.outputs.all_changed_and_modified_files }}"
-
   flux-diff:
     name: Flux Diff
     runs-on: ubuntu-latest
-    needs:
-      - changed-clusters
     permissions:
       pull-requests: write
     strategy:
       matrix:
-        paths: ${{ fromJSON(needs.changed-clusters.outputs.matrix) }}
         resources:
           - helmrelease
           - kustomization
@@ -63,7 +35,7 @@ jobs:
           app-id: ${{ secrets.LAB_ASSISTANT_APP_ID }}
           private-key: ${{ secrets.LAB_ASSISTANT_APP_KEY }}
 
-      - name: Checkout
+      - name: Checkout Pull Request Branch
         uses: actions/checkout@v4
         with:
           token: "${{ steps.app-token.outputs.token }}"
@@ -77,13 +49,13 @@ jobs:
           path: default
 
       - name: Diff Resources
-        uses: docker://ghcr.io/allenporter/flux-local:v6.1.1
+        uses: docker://ghcr.io/allenporter/flux-local:v7.0.0
         with:
           args: >-
             diff ${{ matrix.resources }}
             --unified 6
-            --path /github/workspace/pull/${{ matrix.paths }}/flux
-            --path-orig /github/workspace/default/${{ matrix.paths }}/flux
+            --path /github/workspace/pull/main/flux
+            --path-orig /github/workspace/default/main/flux
             --strip-attrs "helm.sh/chart,checksum/config,app.kubernetes.io/version,chart"
             --limit-bytes 10000
             --all-namespaces
@@ -95,15 +67,15 @@ jobs:
         run: |
           cat diff.patch;
           {
-            echo 'diff<<EOF'
-            cat diff.patch
-            echo EOF
+              echo 'diff<<EOF'
+              cat diff.patch
+              echo EOF
           } >> "$GITHUB_OUTPUT";
           {
-            echo "### Diff"
-            echo '```diff'
-            cat diff.patch
-            echo '```'
+              echo "### Diff"
+              echo '```diff'
+              cat diff.patch
+              echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
       - if: ${{ steps.diff.outputs.diff != '' }}
@@ -111,7 +83,7 @@ jobs:
         uses: mshick/add-pr-comment@v2
         with:
           repo-token: "${{ steps.app-token.outputs.token }}"
-          message-id: "${{ github.event.pull_request.number }}/${{ matrix.paths }}/${{ matrix.resources }}"
+          message-id: "${{ github.event.pull_request.number }}/main/${{ matrix.resources }}"
           message-failure: Diff was not successful
           message: |
             ```diff
