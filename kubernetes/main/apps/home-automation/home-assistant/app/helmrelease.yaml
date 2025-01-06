@@ -40,8 +40,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/onedr0p/home-assistant
-              tag: 2025.1.0@sha256:2abed005d6bfd8dbe0605bd1d9eb5380b14b657401c5c3880e4ba4fa20e636a1
+              repository: ghcr.io/bjw-s-labs/hass
+              tag: latest@sha256:ddfb477c0a0c26d55b1e78646654778c6c9d84c6a57dc689ba508ef5c677bbc0
             resources:
               requests:
                 cpu: 47m
@@ -122,6 +122,8 @@ spec:
             app:
               - path: /tmp
                 subPath: hass-tmp
+              - path: /config/.venv
+                subPath: hass-venv
             code-server:
               - path: /tmp
                 subPath: code-server-tmp
