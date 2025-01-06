@@ -103,12 +103,13 @@ jobs:
         run: talosctl -n $NODE_IP image pull ${{ matrix.images }}
 
   pre-pull-images-success:
-    if: ${{ needs.compare-images.outputs.images != '[]' }}
+    if: ${{ always() }}
     needs:
+      - compare-images
       - pre-pull-images
     name: Pre-pull Images Successful
     runs-on: ubuntu-latest
     steps:
-      - if: ${{ !contains(needs.*.result, 'success') }}
+      - if: ${{ needs.compare-images.outputs.images != '[]' && !contains(needs.*.result, 'success') }}
         name: Check matrix status
         run: exit 1
