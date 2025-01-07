@@ -18,6 +18,8 @@ spec:
     kind: GitRepository
     name: home-ops-kubernetes
   wait: true
+  dependsOn:
+    - name: external-secrets-stores
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -40,6 +42,10 @@ spec:
   wait: true
   dependsOn:
     - name: crunchy-postgres-operator
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: crunchy-postgres-operator-secrets
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
