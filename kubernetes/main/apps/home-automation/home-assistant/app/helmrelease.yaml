@@ -117,6 +117,13 @@ spec:
               - path: /config
             code-server:
               - path: /config
+      hass-cache:
+        existingClaim: hass-cache
+        advancedMounts:
+          home-assistant:
+            app:
+              - path: /venv
+                subPath: hass-venv
       tmpfs:
         type: emptyDir
         advancedMounts:
@@ -124,8 +131,6 @@ spec:
             app:
               - path: /tmp
                 subPath: hass-tmp
-              - path: /venv
-                subPath: hass-venv
             code-server:
               - path: /tmp
                 subPath: code-server-tmp
