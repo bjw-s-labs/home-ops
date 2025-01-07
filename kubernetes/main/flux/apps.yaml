@@ -27,24 +27,3 @@ spec:
       target:
         group: kustomize.toolkit.fluxcd.io
         kind: Kustomization
-    - patch: |
-        - op: add
-          path: /spec/postBuild
-          value:
-            substituteFrom: []
-        - op: add
-          path: /spec/postBuild/substituteFrom/0
-          value:
-            kind: ConfigMap
-            name: cluster-settings
-            optional: true
-        - op: add
-          path: /spec/postBuild/substituteFrom/0
-          value:
-            kind: Secret
-            name: cluster-secrets
-            optional: true
-      target:
-        group: kustomize.toolkit.fluxcd.io
-        kind: Kustomization
-        labelSelector: substitution.flux.home.arpa/disabled notin (true)
