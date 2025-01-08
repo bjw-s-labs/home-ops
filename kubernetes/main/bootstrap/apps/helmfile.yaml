@@ -1,5 +1,6 @@
 ---
 # yaml-language-server: $schema=https://json.schemastore.org/helmfile
+
 helmDefaults:
   wait: true
   waitForJobs: true
@@ -62,3 +63,13 @@ releases:
       - kube-system/coredns
       - system-controllers/kubelet-csr-approver
       - monitoring/prometheus-operator-crds
+
+  - name: flux
+    namespace: flux-system
+    chart: oci://ghcr.io/fluxcd-community/charts/flux2
+    version: 2.14.0
+    values:
+      - ../../apps/flux-system/flux/app/values.yaml
+    needs:
+      - kube-system/coredns
+      - kube-system/spegel
