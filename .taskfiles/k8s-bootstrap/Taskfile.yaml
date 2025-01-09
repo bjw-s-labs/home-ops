@@ -9,7 +9,7 @@ tasks:
       TALOS_CONTROLLER:
         sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | shuf -n 1
     preconditions:
-      - which ls minijinja-cli sops talosctl
+      - which jq minijinja-cli sops talosctl
       - test -f "${TALOSCONFIG}"
       - talosctl config info
     requires:
