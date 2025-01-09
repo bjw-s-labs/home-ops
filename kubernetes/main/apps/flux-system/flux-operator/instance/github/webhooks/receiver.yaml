@@ -3,7 +3,7 @@
 apiVersion: notification.toolkit.fluxcd.io/v1
 kind: Receiver
 metadata:
-  name: home-ops-kubernetes
+  name: flux-system
 spec:
   type: github
   events:
@@ -14,11 +14,7 @@ spec:
   resources:
     - apiVersion: source.toolkit.fluxcd.io/v1
       kind: GitRepository
-      name: home-ops-kubernetes
-      namespace: flux-system
-    - apiVersion: kustomize.toolkit.fluxcd.io/v1
-      kind: Kustomization
-      name: cluster
+      name: flux-system
       namespace: flux-system
     - apiVersion: kustomize.toolkit.fluxcd.io/v1
       kind: Kustomization

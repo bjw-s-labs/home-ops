@@ -3,7 +3,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname flux
+  name: &appname flux-operator
   namespace: flux-system
 spec:
   targetNamespace: flux-system
@@ -12,18 +12,18 @@ spec:
       app.kubernetes.io/name: *appname
   interval: 30m
   timeout: 5m
-  path: ./kubernetes/main/apps/flux-system/flux/app
-  prune: false
+  path: ./kubernetes/main/apps/flux-system/flux-operator/app
+  prune: false # Never delete this
   sourceRef:
     kind: GitRepository
-    name: home-ops-kubernetes
+    name: flux-system
   wait: false
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname flux-cluster-config
+  name: &appname flux-instance
   namespace: flux-system
 spec:
   targetNamespace: flux-system
@@ -32,20 +32,20 @@ spec:
       app.kubernetes.io/name: *appname
   interval: 30m
   timeout: 5m
-  path: ./kubernetes/main/apps/flux-system/flux/cluster-config
-  prune: false # revert to true
+  path: ./kubernetes/main/apps/flux-system/flux-operator/app
+  prune: false # Never delete this
   sourceRef:
     kind: GitRepository
-    name: home-ops-kubernetes
+    name: flux-system
   wait: false
   dependsOn:
-    - name: external-secrets-stores
+    - name: flux-operator
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname flux-github
+  name: &appname flux-instance-config
   namespace: flux-system
 spec:
   targetNamespace: flux-system
@@ -54,12 +54,11 @@ spec:
       app.kubernetes.io/name: *appname
   interval: 30m
   timeout: 5m
-  path: ./kubernetes/main/apps/flux-system/flux/github
-  prune: false # revert to true
+  path: ./kubernetes/main/apps/flux-system/flux-operator/instance-config
+  prune: true
   sourceRef:
     kind: GitRepository
-    name: home-ops-kubernetes
+    name: flux-system
   wait: false
   dependsOn:
-    - name: flux
     - name: external-secrets-stores

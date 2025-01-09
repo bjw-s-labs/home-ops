@@ -13,10 +13,10 @@ spec:
   interval: 30m
   timeout: 5m
   path: ./kubernetes/main/apps/database/crunchy-postgres-operator/operator
-  prune: false # revert to true
+  prune: true
   sourceRef:
     kind: GitRepository
-    name: home-ops-kubernetes
+    name: flux-system
   wait: true
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
@@ -33,10 +33,10 @@ spec:
   interval: 30m
   timeout: 5m
   path: ./kubernetes/main/apps/database/crunchy-postgres-operator/cluster
-  prune: false # revert to true
+  prune: true
   sourceRef:
     kind: GitRepository
-    name: home-ops-kubernetes
+    name: flux-system
   wait: true
   dependsOn:
     - name: crunchy-postgres-operator
@@ -55,10 +55,10 @@ spec:
   interval: 30m
   timeout: 5m
   path: ./kubernetes/main/apps/database/crunchy-postgres-operator/clustersecretstore
-  prune: false # revert to true
+  prune: true
   sourceRef:
     kind: GitRepository
-    name: home-ops-kubernetes
+    name: flux-system
   wait: true
   dependsOn:
     - name: crunchy-postgres-operator-cluster
@@ -78,10 +78,10 @@ spec:
   interval: 30m
   timeout: 5m
   path: ./kubernetes/main/apps/database/crunchy-postgres-operator/userinit-controller
-  prune: false # revert to true
+  prune: true
   sourceRef:
     kind: GitRepository
-    name: home-ops-kubernetes
+    name: flux-system
   wait: true
   dependsOn:
     - name: crunchy-postgres-operator-cluster

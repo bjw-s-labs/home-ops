@@ -13,10 +13,10 @@ spec:
   interval: 30m
   timeout: 5m
   path: "./kubernetes/main/apps/downloads/qbittorrent/app"
-  prune: false # revert to true
+  prune: true
   sourceRef:
     kind: GitRepository
-    name: home-ops-kubernetes
+    name: flux-system
   wait: true
   dependsOn:
     - name: rook-ceph-cluster
@@ -46,10 +46,10 @@ spec:
   interval: 30m
   timeout: 5m
   path: "./kubernetes/main/apps/downloads/qbittorrent/tools"
-  prune: false # revert to true
+  prune: true
   sourceRef:
     kind: GitRepository
-    name: home-ops-kubernetes
+    name: flux-system
   wait: false
   dependsOn:
     - name: qbittorrent
