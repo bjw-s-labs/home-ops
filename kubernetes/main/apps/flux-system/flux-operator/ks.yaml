@@ -40,3 +40,25 @@ spec:
   wait: false
   dependsOn:
     - name: flux-operator
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &appname flux-instance-config
+  namespace: flux-system
+spec:
+  targetNamespace: flux-system
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
+  interval: 30m
+  timeout: 5m
+  path: ./kubernetes/main/apps/flux-system/flux/instance-config
+  prune: false # revert to true
+  sourceRef:
+    kind: GitRepository
+    name: home-ops-kubernetes
+  wait: false
+  dependsOn:
+    - name: external-secrets-stores
