@@ -46,18 +46,26 @@ tasks:
         task: :rook:wipe-disk
 
   apps:
-    desc: Bootstrap Apps [K8S_CLUSTER={{.K8S_CLUSTER}}]
+    desc: Bootstrap Apps [K8S_CLUSTER={{.K8S_CLUSTER}}] [CEPH_DISK_MODEL=required]
+    prompt: Bootstrap apps into Talos cluster {{.K8S_CLUSTER}}?
     preconditions:
-      - which helmfile kubectl
+      - which op helmfile kubectl
       - test -f "${TALOSCONFIG}"
       - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/helmfile.yaml
       - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/templates/resources.yaml.j2
+      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/templates/wipe-rook.yaml.gotmpl
+      - op user get --me
       - talosctl config info
     requires:
       vars:
         - K8S_CLUSTER
+        - CEPH_DISK_MODEL
+    vars:
+      MODEL: "{{.CEPH_DISK_MODEL}}"
+      NODE_COUNT:
+        sh: talosctl config info --output json | jq --raw-output '.nodes | length'
     cmds:
       - until kubectl wait nodes --for=condition=Ready=False --all --timeout=10m; do sleep 5; done
       - op run --env-file {{.K8S_CLUSTER_DIR}}/bootstrap/bootstrap.env --no-masking -- minijinja-cli "{{.K8S_CLUSTER_DIR}}/bootstrap/templates/resources.yaml.j2" | kubectl apply --server-side --filename -
       - helmfile --quiet --file {{.K8S_CLUSTER_DIR}}/bootstrap/apps/helmfile.yaml apply --skip-diff-on-install --suppress-diff
-      - until kubectl wait nodes --for=condition=Ready --all --timeout=10m; do sleep 5; done
+      - helmfile --quiet --file {{.K8S_CLUSTER_DIR}}/bootstrap/helmfile.yaml destroy --selector release=wipe-rook

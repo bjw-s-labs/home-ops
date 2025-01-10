@@ -9,8 +9,6 @@ helmDefaults:
   force: true
 
 repositories:
-  - name: postfinance
-    url: https://postfinance.github.io/kubelet-csr-approver
   - name: cilium
     url: https://helm.cilium.io
   - name: coredns
@@ -38,19 +36,7 @@ releases:
     values:
       - ../apps/kube-system/coredns/app/values.yaml
     needs:
-      - monitoring/prometheus-operator-crds
       - kube-system/cilium
-
-  - name: kubelet-csr-approver
-    namespace: system-controllers
-    chart: postfinance/kubelet-csr-approver
-    version: 1.2.5
-    values:
-      - ../apps/system-controllers/kubelet-csr-approver/app/values.yaml
-    needs:
-      - kube-system/cilium
-      - kube-system/coredns
-      - monitoring/prometheus-operator-crds
 
   - name: spegel
     namespace: system
@@ -59,10 +45,16 @@ releases:
     values:
       - ../apps/system/spegel/app/values.yaml
     needs:
-      - kube-system/cilium
       - kube-system/coredns
-      - system-controllers/kubelet-csr-approver
-      - monitoring/prometheus-operator-crds
+
+  - name: wipe-rook
+    namespace: kube-system
+    chart: oci://ghcr.io/bjw-s/helm/app-template
+    version: 3.6.0
+    values:
+      - ./templates/wipe-rook.yaml.gotmpl
+    needs:
+      - system/spegel
 
   - name: flux-operator
     namespace: flux-system
@@ -70,6 +62,8 @@ releases:
     version: 0.12.0
     values:
       - ../apps/flux-system/flux-operator/app/values.yaml
+    needs:
+      - kube-system/wipe-rook
 
   - name: flux-instance
     namespace: flux-system

@@ -23,12 +23,7 @@ nodes:
     ipAddress: 10.1.1.31
     controlPlane: true
     installDiskSelector:
-      size: "<= 256GB"
-      model: "TS240GMTS420S"
-    machineDisks:
-      - device: /dev/disk/by-id/ata-CT500MX500SSD1_2149E5EC1D9D
-        partitions:
-          - mountpoint: /var/mnt/extra
+      model: Samsung SSD 870
     networkInterfaces:
       - interface: bond0
         bond:
@@ -51,12 +46,7 @@ nodes:
     ipAddress: 10.1.1.32
     controlPlane: true
     installDiskSelector:
-      size: "<= 256GB"
-      model: "TS240GMTS420S"
-    machineDisks:
-      - device: /dev/disk/by-id/ata-CT500MX500SSD1_2149E5EC1D31
-        partitions:
-          - mountpoint: /var/mnt/extra
+      model: Samsung SSD 870
     networkInterfaces:
       - interface: bond0
         bond:
@@ -74,12 +64,7 @@ nodes:
     ipAddress: 10.1.1.33
     controlPlane: true
     installDiskSelector:
-      size: "<= 256GB"
-      model: "TS240GMTS420S"
-    machineDisks:
-      - device: /dev/disk/by-id/ata-KINGSTON_SA400S37480G_50026B77825B2170
-        partitions:
-          - mountpoint: /var/mnt/extra
+      model: Samsung SSD 870
     networkInterfaces:
       - interface: bond0
         bond:
@@ -140,16 +125,6 @@ controlPlane:
         network:
           disableSearchDomain: true
 
-    # Enable cluster discovery
-    - |-
-      cluster:
-        discovery:
-          registries:
-            kubernetes:
-              disabled: true
-            service:
-              disabled: false
-
     # Disable Host DNS
     - |-
       machine:
@@ -159,14 +134,10 @@ controlPlane:
             resolveMemberNames: true
             forwardKubeDNSToHost: false
 
-    # Configure kubelet
+    # Mount openebs-hostpath in kubelet
     - |-
       machine:
         kubelet:
-          extraArgs:
-            rotate-server-certificates: "true"
-          extraConfig:
-            maxPods: 150
           extraMounts:
             - destination: /var/mnt/extra
               type: bind
@@ -175,6 +146,13 @@ controlPlane:
                 - rbind
                 - rshared
                 - rw
+
+    # Configure kubelet
+    - |-
+      machine:
+        kubelet:
+          extraConfig:
+            maxPods: 150
           nodeIP:
             validSubnets:
                 - 10.1.1.0/24
@@ -190,7 +168,7 @@ controlPlane:
     # Configure cluster
     - |-
       cluster:
-        allowSchedulingOnMasters: true
+        allowSchedulingOnControlPlanes: true
         coreDNS:
             disabled: true
         proxy:

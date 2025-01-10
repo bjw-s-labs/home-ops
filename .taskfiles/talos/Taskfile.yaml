@@ -58,7 +58,7 @@ tasks:
         vars:
           FILENAME: "{{.FILE}}"
           HOSTNAME: "{{.NODE}}"
-      - talosctl --nodes {{.NODE}} health --wait-timeout=10m --server=false
+      - talosctl --nodes {{.NODE}} health
 
   upgrade-node:
     desc: Upgrade Talos on a single node [NODE=required]
@@ -77,7 +77,7 @@ tasks:
         sh: yq '.machine.install.image' < "{{.FILE}}"
     cmds:
       - talosctl --nodes {{.NODE}} upgrade --image="{{.TALOS_IMAGE}}" --timeout=10m
-      - talosctl --nodes {{.NODE}} health --wait-timeout=10m --server=false
+      - talosctl --nodes {{.NODE}} health
 
   _apply-machineconfig:
     internal: true
