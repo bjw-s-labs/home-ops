@@ -19,9 +19,7 @@ spec:
     controllers:
       autobrr:
         annotations:
-          secret.reloader.stakater.com/reload: autobrr-secret,autobrr-db-secret
-          configmap.reloader.stakater.com/reload: autobrr-configmap
-
+          secret.reloader.stakater.com/reload: autobrr-secret
         pod:
           securityContext:
             runAsUser: 2000
@@ -41,8 +39,6 @@ spec:
             envFrom:
               - secretRef:
                   name: autobrr-secret
-              - secretRef:
-                  name: autobrr-db-secret
             probes:
               liveness:
                 enabled: true
@@ -85,5 +81,11 @@ spec:
                   port: http
 
     persistence:
+      config:
+        existingClaim: autobrr
+      log:
+        type: emptyDir
+        globalMounts:
+          - path: /config/log
       tmp:
         type: emptyDir
