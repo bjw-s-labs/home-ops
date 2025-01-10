@@ -19,8 +19,11 @@ spec:
     name: flux-system
   wait: false
   dependsOn:
-    - name: external-secrets-stores
     - name: rook-ceph-cluster
-    - name: crunchy-postgres-operator-cluster
-    - name: crunchy-postgres-operator-secretstore
+    - name: volsync
+    - name: external-secrets-stores
     - name: qbittorrent
+  postBuild:
+    substitute:
+      APP: autobrr
+      VOLSYNC_CLAIM: autobrr
