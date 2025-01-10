@@ -125,7 +125,7 @@ controlPlane:
         network:
           disableSearchDomain: true
 
-    # Disable Host DNS
+    # Enable host dns
     - |-
       machine:
         features:
@@ -156,14 +156,6 @@ controlPlane:
           nodeIP:
             validSubnets:
                 - 10.1.1.0/24
-
-    # Enable KubePrism
-    - |-
-      machine:
-        features:
-          kubePrism:
-            enabled: true
-            port: 7445
 
     # Configure cluster
     - |-
