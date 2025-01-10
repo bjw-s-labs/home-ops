@@ -19,7 +19,6 @@ spec:
   values:
     controllers:
       atuin:
-        strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"
 
@@ -34,7 +33,7 @@ spec:
             env:
               ATUIN_HOST: 0.0.0.0
               ATUIN_PORT: &port 8888
-              ATUIN_OPEN_REGISTRATION: true
+              # ATUIN_OPEN_REGISTRATION: true
               ATUIN_TLS__ENABLE: false
               ATUIN_TLS__CERT_PATH: ""
               ATUIN_TLS__PKEY_PATH: ""
@@ -76,4 +75,4 @@ spec:
 
     persistence:
       config:
-        type: emptyDir
+        existingClaim: atuin
