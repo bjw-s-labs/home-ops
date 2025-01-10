@@ -9,7 +9,6 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
-      separateMinorPatch: true,
     },
     {
       description: "Cilium image and chart",
@@ -23,7 +22,6 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
-      separateMinorPatch: true,
     },
     {
       description: "Actions Runner Controller charts",
@@ -49,7 +47,6 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
-      separateMinorPatch: true,
     },
     {
       description: "silence-operator image and CRD",
@@ -59,7 +56,15 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
-      separateMinorPatch: true,
+    },
+    {
+      description: ["Flux Operator Group"],
+      groupName: "Flux Operator",
+      matchPackagePatterns: ["flux-operator", "flux-instance"],
+      matchDatasources: ["docker"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
     },
   ],
 }
