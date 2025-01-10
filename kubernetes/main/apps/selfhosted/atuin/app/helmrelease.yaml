@@ -26,24 +26,18 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/atuinsh/atuin
-              tag: 18.4.0
+              repository: ghcr.io/onedr0p/atuin-server-sqlite
+              tag: v18.3.0@sha256:9d8e8b983d8a8113d87a72111b158552d49ad050ef98ebfe3e7bdd12a5207466
             args:
               - server
               - start
             env:
-              ATUIN_DB_URI:
-                valueFrom:
-                  secretKeyRef:
-                    name: atuin-db-secret
-                    key: ATUIN_DB_URI
               ATUIN_HOST: 0.0.0.0
               ATUIN_PORT: &port 8888
-              ATUIN_OPEN_REGISTRATION: false
+              ATUIN_OPEN_REGISTRATION: true
               ATUIN_TLS__ENABLE: false
               ATUIN_TLS__CERT_PATH: ""
               ATUIN_TLS__PKEY_PATH: ""
-              RUST_LOG: info
             probes:
               liveness:
                 enabled: true

@@ -19,5 +19,11 @@ spec:
     name: flux-system
   wait: false
   dependsOn:
-    - name: crunchy-postgres-operator-cluster
-    - name: crunchy-postgres-operator-secretstore
+    - name: rook-ceph-cluster
+    - name: volsync
+    - name: external-secrets-stores
+  postBuild:
+    substitute:
+      APP: *appname
+      VOLSYNC_CLAIM: atuin
+      VOLSYNC_CAPACITY: 5Gi
