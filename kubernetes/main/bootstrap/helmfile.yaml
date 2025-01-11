@@ -41,7 +41,7 @@ releases:
   - name: spegel
     namespace: system
     chart: oci://ghcr.io/spegel-org/helm-charts/spegel
-    version: v0.0.28
+    version: v0.0.29
     values:
       - ../apps/system/spegel/app/values.yaml
     needs:
@@ -59,7 +59,7 @@ releases:
   - name: flux-operator
     namespace: flux-system
     chart: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator
-    version: 0.12.0
+    version: 0.13.0
     values:
       - ../apps/flux-system/flux-operator/app/values.yaml
     needs:
@@ -68,7 +68,7 @@ releases:
   - name: flux-instance
     namespace: flux-system
     chart: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-instance
-    version: 0.12.0
+    version: 0.13.0
     wait: false
     values:
       - ../apps/flux-system/flux-operator/instance/values.yaml
