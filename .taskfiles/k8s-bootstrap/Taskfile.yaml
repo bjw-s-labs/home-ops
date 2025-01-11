@@ -4,7 +4,7 @@ version: "3"
 
 tasks:
   talos:
-    desc: Bootstrap Talos [K8S_CLUSTER={{.K8S_CLUSTER}}]
+    desc: Bootstrap Talos
     vars:
       TALOS_CONTROLLER:
         sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | shuf -n 1
@@ -12,53 +12,26 @@ tasks:
       - which jq minijinja-cli sops talosctl
       - test -f "${TALOSCONFIG}"
       - talosctl config info
-    requires:
-      vars:
-        - K8S_CLUSTER
     cmds:
       - task: :talos:apply-clusterconfig
         vars:
           INSECURE: "true"
       - until talosctl --nodes {{.TALOS_CONTROLLER}} bootstrap; do sleep 5; done
-      - talosctl kubeconfig --nodes {{.TALOS_CONTROLLER}} --force --force-context-name {{.K8S_CLUSTER}} "${KUBECONFIG}"
-
-  # NOTE: Nodes must all be part of the Ceph cluster
-  rook:
-    desc: Bootstrap Rook-Ceph [K8S_CLUSTER={{.K8S_CLUSTER}}] [MODEL=required]
-    preconditions:
-      - which kubectl talosctl
-      - talosctl config info
-    requires:
-      vars:
-        - K8S_CLUSTER
-    vars:
-      BLUESTORE_DISKS_RAW:
-        sh: talosctl get discoveredvolumes -o json | jq -r 'select(.spec.type=="disk" and .spec.name=="bluestore") | {"node":.node, "disk":.spec.dev_dath}' | jq -crs '.'
-      BLUESTORE_DISKS:
-        ref: "fromJson .BLUESTORE_DISKS_RAW"
-    cmds:
-      - for:
-          var: BLUESTORE_DISKS
-        vars:
-          NODE:
-            sh: kubectl get nodes -o json | jq -r '.items[] | select(.status.addresses[].address=="{{.ITEM.node}}") | .metadata.name'
-          DISK: "{{ .ITEM.disk }}"
-        task: :rook:wipe-disk
+      - talosctl kubeconfig --nodes {{.TALOS_CONTROLLER}} --force --force-context-name "home-ops" "${KUBECONFIG}"
 
   apps:
-    desc: Bootstrap Apps [K8S_CLUSTER={{.K8S_CLUSTER}}] [CEPH_DISK_MODEL=required]
-    prompt: Bootstrap apps into Talos cluster {{.K8S_CLUSTER}}?
+    desc: Bootstrap Apps [CEPH_DISK_MODEL=required]
+    prompt: Bootstrap apps into Talos cluster?
     preconditions:
       - which op helmfile kubectl
       - test -f "${TALOSCONFIG}"
-      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/helmfile.yaml
-      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/templates/resources.yaml.j2
-      - test -f {{.K8S_CLUSTER_DIR}}/bootstrap/templates/wipe-rook.yaml.gotmpl
+      - test -f {{.K8S_DIR}}/bootstrap/helmfile.yaml
+      - test -f {{.K8S_DIR}}/bootstrap/templates/resources.yaml.j2
+      - test -f {{.K8S_DIR}}/bootstrap/templates/wipe-rook.yaml.gotmpl
       - op user get --me
       - talosctl config info
     requires:
       vars:
-        - K8S_CLUSTER
         - CEPH_DISK_MODEL
     vars:
       MODEL: "{{.CEPH_DISK_MODEL}}"
@@ -66,6 +39,6 @@ tasks:
         sh: talosctl config info --output json | jq --raw-output '.nodes | length'
     cmds:
       - until kubectl wait nodes --for=condition=Ready=False --all --timeout=10m; do sleep 5; done
-      - op run --env-file {{.K8S_CLUSTER_DIR}}/bootstrap/bootstrap.env --no-masking -- minijinja-cli "{{.K8S_CLUSTER_DIR}}/bootstrap/templates/resources.yaml.j2" | kubectl apply --server-side --filename -
-      - helmfile --quiet --file {{.K8S_CLUSTER_DIR}}/bootstrap/apps/helmfile.yaml apply --skip-diff-on-install --suppress-diff
-      - helmfile --quiet --file {{.K8S_CLUSTER_DIR}}/bootstrap/helmfile.yaml destroy --selector release=wipe-rook
+      - op run --env-file {{.K8S_DIR}}/bootstrap/bootstrap.env --no-masking -- minijinja-cli "{{.K8S_DIR}}/bootstrap/templates/resources.yaml.j2" | kubectl apply --server-side --filename -
+      - helmfile --quiet --file {{.K8S_DIR}}/bootstrap/apps/helmfile.yaml apply --skip-diff-on-install --suppress-diff
+      - helmfile --quiet --file {{.K8S_DIR}}/bootstrap/helmfile.yaml destroy --selector release=wipe-rook

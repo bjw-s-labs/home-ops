@@ -7,8 +7,8 @@ on:
     branches:
       - main
     paths:
-      - kubernetes/main/apps/**
-      - kubernetes/main/flux/**
+      - kubernetes/apps/**
+      - kubernetes/flux/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
@@ -50,7 +50,7 @@ jobs:
         with:
           args: >-
             get cluster
-            --path /github/workspace/kubernetes/main/flux
+            --path /github/workspace/kubernetes/flux
             --enable-images
             --output yaml
             --output-file images.yaml
