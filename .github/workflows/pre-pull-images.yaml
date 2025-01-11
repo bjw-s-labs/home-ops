@@ -7,8 +7,7 @@ on:
     branches:
       - main
     paths:
-      - kubernetes/apps/**
-      - kubernetes/flux/**
+      - kubernetes/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
@@ -30,6 +29,7 @@ jobs:
     outputs:
       default: ${{ steps.extract-images.outputs.default }}
       pull: ${{ steps.extract-images.outputs.pull }}
+      matrix: ""
     steps:
       - name: Generate Token
         uses: actions/create-github-app-token@v1
@@ -61,7 +61,7 @@ jobs:
           images=$(yq --indent=0 --output-format=json \
               '[.. | .images? | select(. != null)] | flatten | sort | unique' images.yaml \
           )
-          echo "${{ matrix.branches }}=${images}" >> $GITHUB_OUTPUT
+          echo "${{ matrix.branches }}=${images}" >> "$GITHUB_OUTPUT"
 
   compare-images:
     name: Compare Images
@@ -79,13 +79,14 @@ jobs:
               --argjson f2 '${{ needs.extract-images.outputs.pull }}' \
               '$f2 - $f1' \
           )
-          echo "images=${images}" >> $GITHUB_OUTPUT
+          echo "images=${images}" >> "$GITHUB_OUTPUT"
 
   pre-pull-images:
     if: ${{ needs.extract-images.outputs.matrix != '[]' }}
     name: Pre-pull images
     runs-on: arc-bjw-s-labs-home-ops
     needs:
+      - extract-images
       - compare-images
     strategy:
       matrix:
@@ -100,7 +101,7 @@ jobs:
         run: brew install siderolabs/tap/talosctl
 
       - name: Pre-pull Image
-        run: talosctl -n $NODE_IP image pull ${{ matrix.images }}
+        run: talosctl -n "$NODE_IP" image pull "${{ matrix.images }}"
 
   pre-pull-images-success:
     if: ${{ always() }}
