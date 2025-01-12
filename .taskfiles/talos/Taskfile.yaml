@@ -6,29 +6,25 @@ tasks:
   generate-clusterconfig:
     desc: Generate clusterconfig for Talos
     preconditions:
-      - which test talhelper
-      - test -f {{.K8S_CLUSTER_DIR}}/talos/talsecret.sops.yaml
-      - test -f {{.K8S_CLUSTER_DIR}}/talos/talconfig.yaml
-    requires:
-      vars:
-        - K8S_CLUSTER
+      - which op test talhelper
+      - test -f {{.K8S_DIR}}/talos/talsecret.yaml
+      - test -f {{.K8S_DIR}}/talos/talconfig.yaml
+      - test -f {{.K8S_DIR}}/talos/talhelper-secrets.env
+      - op user get --me
     cmds:
-      - talhelper genconfig
-        --secret-file {{.K8S_CLUSTER_DIR}}/talos/talsecret.sops.yaml
-        --config-file {{.K8S_CLUSTER_DIR}}/talos/talconfig.yaml
-        --out-dir {{.K8S_CLUSTER_DIR}}/talos/clusterconfig
+      - op run --env-file {{.K8S_DIR}}/talos/talhelper-secrets.env --no-masking -- talhelper genconfig
+        --secret-file {{.K8S_DIR}}/talos/talsecret.yaml
+        --config-file {{.K8S_DIR}}/talos/talconfig.yaml
+        --out-dir {{.K8S_DIR}}/talos/clusterconfig
 
   apply-clusterconfig:
     desc: Apply clusterconfig for a Talos cluster
     vars:
       CLUSTERCONFIG_FILES:
-        sh: ls {{.K8S_CLUSTER_DIR}}/talos/clusterconfig/*.yaml
+        sh: ls {{.K8S_DIR}}/talos/clusterconfig/*.yaml
     preconditions:
       - which ls
       - test -f "${TALOSCONFIG}"
-    requires:
-      vars:
-        - K8S_CLUSTER
     cmds:
       - for:
           var: CLUSTERCONFIG_FILES
@@ -36,7 +32,7 @@ tasks:
         vars:
           FILENAME: "{{.ITEM}}"
           HOSTNAME: |-
-            {{ trimPrefix (printf "%s-" .K8S_CLUSTER) (base .ITEM) | trimSuffix ".yaml" }}
+            {{ trimPrefix (printf "home-ops-") (base .ITEM) | trimSuffix ".yaml" }}
           DRY_RUN: "{{ .DRY_RUN }}"
           INSECURE: "{{ .INSECURE }}"
 
@@ -48,17 +44,16 @@ tasks:
       - talosctl --nodes {{.NODE}} get machineconfig
     requires:
       vars:
-        - K8S_CLUSTER
         - NODE
     vars:
       FILE:
-        sh: ls {{.K8S_CLUSTER_DIR}}/talos/clusterconfig/{{.K8S_CLUSTER}}-{{.NODE}}*.yaml
+        sh: ls {{.K8S_DIR}}/talos/clusterconfig/home-ops-{{.NODE}}*.yaml
     cmds:
       - task: _apply-machineconfig
         vars:
           FILENAME: "{{.FILE}}"
           HOSTNAME: "{{.NODE}}"
-      - talosctl --nodes {{.NODE}} health --wait-timeout=10m --server=false
+      - talosctl --nodes {{.NODE}} health
 
   upgrade-node:
     desc: Upgrade Talos on a single node [NODE=required]
@@ -68,16 +63,15 @@ tasks:
       - talosctl --nodes {{.NODE}} get machineconfig
     requires:
       vars:
-        - K8S_CLUSTER
         - NODE
     vars:
       FILE:
-        sh: ls {{.K8S_CLUSTER_DIR}}/talos/clusterconfig/{{.K8S_CLUSTER}}-{{.NODE}}*.yaml
+        sh: ls {{.K8S_DIR}}/talos/clusterconfig/home-ops-{{.NODE}}*.yaml
       TALOS_IMAGE:
         sh: yq '.machine.install.image' < "{{.FILE}}"
     cmds:
       - talosctl --nodes {{.NODE}} upgrade --image="{{.TALOS_IMAGE}}" --timeout=10m
-      - talosctl --nodes {{.NODE}} health --wait-timeout=10m --server=false
+      - talosctl --nodes {{.NODE}} health
 
   _apply-machineconfig:
     internal: true
@@ -87,7 +81,6 @@ tasks:
       - test -f "{{.FILENAME}}"
     requires:
       vars:
-        - K8S_CLUSTER
         - HOSTNAME
         - FILENAME
     vars:

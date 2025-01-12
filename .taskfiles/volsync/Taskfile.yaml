@@ -7,12 +7,9 @@ vars:
 
 tasks:
   unlock:
-    desc: Unlock all restic source repos [K8S_CLUSTER=main]
+    desc: Unlock all restic source repos
     preconditions:
       - which kubectl
-    requires:
-      vars:
-        - K8S_CLUSTER
     vars:
       SOURCES:
         sh: kubectl get replicationsources --all-namespaces --no-headers --output=jsonpath='{range .items[*]}{.metadata.namespace},{.metadata.name}{"\n"}{end}'
@@ -23,14 +20,13 @@ tasks:
         cmd: kubectl --namespace {{splitList "," .ITEM | first}} patch --field-manager=flux-client-side-apply replicationsources {{splitList "," .ITEM | last}} --type merge --patch "{\"spec\":{\"restic\":{\"unlock\":\"{{now | unixEpoch}}\"}}}"
 
   list:
-    desc: List snapshots for an app [K8S_CLUSTER=main] [NS=default] [APP=required]
+    desc: List snapshots for an app [NS=default] [APP=required]
     preconditions:
       - which kubectl minijinja-cli
       - kubectl --namespace {{.NS}} get replicationsources {{.APP}}
       - test -f "{{.VOLSYNC_TASK_RESOURCES_DIR}}/list-snapshots.yaml.j2"
     requires:
       vars:
-        - K8S_CLUSTER
         - APP
     vars:
       NS: '{{.NS | default "default"}}'
@@ -46,13 +42,12 @@ tasks:
       - kubectl --namespace {{.NS}} delete job {{ .JOB }}
 
   snapshot:
-    desc: Snapshot an app [K8S_CLUSTER=main] [NS=default] [APP=required]
+    desc: Snapshot an app [NS=default] [APP=required]
     preconditions:
       - which kubectl
       - kubectl --namespace {{.NS}} get replicationsources {{.APP}}
     requires:
       vars:
-        - K8S_CLUSTER
         - APP
     vars:
       NS: '{{.NS | default "default"}}'
@@ -63,13 +58,12 @@ tasks:
       - kubectl --namespace {{.NS}} wait job/{{.JOB}} --for=condition=complete --timeout=120m
 
   restore:
-    desc: Restore an app [K8S_CLUSTER=main] [NS=default] [APP=required] [PREVIOUS=required]
+    desc: Restore an app [NS=default] [APP=required] [PREVIOUS=required]
     preconditions:
       - which flux kubectl minijinja-cli
       - test -f {{.VOLSYNC_TASK_RESOURCES_DIR}}/replicationdestination.yaml.j2
     requires:
       vars:
-        - K8S_CLUSTER
         - APP
         - PREVIOUS
     vars:
@@ -106,41 +100,3 @@ tasks:
       - flux --namespace {{.NS}} resume helmrelease {{.APP}}
       - flux --namespace {{.NS}} reconcile helmrelease {{.APP}} --force
       - kubectl --namespace {{.NS}} wait pod --for=condition=ready --selector="app.kubernetes.io/name={{.APP}}" --timeout=5m
-# x-env: &env
-#   app: "{{.app}}"
-#   controller: "{{.controller}}"
-#   ns: "{{.ns}}"
-#   previous: "{{.previous}}"
-#   ts: "{{.ts}}"
-#   claim: "{{.claim}}"
-#   app_uid: "{{.app_uid}}"
-#   app_gid: "{{.app_gid}}"
-
-# vars:
-#   scriptsDir: "{{.ROOT_DIR}}/.taskfiles/_scripts"
-#   templatesDir: "{{.ROOT_DIR}}/.taskfiles/VolSync/templates"
-#   ts: '{{now | date "150405"}}'
-
-# tasks:
-#   list:
-#     desc: List all snapshots
-#     summary: |
-#       Args:
-#         ns: Namespace the PVC is in (default: default)
-#         app: Application to list snapshots for (required)
-#     cmds:
-#       - envsubst < <(cat {{.templatesDir}}/list.tmpl.yaml) | kubectl apply -f -
-#       - bash {{.scriptsDir}}/wait-for-k8s-job.sh {{.app}}-list-snapshots-{{.ts}} {{.ns}}
-#       - kubectl --namespace {{.ns}} wait job/{{.app}}-list-snapshots-{{.ts}} --for condition=complete --timeout=1m
-#       - kubectl --namespace {{.ns}} logs job/{{.app}}-list-snapshots-{{.ts}} --container list
-#       - kubectl --namespace {{.ns}} delete job {{.app}}-list-snapshots-{{.ts}}
-#     vars:
-#       app: '{{ or .app (fail "Argument (app) is required") }}'
-#       ns: '{{.ns | default "default"}}'
-#     env: *env
-#     preconditions:
-#       - sh: test -f {{.scriptsDir}}/wait-for-k8s-job.sh
-#         msg: "Wait script not found"
-#       - sh: test -f {{.templatesDir}}/list.tmpl.yaml
-#         msg: "List job template not found"
-#     silent: true

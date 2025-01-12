@@ -1,0 +1,57 @@
+---
+use_default_settings: true
+
+server:
+  limiter: true
+  image_proxy: true
+  method: GET # https://github.com/searxng/searxng/pull/3619
+  public_instance: false
+
+search:
+  autocomplete: duckduckgo
+  favicon_resolver: duckduckgo
+  languages:
+    - all
+    - en
+    - en-US
+    - de
+    - nl-NL
+
+general:
+  instance_name: BJW-S Search
+
+ui:
+  default_theme: simple
+  infinite_scroll: true
+  query_in_title: true
+  results_on_new_tab: true
+  static_use_hash: true
+  theme_args:
+    simple_style: auto
+
+categories_as_tabs:
+  general:
+  images:
+  videos:
+  map:
+
+enabled_plugins:
+  - Basic Calculator
+  - Hash plugin
+  - Hostnames plugin
+  - Open Access DOI rewrite
+  - Self Informations
+  - Tracker URL remover
+  - Unit converter plugin
+
+hostnames:
+  high_priority:
+    - (.*)\/blog\/(.*)
+    - (.*\.)?wikipedia.org$
+    - (.*\.)?github.com$
+    - (.*\.)?reddit.com$
+    - (.*\.)?docker.com$
+    - (.*\.)?archlinux.org$
+    - (.*\.)?stackoverflow.com$
+    - (.*\.)?askubuntu.com$
+    - (.*\.)?superuser.com$

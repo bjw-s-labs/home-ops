@@ -11,7 +11,7 @@ vars:
 
 tasks:
   crunchy-dump:
-    desc: Run pg_dump on the master instance of a CrunchyData Postgres cluster. [K8S_CLUSTER={{.K8S_CLUSTER}}] [DB_NAME=required] [OUTPUT_DIR=.] [NS={{.CRUNCHY_DEFAULT_NS}}] [DB_CLUSTER={{.CRUNCHY_DEFAULT_DB_CLUSTER}}]
+    desc: Run pg_dump on the master instance of a CrunchyData Postgres cluster. [DB_NAME=required] [OUTPUT_DIR=.] [NS={{.CRUNCHY_DEFAULT_NS}}] [DB_CLUSTER={{.CRUNCHY_DEFAULT_DB_CLUSTER}}]
     preconditions:
       - which kubectl
       - kubectl get pods --namespace {{.NS}} -l postgres-operator.crunchydata.com/role=master,postgres-operator.crunchydata.com/cluster={{.DB_CLUSTER}}
@@ -29,14 +29,13 @@ tasks:
       - kubectl exec -it --container database --namespace {{.NS}} {{.CRUNCHY_PRIMARY_POD}} -- /bin/bash -c 'rm -rf /pgdata/{{.DB_NAME}}.psql'
 
   crunchy-restore:
-    desc: Restore a pg_dump to a CrunchyData Postgres cluster, writing to the master instance. [K8S_CLUSTER={{.K8S_CLUSTER}}] [DB_NAME=required] [DB_USER=required] [FILE=required] [NS={{.CRUNCHY_DEFAULT_NS}}] [DB_CLUSTER={{.CRUNCHY_DEFAULT_DB_CLUSTER}}]
+    desc: Restore a pg_dump to a CrunchyData Postgres cluster, writing to the master instance. [DB_NAME=required] [DB_USER=required] [FILE=required] [NS={{.CRUNCHY_DEFAULT_NS}}] [DB_CLUSTER={{.CRUNCHY_DEFAULT_DB_CLUSTER}}]
     preconditions:
       - which kubectl
       - kubectl get pods --namespace {{.NS}} -l postgres-operator.crunchydata.com/role=master,postgres-operator.crunchydata.com/cluster={{.DB_CLUSTER}}
       - test -f "{{.FILE}}"
     requires:
       vars:
-        - K8S_CLUSTER
         - DB_NAME
         - DB_USER
         - FILE
@@ -51,13 +50,10 @@ tasks:
       - defer: kubectl exec -it --namespace {{.NS}} {{.CRUNCHY_PRIMARY_POD}} -- /bin/bash -c 'rm -rf /pgdata/restore-{{.DB_NAME}}.psql'
 
   crunchy-exec:
-    desc: Exec in to the master instance of a CrunchyData Postgres cluster. [K8S_CLUSTER={{.K8S_CLUSTER}}] [NS={{.CRUNCHY_DEFAULT_NS}}] [DB_CLUSTER={{.CRUNCHY_DEFAULT_DB_CLUSTER}}]
+    desc: Exec in to the master instance of a CrunchyData Postgres cluster. [NS={{.CRUNCHY_DEFAULT_NS}}] [DB_CLUSTER={{.CRUNCHY_DEFAULT_DB_CLUSTER}}]
     preconditions:
       - which kubectl
       - kubectl get pods --namespace {{.NS}} -l postgres-operator.crunchydata.com/role=master,postgres-operator.crunchydata.com/cluster={{.DB_CLUSTER}}
-    requires:
-      vars:
-        - K8S_CLUSTER
     vars:
       DB_CLUSTER: "{{.DB_CLUSTER | default .CRUNCHY_DEFAULT_DB_CLUSTER }}"
       NS: "{{.NS | default .CRUNCHY_DEFAULT_NS }}"
