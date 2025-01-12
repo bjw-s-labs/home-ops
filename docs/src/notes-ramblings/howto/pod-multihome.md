@@ -11,10 +11,6 @@ A good example of this would be [Home Assistant](https://www.home-assistant.io).
 
 For a Kubernetes cluster to be able to add additional network interfaces to Pods (this is also known as "multi-homing") the [Multus CNI](https://github.com/k8snetworkplumbingwg/multus-cni) needs to be installed in your cluster.
 
-```admonish note
-I use the Helm chart provided by [@angelnu](https://github.com/angelnu/helm-charts/tree/main/charts/apps/multus) to install Multus. The reason for using this over the [official deployment method](https://github.com/k8snetworkplumbingwg/multus-cni/blob/master/deployments/multus-daemonset.yml) is that it has better support for upgrade/update scenarios.
-```
-
 ## NIC configuration
 
 Make sure that the Kubernetes node has a network interface that is connected to the VLAN you wish to connect to.
