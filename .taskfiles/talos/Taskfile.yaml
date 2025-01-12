@@ -6,12 +6,14 @@ tasks:
   generate-clusterconfig:
     desc: Generate clusterconfig for Talos
     preconditions:
-      - which test talhelper
-      - test -f {{.K8S_DIR}}/talos/talsecret.sops.yaml
+      - which op test talhelper
+      - test -f {{.K8S_DIR}}/talos/talsecret.yaml
       - test -f {{.K8S_DIR}}/talos/talconfig.yaml
+      - test -f {{.K8S_DIR}}/talos/talhelper-secrets.env
+      - op user get --me
     cmds:
-      - talhelper genconfig
-        --secret-file {{.K8S_DIR}}/talos/talsecret.sops.yaml
+      - op run --env-file {{.K8S_DIR}}/talos/talhelper-secrets.env --no-masking -- talhelper genconfig
+        --secret-file {{.K8S_DIR}}/talos/talsecret.yaml
         --config-file {{.K8S_DIR}}/talos/talconfig.yaml
         --out-dir {{.K8S_DIR}}/talos/clusterconfig
 

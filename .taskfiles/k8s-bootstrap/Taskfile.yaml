@@ -26,6 +26,7 @@ tasks:
       - which op helmfile kubectl
       - test -f "${TALOSCONFIG}"
       - test -f {{.K8S_DIR}}/bootstrap/helmfile.yaml
+      - test -f {{.K8S_DIR}}/bootstrap/bootstrap.env
       - test -f {{.K8S_DIR}}/bootstrap/templates/resources.yaml.j2
       - test -f {{.K8S_DIR}}/bootstrap/templates/wipe-rook.yaml.gotmpl
       - op user get --me
