@@ -5,9 +5,18 @@ kind: Kustomization
 resources:
   # Pre Flux-Kustomizations
   - ./namespace.yaml
+  - ../../templates/alerts/flux
   # Flux-Kustomizations
   - ./calibre-web/ks.yaml
   - ./maintainerr/ks.yaml
   - ./piped/ks.yaml
   - ./plex/ks.yaml
   - ./tautulli/ks.yaml
+transformers:
+  - |-
+    apiVersion: builtin
+    kind: NamespaceTransformer
+    metadata:
+      name: not-used
+      namespace: media
+    unsetOnly: true

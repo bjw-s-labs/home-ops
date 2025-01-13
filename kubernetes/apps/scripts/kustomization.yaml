@@ -5,5 +5,14 @@ kind: Kustomization
 resources:
   # Pre Flux-Kustomizations
   - ./namespace.yaml
+  - ../../templates/alerts/flux
   # Flux-Kustomizations
   - ./mailbackup/ks.yaml
+transformers:
+  - |-
+    apiVersion: builtin
+    kind: NamespaceTransformer
+    metadata:
+      name: not-used
+      namespace: scripts
+    unsetOnly: true

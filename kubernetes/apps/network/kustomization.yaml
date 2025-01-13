@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   # Pre Flux-Kustomizations
   - ./namespace.yaml
+  - ../../templates/alerts/flux
   # Flux-Kustomizations
   - ./cloudflared/ks.yaml
   - ./echo-server/ks.yaml
@@ -12,3 +13,11 @@ resources:
   - ./ingress-nginx/ks.yaml
   - ./multus/ks.yaml
   - ./openspeedtest/ks.yaml
+transformers:
+  - |-
+    apiVersion: builtin
+    kind: NamespaceTransformer
+    metadata:
+      name: not-used
+      namespace: network
+    unsetOnly: true

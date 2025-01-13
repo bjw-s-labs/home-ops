@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   # Pre Flux-Kustomizations
   - ./namespace.yaml
+  - ../../templates/alerts/flux
   # Flux-Kustomizations
   - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
@@ -16,3 +17,11 @@ resources:
   - ./sabnzbd/ks.yaml
   - ./sonarr/ks.yaml
   - ./ytdl-sub/ks.yaml
+transformers:
+  - |-
+    apiVersion: builtin
+    kind: NamespaceTransformer
+    metadata:
+      name: not-used
+      namespace: downloads
+    unsetOnly: true
