@@ -57,6 +57,23 @@ tasks:
       - until kubectl --namespace {{.NS}} get job/{{.JOB}} &>/dev/null; do sleep 5; done
       - kubectl --namespace {{.NS}} wait job/{{.JOB}} --for=condition=complete --timeout=120m
 
+  snapshot-all:
+    desc: Snapshot all apps across all namespaces
+    preconditions:
+      - which kubectl
+    vars:
+      ALL_APPS:
+        sh: |
+          kubectl get replicationsources -A --no-headers -o jsonpath='{range .items[*]}{.metadata.namespace},{.metadata.name}{"\n"}{end}' | grep -v '\-r2'
+    cmds:
+      - for:
+          var: ALL_APPS
+          split: "\n"
+        task: snapshot
+        vars:
+          NS: '{{splitList "," .ITEM | first}}'
+          APP: '{{splitList "," .ITEM | last}}'
+
   restore:
     desc: Restore an app [NS=default] [APP=required] [PREVIOUS=required]
     preconditions:
