@@ -75,18 +75,9 @@ spec:
       storage:
         useAllNodes: false
         useAllDevices: false
+        devicePathFilter: /dev/disk/by-id/nvme-Samsung_SSD_990_PRO_1TB_.*
         config:
           osdsPerDevice: "1"
-        nodes:
-          - name: "delta"
-            devices:
-              - name: "/dev/disk/by-id/nvme-Samsung_SSD_980_1TB_S649NX0RB57009Y"
-          - name: "enigma"
-            devices:
-              - name: "/dev/disk/by-id/nvme-Samsung_SSD_980_1TB_S649NX0RB57050E"
-          - name: "felix"
-            devices:
-              - name: "/dev/disk/by-id/nvme-CT1000P1SSD8_202228759489"
     cephBlockPools:
       - name: ceph-blockpool
         spec:
