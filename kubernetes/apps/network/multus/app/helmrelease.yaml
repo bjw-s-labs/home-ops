@@ -18,43 +18,17 @@ spec:
 
   values:
     controllers:
-      uninstall:
-        type: job
-
-        annotations:
-          # This is what defines this resource as a hook. Without this line, the
-          # job is considered part of the release.
-          helm.sh/hook: pre-delete, pre-upgrade
-          helm.sh/hook-weight: "-5"
-          helm.sh/hook-delete-policy: hook-succeeded
-
-        pod:
-          hostNetwork: true
-
-        containers:
-          uninstall:
-            image:
-              repository: docker.io/library/alpine
-              tag: "3.21"
-
-            command:
-              - /bin/sh
-              - -c
-
-            args:
-              - |
-                set -x
-                rm -rf /host/etc/cni/net.d/*multus*
-                rm -rf /host/opt/cni/bin/*multus*
-
       multus:
         type: daemonset
 
-        annotations:
-          reloader.stakater.com/auto: "true"
-
         pod:
           hostNetwork: true
+
+        initContainers:
+          cni-plugins:
+            image:
+              repository: ghcr.io/buroa/cni-plugins
+              tag: 1.6.2
 
         containers:
           multus:
@@ -64,9 +38,7 @@ spec:
             command:
               - /thin_entrypoint
             args:
-              - --multus-conf-file=/config/00-multus.conf
-              - --cni-bin-dir=/opt/cni/bin
-              - --cni-conf-dir=/etc/cni/net.d
+              - --cleanup-config-on-exit=true
             resources:
               requests:
                 cpu: "10m"
@@ -76,19 +48,16 @@ spec:
               privileged: true
 
     persistence:
-      config:
-        type: configMap
-        name: multus-configmap
-        globalMounts:
-          - path: /config/00-multus.conf
-            subPath: 00-multus.conf
-            readOnly: true
       etc-cni-net-d:
         type: hostPath
         hostPath: /etc/cni/net.d
+        globalMounts:
+          - path: /host/etc/cni/net.d
       opt-cni-bin:
         type: hostPath
         hostPath: /opt/cni/bin
+        globalMounts:
+          - path: /host/opt/cni/bin
 
     serviceAccount:
       create: true
