@@ -1,0 +1,30 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  # Pre Flux-Kustomizations
+  - ./namespace.yaml
+  - ../../templates/alerts/flux
+  # Flux-Kustomizations
+  - ./alertmanager/ks.yaml
+  - ./blackbox-exporter/ks.yaml
+  - ./fluent-bit/ks.yaml
+  - ./grafana/ks.yaml
+  - ./kromgo/ks.yaml
+  - ./kube-state-metrics/ks.yaml
+  - ./kube-prometheus-stack/ks.yaml
+  - ./loki/ks.yaml
+  - ./node-exporter/ks.yaml
+  - ./prometheus-operator/ks.yaml
+  - ./silence-operator/ks.yaml
+  - ./smartctl-exporter/ks.yaml
+  - ./unpoller/ks.yaml
+transformers:
+  - |-
+    apiVersion: builtin
+    kind: NamespaceTransformer
+    metadata:
+      name: not-used
+      namespace: monitoring
+    unsetOnly: true

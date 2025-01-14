@@ -34,7 +34,7 @@ jobs:
         if: steps.changed-files.outputs.any_changed == 'true'
         uses: bjw-s/action-actionlint@v0.1
         with:
-          actionlint_config: .actionlint.yml
+          actionlint_config: .github/actionlint.yaml
           file_pattern: ${{ steps.changed-files.outputs.all_changed_files }}
 
   yamllint:

@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  # Pre Flux-Kustomizations
+  - ./namespace.yaml
+  - ../../templates/alerts/flux
+  # Flux-Kustomizations
+  - ./cloudflared/ks.yaml
+  - ./echo-server/ks.yaml
+  - ./external-dns/ks.yaml
+  - ./ingress-nginx/ks.yaml
+  - ./multus/ks.yaml
+  - ./openspeedtest/ks.yaml
+transformers:
+  - |-
+    apiVersion: builtin
+    kind: NamespaceTransformer
+    metadata:
+      name: not-used
+      namespace: network
+    unsetOnly: true

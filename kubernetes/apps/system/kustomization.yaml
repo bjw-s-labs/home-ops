@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  # Pre Flux-Kustomizations
+  - ./namespace.yaml
+  - ../../templates/alerts/flux
+  # Flux-Kustomizations
+  - ./descheduler/ks.yaml
+  - ./fstrim/ks.yaml
+  - ./generic-device-plugin/ks.yaml
+  - ./intel-device-plugins/ks.yaml
+  - ./irqbalance/ks.yaml
+  - ./node-feature-discovery/ks.yaml
+  - ./reloader/ks.yaml
+  - ./spegel/ks.yaml
+  - ./volsync/ks.yaml
+transformers:
+  - |-
+    apiVersion: builtin
+    kind: NamespaceTransformer
+    metadata:
+      name: not-used
+      namespace: system
+    unsetOnly: true

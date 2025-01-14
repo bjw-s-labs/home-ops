@@ -4,13 +4,12 @@ version: "3"
 
 tasks:
   ks-*:
-    desc: Perform an action on a Flux KS [K8S_CLUSTER={{.K8S_CLUSTER}}] [PATH=required] [NAME] [SRC]
+    desc: Perform an action on a Flux KS [PATH=required] [NAME] [SRC]
     preconditions:
-      - test -f {{.K8S_CLUSTER_DIR}}/apps/{{.PATH}}/ks.yaml
+      - test -f {{.K8S_DIR}}/apps/{{.PATH}}/ks.yaml
       - which flux kubectl yq
     requires:
       vars:
-        - K8S_CLUSTER
         - PATH
     vars:
       OPERATION: "{{index .MATCH 0}}"
@@ -18,8 +17,8 @@ tasks:
         sh: flux --namespace flux-system get kustomizations {{base .PATH}} 2>&1
     cmd: >
       flux build --namespace flux-system ks {{ if .NAME }}{{.NAME}}{{ else }}{{base .PATH}}{{ end }}
-      --kustomization-file {{.K8S_CLUSTER_DIR}}/apps/{{.PATH}}/ks.yaml
-      --path {{.K8S_CLUSTER_DIR}}/apps/{{.PATH}}{{- if .SRC }}/{{.SRC}}{{ end }}
+      --kustomization-file {{.K8S_DIR}}/apps/{{.PATH}}/ks.yaml
+      --path {{.K8S_DIR}}/apps/{{.PATH}}{{- if .SRC }}/{{.SRC}}{{ end }}
       {{ if contains "not found" .KS }}--dry-run \{{ end }}
       | yq 'with(select(.apiVersion == "kustomize.toolkit.fluxcd.io/v1" and .kind == "Kustomization"); .metadata.namespace = "flux-system")' -
       | kubectl {{.OPERATION}} {{if eq .OPERATION "apply"}}--server-side  --field-manager=kustomize-controller{{end}} --filename -

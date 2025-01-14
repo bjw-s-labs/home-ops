@@ -1,0 +1,56 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: openebs
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: openebs
+      version: 4.1.2
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: openebs
+        namespace: flux-system
+  values:
+    localpv-provisioner:
+      rbac:
+        create: true
+      localpv:
+        image:
+          registry: quay.io/
+          repository: openebs/provisioner-localpv
+        basePath: &hostPath /var/mnt/extra/openebs/local
+      hostpathClass:
+        enabled: true
+        name: openebs-hostpath
+        isDefaultClass: false
+        basePath: *hostPath
+
+    openebs-crds:
+      csi:
+        volumeSnapshots:
+          enabled: false
+          keep: false
+
+    zfs-localpv:
+      enabled: false
+
+    lvm-localpv:
+      enabled: false
+
+    mayastor:
+      enabled: false
+
+    engines:
+      local:
+        lvm:
+          enabled: false
+        zfs:
+          enabled: false
+      replicated:
+        mayastor:
+          enabled: false
