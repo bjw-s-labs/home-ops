@@ -18,9 +18,6 @@ spec:
   driftDetection:
     mode: enabled
   values:
-    runnerGroup: arc-bjw-s-labs
-    runnerScaleSetName: arc-bjw-s-labs
-
     githubConfigUrl: https://github.com/bjw-s-labs
 
     minRunners: 0
@@ -29,22 +26,16 @@ spec:
     containerMode:
       type: kubernetes
       kubernetesModeWorkVolumeClaim:
-        accessModes: ["ReadWriteOnce"]
-        storageClassName: ceph-block
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: openebs-hostpath
         resources:
           requests:
-            storage: 2Gi
+            storage: 5Gi
 
     controllerServiceAccount:
       name: actions-runner-controller-gha-rs-controller
       namespace: actions-runner-system
-
-    listenerTemplate:
-      metadata:
-        labels:
-          app.kubernetes.io/name: arc-bjw-s-labs-listener
-      spec:
-        containers: []
 
     template:
       metadata:
@@ -54,12 +45,11 @@ spec:
         containers:
           - name: runner
             image: ghcr.io/onedr0p/actions-runner:2.321.0
-            command: ["/home/runner/run.sh"]
+            command:
+              - /home/runner/run.sh
             env:
               - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
                 value: "false"
-        securityContext:
-          fsGroup: 123
 
   valuesFrom:
     - kind: Secret
