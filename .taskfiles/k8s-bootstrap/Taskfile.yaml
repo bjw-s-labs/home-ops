@@ -31,7 +31,7 @@ tasks:
       - test -f {{.K8S_DIR}}/bootstrap/templates/wipe-rook.yaml.gotmpl
       - op user get --me
       - talosctl config info
-    vars:
+    env:
       NODE_COUNT:
         sh: talosctl config info --output json | jq --raw-output '.nodes | length'
     cmds:
