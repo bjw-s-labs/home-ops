@@ -18,6 +18,9 @@ spec:
     crds: CreateReplace
   upgrade:
     crds: CreateReplace
+  dependsOn:
+    - name: cert-manager
+      namespace: cert-manager
   values:
     fullnameOverride: emqx-operator
     image:

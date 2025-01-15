@@ -13,5 +13,8 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: crunchy-userinit
+  dependsOn:
+    - name: crunchy-postgres-operator
+      namespace: database
   values:
     fullnameOverride: crunchy-userinit-controller
