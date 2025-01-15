@@ -20,13 +20,9 @@ spec:
   wait: false
   dependsOn:
     - name: multus-networks
-    - name: rook-ceph-cluster
-    - name: volsync
     - name: external-secrets-stores
   postBuild:
     substitute:
       APP: *appname
-      APP_UID: "2000"
-      APP_GID: "2000"
       VOLSYNC_CLAIM: esphome-config
       VOLSYNC_CAPACITY: 5Gi

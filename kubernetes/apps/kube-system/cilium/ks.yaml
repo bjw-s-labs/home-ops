@@ -13,7 +13,7 @@ spec:
   interval: 30m
   timeout: 5m
   path: "./kubernetes/apps/kube-system/cilium/app"
-  prune: true
+  prune: false # Never delete this
   sourceRef:
     kind: GitRepository
     name: flux-system
@@ -34,8 +34,10 @@ spec:
   interval: 30m
   timeout: 5m
   path: "./kubernetes/apps/kube-system/cilium/config"
-  prune: true
+  prune: false # Never delete this
   sourceRef:
     kind: GitRepository
     name: flux-system
   wait: false
+  dependsOn:
+    - name: cilium

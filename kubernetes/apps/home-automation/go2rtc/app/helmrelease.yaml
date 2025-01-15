@@ -15,13 +15,12 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
+  dependsOn:
+    - name: home-assistant
+      namespace: home-automation
   values:
     controllers:
       go2rtc:
-        annotations:
-          reloader.stakater.com/auto: "true"
-
         pod:
           affinity:
             podAffinity:
@@ -71,7 +70,7 @@ spec:
     persistence:
       config:
         type: configMap
-        name: go2rtc-configmap
+        name: go2rtc
         advancedMounts:
           go2rtc:
             app:
