@@ -7,10 +7,11 @@ resources:
   - ./helmrelease.yaml
   - ../../../../templates/volsync
 configMapGenerator:
-  - name: recyclarr-configmap
+  - name: recyclarr
     files:
       - config/recyclarr.yml
 generatorOptions:
-  disableNameSuffixHash: true
   annotations:
     kustomize.toolkit.fluxcd.io/substitute: disabled
+configurations:
+  - kustomizeconfig.yaml

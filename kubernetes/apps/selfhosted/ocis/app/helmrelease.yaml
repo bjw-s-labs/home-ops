@@ -15,7 +15,11 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: system
   values:
     controllers:
       ocis:
@@ -99,7 +103,7 @@ spec:
     persistence:
       config:
         type: configMap
-        name: ocis-configmap
+        name: ocis
         globalMounts:
           - path: /etc/ocis/web.yaml
             subPath: web.yaml

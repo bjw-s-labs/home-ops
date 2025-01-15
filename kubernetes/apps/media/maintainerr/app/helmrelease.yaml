@@ -15,12 +15,16 @@ spec:
         name: bjw-s
         namespace: flux-system
   interval: 30m
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: system
+    - name: plex
+      namespace: media
   values:
     controllers:
       maintainerr:
-        annotations:
-          reloader.stakater.com/auto: "true"
-
         pod:
           securityContext:
             runAsUser: 1000

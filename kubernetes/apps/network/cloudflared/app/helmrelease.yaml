@@ -15,7 +15,11 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
+  dependsOn:
+    - name: externaldns-cloudflare
+      namespace: network
+    - name: nginx-external
+      namespace: network
   values:
     controllers:
       cloudflared:
@@ -111,7 +115,7 @@ spec:
     persistence:
       config:
         type: configMap
-        name: cloudflared-configmap
+        name: cloudflared
         globalMounts:
           - path: /etc/cloudflared/config/config.yaml
             subPath: config.yaml

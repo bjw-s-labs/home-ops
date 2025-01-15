@@ -17,6 +17,11 @@ spec:
       interval: 30m
   driftDetection:
     mode: enabled
+  dependsOn:
+    - name: actions-runner-controller
+      namespace: actions-runner-system
+    - name: openebs
+      namespace: openebs
   values:
     githubConfigUrl: https://github.com/bjw-s-labs
 
@@ -34,7 +39,7 @@ spec:
             storage: 5Gi
 
     controllerServiceAccount:
-      name: actions-runner-controller-gha-rs-controller
+      name: actions-runner-controller
       namespace: actions-runner-system
 
     template:

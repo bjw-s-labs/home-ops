@@ -15,6 +15,11 @@ spec:
         kind: HelmRepository
         name: intel
         namespace: flux-system
+  dependsOn:
+    - name: intel-device-plugins-operator
+      namespace: system
+    - name: node-feature-discovery
+      namespace: system
   values:
     name: intel-gpu-plugin
     sharedDevNum: 3

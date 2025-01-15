@@ -17,10 +17,8 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  wait: true
+  wait: false
   dependsOn:
-    - name: rook-ceph-cluster
-    - name: volsync
     - name: external-secrets-stores
   postBuild:
     substitute:
@@ -48,10 +46,7 @@ spec:
     name: flux-system
   wait: false
   dependsOn:
-    - name: rook-ceph-cluster
-    - name: volsync
     - name: external-secrets-stores
-    - name: plex
   postBuild:
     substitute:
       APP: *appname
@@ -80,7 +75,6 @@ spec:
   wait: false
   dependsOn:
     - name: external-secrets-stores
-    - name: plex
   postBuild:
     substitute:
       APP: *appname

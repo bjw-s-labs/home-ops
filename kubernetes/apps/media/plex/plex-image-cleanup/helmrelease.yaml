@@ -15,13 +15,13 @@ spec:
         name: bjw-s
         namespace: flux-system
   interval: 30m
+  dependsOn:
+    - name: plex
+      namespace: media
   values:
     controllers:
       plex-image-cleanup:
         type: cronjob
-
-        annotations:
-          reloader.stakater.com/auto: "true"
 
         cronjob:
           schedule: "30 8 * * 6"
