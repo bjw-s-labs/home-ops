@@ -20,6 +20,7 @@ spec:
   wait: true
   dependsOn:
     - name: cert-manager
+    - name: external-secrets-stores
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -42,3 +43,4 @@ spec:
   wait: true
   dependsOn:
     - name: emqx-operator
+    - name: external-secrets-stores
