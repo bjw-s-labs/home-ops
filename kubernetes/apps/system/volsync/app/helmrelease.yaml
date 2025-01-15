@@ -15,6 +15,9 @@ spec:
         name: backube
         namespace: flux-system
       interval: 30m
+  dependsOn:
+    - name: snapshot-controller
+      namespace: system-controllers
   values:
     manageCRDs: true
     metrics:
