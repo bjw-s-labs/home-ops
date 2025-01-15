@@ -6,9 +6,9 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
 configMapGenerator:
-  - name: searxng-configmap
+  - name: searxng
     files:
       - ./resources/limiter.toml
       - ./resources/settings.yml
-generatorOptions:
-  disableNameSuffixHash: true
+configurations:
+  - kustomizeconfig.yaml
