@@ -3,17 +3,17 @@
 apiVersion: admissionregistration.k8s.io/v1alpha1
 kind: MutatingAdmissionPolicyBinding
 metadata:
-  name: flux-ks-add-postbuild
+  name: flux-ks-no-postbuild
 spec:
-  policyName: flux-ks-add-postbuild
+  policyName: flux-ks-no-postbuild
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/refs/heads/master/v1.32.0/mutatingadmissionpolicybinding-admissionregistration-v1alpha1.json
 apiVersion: admissionregistration.k8s.io/v1alpha1
 kind: MutatingAdmissionPolicyBinding
 metadata:
-  name: flux-ks-add-substitutefrom
+  name: flux-ks-no-substitutefrom
 spec:
-  policyName: flux-ks-add-substitutefrom
+  policyName: flux-ks-no-substitutefrom
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/refs/heads/master/v1.32.0/mutatingadmissionpolicybinding-admissionregistration-v1alpha1.json
 apiVersion: admissionregistration.k8s.io/v1alpha1
@@ -35,7 +35,7 @@ spec:
 apiVersion: admissionregistration.k8s.io/v1alpha1
 kind: MutatingAdmissionPolicy
 metadata:
-  name: flux-ks-add-postbuild
+  name: flux-ks-no-postbuild
 spec:
   matchConstraints:
     resourceRules:
@@ -58,6 +58,26 @@ spec:
             JSONPatch{
               op: "add", path: "/spec/postBuild",
               value: {}
+            },
+            JSONPatch{
+              op: "add", path: "/spec/postBuild/substituteFrom",
+              value: []
+            },
+            JSONPatch{
+              op: "add", path: "/spec/postBuild/substituteFrom/-",
+              value: Object.spec.postBuild.substituteFrom{
+                name: "cluster-settings",
+                kind: "ConfigMap",
+                optional: true
+              }
+            },
+            JSONPatch{
+              op: "add", path: "/spec/postBuild/substituteFrom/-",
+              value: Object.spec.postBuild.substituteFrom{
+                name: "cluster-secrets",
+                kind: "Secret",
+                optional: true
+              }
             }
           ]
 ---
@@ -65,7 +85,7 @@ spec:
 apiVersion: admissionregistration.k8s.io/v1alpha1
 kind: MutatingAdmissionPolicy
 metadata:
-  name: flux-ks-add-substitutefrom
+  name: flux-ks-no-substitutefrom
 spec:
   matchConstraints:
     resourceRules:
@@ -90,6 +110,22 @@ spec:
             JSONPatch{
               op: "add", path: "/spec/postBuild/substituteFrom",
               value: []
+            },
+            JSONPatch{
+              op: "add", path: "/spec/postBuild/substituteFrom/-",
+              value: Object.spec.postBuild.substituteFrom{
+                name: "cluster-settings",
+                kind: "ConfigMap",
+                optional: true
+              }
+            },
+            JSONPatch{
+              op: "add", path: "/spec/postBuild/substituteFrom/-",
+              value: Object.spec.postBuild.substituteFrom{
+                name: "cluster-secrets",
+                kind: "Secret",
+                optional: true
+              }
             }
           ]
 ---
