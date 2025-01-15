@@ -76,6 +76,8 @@ spec:
   matchConditions:
     - name: skip-flux-system
       expression: '!(object.metadata.name == "flux-system")'
+    - name: has-postBuild
+      expression: "has(object.spec.postBuild)"
     - name: not-has-substituteFrom
       expression: "!has(object.spec.postBuild.substituteFrom)"
   failurePolicy: Fail
@@ -106,8 +108,8 @@ spec:
   matchConditions:
     - name: skip-flux-system
       expression: '!(object.metadata.name == "flux-system")'
-    - name: not-has-substituteFrom
-      expression: "has(object.spec.postBuild.substituteFrom)"
+    - name: has-substituteFrom
+      expression: "(has(object.spec.postBuild) && has(object.spec.postBuild.substituteFrom))"
     - name: cluster-settings-not-present
       expression: "!object.spec.postBuild.substituteFrom.exists(item, item.name == \"cluster-settings\")"
   failurePolicy: Fail
@@ -142,8 +144,8 @@ spec:
   matchConditions:
     - name: skip-flux-system
       expression: '!(object.metadata.name == "flux-system")'
-    - name: not-has-substituteFrom
-      expression: "has(object.spec.postBuild.substituteFrom)"
+    - name: has-substituteFrom
+      expression: "(has(object.spec.postBuild) && has(object.spec.postBuild.substituteFrom))"
     - name: cluster-secrets-not-present
       expression: "!object.spec.postBuild.substituteFrom.exists(item, item.name == \"cluster-secrets\")"
   failurePolicy: Fail
