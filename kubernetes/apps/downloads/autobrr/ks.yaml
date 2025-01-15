@@ -19,11 +19,7 @@ spec:
     name: flux-system
   wait: false
   dependsOn:
-    - name: rook-ceph-cluster
-    - name: volsync
     - name: external-secrets-stores
-    - name: qbittorrent
   postBuild:
     substitute:
-      APP: autobrr
-      VOLSYNC_CLAIM: autobrr
+      APP: *appname

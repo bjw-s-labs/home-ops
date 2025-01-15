@@ -7,8 +7,8 @@ resources:
   - ./helmrelease.yaml
   - ../../../../templates/volsync
 configMapGenerator:
-  - name: ocis-configmap
+  - name: ocis
     files:
       - web.yaml=./config/web.yaml
-generatorOptions:
-  disableNameSuffixHash: true
+configurations:
+  - kustomizeconfig.yaml

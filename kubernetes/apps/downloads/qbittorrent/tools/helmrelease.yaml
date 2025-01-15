@@ -15,7 +15,9 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
+  dependsOn:
+    - name: qbittorrent
+      namespace: downloads
   values:
     defaultPodOptions:
       securityContext:

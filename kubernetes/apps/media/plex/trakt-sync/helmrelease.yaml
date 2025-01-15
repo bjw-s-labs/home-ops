@@ -15,12 +15,16 @@ spec:
         name: bjw-s
         namespace: flux-system
   interval: 30m
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: system
+    - name: plex
+      namespace: media
   values:
     controllers:
       plex-trakt-sync:
-        annotations:
-          reloader.stakater.com/auto: "true"
-
         pod:
           securityContext:
             runAsUser: 1000
@@ -64,7 +68,7 @@ spec:
               - path: /app/config
       config-yaml:
         type: configMap
-        name: plex-tract-sync-configmap
+        name: plex-tract-sync
         globalMounts:
           - path: /app/config/config.yml
             subPath: config.yml

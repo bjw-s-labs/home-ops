@@ -15,6 +15,9 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
   values:
     controllers:
       alertmanager:
@@ -77,7 +80,7 @@ spec:
     persistence:
       config:
         type: configMap
-        name: alertmanager-configmap
+        name: alertmanager
         globalMounts:
           - path: /etc/alertmanager
       secrets:

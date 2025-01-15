@@ -20,9 +20,6 @@ spec:
       ytdl-sub:
         type: cronjob
 
-        annotations:
-          reloader.stakater.com/auto: "true"
-
         pod:
           restartPolicy: Never
           securityContext:
@@ -70,7 +67,7 @@ spec:
 
     persistence:
       config:
-        name: ytdl-sub-configmap
+        name: ytdl-sub
         type: configMap
         advancedMounts:
           ytdl-sub:
