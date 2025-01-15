@@ -14,6 +14,11 @@ spec:
         kind: HelmRepository
         name: rook-ceph
         namespace: flux-system
+  dependsOn:
+    - name: rook-ceph
+      namespace: rook-ceph
+    - name: snapshot-controller
+      namespace: system-controllers
   values:
     monitoring:
       enabled: true
