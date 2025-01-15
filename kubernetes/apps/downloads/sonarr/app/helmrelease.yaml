@@ -15,7 +15,11 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: system
   values:
     controllers:
       sonarr:
@@ -38,7 +42,6 @@ spec:
               repository: ghcr.io/onedr0p/sonarr-develop
               tag: 4.0.12.2849@sha256:fdb0bf1c0a4eee0350530c804a83753f943a33c0cba8bafdf5473e61cf30c702
             env:
-              COMPlus_EnableDiagnostics: "0"
               SONARR__APP__INSTANCENAME: Sonarr
               SONARR__AUTH__APIKEY:
                 valueFrom:
@@ -47,19 +50,23 @@ spec:
                     key: api_key
               SONARR__AUTH__METHOD: External
               SONARR__AUTH__REQUIRED: DisabledForLocalAddresses
+              SONARR__LOG__DBENABLED: "False"
               SONARR__LOG__LEVEL: info
               SONARR__SERVER__PORT: &port 8989
               SONARR__UPDATE__BRANCH: develop
             probes:
-              liveness:
+              liveness: &probes
                 enabled: true
-              readiness:
-                enabled: true
-              startup:
-                enabled: true
+                custom: true
                 spec:
-                  failureThreshold: 30
-                  periodSeconds: 5
+                  httpGet:
+                    path: /ping
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
             resources:
               requests:
                 cpu: 20m

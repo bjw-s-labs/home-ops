@@ -17,11 +17,8 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  wait: true
+  wait: false
   dependsOn:
-    - name: rook-ceph-cluster
-    - name: generic-device-plugin
-    - name: volsync
     - name: external-secrets-stores
   postBuild:
     substitute:
@@ -51,5 +48,3 @@ spec:
     kind: GitRepository
     name: flux-system
   wait: false
-  dependsOn:
-    - name: qbittorrent

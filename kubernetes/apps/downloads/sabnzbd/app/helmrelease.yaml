@@ -15,7 +15,13 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: openebs
+      namespace: openebs
+    - name: volsync
+      namespace: system
   values:
     controllers:
       sabnzbd:
@@ -64,15 +70,18 @@ spec:
                     name: sabnzbd-secret
                     key: xseed_api_key
             probes:
-              liveness:
+              liveness: &probes
                 enabled: true
-              readiness:
-                enabled: true
-              startup:
-                enabled: true
+                custom: true
                 spec:
-                  failureThreshold: 30
-                  periodSeconds: 5
+                  httpGet:
+                    path: /api?mode=version
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
             resources:
               requests:
                 cpu: 5m

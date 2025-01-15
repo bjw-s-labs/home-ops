@@ -19,12 +19,8 @@ spec:
     name: flux-system
   wait: false
   dependsOn:
-    - name: rook-ceph-cluster
-    - name: volsync
     - name: external-secrets-stores
   postBuild:
     substitute:
       APP: *appname
-      APP_UID: "2000"
-      APP_GID: "2000"
       VOLSYNC_CLAIM: prowlarr-config

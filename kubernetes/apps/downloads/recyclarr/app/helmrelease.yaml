@@ -15,14 +15,15 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: system
   values:
     controllers:
       recyclarr:
         type: cronjob
-
-        annotations:
-          reloader.stakater.com/auto: "true"
 
         cronjob:
           schedule: "@daily"
@@ -46,8 +47,6 @@ spec:
               tag: 7.4.0
             args:
               - sync
-            env:
-              COMPlus_EnableDiagnostics: "0"
             envFrom:
               - secretRef:
                   name: recyclarr-secret
