@@ -21,3 +21,11 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ ENV.APP }}-volsync-nfs
+          volumeMounts:
+            - mountPath: /repository
+              name: repository
+      volumes:
+        - name: repository
+          nfs:
+            server: "gladius.bjw-s.internal"
+            path: "/mnt/tank/Backup/Volsync"
