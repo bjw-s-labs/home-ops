@@ -51,6 +51,9 @@ spec:
     name: flux-system
     namespace: flux-system
   wait: false
+  dependsOn:
+    - name: flux-system-secretstore
+      namespace: flux-system
   decryption:
     provider: sops
     secretRef:
