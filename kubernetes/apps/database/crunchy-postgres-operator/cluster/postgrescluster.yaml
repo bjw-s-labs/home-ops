@@ -79,13 +79,11 @@ spec:
       global: &backupFlag
         compress-type: "bz2"
         compress-level: "9"
-        # Minio
+        # NFS
         repo1-block: "y"
         repo1-bundle: "y"
-        repo1-path: /crunchy-pgo
         repo1-retention-full: "30" # days
         repo1-retention-full-type: "time"
-        repo1-s3-uri-style: path
         # R2
         repo2-block: "y"
         repo2-bundle: "y"
@@ -101,11 +99,16 @@ spec:
         labels:
           app.kubernetes.io/name: crunchy-postgres-backup
       repos:
-        - name: repo1 # Minio
-          s3: &minio
-            bucket: "crunchy-postgres"
-            endpoint: "s3.bjw-s.dev"
-            region: "us-east-1"
+        - name: repo1 # NFS
+          volume: &nfs
+            volumeClaimSpec:
+              storageClassName: postgres-nfs
+              volumeName: postgres-nfs
+              accessModes:
+                - ReadWriteMany
+              resources:
+                requests:
+                  storage: "1Mi"
           schedules:
             full: "0 1 * * 0" # Sunday at 01:00
             differential: "0 1 * * 1-6" # Mon-Sat at 01:00
@@ -126,7 +129,7 @@ spec:
       global: *backupFlag
       repo:
         name: "repo1"
-        s3: *minio
+        volume: *nfs
 
   monitoring:
     pgmonitor:

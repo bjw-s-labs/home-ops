@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-nfs
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 1Mi
+  nfs:
+    path: "/mnt/tank/Backup/CPGO"
+    server: gladius.bjw-s.internal
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: postgres-nfs
