@@ -43,7 +43,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname flux-system-secretstore
+  name: &appname flux-sops
 spec:
   targetNamespace: flux-system
   commonMetadata:
@@ -51,7 +51,7 @@ spec:
       app.kubernetes.io/name: *appname
   interval: 30m
   timeout: 5m
-  path: ./kubernetes/apps/flux-system/flux-operator/clustersecretstore
+  path: ./kubernetes/apps/flux-system/flux-operator/sops
   prune: true
   sourceRef:
     kind: GitRepository
