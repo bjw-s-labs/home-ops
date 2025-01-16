@@ -4,7 +4,6 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &appname external-secrets
-  namespace: flux-system
 spec:
   targetNamespace: external-secrets
   commonMetadata:
@@ -17,6 +16,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: true
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
@@ -24,7 +24,6 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &appname external-secrets-stores
-  namespace: flux-system
 spec:
   targetNamespace: external-secrets
   commonMetadata:
@@ -37,7 +36,10 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: true
   dependsOn:
     - name: external-secrets
+      namespace: external-secrets
     - name: onepassword-connect
+      namespace: external-secrets
