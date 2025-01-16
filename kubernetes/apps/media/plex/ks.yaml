@@ -4,7 +4,6 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &appname plex
-  namespace: flux-system
 spec:
   targetNamespace: media
   commonMetadata:
@@ -17,10 +16,13 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: false
   dependsOn:
     - name: external-secrets-stores
+      namespace: external-secrets
     - name: volsync
+      namespace: system
   postBuild:
     substitute:
       APP: *appname
@@ -32,7 +34,6 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &appname plex-trakt-sync
-  namespace: flux-system
 spec:
   targetNamespace: media
   commonMetadata:
@@ -45,10 +46,13 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: false
   dependsOn:
     - name: external-secrets-stores
+      namespace: external-secrets
     - name: volsync
+      namespace: system
   postBuild:
     substitute:
       APP: *appname
@@ -61,7 +65,6 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &appname plex-image-cleanup
-  namespace: flux-system
 spec:
   targetNamespace: media
   commonMetadata:
@@ -74,9 +77,11 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: false
   dependsOn:
     - name: external-secrets-stores
+      namespace: external-secrets
   postBuild:
     substitute:
       APP: *appname

@@ -4,7 +4,6 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &appname searxng
-  namespace: flux-system
 spec:
   targetNamespace: selfhosted
   commonMetadata:
@@ -17,9 +16,11 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: false
   dependsOn:
     - name: external-secrets-stores
+      namespace: external-secrets
   postBuild:
     substitute:
       APP: *appname
