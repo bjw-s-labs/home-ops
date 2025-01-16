@@ -98,6 +98,17 @@ spec:
       meilisearch:
         annotations:
           reloader.stakater.com/auto: "true"
+        pod:
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values:
+                          - hoarder
+                  topologyKey: kubernetes.io/hostname
         containers:
           app:
             image:
