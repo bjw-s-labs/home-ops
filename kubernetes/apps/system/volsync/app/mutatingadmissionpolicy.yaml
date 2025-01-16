@@ -79,13 +79,14 @@ spec:
     - patchType: "JSONPatch"
       jsonPatch:
         expression: >
+          [
             JSONPatch{
               op: "add", path: "/spec/template/spec/volumes/-",
               value: Object.spec.template.spec.volumes{
                 name: "repository",
                 nfs: Object.spec.template.spec.volumes.nfs{
                   server: "gladius.bjw-s.internal",
-                  path: "/mnt/tank/Backup"
+                  path: "/mnt/tank/Backup/Volsync"
                 }
               }
             },
@@ -93,6 +94,7 @@ spec:
               op: "add", path: "/spec/template/spec/containers/0/volumeMounts/-",
               value: Object.spec.template.spec.containers.volumeMounts{
                 name: "repository",
-                mountPath: "/nfs/repository"
+                mountPath: "/repository"
               }
             }
+          ]

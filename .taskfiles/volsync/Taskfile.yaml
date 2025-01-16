@@ -50,15 +50,18 @@ tasks:
       vars:
         - APP
     vars:
+      WAIT: '{{.WAIT | default "true"}}'
       NS: '{{.NS | default "default"}}'
       JOB: volsync-src-{{.APP}}
     cmds:
       - kubectl --namespace {{.NS}} patch replicationsources {{.APP}} --type merge -p '{"spec":{"trigger":{"manual":"{{now | unixEpoch}}"}}}'
-      - until kubectl --namespace {{.NS}} get job/{{.JOB}} &>/dev/null; do sleep 5; done
-      - kubectl --namespace {{.NS}} wait job/{{.JOB}} --for=condition=complete --timeout=120m
+      - |-
+        {{ if eq "true" .WAIT }}until kubectl --namespace {{.NS}} get job/{{.JOB}} &>/dev/null; do sleep 5; done{{ end }}
+      - |-
+        {{ if eq "true" .WAIT }}kubectl --namespace {{.NS}} wait job/{{.JOB}} --for=condition=complete --timeout=120m{{ end }}
 
   snapshot-all:
-    desc: Snapshot all apps across all namespaces
+    desc: Snapshot all apps across all namespaces without waiting
     preconditions:
       - which kubectl
     vars:
@@ -71,6 +74,7 @@ tasks:
           split: "\n"
         task: snapshot
         vars:
+          WAIT: "false"
           NS: '{{splitList "," .ITEM | first}}'
           APP: '{{splitList "," .ITEM | last}}'
 
