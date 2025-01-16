@@ -9,7 +9,7 @@ spec:
   targetNamespace: flux-system
   interval: 30m
   path: ./kubernetes/flux/cluster-meta
-  prune: true
+  prune: false # revert to true
   wait: false
   sourceRef:
     kind: GitRepository
@@ -24,7 +24,7 @@ metadata:
 spec:
   interval: 10m
   path: ./kubernetes/apps
-  prune: true
+  prune: false # revert to true
   sourceRef:
     kind: GitRepository
     name: flux-system
