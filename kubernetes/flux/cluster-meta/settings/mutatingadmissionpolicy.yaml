@@ -44,10 +44,12 @@ spec:
         operations: ["CREATE", "UPDATE"]
         resources: ["kustomizations"]
   matchConditions:
-    - name: skip-flux-system
-      expression: '!(object.metadata.name == "flux-system")'
-    - name: not-has-postBuild
-      expression: "!has(object.spec.postBuild)"
+    - name: name-is-not-flux-system
+      expression: >
+        !(object.metadata.name == "flux-system")
+    - name: postbuild-field-does-not-exist
+      expression: >
+        !has(object.spec.postBuild)
   failurePolicy: Fail
   reinvocationPolicy: IfNeeded
   mutations:
@@ -94,12 +96,15 @@ spec:
         operations: ["CREATE", "UPDATE"]
         resources: ["kustomizations"]
   matchConditions:
-    - name: skip-flux-system
-      expression: '!(object.metadata.name == "flux-system")'
-    - name: has-postBuild
-      expression: "has(object.spec.postBuild)"
-    - name: not-has-substituteFrom
-      expression: "!has(object.spec.postBuild.substituteFrom)"
+    - name: name-is-not-flux-system
+      expression: >
+        !(object.metadata.name == "flux-system")
+    - name: has-postbuild-field
+      expression: >
+        has(object.spec.postBuild)
+    - name: substitutefrom-field-does-not-exist
+      expression: >
+        !has(object.spec.postBuild.substituteFrom)
   failurePolicy: Fail
   reinvocationPolicy: IfNeeded
   mutations:
@@ -142,12 +147,15 @@ spec:
         operations: ["CREATE", "UPDATE"]
         resources: ["kustomizations"]
   matchConditions:
-    - name: skip-flux-system
-      expression: '!(object.metadata.name == "flux-system")'
-    - name: has-substituteFrom
-      expression: "(has(object.spec.postBuild) && has(object.spec.postBuild.substituteFrom))"
-    - name: cluster-settings-not-present
-      expression: "!object.spec.postBuild.substituteFrom.exists(item, item.name == \"cluster-settings\")"
+    - name: name-is-not-flux-system
+      expression: >
+        !(object.metadata.name == "flux-system")
+    - name: has-substitutefrom-field
+      expression: >
+        (has(object.spec.postBuild) && has(object.spec.postBuild.substituteFrom))
+    - name: cluster-settings-configmap-not-present
+      expression: >
+        !object.spec.postBuild.substituteFrom.exists(item, item.name == "cluster-settings")
   failurePolicy: Fail
   reinvocationPolicy: IfNeeded
   mutations:
@@ -178,12 +186,15 @@ spec:
         operations: ["CREATE", "UPDATE"]
         resources: ["kustomizations"]
   matchConditions:
-    - name: skip-flux-system
-      expression: '!(object.metadata.name == "flux-system")'
-    - name: has-substituteFrom
-      expression: "(has(object.spec.postBuild) && has(object.spec.postBuild.substituteFrom))"
-    - name: cluster-secrets-not-present
-      expression: "!object.spec.postBuild.substituteFrom.exists(item, item.name == \"cluster-secrets\")"
+    - name: name-is-not-flux-system
+      expression: >
+        !(object.metadata.name == "flux-system")
+    - name: has-substitutefrom-field
+      expression: >
+        (has(object.spec.postBuild) && has(object.spec.postBuild.substituteFrom))
+    - name: cluster-secrets-secret-not-present
+      expression: >
+        !object.spec.postBuild.substituteFrom.exists(item, item.name == "cluster-secrets")
   failurePolicy: Fail
   reinvocationPolicy: IfNeeded
   mutations:

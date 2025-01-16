@@ -20,10 +20,12 @@ spec:
         operations: ["CREATE", "UPDATE"]
         resources: ["jobs"]
   matchConditions:
-    - name: has-name
-      expression: 'object.metadata.name.startsWith("volsync-src-")'
-    - name: has-labels
-      expression: 'object.metadata.labels["app.kubernetes.io/created-by"] == "volsync"'
+    - name: has-volsync-job-name-prefix
+      expression: >
+        object.metadata.name.startsWith("volsync-src-")
+    - name: has-volsync-created-by-labels
+      expression: >
+        object.metadata.labels["app.kubernetes.io/created-by"] == "volsync"
   failurePolicy: Fail
   reinvocationPolicy: IfNeeded
   mutations:
@@ -67,12 +69,15 @@ spec:
         operations: ["CREATE", "UPDATE"]
         resources: ["jobs"]
   matchConditions:
-    - name: has-name
-      expression: 'object.metadata.name.startsWith("volsync-")'
-    - name: has-labels
-      expression: 'object.metadata.labels["app.kubernetes.io/created-by"] == "volsync"'
-    - name: mount-not-present
-      expression: "!object.spec.template.spec.volumes.exists(item, item.name == \"repository\")"
+    - name: has-volsync-job-name-prefix
+      expression: >
+        object.metadata.name.startsWith("volsync-src-")
+    - name: has-volsync-created-by-labels
+      expression: >
+        object.metadata.labels["app.kubernetes.io/created-by"] == "volsync"
+    - name: repository-volume-does-not-exist
+      expression: >
+        !object.spec.template.spec.volumes.exists(item, item.name == "repository")
   failurePolicy: Fail
   reinvocationPolicy: IfNeeded
   mutations:
