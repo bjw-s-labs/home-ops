@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kustomize-mutating-webhook
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: kustomize-mutating-webhook
+      version: 0.2.4
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: fluxcd-kustomize-mutating-webhook
+        namespace: flux-system
+  values:
+    certManager:
+      enabled: true
+
+    configMaps:
+      - create: true
+        name: cluster-settings
+        data:
+          CLUSTER_NAME: home-ops
+
+    secrets: []
