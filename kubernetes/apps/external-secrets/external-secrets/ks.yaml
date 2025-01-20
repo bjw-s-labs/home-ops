@@ -23,7 +23,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname external-secrets-stores
+  name: &appname onepassword-store
 spec:
   targetNamespace: external-secrets
   commonMetadata:
@@ -31,7 +31,7 @@ spec:
       app.kubernetes.io/name: *appname
   interval: 30m
   timeout: 5m
-  path: "./kubernetes/apps/external-secrets/external-secrets/stores"
+  path: "./kubernetes/apps/external-secrets/external-secrets/stores/onepassword"
   prune: true
   sourceRef:
     kind: GitRepository
@@ -41,5 +41,5 @@ spec:
   dependsOn:
     - name: external-secrets
       namespace: external-secrets
-    - name: onepassword-connect
+    - name: onepassword
       namespace: external-secrets

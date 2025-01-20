@@ -19,7 +19,7 @@ spec:
     namespace: flux-system
   wait: true
   dependsOn:
-    - name: external-secrets-stores
+    - name: onepassword-store
       namespace: external-secrets
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
@@ -44,5 +44,5 @@ spec:
   dependsOn:
     - name: emqx-operator
       namespace: database
-    - name: external-secrets-stores
+    - name: onepassword-store
       namespace: external-secrets
