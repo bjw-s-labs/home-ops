@@ -18,6 +18,8 @@ spec:
   dependsOn:
     - name: qbittorrent
       namespace: downloads
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
   values:
     controllers:
       cross-seed:
@@ -74,7 +76,7 @@ spec:
 
     persistence:
       config:
-        type: emptyDir
+        existingClaim: cross-seed
       config-file:
         type: secret
         name: cross-seed-secret
@@ -82,10 +84,6 @@ spec:
           - path: /config/config.js
             subPath: config.js
             readOnly: true
-      qbittorrent:
-        existingClaim: qbittorrent-config
-        globalMounts:
-          - path: /qbittorrent
       media:
         type: nfs
         server: gladius.bjw-s.internal
