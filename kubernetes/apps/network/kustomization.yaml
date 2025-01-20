@@ -5,7 +5,6 @@ kind: Kustomization
 resources:
   # Pre Flux-Kustomizations
   - ./namespace.yaml
-  - ../../templates/alerts/flux
   # Flux-Kustomizations
   - ./cloudflared/ks.yaml
   - ./echo-server/ks.yaml
@@ -13,6 +12,8 @@ resources:
   - ./ingress-nginx/ks.yaml
   - ./multus/ks.yaml
   - ./openspeedtest/ks.yaml
+components:
+  - ../../components/alerts/flux
 transformers:
   - |-
     apiVersion: builtin
