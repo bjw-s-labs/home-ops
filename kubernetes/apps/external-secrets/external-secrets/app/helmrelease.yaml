@@ -18,22 +18,6 @@ spec:
   dependsOn:
     - name: onepassword
       namespace: external-secrets
-  values:
-    image:
-      repository: ghcr.io/external-secrets/external-secrets
-    installCRDs: true
-    serviceMonitor:
-      enabled: true
-      interval: 1m
-    certController:
-      image:
-        repository: ghcr.io/external-secrets/external-secrets
-      serviceMonitor:
-        enabled: true
-        interval: 1m
-    webhook:
-      image:
-        repository: ghcr.io/external-secrets/external-secrets
-      serviceMonitor:
-        enabled: true
-        interval: 1m
+  valuesFrom:
+    - kind: ConfigMap
+      name: external-secrets-helm-values
