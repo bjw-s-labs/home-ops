@@ -5,12 +5,13 @@ kind: Kustomization
 resources:
   # Pre Flux-Kustomizations
   - ./namespace.yaml
-  - ../../templates/alerts/flux
   # Flux-Kustomizations
   - ./maintainerr/ks.yaml
   - ./piped/ks.yaml
   - ./plex/ks.yaml
   - ./tautulli/ks.yaml
+components:
+  - ../../components/alerts/flux
 transformers:
   - |-
     apiVersion: builtin
