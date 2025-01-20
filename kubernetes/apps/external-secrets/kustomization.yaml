@@ -5,10 +5,11 @@ kind: Kustomization
 resources:
   # Pre Flux-Kustomizations
   - ./namespace.yaml
-  - ../../templates/alerts/flux
   # Flux-Kustomizations
   - ./external-secrets/ks.yaml
   - ./onepassword-connect/ks.yaml
+components:
+  - ../../components/alerts/flux
 transformers:
   - |-
     apiVersion: builtin

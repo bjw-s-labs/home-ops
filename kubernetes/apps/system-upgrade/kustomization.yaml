@@ -5,9 +5,10 @@ kind: Kustomization
 resources:
   # Pre Flux-Kustomizations
   - ./namespace.yaml
-  - ../../templates/alerts/flux
   # Flux-Kustomizations
   - ./system-upgrade-controller/ks.yaml
+components:
+  - ../../components/alerts/flux
 transformers:
   - |-
     apiVersion: builtin

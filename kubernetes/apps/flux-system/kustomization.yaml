@@ -5,10 +5,11 @@ kind: Kustomization
 resources:
   # Pre Flux-Kustomizations
   - ./namespace.yaml
-  - ../../templates/alerts/flux
   # Flux-Kustomizations
   - ./flux-operator/ks.yaml
   - ./kustomize-mutating-webhook/ks.yaml
+components:
+  - ../../components/alerts/flux
 transformers:
   - |-
     apiVersion: builtin
