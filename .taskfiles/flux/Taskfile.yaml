@@ -13,12 +13,14 @@ tasks:
         - PATH
     vars:
       OPERATION: "{{index .MATCH 0}}"
+      NS: |-
+        {{.NS | default "flux-system"}}
       KS:
-        sh: flux --namespace flux-system get kustomizations {{base .PATH}} 2>&1
+        sh: flux --namespace {{.NS}} get kustomizations {{base .PATH}} 2>&1
     cmd: >
-      flux build --namespace flux-system ks {{ if .NAME }}{{.NAME}}{{ else }}{{base .PATH}}{{ end }}
+      flux build --namespace {{.NS}} ks {{ if .NAME }}{{.NAME}}{{ else }}{{base .PATH}}{{ end }}
       --kustomization-file {{.K8S_DIR}}/apps/{{.PATH}}/ks.yaml
       --path {{.K8S_DIR}}/apps/{{.PATH}}{{- if .SRC }}/{{.SRC}}{{ end }}
       {{ if contains "not found" .KS }}--dry-run \{{ end }}
-      | yq 'with(select(.apiVersion == "kustomize.toolkit.fluxcd.io/v1" and .kind == "Kustomization"); .metadata.namespace = "flux-system")' -
+      | yq 'with(select(.apiVersion == "kustomize.toolkit.fluxcd.io/v1" and .kind == "Kustomization"); .metadata.namespace = "{{.NS}}")' -
       | kubectl {{.OPERATION}} {{if eq .OPERATION "apply"}}--server-side  --field-manager=kustomize-controller{{end}} --filename -
