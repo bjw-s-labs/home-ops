@@ -20,12 +20,4 @@ resources:
   - ./smartctl-exporter/ks.yaml
   - ./unpoller/ks.yaml
 components:
-  - ../../components/alerts/flux
-transformers:
-  - |-
-    apiVersion: builtin
-    kind: NamespaceTransformer
-    metadata:
-      name: not-used
-      namespace: monitoring
-    unsetOnly: true
+  - ../../components/flux/alerts

@@ -8,12 +8,4 @@ resources:
   # Flux-Kustomizations
   - ./system-upgrade-controller/ks.yaml
 components:
-  - ../../components/alerts/flux
-transformers:
-  - |-
-    apiVersion: builtin
-    kind: NamespaceTransformer
-    metadata:
-      name: not-used
-      namespace: system-upgrade
-    unsetOnly: true
+  - ../../components/flux/alerts
