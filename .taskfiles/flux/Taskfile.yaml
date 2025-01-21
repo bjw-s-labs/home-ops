@@ -3,24 +3,50 @@
 version: "3"
 
 tasks:
-  ks-*:
-    desc: Perform an action on a Flux KS [PATH=required] [NAME] [SRC]
+  "*-ks":
+    desc: Render a Flux Kustomizations [PATH=required] [NAME] [SRC]
     preconditions:
-      - test -f {{.K8S_DIR}}/apps/{{.PATH}}/ks.yaml
+      - '[[ "{{.OPERATION}}" == "build" || "{{.OPERATION}}" == "apply" || "{{.OPERATION}}" == "delete" ]]'
       - which flux kubectl yq
+      - test -f {{.KS_FILE}}
+      - test -d {{.SRC_FOLDER}}
+      - sh: yq -e 'select(.apiVersion == "kustomize.toolkit.fluxcd.io/v1" and .kind == "Kustomization" and .metadata.name == "{{.KS_NAME}}")' {{.KS_FILE}}
+        msg: Kustomization "{{.KS_NAME}}" not found in "{{.KS_FILE}}"
     requires:
       vars:
         - PATH
     vars:
       OPERATION: "{{index .MATCH 0}}"
       NS: |-
-        {{.NS | default "flux-system"}}
+        {{.NS | default (splitList "/" .PATH | first) | default "flux-system"}}
+      KS_FILE: |-
+        {{.K8S_DIR}}/apps/{{.PATH}}/ks.yaml
+      DEFAULT_KS_NAME:
+        sh: yq 'select(.apiVersion == "kustomize.toolkit.fluxcd.io/v1" and .kind == "Kustomization" and document_index == 0).metadata.name' {{.KS_FILE}}
+      KS_NAME: |-
+        {{.NAME | default .DEFAULT_KS_NAME}}
       KS:
-        sh: flux --namespace {{.NS}} get kustomizations {{base .PATH}} 2>&1
-    cmd: >
-      flux build --namespace {{.NS}} ks {{ if .NAME }}{{.NAME}}{{ else }}{{base .PATH}}{{ end }}
-      --kustomization-file {{.K8S_DIR}}/apps/{{.PATH}}/ks.yaml
-      --path {{.K8S_DIR}}/apps/{{.PATH}}{{- if .SRC }}/{{.SRC}}{{ end }}
-      {{ if contains "not found" .KS }}--dry-run \{{ end }}
-      | yq 'with(select(.apiVersion == "kustomize.toolkit.fluxcd.io/v1" and .kind == "Kustomization"); .metadata.namespace = "{{.NS}}")' -
-      | kubectl {{.OPERATION}} {{if eq .OPERATION "apply"}}--server-side  --field-manager=kustomize-controller{{end}} --filename -
+        sh: flux --namespace {{.NS}} get kustomizations {{.KS_NAME}} --no-header 2>&1
+      SRC_FOLDER:
+        sh: yq 'select(.apiVersion == "kustomize.toolkit.fluxcd.io/v1" and .kind == "Kustomization" and .metadata.name == "{{.KS_NAME}}").spec.path | sub("./kubernetes", "{{.K8S_DIR}}")' {{.KS_FILE}}
+      OPERATION_ARGS: |-
+        {{if eq .OPERATION "apply"}} --server-side --field-manager=kustomize-controller{{end}}
+    cmds:
+      - flux build --namespace {{.NS}} ks {{ .KS_NAME }}
+        --kustomization-file {{.KS_FILE}}
+        --path {{.SRC_FOLDER}}
+        {{ if contains "not found" .KS }}--dry-run {{ end }}
+        | yq -
+        {{ if or (eq .OPERATION "apply") (eq .OPERATION "delete") -}}
+        | kubectl {{.OPERATION}} {{- .OPERATION_ARGS}} --filename -
+        {{ end }}
+
+  "*-ks-all":
+    desc: Suspend or resume all Flux Kustomizations
+    preconditions:
+      - '[[ "{{.STATE}}" == "suspend" || "{{.STATE}}" == "resume" ]]'
+      - which flux kubectl
+    vars:
+      STATE: '{{index .MATCH 0}}'
+    cmds:
+      - kubectl get ns -o jsonpath='{.items[*].metadata.name}' | xargs -n1 flux {{.STATE}} ks --all --namespace
