@@ -4,11 +4,17 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: flux-system
 resources:
-  # Pre Flux-Kustomizations
-  - ./namespace.yaml
   # Flux-Kustomizations
   - ./flux-operator/ks.yaml
   - ./kustomize-mutating-webhook/ks.yaml
 components:
   - ../../components/flux/alerts
   - ../../components/flux/sops
+  - ../../components/namespace
+patches:
+  - patch: |
+      - op: add
+        path: /metadata/name
+        value: flux-system
+    target:
+      kind: Namespace

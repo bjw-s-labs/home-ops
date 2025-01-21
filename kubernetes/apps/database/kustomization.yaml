@@ -4,10 +4,15 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: database
 resources:
-  # Pre Flux-Kustomizations
-  - ./namespace.yaml
-  # Flux-Kustomizations
   - ./crunchy-postgres-operator/ks.yaml
   - ./emqx/ks.yaml
 components:
+  - ../../components/namespace
   - ../../components/flux/alerts
+patches:
+  - patch: |
+      - op: add
+        path: /metadata/name
+        value: database
+    target:
+      kind: Namespace
