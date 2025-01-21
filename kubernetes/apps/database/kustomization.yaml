@@ -2,6 +2,7 @@
 # yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: database
 resources:
   # Pre Flux-Kustomizations
   - ./namespace.yaml
@@ -9,12 +10,4 @@ resources:
   - ./crunchy-postgres-operator/ks.yaml
   - ./emqx/ks.yaml
 components:
-  - ../../components/alerts/flux
-transformers:
-  - |-
-    apiVersion: builtin
-    kind: NamespaceTransformer
-    metadata:
-      name: not-used
-      namespace: database
-    unsetOnly: true
+  - ../../components/flux/alerts

@@ -38,28 +38,3 @@ spec:
     name: flux-system
     namespace: flux-system
   wait: false
----
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: &appname flux-sops
-spec:
-  targetNamespace: flux-system
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: *appname
-  interval: 30m
-  timeout: 5m
-  path: ./kubernetes/apps/flux-system/flux-operator/sops
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-    namespace: flux-system
-  wait: true
-  dependsOn:
-    - name: flux-instance
-      namespace: flux-system
-    - name: external-secrets
-      namespace: external-secrets
