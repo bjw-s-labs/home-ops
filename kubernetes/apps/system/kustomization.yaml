@@ -4,9 +4,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: system
 resources:
-  # Pre Flux-Kustomizations
-  - ./namespace.yaml
-  # Flux-Kustomizations
   - ./descheduler/ks.yaml
   - ./fstrim/ks.yaml
   - ./generic-device-plugin/ks.yaml
@@ -17,4 +14,12 @@ resources:
   - ./spegel/ks.yaml
   - ./volsync/ks.yaml
 components:
+  - ../../components/namespace
   - ../../components/flux/alerts
+patches:
+  - patch: |
+      - op: add
+        path: /metadata/name
+        value: system
+    target:
+      kind: Namespace
