@@ -37,7 +37,12 @@ spec:
               repository: ghcr.io/n8n-io/n8n
               tag: 1.75.2
             env:
+              DB_SQLITE_VACUUM_ON_STARTUP: true
+              EXECUTIONS_DATA_PRUNE: true
+              EXECUTIONS_DATA_MAX_AGE: 7
+              EXECUTIONS_DATA_PRUNE_MAX_COUNT: 50000
               GENERIC_TIMEZONE: "Europe/Amsterdam"
+              N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: false
               N8N_PROTOCOL: "https"
               N8N_PORT: &port 8080
               N8N_HOST: &hostName n8n.bjw-s.dev
