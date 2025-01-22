@@ -29,20 +29,25 @@ spec:
       webhook:
         image:
           repository: ghcr.io/kashalls/external-dns-unifi-webhook
-          tag: v0.3.4@sha256:28dc00c7a21f9571d43181fcc0dd3de59e291741f27bc075d7e06378876b2974
+          tag: v0.4.0@sha256:f71f9e64f723a1af77e9ecdcbaef2db2095721d33b385baee1848d0bf09d44e7
         env:
         - name: UNIFI_HOST
           value: https://10.10.255.1
-        - name: UNIFI_USER
-          valueFrom:
-            secretKeyRef:
-              name: &secret external-dns-unifi-secret
-              key: EXTERNAL_DNS_UNIFI_USER
-        - name: UNIFI_PASS
+        # - name: UNIFI_USER
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: &secret external-dns-unifi-secret
+        #       key: EXTERNAL_DNS_UNIFI_USER
+        # - name: UNIFI_PASS
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: *secret
+        #       key: EXTERNAL_DNS_UNIFI_PASS
+        - name: UNIFI_API_KEY
           valueFrom:
             secretKeyRef:
               name: *secret
-              key: EXTERNAL_DNS_UNIFI_PASS
+              key: EXTERNAL_API_KEY
         # - name: LOG_LEVEL
         #   value: "debug"
         livenessProbe:
