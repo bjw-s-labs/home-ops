@@ -31,7 +31,7 @@ spec:
   values:
     image:
       repository: public.ecr.aws/emqx/emqx
-    replicaCount: 3
+    replicaCount: 1
     recreatePods: true
     emqxConfig:
       EMQX_ALLOW_ANONYMOUS: "false"
@@ -62,18 +62,17 @@ spec:
       enabled: true
       storageClassName: ceph-blockpool-nvme
       size: 100Mi
-
-    affinity:
-      podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 100
-          podAffinityTerm:
-            labelSelector:
-              matchExpressions:
-              - key: app.kubernetes.io/name
-                operator: In
-                values: [ "emqx" ]
-            topologyKey: kubernetes.io/hostname
+    # affinity:
+    #   podAntiAffinity:
+    #     preferredDuringSchedulingIgnoredDuringExecution:
+    #     - weight: 100
+    #       podAffinityTerm:
+    #         labelSelector:
+    #           matchExpressions:
+    #           - key: app.kubernetes.io/name
+    #             operator: In
+    #             values: [ "emqx" ]
+    #         topologyKey: kubernetes.io/hostname
     # resources:
     #   requests:
     #     cpu: 10m
