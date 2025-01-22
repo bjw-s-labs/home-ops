@@ -7,6 +7,15 @@ set:
 shopt:
   - globstar
 
+includes:
+  flux: .taskfiles/flux/Taskfile.yaml
+  k8s: .taskfiles/k8s/Taskfile.yaml
+  k8s-bootstrap: .taskfiles/k8s-bootstrap/Taskfile.yaml
+  # postgres: .taskfiles/postgres/Taskfile.yaml
+  sops: .taskfiles/sops/Taskfile.yaml
+  talos: .taskfiles/talos/Taskfile.yaml
+  volsync: .taskfiles/volsync/Taskfile.yaml
+
 vars:
   K8S_DIR: "{{.ROOT_DIR}}/kubernetes"
   KUBECONFIG: "{{.K8S_DIR}}/kubeconfig"
@@ -17,15 +26,6 @@ env:
   KUBECONFIG: "{{.KUBECONFIG}}"
   MINIJINJA_CONFIG_FILE: "{{.MINIJINJA_CONFIG_FILE}}"
   TALOSCONFIG: "{{.TALOSCONFIG}}"
-
-includes:
-  flux: .taskfiles/flux/Taskfile.yaml
-  k8s: .taskfiles/k8s/Taskfile.yaml
-  k8s-bootstrap: .taskfiles/k8s-bootstrap/Taskfile.yaml
-  # postgres: .taskfiles/postgres/Taskfile.yaml
-  sops: .taskfiles/sops/Taskfile.yaml
-  talos: .taskfiles/talos/Taskfile.yaml
-  volsync: .taskfiles/volsync/Taskfile.yaml
 
 tasks:
   default:
