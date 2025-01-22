@@ -4,8 +4,9 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &appname crunchy-postgres-operator
+  namespace: &namespace database
 spec:
-  targetNamespace: database
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
@@ -27,8 +28,9 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &appname crunchy-postgres-operator-cluster
+  namespace: &namespace database
 spec:
-  targetNamespace: database
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
@@ -57,8 +59,9 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &appname crunchy-postgres-operator-secretstore
+  namespace: &namespace database
 spec:
-  targetNamespace: database
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
@@ -82,8 +85,9 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &appname crunchy-postgres-userinit-controller
+  namespace: &namespace database
 spec:
-  targetNamespace: database
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname

@@ -4,8 +4,9 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &appname multus
+  namespace: &namespace network
 spec:
-  targetNamespace: network
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
@@ -24,8 +25,9 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &appname multus-networks
+  namespace: &namespace network
 spec:
-  targetNamespace: network
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
