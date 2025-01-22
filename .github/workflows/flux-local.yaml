@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: "Flux Diff"
+name: "Flux Local"
 
 on:
   pull_request:
@@ -9,15 +9,36 @@ on:
     paths:
       - kubernetes/apps/**
       - kubernetes/flux/**
-      - kubernetes/templates/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  flux-diff:
-    name: Flux Diff
+  test:
+    name: Flux Local Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Token
+        uses: actions/create-github-app-token@v1
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+        id: app-token
+        with:
+          app-id: ${{ secrets.LAB_ASSISTANT_APP_ID }}
+          private-key: ${{ secrets.LAB_ASSISTANT_APP_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: "${{ steps.app-token.outputs.token }}"
+
+      - name: Run flux-local test
+        uses: docker://ghcr.io/allenporter/flux-local:v7.0.0
+        with:
+          args: test --enable-helm --path /github/workspace/kubernetes/flux/cluster
+
+  diff:
+    name: Flux Local Diff
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -50,7 +71,7 @@ jobs:
           ref: "${{ github.event.repository.default_branch }}"
           path: default
 
-      - name: Diff Resources
+      - name: Run flux-local diff
         uses: docker://ghcr.io/allenporter/flux-local:v7.0.0
         with:
           args: >-
@@ -91,13 +112,14 @@ jobs:
             ```diff
             ${{ steps.diff.outputs.diff }}
 
-  flux-diff-success:
+  flux-local-success:
     needs:
-      - flux-diff
+      - test
+      - diff
     if: ${{ always() }}
-    name: Flux Diff successful
+    name: Flux Local successful
     runs-on: ubuntu-latest
     steps:
-      - name: Check matrix status
+      - name: Check flux-local status
         if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
         run: exit 1
