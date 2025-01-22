@@ -4,7 +4,7 @@ version: "3"
 
 tasks:
   "*-ks":
-    desc: Render a Flux Kustomizations [PATH=required] [NAME] [SRC]
+    desc: Render a Flux Kustomizations [DIR=required] [NAME] [SRC]
     preconditions:
       - '[[ "{{.OPERATION}}" == "build" || "{{.OPERATION}}" == "apply" || "{{.OPERATION}}" == "delete" ]]'
       - which flux kubectl yq
@@ -18,9 +18,9 @@ tasks:
     vars:
       OPERATION: "{{index .MATCH 0}}"
       NS: |-
-        {{.NS | default (splitList "/" .PATH | first) | default "flux-system"}}
+        {{.NS | default (splitList "/" .DIR | first) | default "flux-system"}}
       KS_FILE: |-
-        {{.K8S_DIR}}/apps/{{.PATH}}/ks.yaml
+        {{.K8S_DIR}}/apps/{{.DIR}}/ks.yaml
       DEFAULT_KS_NAME:
         sh: yq 'select(.apiVersion == "kustomize.toolkit.fluxcd.io/v1" and .kind == "Kustomization" and document_index == 0).metadata.name' {{.KS_FILE}}
       KS_NAME: |-
