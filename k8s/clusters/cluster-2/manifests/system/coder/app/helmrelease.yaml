@@ -3,7 +3,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: coder
-  namespace: dev
 spec:
   interval: 30m
   chart:
@@ -45,7 +44,7 @@ spec:
             key: CODER_PG_CONNECTION_URL
       # App
       - name: CODER_ACCESS_URL
-        value: https://coder.skylab.fi
+        value: https://coder.${INGRESS_DOMAIN}
       ingress:
         enable: true
         className: "internal-nginx"
