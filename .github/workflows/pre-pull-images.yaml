@@ -84,7 +84,7 @@ jobs:
           echo "images=${images}" >> "$GITHUB_OUTPUT"
 
   pre-pull-images:
-    if: ${{ needs.extract-images.outputs.matrix != '[]' }}
+    if: ${{ needs.compare-images.outputs.matrix != '[]' }}
     name: Pre-pull images
     runs-on: arc-bjw-s-labs-home-ops
     needs:
