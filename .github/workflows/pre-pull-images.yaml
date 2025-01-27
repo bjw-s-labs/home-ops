@@ -81,14 +81,14 @@ jobs:
               --argjson f2 '${{ needs.extract-images.outputs.pull }}' \
               '$f2 - $f1' \
           )
-          echo "images=${images}" >> "$GITHUB_OUTPUT"
+          echo "images=${images}" >> "${GITHUB_OUTPUT}"
 
   pre-pull-images:
-    if: ${{ needs.compare-images.outputs.matrix != '[]' }}
-    name: Pre-pull images
-    runs-on: arc-bjw-s-labs-home-ops
+    if: ${{ needs.compare-images.outputs.images != '[]' }}
+    name: Pre-pull Images
+    runs-on:
+      - arc-bjw-s-labs-home-ops
     needs:
-      - extract-images
       - compare-images
     strategy:
       matrix:
@@ -108,7 +108,6 @@ jobs:
   pre-pull-images-success:
     if: ${{ always() }}
     needs:
-      - compare-images
       - pre-pull-images
     name: Pre-pull Images Successful
     runs-on: ubuntu-latest
