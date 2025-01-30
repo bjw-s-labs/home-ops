@@ -30,7 +30,7 @@ Kubernetes cluster stats:
 
 ### 📖 Docs
 
-The documentation that goes along with this repo can be found [over here](https://bjw-s.github.io/home-ops/).
+The documentation that goes along with this repo can be found [over here](https://bjw-s-labs.github.io/home-ops/).
 
 ---
 
