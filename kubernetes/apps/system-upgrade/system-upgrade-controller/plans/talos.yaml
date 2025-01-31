@@ -12,16 +12,6 @@ spec:
       path: /var/run/secrets/talos.dev
       ignoreUpdates: true
   serviceAccountName: system-upgrade
-  prepare:
-    image: ghcr.io/siderolabs/talosctl:${TALOS_VERSION}
-    envs:
-      - name: NODE_IP
-        valueFrom:
-          fieldRef:
-            fieldPath: status.hostIP
-    args:
-      - --nodes=$(NODE_IP)
-      - health
   upgrade:
     image: ghcr.io/jfroy/tnu:0.2.1
     envs:
