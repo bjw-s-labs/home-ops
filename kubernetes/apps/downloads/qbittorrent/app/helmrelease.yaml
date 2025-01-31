@@ -24,7 +24,7 @@ spec:
         type: statefulset
 
         annotations:
-          secret.reloader.stakater.com/reload: qbittorrent-secret
+          secret.reloader.stakater.com/reload: qbittorrent-secret,qbittorrent-gluetun-secret
 
         pod:
           securityContext:
@@ -50,6 +50,7 @@ spec:
             env:
               DOT: "off"
               DNS_ADDRESS: "127.0.0.2"
+              HTTP_CONTROL_SERVER_AUTH_CONFIG_FILEPATH: &gluetunAuthPath /gluetun/auth.toml
               VPN_SERVICE_PROVIDER: custom
               VPN_TYPE: wireguard
               VPN_INTERFACE: wg0
@@ -61,6 +62,10 @@ spec:
             envFrom:
               - secretRef:
                   name: qbittorrent-secret
+            lifecycle:
+              postStart:
+                exec:
+                  command: ["/bin/sh", "-c", "(ip rule del table 51820; ip -6 rule del table 51820) || true"]
             resources:
               limits:
                 squat.ai/tun: "1"
@@ -85,7 +90,7 @@ spec:
               XSEED_APIKEY:
                 valueFrom:
                   secretKeyRef:
-                    name: sabnzbd-secret
+                    name: qbittorrent-secret
                     key: xseed_api_key
             probes:
               liveness:
@@ -116,10 +121,15 @@ spec:
           port-forward:
             image:
               repository: ghcr.io/bjw-s-labs/gluetun-qb-port-sync
-              tag: 0.0.2@sha256:23f3d00b21b879ead89dba97114b63930ec050c1780aa0b01062052a5925d197
+              tag: 0.0.4@sha256:1689650236d3f0b9fc79551ce47770e9a743ed3b1d8196f6cc3737cd8cbe92e2
             env:
               GLUETUN_CONTROL_SERVER_HOST: localhost
               GLUETUN_CONTROL_SERVER_PORT: 8000
+              GLUETUN_CONTROL_SERVER_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: qbittorrent-secret
+                    key: GLUETUN_CONTROL_SERVER_API_KEY
               QBITTORRENT_HOST: localhost
               QBITTORRENT_WEBUI_PORT: *port
               CRON_ENABLED: true
@@ -174,6 +184,14 @@ spec:
         globalMounts:
           - path: /data/nas-media/Downloads/qbittorrent
             subPath: Downloads/qbittorrent
+      gluetun-auth:
+        type: secret
+        name: qbittorrent-gluetun-secret
+        advancedMounts:
+          qbittorrent:
+            gluetun:
+              - path: *gluetunAuthPath
+                subPath: auth.toml
       dnsdist:
         type: configMap
         name: qbittorrent-dnsdist
