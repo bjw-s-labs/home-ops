@@ -1,14 +1,6 @@
 libraries:
   Movies:
-    library_type: movie
-    operations:
-    - schedule: daily
-      delete_collections:
-        managed: false
-        configured: false
-      mass_critic_rating_update: tmdb
-      split_duplicates: true
-
+    split_duplicates: true
     schedule: hourly(1)
     collection_files:
     - file: config/1-moviecharts.yml
@@ -19,12 +11,6 @@ libraries:
     - file: config/9-imdb.yml
     - file: config/98-movie.yml
   TV - Shows:
-    operations:
-      mass_critic_rating_update: tmdb
-      split_duplicates: true
-      delete_collections:
-        managed: false
-        configured: false
     schedule: hourly(0)
     collection_files:
     - file: config/2-tvcharts.yml
@@ -146,8 +132,8 @@ trakt:
   authorization:
     access_token: ${TRAKT_ACCESS_TOKEN}
     token_type: Bearer
-    expires_in: 7889238
+    expires_in: 7889237
     refresh_token: ${TRAKT_REFRESH_TOKEN}
     scope: public
-    created_at: 1734397894
+    created_at: 1671803329
   pin:

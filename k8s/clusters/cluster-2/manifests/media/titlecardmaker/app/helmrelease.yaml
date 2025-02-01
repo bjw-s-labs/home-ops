@@ -1,0 +1,97 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app titlecardmaker
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  # dependsOn:
+  #   - name: rook-ceph-cluster
+  #     namespace: rook-ceph
+  #   - name: volsync
+  #     namespace: storage
+  values:
+    controllers:
+      kometa:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: docker.io/kometateam/kometa
+              tag: v2.1.0@sha256:af441b1eeaa3be6a55820f16102d950d12fa52f3bb791b835a6a768385cd3a30
+            env:
+              TZ: ${TIMEZONE}
+              PMM_READ_ONLY_CONFIG: true
+              PMM_TIME: "00:00,01:00,02:00,03:00,04:00,05:00,06:00,07:00,08:00,09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00,18:00,19:00,20:00,21:00,22:00,23:00"
+            resources:
+              requests:
+                cpu: 10m
+                memory: 512Mi
+              limits:
+                memory: 4096Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: [ "ALL" ] }
+    persistence:
+      config:
+        existingClaim: kometa
+        globalMounts:
+        - path: /config
+      config-file:
+        type: configMap
+        name: kometa-configmap
+        globalMounts:
+        - path: /config/config.yml
+          subPath: config.yml
+          readOnly: true
+        - path: /config/1-moviecharts.yml
+          subPath: 1-moviecharts.yml
+          readOnly: true
+        - path: /config/2-tvcharts.yml
+          subPath: 2-tvcharts.yml
+          readOnly: true
+        - path: /config/3-bestof.yml
+          subPath: 3-bestof.yml
+          readOnly: true
+        - path: /config/4-decade.yml
+          subPath: 4-decade.yml
+          readOnly: true
+        - path: /config/5-holliday.yml
+          subPath: 5-holliday.yml
+          readOnly: true
+        - path: /config/6-studios.yml
+          subPath: 6-studios.yml
+          readOnly: true
+        - path: /config/7-networks.yml
+          subPath: 7-networks.yml
+          readOnly: true
+        - path: /config/8-tv.yml
+          subPath: 8-tv.yml
+          readOnly: true
+        - path: /config/9-imdb.yml
+          subPath: 9-imdb.yml
+          readOnly: true
+        - path: /config/98-movie.yml
+          subPath: 98-movie.yml
+          readOnly: true
+        - path: /config/99-overlays.yml
+          subPath: 99-overlays.yml
+          readOnly: true

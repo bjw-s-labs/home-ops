@@ -1,0 +1,101 @@
+templates:
+  Resolution:
+    optional:
+      - overlay_level
+    default:
+      overlay: <<overlay_name>>
+      horizontal_offset: 15
+      horizontal_align: left
+      vertical_offset: 15
+      vertical_align: top
+    collection_level: <<overlay_level>>
+    overlay:
+      name: <<overlay_name>>
+      git: PMM/overlays/images/<<overlay>>
+      group: res
+      weight: <<weight>>
+      horizontal_offset: <<horizontal_offset>>
+      horizontal_align: <<horizontal_align>>
+      vertical_offset: <<vertical_offset>>
+      vertical_align: <<vertical_align>>
+
+  4K:
+    default:
+      4K: false
+    allowed_library_types: <<4K>>
+
+  4K-HDR:
+    default:
+      4K-HDR: false
+    allowed_library_types: <<4K-HDR>>
+
+  4K-Dolby:
+    default:
+      4K-Dolby: false
+    allowed_library_types: <<4K-Dolby>>
+
+  4K-Episode:
+    default:
+      4K-Episode: false
+    allowed_library_types: <<4K-Episode>>
+
+overlays:
+  backdrop:
+    overlay:
+      name: backdrop
+      back_color: "#1c1c1c"
+      back_height: 80
+      vertical_position: top
+    plex_search:
+      all:
+        resolution: '4K'
+  4K:
+    template:
+      name: 4K
+    overlay:
+      name: 4K
+      url: https://raw.githubusercontent.com/drag0n141/kometa-config/master/overlays/resolution/4K-Poster.png
+    plex_search:
+      all:
+        resolution: '4K'
+        hdr: false
+    filters:
+      has_dolby_vision: false
+  4K-HDR:
+    template:
+      name: 4K-HDR
+    overlay:
+      name: 4K-HDR
+      url: https://raw.githubusercontent.com/drag0n141/kometa-config/master/overlays/resolution/4K-HDR-Poster.png
+    plex_search:
+      all:
+        resolution: '4K'
+        hdr: true
+    filters:
+      has_dolby_vision: false
+  4K-Dolby:
+    template:
+      name: 4K-Dolby
+    overlay:
+      name: 4K-Dolby
+      url: https://raw.githubusercontent.com/drag0n141/kometa-config/master/overlays/resolution/4K-Dolby-Poster.png
+    plex_search:
+      all:
+        resolution: '4K'
+    filters:
+      has_dolby_vision: true
+  4K-Episode:
+    template:
+      name: 4K-Episode
+    overlay:
+      name: 4K-Episode
+      url: https://raw.githubusercontent.com/drag0n141/kometa-config/master/overlays/resolution/4K-Episode.png
+      horizontal_offset: 15
+      horizontal_align: left
+      vertical_offset: 15
+      vertical_align: top
+    collection_level: episode
+    plex_search:
+      type: episodes
+      all:
+        resolution: '4K'
