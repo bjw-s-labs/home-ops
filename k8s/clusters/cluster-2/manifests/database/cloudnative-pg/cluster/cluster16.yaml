@@ -4,7 +4,7 @@ kind: Cluster
 metadata:
   name: postgres16
 spec:
-  instances: 2
+  instances: 1
   imageName: ghcr.io/cloudnative-pg/postgresql:16.3-10
   primaryUpdateStrategy: unsupervised
   storage:
@@ -59,7 +59,6 @@ spec:
       owner: app
       secret:
         name: cluster-app-user
-
   # Note: externalClusters is needed when recovering from an existing cnpg cluster
   # externalClusters:
   #   - name: *previousCluster
