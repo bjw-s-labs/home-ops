@@ -47,6 +47,11 @@ spec:
                 "ips": ["10.10.100.12/24"],
                 "mac": "aa:e9:02:a4:7e:78"
               }]
+          securityContext:
+            runAsUser: 2000
+            runAsGroup: 2000
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
 
         containers:
           app:
