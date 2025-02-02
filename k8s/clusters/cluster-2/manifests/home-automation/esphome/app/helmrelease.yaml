@@ -47,11 +47,6 @@ spec:
                 "ips": ["10.10.100.12/24"],
                 "mac": "aa:e9:02:a4:7e:78"
               }]
-          securityContext:
-            runAsUser: 2000
-            runAsGroup: 2000
-            fsGroup: 2000
-            fsGroupChangePolicy: OnRootMismatch
 
         containers:
           app:
@@ -83,7 +78,7 @@ spec:
                 memory: "8G"
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false # must be set to false or I cannot build the files. Need a different image to allow this to be true
+              readOnlyRootFilesystem: true
               capabilities:
                 drop:
                 - ALL
