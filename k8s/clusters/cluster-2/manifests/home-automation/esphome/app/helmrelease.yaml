@@ -134,10 +134,12 @@ spec:
       config:
         enabled: true
         existingClaim: ${VOLSYNC_CLAIM}
-      esphome-cache:
+      cache:
         type: emptyDir
-        globalMounts:
-        - path: /config/.esphome
+        advancedMounts:
+          esphome:
+            app:
+            - path: /cache # ESPHome auto detect a folder at `/cache` and will use that instead
       deploy-key:
         type: secret
         name: esphome-deploykey
