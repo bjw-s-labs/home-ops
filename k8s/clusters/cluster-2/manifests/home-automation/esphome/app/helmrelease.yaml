@@ -83,7 +83,7 @@ spec:
                 memory: "8G"
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
+              readOnlyRootFilesystem: false # must be set to false or I cannot build the files. Need a different image to allow this to be true
               capabilities:
                 drop:
                 - ALL
