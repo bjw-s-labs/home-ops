@@ -33,6 +33,7 @@ spec:
     controllers:
       esphome:
         annotations:
+          secret.reloader.stakater.com/reload: esphome-secrets,esphome-deploykey
           reloader.stakater.com/auto: "true"
         pod:
           annotations:
@@ -46,12 +47,17 @@ spec:
                 "ips": ["10.10.100.12/24"],
                 "mac": "aa:e9:02:a4:7e:78"
               }]
+          securityContext:
+            runAsUser: 2000
+            runAsGroup: 2000
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
 
         containers:
           app:
             image:
               repository: esphome/esphome
-              tag: 2024.12.4
+              tag: 2024.12.4@sha256:13eed88fb1804abf9164eaf510c85f183ac5f5a8983f04b83fcafc420d26d4c3
               pullPolicy: IfNotPresent
             env:
               TZ: "${TIMEZONE}"
@@ -75,6 +81,33 @@ spec:
                 memory: "256M"
               limits:
                 memory: "8G"
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                - ALL
+          code-server:
+            image:
+              repository: ghcr.io/coder/code-server
+              tag: 4.96.4@sha256:f93810f7f6636b3af3b1a750faf612349cddb89fbb6d28d69123a214fc75ee9e
+            args:
+            - --auth
+            - none
+            - --disable-telemetry
+            - --disable-update-check
+            - --user-data-dir
+            - /config/.code-server
+            - --extensions-dir
+            - /config/.code-server
+            - --port
+            - "12321"
+            - /config
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 512Mi
 
     defaultPodOptions:
       affinity:
@@ -84,7 +117,7 @@ spec:
               matchExpressions:
               - key: app.kubernetes.io/name
                 operator: In
-                values: ["multus"]
+                values: [ "multus" ]
             topologyKey: kubernetes.io/hostname
             namespaceSelector: {}
 
@@ -94,6 +127,8 @@ spec:
         ports:
           http:
             port: *port
+          code-server:
+            port: 12321
 
     persistence:
       config:
@@ -103,12 +138,24 @@ spec:
         type: emptyDir
         globalMounts:
         - path: /config/.esphome
+      deploy-key:
+        type: secret
+        name: esphome-deploykey
+        defaultMode: 256
+        advancedMounts:
+          esphome:
+            code-server:
+            - path: /home/coder/.ssh/id_ed25519
+              subPath: id_ed25519
+            - path: /home/coder/.ssh/id_ed25519.pub
+              subPath: id_ed25519.pub
 
     ingress:
       app:
         enabled: true
         className: "internal-nginx"
-        # annotations:
+        annotations:
+          nginx.ingress.kubernetes.io/rewrite-target: /$1
         #   cert-manager.io/cluster-issuer: letsencrypt-production
         #   external-dns.alpha.kubernetes.io/target: ingress.${INGRESS_DOMAIN}
         #   external-dns/is-public: "false"
@@ -116,10 +163,14 @@ spec:
         hosts:
         - host: *host
           paths:
-          - path: /
+          - path: /(.*)
             service:
               identifier: app
               port: http
+          - path: /code/(.*)
+            service:
+              identifier: app
+              port: code-server
         tls:
         - hosts:
           - *host

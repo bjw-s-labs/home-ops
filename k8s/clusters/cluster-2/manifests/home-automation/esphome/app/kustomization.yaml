@@ -2,10 +2,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- ./helmrelease.yaml
-- ../../../../../../templates/volsync
-- ./restore.yaml
+  - ./secret.sops.yaml
+  - ./helmrelease.yaml
+  - ../../../../../../templates/volsync
+  - ./restore.yaml
 labels:
-- pairs:
-    app.kubernetes.io/name: esphome
-    app.kubernetes.io/instance: esphome
+  - pairs:
+        app.kubernetes.io/name: esphome
+        app.kubernetes.io/instance: esphome
