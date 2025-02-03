@@ -9,20 +9,25 @@ spec:
   chart:
     spec:
       chart: kustomize-mutating-webhook
-      version: 0.3.0
+      version: 0.4.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
         name: fluxcd-kustomize-mutating-webhook
         namespace: flux-system
   values:
+    replicas: 2
+
     certManager:
       enabled: true
 
     configMaps:
-      - create: true
-        name: cluster-settings
-        data:
-          CLUSTER_NAME: home-ops
+      - name: cluster-settings
+        optional: true
 
-    secrets: []
+    networkpolicy:
+      create: false
+
+    secrets:
+      - name: cluster-secrets
+        optional: true
