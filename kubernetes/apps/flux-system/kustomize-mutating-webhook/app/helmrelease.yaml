@@ -20,9 +20,12 @@ spec:
       enabled: true
 
     configMaps:
-      - create: true
-        name: cluster-settings
-        data:
-          CLUSTER_NAME: home-ops
+      - name: cluster-settings
+        optional: true
 
-    secrets: []
+    networkpolicy:
+      create: false
+
+    secrets:
+      - name: cluster-secrets
+        optional: true
