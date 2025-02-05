@@ -242,25 +242,27 @@ spec:
         nginx-request-handling-performance:
           url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/request-handling-performance.json
           datasource: Prometheus
-      # unpoller:
-      #   clients:
-      #     gnetId: 11315
-      #     revision: 9
-      #     datasource:
-      #       - name: "DS_PROMETHEUS"
-      #         value: Prometheus
-      #   usw:
-      #     gnetId: 11312
-      #     revision: 9
-      #     datasource:
-      #       - name: "DS_PROMETHEUS"
-      #         value: Prometheus
-      #   uap:
-      #     gnetId: 11314
-      #     revision: 10
-      #     datasource:
-      #       - name: "DS_PROMETHEUS"
-      #         value: Prometheus
+      unifi:
+        unifi-insights:
+          # renovate: depName="UniFi-Poller: Client Insights - Prometheus"
+          gnetId: 11315
+          revision: 9
+          datasource: Prometheus
+        unifi-network-sites:
+          # renovate: depName="UniFi-Poller: Network Sites - Prometheus"
+          gnetId: 11311
+          revision: 5
+          datasource: Prometheus
+        unifi-uap:
+          # renovate: depName="UniFi-Poller: UAP Insights - Prometheus"
+          gnetId: 11314
+          revision: 10
+          datasource: Prometheus
+        unifi-usw:
+          # renovate: depName="UniFi-Poller: USW Insights - Prometheus"
+          gnetId: 11312
+          revision: 9
+          datasource: Prometheus
 
     datasources:
       datasources.yaml:
