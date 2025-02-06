@@ -39,6 +39,7 @@ spec:
             args:
               - server
               - local
+              - --worker-thread=12
             env:
               KESTRA_CONFIGURATION: |
                 kestra:
@@ -55,10 +56,10 @@ spec:
                   name: kestra-secret
             resources:
               requests:
-                cpu: 5m
-                memory: 128Mi
+                cpu: 100m
+                memory: 1Gi
               limits:
-                memory: 2Gi
+                memory: 4Gi
 
     service:
       app:
