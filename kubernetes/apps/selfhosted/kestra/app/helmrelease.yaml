@@ -39,6 +39,20 @@ spec:
             args:
               - server
               - local
+            env:
+              KESTRA_CONFIGURATION: |
+                kestra:
+                  anonymousUsageReport:
+                    enabled: false
+                  tasks:
+                    tmpDir:
+                      path: /tmp/kestra-wd/tmp
+                  tutorialFlows:
+                    enabled: false
+                  url: http://kestra.bjw-s.dev
+            envFrom:
+              - secretRef:
+                  name: kestra-secret
             resources:
               requests:
                 cpu: 5m
@@ -72,3 +86,12 @@ spec:
             app:
               - path: /app/data
                 subPath: data
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          kestra:
+            app:
+              - path: /app/confs
+                subPath: confs
+              - path: /tmp/kestra-wd
+                subPath: kestra-wd
