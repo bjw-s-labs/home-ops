@@ -195,9 +195,9 @@ spec:
         enabled: true
         # className: "internal-nginx"
         className: "external-nginx"
-        # annotations:
-        #   external-dns/is-public: "true"
-        #   external-dns.alpha.kubernetes.io/target: "ingress-ext.${INGRESS_DOMAIN}"
+        annotations:
+          external-dns/is-public: "true"
+          external-dns.alpha.kubernetes.io/target: "ingress-ext.${INGRESS_DOMAIN}"
         hosts:
         - host: &host "coder.${INGRESS_DOMAIN}"
           paths:
