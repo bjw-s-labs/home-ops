@@ -86,11 +86,12 @@ spec:
             # args: [ "/home/linuxbrew/.linuxbrew/sbin/sshd -p 2222 || true; /usr/bin/code-server --auth none --disable-telemetry --user-data-dir /home/coder/.vscode --extensions-dir /home/coder/.vscode --bind-addr 0.0.0.0:8080 --port 8080 /home/coder" ]
             env:
               TZ: "${TIMEZONE}"
-              AUTH: "none"
+              # AUTH: "none"
               USER_DATA_DIR: "/home/coder/.vscode"
               EXTENSIONS_DIR: "/home/coder/.vscode"
               HOME: "/home/coder"
               SSH_AUTH_SOCK: ""
+              CODER_PROMETHEUS_ENABLE: true # needs additional config, which I have not setup 
               SOPS_AGE_KEY:
                 valueFrom:
                   secretKeyRef:
