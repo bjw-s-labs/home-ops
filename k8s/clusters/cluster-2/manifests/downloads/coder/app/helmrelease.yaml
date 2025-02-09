@@ -118,6 +118,13 @@ spec:
       config:
         enabled: true
         existingClaim: ${VOLSYNC_CLAIM}
+        globalMounts:
+        - subPath: "data"
+          path: "/home/coder"
+        - subPath: "ssh"
+          path: "/home/coder/.ssh" # override secret mount perms
+        - subPath: "nix-var"
+          path: "/nix/var"
       ignore:
         type: emptyDir
         advancedMounts:
