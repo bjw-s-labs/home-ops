@@ -34,15 +34,22 @@ spec:
     global:
       nameOverride: *app
 
+    serviceAccount:
+      name: "coder"
+      create: true
+
     defaultPodOptions:
-      # securityContext:
-      #   runAsNonRoot: true
-      #   runAsUser: ${APP_UID}
-      #   runAsGroup: ${APP_GID}
-      #   fsGroup: ${APP_GID}
-      #   fsGroupChangePolicy: OnRootMismatch
-      #   supplementalGroups: [ 34, 10000 ]
-      #   seccompProfile: { type: RuntimeDefault }
+      automountServiceAccountToken: true
+      enableServiceLinks: true
+      hostname: "${CLUSTER_NAME}-code-server"
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: &uid 1000 # Coder UID
+        runAsGroup: *uid
+        fsGroup: *uid
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [ 34, 10000 ]
+        seccompProfile: { type: RuntimeDefault }
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
