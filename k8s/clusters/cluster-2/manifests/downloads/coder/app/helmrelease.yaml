@@ -35,14 +35,14 @@ spec:
       nameOverride: *app
 
     defaultPodOptions:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: ${APP_UID}
-        runAsGroup: ${APP_GID}
-        fsGroup: ${APP_GID}
-        fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [ 34, 10000 ]
-        seccompProfile: { type: RuntimeDefault }
+      # securityContext:
+      #   runAsNonRoot: true
+      #   runAsUser: ${APP_UID}
+      #   runAsGroup: ${APP_GID}
+      #   fsGroup: ${APP_GID}
+      #   fsGroupChangePolicy: OnRootMismatch
+      #   supplementalGroups: [ 34, 10000 ]
+      #   seccompProfile: { type: RuntimeDefault }
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -75,19 +75,14 @@ spec:
               repository: ghcr.io/coder/code-server
               tag: "4.96.4@sha256:f93810f7f6636b3af3b1a750faf612349cddb89fbb6d28d69123a214fc75ee9e"
               pullPolicy: IfNotPresent
-            command: [ "dumb-init", "/bin/bash", "-c" ]
-            args: [ "/home/linuxbrew/.linuxbrew/sbin/sshd -p 2222 || true; /usr/bin/code-server --auth none --disable-telemetry --user-data-dir /home/coder/.vscode --extensions-dir /home/coder/.vscode --bind-addr 0.0.0.0:8080 --port 8080 /home/coder" ]
+            # command: [ "dumb-init", "/bin/bash", "-c" ]
+            # args: [ "/home/linuxbrew/.linuxbrew/sbin/sshd -p 2222 || true; /usr/bin/code-server --auth none --disable-telemetry --user-data-dir /home/coder/.vscode --extensions-dir /home/coder/.vscode --bind-addr 0.0.0.0:8080 --port 8080 /home/coder" ]
             env:
               TZ: "${TIMEZONE}"
-              CODER__APP__INSTANCENAME: Coder
-              CODER__APP__THEME: dark
-              CODER__SERVER__PORT: &port 8080
-              CODER__APPLICATION_URL: &host "coder.${INGRESS_DOMAIN}"
-              CODER__AUTH__METHOD: Forms
-              CODER__AUTH__REQUIRED: Enabled
-              CODER__LOG_LEVEL: info
-              CODER__UPDATE__BRANCH: develop
-              CODER__LOG__DBENABLED: "False"
+              AUTH: "none"
+              USER_DATA_DIR: "/home/coder/.vscode"
+              EXTENSIONS_DIR: "/home/coder/.vscode"
+              HOME: "/home/coder"
               SSH_AUTH_SOCK: ""
               SOPS_AGE_KEY:
                 valueFrom:
@@ -100,7 +95,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: *port
+            port: &port 8080
       ssh:
         enabled: true
         primary: false
@@ -188,7 +183,7 @@ spec:
         #   external-dns/is-public: "true"
         #   external-dns.alpha.kubernetes.io/target: "ingress-ext.${INGRESS_DOMAIN}"
         hosts:
-        - host: *host
+        - host: &host "coder.${INGRESS_DOMAIN}"
           paths:
           - path: /
             service:
