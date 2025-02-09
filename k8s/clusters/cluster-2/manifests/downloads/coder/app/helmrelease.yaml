@@ -46,15 +46,15 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-            - podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: app.kubernetes.io/instance
-                      operator: In
-                      values:
-                        - "coder"
-                topologyKey: kubernetes.io/hostname
-              weight: 1
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/instance
+                  operator: In
+                  values:
+                  - "coder"
+              topologyKey: kubernetes.io/hostname
+            weight: 1
 
     controllers:
       coder:
@@ -75,8 +75,8 @@ spec:
               repository: ghcr.io/coder/code-server
               tag: "4.96.4@sha256:f93810f7f6636b3af3b1a750faf612349cddb89fbb6d28d69123a214fc75ee9e"
               pullPolicy: IfNotPresent
-            command: ["dumb-init", "/bin/bash", "-c"]
-            args: ["/home/linuxbrew/.linuxbrew/sbin/sshd -p 2222 || true; /usr/bin/code-server --auth none --disable-telemetry --user-data-dir /home/coder/.vscode --extensions-dir /home/coder/.vscode --bind-addr 0.0.0.0:8080 --port 8080 /home/coder"]
+            command: [ "dumb-init", "/bin/bash", "-c" ]
+            args: [ "/home/linuxbrew/.linuxbrew/sbin/sshd -p 2222 || true; /usr/bin/code-server --auth none --disable-telemetry --user-data-dir /home/coder/.vscode --extensions-dir /home/coder/.vscode --bind-addr 0.0.0.0:8080 --port 8080 /home/coder" ]
             env:
               TZ: "${TIMEZONE}"
               CODER__APP__INSTANCENAME: Coder
@@ -93,7 +93,7 @@ spec:
                 valueFrom:
                   secretKeyRef:
                     name: "coder-secrets"
-                    key: "age.agekey"              
+                    key: "age.agekey"
 
     service:
       app:
@@ -169,16 +169,16 @@ spec:
         enabled: true
         type: secret
         name: "code-secrets"
-        defaultMode: 0600
+        defaultMode: 600
         advancedMounts:
-          main:
-            main:
-              - subPath: "ssh-privkey"
-                path: "/home/coder/.ssh/id_rsa"
-                readOnly: true
-              - subPath: "ssh-pubkey"
-                path: "/home/coder/.ssh/id_rsa.pub"
-                readOnly: true
+          coder:
+            app:
+            - subPath: "ssh-privkey"
+              path: "/home/coder/.ssh/id_rsa"
+              readOnly: true
+            - subPath: "ssh-pubkey"
+              path: "/home/coder/.ssh/id_rsa.pub"
+              readOnly: true
 
     ingress:
       app:
