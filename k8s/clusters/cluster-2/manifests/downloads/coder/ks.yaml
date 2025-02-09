@@ -16,10 +16,10 @@ spec:
     kind: GitRepository
     name: home-ops
   healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
-      kind: HelmRelease
-      name: *app
-      namespace: *namespace
+  - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    kind: HelmRelease
+    name: *app
+    namespace: *namespace
   interval: 30m
   retryInterval: 1m
   timeout: 3m
@@ -29,5 +29,5 @@ spec:
       NAMESPACE: *namespace
       GATUS_PATH: /web/index.html
       VOLSYNC_CAPACITY: 100Gi
-      VOLSYNC_CLAIM: radarr
+      VOLSYNC_CLAIM: *app
       VOLSYNC_STORAGECLASS: ceph-blockpool-nvme
