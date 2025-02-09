@@ -1,0 +1,199 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-3.0.1/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app coder
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.0
+      interval: 15m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      strategy: uninstall
+  rollback:
+    recreate: true
+    cleanupOnFail: true
+  uninstall:
+    keepHistory: false
+  values:
+    global:
+      nameOverride: *app
+
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: ${APP_UID}
+        runAsGroup: ${APP_GID}
+        fsGroup: ${APP_GID}
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [ 34, 10000 ]
+        seccompProfile: { type: RuntimeDefault }
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/instance
+                      operator: In
+                      values:
+                        - "coder"
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+
+    controllers:
+      coder:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        # initContainers:
+        #   init-db:
+        #     image:
+        #       repository: ghcr.io/onedr0p/postgres-init
+        #       tag: 16
+        #     envFrom: &envFrom
+        #       - secretRef:
+        #           name: coder-secret
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/coder/code-server
+              tag: "4.96.4@sha256:f93810f7f6636b3af3b1a750faf612349cddb89fbb6d28d69123a214fc75ee9e"
+              pullPolicy: IfNotPresent
+            command: ["dumb-init", "/bin/bash", "-c"]
+            args: ["/home/linuxbrew/.linuxbrew/sbin/sshd -p 2222 || true; /usr/bin/code-server --auth none --disable-telemetry --user-data-dir /home/coder/.vscode --extensions-dir /home/coder/.vscode --bind-addr 0.0.0.0:8080 --port 8080 /home/coder"]
+            env:
+              TZ: "${TIMEZONE}"
+              CODER__APP__INSTANCENAME: Coder
+              CODER__APP__THEME: dark
+              CODER__SERVER__PORT: &port 8080
+              CODER__APPLICATION_URL: &host "coder.${INGRESS_DOMAIN}"
+              CODER__AUTH__METHOD: Forms
+              CODER__AUTH__REQUIRED: Enabled
+              CODER__LOG_LEVEL: info
+              CODER__UPDATE__BRANCH: develop
+              CODER__LOG__DBENABLED: "False"
+              SSH_AUTH_SOCK: ""
+              SOPS_AGE_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: "coder-secrets"
+                    key: "age.agekey"              
+
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+      ssh:
+        enabled: true
+        primary: false
+        controller: app
+        type: LoadBalancer
+        externalTrafficPolicy: Cluster
+        annotations:
+          coredns.io/hostname: "vs-ssh.${INGRESS_DOMAIN}"
+          io.cilium/lb-ipam-ips: "${LB_CODER:=127.0.0.1}"
+        ports:
+          http:
+            enabled: true
+            port: 22
+            targetPort: 2222
+            protocol: TCP
+          ssh2:
+            port: 22222
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: ${VOLSYNC_CLAIM}
+      ignore:
+        type: emptyDir
+        advancedMounts:
+          coder:
+            app:
+            - path: /home/coder/ignore
+      brew:
+        type: emptyDir
+        advancedMounts:
+          coder:
+            app:
+            - path: /home/linuxbrew
+      nix:
+        type: emptyDir
+        advancedMounts:
+          coder:
+            app:
+            - path: /nix/store
+      cache:
+        type: emptyDir
+        advancedMounts:
+          coder:
+            app:
+            - path: /home/coder/.cache
+      mise:
+        type: emptyDir
+        advancedMounts:
+          coder:
+            app:
+            - path: /home/coder/.local/share/mise
+      go:
+        type: emptyDir
+        advancedMounts:
+          coder:
+            app:
+            - path: /home/coder/go
+      tmp:
+        type: emptyDir
+        advancedMounts:
+          coder:
+            app:
+            - path: /tmp
+      secrets:
+        enabled: true
+        type: secret
+        name: "code-secrets"
+        defaultMode: 0600
+        advancedMounts:
+          main:
+            main:
+              - subPath: "ssh-privkey"
+                path: "/home/coder/.ssh/id_rsa"
+                readOnly: true
+              - subPath: "ssh-pubkey"
+                path: "/home/coder/.ssh/id_rsa.pub"
+                readOnly: true
+
+    ingress:
+      app:
+        enabled: true
+        className: "internal-nginx"
+        # annotations:
+        #   external-dns/is-public: "true"
+        #   external-dns.alpha.kubernetes.io/target: "ingress-ext.${INGRESS_DOMAIN}"
+        hosts:
+        - host: *host
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
+        tls:
+        - hosts:
+          - *host
