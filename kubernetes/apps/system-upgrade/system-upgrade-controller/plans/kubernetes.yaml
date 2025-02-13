@@ -6,6 +6,7 @@ metadata:
 spec:
   version: ${KUBERNETES_VERSION}
   concurrency: 1
+  postCompleteDelay: 30s
   exclusive: true
   nodeSelector:
     matchExpressions:
@@ -18,12 +19,7 @@ spec:
   serviceAccountName: system-upgrade
   upgrade:
     image: ghcr.io/siderolabs/talosctl:${TALOS_VERSION}
-    envs:
-      - name: NODE_IP
-        valueFrom:
-          fieldRef:
-            fieldPath: status.hostIP
     args:
-      - --nodes=$(NODE_IP)
+      - --nodes=$(SYSTEM_UPGRADE_NODE_NAME)
       - upgrade-k8s
       - --to=$(SYSTEM_UPGRADE_PLAN_LATEST_VERSION)

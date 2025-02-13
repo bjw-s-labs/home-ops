@@ -19,6 +19,7 @@ spec:
     controllers:
       system-upgrade-controller:
         strategy: RollingUpdate
+        replicas: 2
 
         pod:
           securityContext:
@@ -41,23 +42,20 @@ spec:
           app:
             image:
               repository: docker.io/rancher/system-upgrade-controller
-              tag: v0.14.2
+              tag: v0.15.0-rc2@sha256:d6faa9cb5123ae14cfbf0e9e22fa5302e1369649a6f1d117874c30a2a8df732b
             env:
-              SYSTEM_UPGRADE_CONTROLLER_DEBUG: false
-              SYSTEM_UPGRADE_CONTROLLER_THREADS: 2
-              SYSTEM_UPGRADE_JOB_ACTIVE_DEADLINE_SECONDS: 900
-              SYSTEM_UPGRADE_JOB_BACKOFF_LIMIT: 99
-              SYSTEM_UPGRADE_JOB_IMAGE_PULL_POLICY: IfNotPresent
-              SYSTEM_UPGRADE_JOB_KUBECTL_IMAGE: registry.k8s.io/kubectl:v1.32.2
-              SYSTEM_UPGRADE_JOB_POD_REPLACEMENT_POLICY: Failed # Required for Talos
-              SYSTEM_UPGRADE_JOB_PRIVILEGED: true
-              SYSTEM_UPGRADE_JOB_TTL_SECONDS_AFTER_FINISH: 900
-              SYSTEM_UPGRADE_PLAN_POLLING_INTERVAL: 15m
+              SYSTEM_UPGRADE_CONTROLLER_LEADER_ELECT: true
               SYSTEM_UPGRADE_CONTROLLER_NAME: system-upgrade-controller
               SYSTEM_UPGRADE_CONTROLLER_NAMESPACE:
                 valueFrom:
                   fieldRef:
                     fieldPath: metadata.namespace
+              SYSTEM_UPGRADE_CONTROLLER_NODE_NAME:
+                valueFrom:
+                  fieldRef:
+                    fieldPath: spec.nodeName
+              SYSTEM_UPGRADE_JOB_BACKOFF_LIMIT: "99"
+              SYSTEM_UPGRADE_JOB_PRIVILEGED: false
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
