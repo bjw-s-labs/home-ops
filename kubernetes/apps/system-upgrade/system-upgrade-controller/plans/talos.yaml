@@ -6,6 +6,7 @@ metadata:
 spec:
   version: ${TALOS_VERSION}
   concurrency: 1
+  postCompleteDelay: 2m
   exclusive: true
   nodeSelector:
     matchExpressions:
@@ -20,11 +21,6 @@ spec:
   serviceAccountName: system-upgrade
   upgrade:
     image: ghcr.io/jfroy/tnu:0.3.0
-    envs:
-      - name: NODE_IP
-        valueFrom:
-          fieldRef:
-            fieldPath: status.hostIP
     args:
-      - --node=$(NODE_IP)
+      - --node=$(SYSTEM_UPGRADE_NODE_NAME)
       - --tag=$(SYSTEM_UPGRADE_PLAN_LATEST_VERSION)
