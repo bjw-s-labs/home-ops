@@ -15,12 +15,13 @@ instance:
     url: https://github.com/bjw-s-labs/home-ops.git
     ref: refs/heads/main
     path: kubernetes/flux/cluster
+    interval: 1h
   commonMetadata:
     labels:
       app.kubernetes.io/name: flux
   kustomize:
     patches:
-      # Add Sops decryption to Kustomizations
+      # Add Sops decryption to 'flux-system' Kustomization
       - patch: |
           - op: add
             path: /spec/decryption
@@ -31,8 +32,7 @@ instance:
         target:
           group: kustomize.toolkit.fluxcd.io
           kind: Kustomization
-      # Increase the number of workers and limits
-      # Ref: https://fluxcd.io/flux/installation/configuration/vertical-scaling/#increase-the-number-of-workers-and-limits
+      # Increase the number of workers
       - patch: |
           - op: add
             path: /spec/template/spec/containers/0/args/-
@@ -43,6 +43,7 @@ instance:
         target:
           kind: Deployment
           name: (kustomize-controller|helm-controller|source-controller)
+      - # Increase the memory limits
       - patch: |
           apiVersion: apps/v1
           kind: Deployment
@@ -60,7 +61,6 @@ instance:
           kind: Deployment
           name: (kustomize-controller|helm-controller|source-controller)
       # Enable in-memory kustomize builds
-      # Ref: https://fluxcd.io/flux/installation/configuration/vertical-scaling/#enable-in-memory-kustomize-builds
       - patch: |
           - op: add
             path: /spec/template/spec/containers/0/args/-
@@ -75,7 +75,6 @@ instance:
           kind: Deployment
           name: kustomize-controller
       # Enable Helm repositories caching
-      # Ref: https://fluxcd.io/flux/installation/configuration/vertical-scaling/#enable-helm-repositories-caching
       - patch: |
           - op: add
             path: /spec/template/spec/containers/0/args/-
@@ -90,7 +89,6 @@ instance:
           kind: Deployment
           name: source-controller
       # Flux near OOM detection for Helm
-      # Ref: https://fluxcd.io/flux/installation/configuration/helm-oom-detection/
       - patch: |
           - op: add
             path: /spec/template/spec/containers/0/args/-
