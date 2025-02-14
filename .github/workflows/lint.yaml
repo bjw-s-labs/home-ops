@@ -116,16 +116,10 @@ jobs:
       - prettier
       - yamllint
       - markdownlint
-    if: |
-      always()
+    if: ${{ !cancelled() }}
     name: Lint successful
     runs-on: ubuntu-latest
     steps:
       - name: Check job status
-        if: >-
-          ${{
-              (
-                contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
-              )
-          }}
+        if: ${{ contains(needs.*.result, 'failure') }}
         run: exit 1
