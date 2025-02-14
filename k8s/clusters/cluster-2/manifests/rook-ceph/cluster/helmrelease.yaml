@@ -220,24 +220,7 @@ spec:
           - name: "/dev/disk/by-id/ata-TOSHIBA_MG08ACA16TE_6180A028FVGG"
             config:
               metadataDevice: "/dev/disk/by-id/ata-VK0800GDJYA_BTWL342500JH800RGN"
-        - name: work7
-          devices:
-          # HDDs
-          - name: "/dev/disk/by-id/ata-ST16000NM000J-2TW103_WRS05FXH"
-            config:
-              metadataDevice: "/dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S598NJ0NA65759X"
-          - name: "/dev/disk/by-id/ata-ST16000NM001G-2KK103_ZL2JT6BZ"
-            config:
-              metadataDevice: "/dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S598NJ0NA65759X"
-        # - name: work8
-        #   devices:
-        #   # HDDs
-        #   - name: "/dev/disk/by-id/ata-ST16000NM000J-2TW103_WRS05H5H"
-        #     config:
-        #       metadataDevice: "/dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_PHYF911600AW960CGN"
-        #   - name: "/dev/disk/by-id/ata-ST16000NM001G-2KK103_ZL2N7HNZ"
-        #     config:
-        #       metadataDevice: "/dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_PHYF911600AW960CGN"
+
         - name: work9
           devices:
           # NVMe
@@ -250,14 +233,6 @@ spec:
           devices:
           # NVMe
           - name: "/dev/disk/by-id/nvme-WDC_WDS100T2B0C-00PXH0_211603A00104"
-        - name: work12
-          devices:
-          # NVMe
-          - name: "/dev/disk/by-id/nvme-Samsung_SSD_990_EVO_1TB_S7M3NL0XA03063W"
-        # - name: work13
-        #   devices:
-        #   # NVMe
-        #   - name: "/dev/disk/by-id/nvme-Samsung_SSD_990_EVO_1TB_S7M3NL0XA13919R"
 
         - name: n100-04
           devices:
@@ -270,6 +245,19 @@ spec:
               metadataDevice: "/dev/disk/by-id/nvme-ADATA_SX8200PNP_2K1020024662"
           # NVMe
           - name: "/dev/disk/by-id/nvme-Samsung_SSD_990_EVO_1TB_S7M3NL0XA13919R"
+
+        - name: n100-05
+          devices:
+          # HDDs
+          - name: "/dev/disk/by-id/ata-ST16000NM000J-2TW103_WRS05FXH"
+            config:
+              metadataDevice: "/dev/disk/by-id/nvme-ADATA_SX8200PNP_2K1520024111"
+          - name: "/dev/disk/by-id/ata-ST16000NM001G-2KK103_ZL2JT6BZ"
+            config:
+              metadataDevice: "/dev/disk/by-id/nvme-ADATA_SX8200PNP_2K1520024111"
+          # NVMe
+          - name: "/dev/disk/by-id/nvme-Samsung_SSD_990_EVO_1TB_S7M3NL0XA03063W"
+
     cephBlockPools:
     - name: ceph-blockpool-nvme
       spec:
