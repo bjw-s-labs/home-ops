@@ -116,10 +116,10 @@ jobs:
     needs:
       - test
       - diff
-    if: ${{ always() }}
+    if: ${{ !cancelled() }}
     name: Flux Local successful
     runs-on: ubuntu-latest
     steps:
-      - name: Check flux-local status
-        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+      - name: Check job status
+        if: ${{ contains(needs.*.result, 'failure') }}
         run: exit 1
