@@ -119,10 +119,10 @@ jobs:
   retry-on-failure:
     name: Retry on failure
     if: ${{ !cancelled() && failure() && fromJSON(github.run_attempt) < 3 }}
-    uses: bjw-s-labs/github-workflows/.github/workflows/retry-failed-workflow.yaml@main
+    runs-on: ubuntu-latest
     needs:
       - pre-pull-images-success
-    with:
-      github_repository: ${{ github.repository }}
-      run_id: ${{ github.run_id }}
-      delay: 1m
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run --repo bjw-s-labs/github-workflows retry-failed-workflow.yaml -F github_repository="${{ github.repository }}" -F run_id="${{ github.run_id }}"
