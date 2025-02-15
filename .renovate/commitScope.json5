@@ -1,0 +1,12 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  packageRules: [
+    {
+      description: "Set commit scope to the parent directory of the package file",
+      matchFileNames: ["kubernetes/apps/**"],
+      matchDatasources: ["docker", "helm"],
+      // This is dependent on the package file being in a directory structure like `kubernetes/apps/namespace/app-name/**`
+      semanticCommitScope: "{{ lookup (split packageFileDir '/') 3 }}",
+    },
+  ],
+}
