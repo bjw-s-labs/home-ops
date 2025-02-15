@@ -125,4 +125,4 @@ jobs:
     steps:
       - env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run --repo bjw-s-labs/github-workflows retry-failed-workflow.yaml -F github_repository="${{ github.repository }}" -F run_id="${{ github.run_id }}"
+        run: gh workflow run --repo bjw-s-labs/github-workflows retry-failed-workflow.yaml -F github_repository="${{ github.repository }}" -F run_id="${{ github.run_id }}" -F token=${GH_TOKEN}
