@@ -123,6 +123,14 @@ jobs:
     needs:
       - pre-pull-images-success
     steps:
+      - name: Generate Token
+        uses: actions/create-github-app-token@v1
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+        id: app-token
+        with:
+          app-id: ${{ secrets.LAB_ASSISTANT_APP_ID }}
+          private-key: ${{ secrets.LAB_ASSISTANT_APP_KEY }}
+
       - env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: gh workflow run --repo bjw-s-labs/github-workflows retry-failed-workflow.yaml -F github_repository="${{ github.repository }}" -F run_id="${{ github.run_id }}" -F token=${GH_TOKEN}
