@@ -115,3 +115,14 @@ jobs:
       - name: Check job status
         if: ${{ contains(needs.*.result, 'failure') }}
         run: exit 1
+
+  retry-on-failure:
+    name: Retry on failure
+    if: ${{ !cancelled() && failure() && fromJSON(github.run_attempt) < 3 }}
+    uses: bjw-s/gh-workflows/.github/workflows/retry-failed-workflow.yaml@main
+    needs:
+      - pre-pull-images-success
+    with:
+      github_repository: ${{ github.repository }}
+      run_id: ${{ github.run_id }}
+      delay: 30m
