@@ -119,7 +119,7 @@ jobs:
   retry-on-failure:
     name: Retry on failure
     if: ${{ !cancelled() && failure() && fromJSON(github.run_attempt) < 3 }}
-    uses: bjw-s/gh-workflows/.github/workflows/retry-failed-workflow.yaml@main
+    uses: bjw-s-labs/github-workflows/.github/workflows/retry-failed-workflow.yaml@main
     needs:
       - pre-pull-images-success
     with:
