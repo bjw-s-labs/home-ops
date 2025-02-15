@@ -140,6 +140,7 @@ jobs:
             await github.rest.actions.createWorkflowDispatch({
               owner: 'bjw-s-labs',
               repo: 'github-workflows',
+              ref: 'main',
               workflow_id: 'retry-failed-workflow.yaml',
               inputs: {
                 github_repository: '${{ github.repository }}',
