@@ -131,6 +131,14 @@ jobs:
           app-id: ${{ secrets.LAB_ASSISTANT_APP_ID }}
           private-key: ${{ secrets.LAB_ASSISTANT_APP_KEY }}
 
-      - env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: gh workflow run --repo bjw-s-labs/github-workflows retry-failed-workflow.yaml -F github_repository="${{ github.repository }}" -F run_id="${{ github.run_id }}" -F token=${GH_TOKEN}
+      - name: Trigger remote workflow
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          script: |
+            const result = await github.rest.actions.createWorkflowDispatch({
+              owner: 'bjw-s-labs',
+              repo: 'github-workflows',
+              workflow_id: 'retry-failed-workflow.yaml'
+            })
+            console.log(result)
