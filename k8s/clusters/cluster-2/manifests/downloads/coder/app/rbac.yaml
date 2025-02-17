@@ -21,7 +21,7 @@ rules:
   - apiGroups: ["", "apps", "batch", "storage.k8s.io"]  # "" indicates the core API group
     # resources: ["nodes", "namespaces", "pods", ]
     resources: ["*"]
-    verbs: ["get", "list", "watch"]
+    verbs: ["get", "list", "watch", "create"]
   # Grants RO access to RBAC resources
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterroles", "roles", "clusterrolebindings", "rolebindings"]
@@ -36,6 +36,10 @@ rules:
     verbs: ["get", "list", "watch"]
   # Grants access to flux.cd resources
   - apiGroups: ["source.toolkit.fluxcd.io", "kustomize.toolkit.fluxcd.io", "helm.toolkit.fluxcd.io", "notification.toolkit.fluxcd.io", "image.toolkit.fluxcd.io"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch"]
+  # Ceph resources
+  - apiGroup: ["ceph.rook.io"]
     resources: ["*"]
     verbs: ["get", "list", "watch"]
 ---
