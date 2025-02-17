@@ -2,11 +2,10 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ${VOLSYNC_CLAIM}
+  name: ${VOLSYNC_CLAIM}-no-backup
 spec:
-  accessModes: ["ReadWriteOnce"]
+  accessModes: [ "ReadWriteOnce" ]
   resources:
     requests:
-      storage: ${VOLSYNC_CAPACITY}
+      storage: 20G
   storageClassName: ${VOLSYNC_STORAGECLASS}
-  

@@ -133,48 +133,31 @@ spec:
           path: "/home/coder/.ssh" # override secret mount perms
         - subPath: "nix-var"
           path: "/nix/var"
-      ignore:
-        type: emptyDir
-        advancedMounts:
-          coder:
-            app:
-            - path: /home/coder/ignore
-      brew:
-        type: emptyDir
-        advancedMounts:
-          coder:
-            app:
-            - path: /home/linuxbrew
-      nix:
-        type: emptyDir
-        advancedMounts:
-          coder:
-            app:
-            - path: /nix/store
-      cache:
-        type: emptyDir
-        advancedMounts:
-          coder:
-            app:
-            - path: /home/coder/.cache
-      mise:
-        type: emptyDir
-        advancedMounts:
-          coder:
-            app:
-            - path: /home/coder/.local/share/mise
-      go:
-        type: emptyDir
-        advancedMounts:
-          coder:
-            app:
-            - path: /home/coder/go
+      misc:
+        # not backed up
+        enabled: true
+        existingClaim: ${VOLSYNC_CLAIM}-no-backup
+        globalMounts:
+        - subPath: "ignore"
+          path: "/home/coder/ignore"
+        - subPath: "brew"
+          path: "/home/linuxbrew"
+        - subPath: "nix"
+          path: "/nix/store"
+        - subPath: "cache"
+          path: "/home/coder/.cache"
+        - subPath: "mise"
+          path: "/home/coder/.local/share/mise"
+        - subPath: "go"
+          path: "/home/coder/go"
       tmp:
+        enabled: true
         type: emptyDir
-        advancedMounts:
-          coder:
-            app:
-            - path: /tmp
+        medium: Memory
+        globalMounts:
+        - subPath: "tmp"
+          path: "/tmp"
+          readOnly: false
       secrets:
         enabled: true
         type: secret
@@ -189,7 +172,18 @@ spec:
             - subPath: "ssh-pubkey"
               path: "/home/coder/.ssh/id_rsa.pub"
               readOnly: true
-
+      talos-admin:
+        enabled: true
+        type: secret
+        name: "talos"
+        defaultMode: 400
+        advancedMounts:
+          coder:
+            app:
+            - path: "/var/run/secrets/talos.dev"
+              readOnly: true
+            - path: "/home/coder/.talos"
+              readOnly: true
     ingress:
       app:
         enabled: true
