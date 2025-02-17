@@ -18,8 +18,9 @@ metadata:
   name: k9s
 rules:
   # Grants RO access to cluster resources node and namespace
-  - apiGroups: [""]
-    resources: ["nodes", "namespaces"]
+  - apiGroups: [""]  # "" indicates the core API group
+    # resources: ["nodes", "namespaces", "pods", ]
+    resources: ["*"]
     verbs: ["get", "list", "watch"]
   # Grants RO access to RBAC resources
   - apiGroups: ["rbac.authorization.k8s.io"]
