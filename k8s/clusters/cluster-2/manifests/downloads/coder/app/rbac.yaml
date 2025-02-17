@@ -18,7 +18,7 @@ metadata:
   name: k9s
 rules:
   # Grants RO access to cluster resources node and namespace
-  - apiGroups: [""]  # "" indicates the core API group
+  - apiGroups: ["", "apps", "batch", "storage.k8s.io"]  # "" indicates the core API group
     # resources: ["nodes", "namespaces", "pods", ]
     resources: ["*"]
     verbs: ["get", "list", "watch"]
