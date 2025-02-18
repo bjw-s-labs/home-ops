@@ -72,16 +72,11 @@ spec:
                   timeoutSeconds: 1
                   failureThreshold: 3
               readiness: *probes
-            securityContext: &securityContext
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
             resources:
               requests:
-                cpu: "0.04"
                 memory: "250M"
               limits:
-                memory: "6000M"
+                memory: "600M"
           
 
     service:
