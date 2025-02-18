@@ -31,15 +31,15 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: ${APP_UID}
-        runAsGroup: ${APP_GID}
-        fsGroup: ${APP_GID}
-        fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [34, 10000]
-        seccompProfile: {type: RuntimeDefault}
+    # defaultPodOptions:
+    #   securityContext:
+    #     runAsNonRoot: true
+    #     runAsUser: ${APP_UID}
+    #     runAsGroup: ${APP_GID}
+    #     fsGroup: ${APP_GID}
+    #     fsGroupChangePolicy: OnRootMismatch
+    #     supplementalGroups: [34, 10000]
+    #     seccompProfile: {type: RuntimeDefault}
     controllers:
       calibre-web:
         annotations:
