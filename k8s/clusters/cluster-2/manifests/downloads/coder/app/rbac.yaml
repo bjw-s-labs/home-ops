@@ -42,6 +42,10 @@ rules:
   - apiGroups: ["ceph.rook.io"]
     resources: ["*"]
     verbs: ["get", "list", "watch"]
+  # Ceph resources
+  - apiGroups: ["talos.dev"]
+    resources: ["ServiceAccount"]
+    verbs: ["get", "list", "watch", "create", "update", "delete"]
 ---
 apiVersion: talos.dev/v1alpha1
 kind: ServiceAccount
