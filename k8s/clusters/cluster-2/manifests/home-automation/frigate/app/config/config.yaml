@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://frigate.elcarpenter.com/api/config/schema
+# yaml-language-server: $schema=https://demo.frigate.video/api/config/schema.json
 logger:
   default: info
   # logs:
@@ -44,10 +44,6 @@ record:
   retain:
     days: 3
     mode: motion
-  events:
-    retain:
-      default: 30
-      mode: active_objects
 
 objects:
   track:
@@ -63,6 +59,37 @@ objects:
       min_area: 5000
       max_area: 100000
       threshold: 0.7
+
+semantic_search:
+  # Optional: Enable semantic search
+  enabled: True
+  # Optional: Re-index embeddings database from historical tracked objects 
+  reindex: True
+  # Optional: Set the model size used for embeddings. (default: shown below)
+  # NOTE: small model runs on CPU and large model runs on GPU
+  model_size: "large"
+
+# Optional: Configuration for AI generated tracked object descriptions
+# NOTE: Semantic Search must be enabled for this to do anything.
+# WARNING: Depending on the provider, this will send thumbnails over the internet
+# to Google or OpenAI's LLMs to generate descriptions. It can be overridden at
+# the camera level (enabled: False) to enhance privacy for indoor cameras.
+genai:
+  # Optional: Enable AI description generation (default: shown below)
+  enabled: False
+  # Required if enabled: Provider must be one of ollama, gemini, or openai
+  provider: ollama
+  # Required if provider is ollama. May also be used for an OpenAI API compatible backend with the openai provider.
+  base_url: http://localhost::11434
+  # Required if gemini or openai
+  api_key: "{FRIGATE_GENAI_API_KEY}"
+  # Optional: The default prompt for generating descriptions. Can use replacement
+  # variables like "label", "sub_label", "camera" to make more dynamic. (default: shown below)
+  prompt: "Describe the {label} in the sequence of images with as much detail as possible. Do not describe the background."
+  # Optional: Object specific prompts to customize description results
+  # Format: {label}: {prompt}
+  object_prompts:
+    person: "My special person prompt."
 
 # Optional: Restream configuration
 # Uses https://github.com/AlexxIT/go2rtc (v1.2.0)
