@@ -139,6 +139,29 @@ spec:
               subPath: config
             - path: /data
               subPath: data
+      cert:
+        enabled: true
+        type: secret
+        name: frigate-cert
+        globalMounts:
+        - path: /etc/letsencrypt/live/frigate
+        tls.crt
+
+        enabled: true
+        type: secret
+        name: frigate-cert
+        # defaultMode: 0600
+        advancedMounts:
+          frigate:
+            app:
+            - subPath: "tls.crt"
+              path: "/etc/letsencrypt/live/frigate/fullchain.pem"
+              readOnly: true
+            - subPath: "tls.key"
+              path: "/etc/letsencrypt/live/frigate/privkey.pem"
+              readOnly: true
+
+
       media:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-security-footage
@@ -169,6 +192,8 @@ spec:
       app:
         enabled: true
         className: "internal-nginx"
+        annotations:
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
         hosts:
         - host: *host
           paths:
