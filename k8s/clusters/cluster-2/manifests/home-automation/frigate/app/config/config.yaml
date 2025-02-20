@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://frigate.cluster-2.elcarpenter.com/api/config/schema
+# yaml-language-server: $schema=https://frigate.elcarpenter.com/api/config/schema
 logger:
   default: info
   # logs:
@@ -80,6 +80,10 @@ go2rtc:
       - rtsp://{FRIGATE_MQTT_USERNAME}:{FRIGATE_MQTT_PASSWORD}@{FRIGATE_CAMERA_3_HOST}:554/cam/realmonitor?channel=1&subtype=0
     outside_garage_lq:
       - rtsp://{FRIGATE_MQTT_USERNAME}:{FRIGATE_MQTT_PASSWORD}@{FRIGATE_CAMERA_3_HOST}:554/cam/realmonitor?channel=1&subtype=1
+    driveway_hq:
+      - rtsp://{FRIGATE_MQTT_USERNAME}:{FRIGATE_MQTT_PASSWORD}@{FRIGATE_CAMERA_4_HOST}:554/cam/realmonitor?channel=1&subtype=0
+    driveway_lq:
+      - rtsp://{FRIGATE_MQTT_USERNAME}:{FRIGATE_MQTT_PASSWORD}@{FRIGATE_CAMERA_4_HOST}:554/cam/realmonitor?channel=1&subtype=1
 
 # Specify camera's
 cameras:
@@ -135,6 +139,23 @@ cameras:
           roles:
             - record
         - path: rtsp://127.0.0.1:8554/outside_garage_lq?video=copy
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+    detect:
+      width: 704
+      height: 480
+      fps: 30
+  driveway:
+    ffmpeg:
+      output_args:
+        record: preset-record-generic-audio-copy
+      inputs:
+        - path: rtsp://127.0.0.1:8554/drivway_hq?video=copy&audio=aac
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/driveway_lq?video=copy
           input_args: preset-rtsp-restream
           roles:
             - detect
