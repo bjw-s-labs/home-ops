@@ -136,14 +136,16 @@ spec:
             app:
             - path: /config
               subPath: config
-      data:
-        enabled: true
-        existingClaim: ${VOLSYNC_CLAIM}
-        advancedMounts:
-          frigate:
-            app:
             - path: /data
               subPath: data
+      # data:
+      #   enabled: true
+      #   existingClaim: ${VOLSYNC_CLAIM}
+      #   advancedMounts:
+      #     frigate:
+      #       app:
+      #       - path: /data
+      #         subPath: data
       media:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-security-footage
