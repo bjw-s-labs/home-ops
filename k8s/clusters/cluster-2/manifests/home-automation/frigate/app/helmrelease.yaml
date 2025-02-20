@@ -130,17 +130,20 @@ spec:
     persistence:
       config:
         enabled: true
-        type: configMap
-        name: frigate-config
-        advancedMounts:
-          frigate:
-            app:
-            - path: /config/config.yml
-              subPath: config.yaml
-              readOnly: false
+        existingClaim: ${VOLSYNC_CLAIM}
+      # config:
+      #   enabled: true
+      #   type: configMap
+      #   name: frigate-config
+      #   advancedMounts:
+      #     frigate:
+      #       app:
+      #       - path: /config/config.yml
+      #         subPath: config.yaml
+      #         readOnly: false
       data:
         enabled: true
-        existingClaim: ${VOLSYNC_CLAIM}
+        existingClaim: ${VOLSYNC_CLAIM}-data
       media:
         # enabled: true
         # type: emptyDir
