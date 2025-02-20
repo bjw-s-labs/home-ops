@@ -131,19 +131,19 @@ spec:
       config:
         enabled: true
         existingClaim: ${VOLSYNC_CLAIM}
-      # config:
-      #   enabled: true
-      #   type: configMap
-      #   name: frigate-config
-      #   advancedMounts:
-      #     frigate:
-      #       app:
-      #       - path: /config/config.yml
-      #         subPath: config.yaml
-      #         readOnly: false
+        advancedMounts:
+          frigate:
+            app:
+            - path: /config
+              subPath: config
       data:
         enabled: true
-        existingClaim: ${VOLSYNC_CLAIM}-data
+        existingClaim: ${VOLSYNC_CLAIM}
+        advancedMounts:
+          frigate:
+            app:
+            - path: /data
+              subPath: data
       media:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-security-footage
