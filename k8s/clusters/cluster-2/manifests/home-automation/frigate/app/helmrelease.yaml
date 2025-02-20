@@ -143,13 +143,6 @@ spec:
         enabled: true
         type: secret
         name: frigate-cert
-        globalMounts:
-        - path: /etc/letsencrypt/live/frigate
-        tls.crt
-
-        enabled: true
-        type: secret
-        name: frigate-cert
         # defaultMode: 0600
         advancedMounts:
           frigate:
@@ -160,8 +153,6 @@ spec:
             - subPath: "tls.key"
               path: "/etc/letsencrypt/live/frigate/privkey.pem"
               readOnly: true
-
-
       media:
         enabled: true
         existingClaim: ceph-filesystem-${APP}-security-footage
