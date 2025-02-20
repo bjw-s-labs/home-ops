@@ -76,20 +76,20 @@ semantic_search:
 # the camera level (enabled: False) to enhance privacy for indoor cameras.
 genai:
   # Optional: Enable AI description generation (default: shown below)
-  enabled: False
+  enabled: True
   # Required if enabled: Provider must be one of ollama, gemini, or openai
-  provider: ollama
-  # Required if provider is ollama. May also be used for an OpenAI API compatible backend with the openai provider.
-  base_url: http://localhost::11434
+  provider: gemini
   # Required if gemini or openai
   api_key: "{FRIGATE_GENAI_API_KEY}"
+  model: gemini-1.5-pro
   # Optional: The default prompt for generating descriptions. Can use replacement
   # variables like "label", "sub_label", "camera" to make more dynamic. (default: shown below)
-  prompt: "Describe the {label} in the sequence of images with as much detail as possible. Do not describe the background."
+  prompt: "Analyze the {label} in these images from the {camera} security camera. Focus on the actions, behavior, and potential intent of the {label}, rather than just describing its appearance."
   # Optional: Object specific prompts to customize description results
   # Format: {label}: {prompt}
   object_prompts:
-    person: "My special person prompt."
+    person: "Examine the main person in these images. What are they doing and what might their actions suggest about their intent (e.g., approaching a door, leaving an area, standing still)? Do not describe the surroundings or static details."
+    car: "Observe the primary vehicle in these images. Focus on its movement, direction, or purpose (e.g., parking, approaching, circling). If it's a delivery vehicle, mention the company."
 
 # Optional: Restream configuration
 # Uses https://github.com/AlexxIT/go2rtc (v1.2.0)
