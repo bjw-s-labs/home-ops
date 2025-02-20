@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd/helm-controller/main/config/crd/bases/helm.toolkit.fluxcd.io_helmreleases.yaml
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -53,7 +54,7 @@ spec:
             env:
               TZ: "${TIMEZONE}"
               FRIGATE__INSTANCE_NAME: Frigate
-              FRIGATE__PORT: &port 5000
+              FRIGATE__PORT: &port 8971
               FRIGATE__APPLICATION_URL: &host "frigate.${INGRESS_DOMAIN}"
               FRIGATE__LOG_LEVEL: info
             envFrom:
@@ -74,7 +75,7 @@ spec:
                 spec:
                   httpGet:
                     path: /api/version
-                    port: &port 8971
+                    port: *port 8971
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 1
