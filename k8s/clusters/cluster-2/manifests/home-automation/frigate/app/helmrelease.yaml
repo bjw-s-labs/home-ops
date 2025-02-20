@@ -142,16 +142,9 @@ spec:
       #         subPath: config.yaml
       #         readOnly: false
       data:
-        enabled: true
+        enabled: false
         existingClaim: ${VOLSYNC_CLAIM}-data
       media:
-        # enabled: true
-        # type: emptyDir
-        # sizeLimit: 20Gi
-        # advancedMounts:
-        #   frigate:
-        #     app:
-        #       - path: /media
         enabled: true
         existingClaim: ceph-filesystem-${APP}-security-footage
         advancedMounts:
