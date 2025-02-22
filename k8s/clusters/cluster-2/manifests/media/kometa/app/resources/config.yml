@@ -2,22 +2,30 @@ libraries:
   Movies:
     library_type: movie
     operations:
-    - schedule: daily
-      delete_collections:
-        managed: false
-        configured: false
-      mass_critic_rating_update: tmdb
-      split_duplicates: true
+      - schedule: daily
+        delete_collections:
+          managed: false
+          configured: false
+        mass_critic_rating_update: tmdb
+        split_duplicates: true
 
     schedule: hourly(1)
     collection_files:
-    - file: config/1-moviecharts.yml
-    - file: config/3-bestof.yml
-    - file: config/4-decade.yml
-    - file: config/5-holliday.yml
-    - file: config/6-studios.yml
-    - file: config/9-imdb.yml
-    - file: config/98-movie.yml
+      - file: config/1-moviecharts.yml
+      - file: config/3-bestof.yml
+      - file: config/4-decade.yml
+      - file: config/5-holliday.yml
+      - file: config/6-studios.yml
+      - file: config/9-imdb.yml
+      - file: config/98-movie.yml
+    overlay_files:
+      - default: ribbon
+      - default: ratings
+      - default: resolution
+      - default: network
+      - default: streaming
+      - default: commonsense
+      # - file: config/99-overlays.yml
   TV - Shows:
     operations:
       mass_critic_rating_update: tmdb
@@ -27,9 +35,20 @@ libraries:
         configured: false
     schedule: hourly(0)
     collection_files:
-    - file: config/2-tvcharts.yml
-    - file: config/7-networks.yml
-    - file: config/8-tv.yml
+      - file: config/2-tvcharts.yml
+      - file: config/7-networks.yml
+      - file: config/8-tv.yml
+    overlay_files:
+      - default: ribbon
+      - default: ratings
+      - default: resolution
+      - default: network
+      - default: streaming
+      - default: commonsense
+      - default: status     # TV only
+playlist_files:
+  - file: config/50-playlists.yml
+  - default: playlist
 settings:
   cache: true
   cache_expiration: 60
@@ -71,10 +90,10 @@ settings:
   show_unconfigured: true
   playlist_exclude_users:
   run_order:
-  - operations
-  - metadata
-  - collections
-  - overlays
+    - operations
+    - metadata
+    - collections
+    - overlays
 plex:
   url: https://plex.${INGRESS_DOMAIN}
   token: ${PLEX_TOKEN}
