@@ -30,26 +30,6 @@ libraries:
     - file: config/2-tvcharts.yml
     - file: config/7-networks.yml
     - file: config/8-tv.yml
-  # Movies-4K:
-  #   schedule: hourly(6),hourly(18)
-  #   overlay_files:
-  #   - remove_overlays: false
-  #   - file: config/99-overlays.yml
-  #     template_variables:
-  #       4K: true
-  #       4K-HDR: true
-  #       4K-Dolby: true
-  #       4K-Episode: false
-  # TVShows-4K:
-  #   schedule: hourly(6),hourly(18)
-  #   overlay_files:
-  #   - remove_overlays: false
-  #   - file: config/99-overlays.yml
-  #     template_variables:
-  #       4K: true
-  #       4K-HDR: true
-  #       4K-Dolby: true
-  #       4K-Episode: true
 settings:
   cache: true
   cache_expiration: 60
@@ -122,7 +102,7 @@ radarr:
   root_folder_path: /mnt/unionfs/Media/Movies
   monitor: true
   availability: announced
-  quality_profile: Any
+  quality_profile: SQP-4
   tag: pmm
   add_existing: false
   search: true
@@ -130,10 +110,10 @@ sonarr:
   url: https://sonarr.${INGRESS_DOMAIN}
   token: ${SONARR_API_KEY}
   add_missing: false
-  add_existing: true
+  add_existing: false
   root_folder_path: /mnt/unionfs/Media/TV/TV Shows
   monitor: all
-  quality_profile: Any
+  quality_profile: WEB 2160p
   language_profile: English
   series_type: standard
   season_folder: true
