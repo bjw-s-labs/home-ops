@@ -104,6 +104,14 @@ spec:
       enabled: true
 
     operator:
+      tolerations: []    # <-- this may cause a fresh bootstrap of the cluster to fail
+      dashboards:
+        enabled: true
+      prometheus:
+        enabled: true
+        serviceMonitor:
+          enabled: true
+      replicas: 2
       rollOutPods: true
 
     prometheus:
