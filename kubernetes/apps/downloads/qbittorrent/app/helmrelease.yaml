@@ -32,18 +32,20 @@ spec:
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 65542 # gladius:external-services
-          terminationGracePeriodSeconds: 120
 
         initContainers:
-          dnsdist:
+          coredns:
             image:
-              repository: docker.io/powerdns/dnsdist-19
-              tag: 1.9.8
+              repository: mirror.gcr.io/coredns/coredns
+              tag: 1.12.0
+            args:
+              - -conf
+              - /etc/coredns/Corefile
             restartPolicy: Always
 
           gluetun:
             dependsOn:
-              - dnsdist
+              - coredns
             image:
               repository: ghcr.io/qdm12/gluetun
               tag: v3.40.0
@@ -192,14 +194,14 @@ spec:
             gluetun:
               - path: *gluetunAuthPath
                 subPath: auth.toml
-      dnsdist:
+      coredns:
         type: configMap
-        name: qbittorrent-dnsdist
+        name: qbittorrent-coredns
         advancedMounts:
           qbittorrent:
-            dnsdist:
-              - path: /etc/dnsdist/dnsdist.conf
-                subPath: dnsdist.conf
+            coredns:
+              - path: /etc/coredns/Corefile
+                subPath: Corefile
                 readOnly: true
       scripts:
         type: configMap

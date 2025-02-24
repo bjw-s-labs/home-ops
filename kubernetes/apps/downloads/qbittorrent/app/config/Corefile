@@ -1,0 +1,27 @@
+.:53 {
+    bind 127.0.0.2
+    rewrite stop type AAAA A
+    errors
+    health :8081 {
+        lameduck 5s
+    }
+    log {
+        class error
+    }
+    forward . tls://1.1.1.1 tls://1.0.0.1 {
+        tls_servername tls.cloudflare-dns.com
+        policy sequential
+        health_check 5s
+    }
+    reload
+}
+
+cluster.local:53 {
+    bind 127.0.0.2
+    rewrite stop type AAAA A
+    errors
+    log {
+        class error
+    }
+    forward . 10.96.0.10
+}
