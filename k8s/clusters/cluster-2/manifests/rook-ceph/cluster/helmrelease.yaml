@@ -211,16 +211,6 @@ spec:
           - name: "/dev/disk/by-id/ata-TOSHIBA_MG08ACA16TE_6180A067FVGG"
             config:
               metadataDevice: "/dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S598NJ0NA65749Z"
-        - name: work6
-          devices:
-          # HDDs
-          - name: "/dev/disk/by-id/ata-TOSHIBA_MG08ACA16TE_6180A008FVGG"
-            config:
-              metadataDevice: "/dev/disk/by-id/ata-VK0800GDJYA_BTWL342500JH800RGN"
-          - name: "/dev/disk/by-id/ata-TOSHIBA_MG08ACA16TE_6180A028FVGG"
-            config:
-              metadataDevice: "/dev/disk/by-id/ata-VK0800GDJYA_BTWL342500JH800RGN"
-
         - name: work9
           devices:
           # NVMe
@@ -229,10 +219,10 @@ spec:
           devices:
           # NVMe
           - name: "/dev/disk/by-id/nvme-INTEL_SSDPEKNW010T8_BTNH933518TQ1P0B"
-        - name: work11
-          devices:
-          # NVMe
-          - name: "/dev/disk/by-id/nvme-WDC_WDS100T2B0C-00PXH0_211603A00104"
+
+
+
+
 
         - name: n100-04
           devices:
@@ -257,6 +247,18 @@ spec:
               metadataDevice: "/dev/disk/by-id/nvme-ADATA_SX8200PNP_2K1520024111"
           # NVMe
           - name: "/dev/disk/by-id/nvme-Samsung_SSD_990_EVO_1TB_S7M3NL0XA03063W"
+
+        - name: n100-06
+          devices:
+          # HDDs
+          - name: "/dev/disk/by-id/ata-TOSHIBA_MG08ACA16TE_6180A008FVGG"
+            config:
+              metadataDevice: "/dev/disk/by-id/nvme-ADATA_SX8200PNP_2K1020026193"
+          - name: "/dev/disk/by-id/ata-TOSHIBA_MG08ACA16TE_6180A008FVGG"
+            config:
+              metadataDevice: "/dev/disk/by-id/nvme-ADATA_SX8200PNP_2K1020026193"
+          # NVMe
+          - name: "/dev/disk/by-id/nvme-WDC_WDS100T2B0C-00PXH0_211603A00104"
 
     cephBlockPools:
     - name: ceph-blockpool-nvme
