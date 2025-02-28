@@ -20,5 +20,10 @@ spec:
       namespace: system-controllers
   values:
     manageCRDs: true
+    replicaCount: 2
     metrics:
       disableAuth: true
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 2000
+      runAsGroup: 2000

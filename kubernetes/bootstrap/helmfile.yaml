@@ -2,11 +2,9 @@
 # yaml-language-server: $schema=https://json.schemastore.org/helmfile
 
 helmDefaults:
+  force: true
   wait: true
   waitForJobs: true
-  timeout: 600
-  recreatePods: true
-  force: true
 
 repositories:
   - name: cilium
@@ -28,6 +26,15 @@ releases:
       - ../apps/kube-system/cilium/app/values.yaml
     needs:
       - monitoring/prometheus-operator-crds
+    hooks:
+      - # Wait for cilium CRDs to be available
+        events:
+          - postsync
+        command: bash
+        args:
+          - -c
+          - until kubectl get crd ciliumbgppeeringpolicies.cilium.io ciliuml2announcementpolicies.cilium.io ciliumloadbalancerippools.cilium.io &>/dev/null; do sleep 10; done
+        showlogs: true
 
   - name: coredns
     namespace: kube-system
