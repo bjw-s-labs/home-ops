@@ -99,8 +99,8 @@ jobs:
       - name: Setup Homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
-      - name: Setup Workflow Tools
-        run: brew install siderolabs/tap/talosctl
+      - name: Install talosctl
+        run: curl -fsSL https://talos.dev/install | sh
 
       - name: Pre-pull Image
         run: talosctl -n "$NODE_IP" image pull "${{ matrix.images }}"
