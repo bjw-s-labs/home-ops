@@ -88,7 +88,8 @@ spec:
           bdev_enable_discard: "true" # quote
           bdev_async_discard_threads: "1" # quote   4 caused nodes to overload CPU
           osd_class_update_on_start: "false" # quote
-          device_failure_prediction_mode: local # requires mgr module
+          # Cant enable due to `Module 'diskprediction_local' has failed: No module named 'sklearn.svm.classes'`
+          # device_failure_prediction_mode: local # requires mgr module
         mgr:
           mgr/crash/warn_recent_interval: "7200" # 2h
         osd:
