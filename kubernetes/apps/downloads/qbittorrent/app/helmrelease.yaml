@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.7.1
+      version: 3.7.2
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -67,7 +67,10 @@ spec:
             lifecycle:
               postStart:
                 exec:
-                  command: ["/bin/sh", "-c", "(ip rule del table 51820; ip -6 rule del table 51820) || true"]
+                  command:
+                    - /bin/sh
+                    - -c
+                    - (ip rule del table 51820; ip -6 rule del table 51820) || true
             resources:
               limits:
                 squat.ai/tun: "1"
