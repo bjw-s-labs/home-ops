@@ -50,42 +50,51 @@ spec:
     toolbox:
       enabled: true
       image: quay.io/ceph/ceph:v19.2.1
-    configOverride: |
-      [global]
-      bdev_enable_discard = true
-      bdev_async_discard = true
-      osd_class_update_on_start = false
-      bluefs_buffered_io = false
-      # Enables subdomain style S3 endpoints
-      # Cannot enable for Rook Ceph. Causes issues with reconciling Cephobjectstores
-      # rgw_dns_name = s3.cluster-2.elcarpenter.com
-      # rgw_resolve_cname = true
-
-      # ALERTMANAGER_API_HOST
-      # PROMETHEUS_API_HOST
-
-      [mon]
-      mon_data_avail_warn = 20
-
-      [osd]
-      bluestore_min_alloc_size_hdd = 65536
-      osd_max_backfills = 6
-      osd_recovery_max_active_hdd = 16
-      # Default is false. Set to true to auto repair inconsensistencies on EC & bluestore pools
-      osd_scrub_auto_repair = true
-      # Default is 5
-      osd_scrub_auto_repair_num_errors = 5
-      # WPQ should help in cases where a few OSDs are more overloaded than others.
-      osd_op_queue = wpq
-      # Increase deep scrub to allow HDDs time to get scrubbed. Default is 604800 (7 days)
-      # Currently set to 4 weeks
-      osd deep scrub interval = 2419200
-      # Scrubbing does not happen when the system load, as defined by getloadavg() / number of online CPUs, is higher than this defined number.
-      osd_scrub_load_threshold = 2
+    # configOverride: |
+    #   [global]
+    #   bdev_enable_discard = true
+    #   bdev_async_discard = true
+    #   osd_class_update_on_start = false
+    #   bluefs_buffered_io = false
+    #   # Enables subdomain style S3 endpoints
+    #   # Cannot enable for Rook Ceph. Causes issues with reconciling Cephobjectstores
+    #   # rgw_dns_name = s3.cluster-2.elcarpenter.com
+    #   # rgw_resolve_cname = true
+    #   # ALERTMANAGER_API_HOST
+    #   # PROMETHEUS_API_HOST
+    #   [mon]
+    #   mon_data_avail_warn = 20
+    #   [osd]
+    #   bluestore_min_alloc_size_hdd = 65536
+    #   osd_max_backfills = 6
+    #   osd_recovery_max_active_hdd = 16
+    #   # Default is false. Set to true to auto repair inconsensistencies on EC & bluestore pools
+    #   osd_scrub_auto_repair = true
+    #   # Default is 5
+    #   osd_scrub_auto_repair_num_errors = 5
+    #   # WPQ should help in cases where a few OSDs are more overloaded than others.
+    #   osd_op_queue = wpq
+    #   # Increase deep scrub to allow HDDs time to get scrubbed. Default is 604800 (7 days)
+    #   # Currently set to 4 weeks
+    #   osd deep scrub interval = 2419200
+    #   # Scrubbing does not happen when the system load, as defined by getloadavg() / number of online CPUs, is higher than this defined number.
+    #   osd_scrub_load_threshold = 2
 
     cephClusterSpec:
       cephVersion:
         image: quay.io/ceph/ceph:v19.2.1
+      cephConfig:
+        global:
+          bdev_enable_discard: "true" # quote
+          bdev_async_discard_threads: "4" # quote
+          osd_class_update_on_start: "false" # quote
+          device_failure_prediction_mode: local # requires mgr module
+        mgr:
+          mgr/crash/warn_recent_interval: "7200" # 2h
+        osd:
+          bluestore_min_alloc_size_hdd: "65536"
+          # osd_max_backfill: "6"
+          # osd_recovery_max_active_hdd: "16"
       mgr:
         count: 2
         allowMultiplePerNode: false
@@ -98,6 +107,8 @@ spec:
         - name: rook
           enabled: true
         - name: insights
+          enabled: true
+        - name: diskprediction_local
           enabled: true
 
       mon:
