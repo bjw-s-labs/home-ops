@@ -1,45 +1,53 @@
 ---
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: "Flux Local"
+name: Flux Local
 
 on:
   pull_request:
     branches:
       - main
-    paths:
-      - kubernetes/apps/**
-      - kubernetes/flux/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: Flux Local Test
+  filter-changes:
+    name: Filter changes
     runs-on: ubuntu-latest
+    outputs:
+      any_changed: ${{ steps.changed-files.outputs.any_changed }}
     steps:
-      - name: Generate Token
-        uses: actions/create-github-app-token@v1
-        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
-        id: app-token
-        with:
-          app-id: ${{ secrets.LAB_ASSISTANT_APP_ID }}
-          private-key: ${{ secrets.LAB_ASSISTANT_APP_KEY }}
-
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Get Changed Files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
         with:
-          token: "${{ steps.app-token.outputs.token }}"
+          files: kubernetes/**
+
+  test:
+    if: ${{ needs.filter-changes.outputs.any_changed == 'true' }}
+    name: Flux Local Test
+    runs-on: ubuntu-latest
+    needs:
+      - filter-changes
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Run flux-local test
         uses: docker://ghcr.io/allenporter/flux-local:v7.2.0
         with:
-          args: test --enable-helm --path /github/workspace/kubernetes/flux/cluster
+          args: test --enable-helm --all-namespaces --path /github/workspace/kubernetes/flux/cluster -v
 
   diff:
+    if: ${{ needs.filter-changes.outputs.any_changed == 'true' }}
     name: Flux Local Diff
     runs-on: ubuntu-latest
+    needs:
+      - filter-changes
     permissions:
       pull-requests: write
     strategy:
@@ -50,24 +58,14 @@ jobs:
       max-parallel: 4
       fail-fast: false
     steps:
-      - name: Generate Token
-        uses: actions/create-github-app-token@v1
-        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
-        id: app-token
-        with:
-          app-id: ${{ secrets.LAB_ASSISTANT_APP_ID }}
-          private-key: ${{ secrets.LAB_ASSISTANT_APP_KEY }}
-
       - name: Checkout Pull Request Branch
         uses: actions/checkout@v4
         with:
-          token: "${{ steps.app-token.outputs.token }}"
           path: pull
 
       - name: Checkout Default Branch
         uses: actions/checkout@v4
         with:
-          token: "${{ steps.app-token.outputs.token }}"
           ref: "${{ github.event.repository.default_branch }}"
           path: default
 
@@ -88,29 +86,37 @@ jobs:
       - name: Generate Diff
         id: diff
         run: |
-          cat diff.patch;
           {
               echo 'diff<<EOF'
               cat diff.patch
               echo EOF
-          } >> "$GITHUB_OUTPUT";
+          } >> "${GITHUB_OUTPUT}";
           {
-              echo "### Diff"
+              echo "## Flux ${{ matrix.resources }} diff"
               echo '```diff'
               cat diff.patch
               echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Generate Token
+        uses: actions/create-github-app-token@v1
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository && steps.diff.outputs.diff != '' }}
+        id: app-token
+        with:
+          app-id: ${{ secrets.LAB_ASSISTANT_APP_ID }}
+          private-key: ${{ secrets.LAB_ASSISTANT_APP_KEY }}
 
       - if: ${{ steps.diff.outputs.diff != '' }}
         name: Add comment
         uses: mshick/add-pr-comment@v2
         with:
           repo-token: "${{ steps.app-token.outputs.token }}"
-          message-id: "${{ github.event.pull_request.number }}/main/${{ matrix.resources }}"
+          message-id: "${{ github.event.pull_request.number }}/kubernetes/${{ matrix.resources }}"
           message-failure: Diff was not successful
           message: |
             ```diff
             ${{ steps.diff.outputs.diff }}
+            ```
 
   flux-local-success:
     needs:
