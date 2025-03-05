@@ -30,7 +30,6 @@ jobs:
     outputs:
       default: ${{ steps.extract-images.outputs.default }}
       pull: ${{ steps.extract-images.outputs.pull }}
-      matrix: ""
     steps:
       - name: Generate Token
         uses: actions/create-github-app-token@v1
@@ -54,18 +53,17 @@ jobs:
             --all-namespaces
             --path /github/workspace/kubernetes/flux/cluster
             --enable-images
-            --output yaml
-            --output-file images.yaml
+            --only-images
+            --output json
+            --output-file images.json
 
       - name: Extract Images
         id: extract-images
         run: |
-          images=$(yq --indent=0 --output-format=json \
-              '[.. | .images? | select(. != null)] | flatten | sort | unique' images.yaml \
-          )
-          echo "${{ matrix.branches }}=${images}" >> "$GITHUB_OUTPUT"
+          echo "${{ matrix.branches }}=$(jq --compact-output '.' images.json)" >> "${GITHUB_OUTPUT}"
 
   compare-images:
+    if: ${{ needs.extract-images.outputs.default != needs.extract-images.outputs.pull }}
     name: Compare Images
     runs-on: ubuntu-latest
     needs:
@@ -82,6 +80,13 @@ jobs:
               '$f2 - $f1' \
           )
           echo "images=${images}" >> "${GITHUB_OUTPUT}"
+
+          {
+              echo "## New images to Pull"
+              echo '```json'
+              echo "${images}" | jq
+              echo '```'
+          } >> "${GITHUB_STEP_SUMMARY}"
 
   pre-pull-images:
     if: ${{ needs.compare-images.outputs.images != '[]' }}
