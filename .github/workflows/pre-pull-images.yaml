@@ -1,14 +1,11 @@
 ---
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: "Pre-pull Images"
+name: Pre-pull Images
 
 on:
   pull_request:
     branches:
       - main
-    paths:
-      - kubernetes/apps/**
-      - kubernetes/flux/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
@@ -18,9 +15,27 @@ env:
   HOMEBREW_NO_ANALYTICS: "1"
 
 jobs:
+  filter-changes:
+    name: Filter changes
+    runs-on: ubuntu-latest
+    outputs:
+      any_changed: ${{ steps.changed-files.outputs.any_changed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get Changed Files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: kubernetes/**
+
   extract-images:
+    if: ${{ needs.filter-changes.outputs.any_changed == 'true' }}
     name: Extract Images
     runs-on: ubuntu-latest
+    needs:
+      - filter-changes
     strategy:
       matrix:
         branches:
@@ -30,7 +45,6 @@ jobs:
     outputs:
       default: ${{ steps.extract-images.outputs.default }}
       pull: ${{ steps.extract-images.outputs.pull }}
-      matrix: ""
     steps:
       - name: Generate Token
         uses: actions/create-github-app-token@v1
@@ -47,25 +61,24 @@ jobs:
           ref: "${{ matrix.branches == 'default' && github.event.repository.default_branch || '' }}"
 
       - name: Gather Images
-        uses: docker://ghcr.io/allenporter/flux-local:v7.0.0
+        uses: docker://ghcr.io/allenporter/flux-local:v7.2.0
         with:
           args: >-
             get cluster
             --all-namespaces
             --path /github/workspace/kubernetes/flux/cluster
             --enable-images
-            --output yaml
-            --output-file images.yaml
+            --only-images
+            --output json
+            --output-file images.json
 
       - name: Extract Images
         id: extract-images
         run: |
-          images=$(yq --indent=0 --output-format=json \
-              '[.. | .images? | select(. != null)] | flatten | sort | unique' images.yaml \
-          )
-          echo "${{ matrix.branches }}=${images}" >> "$GITHUB_OUTPUT"
+          echo "${{ matrix.branches }}=$(jq --compact-output '.' images.json)" >> "${GITHUB_OUTPUT}"
 
   compare-images:
+    if: ${{ needs.extract-images.outputs.default != needs.extract-images.outputs.pull }}
     name: Compare Images
     runs-on: ubuntu-latest
     needs:
@@ -83,6 +96,13 @@ jobs:
           )
           echo "images=${images}" >> "${GITHUB_OUTPUT}"
 
+          {
+              echo "## New images to Pull"
+              echo '```json'
+              echo "${images}" | jq
+              echo '```'
+          } >> "${GITHUB_STEP_SUMMARY}"
+
   pre-pull-images:
     if: ${{ needs.compare-images.outputs.images != '[]' }}
     name: Pre-pull Images
@@ -96,11 +116,8 @@ jobs:
       max-parallel: 4
       fail-fast: false
     steps:
-      - name: Setup Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
-
-      - name: Setup Workflow Tools
-        run: brew install siderolabs/tap/talosctl
+      - name: Install talosctl
+        run: curl -fsSL https://talos.dev/install | sh
 
       - name: Pre-pull Image
         run: talosctl -n "$NODE_IP" image pull "${{ matrix.images }}"

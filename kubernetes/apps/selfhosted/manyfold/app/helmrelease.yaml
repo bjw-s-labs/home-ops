@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.7.1
+      version: 3.7.2
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -46,7 +46,7 @@ spec:
           main:
             image:
               repository: ghcr.io/bjw-s-labs/manyfold
-              tag: 0.102.0@sha256:044daea9cad6bca9aeecc0950e1cd149314ece6b44276e2df1ae11abe64297a1
+              tag: 0.103.1@sha256:7fb201b84ed3ecce82b7d44cc24c70ff1fd5f6f3164b15d1359b5e71420c0cce
             env:
               DATABASE_URL: sqlite3:/data/database/manyfold.sqlite3
               MULTIUSER: false
@@ -115,6 +115,7 @@ spec:
 
     service:
       app:
+        primary: true
         controller: manyfold
         ports:
           http:
