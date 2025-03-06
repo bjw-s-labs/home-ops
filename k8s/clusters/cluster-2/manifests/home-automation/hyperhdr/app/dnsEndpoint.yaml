@@ -1,0 +1,14 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: hypderhdr
+spec:
+  endpoints:
+  - dnsName: "hyperhdr.iot.${INGRESS_DOMAIN}"
+    recordTTL: 180
+    recordType: A
+    targets:
+    - 10.10.100.13
+    providerSpecific:
+      - name: external-dns.alpha.kubernetes.io/cloudflare-proxied
+        value: "true"
