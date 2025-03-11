@@ -441,31 +441,40 @@ nodes:
     - *vlan100
     - *vlan2040
 
-- hostname: work9.cluster-2.${secret_domain}
-  ipAddress: work9.cluster-2.${secret_domain}
-  # Rasp Pi Specific factory.talos.dev overlay included
-  # talosImageURL: factory.talos.dev/installer/1302eca2c7075b3419d4a7421915a760f254ca339a827d3cb65b2d37208d4e54
-  talosImageURL: factory.talos.dev/installer/f594d596d58fcb3781e23e5acd191309ff45cd3773ca852760b0e0b309d8e33a
-  controlPlane: false
-  disableSearchDomain: true
+- hostname: n100-08
+  ipAddress: n100-08
   nodeLabels:
     node-role.kubernetes.io/rook-osd-node: "true"
-    node-type: "CM4008032-SOQuartz-Blade"
-  nodeTaints:
-    storage-node: true:NoSchedule
+    node-type: "n150"
+  # customization:
+  #     systemExtensions:
+  #         officialExtensions:
+  #             - siderolabs/amd-ucode
+  #             - siderolabs/i915
+  #             - siderolabs/intel-ucode
+  #             - siderolabs/realtek-firmware
+  #             - siderolabs/thunderbolt
+  talosImageURL: factory.talos.dev/installer/6283eac21dabbcb3ffffcea234a5e0de77e016f1398fa64fafb34c0a4fa16904
+  controlPlane: false
+  disableSearchDomain: true
   installDiskSelector:
-    size: <= 50GB
+    wwid: eui.00000000000000008ce38e0404284da3
   networkInterfaces:
-  # 1G Internal Port
   - interface: bond0
     bond:
-      mode: active-backup
+      mode: 802.3ad
+      lacpRate: fast
+      xmitHashPolicy: layer3+4
+      miimon: 100
+      updelay: 200
+      downdelay: 200
       deviceSelectors:
-      - driver: bcmgenet
-    #        hardwareAddr: d8:3a:dd:bb:1d:77
+      - driver: igc
+        hardwareAddr: a8:b8:e0:04:fa:*
     dhcp: false
     vlans:
     - *vlan2002
+    - *vlan100
     - *vlan2040
 
 controlPlane:
