@@ -77,6 +77,15 @@ spec:
                 service:
                   identifier: app
                   port: http
+      webhooks:
+        className: "external-nginx"
+        hosts:
+          - host: n8n-webhook.bjw-s.dev
+            paths:
+              - path: /webhook
+                service:
+                  identifier: app
+                  port: http
 
     persistence:
       data:
