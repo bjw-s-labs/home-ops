@@ -7,15 +7,9 @@ metadata:
 spec:
   interval: 30m
   timeout: 15m
-  chart:
-    spec:
-      chart: loki
-      version: 6.28.0
-      sourceRef:
-        kind: HelmRepository
-        name: grafana
-        namespace: flux-system
-      interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: loki
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
