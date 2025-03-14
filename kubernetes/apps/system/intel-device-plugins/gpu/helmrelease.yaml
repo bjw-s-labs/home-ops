@@ -6,20 +6,13 @@ metadata:
   name: intel-device-plugins-gpu
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: intel-device-plugins-gpu
-      version: 0.32.0
-      interval: 30m
-      sourceRef:
-        kind: HelmRepository
-        name: intel
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: intel-device-plugins-gpu
   dependsOn:
     - name: intel-device-plugins-operator
       namespace: system
-    - name: node-feature-discovery
-      namespace: system
   values:
-    name: intel-gpu-plugin
-    sharedDevNum: 3
+    name: i915
+    nodeFeatureRule: false
+    sharedDevNum: 5
