@@ -9,7 +9,6 @@ bpf:
   datapathMode: netkit
   masquerade: true
   preallocateMaps: true
-  tproxy: true
 cgroup:
   autoMount:
     enabled: false
@@ -29,9 +28,11 @@ endpointRoutes:
   enabled: true
 envoy:
   enabled: true
+  rollOutPods: true
 gatewayAPI:
   enabled: true
   enableAlpn: true
+  xffNumTrustedHops: 1
 hubble:
   enabled: false
 ipam:
