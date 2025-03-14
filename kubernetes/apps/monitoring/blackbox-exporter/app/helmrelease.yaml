@@ -6,15 +6,9 @@ metadata:
   name: blackbox-exporter
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: prometheus-blackbox-exporter
-      version: 9.3.0
-      sourceRef:
-        kind: HelmRepository
-        name: prometheus-community
-        namespace: flux-system
-      interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: blackbox-exporter
   values:
     fullnameOverride: blackbox-exporter
 
