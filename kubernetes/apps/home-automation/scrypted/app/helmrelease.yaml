@@ -62,23 +62,12 @@ spec:
         controller: scrypted
         ports:
           http:
-            port: 11080
+            port: &port 11080
             primary: true
           rebroadcast1:
             port: 34135
           rebroadcast2:
             port: 34136
-
-    ingress:
-      app:
-        className: "internal-nginx"
-        hosts:
-          - host: scrypted.bjw-s.dev
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
 
     persistence:
       config:
@@ -101,3 +90,16 @@ spec:
         path: /mnt/tank/Apps/scrypted
         globalMounts:
           - path: /recs
+
+    route:
+      app:
+        hostnames:
+          - scrypted.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: scrypted
+                port: *port

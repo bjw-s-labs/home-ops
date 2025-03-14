@@ -50,19 +50,21 @@ spec:
         controller: it-tools
         ports:
           http:
-            port: 8080
-
-    ingress:
-      app:
-        className: "internal-nginx"
-        hosts:
-          - host: it-tools.bjw-s.dev
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+            port: &port 8080
 
     persistence:
       tmp:
         type: emptyDir
+
+    route:
+      app:
+        hostnames:
+          - it-tools.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: it-tools
+                port: *port

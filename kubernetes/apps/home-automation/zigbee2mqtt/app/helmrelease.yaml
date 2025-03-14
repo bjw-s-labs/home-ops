@@ -134,23 +134,6 @@ spec:
           code-server:
             port: 12321
 
-    ingress:
-      app:
-        className: internal-nginx
-        annotations:
-          nginx.ingress.kubernetes.io/rewrite-target: /$1
-        hosts:
-          - host: zigbee2mqtt.bjw-s.dev
-            paths:
-              - path: /(.*)
-                service:
-                  identifier: app
-                  port: http
-              - path: /code/(.*)
-                service:
-                  identifier: app
-                  port: code-server
-
     persistence:
       data:
         existingClaim: zigbee2mqtt-data
@@ -160,3 +143,29 @@ spec:
               - path: /data
             code-server:
               - path: /data
+
+    route:
+      app:
+        hostnames:
+          - zigbee2mqtt.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - matches:
+              - path:
+                  type: PathPrefix
+                  value: /code/
+            filters:
+              - type: URLRewrite
+                urlRewrite:
+                  path:
+                    type: ReplacePrefixMatch
+                    replacePrefixMatch: /
+            backendRefs:
+              - name: zigbee2mqtt
+                port: 12321
+          - backendRefs:
+              - name: zigbee2mqtt
+                port: 8123

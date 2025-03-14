@@ -80,17 +80,6 @@ spec:
           http:
             port: *port
 
-    ingress:
-      app:
-        className: "internal-nginx"
-        hosts:
-          - host: sonarr.bjw-s.dev
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-
     persistence:
       config:
         existingClaim: sonarr-config
@@ -104,3 +93,16 @@ spec:
         path: /mnt/tank/Media
         globalMounts:
           - path: /data/nas-media
+
+    route:
+      app:
+        hostnames:
+          - sonarr.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: sonarr
+                port: *port

@@ -95,17 +95,6 @@ spec:
           http:
             port: *port
 
-    ingress:
-      app:
-        className: "internal-nginx"
-        hosts:
-          - host: sabnzbd.bjw-s.dev
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-
     persistence:
       config:
         existingClaim: sabnzbd-config
@@ -151,3 +140,16 @@ spec:
           sabnzbd:
             app:
               - path: /config/scripts
+
+    route:
+      app:
+        hostnames:
+          - sabnzbd.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: sabnzbd
+                port: *port

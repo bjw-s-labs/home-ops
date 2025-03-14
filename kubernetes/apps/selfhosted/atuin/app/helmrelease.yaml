@@ -65,18 +65,19 @@ spec:
           http:
             port: *port
 
-    ingress:
-      app:
-        enabled: true
-        className: "internal-nginx"
-        hosts:
-          - host: atuin.bjw-s.dev
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-
     persistence:
       config:
         existingClaim: atuin
+
+    route:
+      app:
+        hostnames:
+          - atuin.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: atuin
+                port: *port

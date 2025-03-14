@@ -61,17 +61,6 @@ spec:
           http:
             port: *httpPort
 
-    ingress:
-      app:
-        className: "internal-nginx"
-        hosts:
-          - host: actual.bjw-s.dev
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-
     persistence:
       data:
         existingClaim: actual-data
@@ -79,3 +68,16 @@ spec:
           actual:
             app:
               - path: /data
+
+    route:
+      app:
+        hostnames:
+          - actual.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: actual
+                port: *httpPort

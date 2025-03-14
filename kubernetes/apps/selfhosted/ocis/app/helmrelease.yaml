@@ -80,18 +80,7 @@ spec:
         controller: ocis
         ports:
           http:
-            port: 9200
-
-    ingress:
-      app:
-        className: "external-nginx"
-        hosts:
-          - host: files.bjw-s.dev
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+            port: &port 9200
 
     persistence:
       config:
@@ -113,3 +102,16 @@ spec:
         globalMounts:
           - path: /tmp
             subPath: tmp
+
+    route:
+      app:
+        hostnames:
+          - files.bjw-s.dev
+        parentRefs:
+          - name: external
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: ocis
+                port: *port
