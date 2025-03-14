@@ -6,15 +6,9 @@ metadata:
   name: intel-device-plugins-operator
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: intel-device-plugins-operator
-      version: 0.32.0
-      interval: 30m
-      sourceRef:
-        kind: HelmRepository
-        name: intel
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: intel-device-plugins-operator
   install:
     crds: CreateReplace
   upgrade:
@@ -23,5 +17,6 @@ spec:
     - name: cert-manager
       namespace: cert-manager
   values:
-    controllerExtraArgs: |
-      - --devices=gpu
+    manager:
+      devices:
+        gpu: true
