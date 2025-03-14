@@ -6,12 +6,6 @@ metadata:
   name: prometheus-operator-crds
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: prometheus-operator-crds
-      version: 18.0.1
-      interval: 30m
-      sourceRef:
-        kind: HelmRepository
-        name: prometheus-community
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: prometheus-operator-crds
