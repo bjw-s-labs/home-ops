@@ -52,22 +52,23 @@ spec:
         controller: maintainerr
         ports:
           http:
-            port: 6246
-
-    ingress:
-      app:
-        className: internal-nginx
-        hosts:
-          - host: maintainerr.bjw-s.dev
-            paths:
-              - path: /
-                pathType: Prefix
-                service:
-                  identifier: app
-                  port: http
+            port: &port 6246
 
     persistence:
       data:
         existingClaim: maintainerr-data
         globalMounts:
           - path: /opt/data
+
+    route:
+      app:
+        hostnames:
+          - maintainerr.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: maintainerr
+                port: *port

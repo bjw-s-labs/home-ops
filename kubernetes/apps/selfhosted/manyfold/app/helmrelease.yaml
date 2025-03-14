@@ -122,18 +122,7 @@ spec:
         controller: redis
         ports:
           http:
-            port: 6379
-
-    ingress:
-      app:
-        className: "internal-nginx"
-        hosts:
-          - host: manyfold.bjw-s.dev
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+            port: &port 6379
 
     persistence:
       data:
@@ -158,3 +147,16 @@ spec:
               - path: /app/log
                 subPath: app-log
             chown-tmpdirs: *tmpdirs
+
+    route:
+      app:
+        hostnames:
+          - manyfold.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: manyfold
+                port: *port

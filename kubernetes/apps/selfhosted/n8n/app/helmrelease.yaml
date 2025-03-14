@@ -62,26 +62,6 @@ spec:
           http:
             port: *port
 
-    ingress:
-      app:
-        className: "internal-nginx"
-        hosts:
-          - host: *hostName
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-      webhooks:
-        className: "external-nginx"
-        hosts:
-          - host: n8n-webhook.bjw-s.dev
-            paths:
-              - path: /webhook
-                service:
-                  identifier: app
-                  port: http
-
     persistence:
       data:
         existingClaim: n8n
@@ -89,3 +69,30 @@ spec:
           n8n:
             app:
               - path: /home/node/.n8n
+
+    route:
+      app:
+        hostnames:
+          - *hostName
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: n8n
+                port: *port
+      webhooks:
+        hostnames:
+          - n8n-webhook.bjw-s.dev
+        parentRefs:
+          - name: external
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - matches:
+              - path:
+                  value: /webhook
+            backendRefs:
+              - name: n8n
+                port: *port

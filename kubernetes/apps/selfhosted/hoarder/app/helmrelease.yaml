@@ -136,7 +136,7 @@ spec:
         controller: hoarder
         ports:
           http:
-            port: 3000
+            port: &httpPort 3000
       chrome:
         controller: chrome
         ports:
@@ -147,17 +147,6 @@ spec:
         ports:
           http:
             port: 7700
-
-    ingress:
-      app:
-        className: "internal-nginx"
-        hosts:
-          - host: hoarder.bjw-s.dev
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
 
     persistence:
       data:
@@ -171,3 +160,16 @@ spec:
             app:
               - path: /meili_data
                 subPath: meilisearch
+
+    route:
+      app:
+        hostnames:
+          - hoarder.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: hoarder
+                port: *httpPort

@@ -88,24 +88,6 @@ spec:
           code-server:
             port: 12321
 
-    ingress:
-      app:
-        enabled: true
-        className: "internal-nginx"
-        annotations:
-          nginx.ingress.kubernetes.io/rewrite-target: /$1
-        hosts:
-          - host: hass.bjw-s.dev
-            paths:
-              - path: /(.*)
-                service:
-                  identifier: app
-                  port: http
-              - path: /code/(.*)
-                service:
-                  identifier: app
-                  port: code-server
-
     persistence:
       config:
         existingClaim: home-assistant-config
@@ -134,3 +116,29 @@ spec:
                 subPath: code-server-tmp
               - path: /nonexistent
                 subPath: nonexistent
+
+    route:
+      app:
+        hostnames:
+          - hass.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - matches:
+              - path:
+                  type: PathPrefix
+                  value: /code/
+            filters:
+              - type: URLRewrite
+                urlRewrite:
+                  path:
+                    type: ReplacePrefixMatch
+                    replacePrefixMatch: /
+            backendRefs:
+              - name: home-assistant
+                port: 12321
+          - backendRefs:
+              - name: home-assistant
+                port: 8123

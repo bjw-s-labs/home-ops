@@ -78,16 +78,6 @@ spec:
             port: *port
           health:
             port: *hport
-    ingress:
-      app:
-        className: "external-nginx"
-        hosts:
-          - host: kromgo.bjw-s.dev
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
 
     persistence:
       config-file:
@@ -97,3 +87,16 @@ spec:
           - path: /kromgo/config.yaml
             subPath: config.yaml
             readOnly: true
+
+    route:
+      app:
+        hostnames:
+          - kromgo.bjw-s.dev
+        parentRefs:
+          - name: external
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: kromgo
+                port: *port

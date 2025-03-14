@@ -74,20 +74,7 @@ spec:
           lbipam.cilium.io/ips: 10.1.1.136
         ports:
           http:
-            port: 32400
-
-    ingress:
-      app:
-        annotations:
-          nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-        className: "external-nginx"
-        hosts:
-          - host: plex.bjw-s.dev
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+            port: &port 32400
 
     persistence:
       config:
@@ -123,3 +110,16 @@ spec:
           plex:
             app:
               - path: /transcode
+
+    route:
+      app:
+        hostnames:
+          - plex.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: plex
+                port: *port

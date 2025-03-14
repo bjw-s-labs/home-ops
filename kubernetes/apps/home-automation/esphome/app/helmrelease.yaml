@@ -90,23 +90,6 @@ spec:
           code-server:
             port: 12321
 
-    ingress:
-      app:
-        className: "internal-nginx"
-        annotations:
-          nginx.ingress.kubernetes.io/rewrite-target: /$1
-        hosts:
-          - host: esphome.bjw-s.dev
-            paths:
-              - path: /(.*)
-                service:
-                  identifier: app
-                  port: http
-              - path: /code/(.*)
-                service:
-                  identifier: app
-                  port: code-server
-
     persistence:
       config:
         existingClaim: esphome-config
@@ -137,3 +120,29 @@ spec:
             code-server:
               - path: /home/coder/.ssh/id_ed25519
                 subPath: id_ed25519
+
+    route:
+      app:
+        hostnames:
+          - esphome.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - matches:
+              - path:
+                  type: PathPrefix
+                  value: /code/
+            filters:
+              - type: URLRewrite
+                urlRewrite:
+                  path:
+                    type: ReplacePrefixMatch
+                    replacePrefixMatch: /
+            backendRefs:
+              - name: esphome
+                port: 12321
+          - backendRefs:
+              - name: esphome
+                port: 6052

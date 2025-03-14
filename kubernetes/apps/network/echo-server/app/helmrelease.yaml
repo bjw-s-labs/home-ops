@@ -50,13 +50,15 @@ spec:
           http:
             port: *port
 
-    ingress:
+    route:
       app:
-        className: "internal-nginx"
-        hosts:
-          - host: echo-server.bjw-s.dev
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - echo-server.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: echo-server
+                port: *port

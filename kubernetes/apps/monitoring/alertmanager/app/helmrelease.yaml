@@ -59,18 +59,7 @@ spec:
         controller: alertmanager
         ports:
           http:
-            port: 9093
-
-    ingress:
-      app:
-        className: internal-nginx
-        hosts:
-          - host: alertmanager.bjw-s.dev
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+            port: &port 9093
 
     persistence:
       config:
@@ -83,3 +72,16 @@ spec:
         name: alertmanager-secret
         globalMounts:
           - path: /etc/secrets
+
+    route:
+      app:
+        hostnames:
+          - alertmanager.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: alertmanager
+                port: *port

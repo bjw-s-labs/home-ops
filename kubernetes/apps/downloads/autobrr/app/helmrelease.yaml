@@ -67,17 +67,6 @@ spec:
           http:
             port: *port
 
-    ingress:
-      app:
-        className: internal-nginx
-        hosts:
-          - host: autobrr.bjw-s.dev
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-
     persistence:
       config:
         existingClaim: autobrr
@@ -87,3 +76,16 @@ spec:
           - path: /config/log
       tmp:
         type: emptyDir
+
+    route:
+      app:
+        hostnames:
+          - autobrr.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: autobrr
+                port: *port

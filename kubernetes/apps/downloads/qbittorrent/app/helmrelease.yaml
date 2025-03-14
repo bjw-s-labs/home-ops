@@ -152,17 +152,6 @@ spec:
           http:
             port: *port
 
-    ingress:
-      app:
-        className: "internal-nginx"
-        hosts:
-          - host: qbittorrent.bjw-s.dev
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-
     persistence:
       config:
         enabled: true
@@ -209,3 +198,16 @@ spec:
           qbittorrent:
             app:
               - path: /config/scripts
+
+    route:
+      app:
+        hostnames:
+          - qbittorrent.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: qbittorrent
+                port: *port
