@@ -35,6 +35,7 @@ spec:
       - --crd-source-kind=DNSEndpoint
       - --ignore-ingress-tls-spec
       - --ingress-class=external-nginx
+      - --gateway-label-filter=gateway==external
     podAnnotations:
       secret.reloader.stakater.com/reload: externaldns-cloudflare-secrets
     policy: sync
@@ -49,6 +50,7 @@ spec:
       enabled: true
     sources:
       - ingress
+      - gateway-httproute
       - crd
     triggerLoopOnEvent: true
     txtOwnerId: main
