@@ -103,13 +103,6 @@ spec:
     ### Prometheus instance values
     ###
     prometheus:
-      ingress:
-        enabled: true
-        ingressClassName: internal-nginx
-        hosts:
-          - prometheus.bjw-s.dev
-        pathType: Prefix
-
       prometheusSpec:
         alertingEndpoints:
           - namespace: monitoring
@@ -144,3 +137,13 @@ spec:
                 requests:
                   storage: 55Gi
         walCompression: true
+
+      route:
+        main:
+          enabled: true
+          hostnames:
+            - prometheus.bjw-s.dev
+          parentRefs:
+            - name: internal
+              namespace: kube-system
+              sectionName: https

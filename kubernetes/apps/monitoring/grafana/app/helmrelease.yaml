@@ -56,14 +56,6 @@ spec:
             editable: true
             options:
               path: /var/lib/grafana/dashboards/kubernetes
-          - name: nginx
-            orgId: 1
-            folder: Nginx
-            type: file
-            disableDeletion: false
-            editable: true
-            options:
-              path: /var/lib/grafana/dashboards/nginx
           - name: postgres
             orgId: 1
             folder: Postgres
@@ -204,14 +196,6 @@ spec:
           revision: 14
           datasource: Prometheus
 
-      nginx:
-        nginx:
-          url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
-          datasource: Prometheus
-        nginx-request-handling-performance:
-          url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/request-handling-performance.json
-          datasource: Prometheus
-
       unpoller:
         unifi-insights:
           # renovate: dashboardName="UniFi-Poller: Client Insights - Prometheus"
@@ -287,14 +271,6 @@ spec:
     imageRenderer:
       enabled: true
 
-    ingress:
-      enabled: true
-      ingressClassName: internal-nginx
-      annotations:
-        external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
-      hosts:
-        - grafana.bjw-s.dev
-
     persistence:
       enabled: false
 
@@ -315,6 +291,16 @@ spec:
       requests:
         cpu: 50m
         memory: 128Mi
+
+    route:
+      main:
+        enabled: true
+        hostnames:
+          - grafana.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
 
     serviceAccount:
       create: true

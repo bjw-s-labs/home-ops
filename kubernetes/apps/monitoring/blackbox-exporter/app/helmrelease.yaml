@@ -35,17 +35,6 @@ spec:
           icmp:
             preferred_ip_protocol: "ip4"
 
-    ingress:
-      enabled: true
-      className: internal-nginx
-      annotations:
-        external-dns.alpha.kubernetes.io/target: ingress-int.bjw-s.dev
-      hosts:
-        - host: blackbox-exporter.bjw-s.dev
-          paths:
-            - path: /
-              pathType: Prefix
-
     prometheusRule:
       enabled: true
       additionalLabels:
