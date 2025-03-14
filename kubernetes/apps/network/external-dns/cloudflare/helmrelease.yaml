@@ -34,7 +34,6 @@ spec:
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
       - --ignore-ingress-tls-spec
-      - --ingress-class=external-nginx
       - --gateway-label-filter=gateway==external
     podAnnotations:
       secret.reloader.stakater.com/reload: externaldns-cloudflare-secrets
@@ -49,7 +48,6 @@ spec:
     serviceMonitor:
       enabled: true
     sources:
-      - ingress
       - gateway-httproute
       - crd
     triggerLoopOnEvent: true

@@ -1,11 +1,10 @@
 ---
+originRequest:
+  originServerName: ingress-ext.bjw-s.dev
+
 ingress:
-  - hostname: "bjw-s.dev"
-    service: https://nginx-external-controller.network.svc.cluster.local:443
-    originRequest:
-      originServerName: ingress-ext.bjw-s.dev
+  - hostname: bjw-s.dev
+    service: &svc https://cilium-gateway-external.kube-system.svc.cluster.local
   - hostname: "*.bjw-s.dev"
-    service: https://nginx-external-controller.network.svc.cluster.local:443
-    originRequest:
-      originServerName: ingress-ext.bjw-s.dev
+    service: *svc
   - service: http_status:404

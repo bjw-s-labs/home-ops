@@ -56,7 +56,7 @@ spec:
         controller: go2rtc
         ports:
           api:
-            port: 1984
+            port: &port 1984
             primary: true
           rtsp:
             port: 8554
@@ -73,3 +73,16 @@ spec:
               - path: /config/go2rtc.yaml
                 subPath: go2rtc.yaml
                 readOnly: true
+
+    route:
+      app:
+        hostnames:
+          - go2rtc.bjw-s.dev
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: go2rtc
+                port: *port
