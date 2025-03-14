@@ -6,15 +6,9 @@ metadata:
   name: smartctl-exporter
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: prometheus-smartctl-exporter
-      version: 0.13.0
-      sourceRef:
-        kind: HelmRepository
-        name: prometheus-community
-        namespace: flux-system
-      interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: smartctl-exporter
   values:
     fullnameOverride: smartctl-exporter
 
