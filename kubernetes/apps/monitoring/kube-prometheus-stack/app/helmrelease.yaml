@@ -7,15 +7,9 @@ metadata:
 spec:
   interval: 30m
   timeout: 15m
-  chart:
-    spec:
-      chart: kube-prometheus-stack
-      version: 69.8.2
-      sourceRef:
-        kind: HelmRepository
-        name: prometheus-community
-        namespace: flux-system
-      interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: kube-prometheus-stack
   install:
     crds: Skip
   upgrade:
