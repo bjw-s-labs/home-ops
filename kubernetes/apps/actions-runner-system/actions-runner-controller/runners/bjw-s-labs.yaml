@@ -6,15 +6,9 @@ metadata:
   name: arc-bjw-s-labs
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: actions-runner-controller-charts/gha-runner-scale-set
-      version: 0.10.1
-      sourceRef:
-        kind: HelmRepository
-        name: actions-runner-controller
-        namespace: flux-system
-      interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: gha-runner-scale-set
   driftDetection:
     mode: enabled
   dependsOn:
