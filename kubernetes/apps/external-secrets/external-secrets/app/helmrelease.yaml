@@ -6,15 +6,9 @@ metadata:
   name: external-secrets
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: external-secrets
-      version: 0.14.4
-      interval: 30m
-      sourceRef:
-        kind: HelmRepository
-        name: external-secrets
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: external-secrets
   dependsOn:
     - name: onepassword-connect
       namespace: external-secrets
