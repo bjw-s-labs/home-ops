@@ -6,15 +6,9 @@ metadata:
   name: spegel
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: spegel
-      version: v0.0.30
-      sourceRef:
-        kind: HelmRepository
-        name: spegel
-        namespace: flux-system
-      interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: spegel
   values:
     spegel:
       appendMirrors: true
