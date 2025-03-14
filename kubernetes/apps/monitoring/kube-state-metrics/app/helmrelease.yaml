@@ -6,15 +6,9 @@ metadata:
   name: kube-state-metrics
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: kube-state-metrics
-      version: 5.30.1
-      interval: 30m
-      sourceRef:
-        kind: HelmRepository
-        name: prometheus-community
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: kube-state-metrics
   values:
     fullnameOverride: kube-state-metrics
 
