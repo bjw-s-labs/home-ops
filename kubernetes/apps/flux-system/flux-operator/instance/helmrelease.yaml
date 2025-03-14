@@ -5,14 +5,9 @@ kind: HelmRelease
 metadata:
   name: flux-instance
 spec:
-  chart:
-    spec:
-      chart: flux-instance
-      version: 0.17.0
-      sourceRef:
-        kind: HelmRepository
-        name: controlplaneio
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: flux-instance
   interval: 30m
   valuesFrom:
     - kind: ConfigMap
