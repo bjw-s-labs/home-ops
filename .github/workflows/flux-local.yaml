@@ -23,11 +23,11 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: .github/actions/get-changed-files
+        uses: ./.github/actions/get-changed-files
         with:
           matchers: |
-            ^kubernetes/.*
-
+            ^kubernetesz/.*
+            helmrelease.yaml
   # test:
   #   if: ${{ needs.filter-changes.outputs.any_changed == 'true' }}
   #   name: Flux Local Test

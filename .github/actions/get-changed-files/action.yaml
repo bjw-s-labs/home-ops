@@ -30,7 +30,7 @@ runs:
               }
             });
           } else {
-              const { data: commits } = await github.repos.compareCommits({
+              const { data: commits } = await github.rest.repos.compareCommits({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 base: context.payload.before,
