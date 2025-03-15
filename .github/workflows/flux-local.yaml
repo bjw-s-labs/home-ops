@@ -16,19 +16,20 @@ jobs:
     name: Filter changes
     runs-on: ubuntu-latest
     outputs:
-      any_changed: ${{ steps.changed-files.outputs.any_changed }}
+      changed-files: ${{ steps.changed-files.outputs.filtered_files }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Get Changed Files
+      - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v45
+        uses: ./.github/actions/get-changed-files
         with:
-          files: kubernetes/**
+          matchers: |-
+            ^kubernetes/.*
 
   test:
-    if: ${{ needs.filter-changes.outputs.any_changed == 'true' }}
+    if: ${{ needs.filter-changes.outputs.changed-files != '[]' }}
     name: Flux Local Test
     runs-on: ubuntu-latest
     needs:
@@ -43,7 +44,7 @@ jobs:
           args: test --enable-helm --all-namespaces --path /github/workspace/kubernetes/flux/cluster -v
 
   diff:
-    if: ${{ needs.filter-changes.outputs.any_changed == 'true' }}
+    if: ${{ needs.filter-changes.outputs.changed-files != '[]' }}
     name: Flux Local Diff
     runs-on: ubuntu-latest
     needs:
