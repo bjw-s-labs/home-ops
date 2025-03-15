@@ -32,7 +32,7 @@ jobs:
         uses: bjw-s/action-actionlint@v0.1
         with:
           actionlint_config: .github/actionlint.yaml
-          file_pattern: ${{ join(steps.changed-files.outputs.filtered_files, ' ') }}
+          file_pattern: ${{ join(fromJSON(steps.changed-files.outputs.filtered_files), ' ') }}
 
   yamllint:
     name: yamllint
@@ -55,10 +55,10 @@ jobs:
           pip install --user yamllint
 
       - name: Run yamllint
-        if: steps.changed-files.outputs.any_changed != '[]'
+        if: steps.changed-files.outputs.filtered_files != '[]'
         shell: bash
         run: |
-          yamllint --config-file .yamllint.yaml --format github ${{ join(steps.changed-files.outputs.filtered_files, ' ') }}
+          yamllint --config-file .yamllint.yaml --format github ${{ join(fromJSON(steps.changed-files.outputs.filtered_files), ' ') }}
 
   markdownlint:
     name: markdownlint
@@ -75,11 +75,11 @@ jobs:
             ^.+\.md$
 
       - name: Run markdownlint-cli2
-        if: steps.changed-files.outputs.any_changed != '[]'
+        if: steps.changed-files.outputs.filtered_files != '[]'
         uses: bjw-s/action-markdownlint-cli2@v0.1
         with:
           markdownlint_config: .markdownlint.yaml
-          file_pattern: ${{ join(steps.changed-files.outputs.filtered_files, ' ') }}
+          file_pattern: ${{ join(fromJSON(steps.changed-files.outputs.filtered_files), ' ') }}
 
   prettier:
     name: prettier
@@ -93,12 +93,12 @@ jobs:
         uses: ./.github/actions/get-changed-files
 
       - name: Run prettier
-        if: steps.changed-files.outputs.any_changed != '[]'
+        if: steps.changed-files.outputs.filtered_files != '[]'
         uses: bjw-s/action-prettier-lint@v0.1
         with:
           prettier_ignore: .prettierignore
           prettier_config: .prettierrc.yaml
-          file_pattern: ${{ join(steps.changed-files.outputs.filtered_files, ' ') }}
+          file_pattern: ${{ join(fromJSON(steps.changed-files.outputs.filtered_files), ' ') }}
 
   lint_success:
     needs:
