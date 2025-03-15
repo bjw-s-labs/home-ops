@@ -4,7 +4,7 @@ description: "Get the changed files in a pull request or other event"
 inputs:
   matchers:
     description: "Regexes to match the files against"
-    required: false
+    required: true
     default: ".*"
 
 runs:
@@ -15,7 +15,7 @@ runs:
       uses: actions/github-script@v7
       with:
         script: |
-          input_matchers = '${{ inputs.path }}';
+          input_matchers = `${{ inputs.matchers }}`;
           matchers = input_matchers.split('\n');
           output = [];
           if (github.event_name === 'pull_request') {
@@ -42,4 +42,6 @@ runs:
               }
             });
           }
+          console.log("Changed files:");
+          console.log(output);
           return output;
