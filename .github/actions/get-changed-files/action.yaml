@@ -6,6 +6,10 @@ inputs:
     description: "Regexes to match the files against"
     required: true
     default: ".*"
+outputs:
+  filtered_files:
+    description: "The filtered list of changed files"
+    value: ${{ steps.changed-files.outputs.result }}
 
 runs:
   using: "composite"
