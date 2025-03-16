@@ -19,10 +19,11 @@ runs:
       uses: actions/github-script@v7
       with:
         script: |
+          console.log(`eventName: ${context.eventName}`);
           input_matchers = `${{ inputs.matchers }}`;
           matchers = input_matchers.split('\n');
           output = [];
-          if (github.event_name === 'pull_request') {
+          if (context.eventName === 'pull_request') {
             const { data: files } = await github.rest.pulls.listFiles({
               owner: context.repo.owner,
               repo: context.repo.repo,
