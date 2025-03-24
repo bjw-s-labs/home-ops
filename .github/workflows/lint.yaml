@@ -30,7 +30,7 @@ jobs:
 
       - name: Run actionlint
         if: steps.changed-files.outputs.changed_files != '[]'
-        uses: bjw-s/action-actionlint@83d0aa4dfef4ebecbdd304776e133f5936ff7358 # v0.1.0
+        uses: bjw-s/action-actionlint@b346813e82708106544f48a93a5b3fbeeb8e37eb # v0.1.1
         with:
           actionlint_config: .github/actionlint.yaml
           file_pattern: ${{ join(fromJSON(steps.changed-files.outputs.changed_files), ' ') }}
