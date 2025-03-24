@@ -2,74 +2,78 @@
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   packageRules: [
     {
-      description: "Rook-Ceph image and chart",
-      groupName: "Rook Ceph",
-      matchPackagePatterns: ["rook.ceph"],
-      matchDatasources: ["docker", "helm"],
-      group: {
-        commitMessageTopic: "{{{groupName}}} group",
-        commitMessageSuffix: ""
-      },
-    },
-    {
-      description: "Cilium image and chart",
-      groupName: "cilium",
-      matchPackageNames: [
-        "quay.io/cilium/cilium",
-        "quay.io/cilium/operator-generic",
-        "cilium",
-      ],
-      matchDatasources: ["helm", "docker"],
-      group: {
-        commitMessageTopic: "{{{groupName}}} group",
-        commitMessageSuffix: ""
-      },
-    },
-    {
-      description: "Actions Runner Controller charts",
-      groupName: "ARC",
+      description: "Actions Runner Controller Group",
+      groupName: "Actions Runner Controller",
+      matchDatasources: ["docker"],
       matchPackageNames: [
         "actions-runner-controller-charts/gha-runner-scale-set-controller",
         "actions-runner-controller-charts/gha-runner-scale-set",
       ],
-      matchDatasources: ["helm", "docker"],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
-        commitMessageSuffix: ""
       },
-      separateMinorPatch: false,
     },
     {
-      description: "Talos",
-      groupName: "Talos",
-      matchPackageNames: [
-        "ghcr.io/siderolabs/installer",
-        "ghcr.io/siderolabs/talosctl",
-      ],
+      "description": ["Cert-Manager Group"],
+      "groupName": "Cert-Manager",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["/cert-manager/"],
+      "group": {
+        "commitMessageTopic": "{{{groupName}}} group"
+      }
+    },
+    {
+      "description": ["Cilium Group"],
+      "groupName": "Cilium",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["/cilium/"],
+      "group": {
+        "commitMessageTopic": "{{{groupName}}} group"
+      }
+    },
+    {
+      description: "CoreDNS Group",
+      groupName: "CoreDNS",
       matchDatasources: ["docker"],
+      matchPackageNames: ["/coredns/"],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
-        commitMessageSuffix: ""
       },
     },
     {
-      description: "silence-operator image and CRD",
-      groupName: "silence-operator",
-      matchPackagePatterns: ["silence-operator"],
+      description: "External Secrets Operator Group",
+      groupName: "External Secrets Operator",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/external-secrets/"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "Flux Operator Group",
+      groupName: "Flux Operator",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/flux-operator/", "/flux-instance/"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "Rook-Ceph Group",
+      groupName: "Rook-Ceph",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/rook-ceph/", "/rook-ceph-cluster/"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "Silence-Operator Group",
+      groupName: "Silence-Operator",
+      matchPackageNames: ["/silence-operator/"],
       matchDatasources: ["docker", "github-releases"],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
-        commitMessageSuffix: ""
-      },
-    },
-    {
-      description: ["Flux Operator Group"],
-      groupName: "Flux Operator",
-      matchPackagePatterns: ["flux-operator", "flux-instance"],
-      matchDatasources: ["docker"],
-      group: {
-        commitMessageTopic: "{{{groupName}}} group",
-        commitMessageSuffix: ""
       },
     },
   ],
