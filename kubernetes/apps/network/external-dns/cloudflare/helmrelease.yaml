@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: external-dns
-      version: 1.15.2
+      version: 1.16.0
       sourceRef:
         kind: HelmRepository
         name: external-dns-cloudflare
@@ -34,7 +34,7 @@ spec:
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
       - --ignore-ingress-tls-spec
-      - --gateway-label-filter=gateway==external
+      - --gateway-name=external
     podAnnotations:
       secret.reloader.stakater.com/reload: externaldns-cloudflare-secrets
     policy: sync
