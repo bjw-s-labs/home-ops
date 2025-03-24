@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: external-dns
-      version: 1.16.0
+      version: 1.15.2
       sourceRef:
         kind: HelmRepository
         name: external-dns-unifi
@@ -17,6 +17,9 @@ spec:
 
   values:
     fullnameOverride: &name externaldns-unifi
+    image: # TODO: Remove this block when new chart version is released
+      repository: registry.k8s.io/external-dns/external-dns
+      tag: v0.16.1
     domainFilters:
       - bjw-s.dev
     extraArgs:
