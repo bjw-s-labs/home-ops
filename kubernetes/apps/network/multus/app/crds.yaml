@@ -1,0 +1,32 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/refs/heads/main/gitrepository-source-v1.json
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: multus-crd
+spec:
+  interval: 30m
+  url: https://github.com/k8snetworkplumbingwg/network-attachment-definition-client
+  ref:
+    # renovate: depName=k8snetworkplumbingwg/network-attachment-definition-client datasource=github-releases
+    tag: v1.7.5
+  ignore: |
+    # exclude
+    /*
+    # include
+    !artifacts/networks-crd.yaml
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: multus-crd
+spec:
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: multus-crd
+  wait: true
+  interval: 15m
+  retryInterval: 1m
+  timeout: 5m
