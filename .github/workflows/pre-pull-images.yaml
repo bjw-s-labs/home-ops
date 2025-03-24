@@ -109,6 +109,17 @@ jobs:
       max-parallel: 4
       fail-fast: false
     steps:
+      - name: Attest
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          case "${{ matrix.image }}" in
+            *home-operations*)
+              gh attestation verify --owner home-operations oci://${{ matrix.image }} ;;
+            *bjw-s-labs*)
+              gh attestation verify --owner bjw-s-labs oci://${{ matrix.image }} ;;
+          esac
+
       # - name: Install talosctl
       #   run: curl -fsSL https://talos.dev/install | sh
 
