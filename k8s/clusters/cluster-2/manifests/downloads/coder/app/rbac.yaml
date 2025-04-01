@@ -17,11 +17,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: k9s
 rules:
-  # Grants RO access to cluster resources node and namespace
+  # Grants access to cluster resources node and namespace
   - apiGroups: ["", "apps", "batch", "storage.k8s.io"]  # "" indicates the core API group
     # resources: ["nodes", "namespaces", "pods", ]
     resources: ["*"]
-    verbs: ["get", "list", "watch", "create", "delete"]
+    verbs: ["get", "list", "watch", "create", "delete", "update", "patch"]
   # Grants RO access to RBAC resources
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterroles", "roles", "clusterrolebindings", "rolebindings"]
