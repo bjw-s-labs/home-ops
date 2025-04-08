@@ -98,7 +98,7 @@ jobs:
           } >> "${GITHUB_STEP_SUMMARY}"
 
       - name: Generate Token
-        uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
+        uses: actions/create-github-app-token@3ff1caaa28b64c9cc276ce0a02e2ff584f3900c5 # v2.0.2
         if: ${{ github.event.pull_request.head.repo.full_name == github.repository && steps.diff.outputs.diff != '' }}
         id: app-token
         with:
@@ -110,7 +110,7 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@52423e01640425a022ef5fd42c6fb5f633a02728 # v2.9.1
         with:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-          header: ${{ github.event.pull_request.number }}/kubernetes/${{ matrix.resource }}
+          header: ${{ github.event.pull_request.number }}/kubernetes/${{ matrix.resources }}
           message: |
             ```diff
             ${{ steps.diff.outputs.diff }}
