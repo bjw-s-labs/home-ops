@@ -3,7 +3,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname hoarder
+  name: &appname karakeep
   namespace: &namespace selfhosted
 spec:
   targetNamespace: *namespace
@@ -12,7 +12,7 @@ spec:
       app.kubernetes.io/name: *appname
   interval: 30m
   timeout: 5m
-  path: "./kubernetes/apps/selfhosted/hoarder/app"
+  path: "./kubernetes/apps/selfhosted/karakeep/app"
   prune: true
   sourceRef:
     kind: GitRepository
@@ -29,4 +29,4 @@ spec:
   postBuild:
     substitute:
       APP: *appname
-      VOLSYNC_CLAIM: hoarder-data
+      VOLSYNC_CLAIM: karakeep-data
