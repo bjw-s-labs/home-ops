@@ -7,13 +7,9 @@ metadata:
 spec:
   interval: 30m
   releaseName: rook-ceph
-  chart:
-    spec:
-      chart: rook-ceph
-      version: v1.16.5
-      sourceRef:
-        kind: HelmRepository
-        name: rook-ceph
+  chartRef:
+    kind: OCIRepository
+    name: rook-ceph
   values:
     crds:
       enabled: true
