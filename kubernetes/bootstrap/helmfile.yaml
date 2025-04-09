@@ -2,53 +2,74 @@
 # yaml-language-server: $schema=https://json.schemastore.org/helmfile
 
 helmDefaults:
+  cleanupOnFail: true
   wait: true
   waitForJobs: true
-  timeout: 600
-  recreatePods: true
-  force: true
 
 repositories:
   - name: cilium
     url: https://helm.cilium.io
-  - name: jetstack
-    url: https://charts.jetstack.io
 
 releases:
   - name: prometheus-operator-crds
     namespace: monitoring
+    atomic: true
     chart: oci://ghcr.io/prometheus-community/charts/prometheus-operator-crds
     version: 19.0.0
 
   - name: cilium
     namespace: kube-system
+    atomic: true
     chart: cilium/cilium
     version: 1.17.2
     values:
-      - ../apps/kube-system/cilium/app/values.yaml
+      - '{{ requiredEnv "ROOT_DIR" }}/kubernetes/apps/kube-system/cilium/app/values.yaml'
     needs:
       - monitoring/prometheus-operator-crds
+    hooks:
+      - # Wait for cilium CRDs to be available
+        events:
+          - postsync
+        command: bash
+        args:
+          - -c
+          - until kubectl get crd ciliumbgppeeringpolicies.cilium.io ciliuml2announcementpolicies.cilium.io ciliumloadbalancerippools.cilium.io &>/dev/null; do sleep 10; done
+        showlogs: true
+      - # Apply cilium network configuration
+        events:
+          - postsync
+        command: kubectl
+        args:
+          - apply
+          - --namespace=kube-system
+          - --server-side
+          - --field-manager=kustomize-controller
+          - --kustomize={{ requiredEnv "ROOT_DIR" }}/kubernetes/apps/kube-system/cilium/config/
+        showlogs: true
 
   - name: coredns
     namespace: kube-system
+    atomic: true
     chart: oci://ghcr.io/coredns/charts/coredns
     version: 1.39.2
     values:
-      - ../apps/kube-system/coredns/app/values.yaml
+      - '{{ requiredEnv "ROOT_DIR" }}/kubernetes/apps/kube-system/coredns/app/values.yaml'
     needs:
       - kube-system/cilium
 
   - name: cert-manager
     namespace: cert-manager
-    chart: jetstack/cert-manager
+    atomic: true
+    chart: oci://quay.io/jetstack/charts/cert-manager
     version: v1.17.1
     values:
-      - ../apps/cert-manager/cert-manager/app/values.yaml
+      - '{{ requiredEnv "ROOT_DIR" }}/kubernetes/apps/cert-manager/cert-manager/app/values.yaml'
     needs:
       - kube-system/coredns
 
   - name: wipe-rook
     namespace: kube-system
+    atomic: true
     chart: oci://ghcr.io/bjw-s/helm/app-template
     version: 3.7.3
     values:
@@ -58,19 +79,21 @@ releases:
 
   - name: flux-operator
     namespace: flux-system
+    atomic: true
     chart: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator
     version: 0.18.0
     values:
-      - ../apps/flux-system/flux-operator/app/values.yaml
+      - '{{ requiredEnv "ROOT_DIR" }}/kubernetes/apps/flux-system/flux-operator/app/values.yaml'
     needs:
       - kube-system/wipe-rook
 
   - name: flux-instance
     namespace: flux-system
+    atomic: true
     chart: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-instance
     version: 0.18.0
     wait: false
     values:
-      - ../apps/flux-system/flux-operator/instance/values.yaml
+      - '{{ requiredEnv "ROOT_DIR" }}/kubernetes/apps/flux-system/flux-operator/instance/values.yaml'
     needs:
       - flux-system/flux-operator
