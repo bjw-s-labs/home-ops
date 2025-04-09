@@ -6,14 +6,9 @@ metadata:
   name: cert-manager
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: cert-manager
-      version: v1.17.1
-      sourceRef:
-        kind: HelmRepository
-        name: jetstack
-      interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: cert-manager
   install:
     crds: CreateReplace
   upgrade:
