@@ -34,7 +34,9 @@ servers:
       - name: forward
         parameters: . /etc/resolv.conf
       - name: cache
-        parameters: 30
+        configBlock: |-
+          prefetch 20
+          serve_stale
       - name: loop
       - name: reload
       - name: loadbalance
