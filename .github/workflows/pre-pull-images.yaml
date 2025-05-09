@@ -51,6 +51,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: "${{ matrix.branches == 'default' && github.event.repository.default_branch || '' }}"
+          persist-credentials: false
 
       - name: Gather Images
         uses: docker://ghcr.io/allenporter/flux-local:v7.5.0
@@ -105,29 +106,31 @@ jobs:
       - compare-images
     strategy:
       matrix:
-        images: ${{ fromJSON(needs.compare-images.outputs.images) }}
+        image: ${{ fromJSON(needs.compare-images.outputs.images) }}
       max-parallel: 4
       fail-fast: false
+    env:
+      MATRIX_IMAGE: ${{ matrix.image }}
     steps:
       - name: Attest
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          case "${{ matrix.image }}" in
+          case "${{ matrix.images }}" in
             *home-operations*)
-              gh attestation verify --owner home-operations oci://${{ matrix.image }} ;;
+              gh attestation verify --owner home-operations oci://${MATRIX_IMAGE} ;;
             *bjw-s-labs*)
-              gh attestation verify --owner bjw-s-labs oci://${{ matrix.image }} ;;
+              gh attestation verify --owner bjw-s-labs oci://${MATRIX_IMAGE} ;;
           esac
 
       # - name: Install talosctl
       #   run: curl -fsSL https://talos.dev/install | sh
 
       # - name: Pre-pull Image
-      #   run: talosctl -n "$NODE_IP" image pull "${{ matrix.images }}"
+      #   run: talosctl -n "$NODE_IP" image pull "${MATRIX_IMAGE}"
 
       - name: Try to pull Image
-        run: docker pull "${{ matrix.images }}"
+        run: docker pull "${MATRIX_IMAGE}"
 
   pre-pull-images-success:
     if: ${{ !cancelled() }}
