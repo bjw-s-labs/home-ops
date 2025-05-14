@@ -11,34 +11,11 @@ spec:
     name: app-template
     namespace: flux-system
   values:
-    configMaps:
-      config:
-        enabled: true
-        data:
-          config.yml: |
-            server:
-              enable:
-                debug:
-                  server: true
-              listen:
-                address: 'http://0.0.0.0:8000'
-            service:
-              alertmanager:
-                address: http://alertmanager.monitoring.svc.cluster.local:9093
-              kubernetes:
-                address: ''
-                inCluster: true
-                tls:
-                  caFile: ''
-                  crtFile: ''
-                  keyFile: ''
-
     controllers:
       silence-operator:
         pod:
           securityContext:
-            runAsGroup: 1000
-            runAsUser: 1000
+            runAsUser: 65534
             runAsNonRoot: true
 
         containers:
@@ -47,9 +24,9 @@ spec:
               repository: quay.io/giantswarm/silence-operator
               tag: 0.15.0
             args:
-              - daemon
-              - --config.dirs=/var/run/silence-operator/configmap/
-              - --config.files=config
+              - --leader-elect
+              - --metrics-bind-address=:8080
+              - --alertmanager-address=http://alertmanager.monitoring.svc.cluster.local:9093
             probes:
               liveness:
                 enabled: true
@@ -57,7 +34,7 @@ spec:
                 spec:
                   httpGet:
                     path: /healthz
-                    port: &port 8000
+                    port: 8081
                   initialDelaySeconds: 15
                   periodSeconds: 20
                   timeoutSeconds: 1
@@ -69,22 +46,15 @@ spec:
             resources:
               requests:
                 cpu: 10m
-                memory: 128Mi
+                memory: 50Mi
               limits:
-                memory: 256Mi
+                memory: 128Mi
             securityContext:
               allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
               capabilities:
                 drop:
-                  - "ALL"
-
-    persistence:
-      config:
-        enabled: true
-        type: configMap
-        identifier: config
-        globalMounts:
-          - path: /var/run/silence-operator/configmap
+                  - ALL
 
     serviceAccount:
       create: true
