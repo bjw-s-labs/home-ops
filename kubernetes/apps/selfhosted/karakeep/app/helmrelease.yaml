@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.7.3
+      version: 4.0.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s-labs
@@ -28,6 +28,7 @@ spec:
 
     controllers:
       karakeep:
+        forceRename: karakeep
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
@@ -108,7 +109,7 @@ spec:
                         operator: In
                         values:
                           - karakeep
-                      - key: app.kubernetes.io/component
+                      - key: app.kubernetes.io/controller
                         operator: In
                         values:
                           - karakeep
@@ -136,6 +137,7 @@ spec:
 
     service:
       app:
+        forceRename: karakeep
         primary: true
         controller: karakeep
         ports:
@@ -175,5 +177,5 @@ spec:
             sectionName: https
         rules:
           - backendRefs:
-              - name: karakeep
+              - identifier: app
                 port: *httpPort

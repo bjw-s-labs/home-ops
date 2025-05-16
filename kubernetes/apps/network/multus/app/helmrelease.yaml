@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.7.3
+      version: 4.0.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s-labs
@@ -45,6 +45,8 @@ spec:
                 memory: "512Mi"
             securityContext:
               privileged: true
+        serviceAccount:
+          identifier: multus
 
     persistence:
       etc-cni-net-d:
@@ -59,5 +61,4 @@ spec:
           - path: /host/opt/cni/bin
 
     serviceAccount:
-      create: true
-      name: multus
+      multus: {}
