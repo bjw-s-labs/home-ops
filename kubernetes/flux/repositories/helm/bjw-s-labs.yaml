@@ -4,7 +4,12 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
   name: bjw-s-labs
+  namespace: flux-system
+# spec:
+#   type: oci
+#   interval: 30m
+#   url: oci://ghcr.io/bjw-s-labs/helm
 spec:
-  type: oci
   interval: 30m
-  url: oci://ghcr.io/bjw-s-labs/helm
+  url: https://bjw-s-labs.github.io/helm-charts/
+  timeout: 3m
