@@ -6,10 +6,14 @@ metadata:
   name: qbtools
 spec:
   interval: 30m
-  chartRef:
-    kind: OCIRepository
-    name: app-template
-    namespace: flux-system
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-labs
+        namespace: flux-system
   dependsOn:
     - name: qbittorrent
       namespace: downloads
