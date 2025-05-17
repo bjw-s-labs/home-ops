@@ -1,0 +1,136 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: vernemq
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.0.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-labs
+        namespace: flux-system
+  values:
+    controllers:
+      vernemq:
+        type: statefulset
+        strategy: RollingUpdate
+        replicas: 2
+
+        annotations:
+          secret.reloader.stakater.com/reload: vernemq-auth-secret
+
+        pod:
+          securityContext:
+            runAsUser: 10000
+            runAsNonRoot: true
+
+        containers:
+          app:
+            image:
+              repository: vernemq/vernemq
+              tag: 2.0.1-alpine
+            env:
+              MY_POD_NAME:
+                valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.name
+              DOCKER_VERNEMQ_ACCEPT_EULA: "yes"
+              DOCKER_VERNEMQ_DISCOVERY_KUBERNETES: 1
+              DOCKER_VERNEMQ_KUBERNETES_LABEL_SELECTOR: "app.kubernetes.io/name=vernemq"
+            envFrom:
+              - secretRef:
+                  name: vernemq-auth-secret
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health/ping
+                    port: 8888
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+              readiness: *probes
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+
+        serviceAccount:
+          identifier: vernemq
+
+    service:
+      app:
+        type: LoadBalancer
+        annotations:
+          external-dns.alpha.kubernetes.io/hostname: "mqtt.bjw-s.dev."
+          lbipam.cilium.io/ips: 10.1.1.135
+        ports:
+          mqtt:
+            port: 1883
+          ws:
+            port: 8080
+      headless:
+        forceRename: "{{ .Release.Name }}" # TODO: Fix this when app-template 4.1.0 is released
+        publishNotReadyAddresses: true
+        clusterIP: None
+        ports:
+          mqtt:
+            port: 1883
+          ws:
+            port: 8080
+
+    persistence:
+      data:
+        type: emptyDir
+        globalMounts:
+          - path: /vernemq/data
+      log:
+        type: emptyDir
+        globalMounts:
+          - path: /vernemq/log
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+
+    serviceAccount:
+      vernemq: {}
+
+    rbac:
+      roles:
+        vernemq:
+          type: Role
+          rules:
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - get
+                - list
+            - apiGroups:
+                - apps
+              resources:
+                - statefulsets
+              verbs:
+                - get
+      bindings:
+        vernemq:
+          type: RoleBinding
+          roleRef:
+            identifier: vernemq
+          subjects:
+            - identifier: vernemq
