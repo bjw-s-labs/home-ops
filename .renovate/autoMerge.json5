@@ -11,10 +11,11 @@
     },
     {
       description: "Auto merge KPS minors and patches",
-      matchDatasources: ["helm", "docker"],
+      matchDatasources: ["docker"],
       automerge: true,
+      automergeType: "pr",
       matchUpdateTypes: ["minor", "patch"],
-      matchDepNames: ["kube-prometheus-stack"],
+      matchPackageNames: ["/kube-prometheus-stack/"],
       ignoreTests: false,
     },
   ],
