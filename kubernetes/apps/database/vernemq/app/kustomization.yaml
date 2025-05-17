@@ -2,10 +2,6 @@
 # yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: database
 resources:
-  # - ./emqx/ks.yaml
-  - ./vernemq/ks.yaml
-components:
-  - ../../components/namespace
-  - ../../components/flux/alerts
+  - ./helmrelease.yaml
+  - ./externalsecret.yaml
