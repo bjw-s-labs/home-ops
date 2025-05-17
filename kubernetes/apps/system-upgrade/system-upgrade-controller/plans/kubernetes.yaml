@@ -6,14 +6,13 @@ metadata:
 spec:
   version: ${KUBERNETES_VERSION}
   concurrency: 1
-  postCompleteDelay: 30s
   exclusive: true
   nodeSelector:
     matchExpressions:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists
   secrets:
-    - name: system-upgrade
+    - name: system-upgrade-controller
       path: /var/run/secrets/talos.dev
       ignoreUpdates: true
   serviceAccountName: system-upgrade-controller
