@@ -42,6 +42,7 @@ spec:
               DOCKER_VERNEMQ_ACCEPT_EULA: "yes"
               DOCKER_VERNEMQ_DISCOVERY_KUBERNETES: 1
               DOCKER_VERNEMQ_KUBERNETES_LABEL_SELECTOR: "app.kubernetes.io/name=vernemq"
+              DOCKER_VERNEMQ_LEVELDB__MAXIMUM_MEMORY: '200000000' # in bytes
             envFrom:
               - secretRef:
                   name: vernemq-auth-secret
