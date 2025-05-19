@@ -55,3 +55,13 @@ spec:
 
     serviceAccount:
       system-upgrade-controller: {}
+
+    rbac:
+      bindings:
+        system-upgrade-controller:
+          type: ClusterRoleBinding
+          roleRef:
+            kind: ClusterRole
+            name: cluster-admin
+          subjects:
+            - identifier: system-upgrade-controller
