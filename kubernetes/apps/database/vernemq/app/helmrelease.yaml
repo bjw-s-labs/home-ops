@@ -42,7 +42,15 @@ spec:
               DOCKER_VERNEMQ_ACCEPT_EULA: "yes"
               DOCKER_VERNEMQ_DISCOVERY_KUBERNETES: 1
               DOCKER_VERNEMQ_KUBERNETES_LABEL_SELECTOR: "app.kubernetes.io/name=vernemq"
-              DOCKER_VERNEMQ_LEVELDB__MAXIMUM_MEMORY: '200000000' # in bytes
+              DOCKER_VERNEMQ_LEVELDB__MAXIMUM_MEMORY: '10485760' # in bytes
+              DOCKER_VERNEMQ_LEVELDB__WRITE_BUFFER_SIZE_MIN: '1048576'
+              DOCKER_VERNEMQ_LEVELDB__WRITE_BUFFER_SIZE_MAX: '2097152'
+              # allow clients to failover when pods are restarting
+              DOCKER_VERNEMQ_ALLOW_REGISTER_DURING_NETSPLIT: 'on'
+              DOCKER_VERNEMQ_ALLOW_PUBLISH_DURING_NETSPLIT: 'on'
+              DOCKER_VERNEMQ_ALLOW_SUBSCRIBE_DURING_NETSPLIT: 'on'
+              DOCKER_VERNEMQ_ALLOW_UNSUBSCRIBE_DURING_NETSPLIT: 'on'
+
             envFrom:
               - secretRef:
                   name: vernemq-auth-secret
@@ -57,12 +65,27 @@ spec:
                   periodSeconds: 10
                   timeoutSeconds: 5
               readiness: *probes
+              startup:
+                <<: *probes
+                spec:
+                  exec:
+                    command:
+                      # vernemq immediately reports healthy, even before retained messages are replicated
+                      # so we need to make sure all nodes have the same num_replicated on startup
+                      # see https://github.com/vernemq/docker-vernemq/issues/255
+                      - /bin/sh
+                      - -c
+                      - >-
+                        curl -s localhost:8888/status.json |
+                        jq -e '.[0] | [to_entries.[].value.num_retained] | .[0] as $x | all(.[]; . == $x)'
+                  periodSeconds: 10
+                  timeoutSeconds: 5
             resources:
               requests:
                 cpu: 40m
-                memory: 380Mi
+                memory: 128Mi
               limits:
-                memory: 512Mi
+                memory: 256Mi
             securityContext:
               allowPrivilegeEscalation: false
               capabilities:
@@ -75,6 +98,7 @@ spec:
     service:
       app:
         type: LoadBalancer
+        sessionAffinity: ClientIP
         annotations:
           external-dns.alpha.kubernetes.io/hostname: "mqtt.bjw-s.dev."
           lbipam.cilium.io/ips: 10.1.1.135
