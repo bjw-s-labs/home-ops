@@ -6,61 +6,20 @@ metadata:
   name: silence-operator
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: app-template
-      version: 4.0.1
-      sourceRef:
-        kind: HelmRepository
-        name: bjw-s-labs
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: silence-operator
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
   values:
-    controllers:
-      silence-operator:
-        pod:
-          securityContext:
-            runAsUser: 65534
-            runAsNonRoot: true
-
-        containers:
-          silence-operator:
-            image:
-              repository: quay.io/giantswarm/silence-operator
-              tag: 0.16.1
-            args:
-              - --leader-elect
-              - --metrics-bind-address=:8080
-              - --alertmanager-address=http://alertmanager.monitoring.svc.cluster.local:9093
-            probes:
-              liveness:
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /healthz
-                    port: 8081
-                  initialDelaySeconds: 15
-                  periodSeconds: 20
-                  timeoutSeconds: 1
-                  failureThreshold: 3
-              readiness:
-                enabled: false
-              startup:
-                enabled: false
-            resources:
-              requests:
-                cpu: 10m
-                memory: 50Mi
-              limits:
-                memory: 128Mi
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
-        serviceAccount:
-          identifier: silence-operator
-
-    serviceAccount:
-      silence-operator: {}
+    alertmanagerAddress: http://alertmanager.monitoring.svc.cluster.local:9093
+    image:
+      registry: quay.io
+      # TODO: Enable on next Flux release and remove name & tag
+      # REF: https://github.com/fluxcd/helm-controller/pull/1212
+      name: giantswarm/silence-operator
+      tag: 0.16.1
+    networkPolicy:
+      enabled: false
