@@ -122,14 +122,15 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /vernemq/data
-      log:
+      tmpfs:
         type: emptyDir
-        globalMounts:
-          - path: /vernemq/log
-      tmp:
-        type: emptyDir
-        globalMounts:
-          - path: /tmp
+        advancedMounts:
+          vernemq:
+            app:
+              - path: /vernemq/log
+                subPath: log
+              - path: /tmp
+                subPath: tmp
 
     serviceAccount:
       vernemq: {}

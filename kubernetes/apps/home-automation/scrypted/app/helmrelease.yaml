@@ -80,14 +80,15 @@ spec:
           scrypted:
             app:
               - path: /server/volume
-      cache:
+      tmpfs:
         type: emptyDir
-        globalMounts:
-          - path: /.cache
-      cache-npm:
-        type: emptyDir
-        globalMounts:
-          - path: /.npm
+        advancedMounts:
+          scrypted:
+            app:
+              - path: /.cache
+                subPath: cache
+              - path: /.npm
+                subPath: npm-cache
       recs:
         type: nfs
         server: gladius.bjw-s.internal
