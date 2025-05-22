@@ -113,12 +113,11 @@ spec:
         globalMounts:
           - path: /data/nas-media/Downloads/sabnzbd
             subPath: Downloads/sabnzbd
-      temp:
+      tmpfs:
         type: emptyDir
-        advancedMounts:
-          sabnzbd:
-            app:
-              - path: /tmp
+        globalMounts:
+          - path: /tmp
+            subPath: tmp
       ephemeral:
         type: custom
         volumeSpec:

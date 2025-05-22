@@ -93,12 +93,15 @@ spec:
           plex:
             app:
               - path: /config/Library/Application Support/Plex Media Server/Cache
-      logs:
+      tmpfs:
         type: emptyDir
         advancedMounts:
           plex:
             app:
               - path: /config/Library/Application Support/Plex Media Server/Logs
+                subPath: log
+              - path: /transcode
+                subPath: transcode
       nfs-nas-media:
         type: nfs
         server: gladius.bjw-s.internal
@@ -108,12 +111,6 @@ spec:
             app:
               - path: /data/nas-media/Library
                 subPath: Library
-      transcode:
-        type: emptyDir
-        advancedMounts:
-          plex:
-            app:
-              - path: /transcode
 
     route:
       app:

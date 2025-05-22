@@ -87,10 +87,11 @@ spec:
     persistence:
       config:
         existingClaim: radarr-config
-      add-ons:
+      tmpfs:
         type: emptyDir
-      tmp:
-        type: emptyDir
+        globalMounts:
+          - path: /tmp
+            subPath: tmp
       media:
         type: nfs
         server: gladius.bjw-s.internal
