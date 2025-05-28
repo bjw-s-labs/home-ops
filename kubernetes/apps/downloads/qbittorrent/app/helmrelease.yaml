@@ -89,13 +89,6 @@ spec:
             env:
               UMASK: "022"
               QBT_WEBUI_PORT: &port 8080
-              XSEED_HOST: cross-seed.downloads.svc.cluster.local
-              XSEED_PORT: 2468
-              XSEED_APIKEY:
-                valueFrom:
-                  secretKeyRef:
-                    name: qbittorrent-secret
-                    key: xseed_api_key
             probes:
               liveness:
                 enabled: true
@@ -194,14 +187,6 @@ spec:
               - path: /etc/coredns/Corefile
                 subPath: Corefile
                 readOnly: true
-      scripts:
-        type: configMap
-        name: qbittorrent-scripts
-        defaultMode: 0775
-        advancedMounts:
-          qbittorrent:
-            app:
-              - path: /config/scripts
 
     route:
       app:
