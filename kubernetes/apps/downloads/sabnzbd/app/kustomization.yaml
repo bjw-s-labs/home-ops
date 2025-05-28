@@ -5,13 +5,3 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./externalsecret.yaml
-
-configMapGenerator:
-  - name: sabnzbd-scripts
-    files:
-      - scripts/xseed.sh
-generatorOptions:
-  annotations:
-    kustomize.toolkit.fluxcd.io/substitute: disabled
-configurations:
-  - kustomizeconfig.yaml
