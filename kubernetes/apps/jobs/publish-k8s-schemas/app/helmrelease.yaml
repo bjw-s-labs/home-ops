@@ -1,0 +1,119 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: publish-k8s-schemas
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 4.0.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-labs
+        namespace: flux-system
+  interval: 30m
+  values:
+    controllers:
+      publish-k8s-schemas:
+        type: cronjob
+        cronjob:
+          schedule: "0 * * * *"
+          concurrencyPolicy: "Replace"
+        pod:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsUser: 65534
+            runAsGroup: 65534
+            runAsNonRoot: true
+        initContainers:
+          generate-schemas:
+            image:
+              repository: jank.ing/jjgadgets/k8s-crd-extractor
+              tag: 20250130@sha256:bdc7554fa5941bc901e345511f0165a9838e52e610918a0eb1c2c195b0530ab1
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 2Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+        containers:
+          app:
+            image:
+              repository: ghcr.io/bjw-s-labs/wrangler
+              tag: 4.18.0@sha256:54ce7ef78a13f571cb011763a75e2c4b83e78d30860db9f3e370055beeec0db8
+            envFrom:
+              - secretRef:
+                  name: publish-k8s-schemas-secret
+            args:
+              - pages
+              - deploy
+              - /data/crdSchemas
+              - --project-name
+              - kubernetes-schemas
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 2Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+        serviceAccount:
+          identifier: publish-k8s-schemas
+    persistence:
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          publish-k8s-schemas:
+            generate-schemas:
+              - path: /.datree
+                subPath: data
+            app:
+              - path: /config
+                subPath: config
+              - path: /data
+                subPath: data
+    serviceAccount:
+      publish-k8s-schemas: {}
+    rbac:
+      roles:
+        publish-k8s-schemas:
+          type: ClusterRole
+          rules:
+            - apiGroups:
+                - apiextensions.k8s.io
+              resources:
+                - customresourcedefinitions
+                - customresourcedefinitions/status
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - apiregistration.k8s.io
+              resources:
+                - apiservices
+                - apiservices/status
+              verbs:
+                - get
+                - list
+                - watch
+      bindings:
+        publish-k8s-schemas:
+          type: ClusterRoleBinding
+          roleRef:
+            identifier: publish-k8s-schemas
+          subjects:
+            - identifier: publish-k8s-schemas
