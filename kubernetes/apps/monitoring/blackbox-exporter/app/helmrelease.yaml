@@ -11,52 +11,36 @@ spec:
     name: blackbox-exporter
   values:
     fullnameOverride: blackbox-exporter
-
     image:
       registry: quay.io
-
-    podSecurityContext:
-      sysctls:
-        - name: net.ipv4.ping_group_range
-          value: "0 2147483647"
-
+    # podSecurityContext:
+    #   sysctls:
+    #     - name: net.ipv4.ping_group_range
+    #       value: "0 2147483647"
     config:
       modules:
         http_2xx:
           prober: http
           timeout: 5s
           http:
-            valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+            valid_http_versions:
+              - HTTP/1.1
+              - HTTP/2.0
             follow_redirects: true
-            preferred_ip_protocol: "ip4"
+            preferred_ip_protocol: ip4
         icmp:
           prober: icmp
-          timeout: 30s
+          timeout: 5s
           icmp:
-            preferred_ip_protocol: "ip4"
-
+            preferred_ip_protocol: ip4
+        tcp_connect:
+          prober: tcp
+          timeout: 5s
+          tcp:
+            preferred_ip_protocol: ipv4
     prometheusRule:
       enabled: true
-      additionalLabels:
-        app: prometheus-operator
-        release: prometheus
       rules:
-        - alert: BlackboxSslCertificateWillExpireSoon
-          expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 3
-          for: 15m
-          labels:
-            severity: critical
-          annotations:
-            summary: |-
-              The SSL certificate for {{ $labels.target }} will expire in less than 3 days
-        - alert: BlackboxSslCertificateExpired
-          expr: probe_ssl_earliest_cert_expiry - time() <= 0
-          for: 15m
-          labels:
-            severity: critical
-          annotations:
-            summary: |-
-              The SSL certificate for {{ $labels.target }} has expired
         - alert: BlackboxProbeFailed
           expr: probe_success == 0
           for: 15m
@@ -64,60 +48,15 @@ spec:
             severity: critical
           annotations:
             summary: |-
-              The host {{ $labels.instance }} is currently unreachable
-
-    pspEnabled: false
-
+              The host {{ $labels.target }} is currently unreachable
     securityContext:
       readOnlyRootFilesystem: true
       allowPrivilegeEscalation: false
       capabilities:
-        add: ["NET_RAW"]
-
+        add:
+          - NET_RAW
     serviceMonitor:
       enabled: true
       defaults:
-        labels:
-          release: prometheus
         interval: 1m
-        scrapeTimeout: 30s
-      targets:
-        # PiKVM
-        - module: http_2xx
-          name: pikvm-http
-          url: "http://pikvm.bjw-s.internal"
-        - module: icmp
-          name: pikvm-icmp
-          url: pikvm.bjw-s.internal
-
-        # Robot vacuums
-        - module: icmp
-          name: valetudo-living-room-icmp
-          url: livingroom-vacuum.bjw-s.internal
-        - module: http_2xx
-          name: valetudo-living-room-http
-          url: "http://livingroom-vacuum.bjw-s.internal"
-
-        # Wallmount tablets
-        - module: http_2xx
-          name: hallway-tablet-http
-          url: "http://hallway-tablet.bjw-s.internal:2323"
-        - module: icmp
-          name: hallway-tablet-icmp
-          url: hallway-tablet.bjw-s.internal
-        - module: http_2xx
-          name: garage-tablet-http
-          url: "http://garage-tablet.bjw-s.internal:2323"
-        - module: icmp
-          name: garage-tablet-icmp
-          url: garage-tablet.bjw-s.internal
-
-        # Other devices
-        - module: icmp
-          name: zigbee-controller-icmp
-          url: downstairs-hallway-zigbee-adapter.bjw-s.internal
-
-        - module: icmp
-          name: ping-cloudflare
-          url: 1.1.1.1
-          scrape_interval: 30s
+        scrapeTimeout: 10s
