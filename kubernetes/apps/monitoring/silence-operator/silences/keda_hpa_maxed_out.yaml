@@ -3,12 +3,12 @@
 apiVersion: monitoring.giantswarm.io/v1alpha1
 kind: Silence
 metadata:
-  name: keda-hpa-maxed-out
+  name: gladius-memory-usage
 spec:
   matchers:
     - name: alertname
-      value: NodeMemoryHighUtilization
+      value: KubeHpaMaxedOut
       isRegex: false
-    - name: instance
-      value: gladius.bjw-s.internal:9100
-      isRegex: false
+    - name: horizontalpodautoscaler
+      value: keda-hpa-.*
+      isRegex: true
