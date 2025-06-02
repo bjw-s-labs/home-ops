@@ -3,7 +3,7 @@
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: ${APP}-nas-nfs-scaler
+  name: zigbee2mqtt-adapter-scaler
 spec:
   advanced:
     restoreToOriginalReplicaCount: true
@@ -13,11 +13,11 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: ${APP}
+    name: zigbee2mqtt
   triggers:
     - type: prometheus
       metadata:
         serverAddress: http://prometheus-operated.monitoring.svc.cluster.local:9090
-        query: probe_success{instance=~"gladius.bjw-s.internal:2049"}
+        query: probe_success{instance="downstairs-hallway-zigbee-adapter.bjw-s.internal"}
         threshold: "1"
         ignoreNullValues: "0"
