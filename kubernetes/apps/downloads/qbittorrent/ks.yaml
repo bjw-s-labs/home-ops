@@ -58,11 +58,3 @@ spec:
     provider: sops
     secretRef:
       name: sops-age
-  dependsOn:
-    - name: keda
-      namespace: system
-  components:
-    - ../../../../components/keda/nas-nfs-scaler
-  postBuild:
-    substitute:
-      APP: *appname
