@@ -30,8 +30,8 @@ spec:
         initContainers:
           generate-schemas:
             image:
-              repository: jank.ing/jjgadgets/k8s-crd-extractor
-              tag: 20250130@sha256:bdc7554fa5941bc901e345511f0165a9838e52e610918a0eb1c2c195b0530ab1
+              repository: ghcr.io/bjw-s-labs/k8s-crd-extractor
+              tag: 2025.6.3@sha256:c19153ced0c30223506b020ec32d5c1e2d485034b5464181bc674cc69c34b8ee
             resources:
               requests:
                 cpu: 10m
@@ -63,7 +63,7 @@ spec:
                 cpu: 10m
                 memory: 128Mi
               limits:
-                memory: 2Gi
+                memory: 1Gi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -78,8 +78,10 @@ spec:
         advancedMounts:
           publish-k8s-schemas:
             generate-schemas:
-              - path: /.datree
+              - path: /config/.datree
                 subPath: data
+              - path: /tmp
+                subPath: tmp
             app:
               - path: /config
                 subPath: config
