@@ -67,7 +67,7 @@ tasks:
     vars:
       ALL_APPS:
         sh: |
-          kubectl get replicationsources -A --no-headers -o jsonpath='{range .items[*]}{.metadata.namespace},{.metadata.name}{"\n"}{end}' | grep -v '\-r2'
+          kubectl get replicationsources -A --no-headers -o jsonpath='{range .items[*]}{.metadata.namespace},{.metadata.name}{"\n"}{end}'
     cmds:
       - for:
           var: ALL_APPS
