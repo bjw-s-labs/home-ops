@@ -41,6 +41,8 @@ spec:
               repository: ghcr.io/home-operations/sabnzbd
               tag: 4.5.1
             env:
+              CROSS_SEED_HOST: cross-seed.downloads.svc.cluster.local:2468
+              CROSS_SEED_SLEEP_INTERVAL: 60
               SABNZBD__PORT: &port 8080
               SABNZBD__HOST_WHITELIST_ENTRIES: >-
                 sabnzbd,
@@ -49,16 +51,9 @@ spec:
                 sabnzbd.downloads.svc.cluster,
                 sabnzbd.downloads.svc.cluster.local,
                 sabnzbd.bjw-s.dev
-              SABNZBD__API_KEY:
-                valueFrom:
-                  secretKeyRef:
-                    name: sabnzbd-secret
-                    key: api_key
-              SABNZBD__NZB_KEY:
-                valueFrom:
-                  secretKeyRef:
-                    name: sabnzbd-secret
-                    key: nzb_key
+            envFrom:
+              - secretRef:
+                  name: sabnzbd-secret
             probes:
               liveness: &probes
                 enabled: true
@@ -106,6 +101,12 @@ spec:
         globalMounts:
           - path: /data/nas-media/Downloads/sabnzbd
             subPath: Downloads/sabnzbd
+      scripts:
+        type: configMap
+        name: sabnzbd-scripts
+        defaultMode: 0775
+        globalMounts:
+          - readOnly: true
       tmpfs:
         type: emptyDir
         globalMounts:
