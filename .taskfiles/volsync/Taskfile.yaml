@@ -7,17 +7,25 @@ vars:
 
 tasks:
   unlock:
-    desc: Unlock all restic source repos
+    desc: Unlock a restic source repo from local machine [NS=default] [APP=required]
     preconditions:
-      - which kubectl
+      - which kubectl minijinja-cli stern
+      - test -f {{.VOLSYNC_RESOURCES_DIR}}/unlock.yaml.j2
+    requires:
+      vars:
+        - APP
     vars:
-      SOURCES:
-        sh: kubectl get replicationsources --all-namespaces --no-headers --output=jsonpath='{range .items[*]}{.metadata.namespace},{.metadata.name}{"\n"}{end}'
+      NS: '{{.NS | default "default"}}'
+      JOB: "volsync-unlock-{{ .APP }}"
+    env:
+      NS: '{{.NS}}'
+      APP: '{{.APP}}'
     cmds:
-      - for:
-          var: SOURCES
-          split: "\n"
-        cmd: kubectl --namespace {{splitList "," .ITEM | first}} patch --field-manager=flux-client-side-apply replicationsources {{splitList "," .ITEM | last}} --type merge --patch "{\"spec\":{\"restic\":{\"unlock\":\"{{now | unixEpoch}}\"}}}"
+      - minijinja-cli {{.VOLSYNC_RESOURCES_DIR}}/unlock.yaml.j2 | kubectl apply --server-side --filename -
+      - until kubectl --namespace {{.NS}} get job/{{ .JOB }} &>/dev/null; do sleep 5; done
+      - kubectl --namespace {{.NS}} wait job/{{ .JOB }} --for=condition=complete --timeout=5m
+      - stern --namespace {{.NS}} job/{{ .JOB }} --no-follow
+      - kubectl --namespace {{.NS}} delete job {{ .JOB }}
 
   list:
     desc: List snapshots for an app [NS=default] [APP=required]
