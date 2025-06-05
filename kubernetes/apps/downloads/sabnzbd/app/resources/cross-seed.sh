@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -Eeuo pipefail
+set -Eeo pipefail
 
 # User-defined variables
 CROSS_SEED_HOST="${CROSS_SEED_HOST:?}"
@@ -19,7 +19,7 @@ search() {
         "http://${CROSS_SEED_HOST}/api/webhook"
     )
 
-    printf "cross-seed search returned with HTTP status code %s and path %s\n" "${status_code}" "${RELEASE_DIR}" >&2
+    printf "cross-seed search returned with HTTP status code %s\n" "${status_code}" >&2
 
     sleep "${CROSS_SEED_SLEEP_INTERVAL}"
 }
