@@ -21,6 +21,9 @@ spec:
         cronjob:
           schedule: "0 * * * *"
           concurrencyPolicy: "Replace"
+          backoffLimit: 0
+          failedJobsHistory: 1
+          successfulJobsHistory: 0
         pod:
           restartPolicy: OnFailure
           securityContext:
