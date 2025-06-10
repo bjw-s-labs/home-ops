@@ -116,6 +116,10 @@ spec:
             port: 1883
           ws:
             port: 8080
+      http:
+        ports:
+          http:
+            port: 8888
 
     persistence:
       data:
@@ -131,9 +135,6 @@ spec:
                 subPath: log
               - path: /tmp
                 subPath: tmp
-
-    serviceAccount:
-      vernemq: {}
 
     rbac:
       roles:
@@ -160,3 +161,16 @@ spec:
             identifier: vernemq
           subjects:
             - identifier: vernemq
+
+    serviceAccount:
+      vernemq: {}
+
+    serviceMonitor:
+      app:
+        serviceName: '{{ .Release.Name }}-http'
+        endpoints:
+          - port: http
+            scheme: http
+            path: /metrics
+            interval: 10s
+            scrapeTimeout: 1s
