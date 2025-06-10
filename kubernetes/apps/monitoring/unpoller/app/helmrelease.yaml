@@ -37,12 +37,11 @@ spec:
               UP_UNIFI_DEFAULT_ROLE: home-ops
               UP_UNIFI_DEFAULT_URL: https://10.1.3.1
               UP_UNIFI_DEFAULT_VERIFY_SSL: false
-              UP_UNIFI_DEFAULT_USER: unpoller
-              UP_UNIFI_DEFAULT_PASS:
+              UP_UNIFI_DEFAULT_API_KEY:
                 valueFrom:
                   secretKeyRef:
                     name: unpoller-secret
-                    key: unifipoller_password
+                    key: unpoller_api_key
               UP_INFLUXDB_DISABLE: true
             probes:
               liveness: &probes
