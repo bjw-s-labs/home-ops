@@ -14,16 +14,11 @@ spec:
         kind: HelmRepository
         name: external-dns-unifi
       interval: 30m
-
   values:
     fullnameOverride: &name externaldns-unifi
-    image: # TODO: Remove this block when new chart version is released
-      repository: registry.k8s.io/external-dns/external-dns
-      tag: v0.17.0
+    logLevel: &logLevel info
     domainFilters:
       - bjw-s.dev
-    extraArgs:
-      - --ignore-ingress-tls-spec
     podAnnotations:
       secret.reloader.stakater.com/reload: externaldns-unifi-secret
     policy: sync
@@ -34,15 +29,15 @@ spec:
           repository: ghcr.io/kashalls/external-dns-unifi-webhook
           tag: v0.6.0
         env:
+          - name: LOG_LEVEL
+            value: *logLevel
           - name: UNIFI_HOST
             value: https://10.1.0.1
-          - name: UNIFI_USER
-            value: external-dns
-          - name: UNIFI_PASS
+          - name: UNIFI_API_KEY
             valueFrom:
               secretKeyRef:
                 name: external-dns-unifi-secret
-                key: external_dns_password
+                key: external_dns_api_key
         livenessProbe:
           httpGet:
             path: /healthz
@@ -69,15 +64,3 @@ spec:
     triggerLoopOnEvent: true
     txtOwnerId: main
     txtPrefix: "k8s."
-
-  postRenderers:
-    - kustomize:
-        patches:
-          - target:
-              version: v1
-              kind: Deployment
-              name: *name
-            patch: |
-              - op: add
-                path: /spec/template/spec/enableServiceLinks
-                value: false
