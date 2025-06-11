@@ -42,14 +42,14 @@ spec:
               DOCKER_VERNEMQ_ACCEPT_EULA: "yes"
               DOCKER_VERNEMQ_DISCOVERY_KUBERNETES: 1
               DOCKER_VERNEMQ_KUBERNETES_LABEL_SELECTOR: "app.kubernetes.io/name=vernemq"
-              DOCKER_VERNEMQ_LEVELDB__MAXIMUM_MEMORY: '10485760' # in bytes
-              DOCKER_VERNEMQ_LEVELDB__WRITE_BUFFER_SIZE_MIN: '1048576'
-              DOCKER_VERNEMQ_LEVELDB__WRITE_BUFFER_SIZE_MAX: '2097152'
+              DOCKER_VERNEMQ_LEVELDB__MAXIMUM_MEMORY: "10485760" # in bytes
+              DOCKER_VERNEMQ_LEVELDB__WRITE_BUFFER_SIZE_MIN: "1048576"
+              DOCKER_VERNEMQ_LEVELDB__WRITE_BUFFER_SIZE_MAX: "2097152"
               # allow clients to failover when pods are restarting
-              DOCKER_VERNEMQ_ALLOW_REGISTER_DURING_NETSPLIT: 'on'
-              DOCKER_VERNEMQ_ALLOW_PUBLISH_DURING_NETSPLIT: 'on'
-              DOCKER_VERNEMQ_ALLOW_SUBSCRIBE_DURING_NETSPLIT: 'on'
-              DOCKER_VERNEMQ_ALLOW_UNSUBSCRIBE_DURING_NETSPLIT: 'on'
+              DOCKER_VERNEMQ_ALLOW_REGISTER_DURING_NETSPLIT: "on"
+              DOCKER_VERNEMQ_ALLOW_PUBLISH_DURING_NETSPLIT: "on"
+              DOCKER_VERNEMQ_ALLOW_SUBSCRIBE_DURING_NETSPLIT: "on"
+              DOCKER_VERNEMQ_ALLOW_UNSUBSCRIBE_DURING_NETSPLIT: "on"
 
             envFrom:
               - secretRef:
@@ -167,7 +167,7 @@ spec:
 
     serviceMonitor:
       app:
-        serviceName: '{{ .Release.Name }}-http'
+        serviceName: "{{ .Release.Name }}-http"
         endpoints:
           - port: http
             scheme: http
