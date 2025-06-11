@@ -4,29 +4,6 @@
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: k8tz-webhook-selfsign
+  name: k8tz-webhook-issuer
 spec:
   selfSigned: {}
----
-# Generate a CA Certificate used to sign certificates for the webhook
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: k8tz-webhook-ca
-spec:
-  secretName: k8tz-webhook-ca
-  duration: 43800h # 5y
-  issuerRef:
-    name: k8tz-webhook-selfsign
-    kind: Issuer
-  commonName: "ca.k8tz.cert-manager"
-  isCA: true
----
-# Create an Issuer that uses the above generated CA certificate to issue certs
-apiVersion: cert-manager.io/v1
-kind: Issuer
-metadata:
-  name: k8tz-webhook-ca
-spec:
-  ca:
-    secretName: k8tz-webhook-ca
