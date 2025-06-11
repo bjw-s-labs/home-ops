@@ -29,6 +29,10 @@ spec:
             runAsUser: 10000
             runAsNonRoot: true
 
+        statefulset:
+          serviceName:
+            identifier: headless
+
         containers:
           app:
             image:
@@ -42,15 +46,11 @@ spec:
               DOCKER_VERNEMQ_ACCEPT_EULA: "yes"
               DOCKER_VERNEMQ_DISCOVERY_KUBERNETES: 1
               DOCKER_VERNEMQ_KUBERNETES_LABEL_SELECTOR: "app.kubernetes.io/name=vernemq"
-              DOCKER_VERNEMQ_LEVELDB__MAXIMUM_MEMORY: "10485760" # in bytes
-              DOCKER_VERNEMQ_LEVELDB__WRITE_BUFFER_SIZE_MIN: "1048576"
-              DOCKER_VERNEMQ_LEVELDB__WRITE_BUFFER_SIZE_MAX: "2097152"
-              # allow clients to failover when pods are restarting
+              DOCKER_VERNEMQ_LEVELDB__MAXIMUM_MEMORY__PERCENT: '25' # 25% of the available memory
               DOCKER_VERNEMQ_ALLOW_REGISTER_DURING_NETSPLIT: "on"
               DOCKER_VERNEMQ_ALLOW_PUBLISH_DURING_NETSPLIT: "on"
               DOCKER_VERNEMQ_ALLOW_SUBSCRIBE_DURING_NETSPLIT: "on"
               DOCKER_VERNEMQ_ALLOW_UNSUBSCRIBE_DURING_NETSPLIT: "on"
-
             envFrom:
               - secretRef:
                   name: vernemq-auth-secret
@@ -85,18 +85,16 @@ spec:
                 cpu: 20m
                 memory: 128Mi
               limits:
-                memory: 384Mi
+                memory: 512Mi
             securityContext:
               allowPrivilegeEscalation: false
               capabilities:
                 drop:
                   - ALL
 
-        serviceAccount:
-          identifier: vernemq
-
     service:
       app:
+        primary: true
         type: LoadBalancer
         sessionAffinity: ClientIP
         annotations:
@@ -108,7 +106,6 @@ spec:
           ws:
             port: 8080
       headless:
-        forceRename: "{{ .Release.Name }}" # TODO: Fix this when app-template 4.1.0 is released
         publishNotReadyAddresses: true
         clusterIP: None
         ports:
