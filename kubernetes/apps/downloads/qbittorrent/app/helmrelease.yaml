@@ -142,14 +142,18 @@ spec:
 
     service:
       app:
-        controller: qbittorrent
-        type: LoadBalancer
+        forceRename: qbittorrent
+        primary: true
         annotations:
           lbipam.cilium.io/ips: 10.1.1.137
         ports:
           http:
-            primary: true
             port: *port
+      bittorrent:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 10.1.1.137
+        ports:
           bittorrent:
             enabled: true
             port: *torrentPort
@@ -157,7 +161,6 @@ spec:
 
     persistence:
       config:
-        enabled: true
         existingClaim: qbittorrent
         advancedMounts:
           qbittorrent:
