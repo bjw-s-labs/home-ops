@@ -58,7 +58,7 @@ spec:
       app:
         ports:
           http:
-            port: &port 8181
+            port: 8181
 
     persistence:
       config:
@@ -75,6 +75,4 @@ spec:
             namespace: kube-system
             sectionName: https
         rules:
-          - backendRefs:
-              - identifier: app
-                port: *port
+          - backendRefs: [{}]

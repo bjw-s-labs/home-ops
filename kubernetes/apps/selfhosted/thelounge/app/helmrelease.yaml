@@ -53,7 +53,7 @@ spec:
       app:
         ports:
           http:
-            port: &httpPort 9000
+            port: 9000
     persistence:
       config:
         existingClaim: thelounge
@@ -66,6 +66,4 @@ spec:
             namespace: kube-system
             sectionName: https
         rules:
-          - backendRefs:
-              - identifier: app
-                port: *httpPort
+          - backendRefs: [{}]

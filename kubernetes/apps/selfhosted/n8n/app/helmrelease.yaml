@@ -82,9 +82,7 @@ spec:
             namespace: kube-system
             sectionName: https
         rules:
-          - backendRefs:
-              - identifier: app
-                port: *port
+          - backendRefs: [{}]
       webhooks:
         hostnames:
           - n8n-webhook.bjw-s.dev
@@ -96,6 +94,4 @@ spec:
           - matches:
               - path:
                   value: /webhook
-            backendRefs:
-              - identifier: app
-                port: *port
+            backendRefs: [{}]

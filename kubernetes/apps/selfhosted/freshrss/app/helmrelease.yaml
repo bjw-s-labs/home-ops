@@ -34,7 +34,7 @@ spec:
             env:
               CRON_MIN: "*"
               DOMAIN: freshrss.bjw-s.dev
-              LISTEN: 8080
+              LISTEN: &port 8080
             probes:
               liveness:
                 enabled: true
@@ -51,7 +51,7 @@ spec:
       app:
         ports:
           http:
-            port: &port 8080
+            port: *port
 
     persistence:
       data:
@@ -75,6 +75,4 @@ spec:
             namespace: kube-system
             sectionName: https
         rules:
-          - backendRefs:
-              - identifier: app
-                port: *port
+          - backendRefs: [{}]

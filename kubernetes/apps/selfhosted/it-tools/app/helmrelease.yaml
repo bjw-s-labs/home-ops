@@ -53,7 +53,7 @@ spec:
       app:
         ports:
           http:
-            port: &port 8080
+            port: 8080
 
     persistence:
       tmpfs:
@@ -71,6 +71,4 @@ spec:
             namespace: kube-system
             sectionName: https
         rules:
-          - backendRefs:
-              - identifier: app
-                port: *port
+          - backendRefs: [{}]
