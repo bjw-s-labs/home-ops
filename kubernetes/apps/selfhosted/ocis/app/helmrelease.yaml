@@ -81,10 +81,9 @@ spec:
 
     service:
       app:
-        controller: ocis
         ports:
           http:
-            port: &port 9200
+            port: 9200
 
     persistence:
       config:
@@ -116,6 +115,4 @@ spec:
             namespace: kube-system
             sectionName: https
         rules:
-          - backendRefs:
-              - identifier: app
-                port: *port
+          - backendRefs: [{}]
