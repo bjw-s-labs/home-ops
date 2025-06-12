@@ -53,7 +53,6 @@ spec:
 
     service:
       app:
-        controller: maintainerr
         ports:
           http:
             port: &port 6246
@@ -73,6 +72,4 @@ spec:
             namespace: kube-system
             sectionName: https
         rules:
-          - backendRefs:
-              - identifier: app
-                port: *port
+          - backendRefs: [{}]

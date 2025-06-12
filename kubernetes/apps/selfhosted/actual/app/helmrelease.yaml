@@ -60,7 +60,6 @@ spec:
 
     service:
       app:
-        controller: actual
         ports:
           http:
             port: *httpPort
@@ -82,6 +81,4 @@ spec:
             namespace: kube-system
             sectionName: https
         rules:
-          - backendRefs:
-              - identifier: app
-                port: *httpPort
+          - backendRefs: [{}]
