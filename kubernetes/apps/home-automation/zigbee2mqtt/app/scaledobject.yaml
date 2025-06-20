@@ -15,9 +15,9 @@ spec:
     kind: Deployment
     name: zigbee2mqtt
   triggers:
-    - type: prometheus
-      metadata:
-        serverAddress: http://prometheus-operated.monitoring.svc.cluster.local:9090
-        query: probe_success{instance="downstairs-hallway-zigbee-adapter.bjw-s.internal"}
-        threshold: "1"
-        ignoreNullValues: "0"
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-operated.monitoring.svc.cluster.local:9090
+      query: probe_success{instance="downstairs-hallway-slzb06.bjw-s.internal"}
+      threshold: "1"
+      ignoreNullValues: "0"
