@@ -12,7 +12,8 @@ tasks:
       - test -f {{.K8S_DIR}}/talos/talhelper-secrets.env
       - op user get --me
     cmds:
-      - op run --env-file {{.K8S_DIR}}/talos/talhelper-secrets.env --no-masking -- talhelper genconfig
+      - >
+        op run --env-file {{.K8S_DIR}}/talos/talhelper-secrets.env --no-masking -- talhelper genconfig
         --secret-file {{.K8S_DIR}}/talos/talsecret.yaml
         --config-file {{.K8S_DIR}}/talos/talconfig.yaml
         --out-dir {{.K8S_DIR}}/talos/clusterconfig
@@ -84,9 +85,11 @@ tasks:
         - HOSTNAME
         - FILENAME
     vars:
-      MODE: '{{.MODE | default "auto"}}'
+      MODE: >-
+        {{.MODE | default "auto"}}
     cmds:
-      - talosctl apply-config
+      - >
+        talosctl apply-config
         --nodes "{{.HOSTNAME}}"
         --file "{{.FILENAME}}"
         --mode="{{.MODE}}"

@@ -9,32 +9,32 @@ tasks:
       TALOS_CONTROLLER:
         sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | shuf -n 1
     preconditions:
-    - which jq minijinja-cli sops talosctl
-    - test -f "${TALOSCONFIG}"
-    - talosctl config info
+      - which jq minijinja-cli sops talosctl
+      - test -f "${TALOSCONFIG}"
+      - talosctl config info
     cmds:
-    - task: :talos:apply-clusterconfig
-      vars:
-        INSECURE: "true"
-    - until talosctl --nodes {{.TALOS_CONTROLLER}} bootstrap; do sleep 5; done
-    - talosctl kubeconfig --nodes {{.TALOS_CONTROLLER}} --force --force-context-name "home-ops" "${KUBECONFIG}"
+      - task: :talos:apply-clusterconfig
+        vars:
+          INSECURE: "true"
+      - until talosctl --nodes {{.TALOS_CONTROLLER}} bootstrap; do sleep 5; done
+      - talosctl kubeconfig --nodes {{.TALOS_CONTROLLER}} --force --force-context-name "home-ops" "${KUBECONFIG}"
 
   apps:
     desc: Bootstrap Apps
     prompt: Bootstrap apps into Talos cluster?
     preconditions:
-    - which op helmfile kubectl
-    - test -f "${TALOSCONFIG}"
-    - test -f {{.K8S_DIR}}/bootstrap/helmfile.yaml
-    - test -f {{.K8S_DIR}}/bootstrap/bootstrap.env
-    - test -f {{.K8S_DIR}}/bootstrap/templates/resources.yaml.j2
-    - op user get --me
-    - talosctl config info
+      - which op helmfile kubectl
+      - test -f "${TALOSCONFIG}"
+      - test -f {{.K8S_DIR}}/bootstrap/helmfile.yaml
+      - test -f {{.K8S_DIR}}/bootstrap/bootstrap.env
+      - test -f {{.K8S_DIR}}/bootstrap/templates/resources.yaml.j2
+      - op user get --me
+      - talosctl config info
     env:
       NODE_COUNT:
         sh: talosctl config info --output json | jq --raw-output '.nodes | length'
       ROOK_DISK: nvme-Samsung_SSD_990_PRO_1TB
     cmds:
-    - until kubectl wait nodes --for=condition=Ready=False --all --timeout=10m; do sleep 5; done
-    - op run --env-file {{.K8S_DIR}}/bootstrap/bootstrap.env --no-masking -- minijinja-cli "{{.K8S_DIR}}/bootstrap/templates/resources.yaml.j2" | kubectl apply --server-side --filename -
-    - helmfile --quiet --file {{.K8S_DIR}}/bootstrap/helmfile.yaml apply --skip-diff-on-install --suppress-diff
+      - until kubectl wait nodes --for=condition=Ready=False --all --timeout=10m; do sleep 5; done
+      - op run --env-file {{.K8S_DIR}}/bootstrap/bootstrap.env --no-masking -- minijinja-cli "{{.K8S_DIR}}/bootstrap/templates/resources.yaml.j2" | kubectl apply --server-side --filename -
+      - helmfile --quiet --file {{.K8S_DIR}}/bootstrap/helmfile.yaml apply --skip-diff-on-install --suppress-diff

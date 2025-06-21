@@ -11,10 +11,10 @@ spec:
     name: app-template
     namespace: flux-system
   dependsOn:
-    - name: mosquitto
-      namespace: database
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
+  - name: mosquitto
+    namespace: database
+  - name: rook-ceph-cluster
+    namespace: rook-ceph
   values:
     controllers:
       zigbee2mqtt:
@@ -46,7 +46,8 @@ spec:
               ZIGBEE2MQTT_CONFIG_ADVANCED_LEGACY_API: false
               ZIGBEE2MQTT_CONFIG_ADVANCED_LEGACY_AVAILABILITY_PAYLOAD: false
               ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_LEVEL: info
-              ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_OUTPUT: '["console"]'
+              ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_OUTPUT: >-
+                ["console"]
               ZIGBEE2MQTT_CONFIG_ADVANCED_NETWORK_KEY:
                 valueFrom:
                   secretKeyRef:
@@ -91,23 +92,23 @@ spec:
               readOnlyRootFilesystem: true
               capabilities:
                 drop:
-                  - ALL
+                - ALL
           code-server:
             image:
               repository: ghcr.io/coder/code-server
               tag: 4.100.3@sha256:c5b7ec231b24f26ecee243e8d9f9df57af906d03c9c8238efd893217c9f1f725
             args:
-              - --auth
-              - none
-              - --disable-telemetry
-              - --disable-update-check
-              - --user-data-dir
-              - /data/.code-server
-              - --extensions-dir
-              - /data/.code-server
-              - --port
-              - "12321"
-              - /data
+            - --auth
+            - none
+            - --disable-telemetry
+            - --disable-update-check
+            - --user-data-dir
+            - /data/.code-server
+            - --extensions-dir
+            - /data/.code-server
+            - --port
+            - "12321"
+            - /data
             resources:
               requests:
                 cpu: 10m
@@ -131,32 +132,32 @@ spec:
         advancedMounts:
           zigbee2mqtt:
             app:
-              - path: /data
+            - path: /data
             code-server:
-              - path: /data
+            - path: /data
 
     route:
       app:
         hostnames:
-          - zigbee2mqtt.bjw-s.dev
+        - zigbee2mqtt.bjw-s.dev
         parentRefs:
-          - name: internal
-            namespace: kube-system
-            sectionName: https
+        - name: internal
+          namespace: kube-system
+          sectionName: https
         rules:
-          - matches:
-              - path:
-                  type: PathPrefix
-                  value: /code/
-            filters:
-              - type: URLRewrite
-                urlRewrite:
-                  path:
-                    type: ReplacePrefixMatch
-                    replacePrefixMatch: /
-            backendRefs:
-              - identifier: app
-                port: 12321
-          - backendRefs:
-              - identifier: app
-                port: *httpPort
+        - matches:
+          - path:
+              type: PathPrefix
+              value: /code/
+          filters:
+          - type: URLRewrite
+            urlRewrite:
+              path:
+                type: ReplacePrefixMatch
+                replacePrefixMatch: /
+          backendRefs:
+          - identifier: app
+            port: 12321
+        - backendRefs:
+          - identifier: app
+            port: *httpPort

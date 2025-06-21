@@ -15,11 +15,12 @@ tasks:
       vars:
         - APP
     vars:
-      NS: '{{.NS | default "default"}}'
+      NS: >
+        {{.NS | default "default"}}
       JOB: "volsync-unlock-{{ .APP }}"
     env:
-      NS: '{{.NS}}'
-      APP: '{{.APP}}'
+      NS: "{{.NS}}"
+      APP: "{{.APP}}"
     cmds:
       - minijinja-cli {{.VOLSYNC_RESOURCES_DIR}}/unlock.yaml.j2 | kubectl apply --server-side --filename -
       - until kubectl --namespace {{.NS}} get job/{{ .JOB }} &>/dev/null; do sleep 5; done
@@ -37,7 +38,8 @@ tasks:
       vars:
         - APP
     vars:
-      NS: '{{.NS | default "default"}}'
+      NS: >
+        {{.NS | default "default"}}
       JOB: "list-snapshots-{{ .APP }}"
     env:
       NS: "{{.NS}}"
@@ -58,8 +60,10 @@ tasks:
       vars:
         - APP
     vars:
-      WAIT: '{{.WAIT | default "true"}}'
-      NS: '{{.NS | default "default"}}'
+      WAIT: >
+        {{.WAIT | default "true"}}
+      NS: >
+        {{.NS | default "default"}}
       JOB: volsync-src-{{.APP}}
     cmds:
       - kubectl --namespace {{.NS}} patch replicationsources {{.APP}} --type merge -p '{"spec":{"trigger":{"manual":"{{now | unixEpoch}}"}}}'
@@ -83,8 +87,10 @@ tasks:
         task: snapshot
         vars:
           WAIT: "false"
-          NS: '{{splitList "," .ITEM | first}}'
-          APP: '{{splitList "," .ITEM | last}}'
+          NS: >
+            {{splitList "," .ITEM | first}}
+          APP: >
+            {{splitList "," .ITEM | last}}
 
   restore:
     desc: Restore an app [NS=default] [APP=required] [PREVIOUS=required]
@@ -96,7 +102,8 @@ tasks:
         - APP
         - PREVIOUS
     vars:
-      NS: '{{.NS | default "default"}}'
+      NS: >
+        {{.NS | default "default"}}
       CONTROLLER:
         sh: kubectl --namespace {{.NS}} get deployment {{.APP}} &>/dev/null && echo deployment || echo statefulset
     env:
