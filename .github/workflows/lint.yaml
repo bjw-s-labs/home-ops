@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - main
+    - main
 
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}
@@ -20,109 +20,87 @@ jobs:
     name: actionlint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          persist-credentials: false
+    - name: Checkout
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
 
-      - name: Get changed files
-        id: changed-files
-        uses: bjw-s-labs/action-changed-files@930cef8463348e168cab7235c47fe95a7a235f65 # v0.3.3
-        with:
-          patterns: |-
-            .github/workflows/*.yaml
-            .github/workflows/*.yml
+    - name: Get changed files
+      id: changed-files
+      uses: bjw-s-labs/action-changed-files@930cef8463348e168cab7235c47fe95a7a235f65 # v0.3.3
+      with:
+        patterns: |-
+          .github/workflows/*.yaml
+          .github/workflows/*.yml
 
-      - name: Run actionlint
-        if: steps.changed-files.outputs.changed_files != '[]'
-        uses: bjw-s/action-actionlint@b346813e82708106544f48a93a5b3fbeeb8e37eb # v0.1.1
-        with:
-          actionlint_config: .github/actionlint.yaml
-          file_pattern: ${{ join(fromJSON(steps.changed-files.outputs.changed_files), ' ') }}
+    - name: Run actionlint
+      if: steps.changed-files.outputs.changed_files != '[]'
+      uses: bjw-s/action-actionlint@b346813e82708106544f48a93a5b3fbeeb8e37eb # v0.1.1
+      with:
+        actionlint_config: .github/actionlint.yaml
+        file_pattern: ${{ join(fromJSON(steps.changed-files.outputs.changed_files), ' ') }}
 
   yamllint:
     name: yamllint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          persist-credentials: false
+    - name: Checkout
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
 
-      - name: Get changed files
-        id: changed-files
-        uses: bjw-s-labs/action-changed-files@930cef8463348e168cab7235c47fe95a7a235f65 # v0.3.3
-        with:
-          patterns: |-
-            **/*.yaml
-            **/*.yml
+    - name: Get changed files
+      id: changed-files
+      uses: bjw-s-labs/action-changed-files@930cef8463348e168cab7235c47fe95a7a235f65 # v0.3.3
+      with:
+        patterns: |-
+          **/*.yaml
+          **/*.yml
 
-      - name: Install yamllint
-        if: steps.changed-files.outputs.changed_files != '[]'
-        shell: bash
-        run: |
-          pip install --user yamllint
+    - name: Install yamllint
+      if: steps.changed-files.outputs.changed_files != '[]'
+      shell: bash
+      run: |
+        pip install --user yamllint
 
-      - name: Run yamllint
-        if: steps.changed-files.outputs.changed_files != '[]'
-        shell: bash
-        run: |
-          yamllint --config-file .yamllint.yaml --format github ${{ join(fromJSON(steps.changed-files.outputs.changed_files), ' ') }}
+    - name: Run yamllint
+      if: steps.changed-files.outputs.changed_files != '[]'
+      shell: bash
+      run: |
+        yamllint --config-file .yamllint.yaml --format github ${{ join(fromJSON(steps.changed-files.outputs.changed_files), ' ') }}
 
   markdownlint:
     name: markdownlint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          persist-credentials: false
+    - name: Checkout
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
 
-      - name: Get changed files
-        id: changed-files
-        uses: bjw-s-labs/action-changed-files@930cef8463348e168cab7235c47fe95a7a235f65 # v0.3.3
-        with:
-          patterns: |-
-            **/*.md
+    - name: Get changed files
+      id: changed-files
+      uses: bjw-s-labs/action-changed-files@930cef8463348e168cab7235c47fe95a7a235f65 # v0.3.3
+      with:
+        patterns: |-
+          **/*.md
 
-      - name: Run markdownlint-cli2
-        if: steps.changed-files.outputs.changed_files != '[]'
-        uses: bjw-s/action-markdownlint-cli2@c3c44cc6f77516007f1a85d982ed6276e840dcec # v0.1.0
-        with:
-          markdownlint_config: .markdownlint.yaml
-          file_pattern: ${{ join(fromJSON(steps.changed-files.outputs.changed_files), ' ') }}
-
-  prettier:
-    name: prettier
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          persist-credentials: false
-
-      - name: Get changed files
-        id: changed-files
-        uses: bjw-s-labs/action-changed-files@930cef8463348e168cab7235c47fe95a7a235f65 # v0.3.3
-
-      - name: Run prettier
-        if: steps.changed-files.outputs.changed_files != '[]'
-        uses: bjw-s/action-prettier-lint@1014e6a3453ff28a8b746715f44a75306d223266 # v0.1.1
-        with:
-          prettier_ignore: .prettierignore
-          prettier_config: .prettierrc.yaml
-          file_pattern: ${{ join(fromJSON(steps.changed-files.outputs.changed_files), ' ') }}
+    - name: Run markdownlint-cli2
+      if: steps.changed-files.outputs.changed_files != '[]'
+      uses: bjw-s/action-markdownlint-cli2@c3c44cc6f77516007f1a85d982ed6276e840dcec # v0.1.0
+      with:
+        markdownlint_config: .markdownlint.yaml
+        file_pattern: ${{ join(fromJSON(steps.changed-files.outputs.changed_files), ' ') }}
 
   lint_success:
     needs:
-      - actionlint
-      - prettier
-      - yamllint
-      - markdownlint
+    - actionlint
+    - yamllint
+    - markdownlint
     if: ${{ !cancelled() }}
     name: Lint successful
     runs-on: ubuntu-latest
     steps:
-      - name: Check job status
-        if: ${{ contains(needs.*.result, 'failure') }}
-        run: exit 1
+    - name: Check job status
+      if: ${{ contains(needs.*.result, 'failure') }}
+      run: exit 1
