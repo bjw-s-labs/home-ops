@@ -14,11 +14,13 @@ tasks:
       vars:
         - DIR
     preconditions:
-      - '[[ "{{.OPERATION}}" == "build" || "{{.OPERATION}}" == "apply" || "{{.OPERATION}}" == "delete" ]]'
+      - >
+        [[ "{{.OPERATION}}" == "build" || "{{.OPERATION}}" == "apply" || "{{.OPERATION}}" == "delete" ]]
       - which kubectl flux-local
       - test -d {{.KS_DIR}}
     cmds:
-      - flux-local build ks --all-namespaces {{.NS}} --path {{.KS_DIR}} {{.NAME}}
+      - >
+        flux-local build ks --all-namespaces {{.NS}} --path {{.KS_DIR}} {{.NAME}}
         | yq -
         {{ if or (eq .OPERATION "apply") (eq .OPERATION "delete") -}}
         | kubectl {{.OPERATION}} {{- .OPERATION_ARGS}} --filename -
@@ -27,11 +29,12 @@ tasks:
   "*-ks-all":
     desc: Suspend or resume all Flux Kustomizations
     vars:
-      STATE: '{{index .MATCH 0}}'
+      STATE: "{{index .MATCH 0}}"
       NAMESPACES:
         sh: kubectl get ns --no-headers -o custom-columns='NAME:.metadata.name'
     preconditions:
-      - '[[ "{{.STATE}}" == "suspend" || "{{.STATE}}" == "resume" ]]'
+      - >
+        [[ "{{.STATE}}" == "suspend" || "{{.STATE}}" == "resume" ]]
       - which flux kubectl
     cmds:
       - for:

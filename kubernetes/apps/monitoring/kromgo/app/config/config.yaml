@@ -33,39 +33,67 @@ metrics:
     title: CPU
     suffix: "%"
     colors:
-      - {color: "green", min: 0, max: 35}
-      - {color: "orange", min: 36, max: 75}
-      - {color: "red", min: 76, max: 9999}
+      - color: "green"
+        min: 0
+        max: 35
+      - color: "orange"
+        min: 36
+        max: 75
+      - color: "red"
+        min: 76
+        max: 9999
 
   - name: cluster_memory_usage
     query: round(sum(node_memory_MemTotal_bytes{kubernetes_node!=""} - node_memory_MemAvailable_bytes{kubernetes_node!=""}) / sum(node_memory_MemTotal_bytes{kubernetes_node!=""}) * 100, 0.1)
     title: Memory
     suffix: "%"
     colors:
-      - {color: green, min: 0, max: 35}
-      - {color: orange, min: 36, max: 75}
-      - {color: red, min: 76, max: 9999}
+      - color: "green"
+        min: 0
+        max: 35
+      - color: "orange"
+        min: 36
+        max: 75
+      - color: "red"
+        min: 76
+        max: 9999
 
   - name: cluster_age_days
     query: round((time() - max(kube_node_created) ) / 86400)
     title: Age
     suffix: "d"
     colors:
-      - {color: "green", min: 0, max: 180}
-      - {color: "orange", min: 181, max: 360}
-      - {color: "red", min: 361, max: 9999}
+      - color: "green"
+        min: 0
+        max: 180
+      - color: "orange"
+        min: 181
+        max: 360
+      - color: "red"
+        min: 361
+        max: 9999
 
   - name: cluster_uptime_days
     query: round(avg(node_time_seconds{kubernetes_node!=""} - node_boot_time_seconds{kubernetes_node!=""}) / 86400)
     suffix: "d"
     colors:
-      - {color: "green", min: 0, max: 180}
-      - {color: "orange", min: 181, max: 360}
-      - {color: "red", min: 361, max: 9999}
+      - color: "green"
+        min: 0
+        max: 180
+      - color: "orange"
+        min: 181
+        max: 360
+      - color: "red"
+        min: 361
+        max: 9999
 
   - name: cluster_alert_count
     query: ALERTS{alertstate="firing"} - 1 # Ignore Watchdog
-    colors:
-      - { color: "green", min: 0, max: 0 }
-      - { color: "red", min: 1, max: 9999 }
     title: Alerts
+    colors:
+      - color: "green"
+        min: 0
+        max: 0
+      - color: "red"
+        min: 1
+        max: 9999
