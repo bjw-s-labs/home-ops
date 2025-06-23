@@ -18,58 +18,61 @@ spec:
       atuin:
         annotations:
           reloader.stakater.com/auto: "true"
-
         pod:
           securityContext:
+            runAsNonRoot: true
             runAsUser: 2000
             runAsGroup: 2000
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
-
         containers:
           app:
             image:
-              repository: ghcr.io/conradludgate/atuin-server-sqlite
-              tag: v18.4.0@sha256:2b89387bbf532b37c65c73aa8feebd52dd220d2bf392cd7f40d88a7b2e99d4c8
+              repository: ghcr.io/szinn/atuin
+              tag: v18.6.1-sqlite-5@sha256:192389b6b6da30fbf81c6fee8f978a7262d8683657056cf021983481b41162c5
+            command:
+              - atuin
             args:
               - server
               - start
             env:
-              ATUIN_CONFIG_DIR: /config
               ATUIN_DB_URI: sqlite:///config/atuin.db
               ATUIN_HOST: 0.0.0.0
               ATUIN_PORT: &port 8888
               # ATUIN_OPEN_REGISTRATION: true
-              ATUIN_TLS__ENABLE: false
-              ATUIN_TLS__CERT_PATH: ""
-              ATUIN_TLS__PKEY_PATH: ""
             probes:
-              liveness:
+              liveness: &probes
                 enabled: true
-              readiness:
-                enabled: true
-              startup:
-                enabled: true
+                custom: true
                 spec:
-                  failureThreshold: 30
-                  periodSeconds: 5
+                  httpGet:
+                    path: /
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
             resources:
               requests:
                 cpu: 10m
                 memory: 128Mi
               limits:
-                memory: 512Mi
-
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
     service:
       app:
         ports:
           http:
             port: *port
-
     persistence:
       config:
         existingClaim: atuin
-
     route:
       app:
         hostnames:
