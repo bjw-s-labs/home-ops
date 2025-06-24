@@ -80,10 +80,16 @@ spec:
 
     service:
       app:
+        primary: true
+        type: LoadBalancer
+        sessionAffinity: ClientIP
+        annotations:
+          lbipam.cilium.io/ips: 10.1.1.134
         ports:
           http:
             port: 8123
-            primary: true
+      code-server:
+        ports:
           code-server:
             port: 12321
 
@@ -136,7 +142,7 @@ spec:
                     type: ReplacePrefixMatch
                     replacePrefixMatch: /
             backendRefs:
-              - identifier: app
+              - identifier: code-server
                 port: 12321
           - backendRefs:
               - identifier: app
