@@ -1,0 +1,153 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+spec:
+  interval: 30m
+  timeout: 15m
+  chartRef:
+    kind: OCIRepository
+    name: kube-prometheus-stack
+  install:
+    crds: Skip
+  upgrade:
+    crds: Skip
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+  values:
+    crds:
+      enabled: false
+    cleanPrometheusOperatorObjectNames: true
+
+    ###
+    ### Component values
+    ###
+    alertmanager:
+      enabled: false
+
+    kubeApiServer:
+      enabled: true
+      serviceMonitor:
+        metricRelabelings:
+          # Drop high cardinality labels
+          - action: drop
+            sourceLabels:
+              - "__name__"
+            regex: (apiserver|etcd|rest_client)_request(|_sli|_slo)_duration_seconds_bucket
+          - action: drop
+            sourceLabels:
+              - "__name__"
+            regex: (apiserver_response_sizes_bucket|apiserver_watch_events_sizes_bucket)
+
+    kubeControllerManager:
+      enabled: false
+
+    kubeEtcd:
+      enabled: false
+
+    kubelet:
+      enabled: true
+      serviceMonitor:
+        metricRelabelings:
+          # Drop high cardinality labels
+          - action: labeldrop
+            regex: (uid)
+          - action: labeldrop
+            regex: (id|name)
+          - action: drop
+            sourceLabels:
+              - "__name__"
+            regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
+
+    kubeProxy:
+      enabled: false
+
+    kubeScheduler:
+      enabled: false
+
+    kubeStateMetrics:
+      enabled: false
+
+    nodeExporter:
+      enabled: false
+
+    grafana:
+      enabled: false
+      forceDeployDashboards: true
+      sidecar:
+        dashboards:
+          annotations:
+            grafana_folder: Kubernetes
+
+    ###
+    ### Prometheus operator values
+    ###
+    prometheusOperator:
+      resources:
+        requests:
+          cpu: 35m
+          memory: 273M
+        limits:
+          memory: 326M
+
+      prometheusConfigReloader:
+        # resource config for prometheusConfigReloader
+        resources:
+          requests:
+            cpu: 5m
+            memory: 32M
+          limits:
+            memory: 32M
+
+    ###
+    ### Prometheus instance values
+    ###
+    prometheus:
+      prometheusSpec:
+        image:
+          registry: docker.io
+          repository: prompp/prompp
+          tag: 2.53.2-0.3.3
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 64535
+          runAsGroup: 64535
+          fsGroup: 64535
+        alertingEndpoints:
+          - namespace: observability
+            name: alertmanager
+            port: 9093
+            apiVersion: v2
+        podMonitorSelectorNilUsesHelmValues: false
+        probeSelectorNilUsesHelmValues: false
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            memory: 2000M
+        retention: 14d
+        retentionSize: 50GB
+        ruleSelectorNilUsesHelmValues: false
+        scrapeConfigSelectorNilUsesHelmValues: false
+        scrapeInterval: 1m # Must match interval in Grafana Helm chart
+        serviceMonitorSelectorNilUsesHelmValues: false
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: ceph-block
+              resources:
+                requests:
+                  storage: 55Gi
+
+      route:
+        main:
+          enabled: true
+          hostnames:
+            - prometheus.bjw-s.dev
+          parentRefs:
+            - name: internal
+              namespace: kube-system
+              sectionName: https

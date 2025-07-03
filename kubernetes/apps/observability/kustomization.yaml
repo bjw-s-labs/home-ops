@@ -1,0 +1,22 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: observability
+resources:
+  - ./alertmanager/ks.yaml
+  - ./blackbox-exporter/ks.yaml
+  - ./grafana/ks.yaml
+  - ./kromgo/ks.yaml
+  - ./kube-state-metrics/ks.yaml
+  - ./kube-prometheus-stack/ks.yaml
+  - ./loki/ks.yaml
+  - ./node-exporter/ks.yaml
+  - ./prometheus-operator/ks.yaml
+  - ./promtail/ks.yaml
+  - ./silence-operator/ks.yaml
+  - ./smartctl-exporter/ks.yaml
+  - ./unpoller/ks.yaml
+components:
+  - ../../components/namespace
+  - ../../components/flux/alerts
