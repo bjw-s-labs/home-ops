@@ -1,6 +1,6 @@
 ---
-# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/monitoring.giantswarm.io/silence_v1alpha1.json
-apiVersion: monitoring.giantswarm.io/v1alpha1
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/observability.giantswarm.io/silence_v1alpha2.json
+apiVersion: observability.giantswarm.io/v1alpha2
 kind: Silence
 metadata:
   name: cephnodediskspacewarning-nfs
@@ -8,13 +8,11 @@ spec:
   matchers:
     - name: alertname
       value: CephNodeDiskspaceWarning
-      isRegex: false
     - name: mountpoint
       value: /etc/nfsmount.conf
-      isRegex: false
 ---
-# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/monitoring.giantswarm.io/silence_v1alpha1.json
-apiVersion: monitoring.giantswarm.io/v1alpha1
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/observability.giantswarm.io/silence_v1alpha2.json
+apiVersion: observability.giantswarm.io/v1alpha2
 kind: Silence
 metadata:
   name: cephnodediskspacewarning-local
@@ -22,7 +20,6 @@ spec:
   matchers:
     - name: alertname
       value: CephNodeDiskspaceWarning
-      isRegex: false
     - name: device
-      value: /dev/sda6
-      isRegex: false
+      value: /dev/sd.*
+      matchType: "=~"
