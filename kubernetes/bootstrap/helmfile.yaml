@@ -12,7 +12,7 @@ repositories:
 
 releases:
   - name: prometheus-operator-crds
-    namespace: monitoring
+    namespace: observability
     atomic: true
     chart: oci://ghcr.io/prometheus-community/charts/prometheus-operator-crds
     version: 21.0.0
@@ -26,7 +26,7 @@ releases:
       - >
         {{ requiredEnv "ROOT_DIR" }}/kubernetes/apps/kube-system/cilium/app/values.yaml
     needs:
-      - monitoring/prometheus-operator-crds
+      - observability/prometheus-operator-crds
     hooks:
       # Wait for cilium CRDs to be available
       - events:

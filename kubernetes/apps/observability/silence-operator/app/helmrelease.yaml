@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/app-template-4.0.1/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: silence-operator
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: silence-operator
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  values:
+    alertmanagerAddress: http://alertmanager.observability.svc.cluster.local:9093
+    image:
+      registry: quay.io
+    networkPolicy:
+      enabled: false

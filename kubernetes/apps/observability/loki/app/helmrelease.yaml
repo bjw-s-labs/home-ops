@@ -1,0 +1,74 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: loki
+spec:
+  interval: 30m
+  timeout: 15m
+  chartRef:
+    kind: OCIRepository
+    name: loki
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+  values:
+    deploymentMode: SingleBinary
+
+    loki:
+      analytics:
+        reporting_enabled: false
+      auth_enabled: false
+      commonConfig:
+        replication_factor: 1
+      compactor:
+        working_directory: /var/loki/compactor/retention
+        delete_request_store: filesystem
+        retention_enabled: true
+      ingester:
+        chunk_encoding: snappy
+      limits_config:
+        retention_period: 14d
+      schemaConfig:
+        configs:
+          - from: "2024-04-01"
+            store: tsdb
+            object_store: filesystem
+            schema: v13
+            index:
+              prefix: loki_index_
+              period: 24h
+      server:
+        log_level: info
+      storage:
+        type: filesystem
+
+    backend:
+      replicas: 0
+    chunksCache:
+      enabled: false
+    gateway:
+      replicas: 0
+    lokiCanary:
+      enabled: false
+    read:
+      replicas: 0
+    resultsCache:
+      enabled: false
+    sidecar:
+      image:
+        repository: ghcr.io/home-operations/k8s-sidecar
+        tag: 1.30.6@sha256:ee7efa82ce53089e6a0644d16fbf1263020510b938794a0e3da373972dbbdecc
+      rules:
+        searchNamespace: ALL
+    singleBinary:
+      replicas: 1
+      persistence:
+        enabled: true
+        storageClass: ceph-block
+        size: 50Gi
+    test:
+      enabled: false
+    write:
+      replicas: 0
