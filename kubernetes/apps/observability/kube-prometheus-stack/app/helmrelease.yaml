@@ -26,7 +26,28 @@ spec:
     ### Component values
     ###
     alertmanager:
-      enabled: false
+      route:
+        main:
+          enabled: true
+          hostnames:
+            - alertmanager.bjw-s.dev
+          parentRefs:
+            - name: internal
+              namespace: kube-system
+              sectionName: https
+      alertmanagerSpec:
+        alertmanagerConfiguration:
+          name: alertmanager
+          global:
+            resolveTimeout: 5m
+        externalUrl: https://alertmanager.bjw-s.dev
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: ceph-block
+              resources:
+                requests:
+                  storage: 1Gi
 
     kubeApiServer:
       enabled: true
@@ -116,11 +137,6 @@ spec:
           runAsUser: 64535
           runAsGroup: 64535
           fsGroup: 64535
-        alertingEndpoints:
-          - namespace: observability
-            name: alertmanager
-            port: 9093
-            apiVersion: v2
         podMonitorSelectorNilUsesHelmValues: false
         probeSelectorNilUsesHelmValues: false
         resources:
