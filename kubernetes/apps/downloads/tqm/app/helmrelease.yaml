@@ -3,16 +3,13 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: qbtools
+  name: tqm
 spec:
   interval: 30m
   chartRef:
     kind: OCIRepository
     name: app-template
     namespace: flux-system
-  dependsOn:
-    - name: qbittorrent
-      namespace: downloads
   values:
     defaultPodOptions:
       securityContext:
@@ -25,106 +22,63 @@ spec:
           - 65542 # gladius:external-services
 
     controllers:
-      prune:
+      tqm:
         type: cronjob
-
         cronjob: &cronJobSpec
           schedule: "@hourly"
           backoffLimit: 0
           concurrencyPolicy: Forbid
           failedJobsHistory: 1
           successfulJobsHistory: 0
-
-        pod:
-          restartPolicy: Never
-
+          ttlSecondsAfterFinished: 3600
         initContainers:
-          tagging: &container
+          retag: &container
             image:
-              repository: ghcr.io/buroa/qbtools
-              tag: v0.21.1
-            env:
-              QBITTORRENT_HOST: qbittorrent.downloads.svc.cluster.local
-              QBITTORRENT_PORT: 8080
+              repository: ghcr.io/home-operations/tqm
+              tag: 1.15.0@sha256:70545e1a52e5afc4a6474c5b492e127be7b776eb9cea7adea3c6399e67ae2287
             args:
-              - tagging
-              - --added-on
-              - --expired
-              - --last-activity
-              - --sites
-              - --unregistered
-              - --not-linked
+              - retag
+              - qb
             resources:
               requests:
-                memory: 128Mi
-                cpu: 25m
+                cpu: 10m
+                memory: 64Mi
               limits:
-                memory: 256Mi
+                memory: 64Mi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities:
                 drop:
                   - ALL
-
         containers:
-          expired:
+          clean:
             <<: *container
             args:
-              - prune
-              - --exclude-category
-              - manual
-              - --exclude-category
-              - cross-seed
-              - --exclude-tag
-              - added:24h
-              - --include-tag
-              - expired
-
-          unregistered:
-            <<: *container
-            args:
-              - prune
-              - --exclude-category
-              - manual
-              - --exclude-category
-              - cross-seed
-              - --exclude-tag
-              - added:24h
-              - --include-tag
-              - unregistered
-
+              - clean
+              - qb
       orphaned:
         type: cronjob
         cronjob:
           <<: *cronJobSpec
-          schedule: "@daily"
-        pod:
-          restartPolicy: Never
+          schedule: 0 0 * * 0
+          suspend: true
         containers:
           app:
             <<: *container
             args:
-              - orphaned
-              - --exclude-pattern
-              - "*/manual/*"
-              - --exclude-pattern
-              - "*/cross-seed/*"
-
-      reannounce:
-        containers:
-          app:
-            <<: *container
-            args:
-              - reannounce
-              - --process-seeding
-
+              - orphan
+              - qb
     persistence:
+      config:
+        type: emptyDir
+        globalMounts:
+          - path: /.config/tqm
       config-file:
         type: secret
-        name: qbtools-secret
+        name: tqm-secret
         globalMounts:
-          - path: /config/config.yaml
+          - path: /.config/tqm/config.yaml
             subPath: config.yaml
             readOnly: true
       downloads:
