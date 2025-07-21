@@ -175,6 +175,10 @@ controlPlane:
             kind: KubeSchedulerConfiguration
             profiles:
               - schedulerName: default-scheduler
+                plugins:
+                  score:
+                    disabled:
+                      - name: ImageLocality
                 pluginConfig:
                   - name: PodTopologySpread
                     args:
