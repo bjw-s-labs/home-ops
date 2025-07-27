@@ -41,9 +41,10 @@ spec:
               period: 24h
       server:
         log_level: info
+        grpc_server_max_recv_msg_size: 10485760 # 10 MiB
+        grpc_server_max_send_msg_size: 10485760 # 10 MiB
       storage:
         type: filesystem
-
     backend:
       replicas: 0
     chunksCache:
