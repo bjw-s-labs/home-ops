@@ -6,10 +6,6 @@ helmDefaults:
   wait: true
   waitForJobs: true
 
-repositories:
-  - name: cilium
-    url: https://helm.cilium.io
-
 releases:
   - name: prometheus-operator-crds
     namespace: observability
@@ -20,10 +16,10 @@ releases:
   - name: cilium
     namespace: kube-system
     atomic: true
-    chart: cilium/cilium
-    version: 1.17.6
+    chart: oci://ghcr.io/home-operations/charts-mirror/cilium
+    version: 1.18.0
     values:
-      - >
+      - >-
         {{ requiredEnv "ROOT_DIR" }}/kubernetes/apps/kube-system/cilium/app/values.yaml
     needs:
       - observability/prometheus-operator-crds
@@ -54,7 +50,7 @@ releases:
     chart: oci://ghcr.io/coredns/charts/coredns
     version: 1.43.0
     values:
-      - >
+      - >-
         {{ requiredEnv "ROOT_DIR" }}/kubernetes/apps/kube-system/coredns/app/values.yaml
     needs:
       - kube-system/cilium
@@ -65,7 +61,7 @@ releases:
     chart: oci://quay.io/jetstack/charts/cert-manager
     version: v1.18.2
     values:
-      - >
+      - >-
         {{ requiredEnv "ROOT_DIR" }}/kubernetes/apps/cert-manager/cert-manager/app/values.yaml
     needs:
       - kube-system/coredns
@@ -76,7 +72,7 @@ releases:
     chart: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator
     version: 0.26.0
     values:
-      - >
+      - >-
         {{ requiredEnv "ROOT_DIR" }}/kubernetes/apps/flux-system/flux-operator/app/values.yaml
     needs:
       - kube-system/coredns
@@ -88,7 +84,7 @@ releases:
     version: 0.26.0
     wait: false
     values:
-      - >
+      - >-
         {{ requiredEnv "ROOT_DIR" }}/kubernetes/apps/flux-system/flux-operator/instance/values.yaml
     needs:
       - flux-system/flux-operator
