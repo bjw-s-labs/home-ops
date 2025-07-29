@@ -5,15 +5,9 @@ kind: HelmRelease
 metadata:
   name: cilium
 spec:
-  chart:
-    spec:
-      chart: cilium
-      interval: 30m
-      sourceRef:
-        kind: HelmRepository
-        name: cilium
-        namespace: kube-system
-      version: 1.17.6
+  chartRef:
+    kind: OCIRepository
+    name: cilium
   interval: 30m
   valuesFrom:
     - kind: ConfigMap
