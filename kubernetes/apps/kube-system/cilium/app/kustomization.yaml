@@ -3,13 +3,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./helmrepository.yaml
+  - ./ocirepository.yaml
   - ./helmrelease.yaml
   - ./crds.yaml
 configMapGenerator:
   - name: cilium-values
     files:
       - values.yaml=./values.yaml
-
 configurations:
   - kustomizeconfig.yaml
