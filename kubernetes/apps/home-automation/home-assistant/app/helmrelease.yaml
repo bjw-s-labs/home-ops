@@ -72,12 +72,15 @@ spec:
               - /config
             env:
               HASS_SERVER: http://localhost:8123
+              HASS_TOKEN:
+                secretKeyRef:
+                  name: home-assistant-secret
+                  key: vscode_hass_token
             resources:
               requests:
                 cpu: 10m
               limits:
                 memory: 1Gi
-
     service:
       app:
         primary: true
@@ -92,7 +95,6 @@ spec:
         ports:
           code-server:
             port: 12321
-
     persistence:
       config:
         existingClaim: home-assistant-config
