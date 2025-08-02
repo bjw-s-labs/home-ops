@@ -18,6 +18,10 @@ spec:
 
         pod:
           hostNetwork: true
+          priorityClassName: system-node-critical
+          tolerations:
+            - key: CriticalAddonsOnly
+              operator: Exists
 
         initContainers:
           cni-plugins:
@@ -31,14 +35,21 @@ spec:
               repository: ghcr.io/k8snetworkplumbingwg/multus-cni
               tag: v4.2.2
             args:
-              - --cleanup-config-on-exit=true
+              - --cleanup-config-on-exit
+              - --multus-cni-conf-dir=/tmp
             resources:
               requests:
                 cpu: "10m"
               limits:
                 memory: "512Mi"
             securityContext:
-              privileged: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                add:
+                  - NET_ADMIN
+                drop:
+                  - ALL
 
     persistence:
       etc-cni-net-d:
@@ -51,6 +62,8 @@ spec:
         hostPath: /opt/cni/bin
         globalMounts:
           - path: /host/opt/cni/bin
+      tmp:
+        type: emptyDir
 
     rbac:
       roles:
