@@ -1,0 +1,29 @@
+---
+log:
+  output: stdout
+  level: debug
+
+api:
+  listen: :1984
+
+rtsp:
+  listen: :8554
+
+webrtc:
+  listen: :8555
+  candidates:
+    - 10.1.1.133:8555
+    - stun:8555
+  ice_servers:
+    - urls:
+        - stun:stun.cloudflare.com:3478
+
+streams:
+  attic_office_3d_printer_front:
+    - ffmpeg:${RTSP_PATHS_KIDS_SOURCE}
+    - ffmpeg:attic_office_3d_printer_front#audio=opus
+    - ffmpeg:attic_office_3d_printer_front#video=mjpeg
+  driveway_front_door:
+    - ffmpeg:rtsp://scrypted.home-automation.svc.cluster.local:34136/8472285c9f0c0dd8
+    - ffmpeg:driveway_front_door#audio=opus
+    - ffmpeg:driveway_front_door#video=mjpeg
