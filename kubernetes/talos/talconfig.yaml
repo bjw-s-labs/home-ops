@@ -110,10 +110,10 @@ controlPlane:
                 [plugins."io.containerd.grpc.v1.cri"]
                   enable_unprivileged_ports = true
                   enable_unprivileged_icmp = true
-              [plugins."io.containerd.grpc.v1.cri".containerd]
+              [plugins."io.containerd.cri.v1.images"]
                 discard_unpacked_layers = false
-              [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-                discard_unpacked_layers = false
+              [plugins."io.containerd.cri.v1.runtime"]
+                device_ownership_from_security_context = true
 
     # Disable search domain everywhere
     - |-
@@ -229,14 +229,6 @@ controlPlane:
           net.ipv4.neigh.default.gc_thresh2: 8192  # Prevent ARP cache overflows
           net.ipv4.neigh.default.gc_thresh3: 16384 # Prevent ARP cache overflows
           user.max_user_namespaces: 11255          # User namespaces
-
-    # Configure udev rules
-    - |-
-      machine:
-        udev:
-          rules:
-            # Intel GPU
-            - SUBSYSTEM=="drm", KERNEL=="renderD*", GROUP="44", MODE="0660"
 
     # Disable default API server admission plugins.
     - |-
