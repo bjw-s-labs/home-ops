@@ -55,9 +55,15 @@ spec:
             resources:
               requests:
                 cpu: 12m
-                memory: 128M
+                memory: 128Mi
               limits:
-                memory: 512M
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
 
     service:
       app:
