@@ -6,14 +6,9 @@ metadata:
   name: externaldns-unifi
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: external-dns
-      version: 1.15.2
-      sourceRef:
-        kind: HelmRepository
-        name: external-dns-unifi
-      interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: externaldns-unifi
   values:
     fullnameOverride: &name externaldns-unifi
     logLevel: &logLevel info
