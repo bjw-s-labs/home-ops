@@ -6,14 +6,9 @@ metadata:
   name: metrics-server
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: metrics-server
-      version: 3.12.2
-      sourceRef:
-        kind: HelmRepository
-        name: metrics-server
-      interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: metrics-server
   values:
     args:
       - --kubelet-insecure-tls
