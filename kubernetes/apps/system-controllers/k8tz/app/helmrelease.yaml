@@ -5,30 +5,21 @@ kind: HelmRelease
 metadata:
   name: k8tz
 spec:
-  chart:
-    spec:
-      chart: k8tz
-      version: 0.17.1
-      interval: 30m
-      sourceRef:
-        kind: HelmRepository
-        name: k8tz
   interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: k8tz
   values:
     namespace: system-controllers
-
     replicaCount: 2
-
     timezone: Europe/Amsterdam
     cronJobTimeZone: true
-
     webhook:
       certManager:
         enabled: true
         issuerRef:
           name: k8tz-webhook-issuer
           kind: Issuer
-
     affinity:
       podAntiAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
@@ -38,7 +29,6 @@ spec:
                 matchLabels:
                   app.kubernetes.io/name: k8tz
               topologyKey: kubernetes.io/hostname
-
   postRenderers:
     - kustomize:
         patches:
