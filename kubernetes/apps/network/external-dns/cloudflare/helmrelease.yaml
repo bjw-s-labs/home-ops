@@ -6,20 +6,13 @@ metadata:
   name: externaldns-cloudflare
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: external-dns
-      version: 1.16.0
-      sourceRef:
-        kind: HelmRepository
-        name: external-dns-cloudflare
-      interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: externaldns-cloudflare
   install:
     crds: CreateReplace
-    disableSchemaValidation: true # Ref: https://github.com/kubernetes-sigs/external-dns/issues/5206
   upgrade:
     crds: CreateReplace
-    disableSchemaValidation: true # Ref: https://github.com/kubernetes-sigs/external-dns/issues/5206
   values:
     fullnameOverride: &name externaldns-cloudflare
     domainFilters:
@@ -63,7 +56,7 @@ spec:
               version: v1
               kind: Deployment
               name: *name
-            patch: |
+            patch: |-
               - op: add
                 path: /spec/template/spec/enableServiceLinks
                 value: false
