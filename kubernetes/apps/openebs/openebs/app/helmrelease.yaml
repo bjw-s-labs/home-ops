@@ -6,14 +6,9 @@ metadata:
   name: openebs
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: openebs
-      version: 4.2.0
-      interval: 30m
-      sourceRef:
-        kind: HelmRepository
-        name: openebs
+  chartRef:
+    kind: OCIRepository
+    name: openebs
   values:
     localpv-provisioner:
       rbac:
