@@ -11,7 +11,7 @@ bpf:
   preallocateMaps: true
 bpfClockProbe: true
 cgroup:
-  autoMount:
+  automount:
     enabled: false
   hostRoot: /sys/fs/cgroup
 cluster:
@@ -24,12 +24,13 @@ dashboards:
   annotations:
     grafana_folder: Cilium
 devices: bond+
-enableRuntimeDeviceDetection: true
 endpointRoutes:
   enabled: true
 envoy:
-  enabled: true
   rollOutPods: true
+  prometheus:
+    serviceMonitor:
+      enabled: true
 gatewayAPI:
   enabled: true
   enableAlpn: true
@@ -37,7 +38,7 @@ gatewayAPI:
 hubble:
   enabled: false
 ipam:
-  mode: "kubernetes"
+  mode: kubernetes
 ipv4NativeRoutingCIDR: 10.244.0.0/16
 k8sServiceHost: 127.0.0.1
 k8sServicePort: 7445
