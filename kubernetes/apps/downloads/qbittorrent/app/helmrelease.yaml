@@ -175,25 +175,28 @@ spec:
         globalMounts:
           - path: /data/nas-media/Downloads/qbittorrent
             subPath: Downloads/qbittorrent
+      qbrr:
+        type: image
+        image: ghcr.io/buroa/qbrr:0.0.28@sha256:4c86e047a3da5b18a1b5af840d38c11a820d2e07a4155f63865ea3225a222553
       tmp:
         type: emptyDir
-      # gluetun-auth:
-      #   type: secret
-      #   name: qbittorrent-gluetun-secret
-      #   advancedMounts:
-      #     qbittorrent:
-      #       gluetun:
-      #         - path: *gluetunAuthPath
-      #           subPath: auth.toml
-      # coredns:
-      #   type: configMap
-      #   name: qbittorrent-coredns
-      #   advancedMounts:
-      #     qbittorrent:
-      #       coredns:
-      #         - path: /etc/coredns/Corefile
-      #           subPath: Corefile
-      #           readOnly: true
+        # gluetun-auth:
+        #   type: secret
+        #   name: qbittorrent-gluetun-secret
+        #   advancedMounts:
+        #     qbittorrent:
+        #       gluetun:
+        #         - path: *gluetunAuthPath
+        #           subPath: auth.toml
+        # coredns:
+        #   type: configMap
+        #   name: qbittorrent-coredns
+        #   advancedMounts:
+        #     qbittorrent:
+        #       coredns:
+        #         - path: /etc/coredns/Corefile
+        #           subPath: Corefile
+        #           readOnly: true
 
     route:
       app:
