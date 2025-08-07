@@ -27,7 +27,6 @@ spec:
             fsGroupChangePolicy: OnRootMismatch
             supplementalGroups:
               - 65542 # gladius:external-services
-
         initContainers:
           init-config:
             image:
@@ -41,7 +40,6 @@ spec:
                 if [ ! -f /etc/ocis/ocis.yaml ]; then ocis init; else exit 0; fi
             env:
               OCIS_INSECURE: true
-
         containers:
           ocis:
             image:
@@ -74,13 +72,11 @@ spec:
               capabilities:
                 drop:
                   - ALL
-
     service:
       app:
         ports:
           http:
             port: 9200
-
     persistence:
       config:
         type: configMap
@@ -101,7 +97,6 @@ spec:
         globalMounts:
           - path: /tmp
             subPath: tmp
-
     route:
       app:
         hostnames:
