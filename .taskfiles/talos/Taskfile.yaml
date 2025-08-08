@@ -127,3 +127,21 @@ tasks:
       - talosctl --nodes {{.RANDOM_CONTROLLER}} get machineconfig
       - which jq talosctl
     cmd: talosctl kubeconfig --nodes {{.RANDOM_CONTROLLER}} --force {{.KUBERNETES_DIR}}
+
+  generate-iso:
+    desc: Generate a Talos ISO image
+    vars:
+      TALOS_SCHEMATIC:
+        sh: |-
+          minijinja-cli {{.TALOS_DIR}}/schematic.yaml.j2 \
+            | curl --silent -X POST --data-binary @- https://factory.talos.dev/schematics \
+            | jq --raw-output '.id'
+    requires:
+      vars:
+        - VERSION
+    preconditions:
+      - test -f {{.TALOS_DIR}}/schematic.yaml.j2
+      - which wget minijinja-cli jq talosctl
+    cmd: |-
+      wget -O {{.TALOS_DIR}}/talos-{{.VERSION}}.iso \
+          https://factory.talos.dev/image/{{.TALOS_SCHEMATIC}}/{{.VERSION}}/metal-amd64.iso
