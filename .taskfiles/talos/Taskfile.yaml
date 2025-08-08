@@ -21,28 +21,25 @@ tasks:
         {{.MODE | default "auto"}}
       INSECURE:
         sh: talosctl --nodes {{.NODE}} get machineconfig &> /dev/null || echo true
-      MACHINE_TYPE:
-        sh: >-
-          yq 'select(documentIndex == 0) | .machine.type // "worker"' {{.TALOS_DIR}}/nodes/{{.NODE}}.yaml
     requires:
       vars:
         - NODE
     preconditions:
       - op user get --me
       - talosctl config info
-      - test -f {{.TALOS_DIR}}/machineconfig.yaml.j2
-      - test -f {{.TALOS_DIR}}/schematic.yaml.j2
+      - test -f {{.TALOS_DIR}}/controlplane.yaml
+      - test -f {{.TALOS_DIR}}/schematic.yaml
       - test -f {{.TALOS_DIR}}/nodes/{{.NODE}}.yaml
       - which curl jq minijinja-cli op talosctl
     env:
       MACHINE_TYPE: "{{.MACHINE_TYPE}}"
       TALOS_SCHEMATIC:
         sh: >-
-          minijinja-cli {{.TALOS_DIR}}/schematic.yaml.j2 \
+          minijinja-cli {{.TALOS_DIR}}/schematic.yaml \
             | curl --silent -X POST --data-binary @- https://factory.talos.dev/schematics \
             | jq --raw-output '.id'
     cmd: >-
-      minijinja-cli {{.TALOS_DIR}}/machineconfig.yaml.j2 \
+      minijinja-cli {{.TALOS_DIR}}/controlplane.yaml \
         | op inject \
         | talosctl --nodes {{.NODE}} apply-config \
           --mode {{.MODE}} \
@@ -133,14 +130,14 @@ tasks:
     vars:
       TALOS_SCHEMATIC:
         sh: >-
-          minijinja-cli {{.TALOS_DIR}}/schematic.yaml.j2 \
+          cat {{.TALOS_DIR}}/schematic.yaml \
             | curl --silent -X POST --data-binary @- https://factory.talos.dev/schematics \
             | jq --raw-output '.id'
     requires:
       vars:
         - VERSION
     preconditions:
-      - test -f {{.TALOS_DIR}}/schematic.yaml.j2
+      - test -f {{.TALOS_DIR}}/schematic.yaml
       - which wget minijinja-cli jq talosctl
     cmd: >-
       wget -O {{.TALOS_DIR}}/talos-{{.VERSION}}.iso \
