@@ -6,3 +6,27 @@ machine:
       model: Samsung SSD 870
   network:
     hostname: felix.bjw-s.internal
+    interfaces:
+      - interface: bond0
+        bond:
+          deviceSelectors:
+            - hardwareAddr: 48:21:0b:56:09:47
+              driver: igc
+          mode: active-backup
+        dhcp: true
+        vip:
+          ip: 10.1.1.30
+        vlans:
+          - vlanId: 303
+            dhcp: false
+            mtu: 1500
+  nodeLabels:
+    intel.feature.node.kubernetes.io/gpu: "true"
+---
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: local-hostpath
+provisioning:
+  diskSelector:
+    match: disk.model == "Samsung SSD 990 PRO 1TB" && !system_disk
+  minSize: 1TB

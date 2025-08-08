@@ -23,7 +23,7 @@ tasks:
         sh: talosctl --nodes {{.NODE}} get machineconfig &> /dev/null || echo true
       MACHINE_TYPE:
         sh: |-
-          yq '.machine.type // "worker"' {{.TALOS_DIR}}/nodes/{{.NODE}}.yaml
+          yq 'select(documentIndex == 0) | .machine.type // "worker"' {{.TALOS_DIR}}/nodes/{{.NODE}}.yaml
     requires:
       vars:
         - NODE
@@ -31,8 +31,8 @@ tasks:
       - op user get --me
       - talosctl config info
       - test -f {{.TALOS_DIR}}/machineconfig.yaml.j2
-      - test -f {{.TALOS_DIR}}/nodes/{{.NODE}}.yaml
       - test -f {{.TALOS_DIR}}/schematic.yaml.j2
+      - test -f {{.TALOS_DIR}}/nodes/{{.NODE}}.yaml
       - which curl jq minijinja-cli op talosctl
     env:
       MACHINE_TYPE: "{{.MACHINE_TYPE}}"

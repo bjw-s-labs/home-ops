@@ -59,42 +59,16 @@ machine:
     extraConfig:
       maxPods: 150
       serializeImagePulls: false
-    extraMounts:
-      - destination: /var/mnt/extra
-        type: bind
-        source: /var/mnt/extra
-        options:
-          - rbind
-          - rshared
-          - rw
     image: ghcr.io/siderolabs/kubelet:{{ ENV.KUBERNETES_VERSION }}
     nodeIP:
       validSubnets:
         - 10.1.1.0/24
   network:
-    interfaces:
-      - interface: bond0
-        bond:
-          deviceSelectors:
-            - hardwareAddr: 48:21:0b:55:*
-              driver: igc
-            - hardwareAddr: 48:21:0b:56:*
-              driver: igc
-          mode: active-backup
-        dhcp: true
-        vip:
-          ip: &talosVIP 10.1.1.30
-        vlans:
-          - vlanId: 303
-            dhcp: false
-            mtu: 1500
     disableSearchDomain: true
     extraHostEntries:
-      - ip: *talosVIP
+      - ip: 10.1.1.30
         aliases:
           - k8s.bjw-s.internal
-  nodeLabels:
-    intel.feature.node.kubernetes.io/gpu: "true"
   sysctls:
     fs.inotify.max_user_instances: "8192"
     fs.inotify.max_user_watches: "1048576"
@@ -194,11 +168,3 @@ cluster:
   serviceAccount:
     key: op://automation/talos/CLUSTER_SERVICEACCOUNT_KEY
   {% endif %}
----
-apiVersion: v1alpha1
-kind: UserVolumeConfig
-name: local-hostpath
-provisioning:
-  diskSelector:
-    match: disk.model == "Samsung SSD 990 PRO 1TB" && !system_disk
-  minSize: 1TB
