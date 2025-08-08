@@ -10,8 +10,8 @@ metadata:
   name: onepassword-secret
   namespace: external-secrets
 stringData:
-  1password-credentials.json: {{ ENV.ONEPASSWORD_CREDENTIALS }}
-  token: {{ ENV.ONEPASSWORD_CONNECT_TOKEN }}
+  1password-credentials.json: op://Automation/1password connect/credentials
+  token: op://Automation/1password connect/token
 ---
 apiVersion: v1
 kind: Namespace
@@ -24,5 +24,4 @@ metadata:
   name: sops-age
   namespace: flux-system
 stringData:
-  age.agekey: |
-    {{ ENV.FLUX_SOPS_PRIVATE_KEY | indent(4) }}
+  age.agekey: op://automation/flux/sops_private_key
