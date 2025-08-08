@@ -22,7 +22,7 @@ tasks:
       INSECURE:
         sh: talosctl --nodes {{.NODE}} get machineconfig &> /dev/null || echo true
       MACHINE_TYPE:
-        sh: |-
+        sh: >-
           yq 'select(documentIndex == 0) | .machine.type // "worker"' {{.TALOS_DIR}}/nodes/{{.NODE}}.yaml
     requires:
       vars:
@@ -37,11 +37,11 @@ tasks:
     env:
       MACHINE_TYPE: "{{.MACHINE_TYPE}}"
       TALOS_SCHEMATIC:
-        sh: |-
+        sh: >-
           minijinja-cli {{.TALOS_DIR}}/schematic.yaml.j2 \
             | curl --silent -X POST --data-binary @- https://factory.talos.dev/schematics \
             | jq --raw-output '.id'
-    cmd: |-
+    cmd: >-
       minijinja-cli {{.TALOS_DIR}}/machineconfig.yaml.j2 \
         | op inject \
         | talosctl --nodes {{.NODE}} apply-config \
@@ -70,7 +70,7 @@ tasks:
     desc: Upgrade Talos on a single node [NODE=required]
     vars:
       TALOS_IMAGE:
-        sh: |-
+        sh: >-
           talosctl --nodes {{.NODE}} get machineconfig --output=jsonpath='{.spec}' \
             | yq '.machine.install.image | select(. != null)'
     requires:
@@ -132,7 +132,7 @@ tasks:
     desc: Generate a Talos ISO image
     vars:
       TALOS_SCHEMATIC:
-        sh: |-
+        sh: >-
           minijinja-cli {{.TALOS_DIR}}/schematic.yaml.j2 \
             | curl --silent -X POST --data-binary @- https://factory.talos.dev/schematics \
             | jq --raw-output '.id'
@@ -142,6 +142,6 @@ tasks:
     preconditions:
       - test -f {{.TALOS_DIR}}/schematic.yaml.j2
       - which wget minijinja-cli jq talosctl
-    cmd: |-
+    cmd: >-
       wget -O {{.TALOS_DIR}}/talos-{{.VERSION}}.iso \
           https://factory.talos.dev/image/{{.TALOS_SCHEMATIC}}/{{.VERSION}}/metal-amd64.iso
