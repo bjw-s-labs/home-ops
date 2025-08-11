@@ -15,5 +15,12 @@
   kubernetes: {
     managerFilePatterns: ["/^kubernetes/.+\\.ya?ml$/"],
   },
-
+  packageRules: [
+    {
+      description: "Configure prompp versioning",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["docker.io/prompp/prompp"],
+      versioning: "regex:^(?<build>.*)-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
+    },
+  ],
 }
