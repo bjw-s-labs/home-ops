@@ -15,10 +15,15 @@ metadata:
 spec:
   matchConstraints:
     resourceRules:
-      - apiGroups: ["batch"]
-        apiVersions: ["v1"]
-        operations: ["CREATE", "UPDATE"]
-        resources: ["jobs"]
+      - apiGroups:
+          - "batch"
+        apiVersions:
+          - "v1"
+        operations:
+          - "CREATE"
+          - "UPDATE"
+        resources:
+          - "jobs"
   matchConditions:
     - name: has-volsync-job-name-prefix
       expression: >
@@ -43,7 +48,7 @@ spec:
                 name: "jitter",
                 image: "docker.io/library/busybox:latest",
                 imagePullPolicy: "IfNotPresent",
-                command: ["sh", "-c", "sleep $(shuf -i 0-60 -n 1)"]
+                command: ["sh", "-c", "sleep $(shuf -i 0-30 -n 1)"]
               }
             }
           ]
@@ -64,10 +69,15 @@ metadata:
 spec:
   matchConstraints:
     resourceRules:
-      - apiGroups: ["batch"]
-        apiVersions: ["v1"]
-        operations: ["CREATE", "UPDATE"]
-        resources: ["jobs"]
+      - apiGroups:
+          - "batch"
+        apiVersions:
+          - "v1"
+        operations:
+          - "CREATE"
+          - "UPDATE"
+        resources:
+          - "jobs"
   matchConditions:
     - name: has-volsync-job-name-prefix
       expression: >
@@ -83,7 +93,7 @@ spec:
   mutations:
     - patchType: "JSONPatch"
       jsonPatch:
-        expression: >
+        expression: >-
           [
             JSONPatch{
               op: "add", path: "/spec/template/spec/volumes/-",
