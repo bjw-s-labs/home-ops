@@ -132,16 +132,23 @@ tasks:
     desc: Generate a Talos ISO image
     vars:
       TALOS_SCHEMATIC:
-        sh: >-
-          cat {{.TALOS_DIR}}/schematic.yaml \
-            | curl --silent -X POST --data-binary @- https://factory.talos.dev/schematics \
-            | jq --raw-output '.id'
+        sh: task --silent talos:generate-schematic
     requires:
       vars:
         - VERSION
     preconditions:
       - test -f {{.TALOS_DIR}}/schematic.yaml
-      - which wget minijinja-cli jq talosctl
+      - which wget task
     cmd: >-
       wget -O {{.TALOS_DIR}}/talos-{{.VERSION}}.iso \
           https://factory.talos.dev/image/{{.TALOS_SCHEMATIC}}/{{.VERSION}}/metal-amd64.iso
+
+  generate-schematic:
+    desc: Generate a Talos schematic
+    cmd: |
+      cat {{.TALOS_DIR}}/schematic.yaml \
+        | curl --silent -X POST --data-binary @- https://factory.talos.dev/schematics \
+        | jq --raw-output '.id'
+    preconditions:
+      - test -f {{.TALOS_DIR}}/schematic.yaml
+      - which curl jq
