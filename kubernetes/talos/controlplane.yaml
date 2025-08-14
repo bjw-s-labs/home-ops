@@ -1,14 +1,10 @@
-{% set is_controlplane = (ENV.MACHINE_TYPE == 'controlplane') %}
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/refs/heads/release-1.10/website/content/v1.10/schemas/config.schema.json
 version: v1alpha1
 machine:
-  token: op://automation/talos/MACHINE_TOKEN
   ca:
     crt: op://automation/talos/MACHINE_CA_CRT
-    {% if is_controlplane %}
     key: op://automation/talos/MACHINE_CA_KEY
-    {% endif %}
   features:
     apidCheckExtKeyUsage: true
     diskQuotaSupport: true
@@ -19,7 +15,6 @@ machine:
     kubePrism:
       enabled: true
       port: 7445
-    {% if is_controlplane %}
     kubernetesTalosAPIAccess:
       enabled: true
       allowedRoles:
@@ -27,7 +22,6 @@ machine:
       allowedKubernetesNamespaces:
         - actions-runner-system
         - system-upgrade
-    {% endif %}
     rbac: true
     stableHostname: true
   files:
@@ -52,14 +46,14 @@ machine:
         noatime=True
         nconnect=16
   install:
-    image: factory.talos.dev/metal-installer/{{ ENV.TALOS_SCHEMATIC }}:{{ ENV.TALOS_VERSION }}
+    image: factory.talos.dev/metal-installer/a30c16a32db3c99cb35f22401fad96807f80896dfc86aa4ec716ed6b4aff09de:v1.11.0-beta.2
   kubelet:
     defaultRuntimeSeccompProfileEnabled: true
     disableManifestsDirectory: true
     extraConfig:
       maxPods: 150
       serializeImagePulls: false
-    image: ghcr.io/siderolabs/kubelet:{{ ENV.KUBERNETES_VERSION }}
+    image: ghcr.io/siderolabs/kubelet:v1.33.3
     nodeIP:
       validSubnets:
         - 10.1.1.0/24
@@ -83,10 +77,15 @@ machine:
     disabled: false
     servers:
       - 10.1.1.12
-  type: {{ ENV.MACHINE_TYPE }}
+  token: op://automation/talos/MACHINE_TOKEN
+  type: controlplane
 cluster:
+  aggregatorCA:
+    crt: op://automation/talos/CLUSTER_AGGREGATORCA_CRT
+    key: op://automation/talos/CLUSTER_AGGREGATORCA_KEY
+  allowSchedulingOnControlPlanes: true
   apiServer:
-    image: registry.k8s.io/kube-apiserver:{{ ENV.KUBERNETES_VERSION }}
+    image: registry.k8s.io/kube-apiserver:v1.33.3
     extraArgs:
       enable-aggregator-routing: "true"
       feature-gates: MutatingAdmissionPolicy=true
@@ -97,11 +96,15 @@ cluster:
     disablePodSecurityPolicy: true
   ca:
     crt: op://automation/talos/CLUSTER_CA_CRT
-    {% if is_controlplane %}
     key: op://automation/talos/CLUSTER_CA_KEY
-    {% endif %}
+  controllerManager:
+    image: registry.k8s.io/kube-controller-manager:v1.33.3
+    extraArgs:
+      bind-address: 0.0.0.0
   controlPlane:
     endpoint: https://k8s.bjw-s.internal:6443
+  coreDNS:
+    disabled: true
   clusterName: home-ops # TODO; rename this to "main"
   discovery:
     enabled: true
@@ -110,6 +113,14 @@ cluster:
         disabled: true
       service:
         disabled: false
+  etcd:
+    advertisedSubnets:
+      - 10.1.1.0/24
+    ca:
+      crt: op://automation/talos/CLUSTER_ETCD_CA_CRT
+      key: op://automation/talos/CLUSTER_ETCD_CA_KEY
+    extraArgs:
+      listen-metrics-urls: http://0.0.0.0:2381
   id: op://automation/talos/CLUSTER_ID
   network:
     cni:
@@ -119,30 +130,9 @@ cluster:
       - 10.244.0.0/16
     serviceSubnets:
       - 10.96.0.0/12
-  secret: op://automation/talos/CLUSTER_SECRET
-  token: op://automation/talos/CLUSTER_TOKEN
-  {% if is_controlplane %}
-  aggregatorCA:
-    crt: op://automation/talos/CLUSTER_AGGREGATORCA_CRT
-    key: op://automation/talos/CLUSTER_AGGREGATORCA_KEY
-  allowSchedulingOnControlPlanes: true
-  controllerManager:
-    image: registry.k8s.io/kube-controller-manager:{{ ENV.KUBERNETES_VERSION }}
-    extraArgs:
-      bind-address: 0.0.0.0
-  coreDNS:
-    disabled: true
-  etcd:
-    advertisedSubnets:
-      - 10.1.1.0/24
-    ca:
-      crt: op://automation/talos/CLUSTER_ETCD_CA_CRT
-      key: op://automation/talos/CLUSTER_ETCD_CA_KEY
-    extraArgs:
-      listen-metrics-urls: http://0.0.0.0:2381
   proxy:
     disabled: true
-    image: registry.k8s.io/kube-proxy:{{ ENV.KUBERNETES_VERSION }}
+    image: registry.k8s.io/kube-proxy:v1.33.3
   scheduler:
     config:
       apiVersion: kubescheduler.config.k8s.io/v1
@@ -163,8 +153,9 @@ cluster:
           schedulerName: default-scheduler
     extraArgs:
       bind-address: 0.0.0.0
-    image: registry.k8s.io/kube-scheduler:{{ ENV.KUBERNETES_VERSION }}
+    image: registry.k8s.io/kube-scheduler:v1.33.3
+  secret: op://automation/talos/CLUSTER_SECRET
   secretboxEncryptionSecret: op://automation/talos/CLUSTER_SECRETBOXENCRYPTIONSECRET
   serviceAccount:
     key: op://automation/talos/CLUSTER_SERVICEACCOUNT_KEY
-  {% endif %}
+  token: op://automation/talos/CLUSTER_TOKEN
