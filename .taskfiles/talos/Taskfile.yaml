@@ -104,7 +104,7 @@ tasks:
   generate-iso:
     desc: Generate a Talos ISO image
     vars:
-      TALOS_SCHEMATIC:
+      SCHEMATIC:
         sh: task --silent talos:generate-schematic
     requires:
       vars:
@@ -112,9 +112,11 @@ tasks:
     preconditions:
       - test -f {{.TALOS_DIR}}/schematic.yaml
       - which wget task
+    status:
+      - test -f {{.TALOS_DIR}}/talos-{{.VERSION}}-{{substr 0 8 .SCHEMATIC}}.iso
     cmd: >-
-      wget -O {{.TALOS_DIR}}/talos-{{.VERSION}}.iso \
-          https://factory.talos.dev/image/{{.TALOS_SCHEMATIC}}/{{.VERSION}}/metal-amd64.iso
+      wget -O {{.TALOS_DIR}}/talos-{{.VERSION}}-{{substr 0 8 .SCHEMATIC}}.iso \
+          https://factory.talos.dev/image/{{.SCHEMATIC}}/{{.VERSION}}/metal-amd64.iso
 
   generate-schematic:
     desc: Generate a Talos schematic
