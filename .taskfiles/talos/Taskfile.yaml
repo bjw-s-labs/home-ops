@@ -93,6 +93,9 @@ tasks:
   reset-node:
     desc: Reset Talos on a single node [NODE=required]
     prompt: Reset Talos node '{{.NODE}}' ... continue?
+    vars:
+      MODE: >-
+        {{.MODE}}
     requires:
       vars:
         - NODE
@@ -100,7 +103,7 @@ tasks:
       - talosctl config info
       - talosctl --nodes {{.NODE}} get machineconfig
       - which talosctl
-    cmd: talosctl --nodes {{.NODE}} reset --graceful=false --user-disks-to-wipe u-local-hostpath
+    cmd: talosctl --nodes {{.NODE}} reset --graceful=false --user-disks-to-wipe u-local-hostpath {{if eq .MODE "reboot"}}--reboot{{end}}
 
   reset-cluster:
     desc: Reset Talos across the whole cluster
