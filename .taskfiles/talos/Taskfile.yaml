@@ -16,7 +16,7 @@ tasks:
     desc: Apply Talos config for a node [NODE=required] [MODE=auto]
     vars:
       DRYRUN: >-
-        {{.INSECURE | default "false"}}
+        {{.DRYRUN | default false}}
       MODE: >-
         {{.MODE | default "auto"}}
       INSECURE:
@@ -44,7 +44,7 @@ tasks:
         | talosctl --nodes {{.NODE}} apply-config \
           --mode {{.MODE}} \
           --config-patch @{{.TALOS_DIR}}/nodes/{{.NODE}}.yaml \
-          --file /dev/stdin {{if .INSECURE}}--insecure{{end}} {{if .DRYRUN}}--dry-run{{end}}
+          --file /dev/stdin {{if .INSECURE}}--insecure{{end}} {{if eq .DRYRUN "true"}}--dry-run{{end}}
 
   apply-cluster:
     desc: Apply the Talos config on all nodes for an existing cluster [CLUSTER=main]
