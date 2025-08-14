@@ -9,6 +9,7 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
+      minimumGroupSize: 2,
     },
     {
       description: "Actions Runner Controller Group",
@@ -21,6 +22,7 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
+      minimumGroupSize: 2,
     },
     {
       description: ["Cert-Manager Group"],
@@ -30,6 +32,7 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
+      minimumGroupSize: 2,
     },
     {
       description: ["Cilium Group"],
@@ -39,6 +42,7 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
+      minimumGroupSize: 2,
     },
     {
       description: "CoreDNS Group",
@@ -48,6 +52,7 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
+      minimumGroupSize: 2,
     },
     {
       description: "External Secrets Operator Group",
@@ -57,6 +62,7 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
+      minimumGroupSize: 2,
     },
     {
       description: "Flux Operator Group",
@@ -66,6 +72,22 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
+      minimumGroupSize: 2,
+    },
+    {
+      description: "Kubernetes Group",
+      groupName: "Kubernetes",
+      matchDatasources: ["docker"],
+      matchPackageNames: [
+        "/kube-apiserver/",
+        "/kube-controller-manager/",
+        "/kube-scheduler/",
+        "/kubelet/",
+      ],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      minimumGroupSize: 4,
     },
     {
       description: "Rook-Ceph Group",
@@ -75,15 +97,37 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
+      minimumGroupSize: 2,
     },
     {
       description: "Silence-Operator Group",
       groupName: "Silence-Operator",
-      matchPackageNames: ["/silence-operator/"],
       matchDatasources: ["docker", "github-releases"],
+      matchPackageNames: ["/silence-operator/"],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
+      minimumGroupSize: 2,
+    },
+    {
+      description: "Spegel Group",
+      groupName: "Spegel",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/spegel/"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      minimumGroupSize: 2,
+    },
+    {
+      description: "Talos Group",
+      groupName: "Talos",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/metal-installer/", "/talosctl/"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      minimumGroupSize: 2,
     },
   ],
 }
