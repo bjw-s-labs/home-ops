@@ -6,16 +6,18 @@ metadata:
   name: &appname mosquitto
   namespace: &namespace database
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
   interval: 30m
-  timeout: 5m
   path: "./kubernetes/apps/database/mosquitto/app"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  wait: false
+  targetNamespace: *namespace
+  timeout: 5m

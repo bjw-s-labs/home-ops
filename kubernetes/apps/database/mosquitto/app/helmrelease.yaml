@@ -14,25 +14,16 @@ spec:
     configMaps:
       config:
         data:
-          mosquitto-0.conf: |
-            listener 1883
+          mosquitto.conf: |
             allow_anonymous true
-            log_type error
-            log_type warning
-          mosquitto-1.conf: |
+            autosave_interval 60
+            connection_messages false
             listener 1883
-            allow_anonymous true
-            log_type error
-            log_type warning
-            connection mosquitto-bridge
-            address mosquitto-0.mosquitto.database.svc.cluster.local:1883
-            clientid mosquitto-bridge
-            topic # both 0
-
+            per_listener_settings false
+            persistence true
+            persistence_location /config
     controllers:
       mosquitto:
-        type: statefulset
-        replicas: 2
         pod:
           securityContext:
             runAsUser: 2000
@@ -44,44 +35,33 @@ spec:
             image:
               repository: public.ecr.aws/docker/library/eclipse-mosquitto
               tag: 2.0.22
-            command:
-              - sh
-              - -c
-            args:
-              - exec mosquitto -c "/config/$(hostname).conf"
             probes:
               liveness:
                 enabled: true
-                custom: true
-                spec:
-                  exec:
-                    command:
-                      - /bin/sh
-                      - -c
-                      - >-
-                        /usr/bin/mosquitto_pub -h localhost -p 1883 -t mosquitto/healthcheck/$(hostname)/liveness -m "ok $(date)" -r -q 0
               readiness:
                 enabled: true
             resources:
               limits:
                 memory: 256Mi
               requests:
-                cpu: 2m
-                memory: 16Mi
+                cpu: 10m
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities:
                 drop:
                   - ALL
-
     persistence:
       config:
+        existingClaim: "{{ .Release.Name }}-cache"
+      config-file:
         type: configMap
         identifier: config
-        globalMounts:
-          - path: /config
-
+        advancedMounts:
+          mosquitto:
+            app:
+              - path: /mosquitto/config/mosquitto.conf
+                subPath: mosquitto.conf
     service:
       mosquitto:
         type: LoadBalancer
