@@ -6,16 +6,20 @@ metadata:
   name: &appname openebs
   namespace: &namespace openebs
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  interval: 30m
-  timeout: 5m
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: *appname
+      namespace: *namespace
+  interval: 1h
   path: "./kubernetes/apps/openebs/openebs/app"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  wait: false
+  targetNamespace: *namespace
+  timeout: 5m

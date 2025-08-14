@@ -6,16 +6,32 @@ metadata:
   name: &appname volsync
   namespace: &namespace system
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  interval: 30m
-  timeout: 5m
+  components:
+    - ../../../../components/keda/nas-nfs-scaler
+  dependsOn:
+    - name: keda
+      namespace: system
+    - name: openebs
+      namespace: openebs
+    - name: snapshot-controller
+      namespace: system-controllers
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: *appname
+      namespace: *namespace
+  interval: 1h
   path: "./kubernetes/apps/system/volsync/app"
+  postBuild:
+    substitute:
+      APP: *appname
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  wait: true
+  timeout: 5m
+  targetNamespace: *namespace
