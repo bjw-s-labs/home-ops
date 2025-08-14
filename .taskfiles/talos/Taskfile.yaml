@@ -2,15 +2,6 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
-vars:
-  SYSTEM_UPGRADE_KS: "{{.K8S_DIR}}/apps/system-upgrade/system-upgrade-controller/ks.yaml"
-
-env:
-  KUBERNETES_VERSION:
-    sh: yq '.spec.postBuild.substitute.KUBERNETES_VERSION | select(.)' {{.SYSTEM_UPGRADE_KS}}
-  TALOS_VERSION:
-    sh: yq '.spec.postBuild.substitute.TALOS_VERSION | select(.)' {{.SYSTEM_UPGRADE_KS}}
-
 tasks:
   apply-node:
     desc: Apply Talos config for a node [NODE=required] [MODE=auto]
@@ -30,16 +21,9 @@ tasks:
       - test -f {{.TALOS_DIR}}/controlplane.yaml
       - test -f {{.TALOS_DIR}}/schematic.yaml
       - test -f {{.TALOS_DIR}}/nodes/{{.NODE}}.yaml
-      - which curl jq minijinja-cli op talosctl
-    env:
-      MACHINE_TYPE: "{{.MACHINE_TYPE}}"
-      TALOS_SCHEMATIC:
-        sh: >-
-          minijinja-cli {{.TALOS_DIR}}/schematic.yaml \
-            | curl --silent -X POST --data-binary @- https://factory.talos.dev/schematics \
-            | jq --raw-output '.id'
+      - which cat op talosctl
     cmd: >-
-      minijinja-cli {{.TALOS_DIR}}/controlplane.yaml \
+      cat {{.TALOS_DIR}}/controlplane.yaml \
         | op inject \
         | talosctl --nodes {{.NODE}} apply-config \
           --mode {{.MODE}} \
@@ -76,19 +60,8 @@ tasks:
     preconditions:
       - talosctl config info
       - talosctl --nodes {{.NODE}} get machineconfig
-      - which minijinja-cli talosctl yq
+      - which talosctl yq
     cmd: talosctl --nodes {{.NODE}} upgrade --image={{.TALOS_IMAGE}} --timeout=10m
-
-  upgrade-k8s:
-    desc: Upgrade Kubernetes across the whole cluster
-    vars:
-      RANDOM_CONTROLLER:
-        sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | shuf -n 1
-    preconditions:
-      - talosctl config info
-      - talosctl --nodes {{.RANDOM_CONTROLLER}} get machineconfig
-      - which jq talosctl
-    cmd: talosctl --nodes {{.RANDOM_CONTROLLER}} upgrade-k8s --to $KUBERNETES_VERSION
 
   reset-node:
     desc: Reset Talos on a single node [NODE=required]
