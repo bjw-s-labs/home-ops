@@ -22,7 +22,7 @@ tasks:
     prompt: Bootstrap Kubernetes Apps ...?
     preconditions:
       - which helmfile jq kubectl op talosctl
-      - test -f {{.K8S_DIR}}/bootstrap/helmfile.yaml
+      - test -d {{.K8S_DIR}}/bootstrap/helmfile.d
       - test -f {{.K8S_DIR}}/bootstrap/resources.yaml.j2
       - op user get --me
       - talosctl config info
@@ -35,4 +35,4 @@ tasks:
       - defer: talosctl kubeconfig --nodes {{.RANDOM_CONTROLLER}} --force {{.KUBERNETES_DIR}}
       - until kubectl wait nodes --for=condition=Ready=False --all --timeout=10m; do sleep 5; done
       - minijinja-cli {{.K8S_DIR}}/bootstrap/resources.yaml.j2 | op inject | kubectl apply --server-side --filename -
-      - helmfile --file {{.K8S_DIR}}/bootstrap/helmfile.yaml sync --hide-notes
+      - helmfile --file {{.K8S_DIR}}/bootstrap sync --hide-notes

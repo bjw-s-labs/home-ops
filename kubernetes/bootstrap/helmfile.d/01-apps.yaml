@@ -7,19 +7,12 @@ helmDefaults:
   waitForJobs: true
 
 releases:
-  - name: prometheus-operator-crds
-    namespace: observability
-    chart: oci://ghcr.io/prometheus-community/charts/prometheus-operator-crds
-    version: 22.0.2
-
   - name: cilium
     namespace: kube-system
     chart: oci://ghcr.io/home-operations/charts-mirror/cilium
     version: 1.18.0
     values:
-      - ../apps/kube-system/cilium/app/values.yaml
-    needs:
-      - observability/prometheus-operator-crds
+      - ../../apps/kube-system/cilium/app/values.yaml
     hooks:
       # Apply cilium network configuration
       - events:
@@ -31,7 +24,7 @@ releases:
           - --server-side
           - --field-manager=kustomize-controller
           - --kustomize
-          - ../apps/kube-system/cilium/config/
+          - ../../apps/kube-system/cilium/config/
         showlogs: true
 
   - name: coredns
@@ -39,7 +32,7 @@ releases:
     chart: oci://ghcr.io/coredns/charts/coredns
     version: 1.43.2
     values:
-      - ../apps/kube-system/coredns/app/values.yaml
+      - ../../apps/kube-system/coredns/app/values.yaml
     needs:
       - kube-system/cilium
 
@@ -48,7 +41,7 @@ releases:
     chart: oci://ghcr.io/spegel-org/helm-charts/spegel
     version: 0.3.0
     values:
-      - ../apps/system/spegel/app/values.yaml
+      - ../../apps/system/spegel/app/values.yaml
     needs:
       - kube-system/coredns
 
@@ -57,27 +50,18 @@ releases:
     chart: oci://quay.io/jetstack/charts/cert-manager
     version: v1.18.2
     values:
-      - ../apps/cert-manager/cert-manager/app/values.yaml
+      - ../../apps/cert-manager/cert-manager/app/values.yaml
     needs:
       - system/spegel
-
-  - name: external-secrets
-    namespace: external-secrets
-    chart: oci://ghcr.io/external-secrets/charts/external-secrets
-    version: 0.19.2
-    values:
-      - ../apps/external-secrets/external-secrets/app/values.yaml
-    needs:
-      - cert-manager/cert-manager
 
   - name: flux-operator
     namespace: flux-system
     chart: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator
     version: 0.27.0
     values:
-      - ../apps/flux-system/flux-operator/app/values.yaml
+      - ../../apps/flux-system/flux-operator/app/values.yaml
     needs:
-      - external-secrets/external-secrets
+      - cert-manager/cert-manager
 
   - name: flux-instance
     namespace: flux-system
@@ -85,6 +69,6 @@ releases:
     version: 0.27.0
     wait: false
     values:
-      - ../apps/flux-system/flux-operator/instance/values.yaml
+      - ../../apps/flux-system/flux-operator/instance/values.yaml
     needs:
       - flux-system/flux-operator
