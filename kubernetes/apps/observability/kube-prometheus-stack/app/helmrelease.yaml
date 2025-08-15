@@ -11,15 +11,15 @@ spec:
     kind: OCIRepository
     name: kube-prometheus-stack
   install:
-    crds: Skip
+    crds: CreateReplace
   upgrade:
-    crds: Skip
+    crds: CreateReplace
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
   values:
     crds:
-      enabled: false
+      enabled: true
     cleanPrometheusOperatorObjectNames: true
 
     ###
