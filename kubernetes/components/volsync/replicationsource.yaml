@@ -15,6 +15,7 @@ spec:
       - "${VOLSYNC_CACHE_ACCESSMODES:=ReadWriteOnce}"
     cacheCapacity: "${VOLSYNC_CAPACITY:=5Gi}"
     cacheStorageClassName: "${VOLSYNC_CACHE_SNAPSHOTCLASS:=openebs-hostpath}"
+    compression: zstd-fastest
     copyMethod: Snapshot
     moverSecurityContext:
       runAsUser: ${APP_UID:=2000}
