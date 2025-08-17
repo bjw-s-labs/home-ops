@@ -76,7 +76,7 @@ tasks:
       - talosctl config info
       - talosctl --nodes {{.NODE}} get machineconfig
       - which talosctl
-    cmd: talosctl --nodes {{.NODE}} reset --graceful=false --user-disks-to-wipe u-local-hostpath {{if eq .MODE "reboot"}}--reboot{{end}}
+    cmd: talosctl --nodes {{.NODE}} reset --graceful=false {{if eq .MODE "reboot"}}--reboot{{end}}
 
   reset-cluster:
     desc: Reset Talos across the whole cluster
@@ -88,7 +88,7 @@ tasks:
     vars:
       NODES:
         sh: talosctl config info --output json | jq --join-output '[.nodes[]] | join(",")'
-    cmd: talosctl --nodes {{.NODES}} reset --graceful=false --user-disks-to-wipe u-local-hostpath
+    cmd: talosctl --nodes {{.NODES}} reset --graceful=false {{if eq .MODE "reboot"}}--reboot{{end}}
 
   generate-kubeconfig:
     desc: Generate the kubeconfig for a Talos cluster
