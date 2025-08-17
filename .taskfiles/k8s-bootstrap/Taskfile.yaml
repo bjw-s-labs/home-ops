@@ -22,13 +22,15 @@ tasks:
     prompt: Bootstrap Kubernetes Apps ...?
     preconditions:
       - which helmfile yq jq kubectl op talosctl
-      - test -d {{.K8S_DIR}}/bootstrap/helmfile.d/00-crds.yaml
-      - test -d {{.K8S_DIR}}/bootstrap/helmfile.d/01-apps.yaml
+      - test -f {{.K8S_DIR}}/bootstrap/helmfile.d/00-crds.yaml
+      - test -f {{.K8S_DIR}}/bootstrap/helmfile.d/01-apps.yaml
       - test -f {{.K8S_DIR}}/bootstrap/resources.yaml.j2
       - op user get --me
       - talosctl config info
       - talosctl --nodes {{.RANDOM_CONTROLLER}} get machineconfig
-    env:
+    vars:
+      CONTEXT:
+        sh: talosctl config info --output json | jq --raw-output '.context'
       RANDOM_CONTROLLER:
         sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | shuf -n 1
     cmds:
