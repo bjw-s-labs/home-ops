@@ -9,31 +9,93 @@ spec:
     kind: OCIRepository
     name: cilium
   interval: 30m
-  valuesFrom:
-    - kind: ConfigMap
-      name: cilium-values
   values:
-    hubble:
+    autoDirectNodeRoutes: true
+    bandwidthManager:
+      bbr: true
       enabled: true
-      metrics:
-        enabled:
-          - dns:query
-          - drop
-          - tcp
-          - flow
-          - port-distribution
-          - icmp
-          - http
+    bgpControlPlane:
+      enabled: true
+    bpf:
+      datapathMode: netkit
+      masquerade: true
+      preallocateMaps: true
+    bpfClockProbe: true
+    cgroup:
+      automount:
+        enabled: false
+      hostRoot: /sys/fs/cgroup
+    cluster:
+      id: 1
+      name: main
+    cni:
+      exclusive: false
+    dashboards:
+      enabled: true
+      annotations:
+        grafana_folder: Cilium
+    devices: bond+
+    endpointRoutes:
+      enabled: true
+    envoy:
+      rollOutPods: true
+      prometheus:
         serviceMonitor:
           enabled: true
-        dashboards:
+    gatewayAPI:
+      enabled: true
+      enableAlpn: true
+      xffNumTrustedHops: 1
+    hubble:
+      enabled: false
+    ipam:
+      mode: kubernetes
+    ipv4NativeRoutingCIDR: 10.244.0.0/16
+    k8sServiceHost: 127.0.0.1
+    k8sServicePort: 7445
+    kubeProxyReplacement: true
+    kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
+    l2announcements:
+      enabled: false
+    loadBalancer:
+      algorithm: maglev
+      mode: dsr
+    localRedirectPolicy: true
+    operator:
+      dashboards:
+        enabled: true
+        annotations:
+          grafana_folder: Cilium
+      prometheus:
+        enabled: true
+        serviceMonitor:
           enabled: true
-      relay:
+      replicas: 2
+      rollOutPods: true
+    prometheus:
+      enabled: true
+      serviceMonitor:
         enabled: true
-        rollOutPods: true
-        prometheus:
-          serviceMonitor:
-            enabled: true
-      ui:
-        enabled: true
-        rollOutPods: true
+        trustCRDsExist: true
+    rollOutCiliumPods: true
+    routingMode: native
+    securityContext:
+      capabilities:
+        ciliumAgent:
+          - CHOWN
+          - KILL
+          - NET_ADMIN
+          - NET_RAW
+          - IPC_LOCK
+          - SYS_ADMIN
+          - SYS_RESOURCE
+          - PERFMON
+          - BPF
+          - DAC_OVERRIDE
+          - FOWNER
+          - SETGID
+          - SETUID
+        cleanCiliumState:
+          - NET_ADMIN
+          - SYS_ADMIN
+          - SYS_RESOURCE
