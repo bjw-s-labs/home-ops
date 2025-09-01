@@ -53,7 +53,7 @@ machine:
     extraConfig:
       maxPods: 150
       serializeImagePulls: false
-    image: ghcr.io/siderolabs/kubelet:v1.33.4
+    image: ghcr.io/siderolabs/kubelet:v1.34.0
     nodeIP:
       validSubnets:
         - 10.1.1.0/24
@@ -85,11 +85,11 @@ cluster:
     key: op://automation/talos/CLUSTER_AGGREGATORCA_KEY
   allowSchedulingOnControlPlanes: true
   apiServer:
-    image: registry.k8s.io/kube-apiserver:v1.33.4
+    image: registry.k8s.io/kube-apiserver:v1.34.0
     extraArgs:
       enable-aggregator-routing: "true"
       feature-gates: MutatingAdmissionPolicy=true
-      runtime-config: admissionregistration.k8s.io/v1alpha1=true
+      runtime-config: admissionregistration.k8s.io/v1beta1=true
     certSANs:
       - k8s.bjw-s.internal
       - 127.0.0.1 # KubePrism
@@ -98,7 +98,7 @@ cluster:
     crt: op://automation/talos/CLUSTER_CA_CRT
     key: op://automation/talos/CLUSTER_CA_KEY
   controllerManager:
-    image: registry.k8s.io/kube-controller-manager:v1.33.4
+    image: registry.k8s.io/kube-controller-manager:v1.34.0
     extraArgs:
       bind-address: 0.0.0.0
   controlPlane:
@@ -152,7 +152,7 @@ cluster:
           schedulerName: default-scheduler
     extraArgs:
       bind-address: 0.0.0.0
-    image: registry.k8s.io/kube-scheduler:v1.33.4
+    image: registry.k8s.io/kube-scheduler:v1.34.0
   secret: op://automation/talos/CLUSTER_SECRET
   secretboxEncryptionSecret: op://automation/talos/CLUSTER_SECRETBOXENCRYPTIONSECRET
   serviceAccount:
