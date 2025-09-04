@@ -4,7 +4,9 @@ version: v1alpha1
 machine:
   ca:
     crt: op://automation/talos/MACHINE_CA_CRT
+    {% if ENV.IS_CONTROLPLANE %}
     key: op://automation/talos/MACHINE_CA_KEY
+    {% endif %}
   features:
     apidCheckExtKeyUsage: true
     diskQuotaSupport: true
@@ -15,6 +17,7 @@ machine:
     kubePrism:
       enabled: true
       port: 7445
+    {% if ENV.IS_CONTROLPLANE %}
     kubernetesTalosAPIAccess:
       enabled: true
       allowedRoles:
@@ -22,6 +25,7 @@ machine:
       allowedKubernetesNamespaces:
         - actions-runner-system
         - system-upgrade
+    {% endif %}
     rbac: true
     stableHostname: true
   files:
@@ -80,6 +84,7 @@ machine:
   token: op://automation/talos/MACHINE_TOKEN
   type: controlplane
 cluster:
+  {% if ENV.IS_CONTROLPLANE %}
   aggregatorCA:
     crt: op://automation/talos/CLUSTER_AGGREGATORCA_CRT
     key: op://automation/talos/CLUSTER_AGGREGATORCA_KEY
@@ -94,25 +99,12 @@ cluster:
       - k8s.bjw-s.internal
       - 127.0.0.1 # KubePrism
     disablePodSecurityPolicy: true
-  ca:
-    crt: op://automation/talos/CLUSTER_CA_CRT
-    key: op://automation/talos/CLUSTER_CA_KEY
   controllerManager:
     image: registry.k8s.io/kube-controller-manager:v1.34.0
     extraArgs:
       bind-address: 0.0.0.0
-  controlPlane:
-    endpoint: https://k8s.bjw-s.internal:6443
   coreDNS:
     disabled: true
-  clusterName: home-ops
-  discovery:
-    enabled: true
-    registries:
-      kubernetes:
-        disabled: true
-      service:
-        disabled: false
   etcd:
     advertisedSubnets:
       - 10.1.1.0/24
@@ -121,17 +113,9 @@ cluster:
       key: op://automation/talos/CLUSTER_ETCD_CA_KEY
     extraArgs:
       listen-metrics-urls: http://0.0.0.0:2381
-  id: op://automation/talos/CLUSTER_ID
-  network:
-    cni:
-      name: none
-    dnsDomain: cluster.local
-    podSubnets:
-      - 10.244.0.0/16
-    serviceSubnets:
-      - 10.96.0.0/12
   proxy:
     disabled: true
+    image: registry.k8s.io/kube-proxy:v1.34.0
   scheduler:
     config:
       apiVersion: kubescheduler.config.k8s.io/v1
@@ -153,8 +137,33 @@ cluster:
     extraArgs:
       bind-address: 0.0.0.0
     image: registry.k8s.io/kube-scheduler:v1.34.0
-  secret: op://automation/talos/CLUSTER_SECRET
   secretboxEncryptionSecret: op://automation/talos/CLUSTER_SECRETBOXENCRYPTIONSECRET
   serviceAccount:
     key: op://automation/talos/CLUSTER_SERVICEACCOUNT_KEY
+  {% endif %}
+  ca:
+    crt: op://automation/talos/CLUSTER_CA_CRT
+    {% if ENV.IS_CONTROLPLANE %}
+    key: op://automation/talos/CLUSTER_CA_KEY
+    {% endif %}
+  controlPlane:
+    endpoint: https://k8s.bjw-s.internal:6443
+  clusterName: home-ops
+  discovery:
+    enabled: true
+    registries:
+      kubernetes:
+        disabled: true
+      service:
+        disabled: false
+  id: op://automation/talos/CLUSTER_ID
+  network:
+    cni:
+      name: none
+    dnsDomain: cluster.local
+    podSubnets:
+      - 10.244.0.0/16
+    serviceSubnets:
+      - 10.96.0.0/12
+  secret: op://automation/talos/CLUSTER_SECRET
   token: op://automation/talos/CLUSTER_TOKEN
