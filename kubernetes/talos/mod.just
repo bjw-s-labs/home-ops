@@ -42,7 +42,7 @@ reboot-node node:
 [doc('Reset a node')]
 reset-node node mode="reboot":
   gum confirm "Reset node {{ node }}?" && \
-    echo talosctl -n "{{ node }}" reset --graceful=false {{ if mode == "reboot" { "--reboot" } else { "" } }} || exit 0
+    talosctl -n "{{ node }}" reset --graceful=false {{ if mode == "reboot" { "--reboot" } else { "" } }} || exit 0
 
 [doc('Reset all nodes in the cluster')]
 reset-cluster mode="reboot":
@@ -57,7 +57,7 @@ upgrade-k8s version:
 
 [doc('Upgrade Talos version on a node')]
 upgrade-node node:
-  echo talosctl -n "{{ node }}" upgrade -i "$(just talos machine-image {{ node }})" -m powercycle --timeout=10m
+  talosctl -n "{{ node }}" upgrade -i "$(just talos machine-image {{ node }})" -m powercycle --timeout=10m
 
 [doc('Download Talos machine image')]
 download-image version schematic:
