@@ -4,12 +4,12 @@ machine:
     diskSelector:
       model: Samsung SSD 870
   network:
-    hostname: enigma.bjw-s.internal
+    hostname: felix.bjw-s.internal
     interfaces:
       - interface: bond0
         bond:
           deviceSelectors:
-            - hardwareAddr: 48:21:0b:55:dc:7b
+            - hardwareAddr: 48:21:0b:56:09:47
               driver: igc
           mode: active-backup
         dhcp: true
@@ -21,6 +21,7 @@ machine:
             mtu: 1500
   nodeLabels:
     intel.feature.node.kubernetes.io/gpu: "true"
+  type: controlplane
 ---
 apiVersion: v1alpha1
 kind: VolumeConfig
