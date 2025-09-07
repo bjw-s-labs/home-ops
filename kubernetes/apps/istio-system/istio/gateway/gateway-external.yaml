@@ -3,14 +3,14 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: internal
+  name: external
   annotations:
-    external-dns.alpha.kubernetes.io/target: &hostname ingress-int.bjw-s.dev
+    external-dns.alpha.kubernetes.io/target: &hostname ingress-ext.bjw-s.dev
 spec:
-  gatewayClassName: cilium
+  gatewayClassName: istio
   addresses:
     - type: IPAddress
-      value: 10.1.1.131
+      value: 10.1.1.132
   infrastructure:
     annotations:
       external-dns.alpha.kubernetes.io/hostname: *hostname
