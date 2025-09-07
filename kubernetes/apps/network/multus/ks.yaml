@@ -6,18 +6,18 @@ metadata:
   name: &appname multus
   namespace: &namespace network
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
   interval: 30m
-  timeout: 5m
   path: "./kubernetes/apps/network/multus/app"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
   wait: true
 ---
 # yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
@@ -27,19 +27,19 @@ metadata:
   name: &appname multus-networks
   namespace: &namespace network
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
+  dependsOn:
+    - name: multus
+      namespace: network
   interval: 30m
-  timeout: 5m
   path: "./kubernetes/apps/network/multus/networks"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
   wait: true
-  dependsOn:
-    - name: multus
-      namespace: network
