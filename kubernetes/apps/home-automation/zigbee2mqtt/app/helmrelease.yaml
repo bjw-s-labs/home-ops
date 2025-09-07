@@ -11,10 +11,10 @@ spec:
     name: app-template
     namespace: flux-system
   dependsOn:
-  - name: mosquitto
-    namespace: database
-  - name: rook-ceph-cluster
-    namespace: rook-ceph
+    - name: mosquitto
+      namespace: database
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
   values:
     controllers:
       zigbee2mqtt:
@@ -92,23 +92,23 @@ spec:
               readOnlyRootFilesystem: true
               capabilities:
                 drop:
-                - ALL
+                  - ALL
           code-server:
             image:
               repository: ghcr.io/coder/code-server
               tag: 4.103.2@sha256:f9ed058d6b1a4aa80846f77902d344bd97e450aec69201a0f8939baf58b18a5f
             args:
-            - --auth
-            - none
-            - --disable-telemetry
-            - --disable-update-check
-            - --user-data-dir
-            - /data/.code-server
-            - --extensions-dir
-            - /data/.code-server
-            - --port
-            - "12321"
-            - /data
+              - --auth
+              - none
+              - --disable-telemetry
+              - --disable-update-check
+              - --user-data-dir
+              - /data/.code-server
+              - --extensions-dir
+              - /data/.code-server
+              - --port
+              - "12321"
+              - /data
             resources:
               requests:
                 cpu: 10m
@@ -132,32 +132,32 @@ spec:
         advancedMounts:
           zigbee2mqtt:
             app:
-            - path: /data
+              - path: /data
             code-server:
-            - path: /data
+              - path: /data
 
     route:
       app:
         hostnames:
-        - zigbee2mqtt.bjw-s.dev
+          - zigbee2mqtt.bjw-s.dev
         parentRefs:
-        - name: internal
-          namespace: kube-system
-          sectionName: https
+          - name: internal
+            namespace: istio-system
+            sectionName: https
         rules:
-        - matches:
-          - path:
-              type: PathPrefix
-              value: /code/
-          filters:
-          - type: URLRewrite
-            urlRewrite:
-              path:
-                type: ReplacePrefixMatch
-                replacePrefixMatch: /
-          backendRefs:
-          - identifier: app
-            port: 12321
-        - backendRefs:
-          - identifier: app
-            port: *httpPort
+          - matches:
+              - path:
+                  type: PathPrefix
+                  value: /code/
+            filters:
+              - type: URLRewrite
+                urlRewrite:
+                  path:
+                    type: ReplacePrefixMatch
+                    replacePrefixMatch: /
+            backendRefs:
+              - identifier: app
+                port: 12321
+          - backendRefs:
+              - identifier: app
+                port: *httpPort

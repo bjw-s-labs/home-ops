@@ -7,7 +7,7 @@ metadata:
   annotations:
     external-dns.alpha.kubernetes.io/target: &hostname ingress-int.bjw-s.dev
 spec:
-  gatewayClassName: cilium
+  gatewayClassName: istio
   addresses:
     - type: IPAddress
       value: 10.1.1.131
@@ -18,14 +18,12 @@ spec:
     - name: http
       protocol: HTTP
       port: 80
-      hostname: "*.bjw-s.dev"
       allowedRoutes:
         namespaces:
           from: All
     - name: https
       protocol: HTTPS
       port: 443
-      hostname: "*.bjw-s.dev"
       allowedRoutes:
         namespaces:
           from: All
