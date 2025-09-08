@@ -15,6 +15,7 @@ spec:
     crds: CreateReplace
   values:
     fullnameOverride: &name externaldns-cloudflare
+    logLevel: info
     domainFilters:
       - bjw-s.dev
     env:
@@ -28,7 +29,7 @@ spec:
       - --cloudflare-proxied
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
-      - --gateway-name=external
+      - --gateway-name=envoy-external
     podAnnotations:
       secret.reloader.stakater.com/reload: externaldns-cloudflare-secrets
     policy: sync
