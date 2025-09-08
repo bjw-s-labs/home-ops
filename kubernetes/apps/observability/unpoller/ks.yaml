@@ -6,10 +6,12 @@ metadata:
   name: &appname unpoller
   namespace: &namespace observability
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
+  dependsOn:
+    - name: onepassword-store
+      namespace: external-secrets
   interval: 30m
   timeout: 5m
   path: "./kubernetes/apps/observability/unpoller/app"
@@ -18,7 +20,5 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
   wait: false
-  dependsOn:
-    - name: onepassword-store
-      namespace: external-secrets
