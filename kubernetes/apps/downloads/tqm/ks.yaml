@@ -6,10 +6,13 @@ metadata:
   name: &appname tqm
   namespace: &namespace downloads
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
   interval: 30m
   timeout: 5m
   path: "./kubernetes/apps/downloads/tqm/app"
@@ -18,8 +21,5 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
   wait: false
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age

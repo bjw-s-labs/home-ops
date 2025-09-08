@@ -6,10 +6,16 @@ metadata:
   name: &appname zigbee2mqtt
   namespace: &namespace home-automation
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
+  components:
+    - ../../../../components/volsync
+  dependsOn:
+    - name: onepassword-store
+      namespace: external-secrets
+    - name: volsync
+      namespace: system
   interval: 30m
   timeout: 5m
   path: "./kubernetes/apps/home-automation/zigbee2mqtt/app"
@@ -18,14 +24,8 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
   wait: false
-  dependsOn:
-    - name: onepassword-store
-      namespace: external-secrets
-    - name: volsync
-      namespace: system
-  components:
-    - ../../../../components/volsync
   postBuild:
     substitute:
       APP: *appname

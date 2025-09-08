@@ -6,18 +6,18 @@ metadata:
   name: &appname cert-manager
   namespace: &namespace cert-manager
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
   interval: 30m
-  timeout: 5m
   path: "./kubernetes/apps/cert-manager/cert-manager/app"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
   wait: true
 ---
 # yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
@@ -27,21 +27,21 @@ metadata:
   name: &appname cert-manager-issuers
   namespace: &namespace cert-manager
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
+  dependsOn:
+    - name: cert-manager
+      namespace: cert-manager
+    - name: onepassword-store
+      namespace: external-secrets
   interval: 30m
-  timeout: 5m
   path: "./kubernetes/apps/cert-manager/cert-manager/issuers"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
   wait: true
-  dependsOn:
-    - name: cert-manager
-      namespace: cert-manager
-    - name: onepassword-store
-      namespace: external-secrets

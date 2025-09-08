@@ -6,10 +6,17 @@ metadata:
   name: &appname sonarr
   namespace: &namespace downloads
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
+  components:
+    - ../../../../components/volsync
+    - ../../../../components/keda/nas-nfs-scaler
+  dependsOn:
+    - name: onepassword-store
+      namespace: external-secrets
+    - name: volsync
+      namespace: system
   interval: 30m
   timeout: 5m
   path: "./kubernetes/apps/downloads/sonarr/app"
@@ -18,15 +25,8 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
   wait: false
-  dependsOn:
-    - name: onepassword-store
-      namespace: external-secrets
-    - name: volsync
-      namespace: system
-  components:
-    - ../../../../components/volsync
-    - ../../../../components/keda/nas-nfs-scaler
   postBuild:
     substitute:
       APP: *appname

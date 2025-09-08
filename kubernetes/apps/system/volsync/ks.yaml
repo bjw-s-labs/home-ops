@@ -21,7 +21,7 @@ spec:
       kind: HelmRelease
       name: *appname
       namespace: *namespace
-  interval: 1h
+  interval: 30m
   path: "./kubernetes/apps/system/volsync/app"
   postBuild:
     substitute:
@@ -31,5 +31,5 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  timeout: 5m
   targetNamespace: *namespace
+  timeout: 5m

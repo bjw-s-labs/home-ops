@@ -6,32 +6,32 @@ metadata:
   name: &appname plex
   namespace: &namespace media
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  interval: 30m
-  timeout: 5m
-  path: "./kubernetes/apps/media/plex/app"
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-    namespace: flux-system
-  wait: false
+  components:
+    - ../../../../components/volsync
+    - ../../../../components/keda/nas-nfs-scaler
   dependsOn:
     - name: onepassword-store
       namespace: external-secrets
     - name: volsync
       namespace: system
-  components:
-    - ../../../../components/volsync
-    - ../../../../components/keda/nas-nfs-scaler
+  interval: 30m
+  path: "./kubernetes/apps/media/plex/app"
   postBuild:
     substitute:
       APP: *appname
       VOLSYNC_CLAIM: plex-config
       VOLSYNC_CAPACITY: 50Gi
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
+  wait: false
 ---
 # yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -40,32 +40,32 @@ metadata:
   name: &appname plex-trakt-sync
   namespace: &namespace media
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  interval: 30m
-  timeout: 5m
-  path: "./kubernetes/apps/media/plex/trakt-sync"
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-    namespace: flux-system
-  wait: false
+  components:
+    - ../../../../components/volsync
   dependsOn:
     - name: onepassword-store
       namespace: external-secrets
     - name: volsync
       namespace: system
-  components:
-    - ../../../../components/volsync
+  interval: 30m
+  path: "./kubernetes/apps/media/plex/trakt-sync"
   postBuild:
     substitute:
       APP: *appname
       APP_UID: "1000"
       APP_GID: "1000"
       VOLSYNC_CLAIM: plex-trakt-sync-config
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
+  wait: false
 ---
 # yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -74,22 +74,22 @@ metadata:
   name: &appname plex-image-cleanup
   namespace: &namespace media
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
+  dependsOn:
+    - name: onepassword-store
+      namespace: external-secrets
   interval: 30m
-  timeout: 5m
   path: "./kubernetes/apps/media/plex/plex-image-cleanup"
+  postBuild:
+    substitute:
+      APP: *appname
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
   wait: false
-  dependsOn:
-    - name: onepassword-store
-      namespace: external-secrets
-  postBuild:
-    substitute:
-      APP: *appname
