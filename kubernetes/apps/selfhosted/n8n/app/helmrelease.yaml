@@ -74,16 +74,16 @@ spec:
         hostnames:
           - *hostName
         parentRefs:
-          - name: internal
-            namespace: istio-system
+          - name: envoy-internal
+            namespace: network
             sectionName: https
 
       webhooks:
         hostnames:
           - n8n-webhook.bjw-s.dev
         parentRefs:
-          - name: external
-            namespace: istio-system
+          - name: envoy-external
+            namespace: network
             sectionName: https
         rules:
           - matches:

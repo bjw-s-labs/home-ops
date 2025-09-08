@@ -32,8 +32,8 @@ spec:
           hostnames:
             - alertmanager.bjw-s.dev
           parentRefs:
-            - name: internal
-              namespace: istio-system
+            - name: envoy-internal
+              namespace: network
               sectionName: https
       alertmanagerSpec:
         alertmanagerConfiguration:
@@ -164,6 +164,6 @@ spec:
           hostnames:
             - prometheus.bjw-s.dev
           parentRefs:
-            - name: internal
-              namespace: istio-system
+            - name: envoy-internal
+              namespace: network
               sectionName: https

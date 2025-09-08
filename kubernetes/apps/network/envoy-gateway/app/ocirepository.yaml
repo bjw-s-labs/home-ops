@@ -3,12 +3,12 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
-  name: istio-istiod
+  name: envoy-gateway
 spec:
   interval: 10m
   layerSelector:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: 1.27.1
-  url: oci://gcr.io/istio-release/charts/istiod
+    tag: 1.5.0
+  url: oci://docker.io/envoyproxy/gateway-helm
