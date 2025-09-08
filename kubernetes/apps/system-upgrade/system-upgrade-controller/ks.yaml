@@ -6,18 +6,18 @@ metadata:
   name: &appname system-upgrade-controller
   namespace: &namespace system-upgrade
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
   interval: 30m
-  timeout: 5m
   path: "./kubernetes/apps/system-upgrade/system-upgrade-controller/app"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
   wait: true
 ---
 # yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
@@ -27,19 +27,19 @@ metadata:
   name: &appname system-upgrade-controller-plans
   namespace: &namespace system-upgrade
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
+  dependsOn:
+    - name: system-upgrade-controller
+      namespace: system-upgrade
   interval: 30m
-  timeout: 5m
   path: "./kubernetes/apps/system-upgrade/system-upgrade-controller/plans"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
   wait: false
-  dependsOn:
-    - name: system-upgrade-controller
-      namespace: system-upgrade
