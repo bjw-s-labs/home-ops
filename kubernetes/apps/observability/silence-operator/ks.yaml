@@ -6,18 +6,18 @@ metadata:
   name: &appname silence-operator
   namespace: &namespace observability
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  interval: 30m
-  timeout: 5m
   path: "./kubernetes/apps/observability/silence-operator/app"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
+  interval: 30m
+  timeout: 5m
   wait: true
 ---
 # yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
@@ -27,19 +27,19 @@ metadata:
   name: &appname silence-operator-silences
   namespace: &namespace observability
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  interval: 30m
-  timeout: 5m
+  dependsOn:
+    - name: silence-operator
+      namespace: observability
   path: "./kubernetes/apps/observability/silence-operator/silences"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
+  interval: 30m
+  timeout: 5m
   wait: false
-  dependsOn:
-    - name: silence-operator
-      namespace: observability
