@@ -18,6 +18,7 @@ spec:
       namespace: openebs
   values:
     githubConfigUrl: https://github.com/bjw-s-labs/home-ops
+    githubConfigSecret: actions-runner-controller-secret
 
     minRunners: 0
     maxRunners: 2
@@ -59,17 +60,3 @@ spec:
           - name: talos
             secret:
               secretName: actions-runner
-
-  valuesFrom:
-    - kind: Secret
-      name: actions-runner-controller-secret
-      valuesKey: github_app_id
-      targetPath: githubConfigSecret.github_app_id
-    - kind: Secret
-      name: actions-runner-controller-secret
-      valuesKey: github_app_installation_id
-      targetPath: githubConfigSecret.github_app_installation_id
-    - kind: Secret
-      name: actions-runner-controller-secret
-      valuesKey: github_app_private_key
-      targetPath: githubConfigSecret.github_app_private_key
