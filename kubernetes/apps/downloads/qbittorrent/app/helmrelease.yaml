@@ -18,6 +18,14 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
+          annotations:
+            k8s.v1.cni.cncf.io/networks: |-
+              [{
+                "name": "multus-vpn",
+                "namespace": "network",
+                "ips": ["10.1.5.10/24"],
+                "mac": "2e:54:30:22:3f:74"
+              }]
           securityContext:
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"
@@ -31,7 +39,7 @@ spec:
               tag: 5.1.2
             env:
               QBT_WEBUI_PORT: &port 8080
-              QBT_TORRENTING_PORT: &torrentPort 50413
+              QBT_TORRENTING_PORT: 51478
             probes:
               liveness:
                 enabled: true
@@ -61,20 +69,9 @@ spec:
       app:
         forceRename: qbittorrent
         primary: true
-        annotations:
-          lbipam.cilium.io/ips: 10.1.1.137
         ports:
           http:
             port: *port
-      bittorrent:
-        type: LoadBalancer
-        annotations:
-          lbipam.cilium.io/ips: 10.1.1.137
-        ports:
-          bittorrent:
-            enabled: true
-            port: *torrentPort
-            protocol: TCP
     persistence:
       config:
         existingClaim: qbittorrent
