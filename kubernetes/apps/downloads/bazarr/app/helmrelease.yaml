@@ -5,28 +5,27 @@ kind: HelmRelease
 metadata:
   name: bazarr
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: bazarr
+  interval: 30m
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
   values:
     controllers:
       bazarr:
-        annotations:
-          reloader.stakater.com/auto: "true"
-
         pod:
           securityContext:
-            runAsUser: 2000
+            fsGroupChangePolicy: "OnRootMismatch"
             runAsGroup: 2000
             runAsNonRoot: true
+            runAsUser: 2000
             fsGroup: 2000
-            fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 65542 # gladius:external-services
+        annotations:
+          reloader.stakater.com/auto: "true"
 
         containers:
           app:
@@ -57,24 +56,18 @@ spec:
                 memory: 512Mi
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
               capabilities:
                 drop:
                   - ALL
-
-    service:
-      app:
-        ports:
-          http:
-            port: *port
+              readOnlyRootFilesystem: true
 
     persistence:
       config:
         existingClaim: bazarr-config
       media:
         type: nfs
-        server: gladius.bjw-s.internal
         path: /mnt/tank/Media
+        server: gladius.bjw-s.internal
         globalMounts:
           - path: /data/nas-media
 
@@ -86,3 +79,9 @@ spec:
           - name: envoy-internal
             namespace: network
             sectionName: https
+
+    service:
+      app:
+        ports:
+          http:
+            port: *port

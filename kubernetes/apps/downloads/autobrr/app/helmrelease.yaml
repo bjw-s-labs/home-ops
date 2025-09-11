@@ -5,23 +5,24 @@ kind: HelmRelease
 metadata:
   name: autobrr
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: autobrr
+  interval: 30m
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
   values:
     controllers:
       autobrr:
-        annotations:
-          secret.reloader.stakater.com/reload: autobrr-secret
         pod:
           securityContext:
-            runAsUser: 2000
             runAsGroup: 2000
             runAsNonRoot: true
+            runAsUser: 2000
+
+        annotations:
+          secret.reloader.stakater.com/reload: autobrr-secret
 
         containers:
           app:
@@ -54,16 +55,10 @@ spec:
                 memory: 256Mi
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
               capabilities:
                 drop:
                   - ALL
-
-    service:
-      app:
-        ports:
-          http:
-            port: *port
+              readOnlyRootFilesystem: true
 
     persistence:
       config:
@@ -86,3 +81,9 @@ spec:
           - name: envoy-internal
             namespace: network
             sectionName: https
+
+    service:
+      app:
+        ports:
+          http:
+            port: *port

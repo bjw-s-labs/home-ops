@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: tqm
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: tqm
+  interval: 30m
   values:
     defaultPodOptions:
       securityContext:
@@ -24,10 +24,10 @@ spec:
       tqm:
         type: cronjob
         cronjob: &cronJobSpec
-          schedule: "@hourly"
           backoffLimit: 0
           concurrencyPolicy: Forbid
           failedJobsHistory: 1
+          schedule: "@hourly"
           successfulJobsHistory: 0
           ttlSecondsAfterFinished: 3600
         initContainers:
@@ -45,11 +45,11 @@ spec:
               limits:
                 memory: 64Mi
             securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
               capabilities:
                 drop:
                   - ALL
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
         containers:
           clean:
             <<: *container
@@ -60,8 +60,8 @@ spec:
         type: cronjob
         cronjob:
           <<: *cronJobSpec
-          schedule: 0 0 * * 0
           suspend: true
+          schedule: 0 0 * * 0
         containers:
           app:
             <<: *container
@@ -70,16 +70,16 @@ spec:
               - qb
     persistence:
       config:
-        type: emptyDir
         globalMounts:
           - path: /.config/tqm
+        type: emptyDir
       config-file:
-        type: secret
-        name: tqm-secret
         globalMounts:
           - path: /.config/tqm/config.yaml
             subPath: config.yaml
             readOnly: true
+        name: tqm-secret
+        type: secret
       downloads:
         type: nfs
         server: gladius.bjw-s.internal

@@ -5,15 +5,13 @@ kind: HelmRelease
 metadata:
   name: qui
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: qui
+  interval: 30m
   values:
     controllers:
       qui:
-        annotations:
-          reloader.stakater.com/auto: "true"
         pod:
           securityContext:
             runAsNonRoot: true
@@ -21,6 +19,8 @@ spec:
             runAsGroup: 2000
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"
+        annotations:
+          reloader.stakater.com/auto: "true"
         containers:
           app:
             image:
@@ -53,15 +53,10 @@ spec:
                 memory: 512Mi
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
               capabilities:
                 drop:
                   - ALL
-    service:
-      app:
-        ports:
-          http:
-            port: *port
+              readOnlyRootFilesystem: true
     persistence:
       config:
         existingClaim: qui
@@ -73,3 +68,8 @@ spec:
           - name: envoy-internal
             namespace: network
             sectionName: https
+    service:
+      app:
+        ports:
+          http:
+            port: *port

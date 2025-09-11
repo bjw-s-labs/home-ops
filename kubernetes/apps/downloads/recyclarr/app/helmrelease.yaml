@@ -5,32 +5,30 @@ kind: HelmRelease
 metadata:
   name: recyclarr
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: recyclarr
+  interval: 30m
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
   values:
     controllers:
       recyclarr:
-        type: cronjob
-
+        pod:
+          securityContext:
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
         cronjob:
-          schedule: "@daily"
           backoffLimit: 0
           concurrencyPolicy: Forbid
           failedJobsHistory: 1
+          schedule: "@daily"
           successfulJobsHistory: 0
-
-        pod:
-          securityContext:
-            runAsUser: 2000
-            runAsGroup: 2000
-            runAsNonRoot: true
-            fsGroup: 2000
-            fsGroupChangePolicy: OnRootMismatch
+        type: cronjob
 
         containers:
           app:
@@ -49,23 +47,23 @@ spec:
               limits:
                 memory: 128M
             securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
               capabilities:
                 drop:
                   - ALL
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
 
     persistence:
       config:
-        existingClaim: recyclarr-config
         advancedMounts:
           recyclarr:
             app:
               - path: /config
+        existingClaim: recyclarr-config
       config-file:
-        type: configMap
-        name: recyclarr
         globalMounts:
           - path: /config/recyclarr.yml
             subPath: recyclarr.yml
             readOnly: true
+        name: recyclarr
+        type: configMap
