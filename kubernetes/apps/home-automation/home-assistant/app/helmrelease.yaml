@@ -70,7 +70,7 @@ spec:
               - "12321"
               - /config
             env:
-              HASS_SERVER: http://localhost:8123
+              HASS_SERVER: https://hass.bjw-s.dev
               HASS_TOKEN:
                 secretKeyRef:
                   name: home-assistant-secret
@@ -134,19 +134,17 @@ spec:
             namespace: network
             sectionName: https
         rules:
-          - matches:
-              - path:
-                  type: PathPrefix
-                  value: /code/
-            filters:
-              - type: URLRewrite
-                urlRewrite:
-                  path:
-                    type: ReplacePrefixMatch
-                    replacePrefixMatch: /
-            backendRefs:
-              - identifier: code-server
-                port: 12321
           - backendRefs:
               - identifier: app
                 port: 8123
+      code:
+        hostnames:
+          - hass-code.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: code-server
+                port: 12321
