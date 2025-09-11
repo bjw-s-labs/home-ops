@@ -1,0 +1,94 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: emby
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: emby
+  interval: 30m
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+  values:
+    controllers:
+      emby:
+        pod:
+          securityContext:
+            runAsUser: 2000
+            runAsGroup: 2000
+            fsGroup: 2000
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 65542 # gladius:external-services
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/home-operations/emby
+              tag: 4.8.11
+            env:
+              DOTNET_SYSTEM_IO_DISABLEFILELOCKING: "true"
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                gpu.intel.com/i915: 1
+                memory: 8Gi
+
+    service:
+      app:
+        ports:
+          http:
+            port: &port 8096
+
+    persistence:
+      config:
+        existingClaim: emby
+        advancedMounts:
+          emby:
+            app:
+              - path: /config
+      config-cache:
+        existingClaim: emby-cache
+        advancedMounts:
+          emby:
+            app:
+              - path: /config/cache
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          emby:
+            app:
+              - path: /transcode
+                subPath: transcode
+              - path: /config/logs
+                subPath: logs
+              - path: /tmp
+                subPath: tmp
+      nfs-nas-media:
+        type: nfs
+        server: gladius.bjw-s.internal
+        path: /mnt/tank/Media
+        advancedMounts:
+          emby:
+            app:
+              - path: /data/nas-media/Library
+                subPath: Library
+
+    route:
+      app:
+        hostnames:
+          - emby.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
