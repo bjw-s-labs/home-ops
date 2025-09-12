@@ -1,0 +1,62 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: watchstate
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: watchstate
+  interval: 30m
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+  values:
+    controllers:
+      watchstate:
+        pod:
+          securityContext:
+            runAsUser: 2000
+            runAsGroup: 2000
+            fsGroup: 2000
+            fsGroupChangePolicy: "OnRootMismatch"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/arabcoders/watchstate
+              tag: v0.4.1
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 2Gi
+    service:
+      app:
+        ports:
+          http:
+            port: 8080
+    persistence:
+      config:
+        existingClaim: watchstate
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          watchstate:
+            app:
+              - path: /tmp
+                subPath: tmp
+    route:
+      app:
+        hostnames:
+          - watchstate.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
