@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: scrypted
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: scrypted
+  interval: 30m
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -65,12 +65,12 @@ spec:
             port: 34136
 
     persistence:
-      config:
-        existingClaim: scrypted-config
-        advancedMounts:
-          scrypted:
-            app:
-              - path: /server/volume
+      recs:
+        type: nfs
+        server: gladius.bjw-s.internal
+        path: /mnt/tank/Apps/scrypted
+        globalMounts:
+          - path: /recs
       tmpfs:
         type: emptyDir
         advancedMounts:
@@ -80,12 +80,12 @@ spec:
                 subPath: cache
               - path: /.npm
                 subPath: npm-cache
-      recs:
-        type: nfs
-        server: gladius.bjw-s.internal
-        path: /mnt/tank/Apps/scrypted
-        globalMounts:
-          - path: /recs
+      config:
+        existingClaim: scrypted-config
+        advancedMounts:
+          scrypted:
+            app:
+              - path: /server/volume
 
     route:
       app:

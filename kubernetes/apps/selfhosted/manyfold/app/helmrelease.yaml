@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: manyfold
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: manyfold
+  interval: 30m
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -56,6 +56,18 @@ spec:
                   secretKeyRef:
                     name: manyfold-secret
                     key: MANYFOLD_SECRET_KEY
+            resources:
+              requests:
+                cpu: 20m
+                memory: 128Mi
+              limits:
+                memory: 1536Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
             probes:
               liveness: &probes
                 enabled: true
@@ -69,18 +81,6 @@ spec:
                   timeoutSeconds: 1
                   failureThreshold: 3
               readiness: *probes
-            resources:
-              requests:
-                cpu: 20m
-                memory: 128Mi
-              limits:
-                memory: 1536Mi
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
 
       redis:
         pod:

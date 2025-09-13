@@ -46,22 +46,15 @@ spec:
               repository: docker.io/meisnate12/plex-image-cleanup
               tag: v1.0.2
             env:
-              PLEX_URL: http://plex.media.svc.cluster.local:32400
+              MODE: remove
+              PHOTO_TRANSCODER: true
+              PLEX_PATH: /data/plex_config/Library/Application Support/Plex Media Server
               PLEX_TOKEN:
                 valueFrom:
                   secretKeyRef:
                     name: plex-image-cleanup-secret
                     key: PLEX_TOKEN
-              PLEX_PATH: /data/plex_config/Library/Application Support/Plex Media Server
-              MODE: remove
-              PHOTO_TRANSCODER: true
-            probes:
-              liveness:
-                enabled: false
-              readiness:
-                enabled: false
-              startup:
-                enabled: false
+              PLEX_URL: http://plex.media.svc.cluster.local:32400
             resources:
               requests:
                 cpu: 25m
@@ -74,6 +67,13 @@ spec:
               capabilities:
                 drop:
                   - ALL
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
 
     persistence:
       config:
@@ -82,15 +82,15 @@ spec:
           plex-image-cleanup:
             app:
               - path: /config
-      plex-config:
-        existingClaim: plex-config
-        advancedMounts:
-          plex-image-cleanup:
-            app:
-              - path: /data/plex_config
       plex-cache:
         existingClaim: plex-cache
         advancedMounts:
           plex-image-cleanup:
             app:
               - path: /data/plex_config/Library/Application Support/Plex Media Server/Cache
+      plex-config:
+        existingClaim: plex-config
+        advancedMounts:
+          plex-image-cleanup:
+            app:
+              - path: /data/plex_config

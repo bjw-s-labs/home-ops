@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: spoolman
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: spoolman
+  interval: 30m
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -38,6 +38,18 @@ spec:
               - 0.0.0.0
             env:
               SPOOLMAN_PORT: &httpPort 8000
+            resources:
+              requests:
+                cpu: 12m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
             probes:
               liveness: &probes
                 enabled: true
@@ -51,18 +63,6 @@ spec:
                   timeoutSeconds: 1
                   failureThreshold: 3
               readiness: *probes
-            resources:
-              requests:
-                cpu: 12m
-                memory: 128Mi
-              limits:
-                memory: 512Mi
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
 
     service:
       app:

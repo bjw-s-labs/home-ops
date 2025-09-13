@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: home-assistant
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: home-assistant
+  interval: 30m
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -84,10 +84,10 @@ spec:
     service:
       app:
         primary: true
-        type: LoadBalancer
-        sessionAffinity: ClientIP
         annotations:
           lbipam.cilium.io/ips: 10.1.1.134
+        type: LoadBalancer
+        sessionAffinity: ClientIP
         ports:
           http:
             port: 8123
@@ -97,6 +97,13 @@ spec:
           code-server:
             port: 12321
     persistence:
+      hass-cache:
+        existingClaim: hass-cache
+        advancedMounts:
+          home-assistant:
+            app:
+              - path: /venv
+                subPath: hass-venv
       config:
         existingClaim: home-assistant-config
         advancedMounts:
@@ -105,13 +112,6 @@ spec:
               - path: /config
             code-server:
               - path: /config
-      hass-cache:
-        existingClaim: hass-cache
-        advancedMounts:
-          home-assistant:
-            app:
-              - path: /venv
-                subPath: hass-venv
       tmpfs:
         type: emptyDir
         advancedMounts:

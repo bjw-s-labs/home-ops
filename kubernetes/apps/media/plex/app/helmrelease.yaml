@@ -32,6 +32,18 @@ spec:
             env:
               PLEX_ADVERTISE_URL: https://10.1.1.136:32400,https://plex.bjw-s.dev:443
               PLEX_NO_AUTH_NETWORKS: 10.244.0.0/16
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                gpu.intel.com/i915: 1
+                memory: 9248M
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
             probes:
               liveness: &probes
                 enabled: true
@@ -50,18 +62,6 @@ spec:
                 spec:
                   failureThreshold: 30
                   periodSeconds: 10
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
-            resources:
-              requests:
-                cpu: 100m
-              limits:
-                gpu.intel.com/i915: 1
-                memory: 9248M
 
     service:
       app:
@@ -79,6 +79,15 @@ spec:
           plex:
             app:
               - path: /config
+      nfs-nas-media:
+        type: nfs
+        path: /mnt/tank/Media
+        server: gladius.bjw-s.internal
+        advancedMounts:
+          plex:
+            app:
+              - path: /data/nas-media/Library
+                subPath: Library
       plex-cache:
         existingClaim: plex-cache
         advancedMounts:
@@ -94,15 +103,6 @@ spec:
                 subPath: log
               - path: /transcode
                 subPath: transcode
-      nfs-nas-media:
-        type: nfs
-        server: gladius.bjw-s.internal
-        path: /mnt/tank/Media
-        advancedMounts:
-          plex:
-            app:
-              - path: /data/nas-media/Library
-                subPath: Library
 
     route:
       app:

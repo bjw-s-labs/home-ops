@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: ocis
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: ocis
+  interval: 30m
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -54,11 +54,6 @@ spec:
             envFrom:
               - secretRef:
                   name: ocis-secret
-            probes:
-              liveness:
-                enabled: true
-              readiness:
-                enabled: true
             resources:
               requests:
                 cpu: 50m
@@ -71,6 +66,11 @@ spec:
               capabilities:
                 drop:
                   - ALL
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
     service:
       app:
         ports:

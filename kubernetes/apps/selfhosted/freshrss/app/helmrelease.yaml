@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: freshrss
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: freshrss
+  interval: 30m
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -30,17 +30,17 @@ spec:
               CRON_MIN: "*"
               DOMAIN: freshrss.bjw-s.dev
               LISTEN: &port 8080
-            probes:
-              liveness:
-                enabled: true
-              readiness:
-                enabled: true
             resources:
               requests:
                 cpu: 12m
                 memory: 128M
               limits:
                 memory: 512M
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
 
     service:
       app:

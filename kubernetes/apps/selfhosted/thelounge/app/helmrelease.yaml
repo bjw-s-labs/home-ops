@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: thelounge
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: thelounge
+  interval: 30m
   values:
     controllers:
       thelounge:
@@ -28,11 +28,6 @@ spec:
               tag: 4.4.3@sha256:c2aa0916203b298ffaf3a36c4eb60ef73c1006448d430e218d37840472e84e50
             env:
               THELOUNGE_HOME: /config/thelounge
-            probes:
-              liveness:
-                enabled: true
-              readiness:
-                enabled: true
             resources:
               requests:
                 cpu: 10m
@@ -44,6 +39,11 @@ spec:
               capabilities:
                 drop:
                   - ALL
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
     service:
       app:
         ports:

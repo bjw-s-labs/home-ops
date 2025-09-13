@@ -29,6 +29,12 @@ spec:
             image:
               repository: ghcr.io/home-operations/tautulli
               tag: 2.16.0
+            resources:
+              requests:
+                cpu: 5m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
             probes:
               liveness: &probes
                 enabled: true
@@ -42,12 +48,6 @@ spec:
                   timeoutSeconds: 1
                   failureThreshold: 3
               readiness: *probes
-            resources:
-              requests:
-                cpu: 5m
-                memory: 128Mi
-              limits:
-                memory: 512Mi
 
     service:
       app:

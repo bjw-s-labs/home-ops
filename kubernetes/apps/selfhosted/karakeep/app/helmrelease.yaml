@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: karakeep
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: karakeep
+  interval: 30m
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -33,10 +33,12 @@ spec:
               tag: 0.27.0@sha256:092a2d9c7e5b34655b0833dc22de7e271c7dd165cf17b3205013b3493bfaae4c
             env:
               BROWSER_WEB_URL: http://karakeep-chrome.selfhosted.svc.cluster.local:9222
+              COREPACK_INTEGRITY_KEYS: 0
               CRAWLER_DOWNLOAD_BANNER_IMAGE: true
               CRAWLER_ENABLE_ADBLOCKER: true
               CRAWLER_STORE_SCREENSHOT: true
               DATA_DIR: /data
+              DISABLE_NEW_RELEASE_CHECK: true
               DISABLE_SIGNUPS: true
               MEILI_ADDR: http://karakeep-meilisearch.selfhosted.svc.cluster.local:7700
               MEILI_MASTER_KEY:
@@ -50,18 +52,16 @@ spec:
                     name: karakeep-secret
                     key: encryption_key
               NEXTAUTH_URL: https://karakeep.bjw-s.dev
-              DISABLE_NEW_RELEASE_CHECK: true
-              COREPACK_INTEGRITY_KEYS: 0
-            probes:
-              liveness:
-                enabled: true
-              readiness:
-                enabled: true
             resources:
               requests:
                 cpu: 10m
               limits:
                 memory: 1Gi
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
 
       chrome:
         annotations:
@@ -118,12 +118,12 @@ spec:
               - /bin/meilisearch
               - --experimental-dumpless-upgrade
             env:
-              MEILI_NO_ANALYTICS: true
               MEILI_MASTER_KEY:
                 valueFrom:
                   secretKeyRef:
                     name: karakeep-secret
                     key: meilisearch_master_key
+              MEILI_NO_ANALYTICS: true
             resources:
               requests:
                 cpu: 10m

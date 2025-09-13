@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: paperless
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: paperless
+  interval: 30m
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -26,43 +26,43 @@ spec:
               tag: 2.18.4
             env:
               # Configure application
-              PAPERLESS_SECRET_KEY:
-                valueFrom:
-                  secretKeyRef:
-                    name: paperless-secret
-                    key: PAPERLESS_SECRET_KEY
-              PAPERLESS_URL: https://paperless.bjw-s.dev
-              PAPERLESS_PORT: "8000"
-              PAPERLESS_TIME_ZONE: "Europe/Amsterdam"
-              PAPERLESS_WEBSERVER_WORKERS: "2"
-              PAPERLESS_TASK_WORKERS: "2"
-              # Configure folders
-              PAPERLESS_CONSUMPTION_DIR: /data/nas/incoming
-              PAPERLESS_DATA_DIR: /data/local/data
-              PAPERLESS_EXPORT_DIR: /data/nas/export
-              PAPERLESS_MEDIA_ROOT: /data/local/media
-              # Configure folder importer
-              PAPERLESS_CONSUMER_POLLING: "60"
-              PAPERLESS_CONSUMER_RECURSIVE: "true"
-              PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
-              # Configure OCR
-              PAPERLESS_OCR_LANGUAGES: nld
-              PAPERLESS_OCR_LANGUAGE: nld
-              # Configure redis integration
-              PAPERLESS_REDIS: redis://paperless-redis.selfhosted.svc.cluster.local:6379
-              # Configure user permissions
-              USERMAP_GID: "65542" # gladius:external-services
-              # Configure admin user
-              PAPERLESS_ADMIN_USER:
-                valueFrom:
-                  secretKeyRef:
-                    name: paperless-secret
-                    key: PAPERLESS_ADMIN_USER
               PAPERLESS_ADMIN_PASSWORD:
                 valueFrom:
                   secretKeyRef:
                     name: paperless-secret
                     key: PAPERLESS_ADMIN_PASSWORD
+              PAPERLESS_ADMIN_USER:
+                valueFrom:
+                  secretKeyRef:
+                    name: paperless-secret
+                    key: PAPERLESS_ADMIN_USER
+              PAPERLESS_CONSUMER_POLLING: "60"
+              PAPERLESS_CONSUMER_RECURSIVE: "true"
+              PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
+              PAPERLESS_CONSUMPTION_DIR: /data/nas/incoming
+              PAPERLESS_DATA_DIR: /data/local/data
+              PAPERLESS_EXPORT_DIR: /data/nas/export
+              PAPERLESS_MEDIA_ROOT: /data/local/media
+              PAPERLESS_OCR_LANGUAGE: nld
+              PAPERLESS_OCR_LANGUAGES: nld
+              PAPERLESS_PORT: "8000"
+              PAPERLESS_REDIS: redis://paperless-redis.selfhosted.svc.cluster.local:6379
+              PAPERLESS_SECRET_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: paperless-secret
+                    key: PAPERLESS_SECRET_KEY
+              PAPERLESS_TASK_WORKERS: "2"
+              PAPERLESS_TIME_ZONE: "Europe/Amsterdam"
+              PAPERLESS_URL: https://paperless.bjw-s.dev
+              PAPERLESS_WEBSERVER_WORKERS: "2"
+              USERMAP_GID: "65542" # gladius:external-services
+            resources:
+              requests:
+                cpu: 25m
+                memory: 2Gi
+              limits:
+                memory: 6Gi
             probes:
               liveness:
                 enabled: true
@@ -73,12 +73,6 @@ spec:
                 spec:
                   failureThreshold: 30
                   periodSeconds: 5
-            resources:
-              requests:
-                cpu: 25m
-                memory: 2Gi
-              limits:
-                memory: 6Gi
 
       redis:
         containers:

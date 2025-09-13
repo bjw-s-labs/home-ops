@@ -29,6 +29,12 @@ spec:
             image:
               repository: ghcr.io/jorenn92/maintainerr
               tag: 2.19.0
+            resources:
+              requests:
+                cpu: 5m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
             probes:
               liveness:
                 enabled: true
@@ -39,12 +45,6 @@ spec:
                 spec:
                   failureThreshold: 30
                   periodSeconds: 5
-            resources:
-              requests:
-                cpu: 5m
-                memory: 128Mi
-              limits:
-                memory: 512Mi
 
     service:
       app:
