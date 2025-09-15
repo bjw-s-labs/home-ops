@@ -101,3 +101,8 @@ spec:
           - name: envoy-internal
             namespace: network
             sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+            timeouts:
+              backendRequest: 30s
