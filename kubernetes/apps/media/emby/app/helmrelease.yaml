@@ -46,6 +46,9 @@ spec:
 
     service:
       app:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 10.1.1.133
         ports:
           http:
             port: &port 8096
