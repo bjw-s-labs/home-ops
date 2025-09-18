@@ -10,24 +10,39 @@ spec:
     name: mailbackup
   interval: 30m
   values:
+    configMaps:
+      scripts:
+        data:
+          mailbackup.sh: |-
+            #!/bin/bash
+
+            RCFILES="/config/*"
+            for rcfile in $RCFILES; do
+                echo "Processing ${rcfile}..."
+
+                filename=$(basename -- "${rcfile}")
+
+                mkdir -p "/data/nas-backup/Bernd/Email/${filename}/new"
+                mkdir -p "/data/nas-backup/Bernd/Email/${filename}/cur"
+                mkdir -p "/data/nas-backup/Bernd/Email/${filename}/tmp"
+
+                getmail --getmaildir "/data/nas-backup/Bernd/Email/${filename}/" --rcfile "/config/${filename}"
+            done
     controllers:
       mailbackup:
         type: cronjob
-
         cronjob:
           schedule: "0 2 * * *"
           backoffLimit: 0
           concurrencyPolicy: Forbid
           failedJobsHistory: 1
           successfulJobsHistory: 0
-
         pod:
           restartPolicy: OnFailure
           securityContext:
             runAsUser: 65534
             runAsGroup: 65534
             runAsNonRoot: true
-
         containers:
           app:
             image:
@@ -35,7 +50,6 @@ spec:
               tag: 6.19.10
             command:
               - "/scripts/mailbackup.sh"
-
     persistence:
       config:
         type: secret
@@ -46,7 +60,7 @@ spec:
               - path: /config
       scripts:
         type: configMap
-        name: mailbackup-scripts
+        identifier: scripts
         defaultMode: 0775
         advancedMounts:
           mailbackup:
