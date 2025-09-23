@@ -13,25 +13,33 @@ spec:
     - name: externaldns-cloudflare
       namespace: network
   values:
+    configMaps:
+      config:
+        data:
+          config.yaml: |-
+            originRequest:
+              originServerName: ingress-ext.bjw-s.dev
+
+            ingress:
+              - hostname: bjw-s.dev
+                service: https://envoy-external.{{ .Release.Namespace }}.svc.cluster.local
+              - hostname: "*.bjw-s.dev"
+                service: https://envoy-external.{{ .Release.Namespace }}.svc.cluster.local
+              - service: http_status:404
     controllers:
       cloudflared:
         replicas: 2
         strategy: RollingUpdate
-
-        annotations:
-          reloader.stakater.com/auto: "true"
-
         pod:
           securityContext:
             runAsNonRoot: true
             runAsUser: 2000
             runAsGroup: 2000
-
         containers:
           app:
             image:
               repository: docker.io/cloudflare/cloudflared
-              tag: 2025.8.1
+              tag: 2025.9.1
             args:
               - tunnel
               - run
@@ -68,22 +76,19 @@ spec:
               capabilities:
                 drop:
                   - ALL
-
     persistence:
       config:
         type: configMap
-        name: cloudflared
+        identifier: config
         globalMounts:
           - path: /etc/cloudflared/config.yaml
             subPath: config.yaml
             readOnly: true
-
     service:
       app:
         ports:
           http:
             port: *port
-
     serviceMonitor:
       app:
         endpoints:

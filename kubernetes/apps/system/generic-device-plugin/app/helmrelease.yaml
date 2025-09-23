@@ -11,17 +11,23 @@ spec:
     name: generic-device-plugin
   driftDetection:
     mode: enabled
-
   values:
     defaultPodOptions:
       priorityClassName: system-node-critical
-
+    configMaps:
+      config:
+        data:
+          config.yaml: |-
+            devices:
+              - name: tun
+                groups:
+                  - count: 1000
+                    paths:
+                      - path: /dev/net/tun
     controllers:
       generic-device-plugin:
         type: daemonset
         strategy: RollingUpdate
-        annotations:
-          reloader.stakater.com/auto: "true"
         containers:
           app:
             image:
@@ -42,11 +48,10 @@ spec:
               capabilities:
                 drop:
                   - ALL
-
     persistence:
       config:
         type: configMap
-        name: generic-device-plugin
+        identifier: config
         globalMounts:
           - path: /config/config.yaml
             subPath: config.yaml

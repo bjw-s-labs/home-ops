@@ -3,60 +3,65 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: watchstate
+  name: mumc
 spec:
   chartRef:
     kind: OCIRepository
-    name: watchstate
+    name: mumc
   interval: 30m
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
   values:
     controllers:
-      watchstate:
+      mumc:
+        type: cronjob
+
+        cronjob:
+          schedule: "0 2 * * *"
+          backoffLimit: 0
+          concurrencyPolicy: Forbid
+          failedJobsHistory: 1
+          successfulJobsHistory: 0
+
         pod:
           securityContext:
-            runAsUser: 2000
-            runAsGroup: 2000
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
+
         containers:
           app:
             image:
-              repository: ghcr.io/arabcoders/watchstate
-              tag: v0.4.2
+              repository: ghcr.io/terrelsa13/mumc
+              tag: v5.11.36@sha256:36b2b70608e2e43336f9470a4cb284a8c2d489cf7e001d7058ea63340b241b1a
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
+              # readOnlyRootFilesystem: true
               capabilities:
                 drop:
                   - ALL
             resources:
               requests:
-                cpu: 10m
+                cpu: 100m
               limits:
-                memory: 2Gi
-    service:
-      app:
-        ports:
-          http:
-            port: 8080
+                memory: 512Mi
+
     persistence:
       config:
-        existingClaim: watchstate
+        type: secret
+        name: mumc-secret
+        advancedMounts:
+          mumc:
+            app:
+              - path: /usr/src/app/config/mumc_config.yaml
+                subPath: mumc_config.yaml
       tmpfs:
         type: emptyDir
         advancedMounts:
-          watchstate:
+          mumc:
             app:
-              - path: /tmp
-                subPath: tmp
-    route:
-      app:
-        hostnames:
-          - watchstate.bjw-s.dev
-        parentRefs:
-          - name: envoy-internal
-            namespace: network
-            sectionName: https
+              - path: /usr/src/app/logs
+                subPath: logs

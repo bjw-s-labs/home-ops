@@ -3,19 +3,25 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname alloy
-  namespace: &namespace observability
+  name: &appname mumc
+  namespace: &namespace media
 spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
+  dependsOn:
+    - name: onepassword-store
+      namespace: external-secrets
   interval: 30m
-  timeout: 5m
-  path: "./kubernetes/apps/observability/alloy/app"
+  path: "./kubernetes/apps/media/mumc/app"
+  postBuild:
+    substitute:
+      APP: *appname
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   targetNamespace: *namespace
+  timeout: 5m
   wait: false

@@ -10,10 +10,24 @@ spec:
     kind: OCIRepository
     name: kopia
   values:
+    configMaps:
+      config:
+        data:
+          repository.config: |-
+            {
+              "storage": {
+                "type": "filesystem",
+                "config": {
+                  "path": "/repository"
+                }
+              },
+              "hostname": "volsync.{{ .Release.Namespace }}.svc.cluster.local",
+              "username": "volsync",
+              "description": "volsync",
+              "enableActions": false
+            }
     controllers:
       kopia:
-        annotations:
-          reloader.stakater.com/auto: "true"
         pod:
           securityContext:
             runAsUser: 2000
@@ -68,7 +82,7 @@ spec:
     persistence:
       config-file:
         type: configMap
-        name: kopia-repository-configmap
+        identifier: config
         globalMounts:
           - path: /config/repository.config
             subPath: repository.config

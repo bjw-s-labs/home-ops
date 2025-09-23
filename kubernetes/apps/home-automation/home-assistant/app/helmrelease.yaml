@@ -37,7 +37,7 @@ spec:
           app:
             image:
               repository: ghcr.io/home-operations/home-assistant
-              tag: 2025.9.3
+              tag: 2025.9.4
             env:
               VENV_FOLDER: /venv
             resources:
@@ -56,7 +56,7 @@ spec:
           code-server:
             image:
               repository: ghcr.io/coder/code-server
-              tag: 4.103.2@sha256:f9ed058d6b1a4aa80846f77902d344bd97e450aec69201a0f8939baf58b18a5f
+              tag: 4.104.1@sha256:66b4f0e6d32da53b0cf6af7cb0894b4078a93f2e160a9270c539e12e1ebf278d
             args:
               - --auth
               - none
@@ -84,10 +84,6 @@ spec:
     service:
       app:
         primary: true
-        type: LoadBalancer
-        sessionAffinity: ClientIP
-        annotations:
-          lbipam.cilium.io/ips: 10.1.1.134
         ports:
           http:
             port: 8123
