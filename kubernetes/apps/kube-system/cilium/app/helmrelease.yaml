@@ -9,11 +9,18 @@ spec:
     kind: OCIRepository
     name: cilium
   interval: 30m
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
   values:
     autoDirectNodeRoutes: true
     bandwidthManager:
-      bbr: true
       enabled: true
+      bbr: true
     bgpControlPlane:
       enabled: true
     bpf:
@@ -25,9 +32,6 @@ spec:
       automount:
         enabled: false
       hostRoot: /sys/fs/cgroup
-    cluster:
-      id: 1
-      name: main
     cni:
       exclusive: false
     dashboards:
@@ -38,14 +42,9 @@ spec:
     endpointRoutes:
       enabled: true
     envoy:
-      rollOutPods: true
-      prometheus:
-        serviceMonitor:
-          enabled: true
+      enabled: false
     gatewayAPI:
-      enabled: true
-      enableAlpn: true
-      xffNumTrustedHops: 1
+      enabled: false
     hubble:
       enabled: false
     ipam:
@@ -72,6 +71,8 @@ spec:
           enabled: true
       replicas: 2
       rollOutPods: true
+    pmtuDiscovery:
+      enabled: true
     prometheus:
       enabled: true
       serviceMonitor:

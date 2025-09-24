@@ -63,10 +63,6 @@ machine:
         - 10.1.1.0/24
   network:
     disableSearchDomain: true
-    extraHostEntries:
-      - ip: 10.1.1.30
-        aliases:
-          - k8s.bjw-s.internal
   sysctls:
     fs.inotify.max_user_instances: "8192"
     fs.inotify.max_user_watches: "1048576"
@@ -96,8 +92,8 @@ cluster:
       feature-gates: MutatingAdmissionPolicy=true
       runtime-config: admissionregistration.k8s.io/v1beta1=true
     certSANs:
-      - k8s.bjw-s.internal
       - 127.0.0.1 # KubePrism
+      - 10.1.1.130
     disablePodSecurityPolicy: true
   controllerManager:
     image: registry.k8s.io/kube-controller-manager:v1.34.1
@@ -147,15 +143,8 @@ cluster:
     key: op://automation/talos/CLUSTER_CA_KEY
     {% endif %}
   controlPlane:
-    endpoint: https://k8s.bjw-s.internal:6443
+    endpoint: https://10.1.1.130:6443
   clusterName: home-ops
-  discovery:
-    enabled: true
-    registries:
-      kubernetes:
-        disabled: true
-      service:
-        disabled: false
   id: op://automation/talos/CLUSTER_ID
   network:
     cni:
