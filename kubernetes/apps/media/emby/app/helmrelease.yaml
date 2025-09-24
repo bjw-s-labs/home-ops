@@ -49,6 +49,7 @@ spec:
         type: LoadBalancer
         annotations:
           lbipam.cilium.io/ips: 10.1.1.133
+        externalTrafficPolicy: Local
         ports:
           http:
             port: &port 8096
@@ -95,3 +96,9 @@ spec:
           - name: envoy-internal
             namespace: network
             sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+            timeouts:
+              request: 0s
+              backendRequest: 0s

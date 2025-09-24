@@ -14,7 +14,7 @@ spec:
       kind: HelmRelease
       name: *appname
       namespace: *namespace
-  interval: 30m
+  interval: 1h
   path: "./kubernetes/apps/network/envoy-gateway/app"
   prune: true
   sourceRef:
@@ -39,7 +39,7 @@ spec:
       namespace: cert-manager
     - name: envoy-gateway
       namespace: network
-  interval: 30m
+  interval: 1h
   path: "./kubernetes/apps/network/envoy-gateway/config"
   prune: true
   sourceRef:
