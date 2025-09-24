@@ -14,9 +14,15 @@ releases:
     values:
       - templates/values.yaml.gotmpl
     hooks:
-      # Apply cilium network configuration
-      - events:
+      - # Wait for Cilium CRDs to be available
+        command: bash
+        args:
+          - -c
+          - until kubectl get crd ciliumloadbalancerippools.cilium.io ciliumbgpadvertisements.cilium.io ciliumbgppeerconfigs.cilium.io ciliumbgpclusterconfigs.cilium.io &>/dev/null; do sleep 5; done
+        events:
           - postsync
+        showlogs: true
+      - # Apply cilium network configuration
         command: kubectl
         args:
           - apply
@@ -25,6 +31,8 @@ releases:
           - --field-manager=kustomize-controller
           - --kustomize
           - ../../apps/kube-system/cilium/config/
+        events:
+          - postsync
         showlogs: true
 
   - name: coredns

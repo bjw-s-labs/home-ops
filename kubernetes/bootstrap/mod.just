@@ -7,7 +7,7 @@ controller := `talosctl config info --output json | jq --raw-output '.endpoints[
 nodes := `talosctl config info -o yaml | yq -e '.nodes | join (" ")'`
 
 [private]
-default: talos kubernetes kubeconfig wait namespaces resources crds apps
+default: talos kubernetes (kubeconfig "node") wait namespaces resources crds apps kubeconfig
 
 [doc('Install Talos')]
 talos:
@@ -30,11 +30,16 @@ kubernetes:
     sleep 5; \
   done
 
-[doc('Fetch kubeconfig for the Talos cluster')]
-kubeconfig:
+[doc('Fetch kubeconfig')]
+kubeconfig lb="cilium":
   just log info "Running stage..." "stage" "$0"
-  if ! just talos gen-kubeconfig; then \
+  if ! talosctl kubeconfig -n "{{ controller }}" -f --force-context-name main {{ justfile_dir() }}; then \
     just log fatal "Failed to fetch kubeconfig" "stage" "$0"; \
+  fi
+  if [[ "{{ lb }}" != "cilium" ]]; then \
+    if ! kubectl config set-cluster main --server "https://{{ controller }}:6443"; then \
+      just log fatal "Failed to set kubectl cluster server address" "stage" "$0"; \
+    fi; \
   fi
 
 [doc('Wait for nodes to be not-ready')]
