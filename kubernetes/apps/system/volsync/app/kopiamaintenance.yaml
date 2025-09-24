@@ -1,0 +1,71 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/volsync.backube/kopiamaintenance_v1alpha1.json
+apiVersion: volsync.backube/v1alpha1
+kind: KopiaMaintenance
+metadata:
+  name: kopia-daily-maintenance
+  namespace: volsync
+spec:
+  repository:
+    repository: volsync-secret
+  trigger:
+    schedule: "30 3 * * *"
+  enabled: true
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/refs/heads/master/v1.34.1/mutatingadmissionpolicybinding-admissionregistration-v1beta1.json
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingAdmissionPolicyBinding
+metadata:
+  name: kopia-maintenance-add-nfs
+spec:
+  policyName: kopia-maintenance-add-nfs
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/refs/heads/master/v1.34.1/mutatingadmissionpolicy-admissionregistration-v1beta1.json
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingAdmissionPolicy
+metadata:
+  name: kopia-maintenance-add-nfs
+spec:
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - "batch"
+        apiVersions:
+          - "v1"
+        operations:
+          - "CREATE"
+          - "UPDATE"
+        resources:
+          - "jobs"
+  matchConditions:
+    - name: has-kopia-maint-job-name-prefix
+      expression: >
+        object.metadata.name.startsWith("kopia-maint-")
+    - name: repository-volume-does-not-exist
+      expression: >
+        !object.spec.template.spec.volumes.exists(item, item.name == "repository")
+  failurePolicy: Fail
+  reinvocationPolicy: IfNeeded
+  mutations:
+    - patchType: "JSONPatch"
+      jsonPatch:
+        expression: >-
+          [
+            JSONPatch{
+              op: "add", path: "/spec/template/spec/volumes/-",
+              value: Object.spec.template.spec.volumes{
+                name: "repository",
+                nfs: Object.spec.template.spec.volumes.nfs{
+                  server: "gladius.bjw-s.internal",
+                  path: "/mnt/tank/Backup/Volsync"
+                }
+              }
+            },
+            JSONPatch{
+              op: "add", path: "/spec/template/spec/containers/0/volumeMounts/-",
+              value: Object.spec.template.spec.containers.volumeMounts{
+                name: "repository",
+                mountPath: "/repository"
+              }
+            }
+          ]
