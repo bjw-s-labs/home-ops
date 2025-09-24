@@ -9,7 +9,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  interval: 30m
+  interval: 1h
   path: "./kubernetes/apps/system-upgrade/system-upgrade-controller/app"
   prune: true
   sourceRef:
@@ -33,7 +33,7 @@ spec:
   dependsOn:
     - name: system-upgrade-controller
       namespace: system-upgrade
-  interval: 30m
+  interval: 1h
   path: "./kubernetes/apps/system-upgrade/system-upgrade-controller/plans"
   prune: true
   sourceRef:

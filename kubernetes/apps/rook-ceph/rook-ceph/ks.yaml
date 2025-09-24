@@ -9,7 +9,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  interval: 30m
+  interval: 1h
   path: "./kubernetes/apps/rook-ceph/rook-ceph/operator"
   prune: false # Never delete this
   sourceRef:
@@ -44,7 +44,7 @@ spec:
       kind: CephCluster
       name: rook-ceph
       namespace: *namespace
-  interval: 30m
+  interval: 1h
   path: "./kubernetes/apps/rook-ceph/rook-ceph/cluster"
   prune: false # Never delete this
   sourceRef:

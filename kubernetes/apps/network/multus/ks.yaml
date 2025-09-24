@@ -9,7 +9,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  interval: 30m
+  interval: 1h
   path: "./kubernetes/apps/network/multus/app"
   prune: true
   sourceRef:
@@ -33,7 +33,7 @@ spec:
   dependsOn:
     - name: multus
       namespace: network
-  interval: 30m
+  interval: 1h
   path: "./kubernetes/apps/network/multus/networks"
   prune: true
   sourceRef:
