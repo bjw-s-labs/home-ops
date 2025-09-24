@@ -14,7 +14,7 @@ spec:
       kind: HelmRelease
       name: *appname
       namespace: *namespace
-  interval: 30m
+  interval: 1h
   path: "./kubernetes/apps/system-upgrade/tuppr/app"
   prune: true
   sourceRef:
@@ -37,7 +37,7 @@ spec:
   dependsOn:
     - name: tuppr
       namespace: system-upgrade
-  interval: 30m
+  interval: 1h
   path: "./kubernetes/apps/system-upgrade/tuppr/upgrades"
   prune: true
   sourceRef:
