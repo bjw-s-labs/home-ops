@@ -1,0 +1,67 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: arrem-sync
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: arrem-sync
+  interval: 30m
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+  values:
+    controllers:
+      arrem-sync-sonarr:
+        type: cronjob
+
+        cronjob:
+          schedule: "45 * * * *"
+          backoffLimit: 0
+          concurrencyPolicy: Forbid
+          failedJobsHistory: 1
+          successfulJobsHistory: 1
+
+        pod:
+          securityContext:
+            fsGroup: 2000
+            fsGroupChangePolicy: "OnRootMismatch"
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/bjw-s-labs/arrem-sync
+              tag: rolling@sha256:89993a57def718a2d99b944f360600b84045bbf04dff169a050a9b8c3d16ea9d
+            args:
+              - sync
+            env:
+              ARREM_DRY_RUN: false
+              ARREM_EMBY_URL: http://emby.media.svc.cluster.local:8096
+              ARREM_EMBY_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: arrem-sync-secret
+                    key: emby_api_key
+              ARREM_ARR_TYPE: sonarr
+              ARREM_ARR_URL: http://sonarr.downloads.svc.cluster.local:8989
+              ARREM_ARR_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: arrem-sync-secret
+                    key: sonarr_api_key
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                memory: 256Mi
