@@ -2,16 +2,9 @@
 # yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: system
+namespace: system-upgrade
 resources:
-  - ./descheduler/ks.yaml
-  - ./generic-device-plugin/ks.yaml
-  - ./intel-device-plugins/ks.yaml
-  - ./keda/ks.yaml
-  - ./kopia/ks.yaml
-  - ./reloader/ks.yaml
-  - ./spegel/ks.yaml
-  - ./volsync/ks.yaml
+  - ./tuppr/ks.yaml
 components:
   - ../../components/namespace
   - ../../components/flux/alerts
