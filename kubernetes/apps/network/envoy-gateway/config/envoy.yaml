@@ -49,12 +49,13 @@ kind: BackendTrafficPolicy
 metadata:
   name: envoy
 spec:
-  targetSelectors:
-    - group: gateway.networking.k8s.io
-      kind: Gateway
   compression:
     - type: Brotli
     - type: Gzip
+  targetSelectors:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+  tcpKeepalive: {}
 ---
 # yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/gateway.envoyproxy.io/clienttrafficpolicy_v1alpha1.json
 apiVersion: gateway.envoyproxy.io/v1alpha1
@@ -65,10 +66,13 @@ spec:
   clientIPDetection:
     xForwardedFor:
       numTrustedHops: 1
+  http2:
+    onInvalidMessage: TerminateStream
   http3: {}
   targetSelectors:
     - group: gateway.networking.k8s.io
       kind: Gateway
+  tcpKeepalive: {}
   tls:
     minVersion: "1.2"
     alpnProtocols:
