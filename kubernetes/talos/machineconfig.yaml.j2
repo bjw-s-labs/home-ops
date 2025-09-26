@@ -145,6 +145,11 @@ cluster:
   controlPlane:
     endpoint: https://10.1.1.130:6443
   clusterName: home-ops
+  discovery:
+    enabled: true
+    registries:
+      kubernetes: { disabled: true }
+      service: { disabled: false }
   id: op://automation/talos/CLUSTER_ID
   network:
     cni:
@@ -156,3 +161,8 @@ cluster:
       - 10.96.0.0/12
   secret: op://automation/talos/CLUSTER_SECRET
   token: op://automation/talos/CLUSTER_TOKEN
+---
+apiVersion: v1alpha1
+kind: WatchdogTimerConfig
+device: /dev/watchdog0
+timeout: 5m
