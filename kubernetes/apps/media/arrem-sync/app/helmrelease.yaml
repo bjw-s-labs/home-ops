@@ -18,7 +18,7 @@ spec:
         type: cronjob
 
         cronjob:
-          schedule: "45 * * * *"
+          schedule: "45 */6 * * *"
           backoffLimit: 0
           concurrencyPolicy: Forbid
           failedJobsHistory: 1
@@ -36,9 +36,7 @@ spec:
           app:
             image:
               repository: ghcr.io/bjw-s-labs/arrem-sync
-              tag: rolling@sha256:89993a57def718a2d99b944f360600b84045bbf04dff169a050a9b8c3d16ea9d
-            args:
-              - sync
+              tag: 0.0.2@sha256:786ed1750a2b5bd37dbbf0b447bf4537b43ac42935e3a9e1eb366650714d0bbb
             env:
               ARREM_DRY_RUN: false
               ARREM_EMBY_URL: http://emby.media.svc.cluster.local:8096
@@ -47,13 +45,20 @@ spec:
                   secretKeyRef:
                     name: arrem-sync-secret
                     key: emby_api_key
-              ARREM_ARR_TYPE: sonarr
-              ARREM_ARR_URL: http://sonarr.downloads.svc.cluster.local:8989
-              ARREM_ARR_API_KEY:
+              ARREM_ARR_1_TYPE: sonarr
+              ARREM_ARR_1_URL: http://sonarr.downloads.svc.cluster.local:8989
+              ARREM_ARR_1_API_KEY:
                 valueFrom:
                   secretKeyRef:
                     name: arrem-sync-secret
                     key: sonarr_api_key
+              ARREM_ARR_2_TYPE: radarr
+              ARREM_ARR_2_URL: http://radarr.downloads.svc.cluster.local:7878
+              ARREM_ARR_2_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: arrem-sync-secret
+                    key: radarr_api_key
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
