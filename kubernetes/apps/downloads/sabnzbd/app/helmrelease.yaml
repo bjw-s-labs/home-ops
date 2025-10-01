@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: sabnzbd
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: sabnzbd
+  interval: 30m
   values:
     controllers:
       sabnzbd:
@@ -16,11 +16,11 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           securityContext:
-            runAsUser: 2000
-            runAsGroup: 2000
-            runAsNonRoot: true
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
             supplementalGroups:
               - 65542 # gladius:external-services
         containers:
@@ -80,24 +80,11 @@ spec:
               - path: /config
       downloads:
         type: nfs
-        server: gladius.bjw-s.internal
         path: /mnt/tank/Media
+        server: gladius.bjw-s.internal
         globalMounts:
           - path: /data/nas-media/Downloads/sabnzbd
             subPath: Downloads/sabnzbd
-      scripts:
-        type: configMap
-        name: sabnzbd-scripts
-        defaultMode: 0775
-        globalMounts:
-          - readOnly: true
-      tmpfs:
-        type: emptyDir
-        globalMounts:
-          - path: /config/logs
-            subPath: logs
-          - path: /tmp
-            subPath: tmp
       ephemeral:
         type: custom
         volumeSpec:
@@ -115,6 +102,17 @@ spec:
             app:
               - path: /incomplete
                 subPath: incomplete
+      scripts:
+        type: configMap
+        defaultMode: 0775
+        name: sabnzbd-scripts
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /config/logs
+            subPath: logs
+          - path: /tmp
+            subPath: tmp
     route:
       app:
         hostnames:

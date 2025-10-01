@@ -5,12 +5,12 @@ kind: HelmRelease
 metadata:
   name: actions-runner-controller
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: gha-runner-scale-set-controller
   driftDetection:
     mode: enabled
+  interval: 30m
   values:
     fullnameOverride: actions-runner-controller
     replicaCount: 1

@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: opencloud
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: opencloud
+  interval: 30m
   values:
     controllers:
       opencloud:
@@ -16,11 +16,11 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           securityContext:
-            runAsUser: 2000
-            runAsGroup: 2000
-            runAsNonRoot: true
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
         containers:
           opencloud:
             image:

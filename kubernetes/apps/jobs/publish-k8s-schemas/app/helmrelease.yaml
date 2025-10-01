@@ -14,17 +14,17 @@ spec:
       publish-k8s-schemas:
         type: cronjob
         cronjob:
-          schedule: "0 * * * *"
-          concurrencyPolicy: "Replace"
           backoffLimit: 0
+          concurrencyPolicy: "Replace"
           failedJobsHistory: 1
+          schedule: "0 * * * *"
           successfulJobsHistory: 0
         pod:
           restartPolicy: OnFailure
           securityContext:
-            runAsUser: 65534
             runAsGroup: 65534
             runAsNonRoot: true
+            runAsUser: 65534
         initContainers:
           generate-schemas:
             image:

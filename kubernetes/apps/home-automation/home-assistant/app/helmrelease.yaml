@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: home-assistant
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: home-assistant
+  interval: 30m
   values:
     controllers:
       home-assistant:
@@ -24,10 +24,10 @@ spec:
                 "mac": "3e:59:e4:f7:43:08"
               }]
           securityContext:
-            runAsUser: 65534
-            runAsGroup: 65533
             fsGroup: 65533
             fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 65533
+            runAsUser: 65534
         containers:
           app:
             image:
@@ -77,11 +77,11 @@ spec:
                 memory: 2Gi
     service:
       app:
-        primary: true
         ports:
           http:
-            port: 8123
             appProtocol: kubernetes.io/wss
+            port: 8123
+        primary: true
       code-server:
         ports:
           code-server:

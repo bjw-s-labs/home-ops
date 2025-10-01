@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: esphome
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: esphome
+  interval: 30m
   values:
     controllers:
       esphome:
@@ -24,10 +24,10 @@ spec:
                 "mac": "92:cf:d7:05:70:84"
               }]
           securityContext:
-            runAsUser: 2000
-            runAsGroup: 2000
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 2000
+            runAsUser: 2000
         containers:
           app:
             image:

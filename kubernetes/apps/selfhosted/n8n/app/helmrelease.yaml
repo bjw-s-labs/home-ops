@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: n8n
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: n8n
+  interval: 30m
   values:
     controllers:
       n8n:
@@ -17,10 +17,10 @@ spec:
 
         pod:
           securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
             fsGroup: 1000
             fsGroupChangePolicy: "OnRootMismatch"
+            runAsGroup: 1000
+            runAsUser: 1000
 
         containers:
           app:

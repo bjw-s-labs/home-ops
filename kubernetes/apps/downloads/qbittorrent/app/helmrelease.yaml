@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: qbittorrent
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: qbittorrent
+  interval: 30m
   values:
     controllers:
       qbittorrent:
@@ -30,13 +30,13 @@ spec:
               - 65542 # gladius:external-services
         containers:
           app:
-            nameOverride: qbittorrent
             image:
               repository: ghcr.io/home-operations/qbittorrent
               tag: 5.1.2
             env:
               QBT_WEBUI_PORT: &port 8080
               QBT_TORRENTING_PORT: 51478
+            nameOverride: qbittorrent
             probes:
               liveness:
                 enabled: true
@@ -54,21 +54,21 @@ spec:
               limits:
                 memory: 10Gi
             securityContext:
-              runAsUser: 2000
-              runAsGroup: 2000
-              runAsNonRoot: true
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
               capabilities:
                 drop:
                   - ALL
+              readOnlyRootFilesystem: true
+              runAsGroup: 2000
+              runAsNonRoot: true
+              runAsUser: 2000
     service:
       app:
         forceRename: qbittorrent
-        primary: true
         ports:
           http:
             port: *port
+        primary: true
     persistence:
       config:
         existingClaim: qbittorrent
@@ -78,8 +78,8 @@ spec:
               - path: /config
       downloads:
         type: nfs
-        server: gladius.bjw-s.internal
         path: /mnt/tank/Media
+        server: gladius.bjw-s.internal
         globalMounts:
           - path: /data/nas-media/Downloads/qbittorrent
             subPath: Downloads/qbittorrent

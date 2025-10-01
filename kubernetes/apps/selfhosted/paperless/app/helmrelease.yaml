@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: paperless
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: paperless
+  interval: 30m
   values:
     controllers:
       paperless:
@@ -113,8 +113,8 @@ spec:
               - path: /data/local
       nas:
         type: nfs
-        server: gladius.bjw-s.internal
         path: /mnt/tank/Apps/paperless
+        server: gladius.bjw-s.internal
         advancedMounts:
           paperless:
             app:

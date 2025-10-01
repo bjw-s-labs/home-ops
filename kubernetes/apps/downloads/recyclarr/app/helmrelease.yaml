@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: recyclarr
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: recyclarr
+  interval: 30m
   values:
     controllers:
       recyclarr:
@@ -21,11 +21,11 @@ spec:
           successfulJobsHistory: 0
         pod:
           securityContext:
-            runAsUser: 2000
-            runAsGroup: 2000
-            runAsNonRoot: true
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
         containers:
           app:
             image:
@@ -61,4 +61,3 @@ spec:
         globalMounts:
           - path: /config/recyclarr.yml
             subPath: recyclarr.yml
-            readOnly: true

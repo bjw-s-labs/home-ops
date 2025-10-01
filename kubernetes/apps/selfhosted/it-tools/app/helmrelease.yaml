@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: it-tools
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: it-tools
+  interval: 30m
 
   values:
     controllers:
@@ -21,10 +21,10 @@ spec:
 
         pod:
           securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
             fsGroup: 1000
             fsGroupChangePolicy: "OnRootMismatch"
+            runAsGroup: 1000
+            runAsUser: 1000
 
         containers:
           app:
