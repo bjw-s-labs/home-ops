@@ -16,16 +16,16 @@ spec:
     - name: rook-ceph-cluster
       namespace: rook-ceph
   interval: 1h
-  timeout: 5m
   path: "./kubernetes/apps/downloads/sonarr/app"
+  postBuild:
+    substitute:
+      APP: *appname
+      VOLSYNC_CLAIM: sonarr-config
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   targetNamespace: *namespace
+  timeout: 5m
   wait: false
-  postBuild:
-    substitute:
-      APP: *appname
-      VOLSYNC_CLAIM: sonarr-config

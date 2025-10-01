@@ -14,6 +14,7 @@ spec:
       kind: HelmRelease
       name: *appname
       namespace: *namespace
+  interval: 1h
   path: ./kubernetes/apps/observability/silence-operator/app
   prune: true
   sourceRef:
@@ -21,7 +22,6 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: *namespace
-  interval: 1h
   timeout: 5m
 ---
 # yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
@@ -37,6 +37,7 @@ spec:
   dependsOn:
     - name: silence-operator
       namespace: observability
+  interval: 1h
   path: ./kubernetes/apps/observability/silence-operator/silences
   prune: true
   sourceRef:
@@ -44,6 +45,5 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: *namespace
-  interval: 1h
   timeout: 5m
   wait: false
