@@ -17,17 +17,17 @@ spec:
     - name: rook-ceph-cluster
       namespace: rook-ceph
   interval: 1h
-  timeout: 5m
   path: "./kubernetes/apps/home-automation/esphome/app"
+  postBuild:
+    substitute:
+      APP: *appname
+      VOLSYNC_CLAIM: esphome-config
+      VOLSYNC_CAPACITY: 5Gi
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   targetNamespace: *namespace
+  timeout: 5m
   wait: false
-  postBuild:
-    substitute:
-      APP: *appname
-      VOLSYNC_CLAIM: esphome-config
-      VOLSYNC_CAPACITY: 5Gi

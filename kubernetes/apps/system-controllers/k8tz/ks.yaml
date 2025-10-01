@@ -6,19 +6,19 @@ metadata:
   name: &appname k8tz
   namespace: &namespace system-controllers
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
+  dependsOn:
+    - name: cert-manager
+      namespace: cert-manager
   interval: 1h
-  timeout: 5m
   path: "./kubernetes/apps/system-controllers/k8tz/app"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
   wait: false
-  dependsOn:
-    - name: cert-manager
-      namespace: cert-manager

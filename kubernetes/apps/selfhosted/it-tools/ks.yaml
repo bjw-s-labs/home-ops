@@ -6,16 +6,16 @@ metadata:
   name: &appname it-tools
   namespace: &namespace selfhosted
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
   interval: 1h
-  timeout: 5m
   path: "./kubernetes/apps/selfhosted/it-tools/app"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
   wait: false

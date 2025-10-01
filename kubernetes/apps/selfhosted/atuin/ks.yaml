@@ -6,26 +6,26 @@ metadata:
   name: &appname atuin
   namespace: &namespace selfhosted
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  interval: 1h
-  timeout: 5m
-  path: "./kubernetes/apps/selfhosted/atuin/app"
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-    namespace: flux-system
-  wait: false
+  components:
+    - ../../../../components/volsync
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
-  components:
-    - ../../../../components/volsync
+  interval: 1h
+  path: "./kubernetes/apps/selfhosted/atuin/app"
   postBuild:
     substitute:
       APP: *appname
       VOLSYNC_CLAIM: atuin
       VOLSYNC_CAPACITY: 5Gi
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
+  wait: false
