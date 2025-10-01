@@ -9,7 +9,12 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  path: "./kubernetes/apps/observability/silence-operator/app"
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: *appname
+      namespace: *namespace
+  path: ./kubernetes/apps/observability/silence-operator/app
   prune: true
   sourceRef:
     kind: GitRepository
@@ -18,7 +23,6 @@ spec:
   targetNamespace: *namespace
   interval: 1h
   timeout: 5m
-  wait: true
 ---
 # yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -33,7 +37,7 @@ spec:
   dependsOn:
     - name: silence-operator
       namespace: observability
-  path: "./kubernetes/apps/observability/silence-operator/silences"
+  path: ./kubernetes/apps/observability/silence-operator/silences
   prune: true
   sourceRef:
     kind: GitRepository

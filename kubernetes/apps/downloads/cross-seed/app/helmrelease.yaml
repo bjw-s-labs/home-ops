@@ -9,17 +9,11 @@ spec:
   chartRef:
     kind: OCIRepository
     name: cross-seed
-  dependsOn:
-    - name: qbittorrent
-      namespace: downloads
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
   values:
     controllers:
       cross-seed:
         annotations:
           secret.reloader.stakater.com/reload: cross-seed-secret
-
         pod:
           securityContext:
             runAsUser: 2000
@@ -29,7 +23,6 @@ spec:
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 65542 # gladius:external-services
-
         containers:
           app:
             image:
@@ -60,13 +53,11 @@ spec:
               capabilities:
                 drop:
                   - ALL
-
     service:
       app:
         ports:
           http:
             port: 2468
-
     persistence:
       config:
         existingClaim: cross-seed

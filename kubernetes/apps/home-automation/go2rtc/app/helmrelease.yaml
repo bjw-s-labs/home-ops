@@ -9,9 +9,6 @@ spec:
   chartRef:
     kind: OCIRepository
     name: go2rtc
-  dependsOn:
-    - name: home-assistant
-      namespace: home-automation
   values:
     configMaps:
       config:
@@ -79,7 +76,7 @@ spec:
         primary: true
         ports:
           api:
-            port: &port 1984
+            port: 1984
             primary: true
           rtsp:
             port: 8554

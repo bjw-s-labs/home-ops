@@ -9,17 +9,13 @@ spec:
     kind: OCIRepository
     name: grafana
   interval: 30m
-  timeout: 20m
   values:
     admin:
       existingSecret: grafana-admin-secret
-
     annotations:
       configmap.reloader.stakater.com/reload: grafana
       secret.reloader.stakater.com/reload: grafana-admin-secret
-
     replicas: 1
-
     dashboardProviders:
       dashboardproviders.yaml:
         apiVersion: 1
