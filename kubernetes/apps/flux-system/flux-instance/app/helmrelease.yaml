@@ -32,17 +32,6 @@ spec:
           app.kubernetes.io/name: flux
       kustomize:
         patches:
-          # Add Sops decryption to 'flux-system' Kustomization
-          - patch: |
-              - op: add
-                path: /spec/decryption
-                value:
-                  provider: sops
-                  secretRef:
-                    name: sops-age
-            target:
-              group: kustomize.toolkit.fluxcd.io
-              kind: Kustomization
           # Increase the number of workers
           - patch: |
               - op: add
@@ -121,3 +110,11 @@ spec:
             target:
               kind: Deployment
               name: helm-controller
+          - # Controller-level SOPS decryption
+            patch: |
+              - op: add
+                path: /spec/template/spec/containers/0/args/-
+                value: --sops-age-secret=sops-age
+            target:
+              kind: Deployment
+              name: kustomize-controller
