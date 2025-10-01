@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: spoolman
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: spoolman
+  interval: 30m
   values:
     controllers:
       spoolman:
@@ -17,11 +17,11 @@ spec:
 
         pod:
           securityContext:
-            runAsNonRoot: true
-            runAsUser: 1000
-            runAsGroup: 1000
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
 
         containers:
           app:

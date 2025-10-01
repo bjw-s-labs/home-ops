@@ -5,11 +5,18 @@ kind: HelmRelease
 metadata:
   name: onepassword-connect
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: onepassword-connect
+  interval: 30m
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 999
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 999
+        runAsNonRoot: true
+        runAsUser: 999
     controllers:
       onepassword-connect:
         strategy: RollingUpdate
@@ -95,13 +102,6 @@ spec:
                   initialDelaySeconds: 15
             securityContext: *securityContext
             resources: *resources
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 999
-        runAsGroup: 999
-        fsGroup: 999
-        fsGroupChangePolicy: OnRootMismatch
     service:
       app:
         ports:

@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: kromgo
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: kromgo
+  interval: 30m
   values:
     controllers:
       kromgo:
@@ -18,9 +18,9 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           securityContext:
-            runAsUser: 2000
             runAsGroup: 2000
             runAsNonRoot: true
+            runAsUser: 2000
           topologySpreadConstraints:
             - maxSkew: 1
               topologyKey: kubernetes.io/hostname
@@ -79,7 +79,6 @@ spec:
         globalMounts:
           - path: /kromgo/config.yaml
             subPath: config.yaml
-            readOnly: true
     route:
       app:
         hostnames:

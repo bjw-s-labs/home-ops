@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: kopia
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: kopia
+  interval: 30m
   values:
     configMaps:
       config:
@@ -30,11 +30,11 @@ spec:
       kopia:
         pod:
           securityContext:
-            runAsUser: 2000
-            runAsGroup: 2000
-            runAsNonRoot: true
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
             supplementalGroups:
               - 65542 # gladius:external-services
         containers:
@@ -86,11 +86,10 @@ spec:
         globalMounts:
           - path: /config/repository.config
             subPath: repository.config
-            readOnly: true
       repository:
         type: nfs
-        server: gladius.bjw-s.internal
         path: /mnt/tank/Backup/Volsync
+        server: gladius.bjw-s.internal
         globalMounts:
           - path: /repository
       tmpfs:

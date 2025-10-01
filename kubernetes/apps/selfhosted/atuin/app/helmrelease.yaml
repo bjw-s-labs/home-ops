@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: atuin
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: atuin
+  interval: 30m
   values:
     controllers:
       atuin:
@@ -16,11 +16,11 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           securityContext:
-            runAsNonRoot: true
-            runAsUser: 2000
-            runAsGroup: 2000
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
         containers:
           app:
             image:

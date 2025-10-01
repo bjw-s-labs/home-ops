@@ -5,18 +5,18 @@ kind: HelmRelease
 metadata:
   name: karakeep
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: karakeep
+  interval: 30m
   values:
     defaultPodOptions:
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        runAsNonRoot: true
         fsGroup: 1000
         fsGroupChangePolicy: "OnRootMismatch"
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
 
     controllers:
       karakeep:

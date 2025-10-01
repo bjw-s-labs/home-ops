@@ -32,17 +32,17 @@ spec:
       mailbackup:
         type: cronjob
         cronjob:
-          schedule: "0 2 * * *"
           backoffLimit: 0
           concurrencyPolicy: Forbid
           failedJobsHistory: 1
+          schedule: "0 2 * * *"
           successfulJobsHistory: 0
         pod:
           restartPolicy: OnFailure
           securityContext:
-            runAsUser: 65534
             runAsGroup: 65534
             runAsNonRoot: true
+            runAsUser: 65534
         containers:
           app:
             image:
@@ -69,8 +69,8 @@ spec:
                 subPath: mailbackup.sh
       backup:
         type: nfs
-        server: gladius.bjw-s.internal
         path: /mnt/tank/Backup/Bernd
+        server: gladius.bjw-s.internal
         advancedMounts:
           mailbackup:
             app:
