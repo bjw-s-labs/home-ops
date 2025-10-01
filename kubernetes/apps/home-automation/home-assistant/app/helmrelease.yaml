@@ -9,15 +9,11 @@ spec:
   chartRef:
     kind: OCIRepository
     name: home-assistant
-  dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
   values:
     controllers:
       home-assistant:
         annotations:
           reloader.stakater.com/auto: "true"
-
         pod:
           annotations:
             k8s.v1.cni.cncf.io/networks: |
@@ -32,7 +28,6 @@ spec:
             runAsGroup: 65533
             fsGroup: 65533
             fsGroupChangePolicy: OnRootMismatch
-
         containers:
           app:
             image:
@@ -52,7 +47,6 @@ spec:
               capabilities:
                 drop:
                   - ALL
-
           code-server:
             image:
               repository: ghcr.io/coder/code-server
@@ -120,7 +114,6 @@ spec:
                 subPath: code-server-tmp
               - path: /nonexistent
                 subPath: nonexistent
-
     route:
       app:
         hostnames:

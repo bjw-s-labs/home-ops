@@ -10,13 +10,6 @@ spec:
   chartRef:
     kind: OCIRepository
     name: kube-prometheus-stack
-  install:
-    crds: CreateReplace
-  upgrade:
-    crds: CreateReplace
-  dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
   values:
     crds:
       enabled: true

@@ -9,16 +9,20 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: *appname
+      namespace: *namespace
   interval: 1h
-  path: "./kubernetes/apps/rook-ceph/rook-ceph/operator"
-  prune: false # Never delete this
+  path: ./kubernetes/apps/rook-ceph/rook-ceph/operator
+  prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   targetNamespace: *namespace
   timeout: 5m
-  wait: false
 ---
 # yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -30,27 +34,31 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  healthCheckExprs:
-    - apiVersion: ceph.rook.io/v1
-      kind: CephCluster
-      failed: status.ceph.health == 'HEALTH_ERR'
-      current: status.ceph.health == 'HEALTH_OK' || status.ceph.health == 'HEALTH_WARN'
+  dependsOn:
+    - name: rook-ceph
+      namespace: *namespace
+    - name: volsync
+      namespace: system
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
-      name: rook-ceph-cluster
+      name: *appname
       namespace: *namespace
     - apiVersion: ceph.rook.io/v1
       kind: CephCluster
       name: rook-ceph
       namespace: *namespace
+  healthCheckExprs:
+    - apiVersion: ceph.rook.io/v1
+      kind: CephCluster
+      failed: status.ceph.health == 'HEALTH_ERR'
+      current: status.ceph.health in ['HEALTH_OK', 'HEALTH_WARN']
   interval: 1h
   path: "./kubernetes/apps/rook-ceph/rook-ceph/cluster"
-  prune: false # Never delete this
+  prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   targetNamespace: *namespace
   timeout: 5m
-  wait: false
