@@ -9,15 +9,11 @@ spec:
   chartRef:
     kind: OCIRepository
     name: radarr
-  dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
   values:
     controllers:
       radarr:
         annotations:
           reloader.stakater.com/auto: "true"
-
         pod:
           securityContext:
             runAsUser: 2000
@@ -27,7 +23,6 @@ spec:
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 65542 # gladius:external-services
-
         containers:
           app:
             image:
@@ -71,13 +66,11 @@ spec:
               capabilities:
                 drop:
                   - ALL
-
     service:
       app:
         ports:
           http:
             port: *port
-
     persistence:
       config:
         existingClaim: radarr-config
@@ -92,7 +85,6 @@ spec:
         path: /mnt/tank/Media
         globalMounts:
           - path: /data/nas-media
-
     route:
       app:
         hostnames:

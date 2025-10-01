@@ -9,15 +9,11 @@ spec:
   chartRef:
     kind: OCIRepository
     name: scrypted
-  dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
   values:
     controllers:
       scrypted:
         annotations:
           reloader.stakater.com/auto: "true"
-
         pod:
           annotations:
             k8s.v1.cni.cncf.io/networks: |
@@ -34,7 +30,6 @@ spec:
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
               - 65542 # gladius:external-services
-
         containers:
           app:
             image:
@@ -52,18 +47,16 @@ spec:
               limits:
                 gpu.intel.com/i915: 1
                 memory: 8192Mi
-
     service:
       app:
         ports:
           http:
-            port: &port 11080
+            port: 11080
             primary: true
           rebroadcast1:
             port: 34135
           rebroadcast2:
             port: 34136
-
     persistence:
       config:
         existingClaim: scrypted-config
@@ -86,7 +79,6 @@ spec:
         path: /mnt/tank/Apps/scrypted
         globalMounts:
           - path: /recs
-
     route:
       app:
         hostnames:

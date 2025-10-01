@@ -14,10 +14,8 @@ spec:
       kromgo:
         replicas: 1
         strategy: RollingUpdate
-
         annotations:
           reloader.stakater.com/auto: "true"
-
         pod:
           securityContext:
             runAsUser: 2000
@@ -30,7 +28,6 @@ spec:
               labelSelector:
                 matchLabels:
                   app.kubernetes.io/name: kromgo
-
         containers:
           kromgo:
             image:
@@ -67,7 +64,6 @@ spec:
                 memory: 10M
               limits:
                 memory: 64M
-
     service:
       app:
         ports:
@@ -76,7 +72,6 @@ spec:
             port: *port
           health:
             port: *hport
-
     persistence:
       config-file:
         type: configMap
@@ -85,7 +80,6 @@ spec:
           - path: /kromgo/config.yaml
             subPath: config.yaml
             readOnly: true
-
     route:
       app:
         hostnames:

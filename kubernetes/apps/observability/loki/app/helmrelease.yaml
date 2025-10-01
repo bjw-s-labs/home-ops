@@ -10,12 +10,8 @@ spec:
   chartRef:
     kind: OCIRepository
     name: loki
-  dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
   values:
     deploymentMode: SingleBinary
-
     loki:
       analytics:
         reporting_enabled: false

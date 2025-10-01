@@ -9,15 +9,11 @@ spec:
   chartRef:
     kind: OCIRepository
     name: prowlarr
-  dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
   values:
     controllers:
       prowlarr:
         annotations:
           reloader.stakater.com/auto: "true"
-
         pod:
           securityContext:
             runAsUser: 2000
@@ -25,7 +21,6 @@ spec:
             runAsNonRoot: true
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
-
         containers:
           app:
             image:
@@ -68,17 +63,14 @@ spec:
               capabilities:
                 drop:
                   - ALL
-
     service:
       app:
         ports:
           http:
             port: *port
-
     persistence:
       config:
         existingClaim: prowlarr-config
-
     route:
       app:
         hostnames:

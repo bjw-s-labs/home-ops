@@ -9,12 +9,10 @@ spec:
   chartRef:
     kind: OCIRepository
     name: multus
-
   values:
     controllers:
       multus:
         type: daemonset
-
         pod:
           hostNetwork: true
           priorityClassName: system-node-critical
@@ -49,7 +47,6 @@ spec:
                   - NET_ADMIN
                 drop:
                   - ALL
-
     persistence:
       etc-cni-net-d:
         type: hostPath
@@ -63,7 +60,6 @@ spec:
           - path: /host/opt/cni/bin
       tmp:
         type: emptyDir
-
     rbac:
       roles:
         multus:
@@ -99,6 +95,5 @@ spec:
             identifier: multus
           subjects:
             - identifier: multus
-
     serviceAccount:
       multus: {}

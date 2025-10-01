@@ -3,15 +3,15 @@
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingAdmissionPolicyBinding
 metadata:
-  name: volsync-movers-add-jitter
+  name: volsync-mover-jitter
 spec:
-  policyName: volsync-movers-add-jitter
+  policyName: volsync-mover-jitter
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/refs/heads/master/v1.34.1/mutatingadmissionpolicy-admissionregistration-v1beta1.json
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingAdmissionPolicy
 metadata:
-  name: volsync-movers-add-jitter
+  name: volsync-mover-jitter
 spec:
   matchConstraints:
     resourceRules:
@@ -26,11 +26,11 @@ spec:
           - "jobs"
   matchConditions:
     - name: has-volsync-job-name-prefix
-      expression: >
+      expression: >-
         object.metadata.name.startsWith("volsync-src-")
     - name: has-volsync-created-by-labels
-      expression: >
-        object.metadata.labels["app.kubernetes.io/created-by"] == "volsync"
+      expression: >-
+        object.metadata.?labels["app.kubernetes.io/created-by"].orValue("") == "volsync"
   failurePolicy: Fail
   reinvocationPolicy: IfNeeded
   mutations:
@@ -57,15 +57,15 @@ spec:
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingAdmissionPolicyBinding
 metadata:
-  name: volsync-movers-add-nfs
+  name: volsync-mover-nfs
 spec:
-  policyName: volsync-movers-add-nfs
+  policyName: volsync-mover-nfs
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/refs/heads/master/v1.34.1/mutatingadmissionpolicy-admissionregistration-v1beta1.json
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingAdmissionPolicy
 metadata:
-  name: volsync-movers-add-nfs
+  name: volsync-mover-nfs
 spec:
   matchConstraints:
     resourceRules:
@@ -80,13 +80,14 @@ spec:
           - "jobs"
   matchConditions:
     - name: has-volsync-job-name-prefix
-      expression: >
+      expression: >-
         object.metadata.name.startsWith("volsync-")
     - name: has-volsync-created-by-labels
-      expression: >
-        object.metadata.labels["app.kubernetes.io/created-by"] == "volsync"
+      expression: >-
+        object.metadata.?labels["app.kubernetes.io/created-by"].orValue("") == "volsync"
     - name: repository-volume-does-not-exist
-      expression: >
+      expression: >-
+        !has(object.spec.template.spec.volumes) ||
         !object.spec.template.spec.volumes.exists(item, item.name == "repository")
   failurePolicy: Fail
   reinvocationPolicy: IfNeeded

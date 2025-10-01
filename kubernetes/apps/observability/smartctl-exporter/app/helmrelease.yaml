@@ -11,10 +11,8 @@ spec:
     name: smartctl-exporter
   values:
     fullnameOverride: smartctl-exporter
-
     image:
       registry: quay.io
-
     serviceMonitor:
       enabled: true
       relabelings:
@@ -26,6 +24,5 @@ spec:
           sourceLabels:
             - __meta_kubernetes_endpoint_node_name
           targetLabel: instance
-
     prometheusRules:
       enabled: false

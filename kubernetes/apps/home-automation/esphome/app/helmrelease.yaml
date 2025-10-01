@@ -9,15 +9,11 @@ spec:
   chartRef:
     kind: OCIRepository
     name: esphome
-  dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
   values:
     controllers:
       esphome:
         annotations:
           secret.reloader.stakater.com/reload: esphome-secrets,esphome-deploykey
-
         pod:
           annotations:
             k8s.v1.cni.cncf.io/networks: |
@@ -32,7 +28,6 @@ spec:
             runAsGroup: 2000
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
-
         containers:
           app:
             image:
@@ -78,7 +73,6 @@ spec:
                 cpu: 10m
               limits:
                 memory: 512Mi
-
     service:
       app:
         forceRename: "{{.Release.Name}}"
@@ -89,7 +83,6 @@ spec:
         ports:
           http:
             port: &code-server-port 12321
-
     persistence:
       config:
         existingClaim: esphome-config
@@ -126,7 +119,6 @@ spec:
             code-server:
               - path: /home/coder/.ssh/id_ed25519
                 subPath: id_ed25519
-
     route:
       app:
         hostnames:

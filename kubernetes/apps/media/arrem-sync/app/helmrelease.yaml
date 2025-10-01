@@ -9,21 +9,16 @@ spec:
     kind: OCIRepository
     name: arrem-sync
   interval: 30m
-  dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
   values:
     controllers:
       arrem-sync-sonarr:
         type: cronjob
-
         cronjob:
           schedule: "45 */6 * * *"
           backoffLimit: 0
           concurrencyPolicy: Forbid
           failedJobsHistory: 1
           successfulJobsHistory: 1
-
         pod:
           securityContext:
             fsGroup: 2000
@@ -31,7 +26,6 @@ spec:
             runAsGroup: 2000
             runAsNonRoot: true
             runAsUser: 2000
-
         containers:
           app:
             image:

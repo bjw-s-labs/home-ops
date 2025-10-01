@@ -11,11 +11,9 @@ spec:
     name: node-exporter
   values:
     fullnameOverride: node-exporter
-
     image:
       registry: quay.io
       repository: prometheus/node-exporter
-
     prometheus:
       monitor:
         enabled: true
@@ -40,12 +38,10 @@ spec:
             sourceLabels:
               - kubernetes_node
             targetLabel: instance
-
     resources:
       requests:
         cpu: 23m
         memory: 64M
       limits:
         memory: 64M
-
     hostNetwork: false

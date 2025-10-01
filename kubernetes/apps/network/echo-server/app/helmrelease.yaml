@@ -9,13 +9,11 @@ spec:
   chartRef:
     kind: OCIRepository
     name: echo-server
-
   values:
     controllers:
       echo-server:
         annotations:
           reloader.stakater.com/auto: "true"
-
         containers:
           app:
             image:
@@ -41,13 +39,11 @@ spec:
                 memory: 64M
               limits:
                 memory: 64M
-
     service:
       app:
         ports:
           http:
             port: *port
-
     route:
       app:
         hostnames:
