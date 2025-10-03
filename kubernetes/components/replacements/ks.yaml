@@ -8,6 +8,13 @@
         kind: Kustomization
         group: kustomize.toolkit.fluxcd.io
       fieldPaths:
+        - metadata.namespace
+      options:
+        create: true
+    - select:
+        kind: Kustomization
+        group: kustomize.toolkit.fluxcd.io
+      fieldPaths:
         - spec.targetNamespace
       options:
         create: true

@@ -4,7 +4,6 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &appname intel-device-plugins-operator
-  namespace: &namespace system
 spec:
   commonMetadata:
     labels:
@@ -13,7 +12,6 @@ spec:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
       name: *appname
-      namespace: *namespace
   interval: 1h
   path: "./kubernetes/apps/system/intel-device-plugins/operator"
   prune: true
@@ -28,19 +26,16 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &appname intel-device-plugins-gpu
-  namespace: &namespace system
 spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
   dependsOn:
     - name: intel-device-plugins-operator
-      namespace: *namespace
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
       name: *appname
-      namespace: *namespace
     - apiVersion: deviceplugin.intel.com/v1
       kind: GpuDevicePlugin
       name: i915
