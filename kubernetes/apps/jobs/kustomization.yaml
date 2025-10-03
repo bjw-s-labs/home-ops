@@ -5,6 +5,8 @@ kind: Kustomization
 namespace: jobs
 components:
   - ../../components/namespace
+replacements:
+  - path: ../../components/replacements/ks.yaml
 resources:
   - ./mailbackup/ks.yaml
   - ./publish-k8s-schemas/ks.yaml
