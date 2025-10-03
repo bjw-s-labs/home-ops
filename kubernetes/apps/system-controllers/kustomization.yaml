@@ -3,12 +3,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: system-controllers
-resources:
-  - ./k8tz/ks.yaml
-  - ./snapshot-controller/ks.yaml
 components:
   - ../../components/namespace
-
 patches:
   - patch: |
       - op: add
@@ -16,3 +12,8 @@ patches:
         value: "true"
     target:
       kind: Namespace
+resources:
+  - ./k8tz/ks.yaml
+  - ./snapshot-controller/ks.yaml
+replacements:
+  - path: ../../components/replacements/ks.yaml

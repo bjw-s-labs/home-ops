@@ -4,14 +4,12 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &appname flux-instance
-  namespace: &namespace flux-system
 spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
   dependsOn:
     - name: flux-operator
-      namespace: *namespace
   interval: 1h
   path: ./kubernetes/apps/flux-system/flux-instance/app
   prune: false # Never delete this
@@ -19,6 +17,5 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: *namespace
   timeout: 5m
   wait: false

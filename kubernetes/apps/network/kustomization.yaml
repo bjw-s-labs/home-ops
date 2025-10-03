@@ -3,11 +3,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: network
+components:
+  - ../../components/namespace
+replacements:
+  - path: ../../components/replacements/ks.yaml
 resources:
   - ./cloudflared/ks.yaml
   - ./echo-server/ks.yaml
   - ./envoy-gateway/ks.yaml
   - ./external-dns/ks.yaml
   - ./multus/ks.yaml
-components:
-  - ../../components/namespace
