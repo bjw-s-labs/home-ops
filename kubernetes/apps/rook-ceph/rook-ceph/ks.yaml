@@ -12,6 +12,7 @@ spec:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
       name: *appname
+      namespace: rook-ceph
   interval: 1h
   path: ./kubernetes/apps/rook-ceph/rook-ceph/operator
   prune: true
@@ -38,6 +39,7 @@ spec:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
       name: *appname
+      namespace: rook-ceph
     - apiVersion: ceph.rook.io/v1
       kind: CephCluster
       name: rook-ceph
