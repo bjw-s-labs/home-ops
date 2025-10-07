@@ -93,7 +93,8 @@ cluster:
       runtime-config: admissionregistration.k8s.io/v1beta1=true
     certSANs:
       - 127.0.0.1 # KubePrism
-      - 10.1.1.130
+      - 10.1.6.50
+      - k8s.bjw-s.internal
     disablePodSecurityPolicy: true
   controllerManager:
     image: registry.k8s.io/kube-controller-manager:v1.34.1
@@ -143,7 +144,7 @@ cluster:
     key: op://automation/talos/CLUSTER_CA_KEY
     {% endif %}
   controlPlane:
-    endpoint: https://10.1.1.130:6443
+    endpoint: https://10.1.6.50:6443
   clusterName: home-ops
   discovery:
     enabled: true
