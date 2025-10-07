@@ -28,7 +28,7 @@ spec:
             webrtc:
               listen: :8555
               candidates:
-                - 10.1.1.133:8555
+                - 10.1.6.62:8555
                 - stun:8555
               ice_servers:
                 - urls:
@@ -73,6 +73,10 @@ spec:
                   - ALL
     service:
       app:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 10.1.6.62
+        externalTrafficPolicy: Local
         ports:
           api:
             port: 1984
