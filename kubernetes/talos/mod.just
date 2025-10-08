@@ -20,10 +20,6 @@ apply-cluster *args:
     just talos apply-node ${node} {{ args }}; \
   done
 
-[doc('Generate kubeconfig for Talos cluster')]
-gen-kubeconfig:
-  talosctl kubeconfig -n "{{ controller }}" -f --force-context-name main {{ kubernetes_dir }}
-
 [doc('Generate schematic ID from Talos schematic')]
 gen-schematic-id:
   curl -sX POST --data-binary "@{{ talos_dir }}/schematic.yaml" "https://factory.talos.dev/schematics" | jq -r '.id'
