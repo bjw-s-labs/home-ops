@@ -23,13 +23,13 @@ prune-pods:
   done
 
 [doc('Apply local Flux Kustomization')]
-apply-ks dir ks="*":
-  just k8s render-local-ks "{{ dir }}" "{{ ks }}" \
+apply-ks ns ks:
+  just k8s render-local-ks "{{ ns }}" "{{ ks }}" \
   | kubectl apply --server-side --field-manager=kustomize-controller -f /dev/stdin
 
 [doc('Delete local Flux Kustomization')]
-delete-ks dir ks="*":
-  just k8s render-local-ks "{{ dir }}" "{{ ks }}" \
+delete-ks ns ks:
+  just k8s render-local-ks "{{ ns }}" "{{ ks }}" \
   | kubectl delete -f /dev/stdin
 
 [doc('Sync single Flux HelmRelease')]
@@ -69,5 +69,5 @@ snapshot:
   done
 
 [private]
-render-local-ks dir ks="*":
-  flux-local build ks --all-namespaces --path "{{ kubernetes_dir }}/apps/{{ dir }}" {{ if ks != "*" { ks } else { "" } }}
+render-local-ks ns ks:
+  flux-local build ks --namespace "{{ ns }}" --path "{{ kubernetes_dir }}/flux/cluster" "{{ ks }}"
