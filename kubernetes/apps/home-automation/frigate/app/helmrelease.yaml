@@ -12,6 +12,10 @@ spec:
   values:
     controllers:
       frigate:
+        pod:
+          resourceClaims:
+            - name: gpu
+              resourceClaimTemplateName: frigate-gpu
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
@@ -36,11 +40,12 @@ spec:
                   failureThreshold: 3
               readiness: *probes
             resources:
+              claims:
+                - name: gpu
               requests:
                 cpu: 100m
                 memory: 1024Mi
               limits:
-                gpu.intel.com/i915: 1
                 memory: 8192Mi
     service:
       frigate:
