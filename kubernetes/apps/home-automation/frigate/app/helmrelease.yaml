@@ -1,0 +1,116 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: frigate
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: frigate
+  interval: 30m
+  values:
+    controllers:
+      frigate:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/blakeblackshear/frigate
+              tag: 0.16.1@sha256:cb6624b9075f76ece626139eedca7e728cab1456a5f8c351afbf877320826bc1
+            envFrom:
+              - secretRef:
+                  name: frigate-secret
+            probes:
+              liveness: &probes
+                enabled: false
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/version
+                    port: 5000
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            resources:
+              requests:
+                cpu: 100m
+                memory: 1024Mi
+              limits:
+                gpu.intel.com/i915: 1
+                memory: 8192Mi
+    service:
+      frigate:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 10.1.6.64
+        ports:
+          http:
+            appProtocol: kubernetes.io/wss
+            port: 5000
+          go2rtc:
+            primary: true
+            port: 1984
+          rtsp:
+            port: 8554
+          webrtc-tcp:
+            port: 8555
+            protocol: TCP
+          webrtc-udp:
+            port: 8555
+            protocol: UDP
+    persistence:
+      config:
+        existingClaim: frigate
+      # config-file:
+      #   type: secret
+      #   name: frigate-secrets
+      #   globalMounts:
+      #     - path: /config/config.yaml
+      #       subPath: config.yaml
+      media:
+        type: nfs
+        path: /mnt/tank/Apps/frigate
+        server: gladius.bjw-s.internal
+        globalMounts:
+          - path: /media/frigate
+      cache:
+        enabled: true
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 2Gi
+        globalMounts:
+          - path: /dev/shm
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          frigate:
+            app:
+              - path: /tmp
+                subPath: tmp
+    route:
+      frigate:
+        hostnames:
+          - frigate.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: frigate
+                port: 5000
+      go2rtc:
+        hostnames:
+          - frigate-go2rtc.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: frigate
+                port: 1984
