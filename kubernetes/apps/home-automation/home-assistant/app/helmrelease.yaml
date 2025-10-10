@@ -57,9 +57,9 @@ spec:
               - --disable-telemetry
               - --disable-update-check
               - --user-data-dir
-              - /config/.vscode
+              - /data/user-data
               - --extensions-dir
-              - /config/.vscode
+              - /data/extensions
               - --port
               - "12321"
               - /config
@@ -88,13 +88,17 @@ spec:
             port: 12321
     persistence:
       config:
-        existingClaim: home-assistant-config
+        existingClaim: home-assistant
         advancedMounts:
           home-assistant:
             app:
               - path: /config
+                subPath: config
             code-server:
               - path: /config
+                subPath: config
+              - path: /data
+                subPath: code-server
       hass-cache:
         existingClaim: hass-cache
         advancedMounts:
