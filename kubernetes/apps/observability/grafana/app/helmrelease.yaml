@@ -233,10 +233,10 @@ spec:
             isDefault: true
             jsonData:
               prometheusType: Prometheus
-          - access: proxy
-            name: Loki
-            type: loki
-            url: http://loki-headless.observability.svc.cluster.local:3100
+          - name: VictoriaLogs
+            type: victoriametrics-logs-datasource
+            access: proxy
+            url: http://victoria-logs-server.observability.svc.cluster.local:9428
           - name: Alertmanager
             type: alertmanager
             access: proxy
@@ -249,7 +249,7 @@ spec:
             orgId: 1
           - name: Prometheus
             orgId: 1
-          - name: Loki
+          - name: VictoriaLogs
             orgId: 1
 
     env:
@@ -281,6 +281,7 @@ spec:
       - natel-discrete-panel
       - pr0ps-trackmap-panel
       - vonage-status-panel
+      - victoriametrics-logs-datasource
 
     rbac:
       pspEnabled: false
@@ -313,7 +314,7 @@ spec:
       image:
         registry: ghcr.io
         repository: home-operations/k8s-sidecar
-        tag: 1.30.11@sha256:d8a53f834b0fe70030df75f3f956d1c5e56fbb067b09803708b2bc26e26cfc12
+        tag: 1.30.9
       dashboards:
         enabled: true
         searchNamespace: ALL
