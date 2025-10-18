@@ -1,0 +1,97 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: audiobookshelf
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: audiobookshelf
+  interval: 30m
+  values:
+    controllers:
+      audiobookshelf:
+        pod:
+          securityContext:
+            runAsUser: 2000
+            runAsGroup: 2000
+            fsGroup: 2000
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 65542 # gladius:external-services
+        containers:
+          app:
+            image:
+              repository: ghcr.io/advplyr/audiobookshelf
+              tag: 2.30.0@sha256:6fbd7dc95d53c6e168ce69e760b87c334e3b9ba88bf7b8531ed5a116d5d6da03
+            env:
+              AUDIOBOOKSHELF_UID: 2000
+              AUDIOBOOKSHELF_GID: 2000
+              CONFIG_PATH: /config
+              METADATA_PATH: /config/metadata
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthcheck
+                    port: 80
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 50m
+              limits:
+                memory: 1.5Gi
+    service:
+      app:
+        ports:
+          http:
+            port: 80
+    persistence:
+      config:
+        existingClaim: audiobookshelf
+        advancedMounts:
+          audiobookshelf:
+            app:
+              - path: /config
+                subPath: config
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          audiobookshelf:
+            app:
+              - path: /.npm
+                subPath: cache
+              - path: /metadata/logs
+                subPath: logs
+              - path: /tmp
+                subPath: tmp
+      nfs-nas-media:
+        type: nfs
+        server: gladius.bjw-s.internal
+        path: /mnt/tank/Media
+        advancedMounts:
+          audiobookshelf:
+            app:
+              - path: /data/nas-media/Library
+                subPath: Library
+    route:
+      app:
+        hostnames:
+          - audiobookshelf.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
