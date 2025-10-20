@@ -1,0 +1,15 @@
+---
+services:
+  app:
+    container_name: doco-cd
+    environment:
+      POLL_CONFIG: |
+        - url: https://github.com/bjw-s-labs/home-ops.git
+          reference: doco-cd
+          interval: 180
+          target: truenas
+      TZ: Europe/Amsterdam
+    image: ghcr.io/kimdre/doco-cd:0.42.1
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
