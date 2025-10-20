@@ -3,17 +3,28 @@ services:
   app:
     container_name: doco-cd
     environment:
-      POLL_CONFIG: |
-        - url: https://github.com/bjw-s-labs/home-ops.git
-          reference: main
-          interval: 3600
-          target: truenas
+      HTTP_PORT: 8080
+      LOG_LEVEL: info
       TZ: Europe/Amsterdam
+      WEBHOOK_SECRET: <webhook-secret>
+    healthcheck:
+      interval: 30s
+      retries: 3
+      start_period: 15s
+      test:
+        - CMD
+        - wget
+        - '--no-verbose'
+        - '--tries=1'
+        - '--spider'
+        - http://localhost:8080/v1/health
+      timeout: 5s
     image: ghcr.io/kimdre/doco-cd:0.42.1
+    ports:
+      - '8080:8080'
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - data:/data
-
 volumes:
-  data:
+  data: Null
