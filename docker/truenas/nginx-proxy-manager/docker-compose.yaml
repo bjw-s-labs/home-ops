@@ -1,0 +1,17 @@
+---
+services:
+  app:
+    environment:
+      DISABLE_IPV6: 'true'
+    image: jc21/nginx-proxy-manager:2.12.6
+    ports:
+      - '80:80'
+      - '8881:81'
+      - '443:443'
+    restart: unless-stopped
+    volumes:
+      - data:/data
+      - letsencrypt:/etc/letsencrypt
+volumes:
+  data: {}
+  letsencrypt: {}
