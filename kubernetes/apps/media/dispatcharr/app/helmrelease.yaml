@@ -1,0 +1,66 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: dispatcharr
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: dispatcharr
+  interval: 30m
+  values:
+    controllers:
+      dispatcharr:
+        pod:
+          hostUsers: false
+          resourceClaims:
+            - name: gpu
+              resourceClaimTemplateName: dispatcharr-gpu
+        containers:
+          app:
+            image:
+              repository: ghcr.io/dispatcharr/dispatcharr
+              tag: 0.10.4@sha256:31242b53f369e82e92d8f5ef53f93d5686c2a8c7fbb486a1fc57d006def13401
+            env:
+              CELERY_BROKER_URL: redis://localhost:6379/0
+              DISPATCHARR_ENV: aio
+              DISPATCHARR_LOG_LEVEL: info
+              DISPATCHARR_PORT: &port 9191
+              REDIS_HOST: localhost
+            resources:
+              claims:
+                - name: gpu
+              requests:
+                cpu: 100m
+              limits:
+                memory: 4Gi
+    service:
+      app:
+        ports:
+          http:
+            appProtocol: kubernetes.io/wss
+            port: *port
+    persistence:
+      data:
+        existingClaim: dispatcharr
+        advancedMounts:
+          dispatcharr:
+            app:
+              - path: /data
+                subPath: data
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          dispatcharr:
+            app:
+              - path: /tmp
+                subPath: tmp
+    route:
+      app:
+        hostnames:
+          - dispatcharr.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
