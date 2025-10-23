@@ -3,11 +3,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname audiobookshelf
+  name: audiobookshelf
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: audiobookshelf
   components:
     - ../../../../components/volsync
     - ../../../../components/keda/nas-nfs-scaler
@@ -20,12 +20,13 @@ spec:
   path: "./kubernetes/apps/media/audiobookshelf/app"
   postBuild:
     substitute:
-      APP: *appname
+      APP: audiobookshelf
       VOLSYNC_CLAIM: audiobookshelf
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: media
   timeout: 5m
   wait: false

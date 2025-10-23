@@ -3,11 +3,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname kube-state-metrics
+  name: kube-state-metrics
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: kube-state-metrics
   interval: 1h
   path: ./kubernetes/apps/observability/kube-state-metrics/app
   prune: true
@@ -15,5 +15,6 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: observability
   timeout: 5m
   wait: false

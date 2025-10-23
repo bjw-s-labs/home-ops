@@ -3,11 +3,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname opencloud
+  name: opencloud
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: opencloud
   components:
     - ../../../../components/volsync
   dependsOn:
@@ -17,7 +17,7 @@ spec:
   path: "./kubernetes/apps/selfhosted/opencloud/app"
   postBuild:
     substitute:
-      APP: *appname
+      APP: opencloud
       VOLSYNC_CLAIM: opencloud
       VOLSYNC_CAPACITY: 15Gi
   prune: true
@@ -25,5 +25,6 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: selfhosted
   timeout: 5m
   wait: false

@@ -3,11 +3,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname cross-seed
+  name: cross-seed
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: cross-seed
   components:
     - ../../../../components/volsync
     - ../../../../components/keda/nas-nfs-scaler
@@ -18,11 +18,12 @@ spec:
   path: "./kubernetes/apps/downloads/cross-seed/app"
   postBuild:
     substitute:
-      APP: *appname
+      APP: cross-seed
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: downloads
   timeout: 5m
   wait: false

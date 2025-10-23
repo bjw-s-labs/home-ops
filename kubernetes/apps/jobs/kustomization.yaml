@@ -4,9 +4,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: jobs
 components:
-  - ../../components/namespace
-replacements:
-  - path: ../../components/replacements/ks.yaml
+  - ../../components/flux-alerts
 resources:
+  - ./namespace.yaml
   - ./mailbackup/ks.yaml
   - ./publish-k8s-schemas/ks.yaml

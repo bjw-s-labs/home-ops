@@ -3,11 +3,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname home-assistant
+  name: home-assistant
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: home-assistant
   components:
     - ../../../../components/volsync
   dependsOn:
@@ -19,7 +19,7 @@ spec:
   path: "./kubernetes/apps/home-automation/home-assistant/app"
   postBuild:
     substitute:
-      APP: *appname
+      APP: home-assistant
       APP_UID: "65534"
       APP_GID: "65533"
       VOLSYNC_CLAIM: home-assistant
@@ -29,5 +29,6 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: home-automation
   timeout: 5m
   wait: false

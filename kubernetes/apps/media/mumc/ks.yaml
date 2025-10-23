@@ -3,20 +3,21 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname mumc
+  name: mumc
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: mumc
   interval: 1h
   path: "./kubernetes/apps/media/mumc/app"
   postBuild:
     substitute:
-      APP: *appname
+      APP: mumc
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: media
   timeout: 5m
   wait: false
