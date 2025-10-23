@@ -4,10 +4,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: media
 components:
-  - ../../components/namespace
+  - ../../components/flux-alerts
 replacements:
   - path: ../../components/replacements/ks.yaml
 resources:
+  - ./namespace.yaml
   - ./arrem-sync/ks.yaml
   - ./audiobookshelf/ks.yaml
   - ./dispatcharr/ks.yaml
