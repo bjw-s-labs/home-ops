@@ -4,10 +4,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: home-automation
 components:
-  - ../../components/namespace
-replacements:
-  - path: ../../components/replacements/ks.yaml
+  - ../../components/flux-alerts
 resources:
+  - ./namespace.yaml
   - ./esphome/ks.yaml
   - ./frigate/ks.yaml
   - ./home-assistant/ks.yaml

@@ -4,16 +4,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: system-controllers
 components:
-  - ../../components/namespace
-patches:
-  - patch: |
-      - op: add
-        path: /metadata/labels/k8tz.io~1controller-namespace
-        value: "true"
-    target:
-      kind: Namespace
+  - ../../components/flux-alerts
 resources:
+  - ./namespace.yaml
   - ./k8tz/ks.yaml
   - ./snapshot-controller/ks.yaml
-replacements:
-  - path: ../../components/replacements/ks.yaml

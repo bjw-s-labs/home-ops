@@ -3,11 +3,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname node-exporter
+  name: node-exporter
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: node-exporter
   interval: 1h
   path: "./kubernetes/apps/observability/node-exporter/app"
   prune: true
@@ -15,5 +15,6 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: observability
   timeout: 5m
   wait: false
