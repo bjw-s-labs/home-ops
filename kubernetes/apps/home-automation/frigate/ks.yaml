@@ -3,11 +3,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname frigate
+  name: frigate
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: frigate
   components:
     - ../../../../components/gpu
     - ../../../../components/volsync
@@ -23,7 +23,7 @@ spec:
   path: "./kubernetes/apps/home-automation/frigate/app"
   postBuild:
     substitute:
-      APP: *appname
+      APP: frigate
       VOLSYNC_CLAIM: frigate
       VOLSYNC_CAPACITY: 5Gi
   prune: true
@@ -31,5 +31,6 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: home-automation
   timeout: 5m
   wait: false

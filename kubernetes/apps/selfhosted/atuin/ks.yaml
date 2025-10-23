@@ -3,11 +3,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname atuin
+  name: atuin
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: atuin
   components:
     - ../../../../components/volsync
   dependsOn:
@@ -17,7 +17,7 @@ spec:
   path: "./kubernetes/apps/selfhosted/atuin/app"
   postBuild:
     substitute:
-      APP: *appname
+      APP: atuin
       VOLSYNC_CLAIM: atuin
       VOLSYNC_CAPACITY: 5Gi
   prune: true
@@ -25,5 +25,6 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: selfhosted
   timeout: 5m
   wait: false

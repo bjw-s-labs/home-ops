@@ -3,11 +3,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname victoria-logs
+  name: victoria-logs
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: victoria-logs
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -18,5 +18,6 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: observability
   timeout: 5m
   wait: false

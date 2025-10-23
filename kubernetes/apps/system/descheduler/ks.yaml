@@ -3,11 +3,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname descheduler
+  name: descheduler
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: descheduler
   interval: 1h
   path: "./kubernetes/apps/system/descheduler/app"
   prune: true
@@ -15,5 +15,6 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: system
   timeout: 5m
   wait: false

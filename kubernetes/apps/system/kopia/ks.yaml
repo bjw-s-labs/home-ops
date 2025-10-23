@@ -3,11 +3,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname kopia
+  name: kopia
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: kopia
   components:
     - ../../../../components/keda/nas-nfs-scaler
   dependsOn:
@@ -16,16 +16,17 @@ spec:
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
-      name: *appname
+      name: kopia
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/system/kopia/app"
   postBuild:
     substitute:
-      APP: *appname
+      APP: kopia
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: system
   timeout: 5m

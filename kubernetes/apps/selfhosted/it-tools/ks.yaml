@@ -3,11 +3,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname it-tools
+  name: it-tools
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: it-tools
   interval: 1h
   path: "./kubernetes/apps/selfhosted/it-tools/app"
   prune: true
@@ -15,5 +15,6 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: selfhosted
   timeout: 5m
   wait: false

@@ -3,11 +3,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname arrem-sync
+  name: arrem-sync
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: arrem-sync
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -15,11 +15,12 @@ spec:
   path: "./kubernetes/apps/media/arrem-sync/app"
   postBuild:
     substitute:
-      APP: *appname
+      APP: arrem-sync
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: media
   timeout: 5m
   wait: false

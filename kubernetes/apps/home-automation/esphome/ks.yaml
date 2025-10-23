@@ -3,11 +3,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname esphome
+  name: esphome
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: esphome
   components:
     - ../../../../components/volsync
   dependsOn:
@@ -19,7 +19,7 @@ spec:
   path: "./kubernetes/apps/home-automation/esphome/app"
   postBuild:
     substitute:
-      APP: *appname
+      APP: esphome
       VOLSYNC_CLAIM: esphome-config
       VOLSYNC_CAPACITY: 5Gi
   prune: true
@@ -27,5 +27,6 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: home-automation
   timeout: 5m
   wait: false
