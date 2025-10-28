@@ -50,9 +50,19 @@ spec:
       storage:
         useAllNodes: true
         useAllDevices: false
-        deviceFilter: nvme0n1
+        # devicePathFilter: /dev/disk/by-id/nvme-Micron_7450_MTFDKBA960TFR_.*
         config:
           osdsPerDevice: "1"
+        nodes:
+          - name: delta
+            devices:
+              - name: /dev/disk/by-id/nvme-Samsung_SSD_990_PRO_1TB_S6Z1NU0XB20763T
+          - name: enigma
+            devices:
+              - name: /dev/disk/by-id/nvme-Samsung_SSD_990_PRO_1TB_S6Z1NU0XB15848B
+          - name: felix
+            devices:
+              - name: /dev/disk/by-id/nvme-Samsung_SSD_990_PRO_1TB_S6Z1NU0XB20775A
     cephBlockPools:
       - name: ceph-blockpool
         spec:
