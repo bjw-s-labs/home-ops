@@ -52,6 +52,11 @@ machine:
         nconnect=16
   install:
     image: factory.talos.dev/metal-installer/a30c16a32db3c99cb35f22401fad96807f80896dfc86aa4ec716ed6b4aff09de:v1.11.3
+  kernel:
+    modules:
+      - name: nbd
+      - name: thunderbolt
+      - name: thunderbolt_net
   kubelet:
     defaultRuntimeSeccompProfileEnabled: true
     disableManifestsDirectory: true
@@ -82,6 +87,10 @@ machine:
       - 10.1.1.12
   token: op://automation/talos/MACHINE_TOKEN
   type: controlplane
+  udev:
+    rules:
+      - # Thunderbolt
+        ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"
 cluster:
   {% if ENV.IS_CONTROLPLANE %}
   aggregatorCA:
