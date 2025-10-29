@@ -70,6 +70,26 @@ machine:
       validSubnets:
         - 10.1.1.0/24
   network:
+    interfaces:
+      - # 2.5GbE onboard
+        interface: bond0
+        bond:
+          deviceSelectors:
+            - hardwareAddr: 48:21:0b:55:*
+              driver: igc
+            - hardwareAddr: 48:21:0b:56:*
+              driver: igc
+          mode: active-backup
+        dhcp: true
+        vlans:
+          - # IOT
+            vlanId: 303
+            dhcp: false
+            mtu: 1500
+          - # VPN
+            vlanId: 305
+            dhcp: false
+            mtu: 1500
     disableSearchDomain: true
   sysctls:
     fs.inotify.max_user_instances: "8192"
@@ -179,3 +199,19 @@ apiVersion: v1alpha1
 kind: WatchdogTimerConfig
 device: /dev/watchdog0
 timeout: 5m
+---
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: EPHEMERAL
+provisioning:
+  diskSelector:
+    match: system_disk
+  maxSize: 512GiB
+---
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: local-hostpath
+provisioning:
+  diskSelector:
+    match: system_disk
+  maxSize: 256GiB
