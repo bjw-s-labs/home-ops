@@ -6,36 +6,26 @@ machine:
   network:
     hostname: felix.bjw-s.internal
     interfaces:
-      - interface: bond0
-        bond:
-          deviceSelectors:
-            - hardwareAddr: 48:21:0b:56:09:47
-              driver: igc
-          mode: active-backup
-        dhcp: true
-        vlans:
-          - vlanId: 303
-            dhcp: false
-            mtu: 1500
-          - vlanId: 305
-            dhcp: false
-            mtu: 1500
+      - # delta
+        deviceSelector:
+          busPath: 0-1.0
+        dhcp: false
+        mtu: 65520
+        addresses:
+          - 169.254.255.23/32
+        routes:
+          - network: 169.254.255.21/32
+            metric: 2048
+      - # enigma
+        deviceSelector:
+          busPath: 1-1.0
+        dhcp: false
+        mtu: 65520
+        addresses:
+          - 169.254.255.23/32
+        routes:
+          - network: 169.254.255.22/32
+            metric: 2048
   nodeLabels:
     node.kubernetes.io/gpu: "true"
   type: controlplane
----
-apiVersion: v1alpha1
-kind: VolumeConfig
-name: EPHEMERAL
-provisioning:
-  diskSelector:
-    match: system_disk
-  maxSize: 512GiB
----
-apiVersion: v1alpha1
-kind: UserVolumeConfig
-name: local-hostpath
-provisioning:
-  diskSelector:
-    match: system_disk
-  maxSize: 256GiB
