@@ -45,24 +45,20 @@ spec:
             enabled: true
       network:
         provider: host
+        addressRanges:
+          public:
+            - 10.1.1.0/24
+          cluster:
+            - 10.1.1.0/24
+            # - 169.254.255.0/24
         connections:
           requireMsgr2: true
       storage:
         useAllNodes: true
         useAllDevices: false
-        # devicePathFilter: /dev/disk/by-id/nvme-Micron_7450_MTFDKBA960TFR_.*
+        devicePathFilter: /dev/disk/by-id/nvme-Micron_7450_MTFDKBA960TFR_.*
         config:
           osdsPerDevice: "1"
-        nodes:
-          - name: delta
-            devices:
-              - name: /dev/disk/by-id/nvme-Samsung_SSD_990_PRO_1TB_S6Z1NU0XB20763T
-          - name: enigma
-            devices:
-              - name: /dev/disk/by-id/nvme-Samsung_SSD_990_PRO_1TB_S6Z1NU0XB15848B
-          - name: felix
-            devices:
-              - name: /dev/disk/by-id/nvme-Samsung_SSD_990_PRO_1TB_S6Z1NU0XB20775A
     cephBlockPools:
       - name: ceph-blockpool
         spec:
