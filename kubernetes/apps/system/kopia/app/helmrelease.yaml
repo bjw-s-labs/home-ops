@@ -35,8 +35,6 @@ spec:
             runAsGroup: 2000
             runAsNonRoot: true
             runAsUser: 2000
-            supplementalGroups:
-              - 65542 # gladius:external-services
         containers:
           app:
             image:
@@ -88,7 +86,7 @@ spec:
             subPath: repository.config
       repository:
         type: nfs
-        path: /mnt/tank/Backup/Volsync
+        path: /mnt/tank/kubernetes/volsync
         server: gladius.bjw-s.internal
         globalMounts:
           - path: /repository

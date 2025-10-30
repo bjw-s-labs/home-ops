@@ -21,8 +21,6 @@ spec:
             runAsGroup: 2000
             runAsNonRoot: true
             runAsUser: 2000
-            supplementalGroups:
-              - 65542 # gladius:external-services
         containers:
           app:
             image:
@@ -80,7 +78,7 @@ spec:
               - path: /config
       downloads:
         type: nfs
-        path: /mnt/tank/Media
+        path: /mnt/tank/media
         server: gladius.bjw-s.internal
         globalMounts:
           - path: /data/nas-media/Downloads/sabnzbd
