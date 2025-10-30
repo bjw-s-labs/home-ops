@@ -21,8 +21,6 @@ spec:
             runAsGroup: 2000
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"
-            supplementalGroups:
-              - 65542 # gladius:external-services
         containers:
           app:
             image:
@@ -79,7 +77,7 @@ spec:
       nfs-nas-media:
         type: nfs
         server: gladius.bjw-s.internal
-        path: /mnt/tank/Media
+        path: /mnt/tank/media
         advancedMounts:
           emby:
             app:

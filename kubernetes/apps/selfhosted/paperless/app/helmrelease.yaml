@@ -48,7 +48,7 @@ spec:
               # Configure redis integration
               PAPERLESS_REDIS: redis://paperless-redis.selfhosted.svc.cluster.local:6379
               # Configure user permissions
-              USERMAP_GID: "65542" # gladius:external-services
+              USERMAP_GID: "100" # gladius:users
               # Configure admin user
               PAPERLESS_ADMIN_USER:
                 valueFrom:
@@ -113,7 +113,7 @@ spec:
               - path: /data/local
       nas:
         type: nfs
-        path: /mnt/tank/Apps/paperless
+        path: /mnt/tank/apps/paperless
         server: gladius.bjw-s.internal
         advancedMounts:
           paperless:
