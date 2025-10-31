@@ -8,7 +8,8 @@ machine:
     interfaces:
       - # delta
         deviceSelector:
-          busPath: 0-1.0
+          driver: thunderbolt-net
+          busPath: 1-1.0 # right port
         dhcp: false
         mtu: 65520
         addresses:
@@ -18,7 +19,8 @@ machine:
             metric: 2048
       - # enigma
         deviceSelector:
-          busPath: 1-1.0
+          driver: thunderbolt-net
+          busPath: 0-1.0 # left port
         dhcp: false
         mtu: 65520
         addresses:
