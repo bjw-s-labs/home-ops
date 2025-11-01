@@ -33,8 +33,6 @@ spec:
             image:
               repository: ghcr.io/home-operations/home-assistant
               tag: 2025.10.4
-            env:
-              VENV_FOLDER: /venv
             resources:
               requests:
                 cpu: 100m
@@ -104,7 +102,7 @@ spec:
         advancedMounts:
           home-assistant:
             app:
-              - path: /venv
+              - path: /config/.venv
                 subPath: hass-venv
       tmpfs:
         type: emptyDir
@@ -125,7 +123,6 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-
         rules:
           - backendRefs:
               - identifier: app
@@ -136,7 +133,6 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-
         rules:
           - backendRefs:
               - identifier: code-server
