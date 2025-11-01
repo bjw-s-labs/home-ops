@@ -107,10 +107,6 @@ machine:
       - 10.1.1.12
   token: op://automation/talos/MACHINE_TOKEN
   type: controlplane
-  udev:
-    rules:
-      - # Thunderbolt
-        ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"
 cluster:
   {% if ENV.IS_CONTROLPLANE %}
   aggregatorCA:
