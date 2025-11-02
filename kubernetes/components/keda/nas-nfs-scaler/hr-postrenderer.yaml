@@ -1,0 +1,25 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ${APP}
+spec:
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              version: v1
+              kind: Deployment
+              name: ${APP}
+            patch: |-
+              version: v1
+              kind: Deployment
+              metadata:
+                name: ${APP}
+                labels:
+                  autoscale.keda.io/nfs: "true"
+              spec:
+                template:
+                  metadata:
+                    labels:
+                      autoscale.keda.io/nfs: "true"
