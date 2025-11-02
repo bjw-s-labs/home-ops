@@ -81,6 +81,7 @@ machine:
               driver: igc
           mode: active-backup
         dhcp: true
+        mtu: 9000
         vlans:
           - # IOT
             vlanId: 303
@@ -106,7 +107,6 @@ machine:
     servers:
       - 10.1.1.12
   token: op://automation/talos/MACHINE_TOKEN
-  type: controlplane
 cluster:
   {% if ENV.IS_CONTROLPLANE %}
   aggregatorCA:
