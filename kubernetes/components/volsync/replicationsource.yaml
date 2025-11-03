@@ -5,6 +5,7 @@ kind: ReplicationSource
 metadata:
   name: ${APP}
 spec:
+  paused: true
   sourcePVC: "${VOLSYNC_CLAIM:=${APP}}"
   trigger:
     schedule: "0 * * * *"
