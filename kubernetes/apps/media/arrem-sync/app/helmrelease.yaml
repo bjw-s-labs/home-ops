@@ -20,6 +20,35 @@ spec:
           failedJobsHistory: 1
           successfulJobsHistory: 1
         pod:
+          annotations:
+            k8s.ksgate.org/emby-deployment: |-
+              {
+                "apiVersion": "apps/v1",
+                "kind": "Deployment",
+                "name": "emby",
+                "namespace": "media",
+                "expression": "resource.status.updatedReplicas >= 1"
+              }
+            k8s.ksgate.org/sonarr-deployment: |-
+              {
+                "apiVersion": "apps/v1",
+                "kind": "Deployment",
+                "name": "sonarr",
+                "namespace": "downloads",
+                "expression": "resource.status.updatedReplicas >= 1"
+              }
+            k8s.ksgate.org/radarr-deployment: |-
+              {
+                "apiVersion": "apps/v1",
+                "kind": "Deployment",
+                "name": "radarr",
+                "namespace": "downloads",
+                "expression": "resource.status.updatedReplicas >= 1"
+              }
+          schedulingGates:
+            - name: k8s.ksgate.org/emby-deployment
+            - name: k8s.ksgate.org/sonarr-deployment
+            - name: k8s.ksgate.org/radarr-deployment
           securityContext:
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"

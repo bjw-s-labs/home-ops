@@ -20,6 +20,18 @@ spec:
     controllers:
       tqm:
         type: cronjob
+        pod:
+          annotations:
+            k8s.ksgate.org/qbittorrent-deployment: |-
+              {
+                "apiVersion": "apps/v1",
+                "kind": "Deployment",
+                "name": "qbittorrent",
+                "namespace": "downloads",
+                "expression": "resource.status.updatedReplicas >= 1"
+              }
+          schedulingGates:
+            - name: k8s.ksgate.org/qbittorrent-deployment
         cronjob: &cronJobSpec
           backoffLimit: 0
           concurrencyPolicy: Forbid
