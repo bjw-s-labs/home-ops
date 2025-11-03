@@ -22,7 +22,7 @@ spec:
                 "kind": "Deployment",
                 "name": "qbittorrent",
                 "namespace": "downloads",
-                "expression": "resource.status.updatedReplicas >= 1"
+                "expression": "resource.status.readyReplicas >= 1"
               }
             k8s.ksgate.org/prowlarr-deployment: |-
               {
@@ -30,7 +30,7 @@ spec:
                 "kind": "Deployment",
                 "name": "prowlarr",
                 "namespace": "downloads",
-                "expression": "resource.status.updatedReplicas >= 1"
+                "expression": "resource.status.readyReplicas >= 1"
               }
           schedulingGates:
             - name: k8s.ksgate.org/qbittorrent-deployment

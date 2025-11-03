@@ -27,7 +27,7 @@ spec:
                 "kind": "Deployment",
                 "name": "emby",
                 "namespace": "media",
-                "expression": "resource.status.updatedReplicas >= 1"
+                "expression": "resource.status.readyReplicas >= 1"
               }
           schedulingGates:
             - name: k8s.ksgate.org/emby-deployment
