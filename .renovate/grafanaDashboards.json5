@@ -4,7 +4,7 @@
     "grafana-dashboards": {
       defaultRegistryUrlTemplate: "https://grafana.com/api/dashboards/{{packageName}}",
       format: "json",
-      transformTemplates: ['{"releases":[{"version": $string(revision)}]}'],
+      transformTemplates: ['{"releases":[{"version": $string(revision)}], "sourceDirectory": name}'],
     },
   },
   customManagers: [
@@ -25,13 +25,13 @@
       addLabels: ["renovate/grafana-dashboard"],
       automerge: true,
       automergeType: "branch",
+      commitMessageExtra: "( {{currentVersion}} ➔ {{newVersion}} )",
+      commitMessageTopic: "dashboard {{depName}}",
       ignoreTests: true,
       matchDatasources: ["custom.grafana-dashboards"],
       matchUpdateTypes: ["major"],
       semanticCommitScope: "grafana-dashboards",
       semanticCommitType: "chore",
-      commitMessageTopic: "dashboard {{depName}}",
-      commitMessageExtra: "( {{currentVersion}} ➔ {{newVersion}} )",
     },
   ],
 }
