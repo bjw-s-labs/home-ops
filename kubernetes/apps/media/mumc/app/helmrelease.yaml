@@ -20,6 +20,17 @@ spec:
           failedJobsHistory: 1
           successfulJobsHistory: 1
         pod:
+          annotations:
+            k8s.ksgate.org/emby-deployment: |-
+              {
+                "apiVersion": "apps/v1",
+                "kind": "Deployment",
+                "name": "emby",
+                "namespace": "media",
+                "expression": "resource.status.updatedReplicas >= 1"
+              }
+          schedulingGates:
+            - name: k8s.ksgate.org/emby-deployment
           securityContext:
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"

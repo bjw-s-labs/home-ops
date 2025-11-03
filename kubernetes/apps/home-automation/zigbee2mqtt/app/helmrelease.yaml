@@ -15,6 +15,17 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
+          annotations:
+            k8s.ksgate.org/mqtt-deployment: |-
+              {
+                "apiVersion": "apps/v1",
+                "kind": "Deployment",
+                "name": "mosquitto",
+                "namespace": "database",
+                "expression": "resource.status.updatedReplicas >= 1"
+              }
+          schedulingGates:
+            - name: k8s.ksgate.org/mqtt-deployment
           securityContext:
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch

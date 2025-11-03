@@ -15,6 +15,26 @@ spec:
         annotations:
           secret.reloader.stakater.com/reload: cross-seed-secret
         pod:
+          annotations:
+            k8s.ksgate.org/qbittorrent-deployment: |-
+              {
+                "apiVersion": "apps/v1",
+                "kind": "Deployment",
+                "name": "qbittorrent",
+                "namespace": "downloads",
+                "expression": "resource.status.updatedReplicas >= 1"
+              }
+            k8s.ksgate.org/prowlarr-deployment: |-
+              {
+                "apiVersion": "apps/v1",
+                "kind": "Deployment",
+                "name": "prowlarr",
+                "namespace": "downloads",
+                "expression": "resource.status.updatedReplicas >= 1"
+              }
+          schedulingGates:
+            - name: k8s.ksgate.org/qbittorrent-deployment
+            - name: k8s.ksgate.org/prowlarr-deployment
           securityContext:
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"
