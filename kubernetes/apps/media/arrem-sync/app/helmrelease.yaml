@@ -27,7 +27,7 @@ spec:
                 "kind": "Deployment",
                 "name": "emby",
                 "namespace": "media",
-                "expression": "resource.status.updatedReplicas >= 1"
+                "expression": "resource.status.readyReplicas >= 1"
               }
             k8s.ksgate.org/sonarr-deployment: |-
               {
@@ -35,7 +35,7 @@ spec:
                 "kind": "Deployment",
                 "name": "sonarr",
                 "namespace": "downloads",
-                "expression": "resource.status.updatedReplicas >= 1"
+                "expression": "resource.status.readyReplicas >= 1"
               }
             k8s.ksgate.org/radarr-deployment: |-
               {
@@ -43,7 +43,7 @@ spec:
                 "kind": "Deployment",
                 "name": "radarr",
                 "namespace": "downloads",
-                "expression": "resource.status.updatedReplicas >= 1"
+                "expression": "resource.status.readyReplicas >= 1"
               }
           schedulingGates:
             - name: k8s.ksgate.org/emby-deployment

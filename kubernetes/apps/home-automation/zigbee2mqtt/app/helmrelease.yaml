@@ -22,7 +22,7 @@ spec:
                 "kind": "Deployment",
                 "name": "mosquitto",
                 "namespace": "database",
-                "expression": "resource.status.updatedReplicas >= 1"
+                "expression": "resource.status.readyReplicas >= 1"
               }
           schedulingGates:
             - name: k8s.ksgate.org/mqtt-deployment
