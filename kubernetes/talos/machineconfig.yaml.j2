@@ -61,8 +61,6 @@ machine:
     defaultRuntimeSeccompProfileEnabled: true
     disableManifestsDirectory: true
     extraConfig:
-      featureGates:
-        ResourceHealthStatus: true
       maxPods: 150
       serializeImagePulls: false
     image: ghcr.io/siderolabs/kubelet:v1.34.2
@@ -121,7 +119,7 @@ cluster:
     image: registry.k8s.io/kube-apiserver:v1.34.2
     extraArgs:
       enable-aggregator-routing: "true"
-      feature-gates: MutatingAdmissionPolicy=true,ResourceHealthStatus=true
+      feature-gates: MutatingAdmissionPolicy=true
       runtime-config: admissionregistration.k8s.io/v1beta1=true
     certSANs:
       - 127.0.0.1 # KubePrism
