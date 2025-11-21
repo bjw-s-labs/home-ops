@@ -2,21 +2,29 @@
 # This file is not managed by doco-cd because it can't manage itself
 # Instead it is deployed through the TrueNAS SCALE UI
 
+configs:
+  poll-config.yml:
+    content: |
+      - run_once: true
+        url: https://github.com/bjw-s-labs/home-ops.git
 secrets:
   sops_age_key:
     file: /home/truenas_admin/.sops/sops_age_key.txt
   webhook_secret:
     file: /home/truenas_admin/.config/doco-cd/webhook_secret
-
 services:
   app:
+    configs:
+      - source: poll-config.yml
+        target: /poll-config.yml
     container_name: doco-cd
     environment:
       HTTP_PORT: 8080
       LOG_LEVEL: info
-      TZ: Europe/Amsterdam
+      POLL_CONFIG_FILE: /poll-config.yml
       SOPS_AGE_KEY_FILE: /run/secrets/sops_age_key
       WEBHOOK_SECRET_FILE: /run/secrets/webhook_secret
+      DEPLOY_CONFIG_BASE_DIR: ./docker/truenas/
     healthcheck:
       interval: 30s
       retries: 3
@@ -29,7 +37,7 @@ services:
         - '--spider'
         - http://localhost:8080/v1/health
       timeout: 5s
-    image: ghcr.io/kimdre/doco-cd:0.50.0
+    image: ghcr.io/kimdre/doco-cd:0.51.0
     ports:
       - 8080:8080
     restart: unless-stopped
