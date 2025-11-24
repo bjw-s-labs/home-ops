@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: qui
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: qui
+  components:
+    - ../../../../components/volsync
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+  interval: 1h
+  path: "./kubernetes/apps/downloads/qui/app"
+  postBuild:
+    substitute:
+      APP: qui
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: downloads
+  timeout: 5m
+  wait: false
