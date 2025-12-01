@@ -67,9 +67,9 @@ spec:
               - --disable-telemetry
               - --disable-update-check
               - --user-data-dir
-              - /config/.code-server
+              - /mnt/code-server
               - --extensions-dir
-              - /config/.code-server
+              - /mnt/code-server
               - --port
               - "12321"
               - /config
@@ -93,9 +93,17 @@ spec:
     persistence:
       config:
         existingClaim: esphome
-        globalMounts:
-          - path: /config
-            subPath: config
+        advancedMounts:
+          esphome:
+            app:
+              - path: /config
+                subPath: config
+          code-server:
+            code-server:
+              - path: /config
+                subPath: config
+              - path: /mnt/code-server
+                subPath: code-server
       secrets:
         type: secret
         name: esphome-secrets

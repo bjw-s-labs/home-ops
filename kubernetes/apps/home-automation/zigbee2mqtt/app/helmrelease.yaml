@@ -10,6 +10,12 @@ spec:
     name: zigbee2mqtt
   interval: 30m
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 2000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 2000
+        runAsUser: 2000
     controllers:
       zigbee2mqtt:
         annotations:
@@ -26,11 +32,6 @@ spec:
               }
           schedulingGates:
             - name: k8s.ksgate.org/mqtt-deployment
-          securityContext:
-            fsGroup: 2000
-            fsGroupChangePolicy: OnRootMismatch
-            runAsGroup: 2000
-            runAsUser: 2000
         containers:
           app:
             image:
@@ -96,6 +97,10 @@ spec:
               capabilities:
                 drop:
                   - ALL
+      code-server:
+        annotations:
+          secret.reloader.stakater.com/reload: esphome-secrets,esphome-deploykey
+        containers:
           code-server:
             image:
               repository: ghcr.io/coder/code-server
@@ -106,9 +111,9 @@ spec:
               - --disable-telemetry
               - --disable-update-check
               - --user-data-dir
-              - /data/.code-server
+              - /mnt/code-server
               - --extensions-dir
-              - /data/.code-server
+              - /mnt/code-server
               - --port
               - "12321"
               - /data
@@ -119,23 +124,32 @@ spec:
                 memory: 512Mi
     service:
       app:
+        controller: zigbee2mqtt
         ports:
           http:
             primary: true
             port: *httpPort
           metrics:
             port: 9000
-          code-server:
+      code-server:
+        controller: code-server
+        ports:
+          http:
             port: 12321
     persistence:
       data:
-        existingClaim: zigbee2mqtt-data
+        existingClaim: zigbee2mqtt
         advancedMounts:
           zigbee2mqtt:
             app:
               - path: /data
+                subPath: data
+          code-server:
             code-server:
               - path: /data
+                subPath: data
+              - path: /mnt/code-server
+                subPath: code-server
     route:
       app:
         hostnames:
@@ -143,21 +157,17 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-
         rules:
-          - matches:
-              - path:
-                  type: PathPrefix
-                  value: /code/
-            filters:
-              - type: URLRewrite
-                urlRewrite:
-                  path:
-                    type: ReplacePrefixMatch
-                    replacePrefixMatch: /
-            backendRefs:
-              - identifier: app
-                port: 12321
           - backendRefs:
               - identifier: app
                 port: *httpPort
+      code-server:
+        hostnames:
+          - zigbee2mqtt-code.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+        rules:
+          - backendRefs:
+              - identifier: code-server
+                port: 12321
