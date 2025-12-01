@@ -18,7 +18,10 @@ spec:
   postBuild:
     substitute:
       APP: zigbee2mqtt
-      VOLSYNC_CLAIM: zigbee2mqtt-data
+      VOLSYNC_CLAIM: zigbee2mqtt
+      VOLSYNC_ACCESSMODES: ReadWriteMany
+      VOLSYNC_STORAGECLASS: ceph-filesystem
+      VOLSYNC_SNAPSHOTCLASS: csi-ceph-filesystem
   prune: true
   sourceRef:
     kind: GitRepository
