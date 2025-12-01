@@ -20,8 +20,11 @@ spec:
   postBuild:
     substitute:
       APP: esphome
-      VOLSYNC_CLAIM: esphome-config
+      VOLSYNC_CLAIM: esphome
       VOLSYNC_CAPACITY: 5Gi
+      VOLSYNC_ACCESSMODES: ReadWriteMany
+      VOLSYNC_STORAGECLASS: ceph-filesystem
+      VOLSYNC_SNAPSHOTCLASS: csi-ceph-filesystem
   prune: true
   sourceRef:
     kind: GitRepository
