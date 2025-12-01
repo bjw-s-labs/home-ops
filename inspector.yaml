@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: esphome-pvc-inspector
+  namespace: home-automation
+spec:
+  containers:
+    - name: pvc-inspector
+      image: busybox
+      command:
+        - "sh"
+        - "-c"
+        - "sleep infinity"
+      volumeMounts:
+        - mountPath: /pvc/new
+          name: pvc-new
+        - mountPath: /pvc/old
+          name: pvc-old
+  volumes:
+    - name: pvc-new
+      persistentVolumeClaim:
+        claimName: esphome
+    - name: pvc-old
+      persistentVolumeClaim:
+        claimName: esphome-config
