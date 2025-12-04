@@ -18,18 +18,33 @@ spec:
           securityContext:
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
-            runAsGroup: 2000
             runAsNonRoot: true
-            runAsUser: 2000
+        initContainers:
+          init-config:
+            image:
+              repository: docker.io/opencloudeu/opencloud-rolling
+              tag: 4.0.0@sha256:1cbce735bfdde97d38422a52b92104dfd2fd320e2e3febc05314b00d6d115d7e
+            command:
+              - /bin/sh
+              - -c
+              - test -f /etc/opencloud/opencloud.yaml || opencloud init --insecure=true
+            envFrom:
+              - secretRef:
+                  name: opencloud-secret
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
         containers:
           opencloud:
             image:
               repository: docker.io/opencloudeu/opencloud-rolling
               tag: 4.0.0@sha256:1cbce735bfdde97d38422a52b92104dfd2fd320e2e3febc05314b00d6d115d7e
             command:
-              - "/bin/sh"
-              - "-c"
-              - "opencloud init || true; opencloud server"
+              - opencloud
+              - server
             env:
               IDM_CREATE_DEMO_USERS: false
               IDM_ADMIN_PASSWORD:
