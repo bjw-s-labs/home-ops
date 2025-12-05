@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: home-assistant
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: home-assistant
   components:
     - ../../../../components/volsync
   dependsOn:
@@ -20,19 +17,15 @@ spec:
   postBuild:
     substitute:
       APP: home-assistant
-      APP_UID: "65534"
-      APP_GID: "65533"
-      VOLSYNC_CLAIM: home-assistant
-      # VOLSYNC_STORAGECLASS: ceph-filesystem
-      # VOLSYNC_ACCESSMODES: ReadWriteMany
-      # VOLSYNC_SNAP_ACCESSMODES: ReadOnlyMany
-      # VOLSYNC_SNAPSHOTCLASS: csi-ceph-filesystem
+      VOLSYNC_ACCESSMODES: ReadWriteMany
       VOLSYNC_CAPACITY: 8Gi
+      VOLSYNC_CLAIM: home-assistant
+      VOLSYNC_SNAPSHOTCLASS: csi-ceph-filesystem
+      VOLSYNC_STORAGECLASS: ceph-filesystem
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   targetNamespace: home-automation
-  timeout: 5m
   wait: false
