@@ -1,0 +1,77 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: bichon
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: bichon
+  interval: 30m
+  values:
+    controllers:
+      bichon:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
+        containers:
+          app:
+            image:
+              repository: docker.io/rustmailer/bichon
+              tag: 0.1.5
+            env:
+              BICHON_HTTP_PORT: &httpPort 15630
+              BICHON_LOG_LEVEL: info
+              BICHON_PUBLIC_URL: https://bichon.bjw-s.dev
+              BICHON_ROOT_DIR: /data
+            envFrom:
+              - secretRef:
+                  name: bichon-secret
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: *httpPort
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 2Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    service:
+      app:
+        ports:
+          http:
+            port: *httpPort
+    persistence:
+      data:
+        type: nfs
+        path: /mnt/tank/apps/bichon
+        server: gladius.bjw-s.internal
+    route:
+      app:
+        hostnames:
+          - bichon.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
