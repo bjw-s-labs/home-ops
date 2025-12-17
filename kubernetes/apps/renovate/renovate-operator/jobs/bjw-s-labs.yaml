@@ -1,0 +1,65 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/generators.external-secrets.io/githubaccesstoken_v1alpha1.json
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: GithubAccessToken
+metadata:
+  name: lab-assistant-auth-token
+spec:
+  appID: "992099"
+  installID: "54659899"
+  auth:
+    privateKey:
+      secretRef:
+        name: lab-assistant-pem # reference secret from step 1.
+        key: private_key_pem
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/external-secrets.io/externalsecret_v1.json
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: lab-assistant-auth-token
+spec:
+  refreshInterval: "30m0s"
+  target:
+    name: lab-assistant-bjw-s-labs
+    template:
+      type: Opaque
+      engineVersion: v2
+      data:
+        GITHUB_COM_TOKEN: "{{ .token }}"
+        GITHUB_COM_USER: Ymp3LXM=
+        RENOVATE_TOKEN: "{{ .token }}"
+  dataFrom:
+    - sourceRef:
+        generatorRef:
+          apiVersion: generators.external-secrets.io/v1alpha1
+          kind: GithubAccessToken
+          name: lab-assistant-auth-token
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/renovate-operator.mogenius.com/renovatejob_v1alpha1.json
+apiVersion: renovate-operator.mogenius.com/v1alpha1
+kind: RenovateJob
+metadata:
+  name: bjw-s-labs
+  namespace: renovate
+spec:
+  discoveryFilter: bjw-s-labs/*
+  extraEnv:
+    - name: LOG_LEVEL
+      value: debug
+    - name: RENOVATE_ALLOWED_COMMANDS
+      value: '["pnpm run bundle"]'
+    - name: RENOVATE_ENDPOINT
+      value: https://api.github.com/
+    - name: RENOVATE_PLATFORM
+      value: github
+    - name: RENOVATE_PLATFORM_COMMIT
+      value: "true"
+  image: renovate/renovate:42.59.1
+  parallelism: 5
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  schedule: 0 * * * *
+  secretRef: lab-assistant-bjw-s-labs

@@ -1,0 +1,46 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: renovate-operator
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: renovate-operator
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: renovate-operator
+      namespace: renovate
+  interval: 1h
+  path: "./kubernetes/apps/renovate/renovate-operator/app"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: renovate
+  timeout: 5m
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: renovate-operator-jobs
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: renovate-operator
+  dependsOn:
+    - name: renovate-operator
+  interval: 1h
+  path: "./kubernetes/apps/renovate/renovate-operator/jobs"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: renovate
+  timeout: 5m
+  wait: false
