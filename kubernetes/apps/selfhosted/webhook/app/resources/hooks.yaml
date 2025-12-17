@@ -1,0 +1,83 @@
+---
+- id: github-bjw-s-labs-renovate
+  execute-command: /config/renovate-operator.sh
+  pass-arguments-to-command:
+    - # job name
+      source: string
+      name: bjw-s-labs
+    - # namespace
+      source: string
+      name: renovate
+    - # project
+      source: payload
+      name: repository.full_name
+  trigger-rule:
+    and:
+      - # Validate the webhook secret
+        match:
+          type: payload-hmac-sha1
+          secret: >-
+            {{ getenv "GITHUB_WEBHOOK_SECRET" | js }}
+          parameter:
+            source: header
+            name: x-hub-signature
+      - # Trigger only for the bjw-s-labs organization
+        match:
+          type: value
+          value: bjw-s-labs
+          parameter:
+            source: payload
+            name: organization.login
+      - or:
+          - # Trigger on GitHub Issue edits
+            and:
+              - match:
+                  type: value
+                  value: issues
+                  parameter:
+                    source: header
+                    name: x-github-event
+              - match:
+                  type: value
+                  value: edited
+                  parameter:
+                    source: payload
+                    name: action
+              - match:
+                  type: value
+                  value: open
+                  parameter:
+                    source: payload
+                    name: issue.state
+              - match:
+                  type: value
+                  value: Renovate Dashboard
+                  parameter:
+                    source: payload
+                    name: issue.title
+          - # Trigger on GitHub Pull Request edits
+            and:
+              - match:
+                  type: value
+                  value: pull_request
+                  parameter:
+                    source: header
+                    name: x-github-event
+              - match:
+                  type: value
+                  value: edited
+                  parameter:
+                    source: payload
+                    name: action
+              - match:
+                  type: value
+                  value: open
+                  parameter:
+                    source: payload
+                    name: pull_request.state
+              - match:
+                  type: value
+                  value: lab-assistant[bot]
+                  parameter:
+                    source: payload
+                    name: pull_request.user.login
