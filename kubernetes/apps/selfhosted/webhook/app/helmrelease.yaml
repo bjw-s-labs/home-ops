@@ -1,0 +1,70 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: webhook
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: webhook
+  interval: 30m
+  values:
+    controllers:
+      webhook:
+        replicas: 2
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            fsGroup: 2000
+            fsGroupChangePolicy: "OnRootMismatch"
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
+        containers:
+          app:
+            image:
+              repository: ghcr.io/home-operations/webhook
+              tag: 2.8.2@sha256:22bcdc2e1bfa62901616008e97d5d3150a29d721c1e2907297aa1e70b93e1cb7
+            env:
+              WEBHOOK__PORT: &port 8080
+            envFrom:
+              - secretRef:
+                  name: webhook-secret
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      config:
+        type: configMap
+        name: webhook-configmap
+        defaultMode: 0775
+        globalMounts:
+          - readOnly: true
+    route:
+      app:
+        hostnames:
+          - webhook.bjw-s.dev
+        parentRefs:
+          - name: envoy-external
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *port
