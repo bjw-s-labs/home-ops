@@ -26,5 +26,17 @@
       ],
       ignoreTests: false,
     },
+    {
+      description: "Auto merge minors and patches after minimumReleaseAge",
+      matchDatasources: ["docker"],
+      automerge: true,
+      automergeType: "pr",
+      matchUpdateTypes: ["minor", "patch"],
+      matchPackageNames: [
+        "docker.io/renovate/renovate",
+      ],
+      "minimumReleaseAge": "3 days",
+      ignoreTests: false,
+    },
   ],
 }
