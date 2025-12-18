@@ -20,16 +20,17 @@ function notify() {
         "Download")
             printf -v PUSHOVER_TITLE "Movie %s" \
                 "$( [[ "$(_jq '.isUpgrade')" == "true" ]] && echo "Upgraded" || echo "Added" )"
-            printf -v PUSHOVER_MESSAGE "<b>%s (%s)</b><small>\n%s</small><small>\n\n<b>Client:</b> %s</small>" \
+            printf -v PUSHOVER_MESSAGE "<b>%s (%s)</b><small>\n\n<b>Release:</b> %s\n<b>Client:</b> %s</small><small>\n\n%s</small>" \
                 "$(_jq '.movie.title')" \
                 "$(_jq '.movie.year')" \
-                "$(_jq '.movie.overview')" \
-                "$(_jq '.downloadClient')"
+                "$(_jq '.movieFile.sceneName')" \
+                "$(_jq '.downloadClient')" \
+                "$(_jq '.movie.overview')"
             printf -v PUSHOVER_URL "%s/movie/%s" \
                 "$(_jq '.applicationUrl')" \
                 "$(_jq '.movie.tmdbId')"
             printf -v PUSHOVER_URL_TITLE "View Movie"
-            printf -v PUSHOVER_PRIORITY "low"
+            printf -v PUSHOVER_PRIORITY "moderate"
             ;;
         "ManualInteractionRequired")
             printf -v PUSHOVER_TITLE "Movie Requires Manual Interaction"
@@ -46,7 +47,7 @@ function notify() {
             printf -v PUSHOVER_MESSAGE "Howdy this is a test notification"
             printf -v PUSHOVER_URL "%s" "$(_jq '.applicationUrl')"
             printf -v PUSHOVER_URL_TITLE "View Movies"
-            printf -v PUSHOVER_PRIORITY "low"
+            printf -v PUSHOVER_PRIORITY "moderate"
             ;;
         *)
             echo "[ERROR] Unhandled event type: ${event_type}" >&2

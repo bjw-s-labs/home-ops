@@ -30,7 +30,7 @@ function notify() {
                 "$(_jq '.applicationUrl')" \
                 "$(_jq '.series.titleSlug')"
             printf -v PUSHOVER_URL_TITLE "View Series"
-            printf -v PUSHOVER_PRIORITY "low"
+            printf -v PUSHOVER_PRIORITY "moderate"
             ;;
         "ManualInteractionRequired")
             printf -v PUSHOVER_TITLE "Episode Requires Manual Interaction"
@@ -46,7 +46,7 @@ function notify() {
             printf -v PUSHOVER_MESSAGE "Howdy this is a test notification"
             printf -v PUSHOVER_URL "%s" "$(_jq '.applicationUrl')"
             printf -v PUSHOVER_URL_TITLE "View Series"
-            printf -v PUSHOVER_PRIORITY "low"
+            printf -v PUSHOVER_PRIORITY "moderate"
             ;;
         *)
             echo "[ERROR] Unhandled event type: ${event_type}" >&2
