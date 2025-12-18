@@ -1,6 +1,6 @@
 ---
 - id: github-bjw-s-labs-renovate
-  execute-command: /config/renovate-operator.sh
+  execute-command: /config/github-renovate-operator.sh
   pass-arguments-to-command:
     - # job name
       source: string
@@ -11,6 +11,9 @@
     - # project
       source: payload
       name: repository.full_name
+    - # Renovate Operator webhook URL
+      source: string
+      name: http://renovate-operator-webhook.renovate.svc.cluster.local:8082
   trigger-rule:
     and:
       - # Validate the webhook secret
@@ -81,3 +84,57 @@
                   parameter:
                     source: payload
                     name: pull_request.user.login
+- id: github-bjw-s-labs-home-ops-doco
+  trigger-rule:
+    and:
+      - # Validate the webhook secret
+        match:
+          type: payload-hmac-sha1
+          secret: >-
+            {{ getenv "GITHUB_WEBHOOK_SECRET" | js }}
+          parameter:
+            source: header
+            name: x-hub-signature
+      - # Trigger on pushes to main branch of bjw-s-labs/home-ops repo
+        and:
+          - match:
+              type: value
+              value: push
+              parameter:
+                source: header
+                name: x-github-event
+          - match:
+              type: value
+              value: bjw-s-labs/home-ops
+              parameter:
+                source: payload
+                name: repository.full_name
+          - match:
+              type: value
+              value: refs/heads/main
+              parameter:
+                source: payload
+                name: ref
+  execute-command: /config/github-push-doco.sh
+  pass-arguments-to-command:
+    - # ref
+      source: payload
+      name: ref
+    - # sha before
+      source: payload
+      name: before
+    - # sha after
+      source: payload
+      name: after
+    - # repository
+      source: payload
+      name: repository.full_name
+    - # pusher name
+      source: payload
+      name: pusher.name
+    - # pusher email
+      source: payload
+      name: pusher.email
+    - # Doco webhook URL
+      source: string
+      name: http://gladius.bjw-s.internal:8080/v1/webhook
