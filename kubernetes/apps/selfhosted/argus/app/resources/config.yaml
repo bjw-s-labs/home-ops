@@ -1,0 +1,197 @@
+---
+settings:
+  log:
+    level: INFO
+  web:
+    disabled_routes:
+      - service_create
+      - service_update
+      - service_delete
+      - service_actions
+      - dv_refresh
+      - lv_refresh_new
+      - dv_refresh_new
+
+service:
+  OrcaSlicer/OrcaSlicer:
+    latest_version:
+      type: github
+      access_token: ${GITHUB_ACCESS_TOKEN}
+      url: OrcaSlicer/OrcaSlicer
+      use_prerelease: false
+    dashboard:
+      icon: https://wiki.bambulab.com/admin/home/logo-large.png
+    notify:
+      discord_orcaslicer_personal:
+        type: generic
+        options:
+          message: >-
+            {
+              "username": "OrcaSlicer",
+              "avatar_url": "{{ icon }}",
+              "embeds": [
+                {
+                  "title": "OrcaSlicer release {{ version}}",
+                  "thumbnail": {
+                    "url": "{{ icon }}"
+                  },
+                  "color": "2467139",
+                  "fields": [
+                    {
+                      "name": "Release link",
+                      "value": "{{ service_url }}/releases/tag/v{{ version }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        url_fields:
+          host: discord.com/api/webhooks
+          path: ${DISCORD_RELEASES_PERSONAL}
+
+  bjw-s-labs/app-template:
+    latest_version:
+      type: github
+      access_token: ${GITHUB_ACCESS_TOKEN}
+      url: bjw-s-labs/helm-charts
+      use_prerelease: false
+      url_commands:
+        - type: regex
+          regex: ^app-template-?([0-9.]+)$
+    dashboard:
+      icon: https://avatars.githubusercontent.com/u/6213398?s=200&v=4
+    notify:
+      discord_app_template_home_ops:
+        type: generic
+        options:
+          message: >-
+            {
+              "username": "app-template",
+              "avatar_url": "{{ icon }}",
+              "embeds": [
+                {
+                  "title": "app-template release {{ version}}",
+                  "thumbnail": {
+                    "url": "{{ icon }}"
+                  },
+                  "color": "16753920",
+                  "fields": [
+                    {
+                      "name": "Release link",
+                      "value": "{{ service_url }}/releases/tag/app-template-{{ version }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        url_fields:
+          host: https://discord.com/api/webhooks
+          path: ${DISCORD_APP_TEMPLATE_HOME_OPS}
+
+  siderolabs/talos:
+    latest_version:
+      type: github
+      access_token: ${GITHUB_ACCESS_TOKEN}
+      url: siderolabs/talos
+      use_prerelease: false
+    dashboard:
+      icon: https://avatars.githubusercontent.com/u/13804887?s=200&v=4
+    notify:
+      discord_talos_home_ops:
+        type: generic
+        options:
+          message: >-
+            {
+              "username": "Talos",
+              "avatar_url": "{{ icon }}",
+              "embeds": [
+                {
+                  "title": "Talos release {{ version}}",
+                  "thumbnail": {
+                    "url": "{{ icon }}"
+                  },
+                  "color": "16098851",
+                  "fields": [
+                    {
+                      "name": "Release link",
+                      "value": "{{ service_url }}/releases/tag/v{{ version }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        url_fields:
+          host: https://discord.com/api/webhooks
+          path: ${DISCORD_TALOS_HOME_OPS}
+
+  fluxcd/flux2:
+    latest_version:
+      type: github
+      access_token: ${GITHUB_ACCESS_TOKEN}
+      url: fluxcd/flux2
+      use_prerelease: false
+    dashboard:
+      icon: https://avatars.githubusercontent.com/u/52158677?s=200&v=4
+    notify:
+      discord_flux_home_ops:
+        type: generic
+        options:
+          message: >-
+            {
+              "username": "Flux",
+              "avatar_url": "{{ icon }}",
+              "embeds": [
+                {
+                  "title": "Flux release {{ version}}",
+                  "thumbnail": {
+                    "url": "{{ icon }}"
+                  },
+                  "color": "3612660",
+                  "fields": [
+                    {
+                      "name": "Release link",
+                      "value": "{{ service_url }}/releases/tag/v{{ version }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        url_fields:
+          host: https://discord.com/api/webhooks
+          path: ${DISCORD_FLUX_HOME_OPS}
+
+  controlplaneio-fluxcd/flux-operator:
+    latest_version:
+      type: github
+      access_token: ${GITHUB_ACCESS_TOKEN}
+      url: controlplaneio-fluxcd/flux-operator
+      use_prerelease: false
+    dashboard:
+      icon: https://avatars.githubusercontent.com/u/52158677?s=200&v=4
+    notify:
+      discord_flux_operator_home_ops:
+        type: generic
+        options:
+          message: >-
+            {
+              "username": "Flux",
+              "avatar_url": "{{ icon }}",
+              "embeds": [
+                {
+                  "title": "Flux Operator release {{ version}}",
+                  "thumbnail": {
+                    "url": "{{ icon }}"
+                  },
+                  "color": "3612660",
+                  "fields": [
+                    {
+                      "name": "Release link",
+                      "value": "{{ service_url }}/releases/tag/v{{ version }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        url_fields:
+          host: https://discord.com/api/webhooks
+          path: ${DISCORD_FLUX_OPERATOR_HOME_OPS}
