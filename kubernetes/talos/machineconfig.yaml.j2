@@ -104,10 +104,6 @@ machine:
     servers:
       - 10.1.1.12
   token: op://automation/talos/MACHINE_TOKEN
-  udev:
-    rules:
-      - # Thunderbolt - Disable Power Management
-        ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{power/control}="on"
 cluster:
   {% if ENV.IS_CONTROLPLANE %}
   aggregatorCA:
