@@ -4,7 +4,6 @@ machine:
     diskSelector:
       model: Samsung SSD 870
   network:
-    hostname: felix.bjw-s.internal
     interfaces:
       - # delta
         deviceSelector:
@@ -31,3 +30,7 @@ machine:
   nodeLabels:
     node.kubernetes.io/gpu: "true"
   type: controlplane
+---
+apiVersion: v1alpha1
+kind: HostnameConfig
+hostname: felix
