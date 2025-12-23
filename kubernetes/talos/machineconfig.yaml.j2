@@ -66,29 +66,6 @@ machine:
     nodeIP:
       validSubnets:
         - 10.1.1.0/24
-  network:
-    interfaces:
-      - # 2.5GbE onboard
-        interface: bond0
-        bond:
-          deviceSelectors:
-            - hardwareAddr: 48:21:0b:55:*
-              driver: igc
-            - hardwareAddr: 48:21:0b:56:*
-              driver: igc
-          mode: active-backup
-        dhcp: true
-        mtu: 9000
-        vlans:
-          - # IOT
-            vlanId: 303
-            dhcp: false
-            mtu: 1500
-          - # VPN
-            vlanId: 305
-            dhcp: false
-            mtu: 1500
-    disableSearchDomain: true
   sysctls:
     fs.inotify.max_user_instances: "8192"
     fs.inotify.max_user_watches: "1048576"
@@ -99,10 +76,6 @@ machine:
     net.ipv4.neigh.default.gc_thresh3: "16384"
     net.ipv4.tcp_fastopen: "3"
     user.max_user_namespaces: "11255"
-  time:
-    disabled: false
-    servers:
-      - 10.1.1.12
   token: op://automation/talos/MACHINE_TOKEN
 cluster:
   {% if ENV.IS_CONTROLPLANE %}
@@ -189,6 +162,35 @@ cluster:
   token: op://automation/talos/CLUSTER_TOKEN
 ---
 apiVersion: v1alpha1
+kind: BondConfig
+name: bond0
+links:
+  - net0
+bondMode: active-backup
+mtu: 9000
+---
+apiVersion: v1alpha1
+kind: DHCPv4Config
+name: bond0
+clientIdentifier: mac
+---
+# IOT
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.303
+vlanID: 303
+parent: bond0
+mtu: 1500
+---
+# VPN
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.305
+vlanID: 305
+parent: bond0
+mtu: 1500
+---
+apiVersion: v1alpha1
 kind: WatchdogTimerConfig
 device: /dev/watchdog0
 timeout: 5m
@@ -208,3 +210,9 @@ provisioning:
   diskSelector:
     match: system_disk
   maxSize: 256GiB
+---
+apiVersion: v1alpha1
+kind: TimeSyncConfig
+ntp:
+  servers:
+    - 10.1.1.12
