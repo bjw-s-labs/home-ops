@@ -5,23 +5,11 @@ kind: Kustomization
 metadata:
   name: home-assistant
 spec:
-  components:
-    - ../../../../components/volsync
-  dependsOn:
-    - name: multus-networks
-      namespace: network
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
   interval: 1h
   path: "./kubernetes/apps/home-automation/home-assistant/app"
   postBuild:
     substitute:
       APP: home-assistant
-      VOLSYNC_ACCESSMODES: ReadWriteMany
-      VOLSYNC_CAPACITY: 8Gi
-      VOLSYNC_CLAIM: home-assistant
-      VOLSYNC_SNAPSHOTCLASS: csi-ceph-filesystem
-      VOLSYNC_STORAGECLASS: ceph-filesystem
   prune: true
   sourceRef:
     kind: GitRepository
