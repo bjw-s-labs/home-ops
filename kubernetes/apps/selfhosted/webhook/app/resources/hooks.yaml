@@ -84,6 +84,32 @@
                   parameter:
                     source: payload
                     name: pull_request.user.login
+          - # Trigger on GitHub Pull Request merge
+            and:
+              - match:
+                  type: value
+                  value: pull_request
+                  parameter:
+                    source: header
+                    name: x-github-event
+              - match:
+                  type: value
+                  value: closed
+                  parameter:
+                    source: payload
+                    name: action
+              - match:
+                  type: value
+                  value: true
+                  parameter:
+                    source: payload
+                    name: pull_request.merged
+              - match:
+                  type: value
+                  value: lab-assistant[bot]
+                  parameter:
+                    source: payload
+                    name: pull_request.user.login
 - id: github-bjw-s-labs-home-ops-doco
   trigger-rule:
     and:
