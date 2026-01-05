@@ -65,6 +65,13 @@ spec:
     persistence:
       config:
         existingClaim: qui
+      downloads:
+        type: nfs
+        path: /mnt/tank/media
+        server: gladius.bjw-s.internal
+        globalMounts:
+          - path: /data/nas-media/Downloads/qbittorrent
+            subPath: Downloads/qbittorrent
     route:
       app:
         hostnames:
