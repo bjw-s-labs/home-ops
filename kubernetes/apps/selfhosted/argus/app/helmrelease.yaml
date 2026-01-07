@@ -21,6 +21,17 @@ spec:
             runAsGroup: 2000
             runAsNonRoot: true
             runAsUser: 2000
+        initContainers:
+          copy-config:
+            image:
+              repository: docker.io/library/alpine
+              tag: "3.23"
+            command:
+              - /bin/sh
+              - -c
+            args:
+              - |
+                cp /cfg/config.yaml /app/config.yml
         containers:
           app:
             image:
@@ -49,14 +60,21 @@ spec:
       config:
         type: configMap
         name: argus-configmap
-        globalMounts:
-          - path: /app/config.yml
-            subPath: config.yaml
+        advancedMounts:
+          argus:
+            copy-config:
+              - path: /cfg/config.yaml
+                subPath: config.yaml
       data:
         existingClaim: argus
         globalMounts:
           - path: /app/data
             subPath: data
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /app
+            subPath: app
     route:
       app:
         hostnames:
