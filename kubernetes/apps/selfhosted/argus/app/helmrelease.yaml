@@ -21,11 +21,22 @@ spec:
             runAsGroup: 2000
             runAsNonRoot: true
             runAsUser: 2000
+        initContainers:
+          copy-config:
+            image:
+              repository: docker.io/library/alpine
+              tag: "3.23"
+            command:
+              - /bin/sh
+              - -c
+            args:
+              - |
+                cp /cfg/config.yaml /app/config.yml
         containers:
           app:
             image:
               repository: ghcr.io/release-argus/argus
-              tag: 0.28.3@sha256:d78ed6ee8de472d12afcf1c095b8d86eb3c72781909591a44bed37d177abd106
+              tag: 0.29.1@sha256:8b25d011d5075c41d38b3d10b437d997af5b501e6b058d0697cca31b720fcf89
             envFrom:
               - secretRef:
                   name: argus-secret
@@ -49,14 +60,21 @@ spec:
       config:
         type: configMap
         name: argus-configmap
-        globalMounts:
-          - path: /app/config.yml
-            subPath: config.yaml
+        advancedMounts:
+          argus:
+            copy-config:
+              - path: /cfg/config.yaml
+                subPath: config.yaml
       data:
         existingClaim: argus
         globalMounts:
           - path: /app/data
             subPath: data
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /app
+            subPath: app
     route:
       app:
         hostnames:
