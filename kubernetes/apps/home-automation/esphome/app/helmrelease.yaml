@@ -84,12 +84,12 @@ spec:
         controller: esphome
         ports:
           http:
-            port: &esphome-port 6052
+            port: 6052
       code-server:
         controller: code-server
         ports:
           http:
-            port: &code-server-port 12321
+            port: 12321
     persistence:
       config:
         existingClaim: esphome
@@ -150,7 +150,6 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: *esphome-port
       code-server:
         hostnames:
           - esphome-code.bjw-s.dev
@@ -160,4 +159,3 @@ spec:
         rules:
           - backendRefs:
               - identifier: code-server
-                port: *code-server-port

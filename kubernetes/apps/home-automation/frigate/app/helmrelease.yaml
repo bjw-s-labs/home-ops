@@ -55,9 +55,9 @@ spec:
         ports:
           http:
             appProtocol: kubernetes.io/wss
+            primary: true
             port: 5000
           go2rtc:
-            primary: true
             port: 1984
           rtsp:
             port: 8554
@@ -70,12 +70,6 @@ spec:
     persistence:
       config:
         existingClaim: frigate
-      # config-file:
-      #   type: secret
-      #   name: frigate-secrets
-      #   globalMounts:
-      #     - path: /config/config.yaml
-      #       subPath: config.yaml
       media:
         type: nfs
         path: /mnt/tank/apps/frigate
@@ -103,19 +97,17 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-
         rules:
           - backendRefs:
               - identifier: frigate
-                port: 5000
+                port: http
       go2rtc:
         hostnames:
           - frigate-go2rtc.bjw-s.dev
         parentRefs:
           - name: envoy-internal
             namespace: network
-
         rules:
           - backendRefs:
               - identifier: frigate
-                port: 1984
+                port: go2rtc
