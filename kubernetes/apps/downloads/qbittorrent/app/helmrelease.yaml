@@ -62,11 +62,9 @@ spec:
               runAsUser: 2000
     service:
       app:
-        forceRename: qbittorrent
         ports:
           http:
             port: *port
-        primary: true
     persistence:
       config:
         existingClaim: qbittorrent
@@ -90,8 +88,3 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-
-        rules:
-          - backendRefs:
-              - identifier: app
-                port: *port
