@@ -97,7 +97,7 @@ spec:
         controller: paperless
         ports:
           http:
-            port: &port 8000
+            port: 8000
       redis:
         controller: redis
         ports:
@@ -127,8 +127,7 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-
         rules:
           - backendRefs:
               - identifier: app
-                port: *port
+                port: http
