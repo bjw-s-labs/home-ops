@@ -10,5 +10,5 @@ RENOVATE_OPERATOR_WEBHOOK_URL=${4:-}
 # URL encode the project name
 PROJECT=$(echo "${PROJECT}" | jq -Rr @uri)
 
-curl -s -X POST \
+curl -v -X POST \
   "${RENOVATE_OPERATOR_WEBHOOK_URL}/webhook/v1/schedule?job=${JOB}&namespace=${NAMESPACE}&project=${PROJECT}"
