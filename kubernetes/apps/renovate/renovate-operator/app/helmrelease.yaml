@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -11,5 +11,12 @@ spec:
   interval: 30m
   values:
     fullnameOverride: renovate-operator
+    route:
+      enabled: true
+      hostnames:
+        - renovate.bjw-s.dev
+      parentRefs:
+        - name: envoy-internal
+          namespace: network
     webhook:
       enabled: true
