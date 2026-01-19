@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: booklore
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: booklore
+      app.kubernetes.io/instance: booklore
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "6060"
+              protocol: TCP
+  ingressDeny:
+    - fromEndpoints:
+        - {}
+      toPorts:
+        - ports:
+            - port: "3306"
+              protocol: TCP
