@@ -1,0 +1,94 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: shelfmark
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: shelfmark
+  interval: 30m
+  values:
+    controllers:
+      shelfmark:
+        pod:
+          securityContext:
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
+        containers:
+          shelfmark:
+            image:
+              repository: ghcr.io/calibrain/shelfmark
+              tag: v1.0.1@sha256:1efbbd45ea434cb4f5abde217e19c35280ea1de9eb2c0baa37e6b8cddac32fae
+            command:
+              - gunicorn
+            args:
+              # - --log-level=debug
+              - --access-logfile=-
+              - --error-logfile=-
+              - --worker-class=geventwebsocket.gunicorn.workers.GeventWebSocketWorker
+              - --workers=1
+              - -t
+              - "300"
+              - -b
+              - 0.0.0.0:8084
+              - shelfmark.main:app
+            env:
+              INGEST_DIR: /bookdrop
+            probes:
+              liveness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: &port 8084
+              readiness: *probe
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      config:
+        existingClaim: shelfmark
+      nfs-nas-media:
+        type: nfs
+        server: gladius.bjw-s.internal
+        path: /mnt/tank/media
+        advancedMounts:
+          shelfmark:
+            shelfmark:
+              - path: /bookdrop
+                subPath: Library/Main/Books/Booklore/bookdrop
+      tmpfs:
+        type: emptyDir
+        sizeLimit: 1Gi
+        globalMounts:
+          - path: /tmp
+            subPath: tmp
+          - path: /var/log
+            subPath: var-log
+    route:
+      app:
+        hostnames:
+          - shelfmark.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *port
