@@ -127,8 +127,6 @@ spec:
             image:
               repository: ghcr.io/booklore-app/booklore
               tag: v1.17.0@sha256:5b594a607fb0d9533d06a850156e2b54877ed0ddd0da8cd1f0240cb38bb6ac70
-            env:
-              TZ: America/Los_Angeles
             command:
               - nginx
             args:
@@ -220,14 +218,18 @@ spec:
               - path: /tmp
                 subPath: mysql
     route:
-      app:
+      booklore:
         hostnames:
           - booklore.bjw-s.dev
         parentRefs:
           - name: envoy-internal
             namespace: network
     service:
-      app:
+      booklore:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 10.1.6.61
+        externalTrafficPolicy: Local
         ports:
           http:
             port: *httpPort
