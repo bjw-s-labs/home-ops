@@ -56,6 +56,41 @@ service:
           host: discord.com/api/webhooks
           path: ${DISCORD_RELEASES_PERSONAL}
 
+  Hypfer/Valetudo:
+    latest_version:
+      type: github
+      access_token: ${GITHUB_ACCESS_TOKEN}
+      url: Hypfer/Valetudo
+    dashboard:
+      icon: https://raw.githubusercontent.com/Hypfer/Valetudo/refs/heads/master/assets/logo/valetudo_logo_small.svg
+    notify:
+      discord_valetudo_personal:
+        type: generic
+        options:
+          message: >-
+            {
+              "username": "Valetudo",
+              "avatar_url": "{{ icon }}",
+              "embeds": [
+                {
+                  "title": "Valetudo release {{ version}}",
+                  "thumbnail": {
+                    "url": "{{ icon }}"
+                  },
+                  "color": "1012882",
+                  "fields": [
+                    {
+                      "name": "Release link",
+                      "value": "{{ service_url }}/releases/tag/{{ version }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        url_fields:
+          host: discord.com/api/webhooks
+          path: ${DISCORD_RELEASES_PERSONAL}
+
   bjw-s-labs/app-template:
     latest_version:
       type: github
