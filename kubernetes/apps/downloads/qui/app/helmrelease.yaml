@@ -25,11 +25,11 @@ spec:
           app:
             image:
               repository: ghcr.io/autobrr/qui
-              tag: v1.12.0@sha256:b3b18f82f340642fc19ffb8935c112673008e7e6ae0ead5b6e8bb39c9b4462a3
+              # tag: v1.12.0@sha256:b3b18f82f340642fc19ffb8935c112673008e7e6ae0ead5b6e8bb39c9b4462a3
+              tag: develop@sha256:615f481b8fae93fde211f60286ab36495cdbf45b9bfe635892e6d6e5e51b930d
             env:
               QUI__HOST: 0.0.0.0
               QUI__PORT: &port 8080
-              QUI__LOG_LEVEL: INFO
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
@@ -70,8 +70,7 @@ spec:
         path: /mnt/tank/media
         server: gladius.bjw-s.internal
         globalMounts:
-          - path: /data/nas-media/Downloads/qbittorrent
-            subPath: Downloads/qbittorrent
+          - path: /data/nas-media
     route:
       app:
         hostnames:
