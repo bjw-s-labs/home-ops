@@ -116,11 +116,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          case "${{ matrix.images }}" in
+          case "${MATRIX_IMAGE}" in
             *home-operations*)
-              gh attestation verify --owner home-operations oci://${MATRIX_IMAGE} ;;
+              gh attestation verify --owner home-operations "oci://${MATRIX_IMAGE}" ;;
             *bjw-s-labs*)
-              gh attestation verify --owner bjw-s-labs oci://${MATRIX_IMAGE} ;;
+              gh attestation verify --owner bjw-s-labs "oci://${MATRIX_IMAGE}" ;;
           esac
 
       # - name: Install talosctl
