@@ -15,17 +15,12 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
-          annotations:
-            k8s.v1.cni.cncf.io/networks: |-
-              [{
-                "name": "multus-vpn",
-                "namespace": "network",
-                "ips": ["10.1.5.10/24"],
-                "mac": "2e:54:30:22:3f:74"
-              }]
           securityContext:
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
         containers:
           app:
             image:
@@ -33,18 +28,30 @@ spec:
               tag: 5.1.4
             env:
               QBT_WEBUI_PORT: &port 8080
-              QBT_TORRENTING_PORT: 51478
+              QBT_TORRENTING_PORT: &torrentPort 50469
             nameOverride: qbittorrent
             probes:
               liveness:
                 enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
               readiness:
                 enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/v2/app/version
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
               startup:
                 enabled: true
                 spec:
                   failureThreshold: 30
-                  periodSeconds: 5
+                  periodSeconds: 10
             resources:
               requests:
                 cpu: 200m
@@ -57,14 +64,22 @@ spec:
                 drop:
                   - ALL
               readOnlyRootFilesystem: true
-              runAsGroup: 2000
-              runAsNonRoot: true
-              runAsUser: 2000
     service:
       app:
+        forceRename: "{{ .Release.Name }}"
+        primary: true
         ports:
           http:
             port: *port
+      bittorrent:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 10.1.6.61
+        externalTrafficPolicy: Local
+        ports:
+          bittorrent-tcp:
+            port: *torrentPort
+            protocol: TCP
     persistence:
       config:
         existingClaim: qbittorrent
@@ -88,3 +103,7 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: http
