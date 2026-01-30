@@ -26,17 +26,14 @@ services:
       WEBHOOK_SECRET_FILE: /run/secrets/webhook_secret
       DEPLOY_CONFIG_BASE_DIR: ./docker/truenas/
     healthcheck:
-      interval: 30s
-      retries: 3
-      start_period: 15s
       test:
         - CMD
-        - wget
-        - '--no-verbose'
-        - '--tries=1'
-        - '--spider'
-        - http://localhost:8080/v1/health
+        - /doco-cd
+        - healthcheck
+      start_period: 15s
+      interval: 30s
       timeout: 5s
+      retries: 3
     image: ghcr.io/kimdre/doco-cd:0.59.0@sha256:7291c9b8f338dd4fc330a9c96c667d847652ee5b2702e015063c03c7d385477e
     ports:
       - 8080:8080
