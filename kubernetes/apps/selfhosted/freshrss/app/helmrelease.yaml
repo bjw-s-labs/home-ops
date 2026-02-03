@@ -53,6 +53,13 @@ spec:
               - path: /var/www/FreshRSS/extensions
                 subPath: extensions
                 readOnly: false
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          freshrss:
+            app:
+              - path: /var/www/FreshRSS/data/cache
+                subPath: cache
     route:
       app:
         hostnames:
