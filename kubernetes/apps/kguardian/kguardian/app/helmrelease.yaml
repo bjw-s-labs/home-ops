@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kguardian
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: kguardian
+  interval: 30m
+  values:
+    broker:
+      image:
+        repository: ghcr.io/kguardian-dev/kguardian/broker
+        tag: v1.5.0
+    controller:
+      image:
+        repository: ghcr.io/kguardian-dev/kguardian/controller
+        tag: v1.6.0
+      excludedNamespaces:
+        - kguardian
+    frontend:
+      image:
+        repository: ghcr.io/kguardian-dev/kguardian/frontend
+        tag: v1.6.1
