@@ -2,7 +2,7 @@
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   packageRules: [
     {
-      description: "1Password Connect Group",
+      description: "1Password Connect group",
       groupName: "1Password Connect",
       matchDatasources: ["docker"],
       matchPackageNames: ["/1password/"],
@@ -12,7 +12,7 @@
       minimumGroupSize: 2,
     },
     {
-      description: "Actions Runner Controller Group",
+      description: "Actions Runner Controller group",
       groupName: "Actions Runner Controller",
       matchDatasources: ["docker"],
       matchPackageNames: [
@@ -25,7 +25,7 @@
       minimumGroupSize: 2,
     },
     {
-      description: "Flux Operator Group",
+      description: "Flux Operator group",
       groupName: "Flux Operator",
       matchDatasources: ["docker"],
       matchPackageNames: ["/flux-operator/", "/flux-instance/", "/flux-operator-manifests/"],
@@ -35,7 +35,16 @@
       minimumGroupSize: 3,
     },
     {
-      description: "Kubernetes Group",
+      description: "kguardian group",
+      groupName: "kguardian",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/kguardian-dev/"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      }
+    },
+    {
+      description: "Kubernetes group",
       groupName: "Kubernetes",
       matchDatasources: ["docker"],
       matchPackageNames: [
@@ -51,7 +60,7 @@
       minimumGroupSize: 5,
     },
     {
-      description: "Rook-Ceph Group",
+      description: "Rook-Ceph group",
       groupName: "Rook-Ceph",
       matchDatasources: ["docker"],
       matchPackageNames: ["/rook-ceph/", "/rook-ceph-cluster/"],
@@ -61,7 +70,7 @@
       minimumGroupSize: 2,
     },
     {
-      description: "Talos Group",
+      description: "Talos group",
       groupName: "Talos",
       matchDatasources: ["docker"],
       matchPackageNames: ["/installer/", "/talosctl/"],
