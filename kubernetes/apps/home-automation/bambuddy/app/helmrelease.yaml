@@ -1,0 +1,71 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: bambuddy
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: bambuddy
+  interval: 30m
+  values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 2000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 2000
+        runAsUser: 2000
+    controllers:
+      bambuddy:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/maziggy/bambuddy
+              tag: 0.1.7@sha256:7c93e693c5071c885d689eb1fd1a8d829477e8be9a147945ccf26929c343e679
+            env:
+              PORT: &httpPort 8000
+            resources:
+              requests:
+                cpu: 5m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    service:
+      app:
+        forceRename: "{{.Release.Name}}"
+        controller: bambuddy
+        ports:
+          http:
+            appProtocol: kubernetes.io/wss
+            port: *httpPort
+    persistence:
+      config:
+        existingClaim: bambuddy
+        advancedMounts:
+          bambuddy:
+            app:
+              - path: /app/data
+                subPath: data
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          bambuddy:
+            app:
+              - path: /tmp
+                subPath: tmp
+              - path: /app/logs
+                subPath: logs
+    route:
+      app:
+        hostnames:
+          - bambuddy.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
