@@ -18,6 +18,15 @@ spec:
         runAsUser: 2000
     controllers:
       bambuddy:
+        pod:
+          annotations:
+            k8s.v1.cni.cncf.io/networks: |
+              [{
+                "name":"multus-iot",
+                "namespace": "network",
+                "ips": ["10.1.3.151/24"],
+                "mac": "2e:7e:33:e1:dd:aa"
+              }]
         containers:
           app:
             image:
