@@ -39,12 +39,12 @@ spec:
       enabled: false
     gatewayAPI:
       enabled: false
-    hubble:
-      enabled: true
-      relay:
-        enabled: true
-      ui:
-        enabled: true
+    # hubble:
+    #   enabled: true
+    #   relay:
+    #     enabled: true
+    #   ui:
+    #     enabled: true
     ipam:
       mode: kubernetes
     ipv4NativeRoutingCIDR: 10.244.0.0/16
@@ -55,9 +55,9 @@ spec:
     l2announcements:
       enabled: false
     loadBalancer:
+      acceleration: best-effort
       algorithm: maglev
       mode: dsr
-      serviceTopology: true
     localRedirectPolicies:
       enabled: true
     operator:
@@ -100,6 +100,8 @@ spec:
           - NET_ADMIN
           - SYS_ADMIN
           - SYS_RESOURCE
+          - PERFMON
+          - BPF
     socketLB:
       enabled: true
       hostNamespaceOnly: true
