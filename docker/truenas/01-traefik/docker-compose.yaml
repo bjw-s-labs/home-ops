@@ -21,9 +21,8 @@ services:
       - --providers.docker=true
       - --providers.docker.exposedByDefault=false
     container_name: traefik
-    env_file:
-      - path: secrets.sops.env
-        required: true
+    environment:
+      CF_DNS_API_TOKEN: ${TRAEFIK_CF_DNS_API_TOKEN}
     image: traefik:v3.6.7
     networks:
       - apps
