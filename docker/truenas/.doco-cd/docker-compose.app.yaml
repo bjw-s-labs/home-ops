@@ -8,8 +8,8 @@ configs:
       - run_once: true
         url: https://github.com/bjw-s-labs/home-ops.git
 secrets:
-  sops_age_key:
-    file: /home/truenas_admin/.sops/sops_age_key.txt
+  1pw_token:
+    file: /home/truenas_admin/.config/doco-cd/1pw_token
   webhook_secret:
     file: /home/truenas_admin/.config/doco-cd/webhook_secret
 services:
@@ -22,7 +22,8 @@ services:
       HTTP_PORT: 8080
       LOG_LEVEL: info
       POLL_CONFIG_FILE: /poll-config.yml
-      SOPS_AGE_KEY_FILE: /run/secrets/sops_age_key
+      SECRET_PROVIDER: 1password
+      SECRET_PROVIDER_ACCESS_TOKEN_FILE: /run/secrets/1pw_token
       WEBHOOK_SECRET_FILE: /run/secrets/webhook_secret
       DEPLOY_CONFIG_BASE_DIR: ./docker/truenas/
     healthcheck:
@@ -39,7 +40,7 @@ services:
       - 8080:8080
     restart: unless-stopped
     secrets:
-      - sops_age_key
+      - 1pw_token
       - webhook_secret
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
