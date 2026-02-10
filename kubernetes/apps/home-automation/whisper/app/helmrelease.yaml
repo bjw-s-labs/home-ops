@@ -25,10 +25,10 @@ spec:
               repository: docker.io/rhasspy/wyoming-whisper
               tag: 3.1.0@sha256:9501d2659eee83b6eead98d53842193e5fed011eda6c5b1c3ad36f3146b28fed
             args:
-              - --model
-              - small-int8
-              - --language
-              - nl
+              - --stt-library=faster-whisper
+              - --model=small-int8
+              - --language=nl
+              - --compute-type=int8
             resources:
               requests:
                 memory: 256Mi
