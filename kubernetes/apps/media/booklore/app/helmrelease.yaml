@@ -101,22 +101,27 @@ spec:
               DATABASE_URL: jdbc:mariadb://localhost:3306/booklore
               DATABASE_USERNAME: booklore
             probes:
-              liveness: &probe
+              liveness:
+                enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
                     path: /api/v1/healthcheck
                     port: 8080
-              readiness: *probe
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
               startup:
                 enabled: true
-                custom: true
                 spec:
-                  httpGet:
-                    path: /api/v1/healthcheck
-                    port: 8080
-                  failureThreshold: 10
+                  failureThreshold: 30
+                  periodSeconds: 10
             securityContext:
               allowPrivilegeEscalation: false
               capabilities:
