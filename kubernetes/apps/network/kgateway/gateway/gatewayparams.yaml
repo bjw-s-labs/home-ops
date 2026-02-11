@@ -1,0 +1,18 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/gateway.kgateway.dev/gatewayparameters_v1alpha1.json
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayParameters
+metadata:
+  name: kgateway-params
+spec:
+  kube:
+    deployment:
+      replicas: 2
+    envoyContainer:
+      resources:
+        requests:
+          memory: 64Mi
+        limits:
+          memory: 256Mi
+    service:
+      externalTrafficPolicy: Local

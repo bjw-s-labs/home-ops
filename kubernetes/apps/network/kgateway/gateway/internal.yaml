@@ -3,11 +3,11 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: agentgateway-internal
+  name: kgateway-internal
   annotations:
     external-dns.alpha.kubernetes.io/target: &hostname ingress-int.bjw-s.dev
 spec:
-  gatewayClassName: agentgateway
+  gatewayClassName: kgateway
   addresses:
     - type: IPAddress
       value: &ipv4Address 10.1.6.42
@@ -16,9 +16,9 @@ spec:
       external-dns.alpha.kubernetes.io/hostname: *hostname
       lbipam.cilium.io/ips: *ipv4Address
     parametersRef:
-      name: agentgateway-params
-      group: agentgateway.dev
-      kind: AgentgatewayParameters
+      name: kgateway-params
+      group: gateway.kgateway.dev
+      kind: GatewayParameters
   listeners:
     - name: http
       protocol: HTTP
@@ -41,16 +41,16 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  name: agentgateway-internal
+  name: kgateway-internal
 spec:
-  jobLabel: agentgateway-internal
+  jobLabel: kgateway-internal
   namespaceSelector:
     matchNames:
       - network
   podMetricsEndpoints:
-    - port: metrics
+    - port: http-monitoring
       path: /metrics
       honorLabels: true
   selector:
     matchLabels:
-      app.kubernetes.io/name: agentgateway-internal
+      app.kubernetes.io/name: kgateway-internal

@@ -9,12 +9,12 @@ spec:
     - hass.bjw-s.dev
     - home-assistant.bjw-s.dev
   parentRefs:
-    - name: agentgateway-internal
+    - name: kgateway-internal
       namespace: network
   rules:
     - backendRefs:
-        - group: agentgateway.dev
-          kind: AgentgatewayBackend
+        - group: gateway.kgateway.dev
+          kind: Backend
           name: home-assistant
       matches:
         - path:
