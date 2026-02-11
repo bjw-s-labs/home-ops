@@ -9,12 +9,12 @@ spec:
     - hass.bjw-s.dev
     - home-assistant.bjw-s.dev
   parentRefs:
-    - name: envoy-internal
+    - name: agentgateway-internal
       namespace: network
   rules:
     - backendRefs:
-        - group: gateway.envoyproxy.io
-          kind: Backend
+        - group: agentgateway.dev
+          kind: AgentgatewayBackend
           name: home-assistant
       matches:
         - path:

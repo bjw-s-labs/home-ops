@@ -66,11 +66,6 @@ spec:
             - name: DS_PROMETHEUS
               value: Prometheus
           url: https://grafana.com/api/dashboards/17457/revisions/6/download
-        envoy:
-          datasource:
-            - name: DS_AFRANET_PROMETHEUS
-              value: Prometheus
-          url: https://grafana.com/api/dashboards/23239/revisions/1/download
         node-exporter-full:
           datasource:
             - name: DS_PROMETHEUS
@@ -214,7 +209,7 @@ spec:
         hostnames:
           - grafana.bjw-s.dev
         parentRefs:
-          - name: envoy-internal
+          - name: agentgateway-internal
             namespace: network
 
     serviceAccount:

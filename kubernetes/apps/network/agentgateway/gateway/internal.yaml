@@ -1,0 +1,39 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/gateway.networking.k8s.io/gateway_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: agentgateway-internal
+  annotations:
+    external-dns.alpha.kubernetes.io/target: &hostname ingress-int.bjw-s.dev
+spec:
+  gatewayClassName: agentgateway
+  addresses:
+    - type: IPAddress
+      value: &ipv4Address 10.1.6.42
+  infrastructure:
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: *hostname
+      lbipam.cilium.io/ips: *ipv4Address
+    parametersRef:
+      name: agentgateway-params
+      group: agentgateway.dev
+      kind: AgentgatewayParameters
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.bjw-s.dev"
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        certificateRefs:
+          - kind: Secret
+            name: bjw-s-dev-tls

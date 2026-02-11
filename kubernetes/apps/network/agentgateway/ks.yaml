@@ -1,0 +1,73 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: agentgateway-crds
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: agentgateway
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: agentgateway-crds
+      namespace: network
+  interval: 1h
+  path: "./kubernetes/apps/network/agentgateway/crds"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: network
+  timeout: 5m
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: agentgateway
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: agentgateway
+  dependsOn:
+    - name: agentgateway-crds
+      namespace: network
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: agentgateway
+      namespace: network
+  interval: 1h
+  path: "./kubernetes/apps/network/agentgateway/app"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: network
+  timeout: 5m
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: agentgateway-gateway
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: agentgateway
+  dependsOn:
+    - name: agentgateway
+      namespace: network
+  interval: 1h
+  path: "./kubernetes/apps/network/agentgateway/gateway"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: network
+  timeout: 5m
