@@ -37,3 +37,20 @@ spec:
         certificateRefs:
           - kind: Secret
             name: bjw-s-dev-tls
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: agentgateway-internal
+spec:
+  jobLabel: agentgateway-internal
+  namespaceSelector:
+    matchNames:
+      - network
+  podMetricsEndpoints:
+    - port: metrics
+      path: /metrics
+      honorLabels: true
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: agentgateway-internal
