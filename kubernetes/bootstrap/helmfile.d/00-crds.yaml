@@ -13,10 +13,10 @@ helmDefaults:
     - yq ea --exit-status 'select(.kind == "CustomResourceDefinition")' -
 
 releases:
-  - name: envoy-gateway
-    namespace: networking
-    chart: oci://docker.io/envoyproxy/gateway-helm
-    version: 1.7.0
+  - name: gateway-api-crds
+    namespace: kube-system
+    chart: oci://ghcr.io/wiremind/wiremind-helm-charts/gateway-api-crds
+    version: 1.4.0
 
   - name: external-dns
     namespace: network
