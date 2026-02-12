@@ -17,6 +17,7 @@ spec:
               The flux_instance_info metric for the Flux instance in namespace {{ $labels.exported_namespace }} is not available.
           labels:
             severity: critical
+
         - alert: FluxInstanceNotReady
           expr: flux_instance_info{exported_namespace="flux-system", name="flux", ready!="True"}
           for: 15m
@@ -25,5 +26,25 @@ spec:
             description: |
               The Flux instance in namespace {{ $labels.exported_namespace }} is not ready.
               Reason: {{ $labels.reason }}
+          labels:
+            severity: critical
+
+        - alert: HelmReleaseReconciliationFailure
+          expr: |-
+            gotk_resource_info{customresource_kind="HelmRelease", ready!="True"} == 1
+          for: 5m
+          annotations:
+            summary: >-
+              HelmRelease {{ $labels.name }} in {{ $labels.exported_namespace }} is not ready
+          labels:
+            severity: critical
+
+        - alert: KustomizationReconciliationFailure
+          expr: |-
+            gotk_resource_info{customresource_kind="Kustomization", ready!="True"} == 1
+          for: 5m
+          annotations:
+            summary: >-
+              Kustomization {{ $labels.name }} in {{ $labels.exported_namespace }} is not ready
           labels:
             severity: critical
