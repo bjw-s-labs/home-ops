@@ -9,11 +9,11 @@ spec:
         patches:
           - target:
               version: v1
-              kind: Deployment
+              kind: ${CONTROLLER:=Deployment}
               name: ${APP}
             patch: |-
               version: v1
-              kind: Deployment
+              kind: ${CONTROLLER:=Deployment}
               metadata:
                 name: ${APP}
                 labels:
