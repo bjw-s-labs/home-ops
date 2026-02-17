@@ -3,12 +3,12 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
-  name: kgateway-crds
+  name: envoy-gateway
 spec:
   interval: 15m
   layerSelector:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: v2.2.0
-  url: oci://ghcr.io/kgateway-dev/charts/kgateway-crds
+    tag: 1.7.0
+  url: oci://mirror.gcr.io/envoyproxy/gateway-helm

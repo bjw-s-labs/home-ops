@@ -3,13 +3,17 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: kgateway
+  name: envoy-gateway
 spec:
   chartRef:
     kind: OCIRepository
-    name: kgateway
-  install:
-    crds: CreateReplace
+    name: envoy-gateway
   interval: 30m
-  upgrade:
-    crds: CreateReplace
+  values:
+    config:
+      envoyGateway:
+        provider:
+          type: Kubernetes
+          kubernetes:
+            deploy:
+              type: GatewayNamespace

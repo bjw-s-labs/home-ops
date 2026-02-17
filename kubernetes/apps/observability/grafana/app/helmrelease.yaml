@@ -55,11 +55,6 @@ spec:
 
     dashboards:
       default:
-        kgateway:
-          datasource:
-            - name: DS_PROMETHEUS
-              value: Prometheus
-          url: https://grafana.com/api/dashboards/17457/revisions/6/download
         blackbox-exporter:
           datasource: Prometheus
           url: https://grafana.com/api/dashboards/7587/revisions/3/download
@@ -214,7 +209,7 @@ spec:
         hostnames:
           - grafana.bjw-s.dev
         parentRefs:
-          - name: kgateway-internal
+          - name: envoy-internal
             namespace: network
 
     serviceAccount:

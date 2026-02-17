@@ -9,11 +9,11 @@ spec:
     - hass.bjw-s.dev
     - home-assistant.bjw-s.dev
   parentRefs:
-    - name: kgateway-internal
+    - name: envoy-internal
       namespace: network
   rules:
     - backendRefs:
-        - group: gateway.kgateway.dev
+        - group: gateway.envoyproxy.io
           kind: Backend
           name: home-assistant
       matches:
