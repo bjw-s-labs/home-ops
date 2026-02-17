@@ -54,7 +54,7 @@ spec:
       app:
         ports:
           http:
-            appProtocol: kubernetes.io/ws
+            appProtocol: kubernetes.io/wss
             port: *port
     persistence:
       data:
@@ -79,5 +79,5 @@ spec:
         hostnames:
           - dispatcharr.bjw-s.dev
         parentRefs:
-          - name: kgateway-internal
+          - name: envoy-internal
             namespace: network
