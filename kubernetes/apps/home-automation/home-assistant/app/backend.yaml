@@ -1,6 +1,6 @@
 ---
-# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/gateway.kgateway.dev/backend_v1alpha1.json
-apiVersion: gateway.kgateway.dev/v1alpha1
+# yaml-language-server: $schema=https://datreeio.github.io/CRDs-catalog/gateway.envoyproxy.io/backend_v1alpha1.json
+apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: Backend
 metadata:
   labels:
@@ -8,9 +8,10 @@ metadata:
     app.kubernetes.io/name: home-assistant
   name: home-assistant
 spec:
-  type: Static
-  static:
-    hosts:
-      - host: hestia.bjw-s.internal
+  appProtocols:
+    - gateway.envoyproxy.io/ws
+    - gateway.envoyproxy.io/wss
+  endpoints:
+    - fqdn:
+        hostname: hestia.bjw-s.internal
         port: 8123
-    appProtocol: kubernetes.io/ws
