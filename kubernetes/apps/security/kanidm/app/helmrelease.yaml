@@ -1,0 +1,79 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kanidm
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: kanidm
+  interval: 30m
+  values:
+    controllers:
+      kanidm:
+        replicas: 1
+        type: statefulset
+        pod:
+          securityContext:
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
+        containers:
+          app:
+            image:
+              repository: docker.io/kanidm/server
+              tag: 1.9.0
+            env:
+              KANIDM_ADMIN_BIND_PATH: /var/run/kanidmd.sock
+              KANIDM_DOMAIN: idm.bjw-s.dev
+              KANIDM_ORIGIN: https://idm.bjw-s.dev
+              KANIDM_BINDADDRESS: "[::]:8443"
+              KANIDM_LDAPBINDADDRESS: "[::]:3636"
+              KANIDM_DB_PATH: /data/kanidm.db
+              KANIDM_TLS_CHAIN: /certs/tls.crt
+              KANIDM_TLS_KEY: /certs/tls.key
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 1Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      data:
+        existingClaim: kanidm
+        globalMounts:
+          - path: /data
+            subPath: data
+      certs:
+        type: secret
+        name: idm-bjw-s-dev-tls
+        defaultMode: 0400
+        globalMounts:
+          - path: /certs
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /var/run
+            subPath: var-run
+    route:
+      app:
+        hostnames:
+          - idm.bjw-s.dev
+        parentRefs:
+          - name: envoy-external
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: 8443
+          ldap:
+            port: 3636

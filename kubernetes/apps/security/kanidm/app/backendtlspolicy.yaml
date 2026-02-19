@@ -1,0 +1,14 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/gateway.networking.k8s.io/backendtlspolicy_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: kanidm-upstream
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: kanidm
+  validation:
+    wellKnownCACertificates: System
+    hostname: idm.bjw-s.dev
