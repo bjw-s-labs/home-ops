@@ -1,0 +1,13 @@
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: agentgateway-mcp
+spec:
+  mcp:
+    targets:
+      - name: agentgateway-mcp
+        selector:
+          services:
+            matchLabels:
+              mcp.home.arpa/server: "true"

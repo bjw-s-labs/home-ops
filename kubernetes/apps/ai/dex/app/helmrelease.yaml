@@ -1,0 +1,81 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: dex
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: dex
+  interval: 30m
+  values:
+    replicaCount: 1
+    image:
+      repository: ghcr.io/dexidp/dex
+      tag: v2.44.0@sha256:5d0656fce7d453c0e3b2706abf40c0d0ce5b371fb0b73b3cf714d05f35fa5f86
+    envFrom:
+      - secretRef:
+          name: dex-secret
+    grpc:
+      enabled: true
+    config:
+      issuer: https://mcp-dex.bjw-s.dev
+      storage:
+        type: kubernetes
+        config:
+          inCluster: true
+      web:
+        http: 0.0.0.0:5556
+      grpc:
+        addr: 0.0.0.0:5557
+      connectors:
+        - type: oidc
+          id: kanidm
+          name: Kanidm
+          config:
+            issuer: https://idm.bjw-s.dev/oauth2/openid/mcp-dex
+            clientID: $MCP_DEX_OAUTH_CLIENT_ID
+            clientSecret: $MCP_DEX_OAUTH_CLIENT_SECRET
+            redirectURI: https://mcp-dex.bjw-s.dev/callback
+            scopes:
+              - openid
+              - profile
+              - email
+              - groups
+            getUserInfo: true
+            insecureEnableGroups: true
+      oauth2:
+        skipApprovalScreen: true
+        alwaysShowLoginScreen: false
+    service:
+      ports:
+        http:
+          port: 5556
+        grpc:
+          port: 5557
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        memory: 128Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+          - ALL
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 65534
+      runAsGroup: 65534
+      fsGroup: 65534
+      seccompProfile:
+        type: RuntimeDefault
+    volumeMounts:
+      - name: tmp
+        mountPath: /tmp
+    volumes:
+      - name: tmp
+        emptyDir: {}

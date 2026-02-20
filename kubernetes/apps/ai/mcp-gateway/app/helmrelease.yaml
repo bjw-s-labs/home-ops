@@ -1,0 +1,95 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mcp-gateway
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: mcp-gateway
+  interval: 30m
+  values:
+    configMaps:
+      config:
+        data:
+          hyprmcp-gateway.yaml: |-
+            host: https://mcp.bjw-s.dev/
+            authorization:
+              server: https://mcp-dex.bjw-s.dev/
+              serverMetadataProxyEnabled: true
+              authorizationProxyEnabled: true
+              dynamicClientRegistrationEnabled: true
+            dexGRPCClient:
+              addr: dex.ai.svc.cluster.local:5557
+            proxy:
+              - path: /mcp
+                http:
+                  url: http://agentgateway.ai.svc.cluster.local:3000
+                authentication:
+                  enabled: true
+    controllers:
+      mcp-gateway:
+        replicas: 1
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsGroup: 65534
+            runAsNonRoot: true
+            runAsUser: 65534
+        containers:
+          app:
+            image:
+              repository: ghcr.io/hyprmcp/mcp-gateway
+              tag: 0.4.0@sha256:fde162c3b0df2f75b31776d1bc6736a7da29bc9665cc6fa872d37d022e2e3040
+            args:
+              - --config
+              - /config/hyprmcp-gateway.yaml
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: &port 9000
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: *port
+            resources:
+              requests:
+                cpu: 50m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      config:
+        type: configMap
+        identifier: config
+        globalMounts:
+          - path: /config/hyprmcp-gateway.yaml
+            subPath: hyprmcp-gateway.yaml
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        hostnames:
+          - mcp.bjw-s.dev
+        parentRefs:
+          - name: envoy-external
+            namespace: network

@@ -1,0 +1,29 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/agentgateway.dev/agentgatewaypolicy_v1alpha1.json
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: agentgateway-mcp-claude
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: mcp
+      # backend:
+      #   mcp:
+      #     authentication:
+      #       issuer: https://idm.bjw-s.dev/oauth2/openid/mcp-claude
+      #       jwks:
+      #         backendRef:
+      #           name: kanidm
+      #           namespace: security
+      #           port: 8443
+      #         jwksPath: /oauth2/openid/mcp-claude/public_key.jwk
+      #         cacheDuration: 10m
+      #       mode: Strict
+      #       resourceMetadata:
+      #         resource: https://mcp.bjw-s.dev/mcp
+      #         authorization_servers:
+      #           - https://idm.bjw-s.dev/oauth2/openid/mcp-claude
+      #         bearer_methods_supported:
+      #           - header

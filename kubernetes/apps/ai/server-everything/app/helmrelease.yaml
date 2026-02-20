@@ -1,0 +1,61 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: server-everything
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: server-everything
+  interval: 30m
+  values:
+    controllers:
+      server-everything:
+        pod:
+          securityContext:
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
+        containers:
+          app:
+            image:
+              repository: docker.io/library/node
+              tag: 24-alpine
+            command:
+              - npx
+            args:
+              - -y
+              - "@modelcontextprotocol/server-everything"
+              - streamableHttp
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      npm:
+        type: emptyDir
+        globalMounts:
+          - path: /home/node/.npm
+    service:
+      app:
+        labels:
+          mcp.home.arpa/server: "true"
+        ports:
+          http:
+            appProtocol: kgateway.dev/mcp
+            port: 3001
+    route:
+      app:
+        parentRefs:
+          - name: agentgateway-mcp
+            namespace: ai
+        rules:
+          - backendRefs:
+              - name: server-everything
+                group: agentgateway.dev
+                kind: AgentgatewayBackend

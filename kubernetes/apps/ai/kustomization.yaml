@@ -1,0 +1,14 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ai
+components:
+  - ../../components/flux-alerts
+resources:
+  - ./namespace.yaml
+  - ./agentgateway/ks.yaml
+  - ./dex/ks.yaml
+  - ./ha-mcp/ks.yaml
+  - ./mcp-gateway/ks.yaml
+  - ./server-everything/ks.yaml
