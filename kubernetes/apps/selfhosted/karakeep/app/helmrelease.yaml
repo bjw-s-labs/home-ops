@@ -23,6 +23,9 @@ spec:
         forceRename: karakeep
         annotations:
           reloader.stakater.com/auto: "true"
+        pod:
+          labels:
+            app.kubernetes.io/component: application
         containers:
           app:
             image:
@@ -65,6 +68,9 @@ spec:
       chrome:
         annotations:
           reloader.stakater.com/auto: "true"
+        pod:
+          labels:
+            app.kubernetes.io/component: chrome
         containers:
           app:
             image:
@@ -94,6 +100,8 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
+          labels:
+            app.kubernetes.io/component: meilisearch
           affinity:
             podAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:

@@ -29,6 +29,8 @@ spec:
                 "ips": ["10.1.3.152/24"],
                 "mac": "92:cf:d7:05:70:84"
               }]
+          labels:
+            app.kubernetes.io/component: application
         containers:
           app:
             image:
@@ -56,6 +58,9 @@ spec:
       code-server:
         annotations:
           secret.reloader.stakater.com/reload: esphome-secrets,esphome-deploykey
+        pod:
+          labels:
+            app.kubernetes.io/component: code-server
         containers:
           code-server:
             image:

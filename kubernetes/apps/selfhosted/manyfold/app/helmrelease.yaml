@@ -17,6 +17,8 @@ spec:
           secret.reloader.stakater.com/reload: manyfold-secret
 
         pod:
+          labels:
+            app.kubernetes.io/component: application
           securityContext:
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"
@@ -90,6 +92,8 @@ spec:
 
       redis:
         pod:
+          labels:
+            app.kubernetes.io/component: redis
           securityContext:
             runAsUser: 65534
             runAsGroup: 65534
