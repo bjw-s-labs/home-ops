@@ -15,7 +15,9 @@ spec:
         forceRename: paperless
         annotations:
           reloader.stakater.com/auto: "true"
-
+        pod:
+          labels:
+            app.kubernetes.io/component: application
         containers:
           app:
             image:
@@ -78,6 +80,9 @@ spec:
                 memory: 6Gi
 
       redis:
+        pod:
+          labels:
+            app.kubernetes.io/component: redis
         containers:
           redis:
             image:
