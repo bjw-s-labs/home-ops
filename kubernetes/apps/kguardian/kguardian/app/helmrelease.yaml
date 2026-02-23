@@ -10,26 +10,6 @@ spec:
     name: kguardian
   interval: 30m
   values:
-    broker:
-      image:
-        repository: ghcr.io/kguardian-dev/kguardian/broker
-        tag: v1.7.0
-      resources:
-        limits:
-          memory: 1Gi
-        requests:
-          memory: 256Mi
     controller:
-      image:
-        repository: ghcr.io/kguardian-dev/kguardian/controller
-        tag: v1.8.0
       excludedNamespaces:
         - kguardian
-    database:
-      resources:
-        limits:
-          cpu: 6
-    frontend:
-      image:
-        repository: ghcr.io/kguardian-dev/kguardian/frontend
-        tag: v1.7.1
