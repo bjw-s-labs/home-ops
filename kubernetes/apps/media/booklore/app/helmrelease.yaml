@@ -62,26 +62,19 @@ spec:
               # NOTE: io_uring is blocked by the default containerd v2 seccomp profile
               # https://github.com/containerd/containerd/pull/9320
               seccompProfile: {type: Unconfined}
-          nginx-config:
+          wait-for-mariadb:
             image:
-              repository: ghcr.io/booklore-app/booklore
-              tag: v2.0.1@sha256:e5c51133c0c50e97004bf711a34521c698e4b27b6847e54fe304c08ff4aa8ee1
-            command:
-              - /bin/sh
-              - -c
+              repository: wait4x/wait4x
+              tag: 3.6.0
             args:
-              - "envsubst '$${BOOKLORE_PORT}' < /etc/nginx/nginx.conf > /config/nginx.conf"
+              - "mysql"
+              - "booklore:$(DB_PASSWORD)@tcp(localhost:3306)/booklore"
             env:
-              BOOKLORE_PORT: &httpPort 6060
-            securityContext:
-              allowPrivilegeEscalation: false
-              capabilities:
-                drop:
-                  - ALL
-              readOnlyRootFilesystem: true
-              runAsUser: 100
-              runAsGroup: 101
-              fsGroup: 101
+              DB_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: booklore-secret
+                    key: booklore_mariadb_password
         containers:
           booklore:
             image:
@@ -103,7 +96,11 @@ spec:
             probes:
               liveness:
                 enabled: true
+                custom: true
                 spec:
+                  httpGet:
+                    path: /api/v1/healthcheck
+                    port: &httpPort 6060
                   periodSeconds: 30
                   timeoutSeconds: 5
                   failureThreshold: 5
@@ -113,7 +110,7 @@ spec:
                 spec:
                   httpGet:
                     path: /api/v1/healthcheck
-                    port: 8080
+                    port: *httpPort
                   periodSeconds: 10
                   timeoutSeconds: 5
                   failureThreshold: 5
@@ -122,41 +119,18 @@ spec:
                 spec:
                   failureThreshold: 30
                   periodSeconds: 10
+            resources:
+              requests:
+                cpu: 50m
+                memory: 1Gi
+              limits:
+                memory: 2Gi
             securityContext:
               allowPrivilegeEscalation: false
               capabilities:
                 drop:
                   - ALL
               readOnlyRootFilesystem: true
-          nginx:
-            image:
-              repository: ghcr.io/booklore-app/booklore
-              tag: v2.0.1@sha256:e5c51133c0c50e97004bf711a34521c698e4b27b6847e54fe304c08ff4aa8ee1
-            command:
-              - nginx
-            args:
-              - -c
-              - /config/nginx.conf
-              - -g
-              - "daemon off;"
-            probes:
-              liveness: &probe
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /
-                    port: *httpPort
-              readiness: *probe
-            securityContext:
-              allowPrivilegeEscalation: false
-              capabilities:
-                drop:
-                  - ALL
-              readOnlyRootFilesystem: true
-              runAsUser: 100
-              runAsGroup: 101
-              fsGroup: 101
     persistence:
       data:
         existingClaim: booklore
@@ -187,33 +161,8 @@ spec:
           booklore:
             mariadb:
               - path: /run/mysqld
-      nginx:
-        type: emptyDir
-        sizeLimit: 200Mi
-        advancedMounts:
-          booklore:
-            nginx:
-              - path: /config
-                subPath: config
-              - path: /var/lib/nginx/logs
-                subPath: log
-              - path: /var/lib/nginx/tmp
-                subPath: tmp
-            nginx-config:
-              - path: /config
-                subPath: config
-      nginx-run:
-        type: emptyDir
-        medium: Memory
-        sizeLimit: 100Mi
-        advancedMounts:
-          booklore:
-            nginx:
-              - path: /run/nginx
       tmpfs:
         type: emptyDir
-        medium: Memory
-        sizeLimit: 100Mi
         advancedMounts:
           booklore:
             booklore:
