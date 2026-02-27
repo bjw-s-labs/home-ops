@@ -33,6 +33,9 @@ spec:
             enabled: true
           - name: rook
             enabled: true
+      mon:
+        allowMultiplePerNode: false
+        count: 2
       network:
         connections:
           requireMsgr2: true
@@ -52,7 +55,7 @@ spec:
         spec:
           failureDomain: host
           replicated:
-            size: 3
+            size: 1 # REVERT WHEN NEW NODE IS ALIVE
         storageClass:
           enabled: true
           name: ceph-block
@@ -85,12 +88,12 @@ spec:
         spec:
           metadataPool:
             replicated:
-              size: 3
+              size: 1 # REVERT WHEN NEW NODE IS ALIVE
           dataPools:
             - name: data0
               failureDomain: host
               replicated:
-                size: 3
+                size: 1 # REVERT WHEN NEW NODE IS ALIVE
           metadataServer:
             activeCount: 1
             activeStandby: true
