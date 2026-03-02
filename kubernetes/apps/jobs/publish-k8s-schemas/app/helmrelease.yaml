@@ -15,10 +15,10 @@ spec:
         type: cronjob
         cronjob:
           backoffLimit: 0
-          concurrencyPolicy: "Replace"
+          concurrencyPolicy: Forbid
           failedJobsHistory: 1
           schedule: "0 */4 * * *"
-          successfulJobsHistory: 0
+          successfulJobsHistory: 1
         pod:
           restartPolicy: OnFailure
           securityContext:
