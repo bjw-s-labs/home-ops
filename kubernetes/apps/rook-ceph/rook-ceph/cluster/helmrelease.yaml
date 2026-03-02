@@ -55,7 +55,7 @@ spec:
         spec:
           failureDomain: host
           replicated:
-            size: 1 # REVERT WHEN NEW NODE IS ALIVE
+            size: 3
         storageClass:
           enabled: true
           name: ceph-block
@@ -88,12 +88,12 @@ spec:
         spec:
           metadataPool:
             replicated:
-              size: 1 # REVERT WHEN NEW NODE IS ALIVE
+              size: 3
           dataPools:
             - name: data0
               failureDomain: host
               replicated:
-                size: 1 # REVERT WHEN NEW NODE IS ALIVE
+                size: 3
           metadataServer:
             activeCount: 1
             activeStandby: true
