@@ -1,0 +1,44 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: nextcloud
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: nextcloud
+      app.kubernetes.io/instance: nextcloud
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: redis
+            app.kubernetes.io/instance: nextcloud
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: nextcloud-redis
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/instance: nextcloud
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: nextcloud
+            app.kubernetes.io/instance: nextcloud
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
