@@ -1,0 +1,42 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/gateway.networking.k8s.io/httproute_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: agentgateway-mcp
+spec:
+  parentRefs:
+    - name: agentgateway-mcp
+  rules:
+    - backendRefs:
+        - name: agentgateway-mcp
+          group: agentgateway.dev
+          kind: AgentgatewayBackend
+          # - name: agentgateway-mcp
+          #   namespace: ai
+          #   port: 80
+          # ---
+          # # yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/gateway.networking.k8s.io/httproute_v1.json
+          # apiVersion: gateway.networking.k8s.io/v1
+          # kind: HTTPRoute
+          # metadata:
+          #   name: agentgateway-mcp-authorize
+          # spec:
+          #   parentRefs:
+          #     - name: envoy-external
+          #       namespace: network
+          #   hostnames:
+          #     - mcp.bjw-s.dev
+          #   rules:
+          #     - matches:
+          #         - path:
+          #             type: PathPrefix
+          #             value: /authorize
+          #       filters:
+          #         - type: RequestRedirect
+          #           requestRedirect:
+          #             hostname: idm.bjw-s.dev
+          #             path:
+          #               type: ReplacePrefixMatch
+          #               replacePrefixMatch: /ui/oauth2
+          #             statusCode: 302

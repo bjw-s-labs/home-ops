@@ -1,0 +1,73 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: toolhive-operator-crds
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: toolhive-operator-crds
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: toolhive-operator-crds
+      namespace: ai
+  interval: 1h
+  path: "./kubernetes/apps/ai/toolhive/crds"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: ai
+  timeout: 5m
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: toolhive-operator
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: toolhive-operator
+  dependsOn:
+    - name: toolhive-operator-crds
+      namespace: ai
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: toolhive-operator
+      namespace: ai
+  interval: 1h
+  path: "./kubernetes/apps/ai/toolhive/app"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: ai
+  timeout: 5m
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: toolhive-mcp-gateway
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: toolhive
+  dependsOn:
+    - name: toolhive
+      namespace: ai
+  interval: 1h
+  path: "./kubernetes/apps/ai/toolhive/mcp-gateway"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: ai
+  timeout: 5m

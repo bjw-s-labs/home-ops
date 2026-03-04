@@ -1,0 +1,30 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/toolhive.stacklok.dev/virtualmcpserver_v1alpha1.json
+apiVersion: toolhive.stacklok.dev/v1alpha1
+kind: VirtualMCPServer
+metadata:
+  name: mcp-gateway
+spec:
+  config:
+    groupRef: mcp-tools
+    aggregation:
+      conflictResolution: prefix
+      conflictResolutionConfig:
+        prefixFormat: "{workload}_"
+        # optimizer:
+        #   embeddingService: embedding
+  incomingAuth:
+    type: oidc
+    oidcConfig:
+      type: inline
+      resourceUrl: https://mcp.bjw-s.dev
+      inline:
+        audience: toolhive-mcp
+        clientId: toolhive-vmcp
+        clientSecretRef:
+          name: vmcp-oidc-client-secret
+          key: client-secret
+        issuer: https://idm.bjw-s.dev/oauth2/openid/toolhive-vmcp
+        jwksAllowPrivateIP: true
+  outgoingAuth:
+    source: discovered
