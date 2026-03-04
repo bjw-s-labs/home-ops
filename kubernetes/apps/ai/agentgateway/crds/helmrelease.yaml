@@ -1,0 +1,11 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: agentgateway-crds
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: agentgateway-crds
+  interval: 30m

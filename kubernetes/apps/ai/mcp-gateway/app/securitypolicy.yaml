@@ -1,0 +1,22 @@
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: mcp-gateway-cors
+spec:
+  cors:
+    allowHeaders:
+      - Authorization
+      - Content-Type
+    allowMethods:
+      - GET
+      - POST
+      - OPTIONS
+    allowOrigins:
+      - http://localhost:6274 # Needed for MCP Inspector
+    exposeHeaders:
+      - '*'
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: mcp-gateway

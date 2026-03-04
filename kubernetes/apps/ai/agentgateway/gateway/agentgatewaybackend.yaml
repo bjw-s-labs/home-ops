@@ -1,0 +1,14 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/agentgateway.dev/agentgatewaybackend_v1alpha1.json
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: agentgateway-mcp
+spec:
+  mcp:
+    targets:
+      - name: agentgateway-mcp
+        selector:
+          services:
+            matchLabels:
+              mcp.home.arpa/server: "true"
