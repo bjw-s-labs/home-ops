@@ -10,7 +10,7 @@ releases:
   - name: cilium
     namespace: kube-system
     chart: oci://quay.io/cilium/charts/cilium
-    version: 1.19.1
+    version: 1.18.7
     values:
       - templates/values.yaml.gotmpl
     hooks:
@@ -56,7 +56,7 @@ releases:
   - name: cert-manager
     namespace: cert-manager
     chart: oci://quay.io/jetstack/charts/cert-manager
-    version: v1.19.3
+    version: v1.19.4
     values:
       - templates/values.yaml.gotmpl
     needs:
@@ -65,7 +65,7 @@ releases:
   - name: external-secrets
     namespace: external-secrets
     chart: oci://ghcr.io/external-secrets/charts/external-secrets
-    version: 2.0.0
+    version: 2.0.1
     values:
       - templates/values.yaml.gotmpl
     needs:
@@ -94,7 +94,7 @@ releases:
   - name: flux-operator
     namespace: flux-system
     chart: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator
-    version: 0.41.1
+    version: 0.43.0
     values:
       - templates/values.yaml.gotmpl
     needs:
@@ -103,7 +103,7 @@ releases:
   - name: flux-instance
     namespace: flux-system
     chart: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-instance
-    version: 0.41.1
+    version: 0.43.0
     wait: false
     values:
       - templates/values.yaml.gotmpl

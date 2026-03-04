@@ -15,12 +15,14 @@ spec:
         forceRename: paperless
         annotations:
           reloader.stakater.com/auto: "true"
-
+        pod:
+          labels:
+            app.kubernetes.io/component: application
         containers:
           app:
             image:
               repository: ghcr.io/paperless-ngx/paperless-ngx
-              tag: 2.20.7
+              tag: 2.20.9
             env:
               # Configure application
               PAPERLESS_SECRET_KEY:
@@ -78,11 +80,14 @@ spec:
                 memory: 6Gi
 
       redis:
+        pod:
+          labels:
+            app.kubernetes.io/component: redis
         containers:
           redis:
             image:
               repository: ghcr.io/valkey-io/valkey
-              tag: 9.0.2
+              tag: 9.0.3
             resources:
               requests:
                 cpu: 5m

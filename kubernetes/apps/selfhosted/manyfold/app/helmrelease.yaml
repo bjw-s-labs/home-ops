@@ -17,6 +17,8 @@ spec:
           secret.reloader.stakater.com/reload: manyfold-secret
 
         pod:
+          labels:
+            app.kubernetes.io/component: application
           securityContext:
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"
@@ -41,7 +43,7 @@ spec:
           main:
             image:
               repository: ghcr.io/bjw-s-labs/manyfold
-              tag: 0.132.1@sha256:04a38be7b953c0b0bc9ff4b251a67abf12fe39e6317d6e8870bd07630798f10e
+              tag: 0.133.1@sha256:382852d0d150aef509c9771756470776fcab0b92a7a7114a66a8ff24449ad28d
             env:
               DATABASE_URL: sqlite3:/data/database/manyfold.sqlite3
               MULTIUSER: false
@@ -90,15 +92,19 @@ spec:
 
       redis:
         pod:
+          labels:
+            app.kubernetes.io/component: redis
           securityContext:
             runAsUser: 65534
             runAsGroup: 65534
+            fsGroup: 65534
+            fsGroupChangePolicy: "OnRootMismatch"
         strategy: RollingUpdate
         containers:
           redis:
             image:
               repository: ghcr.io/valkey-io/valkey
-              tag: 9.0.2
+              tag: 9.0.3
             args:
               - --save
               - ""
@@ -116,7 +122,6 @@ spec:
               capabilities:
                 drop:
                   - ALL
-
     service:
       app:
         forceRename: manyfold
@@ -153,7 +158,10 @@ spec:
               - path: /app/log
                 subPath: app-log
             chown-tmpdirs: *tmpdirs
-
+          redis:
+            redis:
+              - path: /data
+                subPath: data
     route:
       app:
         hostnames:

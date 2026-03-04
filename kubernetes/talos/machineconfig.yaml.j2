@@ -47,8 +47,10 @@ machine:
         [ NFSMount_Global_Options ]
         nfsvers=4.2
         hard=True
+        nconnect=8
         noatime=True
-        nconnect=16
+        rsize=1048576
+        wsize=1048576
   install:
     image: factory.talos.dev/metal-installer/a30c16a32db3c99cb35f22401fad96807f80896dfc86aa4ec716ed6b4aff09de:v1.12.4
   kernel:
@@ -62,7 +64,7 @@ machine:
     extraConfig:
       maxPods: 150
       serializeImagePulls: false
-    image: ghcr.io/siderolabs/kubelet:v1.35.1
+    image: ghcr.io/siderolabs/kubelet:v1.35.2
     nodeIP:
       validSubnets:
         - 10.1.1.0/24
@@ -96,7 +98,7 @@ cluster:
     key: op://automation/talos/CLUSTER_AGGREGATORCA_KEY
   allowSchedulingOnControlPlanes: true
   apiServer:
-    image: registry.k8s.io/kube-apiserver:v1.35.1
+    image: registry.k8s.io/kube-apiserver:v1.35.2
     extraArgs:
       enable-aggregator-routing: "true"
       feature-gates: MutatingAdmissionPolicy=true
@@ -107,7 +109,7 @@ cluster:
       - k8s.bjw-s.internal
     disablePodSecurityPolicy: true
   controllerManager:
-    image: registry.k8s.io/kube-controller-manager:v1.35.1
+    image: registry.k8s.io/kube-controller-manager:v1.35.2
     extraArgs:
       bind-address: 0.0.0.0
   coreDNS:
@@ -122,7 +124,7 @@ cluster:
       listen-metrics-urls: http://0.0.0.0:2381
   proxy:
     disabled: true
-    image: registry.k8s.io/kube-proxy:v1.35.1
+    image: registry.k8s.io/kube-proxy:v1.35.2
   scheduler:
     config:
       apiVersion: kubescheduler.config.k8s.io/v1
@@ -143,7 +145,7 @@ cluster:
           schedulerName: default-scheduler
     extraArgs:
       bind-address: 0.0.0.0
-    image: registry.k8s.io/kube-scheduler:v1.35.1
+    image: registry.k8s.io/kube-scheduler:v1.35.2
   secretboxEncryptionSecret: op://automation/talos/CLUSTER_SECRETBOXENCRYPTIONSECRET
   serviceAccount:
     key: op://automation/talos/CLUSTER_SERVICEACCOUNT_KEY

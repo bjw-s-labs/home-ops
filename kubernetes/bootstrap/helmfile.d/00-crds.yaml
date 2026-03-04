@@ -7,14 +7,10 @@ helmDefaults:
   args:
     - --include-crds
     - --no-hooks
-  postRenderer: bash
-  postRendererArgs:
-    - -c
-    - yq ea --exit-status 'select(.kind == "CustomResourceDefinition")' -
 
 releases:
   - name: envoy-gateway
-    namespace: networking
+    namespace: network
     chart: oci://docker.io/envoyproxy/gateway-helm
     version: 1.7.0
 
@@ -31,4 +27,4 @@ releases:
   - name: kube-prometheus-stack
     namespace: observability
     chart: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
-    version: 82.1.1
+    version: 82.8.0

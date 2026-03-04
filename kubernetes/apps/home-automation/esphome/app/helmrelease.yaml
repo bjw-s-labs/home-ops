@@ -29,11 +29,13 @@ spec:
                 "ips": ["10.1.3.152/24"],
                 "mac": "92:cf:d7:05:70:84"
               }]
+          labels:
+            app.kubernetes.io/component: application
         containers:
           app:
             image:
               repository: ghcr.io/home-operations/esphome
-              tag: 2026.2.0@sha256:204ef76fee96eec77bb528b7a3e8e70301ec949acfa6529bad8f42af6c93639b
+              tag: 2026.2.4@sha256:e1a0cd7bb5b1146da8bfd2a7680109733c564de561d56382b175f6d289753f94
             probes:
               liveness:
                 enabled: false
@@ -56,11 +58,14 @@ spec:
       code-server:
         annotations:
           secret.reloader.stakater.com/reload: esphome-secrets,esphome-deploykey
+        pod:
+          labels:
+            app.kubernetes.io/component: code-server
         containers:
           code-server:
             image:
               repository: ghcr.io/coder/code-server
-              tag: 4.109.2@sha256:1b84cd817fe8eb1159323ae9d2f29b3c70c6ccd44958d651a94900cf7f0ff9c4
+              tag: 4.109.5@sha256:f9ccfeb5a3de80d16342a6a842519c481522d80aafe65fb24a16393235a34f71
             args:
               - --auth
               - none

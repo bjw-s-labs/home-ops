@@ -14,37 +14,3 @@ kind: LinkAliasConfig
 name: net0
 selector:
     match: link.driver == "igc" && mac(link.permanent_addr).startsWith("48:21:0b:55:")
----
-apiVersion: v1alpha1
-kind: LinkAliasConfig
-name: enigma-delta
-selector:
-    match: link.driver == "thunderbolt-net" && link.bus_path == "0-1.0"
----
-apiVersion: v1alpha1
-kind: LinkConfig
-name: enigma-delta
-addresses:
-  - address: 169.254.255.22/32
-mtu: 65520
-routes:
-  - destination: 169.254.255.21/32
-    metric: 2048
-up: true
----
-apiVersion: v1alpha1
-kind: LinkAliasConfig
-name: enigma-felix
-selector:
-    match: link.driver == "thunderbolt-net" && link.bus_path == "1-1.0"
----
-apiVersion: v1alpha1
-kind: LinkConfig
-name: enigma-felix
-addresses:
-  - address: 169.254.255.22/32
-mtu: 65520
-routes:
-  - destination: 169.254.255.23/32
-    metric: 2048
-up: true

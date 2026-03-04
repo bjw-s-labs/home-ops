@@ -19,6 +19,11 @@ spec:
         - ports:
             - port: "3214"
               protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: manyfold
+            app.kubernetes.io/instance: manyfold
+            app.kubernetes.io/controller: redis
 ---
 # yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/cilium.io/ciliumnetworkpolicy_v2.json
 apiVersion: cilium.io/v2
