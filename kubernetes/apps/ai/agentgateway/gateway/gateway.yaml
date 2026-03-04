@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/gateway.networking.k8s.io/gateway_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: agentgateway-mcp
+spec:
+  gatewayClassName: agentgateway
+  infrastructure:
+    parametersRef:
+      name: agentgateway-config
+      group: agentgateway.dev
+      kind: AgentgatewayParameters
+  listeners:
+    - name: mcp
+      protocol: HTTP
+      port: 3000
+      allowedRoutes:
+        namespaces:
+          from: Same

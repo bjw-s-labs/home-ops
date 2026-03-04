@@ -1,0 +1,22 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/agentgateway.dev/agentgatewaypolicy_v1alpha1.json
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: agentgateway-mcp
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: agentgateway-mcp
+  traffic:
+    cors:
+      allowOrigins:
+        - "*"
+      allowHeaders:
+        - mcp-protocol-version
+        - content-type
+        - cache-control
+        - authorization
+      exposeHeaders:
+        - Mcp-Session-Id
