@@ -1,0 +1,28 @@
+# TODO remove this once https://github.com/kubernetes-sigs/descheduler/issues/1839 is fixed
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: descheduler-extra-permissions
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "persistentvolumeclaims"
+    verbs:
+      - "get"
+      - "watch"
+      - "list"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: descheduler-extra-permissions
+subjects:
+  - kind: ServiceAccount
+    name: descheduler
+    namespace: system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: descheduler-extra-permissions
