@@ -1,0 +1,13 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cert-manager-webhook-ovh
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: cert-manager-webhook-ovh
+  interval: 30m
+  values:
+    groupName: acme.bjw-s.dev
