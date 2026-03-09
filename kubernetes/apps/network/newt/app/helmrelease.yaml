@@ -1,0 +1,72 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: newt
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: newt
+  interval: 30m
+  values:
+    global:
+      podSecurityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+    newtInstances:
+      - name: main-tunnel
+        enabled: true
+        replicas: 2
+        auth:
+          existingSecretName: newt-secret
+          keys:
+            endpointKey: NEWT_SERVER_URL
+            idKey: NEWT_ID
+            secretKey: NEWT_SECRET
+        blueprintFile: /etc/newt/blueprint.yaml
+        blueprintData: |
+          public-resources:
+            envoy-external:
+              name: "External Gateway"
+              protocol: http
+              ssl: true
+              full-domain: "ingress-ext.bjw-s.dev"
+              tls-server-name: ingress-ext.bjw-s.dev
+              rules:
+                # State-sponsored threat actors / sanctioned nations
+                - action: deny
+                  match: country
+                  value: RU
+                - action: deny
+                  match: country
+                  value: CN
+                - action: deny
+                  match: country
+                  value: KP
+                - action: deny
+                  match: country
+                  value: IR
+                - action: deny
+                  match: country
+                  value: BY
+                - action: deny
+                  match: country
+                  value: IL
+              targets:
+                - site: misguided-scytodes-thoracica
+                  hostname: envoy-external.network.svc.cluster.local
+                  method: https
+                  port: 443
+        resources:
+          requests:
+            cpu: 10m
+          limits:
+            memory: 128Mi
