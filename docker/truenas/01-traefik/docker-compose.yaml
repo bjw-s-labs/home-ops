@@ -7,9 +7,7 @@ services:
   traefik:
     command:
       - --certificatesresolvers.cf.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
-      - --certificatesresolvers.cf.acme.dnsChallenge.delayBeforeCheck=0
-      - --certificatesresolvers.cf.acme.dnsChallenge.provider=cloudflare
-      - --certificatesresolvers.cf.acme.dnsChallenge.resolvers=1.1.1.1:53
+      - --certificatesresolvers.cf.acme.dnsChallenge.provider=ovh
       - --certificatesresolvers.cf.acme.storage=/certs/acme.json
       - --entryPoints.web.address=:80
       - --entryPoints.web.http.redirections.entryPoint.scheme=https
@@ -22,7 +20,10 @@ services:
       - --providers.docker.exposedByDefault=false
     container_name: traefik
     environment:
-      CF_DNS_API_TOKEN: ${TRAEFIK_CF_DNS_API_TOKEN}
+      - OVH_ENDPOINT=ovh-eu
+      - OVH_APPLICATION_KEY=${OVH_APPLICATION_KEY}
+      - OVH_APPLICATION_SECRET=${OVH_APPLICATION_SECRET}
+      - OVH_CONSUMER_KEY=${OVH_CONSUMER_KEY}
     image: traefik:v3.6.10
     networks:
       - apps
