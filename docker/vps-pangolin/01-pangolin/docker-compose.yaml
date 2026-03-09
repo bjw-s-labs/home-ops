@@ -1,0 +1,416 @@
+---
+name: pangolin
+services:
+  pangolin:
+    image: docker.io/fosrl/pangolin:ee-1.16.2
+    container_name: pangolin
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+        reservations:
+          memory: 256m
+    volumes:
+      - /opt/pangolin/config:/app/config
+    configs:
+      - source: pangolin_config
+        target: /app/config/config.yml
+    healthcheck:
+      test:
+        - "CMD"
+        - "curl"
+        - "-f"
+        - "http://localhost:3001/api/v1/"
+      interval: "10s"
+      timeout: "10s"
+      retries: 15
+
+  crowdsec:
+    command: -t
+    container_name: crowdsec
+    environment:
+      COLLECTIONS: crowdsecurity/traefik crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-generic-rules
+      ENROLL_INSTANCE_NAME: pangolin-crowdsec
+      ENROLL_TAGS: docker
+      GID: "1000"
+      PARSERS: crowdsecurity/whitelists
+    healthcheck:
+      interval: 10s
+      retries: 3
+      start_period: 30s
+      test:
+        - CMD
+        - cscli
+        - lapi
+        - status
+      timeout: 5s
+    image: docker.io/crowdsecurity/crowdsec:v1.7.6
+    labels:
+      - traefik.enable=false
+    ports:
+      - 6060:6060
+    restart: unless-stopped
+    volumes:
+      - /opt/crowdsec/config:/etc/crowdsec
+      - /opt/crowdsec/data:/var/lib/crowdsec/data
+      - /opt/pangolin/config/traefik/logs:/var/log/traefik:ro
+    configs:
+      - source: crowdsec_acquis
+        target: /etc/crowdsec/acquis.yaml
+
+  gerbil:
+    image: docker.io/fosrl/gerbil:1.3.0
+    container_name: gerbil
+    restart: unless-stopped
+    depends_on:
+      pangolin:
+        condition: service_healthy
+    command:
+      - --reachableAt=http://gerbil:3004
+      - --generateAndSaveKeyTo=/var/config/key
+      - --remoteConfig=http://pangolin:3001/api/v1/
+    volumes:
+      - /opt/pangolin/config/:/var/config
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    ports:
+      - 51820:51820/udp
+      - 21820:21820/udp
+      - 443:443
+      - 80:80
+
+  traefik:
+    image: docker.io/traefik:v3.6
+    container_name: traefik
+    restart: unless-stopped
+    environment:
+      - OVH_ENDPOINT=ovh-eu
+      - OVH_APPLICATION_KEY=${OVH_APPLICATION_KEY}
+      - OVH_APPLICATION_SECRET=${OVH_APPLICATION_SECRET}
+      - OVH_CONSUMER_KEY=${OVH_CONSUMER_KEY}
+      - CROWDSEC_API_KEY=${CROWDSEC_TRAEFIK_API_KEY}
+    network_mode: service:gerbil
+    depends_on:
+      crowdsec:
+        condition: service_healthy
+      pangolin:
+        condition: service_healthy
+    command:
+      - --configFile=/etc/traefik/traefik_config.yml
+    volumes:
+      - /opt/pangolin/config/letsencrypt:/letsencrypt
+      - /opt/pangolin/config/traefik/logs:/var/log/traefik
+    configs:
+      - source: traefik_config
+        target: /etc/traefik/traefik_config.yml
+      - source: traefik_dynamic_config
+        target: /etc/traefik/dynamic_config.yml
+
+  geoipupdate:
+    container_name: geoipupdate
+    image: ghcr.io/maxmind/geoipupdate:v7.1.1
+    restart: unless-stopped
+    environment:
+      - GEOIPUPDATE_ACCOUNT_ID=${MAXMIND_ACCOUNT_ID}
+      - GEOIPUPDATE_LICENSE_KEY=${MAXMIND_PANGOLIN_LICENSE_KEY}
+      - GEOIPUPDATE_EDITION_IDS=GeoLite2-Country GeoLite2-ASN
+      - GEOIPUPDATE_FREQUENCY=72
+    volumes:
+      - '/opt/pangolin/config/GeoLite2:/usr/share/GeoIP'
+
+networks:
+  default:
+    driver: bridge
+    name: pangolin
+
+configs:
+  pangolin_config:
+    content: |-
+      # https://docs.pangolin.net/
+      gerbil:
+          start_port: 51820
+          base_endpoint: "pangolin.bjw-s.dev"
+      app:
+          dashboard_url: "https://pangolin.bjw-s.dev"
+          log_level: "info"
+          telemetry:
+              anonymous_usage: false
+      domains:
+          domain1:
+              base_domain: "bjw-s.dev"
+      server:
+          secret: "${PANGOLIN_SERVER_SECRET}"
+          cors:
+              origins: ["https://pangolin.bjw-s.dev"]
+              methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
+              allowed_headers: ["X-CSRF-Token", "Content-Type"]
+              credentials: false
+          maxmind_db_path: "/app/config/GeoLite2/GeoLite2-Country.mmdb"
+          maxmind_asn_path: "/app/config/GeoLite2/GeoLite2-ASN.mmdb"
+      flags:
+          require_email_verification: false
+          disable_signup_without_invite: true
+          disable_user_create_org: false
+          allow_raw_resources: true
+          enable_integration_api: true
+  crowdsec_acquis:
+    content: |
+      source: file
+      filenames:
+        - /var/log/traefik/access.log
+      labels:
+        type: traefik
+  traefik_config:
+    content: |-
+      ---
+      api:
+        insecure: true
+        dashboard: true
+
+      providers:
+        http:
+          endpoint: "http://pangolin:3001/api/v1/traefik-config"
+          pollInterval: "5s"
+        file:
+          filename: "/etc/traefik/dynamic_config.yml"
+
+      experimental:
+        plugins:
+          badger:
+            moduleName: "github.com/fosrl/badger"
+            version: "v1.3.1"
+          crowdsec:
+            moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+            version: v1.4.4
+      log:
+        level: "INFO"
+        format: "common"
+        maxSize: 100
+        maxBackups: 3
+        maxAge: 3
+        compress: true
+
+      certificatesResolvers:
+        letsencrypt:
+          acme:
+            dnsChallenge:
+              provider: ovh
+            email: "letsencrypt@bjw-s.dev"
+            storage: "/letsencrypt/acme.json"
+            caServer: "https://acme-v02.api.letsencrypt.org/directory"
+
+      entryPoints:
+        web:
+          address: ":80"
+        websecure:
+          address: ":443"
+          transport:
+            respondingTimeouts:
+              readTimeout: "30m"
+          http:
+            tls:
+              certResolver: "letsencrypt"
+            encodedCharacters:
+              allowEncodedSlash: true
+              allowEncodedQuestionMark: true
+
+      serversTransport:
+        insecureSkipVerify: true
+
+      ping:
+        entryPoint: "web"
+
+      accessLog:
+        bufferingSize: 100
+        fields:
+          defaultMode: drop
+          headers:
+            defaultMode: drop
+            names:
+              Authorization: redact
+              Content-Type: keep
+              Cookie: redact
+              User-Agent: keep
+              X-Forwarded-For: keep
+              X-Forwarded-Proto: keep
+              X-Real-Ip: keep
+          names:
+            ClientAddr: keep
+            ClientHost: keep
+            DownstreamContentSize: keep
+            DownstreamStatus: keep
+            Duration: keep
+            RequestMethod: keep
+            RequestPath: keep
+            RequestProtocol: keep
+            RetryAttempts: keep
+            ServiceName: keep
+            StartUTC: keep
+            TLSCipher: keep
+            TLSVersion: keep
+        filePath: /var/log/traefik/access.log
+        filters:
+          minDuration: 100ms
+          retryAttempts: true
+          statusCodes:
+            - 200-299
+            - 400-499
+            - 500-599
+        format: json
+  traefik_dynamic_config:
+    content: |-
+      ---
+      http:
+        middlewares:
+          crowdsec:
+            plugin:
+              crowdsec:
+                clientTrustedIPs:
+                  - 10.0.0.0/8
+                  - 172.16.0.0/12
+                  - 192.168.0.0/16
+                  - 100.89.137.0/20
+                crowdsecAppsecBodyLimit: 10485760
+                crowdsecAppsecEnabled: true
+                crowdsecAppsecFailureBlock: true
+                crowdsecAppsecHost: crowdsec:7422
+                crowdsecAppsecUnreachableBlock: true
+                crowdsecLapiHost: crowdsec:8080
+                crowdsecLapiKey: {{ env "CROWDSEC_API_KEY" }} # yamlint disable
+                crowdsecLapiScheme: http
+                crowdsecMode: live
+                defaultDecisionSeconds: 15
+                enabled: true
+                forwardedHeadersTrustedIPs:
+                  - 0.0.0.0/0
+                httpTimeoutSeconds: 10
+                logLevel: INFO
+                updateIntervalSeconds: 15
+                updateMaxFailure: 0
+          default-whitelist:
+            ipWhiteList:
+              sourceRange:
+                - 10.0.0.0/8
+                - 192.168.0.0/16
+                - 172.16.0.0/12
+          badger:
+            plugin:
+              badger:
+                disableForwardAuth: true
+          cors:
+            headers:
+              accessControlAllowOriginListRegex:
+                - "^https://([a-z0-9-]+\\.)?bjw-s\\.dev$"
+                - "^http://localhost:5173$"
+              accessControlAllowMethods:
+                - GET
+                - OPTIONS
+                - HEAD
+              accessControlAllowHeaders:
+                - "*"
+              accessControlMaxAge: 86400
+              customResponseHeaders:
+                Access-Control-Allow-Private-Network: "true"
+          redirect-to-https:
+            redirectScheme:
+              scheme: https
+          security-headers:
+            headers:
+              contentTypeNosniff: true
+              customFrameOptionsValue: SAMEORIGIN
+              customResponseHeaders:
+                Server: ""
+                X-Forwarded-Proto: https
+                X-Powered-By: ""
+              forceSTSHeader: true
+              hostsProxyHeaders:
+                - X-Forwarded-Host
+              referrerPolicy: strict-origin-when-cross-origin
+              sslProxyHeaders:
+                X-Forwarded-Proto: https
+              stsIncludeSubdomains: true
+              stsPreload: true
+              stsSeconds: 63072000
+        routers:
+          # HTTP to HTTPS redirect router
+          main-app-router-redirect:
+            rule: "Host(`pangolin.bjw-s.dev`)"
+            service: next-service
+            entryPoints:
+              - web
+            middlewares:
+              - redirect-to-https
+              - badger
+
+          # Next.js router (handles everything except API and WebSocket paths)
+          next-router:
+            rule: "Host(`pangolin.bjw-s.dev`) && !PathPrefix(`/api/v1`)"
+            service: next-service
+            entryPoints:
+              - websecure
+            middlewares:
+              - badger
+            tls:
+              certResolver: letsencrypt
+              domains:
+                - main: "bjw-s.dev"
+                  sans:
+                    - "*.bjw-s.dev"
+
+          # API router (handles /api/v1 paths)
+          api-router:
+            rule: "Host(`pangolin.bjw-s.dev`) && PathPrefix(`/api/v1`)"
+            service: api-service
+            entryPoints:
+              - websecure
+            middlewares:
+              - badger
+            tls:
+              certResolver: letsencrypt
+
+          # WebSocket router
+          ws-router:
+            rule: "Host(`pangolin.bjw-s.dev`)"
+            service: api-service
+            entryPoints:
+              - websecure
+            middlewares:
+              - badger
+            tls:
+              certResolver: letsencrypt
+
+          # Wildcard catch-all for *.bjw-s.dev via newt tunnel
+          wildcard-bjw-s:
+            entryPoints:
+              - websecure
+            middlewares:
+              - badger
+              - crowdsec
+              - security-headers
+            priority: 1
+            rule: "HostRegexp(`^.+\\.bjw-s\\.dev$`)"
+            service: "1-External-Gateway-service@http"
+            tls:
+              certResolver: letsencrypt
+
+        services:
+          next-service:
+            loadBalancer:
+              servers:
+                - url: "http://pangolin:3002"
+
+          api-service:
+            loadBalancer:
+              servers:
+                - url: "http://pangolin:3000"
+
+      tcp:
+        serversTransports:
+          pp-transport-v1:
+            proxyProtocol:
+              version: 1
+          pp-transport-v2:
+            proxyProtocol:
+              version: 2
