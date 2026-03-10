@@ -48,15 +48,14 @@ spec:
     - name: LOG_LEVEL
       value: debug
     - name: RENOVATE_ALLOWED_COMMANDS
-      value: '["pnpm run bundle"]'
-    - name: RENOVATE_ENDPOINT
-      value: https://api.github.com/
-    - name: RENOVATE_PLATFORM
-      value: github
+      value: |-
+        ["pnpm run bundle"]
     - name: RENOVATE_PLATFORM_COMMIT
       value: "true"
   image: ghcr.io/renovatebot/renovate:43.0.2
   parallelism: 5
+  provider:
+    name: github
   resources:
     requests:
       cpu: 100m
