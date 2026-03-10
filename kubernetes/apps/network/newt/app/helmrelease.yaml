@@ -10,64 +10,85 @@ spec:
     name: newt
   interval: 30m
   values:
-    global:
-      podSecurityContext:
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
         runAsUser: 1000
         runAsGroup: 1000
-        runAsNonRoot: true
-      securityContext:
-        allowPrivilegeEscalation: false
-        readOnlyRootFilesystem: true
-        capabilities:
-          drop:
-            - ALL
-    newtInstances:
-      - name: main-tunnel
-        enabled: true
+    controllers:
+      newt:
         replicas: 2
-        auth:
-          existingSecretName: newt-secret
-          keys:
-            endpointKey: NEWT_SERVER_URL
-            idKey: NEWT_ID
-            secretKey: NEWT_SECRET
-        blueprintFile: /etc/newt/blueprint.yaml
-        blueprintData: |
-          public-resources:
-            envoy-external:
-              name: "External Gateway"
-              protocol: http
-              ssl: true
-              full-domain: "ingress-ext.bjw-s.dev"
-              tls-server-name: ingress-ext.bjw-s.dev
-              rules:
-                # State-sponsored threat actors / sanctioned nations
-                - action: deny
-                  match: country
-                  value: RU
-                - action: deny
-                  match: country
-                  value: CN
-                - action: deny
-                  match: country
-                  value: KP
-                - action: deny
-                  match: country
-                  value: IR
-                - action: deny
-                  match: country
-                  value: BY
-                - action: deny
-                  match: country
-                  value: IL
-              targets:
-                - site: misguided-scytodes-thoracica
-                  hostname: envoy-external.network.svc.cluster.local
-                  method: https
-                  port: 443
-        resources:
-          requests:
-            cpu: 10m
-          limits:
-            memory: 128Mi
-            cpu: 500m
+        initContainers:
+          newt-sidecar:
+            image:
+              repository: ghcr.io/eleboucher/newt-sidecar
+              tag: main-5026d38
+            args:
+              - --gateway-name=envoy-external
+              - --site-id=misguided-scytodes-thoracica
+              - --target-hostname=envoy-external.network.svc.cluster.local
+              - --deny-countries=RU,CN,KP,IR,BY,IL
+            restartPolicy: Always
+            resources:
+              limits:
+                memory: 64Mi
+        containers:
+          app:
+            image:
+              repository: fosrl/newt
+              tag: 1.10.2
+            env:
+              PANGOLIN_ENDPOINT:
+                valueFrom:
+                  secretKeyRef:
+                    name: newt-secret
+                    key: NEWT_SERVER_URL
+              NEWT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: newt-secret
+                    key: NEWT_ID
+              NEWT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: newt-secret
+                    key: NEWT_SECRET
+              BLUEPRINT_FILE: /etc/newt/blueprint.yaml
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 256Mi
+    rbac:
+      roles:
+        newt:
+          type: ClusterRole
+          rules:
+            - apiGroups:
+                - gateway.networking.k8s.io
+              resources:
+                - httproutes
+              verbs:
+                - get
+                - watch
+                - list
+      bindings:
+        newt:
+          type: ClusterRoleBinding
+          roleRef:
+            identifier: newt
+          subjects:
+            - identifier: newt
+    serviceAccount:
+      newt: {}
+    persistence:
+      blueprint:
+        type: emptyDir
+        globalMounts:
+          - path: /etc/newt
