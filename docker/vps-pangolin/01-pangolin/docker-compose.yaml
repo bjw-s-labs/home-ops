@@ -140,6 +140,7 @@ configs:
       domains:
           domain1:
               base_domain: "bjw-s.dev"
+              cert_resolver: "letsencrypt"
       server:
           secret: "${PANGOLIN_SERVER_SECRET}"
           cors:
@@ -191,7 +192,8 @@ configs:
             version: "v1.3.1"
           crowdsec:
             moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
-            version: v1.4.4
+            version: v1.5.1
+
       log:
         level: "INFO"
         format: "common"
@@ -199,36 +201,6 @@ configs:
         maxBackups: 3
         maxAge: 3
         compress: true
-
-      certificatesResolvers:
-        letsencrypt:
-          acme:
-            dnsChallenge:
-              provider: ovh
-            email: "letsencrypt@bjw-s.dev"
-            storage: "/letsencrypt/acme.json"
-            caServer: "https://acme-v02.api.letsencrypt.org/directory"
-
-      entryPoints:
-        web:
-          address: ":80"
-        websecure:
-          address: ":443"
-          transport:
-            respondingTimeouts:
-              readTimeout: "30m"
-          http:
-            tls:
-              certResolver: "letsencrypt"
-            encodedCharacters:
-              allowEncodedSlash: true
-              allowEncodedQuestionMark: true
-
-      serversTransport:
-        insecureSkipVerify: true
-
-      ping:
-        entryPoint: "web"
 
       accessLog:
         bufferingSize: 100
@@ -267,6 +239,39 @@ configs:
             - 400-499
             - 500-599
         format: json
+
+      certificatesResolvers:
+        letsencrypt:
+          acme:
+            dnsChallenge:
+              provider: ovh
+            email: "letsencrypt@bjw-s.dev"
+            storage: "/letsencrypt/acme.json"
+            caServer: "https://acme-v02.api.letsencrypt.org/directory"
+
+      entryPoints:
+        web:
+          address: ":80"
+        websecure:
+          address: ":443"
+          transport:
+            respondingTimeouts:
+              readTimeout: "30m"
+          http:
+            tls:
+              certResolver: "letsencrypt"
+            middlewares:
+              - crowdsec@file
+            encodedCharacters:
+              allowEncodedSlash: true
+              allowEncodedQuestionMark: true
+
+      serversTransport:
+        insecureSkipVerify: true
+
+      ping:
+        entryPoint: "web"
+
   traefik_dynamic_config:
     content: |-
       ---
@@ -286,7 +291,7 @@ configs:
                 crowdsecAppsecHost: crowdsec:7422
                 crowdsecAppsecUnreachableBlock: true
                 crowdsecLapiHost: crowdsec:8080
-                crowdsecLapiKey: {{ env "CROWDSEC_API_KEY" }} # yamlint disable
+                crowdsecLapiKey: {{ env "CROWDSEC_API_KEY" }}
                 crowdsecLapiScheme: http
                 crowdsecMode: live
                 defaultDecisionSeconds: 15
@@ -303,24 +308,6 @@ configs:
                 - 10.0.0.0/8
                 - 192.168.0.0/16
                 - 172.16.0.0/12
-          badger:
-            plugin:
-              badger:
-                disableForwardAuth: true
-          cors:
-            headers:
-              accessControlAllowOriginListRegex:
-                - "^https://([a-z0-9-]+\\.)?bjw-s\\.dev$"
-                - "^http://localhost:5173$"
-              accessControlAllowMethods:
-                - GET
-                - OPTIONS
-                - HEAD
-              accessControlAllowHeaders:
-                - "*"
-              accessControlMaxAge: 86400
-              customResponseHeaders:
-                Access-Control-Allow-Private-Network: "true"
           redirect-to-https:
             redirectScheme:
               scheme: https
@@ -350,7 +337,6 @@ configs:
               - web
             middlewares:
               - redirect-to-https
-              - badger
 
           # Next.js router (handles everything except API and WebSocket paths)
           next-router:
@@ -359,7 +345,7 @@ configs:
             entryPoints:
               - websecure
             middlewares:
-              - badger
+              - security-headers
             tls:
               certResolver: letsencrypt
               domains:
@@ -374,7 +360,7 @@ configs:
             entryPoints:
               - websecure
             middlewares:
-              - badger
+              - security-headers
             tls:
               certResolver: letsencrypt
 
@@ -385,21 +371,7 @@ configs:
             entryPoints:
               - websecure
             middlewares:
-              - badger
-            tls:
-              certResolver: letsencrypt
-
-          # Wildcard catch-all for *.bjw-s.dev via newt tunnel
-          wildcard-bjw-s:
-            entryPoints:
-              - websecure
-            middlewares:
-              - badger
-              - crowdsec
               - security-headers
-            priority: 1
-            rule: "HostRegexp(`^.+\\.bjw-s\\.dev$`)"
-            service: "1-External-Gateway-service@http"
             tls:
               certResolver: letsencrypt
 
@@ -413,12 +385,3 @@ configs:
             loadBalancer:
               servers:
                 - url: "http://pangolin:3000"
-
-      tcp:
-        serversTransports:
-          pp-transport-v1:
-            proxyProtocol:
-              version: 1
-          pp-transport-v2:
-            proxyProtocol:
-              version: 2
