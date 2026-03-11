@@ -1,0 +1,120 @@
+---
+- name: Bootstrap doco-cd on VPS
+  hosts: all
+  become: true
+  gather_facts: false
+  vars:
+    ansible_user: ubuntu
+    ansible_python_interpreter: auto_silent
+
+  tasks:
+    - name: Check host connectivity
+      ansible.builtin.ping:
+
+    - name: Read secrets from 1Password
+      ansible.builtin.shell: "op read 'op://{{ item.key }}' < /dev/null"
+      delegate_to: localhost
+      become: false
+      loop:
+        - key: Services/n3bwxzaavbbg35dvg47gcycwoa/Personal Access Tokens/pat_doco_cd
+          var: doco_github_token
+        - key: Shared/c6itdbmw5gdslnnep2vfihhu54/Service accounts/doco-cd
+          var: doco_1pw_sa_token
+      check_mode: false
+      changed_when: false
+      no_log: true
+      register: secrets_raw
+
+    - name: Set secret facts
+      ansible.builtin.set_fact:
+        doco_github_token: "{{ secrets_raw.results[0].stdout }}"
+        doco_1pw_sa_token: "{{ secrets_raw.results[1].stdout }}"
+      no_log: true
+
+    - name: ssh
+      block:
+        - name: ssh | Harden sshd_config
+          ansible.builtin.copy:
+            dest: /etc/ssh/sshd_config.d/99-hardening.conf
+            content: |
+              PermitRootLogin no
+              PasswordAuthentication no
+              MaxAuthTries 3
+              LoginGraceTime 20
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Restart ssh.socket
+
+    - name: firewall
+      block:
+        - name: "firewall | Allow ports"
+          community.general.ufw:
+            rule: allow
+            port: "{{ item.port }}"
+            proto: "{{ item.protocol | default('tcp') }}"
+          loop:
+            - name: SSH
+              port: 22
+            - name: HTTP
+              port: 80
+            - name: HTTPS
+              port: 443
+            - name: Wireguard
+              port: 51820
+              protocol: udp
+            - name: Gerbil
+              port: 21820
+              protocol: udp
+
+        - name: firewall | Enable UFW
+          community.general.ufw:
+            state: enabled
+            policy: deny
+
+    - name: doco-cd
+      block:
+        - name: doco-cd | Copy docker-compose app file
+          ansible.builtin.copy:
+            src: ../../docker/vps-pangolin/.doco-cd/docker-compose.app.yaml
+            dest: /opt/doco-cd/docker-compose.yaml
+            owner: ubuntu
+            group: ubuntu
+            mode: "0644"
+          register: compose_file
+
+        - name: doco-cd | Create secrets
+          ansible.builtin.copy:
+            dest: /opt/doco-cd/{{ item.name }}
+            content: |
+              {{ item.content }}
+            owner: ubuntu
+            group: ubuntu
+            mode: "0600"
+          no_log: true
+          loop:
+            - name: 1pw_token
+              content: "{{ doco_1pw_sa_token }}"
+            - name: gh_token
+              content: "{{ doco_github_token }}"
+
+        - name: doco-cd | Run docker-compose
+          ansible.builtin.command:
+            cmd: docker compose -f /opt/doco-cd/docker-compose.yaml up -d --pull always
+          when: compose_file.changed
+
+        - name: doco-cd | Wait for healthy
+          ansible.builtin.command: >
+            docker inspect --format="{{ '{{' }}.State.Health.Status{{ '}}' }}" doco-cd
+          register: dococd_health
+          until: dococd_health.stdout == "healthy"
+          retries: 30
+          delay: 10
+          changed_when: false
+          when: not ansible_check_mode
+
+  handlers:
+    - name: Restart ssh.socket
+      ansible.builtin.service:
+        name: ssh.socket
+        state: restarted
