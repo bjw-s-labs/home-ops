@@ -6,8 +6,14 @@ metadata:
   name: kopia-daily-maintenance
   namespace: volsync
 spec:
+  enabled: true
+  moverVolumes:
+    - mountPath: repository
+      volumeSource:
+        nfs:
+          path: /mnt/tank/backup/volsync
+          server: gladius.bjw-s.internal
   repository:
     repository: volsync-secret
   trigger:
     schedule: "30 3,15 * * *"
-  enabled: true
