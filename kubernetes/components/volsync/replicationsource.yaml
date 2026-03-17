@@ -17,6 +17,12 @@ spec:
       runAsUser: ${APP_UID:=2000}
       runAsGroup: ${APP_GID:=2000}
       fsGroup: ${APP_GID:=2000}
+    moverVolumes:
+      - mountPath: repository
+        volumeSource:
+          nfs:
+            path: /mnt/tank/backup/volsync
+            server: gladius.bjw-s.internal
     parallelism: 2
     repository: "${APP}-volsync-secret"
     retain:
