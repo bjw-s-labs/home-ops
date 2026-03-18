@@ -16,8 +16,6 @@
       delegate_to: localhost
       become: false
       loop:
-        - key: Services/n3bwxzaavbbg35dvg47gcycwoa/Personal Access Tokens/pat_doco_cd
-          var: doco_github_token
         - key: Shared/c6itdbmw5gdslnnep2vfihhu54/Service accounts/doco-cd
           var: doco_1pw_sa_token
       check_mode: false
@@ -27,9 +25,16 @@
 
     - name: Set secret facts
       ansible.builtin.set_fact:
-        doco_github_token: "{{ secrets_raw.results[0].stdout }}"
-        doco_1pw_sa_token: "{{ secrets_raw.results[1].stdout }}"
+        doco_1pw_sa_token: "{{ secrets_raw.results[0].stdout }}"
       no_log: true
+
+    - name: packages
+      block:
+        - name: packages | Install Docker
+          ansible.builtin.shell: curl -fsSL https://get.docker.com | sh
+          args:
+            executable: /bin/bash
+            creates: /usr/bin/docker
 
     - name: ssh
       block:
@@ -74,6 +79,14 @@
 
     - name: doco-cd
       block:
+        - name: doco-cd | Create directory
+          ansible.builtin.file:
+            path: /opt/doco-cd
+            state: directory
+            owner: ubuntu
+            group: ubuntu
+            mode: "0755"
+
         - name: doco-cd | Copy docker-compose app file
           ansible.builtin.copy:
             src: ../../docker/vps-pangolin/.doco-cd/docker-compose.app.yaml
@@ -95,8 +108,6 @@
           loop:
             - name: 1pw_token
               content: "{{ doco_1pw_sa_token }}"
-            - name: gh_token
-              content: "{{ doco_github_token }}"
 
         - name: doco-cd | Run docker-compose
           ansible.builtin.command:

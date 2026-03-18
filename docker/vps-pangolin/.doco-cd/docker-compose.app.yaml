@@ -4,21 +4,19 @@
 secrets:
   1pw_token:
     file: /opt/doco-cd/1pw_token
-  gh_token:
-    file: /opt/doco-cd/gh_token
 services:
   app:
     container_name: doco-cd
     environment:
-      GIT_ACCESS_TOKEN_FILE: /run/secrets/gh_token
+      DEPLOY_CONFIG_BASE_DIR: ./docker/vps-pangolin/
       LOG_LEVEL: info
       POLL_CONFIG: |-
         - url: https://github.com/bjw-s-labs/home-ops.git
-          reference: refs/heads/main
-          interval: 60
+          reference: main
+          interval: 3600
       SECRET_PROVIDER: 1password
       SECRET_PROVIDER_ACCESS_TOKEN_FILE: /run/secrets/1pw_token
-      DEPLOY_CONFIG_BASE_DIR: ./docker/vps-pangolin/
+      TZ: Europe/Amsterdam
     healthcheck:
       test:
         - CMD
@@ -32,7 +30,6 @@ services:
     restart: unless-stopped
     secrets:
       - 1pw_token
-      - gh_token
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - data:/data
