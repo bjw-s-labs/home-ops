@@ -17,17 +17,23 @@ spec:
         runAsGroup: 1000
     controllers:
       newt:
+        annotations:
+          secret.reloader.stakater.com/reload: newt-secret
         replicas: 2
         initContainers:
           newt-sidecar:
             image:
               repository: ghcr.io/home-operations/newt-sidecar
-              tag: 0.1.2
-            args:
-              - --gateway-name=envoy-external
-              - --site-id=misguided-scytodes-thoracica
-              - --target-hostname=envoy-external.network.svc.cluster.local
-              - --deny-countries=RU,CN,KP,IR,BY,IL
+              tag: 0.2.0
+            env:
+              NEWTSC_SITE_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: newt-secret
+                    key: NEWTSC_SITE_NICEID
+              NEWTSC_DENY_COUNTRIES: RU,CN,KP,IR,BY,IL
+              NEWTSC_GATEWAY_NAME: envoy-external
+              NEWTSC_TARGET_HOSTNAME: envoy-external.network.svc.cluster.local
             restartPolicy: Always
             resources:
               limits:
