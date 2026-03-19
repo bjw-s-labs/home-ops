@@ -33,6 +33,9 @@ spec:
               secretKeyRef:
                 name: external-dns-unifi-secret
                 key: external_dns_api_key
+        extraArgs:
+          - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
+          - --crd-source-kind=DNSEndpoint
         livenessProbe:
           httpGet:
             path: /healthz
@@ -54,6 +57,7 @@ spec:
     serviceMonitor:
       enabled: true
     sources:
+      - crd
       - gateway-httproute
       - service
     triggerLoopOnEvent: true
