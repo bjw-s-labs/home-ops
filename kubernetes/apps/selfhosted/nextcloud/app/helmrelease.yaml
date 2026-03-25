@@ -14,6 +14,20 @@ spec:
       enabled: true
       type: cronjob
       cronjob:
+        affinity:
+          podAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/instance
+                      operator: In
+                      values:
+                        - nextcloud
+                    - key: app.kubernetes.io/component
+                      operator: In
+                      values:
+                        - app
+                topologyKey: kubernetes.io/hostname
         successfulJobsHistoryLimit: 1
         securityContext:
           runAsGroup: 1022
