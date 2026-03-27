@@ -1,0 +1,85 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: forgejo
+  interval: 30m
+  values:
+    gitea:
+      admin:
+        username: ""
+      config:
+        lfs:
+          PATH: /data/git/lfs
+        indexer:
+          ISSUE_INDEXER_TYPE: bleve
+          REPO_INDEXER_ENABLED: true
+        mailer:
+          ENABLED: false
+        openid:
+          ENABLE_OPENID_SIGNIN: false
+          ENABLE_OPENID_SIGNUP: false
+        repository:
+          ROOT: /data/git/repositories
+        server:
+          APP_DATA_PATH: /data/gitea
+          ROOT_URL: https://git.bjw-s.dev
+        service:
+          ALLOW_ONLY_EXTERNAL_REGISTRATION: true
+          ENABLE_INTERNAL_SIGNIN: false
+          ENABLE_PASSWORD_SIGNIN_FORM: false
+          SHOW_REGISTRATION_BUTTON: false
+        cache:
+          ENABLED: true
+          ADAPTER: redis
+          HOST: redis://localhost:6379
+        queue:
+          TYPE: redis
+          CONN_STR: redis://localhost:6379
+        session:
+          PROVIDER: redis
+          PROVIDER_CONFIG: redis://localhost:6379
+        service.explore:
+          REQUIRE_SIGNIN_VIEW: true
+      oauth:
+        - name: kanidm
+          adminGroup: forgejo_admins@idm.bjw-s.dev
+          autoDiscoverUrl: https://idm.bjw-s.dev/oauth2/openid/forgejo/.well-known/openid-configuration
+          existingSecret: forgejo-kanidm-oidc
+          groupClaimName: groups
+          provider: openidConnect
+          scopes: profile email groups
+    extraContainers:
+      - name: valkey
+        image: ghcr.io/valkey-io/valkey:9.0.3
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          readOnlyRootFilesystem: true
+          runAsUser: 999
+          runAsGroup: 999
+        volumeMounts:
+          - name: valkey-data
+            mountPath: /data
+    extraVolumes:
+      - name: valkey-data
+        emptyDir: {}
+    httpRoute:
+      enabled: true
+      hostnames:
+        - git.bjw-s.dev
+      parentRefs:
+        - name: envoy-internal
+          namespace: network
+    image:
+      rootless: true
+    persistence:
+      create: false
+      claimName: forgejo
