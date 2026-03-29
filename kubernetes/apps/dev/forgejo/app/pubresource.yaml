@@ -1,0 +1,14 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/newt-sidecar.home-operations.com/publicresource_v1alpha1.json
+apiVersion: newt-sidecar.home-operations.com/v1alpha1
+kind: PublicResource
+metadata:
+  name: forgejo-ssh
+spec:
+  name: Forgejo SSH
+  protocol: tcp
+  proxyPort: 22
+  ssl: false
+  targets:
+    - hostname: envoy-external.network.svc.cluster.local
+      port: 22
