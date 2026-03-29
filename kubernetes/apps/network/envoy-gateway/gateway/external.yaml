@@ -29,3 +29,14 @@ spec:
         certificateRefs:
           - kind: Secret
             name: bjw-s-dev-tls
+    - name: ssh
+      protocol: TCP
+      port: 2222
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: dev
+        kinds:
+          - kind: TCPRoute
