@@ -78,6 +78,7 @@ services:
     ports:
       - 51820:51820/udp
       - 21820:21820/udp
+      - 22:22
       - 443:443
       - 80:80
 
@@ -265,6 +266,8 @@ configs:
             encodedCharacters:
               allowEncodedSlash: true
               allowEncodedQuestionMark: true
+        tcp-22:
+          address: ":22"
 
       serversTransport:
         insecureSkipVerify: true
