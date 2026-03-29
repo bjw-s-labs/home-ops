@@ -12,6 +12,7 @@
     pangolin_site_name: k8s-cluster
     pangolin_org_subnet: 100.89.0.0/16
     pangolin_org_utility_subnet: 100.90.0.0/24
+    host_ssh_port: 22222
 
   tasks:
     - name: Check host connectivity
@@ -53,6 +54,15 @@
 
     - name: ssh
       block:
+        - name: ssh | Update ssh socket config
+          ansible.builtin.replace:
+            path: /lib/systemd/system/ssh.socket
+            regexp: "^(ListenStream=.+):\\d+$"
+            replace: "\\1:{{ host_ssh_port }}"
+          notify:
+            - Reload systemd daemon
+            - Restart ssh.socket
+
         - name: ssh | Harden sshd_config
           ansible.builtin.copy:
             dest: /etc/ssh/sshd_config.d/01-hardening.conf
@@ -76,6 +86,8 @@
           loop:
             - name: SSH
               port: 22
+            - name: Host SSH
+              port: "{{ host_ssh_port }}"
             - name: HTTP
               port: 80
             - name: HTTPS
@@ -309,6 +321,10 @@
           - "  site: {{ site_nice_id }}"
 
   handlers:
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
+
     - name: Restart ssh.socket
       ansible.builtin.service:
         name: ssh.socket
