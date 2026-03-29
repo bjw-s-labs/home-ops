@@ -18,3 +18,23 @@ spec:
   targetNamespace: network
   timeout: 5m
   wait: false
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: newt-sidecar
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: newt-sidecar
+  interval: 1h
+  path: "./kubernetes/apps/network/newt/sidecar"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: network
+  timeout: 5m
+  wait: false
