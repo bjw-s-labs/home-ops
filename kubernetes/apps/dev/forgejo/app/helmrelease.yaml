@@ -14,38 +14,44 @@ spec:
       admin:
         username: ""
       config:
-        lfs:
-          PATH: /data/git/lfs
+        cache:
+          ENABLED: true
+          ADAPTER: redis
+          HOST: redis://localhost:6379
         indexer:
           ISSUE_INDEXER_TYPE: bleve
           REPO_INDEXER_ENABLED: true
+        lfs:
+          PATH: /data/git/lfs
         mailer:
           ENABLED: false
         openid:
           ENABLE_OPENID_SIGNIN: false
           ENABLE_OPENID_SIGNUP: false
+        queue:
+          TYPE: redis
+          CONN_STR: redis://localhost:6379
         repository:
+          DEFAULT_REPO_UNITS: repo.code,repo.releases,repo.issues,repo.pulls
+          DISABLED_REPO_UNITS: repo.ext_wiki,repo.ext_issues
           ROOT: /data/git/repositories
+        repository.pull-request:
+          DEFAULT_DELETE_BRANCH_AFTER_MERGE: true
+          DEFAULT_MERGE_STYLE: squash
         server:
           APP_DATA_PATH: /data/gitea
           ROOT_URL: https://git.bjw-s.dev
         service:
           ALLOW_ONLY_EXTERNAL_REGISTRATION: true
+          DEFAULT_ENABLE_TIMETRACKING: false
           ENABLE_INTERNAL_SIGNIN: false
           ENABLE_PASSWORD_SIGNIN_FORM: false
           SHOW_REGISTRATION_BUTTON: false
-        cache:
-          ENABLED: true
-          ADAPTER: redis
-          HOST: redis://localhost:6379
-        queue:
-          TYPE: redis
-          CONN_STR: redis://localhost:6379
+        service.explore:
+          REQUIRE_SIGNIN_VIEW: true
         session:
           PROVIDER: redis
           PROVIDER_CONFIG: redis://localhost:6379
-        service.explore:
-          REQUIRE_SIGNIN_VIEW: true
       oauth:
         - name: kanidm
           adminGroup: forgejo_admins@idm.bjw-s.dev
