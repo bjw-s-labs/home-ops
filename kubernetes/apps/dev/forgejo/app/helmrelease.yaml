@@ -41,6 +41,9 @@ spec:
         server:
           APP_DATA_PATH: /data/gitea
           ROOT_URL: https://git.bjw-s.dev
+          SSH_DOMAIN: git.bjw-s.dev
+          SSH_PORT: &sshPort 22
+          SSH_SERVER_HOST_KEYS: ssh/ssh_host_ed25519_key
         service:
           ALLOW_ONLY_EXTERNAL_REGISTRATION: true
           DEFAULT_ENABLE_TIMETRACKING: false
@@ -82,10 +85,19 @@ spec:
       hostnames:
         - git.bjw-s.dev
       parentRefs:
-        - name: envoy-internal
+        - name: envoy-external
           namespace: network
     image:
       rootless: true
     persistence:
       create: false
       claimName: forgejo
+    service:
+      ssh:
+        port: *sshPort
+    tcpRoute:
+      enabled: true
+      parentRefs:
+        - name: envoy-external
+          namespace: network
+          sectionName: ssh
