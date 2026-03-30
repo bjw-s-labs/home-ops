@@ -17,7 +17,7 @@ spec:
         cache:
           ENABLED: true
           ADAPTER: redis
-          HOST: redis://localhost:6379
+          HOST: redis://forgejo-redis:6379
         indexer:
           ISSUE_INDEXER_TYPE: bleve
           REPO_INDEXER_ENABLED: true
@@ -30,7 +30,7 @@ spec:
           ENABLE_OPENID_SIGNUP: false
         queue:
           TYPE: redis
-          CONN_STR: redis://localhost:6379
+          CONN_STR: redis://forgejo-redis:6379
         repository:
           DEFAULT_REPO_UNITS: repo.code,repo.releases,repo.issues,repo.pulls
           DISABLED_REPO_UNITS: repo.ext_wiki,repo.ext_issues
@@ -63,7 +63,7 @@ spec:
           REQUIRE_SIGNIN_VIEW: true
         session:
           PROVIDER: redis
-          PROVIDER_CONFIG: redis://localhost:6379
+          PROVIDER_CONFIG: redis://forgejo-redis:6379
       oauth:
         - name: kanidm
           adminGroup: forgejo_admins@idm.bjw-s.dev
@@ -72,20 +72,6 @@ spec:
           groupClaimName: groups
           provider: openidConnect
           scopes: profile email groups
-    extraContainers:
-      - name: valkey
-        image: ghcr.io/valkey-io/valkey:9.0.3
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          readOnlyRootFilesystem: true
-          runAsUser: 999
-          runAsGroup: 999
-        volumeMounts:
-          - name: valkey-data
-            mountPath: /data
     extraContainerVolumeMounts:
       - name: signing-key
         mountPath: /data/signing
@@ -95,8 +81,6 @@ spec:
         mountPath: /data/signing
         readOnly: true
     extraVolumes:
-      - name: valkey-data
-        emptyDir: {}
       - name: signing-key
         secret:
           secretName: forgejo-signing-key
