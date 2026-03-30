@@ -43,10 +43,10 @@ spec:
           SIGNING_KEY: /data/signing/ed25519.pub
           SIGNING_NAME: git.bjw-s.dev Instance
           SIGNING_EMAIL: noreply@git.bjw-s.dev
-          INITIAL_COMMIT: always
-          CRUD_ACTIONS: always
-          MERGES: always
-          WIKI: always
+          INITIAL_COMMIT: pubkey
+          CRUD_ACTIONS: pubkey, parentsigned
+          WIKI: never
+          MERGES: pubkey, basesigned, commitssigned
         server:
           APP_DATA_PATH: /data/gitea
           ROOT_URL: https://git.bjw-s.dev
