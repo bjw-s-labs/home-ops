@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: pangolin-operator
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: pangolin-operator
+  interval: 30m
+  values:
+    image:
+      repository: ghcr.io/home-operations/pangolin-operator
+      tag: 0.0.1
+    pangolin:
+      existingSecret: pangolin-operator-secret
+    resources:
+      limits:
+        memory: 256Mi
+      requests:
+        cpu: 10m
+        memory: 64Mi
