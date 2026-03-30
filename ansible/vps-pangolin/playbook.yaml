@@ -176,7 +176,7 @@
               --password "{{ pangolin_admin_password }}"
           changed_when: false
 
-        - name: Bootstrap Pangolin org and site
+        - name: Bootstrap Pangolin org
           ansible.builtin.shell: |
             docker exec -i pangolin node - << 'JSEOF'
             const http = require('http');
@@ -224,29 +224,6 @@
               if (!r.success && !r.message.includes('already exists')) {
                 console.log('ORG_FAILED: ' + r.message); process.exit(1);
               }
-
-              // Check if site already exists
-              const sites = await api('GET', '/org/{{ pangolin_org_id }}/sites');
-              const existing = (sites.data?.sites || []).find(s => s.name === '{{ pangolin_site_name }}');
-              if (existing) { console.log('SITE_EXISTS:' + existing.niceId); process.exit(0); }
-
-              // Pick site defaults
-              const defaults = await api('GET', '/org/{{ pangolin_org_id }}/pick-site-defaults');
-              if (!defaults.success) { console.log('DEFAULTS_FAILED: ' + defaults.message); process.exit(1); }
-
-              const newtId = defaults.data.newtId;
-              const newtSecret = defaults.data.newtSecret;
-
-              // Create site
-              r = await api('PUT', '/org/{{ pangolin_org_id }}/site', {
-                name: '{{ pangolin_site_name }}', type: 'newt',
-                newtId, secret: newtSecret
-              });
-              if (!r.success) { console.log('SITE_FAILED: ' + r.message); process.exit(1); }
-
-              console.log('NEWT_ID:' + newtId);
-              console.log('NEWT_SECRET:' + newtSecret);
-              console.log('SITE_NICE_ID:' + r.data.niceId);
             }
 
             main().catch(e => { console.log('ERROR: ' + e.message); process.exit(1); });
@@ -254,30 +231,6 @@
           args:
             executable: /bin/bash
           register: pangolin_bootstrap
-
-        - name: Parse bootstrap output
-          ansible.builtin.set_fact:
-            newt_id: "{{ (pangolin_bootstrap.stdout | regex_search('NEWT_ID:(.+)', '\\1') or ['']) | first }}"
-            newt_secret: "{{ (pangolin_bootstrap.stdout | regex_search('NEWT_SECRET:(.+)', '\\1') or ['']) | first }}"
-            site_nice_id: "{{ (pangolin_bootstrap.stdout | regex_search('SITE_(?:NICE_ID|EXISTS):(.+)', '\\1') or ['']) | first }}"
-
-        - name: Fail if bootstrap returned an error
-          ansible.builtin.fail:
-            msg: "{{ pangolin_bootstrap.stdout }}"
-          when: "'_FAILED:' in pangolin_bootstrap.stdout"
-
-        - name: Save Newt credentials to 1Password
-          ansible.builtin.shell: >
-            op item edit Pangolin --vault services
-            "newt_id={{ newt_id }}"
-            "newt_secret={{ newt_secret }}"
-            "newt_site_niceid={{ site_nice_id }}"
-            "website=https://{{ pangolin_hostname }}"
-            "hostname=https://{{ pangolin_hostname }}" < /dev/null
-          delegate_to: localhost
-          become: false
-          changed_when: false
-          when: newt_id != ""
 
     - name: crowdsec
       block:
@@ -312,13 +265,6 @@
           - "VPS IP      : {{ inventory_hostname }}"
           - "Dashboard   : https://{{ pangolin_hostname }}"
           - "Org         : {{ pangolin_org_id }}"
-          - "Site niceId : {{ site_nice_id }}"
-          - "Newt ID     : {{ newt_id if newt_id != '' else '(already existed)' }}"
-          - ""
-          - "Credentials saved to 1Password item 'Services/Pangolin'."
-          - ""
-          - "Next: update the site niceId in kubernetes/apps/network/newt/app/helmrelease.yaml"
-          - "  site: {{ site_nice_id }}"
 
   handlers:
     - name: Reload systemd daemon
