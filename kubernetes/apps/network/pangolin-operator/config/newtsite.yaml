@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/pangolin.home-operations.com/newtsite_v1alpha1.json
+apiVersion: pangolin.home-operations.com/v1alpha1
+kind: NewtSite
+metadata:
+  name: homelab
+spec:
+  name: homelab
+  autoDiscover:
+    annotationPrefix: pangolin-operator
+    denyCountries: RU,CN,KP,IR,BY,IL
+    gatewayName: envoy-external
+    gatewayNamespace: network
+    ssl: true
+    enableRouteDiscovery: true
+    enableServiceDiscovery: true
+  newt:
+    # renovate: datasource=github-releases depName=fosrl/newt
+    tag: 1.10.4
+    mtu: 1380
