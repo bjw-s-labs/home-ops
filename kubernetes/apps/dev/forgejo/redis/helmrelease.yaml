@@ -1,0 +1,53 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo-redis
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: forgejo-redis
+  interval: 30m
+  values:
+    controllers:
+      redis:
+        pod:
+          labels:
+            app.kubernetes.io/component: redis
+          securityContext:
+            runAsGroup: 999
+            runAsNonRoot: true
+            runAsUser: 999
+        containers:
+          redis:
+            image:
+              repository: ghcr.io/valkey-io/valkey
+              tag: 9.0.3
+            resources:
+              requests:
+                cpu: 5m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          redis:
+            redis:
+              - path: /data
+                subPath: data
+              - path: /tmp
+                subPath: tmp
+    service:
+      forgejo-redis:
+        ports:
+          redis:
+            port: 6379
