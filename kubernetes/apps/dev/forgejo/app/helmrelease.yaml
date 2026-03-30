@@ -38,6 +38,15 @@ spec:
         repository.pull-request:
           DEFAULT_DELETE_BRANCH_AFTER_MERGE: true
           DEFAULT_MERGE_STYLE: squash
+        repository.signing:
+          FORMAT: ssh
+          SIGNING_KEY: /data/signing/ed25519.pub
+          SIGNING_NAME: git.bjw-s.dev Instance
+          SIGNING_EMAIL: noreply@git.bjw-s.dev
+          INITIAL_COMMIT: always
+          CRUD_ACTIONS: always
+          MERGES: always
+          WIKI: always
         server:
           APP_DATA_PATH: /data/gitea
           ROOT_URL: https://git.bjw-s.dev
@@ -77,9 +86,21 @@ spec:
         volumeMounts:
           - name: valkey-data
             mountPath: /data
+    extraContainerVolumeMounts:
+      - name: signing-key
+        mountPath: /data/signing
+        readOnly: true
+    extraInitVolumeMounts:
+      - name: signing-key
+        mountPath: /data/signing
+        readOnly: true
     extraVolumes:
       - name: valkey-data
         emptyDir: {}
+      - name: signing-key
+        secret:
+          secretName: forgejo-signing-key
+          defaultMode: 0400
     httpRoute:
       enabled: true
       hostnames:
