@@ -30,7 +30,7 @@ jobs:
 
   test:
     if: ${{ needs.filter-changes.outputs.changed-files != '[]' }}
-    name: Flux Local Test
+    name: Run flux-local test
     runs-on: ubuntu-latest
     needs:
       - filter-changes
@@ -47,7 +47,7 @@ jobs:
 
   diff:
     if: ${{ needs.filter-changes.outputs.changed-files != '[]' }}
-    name: Flux Local Diff ${{ matrix.resources }}
+    name: Run flux-local diff ${{ matrix.resources }}
     runs-on: ubuntu-latest
     needs:
       - filter-changes
@@ -110,7 +110,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           HEADER: "${{ github.event.pull_request.number }}/kubernetes/${{ matrix.resources }}"
           DIFF_CONTENT: ${{ steps.diff.outputs.diff }}
-        run: |
+        run: |-
           MARKER="<!-- sticky-comment: ${HEADER} -->"
           BODY=$(printf $'%s\n```diff\n%s\n```' "${MARKER}" "${DIFF_CONTENT}")
           BODY_JSON=$(jq -Rs '{"body": .}' <<< "${BODY}")
@@ -133,15 +133,3 @@ jobs:
               "${{ github.api_url }}/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
               -d "${BODY_JSON}"
           fi
-
-  flux-local-success:
-    needs:
-      - test
-      - diff
-    if: ${{ !cancelled() }}
-    name: Flux Local successful
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check job status
-        if: ${{ contains(needs.*.result, 'failure') }}
-        run: exit 1
