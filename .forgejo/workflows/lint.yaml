@@ -61,15 +61,11 @@ jobs:
         if: steps.changed-files.outputs.changed_files != '[]'
         shell: bash
         run: |
-          sudo apt-get -qq update
-          sudo apt-get -qq install pipx
           pipx install yamllint
-          echo "$HOME/.local/bin" >> "$FORGEJO_PATH"
+          yamllint --version
 
       - name: Run yamllint
         if: steps.changed-files.outputs.changed_files != '[]'
         shell: bash
         run: |-
-          yamllint --version
-          echo "yamllint --config-file .yamllint.yaml --format github ${{ join(fromJSON(steps.changed-files.outputs.changed_files), ' ') }}"
           yamllint --config-file .yamllint.yaml --format github ${{ join(fromJSON(steps.changed-files.outputs.changed_files), ' ') }}
