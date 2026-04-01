@@ -28,7 +28,6 @@ spec:
                     cpu: 100m
                     memory: 256Mi
                   limits:
-                    cpu: "2"
                     memory: 4Gi
                 volumeMounts:
                   - name: docker-storage
@@ -57,12 +56,11 @@ spec:
                 imagePullPolicy: IfNotPresent
                 name: main
                 resources:
-                  limits:
-                    cpu: "1"
-                    memory: 2Gi
                   requests:
                     cpu: 100m
                     memory: 256Mi
+                  limits:
+                    memory: 2Gi
                 volumeMounts:
                   - name: docker-certs
                     mountPath: /certs
