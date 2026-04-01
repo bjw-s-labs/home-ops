@@ -8,7 +8,7 @@ on:
       - main
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  group: ${{ forgejo.workflow }}-${{ forgejo.event.number || forgejo.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Get changed files
         id: changed-files
-        uses: bjw-s-labs/action-changed-files@015416e33c709af88f84a4496f4030c1f0ef212e # v0.5.0
+        uses: https://github.com/bjw-s-labs/action-changed-files@b6df5283805309713a96e81ad9f99d77615e730e # v0.6.0
         with:
           patterns: |-
             kubernetes/**/*
@@ -84,14 +84,14 @@ jobs:
               --argjson f2 '${{ needs.extract-images.outputs.pull }}' \
               '$f2 - $f1' \
           )
-          echo "images=${images}" >> "${GITHUB_OUTPUT}"
+          echo "images=${images}" >> "${FORGEJO_OUTPUT}"
 
           {
               echo "## New images to Pull"
               echo '```json'
               echo "${images}" | jq
               echo '```'
-          } >> "${GITHUB_STEP_SUMMARY}"
+          } >> "${FORGEJO_STEP_SUMMARY}"
 
   pre-pull-images:
     if: ${{ needs.compare-images.outputs.images != '[]' }}

@@ -8,7 +8,7 @@ on:
       - main
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.number || forgejo.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Get changed files
         id: changed-files
-        uses: bjw-s-labs/action-changed-files@015416e33c709af88f84a4496f4030c1f0ef212e # v0.5.0
+        uses: https://github.com/bjw-s-labs/action-changed-files@b6df5283805309713a96e81ad9f99d77615e730e # v0.6.0
         with:
           patterns: |-
             kubernetes/**/*
@@ -47,7 +47,7 @@ jobs:
 
   diff:
     if: ${{ needs.filter-changes.outputs.changed-files != '[]' }}
-    name: Flux Local Diff
+    name: Flux Local Diff ${{ matrix.resources }}
     runs-on: ubuntu-latest
     needs:
       - filter-changes
@@ -81,8 +81,8 @@ jobs:
           args: >-
             diff ${{ matrix.resources }}
             --unified 6
-            --path /github/workspace/pull/kubernetes/flux/cluster
-            --path-orig /github/workspace/default/kubernetes/flux/cluster
+            --path /workspace/pull/kubernetes/flux/cluster
+            --path-orig /workspace/default/kubernetes/flux/cluster
             --strip-attrs "helm.sh/chart,checksum/config,app.kubernetes.io/version,chart"
             --limit-bytes 10000
             --all-namespaces
@@ -95,32 +95,44 @@ jobs:
               echo 'diff<<EOF'
               cat diff.patch
               echo EOF
-          } >> "${GITHUB_OUTPUT}";
+          } >> "${FORGEJO_OUTPUT}";
           {
               echo "## Flux ${{ matrix.resources }} diff"
               echo '```diff'
               cat diff.patch
               echo '```'
-          } >> "${GITHUB_STEP_SUMMARY}"
+          } >> "${FORGEJO_STEP_SUMMARY}"
 
-      - name: Generate Token
-        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
-        if: ${{ github.event.pull_request.head.repo.full_name == github.repository && steps.diff.outputs.diff != '' }}
-        id: app-token
-        with:
-          app-id: ${{ secrets.LAB_ASSISTANT_APP_ID }}
-          private-key: ${{ secrets.LAB_ASSISTANT_APP_KEY }}
+      - name: Add Comment
+        if: ${{ steps.diff.outputs.diff != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEADER: "${{ github.event.pull_request.number }}/kubernetes/${{ matrix.resources }}"
+          DIFF_CONTENT: ${{ steps.diff.outputs.diff }}
+        run: |
+          MARKER="<!-- sticky-comment: ${HEADER} -->"
+          BODY=$(printf $'%s\n```diff\n%s\n```' "${MARKER}" "${DIFF_CONTENT}")
+          BODY_JSON=$(jq -Rs '{"body": .}' <<< "${BODY}")
 
-      - if: ${{ steps.diff.outputs.diff != '' }}
-        name: Add Comment
-        uses: marocchino/sticky-pull-request-comment@70d2764d1a7d5d9560b100cbea0077fc8f633987 # v3.0.2
-        with:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-          header: ${{ github.event.pull_request.number }}/kubernetes/${{ matrix.resources }}
-          message: |
-            ```diff
-            ${{ steps.diff.outputs.diff }}
-            ```
+          COMMENT_ID=$(curl -s \
+            -H "Authorization: token ${GH_TOKEN}" \
+            "${{ github.api_url }}/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+            | jq -r --arg marker "${MARKER}" '.[] | select(.body | startswith($marker)) | .id' | head -1)
+
+          if [[ -n "${COMMENT_ID}" ]]; then
+            curl -s -X PATCH \
+              -H "Authorization: token ${GH_TOKEN}" \
+              -H "Content-Type: application/json" \
+              "${{ github.api_url }}/repos/${{ github.repository }}/issues/comments/${COMMENT_ID}" \
+              -d "${BODY_JSON}"
+          else
+            curl -s -X POST \
+              -H "Authorization: token ${GH_TOKEN}" \
+              -H "Content-Type: application/json" \
+              "${{ github.api_url }}/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+              -d "${BODY_JSON}"
+          fi
 
   flux-local-success:
     needs:
