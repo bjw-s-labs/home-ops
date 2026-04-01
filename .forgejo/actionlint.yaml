@@ -1,0 +1,12 @@
+---
+self-hosted-runner:
+  labels:
+    - arc-bjw-s-labs
+    - arc-bjw-s-labs-home-ops
+paths:
+  # Glob pattern relative to the repository root for matching files. The path separator is always '/'.
+  # This example configures any YAML file under the '.github/workflows/' directory.
+  .forgejo/workflows/**/*.{yml,yaml}:
+    ignore:
+      - 'invalid format because owner and repo and ref should not be empty. available formats are "{owner}/{repo}@{ref}" or "{owner}/{repo}/{path}@{ref}"'
+      - 'undefined variable "forgejo". available variables are'

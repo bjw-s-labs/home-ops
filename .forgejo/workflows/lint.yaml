@@ -1,0 +1,75 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Lint
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ forgejo.ref }}-${{ forgejo.workflow }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Get changed files
+        id: changed-files
+        uses: https://github.com/bjw-s-labs/action-changed-files@b6df5283805309713a96e81ad9f99d77615e730e # v0.6.0
+        with:
+          patterns: |-
+            .forgejo/workflows/*.yaml
+            .forgejo/workflows/*.yml
+
+      - name: Run actionlint
+        if: steps.changed-files.outputs.changed_files != '[]'
+        uses: https://github.com/bjw-s-labs/action-actionlint@b346813e82708106544f48a93a5b3fbeeb8e37eb # v0.1.1
+        with:
+          actionlint_config: .forgejo/actionlint.yaml
+          file_pattern: ${{ join(fromJSON(steps.changed-files.outputs.changed_files), ' ') }}
+
+  yamllint:
+    name: yamllint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Get changed files
+        id: changed-files
+        uses: https://github.com/bjw-s-labs/action-changed-files@b6df5283805309713a96e81ad9f99d77615e730e # v0.6.0
+        with:
+          patterns: |-
+            **/*.yaml
+            **/*.yml
+
+      - name: Install yamllint
+        if: steps.changed-files.outputs.changed_files != '[]'
+        shell: bash
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install pipx
+          pipx install yamllint
+          echo "$HOME/.local/bin" >> "$FORGEJO_PATH"
+
+      - name: Run yamllint
+        if: steps.changed-files.outputs.changed_files != '[]'
+        shell: bash
+        run: |-
+          yamllint --version
+          echo "yamllint --config-file .yamllint.yaml --format github ${{ join(fromJSON(steps.changed-files.outputs.changed_files), ' ') }}"
+          yamllint --config-file .yamllint.yaml --format github ${{ join(fromJSON(steps.changed-files.outputs.changed_files), ' ') }}
