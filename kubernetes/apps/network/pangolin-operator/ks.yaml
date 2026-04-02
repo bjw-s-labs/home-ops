@@ -35,6 +35,10 @@ spec:
   dependsOn:
     - name: pangolin-operator
       namespace: network
+  healthChecks:
+    - apiVersion: pangolin.home-operations.com/v1alpha1
+      kind: NewtSites
+      name: homelab
   interval: 1h
   path: "./kubernetes/apps/network/pangolin-operator/config"
   prune: true
