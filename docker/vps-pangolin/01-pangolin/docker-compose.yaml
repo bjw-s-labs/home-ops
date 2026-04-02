@@ -45,7 +45,7 @@ services:
         - lapi
         - status
       timeout: 5s
-    image: docker.io/crowdsecurity/crowdsec:v1.7.6
+    image: docker.io/crowdsecurity/crowdsec:v1.7.7
     labels:
       - traefik.enable=false
     ports:
@@ -119,7 +119,7 @@ services:
       - GEOIPUPDATE_EDITION_IDS=GeoLite2-Country GeoLite2-ASN
       - GEOIPUPDATE_FREQUENCY=72
     volumes:
-      - '/opt/pangolin/config/GeoLite2:/usr/share/GeoIP'
+      - /opt/pangolin/config/GeoLite2:/usr/share/GeoIP
 
 networks:
   default:
