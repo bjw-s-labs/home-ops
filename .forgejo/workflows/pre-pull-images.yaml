@@ -95,7 +95,7 @@ jobs:
   pre-pull-images:
     if: ${{ needs.compare-images.outputs.images != '[]' }}
     name: Pre-pull Image ${{ matrix.image }}
-    runs-on: ubuntu-latest
+    runs-on: docker
     needs:
       - compare-images
     strategy:
