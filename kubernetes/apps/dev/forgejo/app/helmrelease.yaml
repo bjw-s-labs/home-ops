@@ -18,6 +18,11 @@ spec:
           ENABLED: true
           ADAPTER: redis
           HOST: redis://forgejo-redis:6379
+        cron.archive_cleanup:
+          ENABLED: true
+          RUN_AT_START: true
+          SCHEDULE: "@every 1h"
+          OLDER_THAN: 2h
         indexer:
           ISSUE_INDEXER_TYPE: bleve
           REPO_INDEXER_ENABLED: true
