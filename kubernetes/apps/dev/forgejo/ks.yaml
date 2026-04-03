@@ -34,6 +34,7 @@ spec:
       app.kubernetes.io/name: forgejo
   components:
     - ../../../../components/volsync
+    - ../../../../components/anubis
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -47,6 +48,7 @@ spec:
       APP_UID: "1000"
       APP_GID: "1000"
       VOLSYNC_CAPACITY: 10Gi
+      ANUBIS_TARGET: http://forgejo-http.dev.svc.cluster.local:3000
   prune: true
   sourceRef:
     kind: GitRepository

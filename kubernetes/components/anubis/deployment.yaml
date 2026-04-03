@@ -1,0 +1,78 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${APP}-anubis
+  labels:
+    app.kubernetes.io/name: ${APP}-anubis
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ${APP}-anubis
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ${APP}-anubis
+    spec:
+      containers:
+        - name: anubis
+          image: ghcr.io/techarohq/anubis:v1.25.0
+          env:
+            - name: BIND
+              value: ":8080"
+            - name: DIFFICULTY
+              value: "${ANUBIS_DIFFICULTY:=\"4\"}"
+            - name: ED25519_PRIVATE_KEY_HEX
+              valueFrom:
+                secretKeyRef:
+                  name: ${APP}-anubis-key-secret
+                  key: ED25519_PRIVATE_KEY_HEX
+            - name: METRICS_BIND
+              value: ":9090"
+            - name: OG_EXPIRY_TIME
+              value: "24h"
+            - name: OG_PASSTHROUGH
+              value: "true"
+            - name: SERVE_ROBOTS_TXT
+              value: "true"
+            - name: TARGET
+              value: "${ANUBIS_TARGET}"
+          livenessProbe:
+            exec:
+              command:
+                - "anubis"
+                - "--healthcheck"
+            initialDelaySeconds: 1
+            periodSeconds: 10
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9090
+              name: metrics
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - "anubis"
+                - "--healthcheck"
+            initialDelaySeconds: 1
+            periodSeconds: 5
+          resources:
+            limits:
+              memory: 256Mi
+            requests:
+              cpu: 10m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault

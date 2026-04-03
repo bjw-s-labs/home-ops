@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${APP}-anubis
+  labels:
+    app.kubernetes.io/name: ${APP}-anubis
+spec:
+  selector:
+    app.kubernetes.io/name: ${APP}-anubis
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: http
