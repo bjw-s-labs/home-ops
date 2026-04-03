@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: ${APP}-anubis
+  name: ${APP}-anubis-policy
+data:
+  policy.yaml: |-
+    bots:
+      - import: (data)/meta/default-config.yaml
+      - import: (data)/apps/gitea-rss-feeds.yaml
+      - name: oci-registry
+        path_regex: ^/v2/.*
+        action: ALLOW
+      - name: catch-all
+        path_regex: .*
+        action: CHALLENGE
+        challenge:
+          algorithm: fast
+          difficulty: 4
+    dnsbl: true

@@ -35,6 +35,8 @@ spec:
               value: "24h"
             - name: OG_PASSTHROUGH
               value: "true"
+            - name: POLICY_FNAME
+              value: "/etc/anubis/policy.yaml"
             - name: SERVE_ROBOTS_TXT
               value: "true"
             - name: TARGET
@@ -76,3 +78,11 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
+          volumeMounts:
+            - name: policy
+              mountPath: /etc/anubis
+              readOnly: true
+      volumes:
+        - name: policy
+          configMap:
+            name: ${APP}-anubis-policy
