@@ -12,8 +12,45 @@ spec:
   values:
     configMaps:
       config:
+        suffix: config
         data:
+          runner.yaml: |-
+            cache:
+              enabled: true
+              dir: /data/cache
+            container:
+              docker_host: "-"
+              workdir_parent: shared/workdir
+            kubernetes:
+              namespace: dev
+              poll_timeout: 10m
+            log:
+              level: info
+            runner:
+              capacity: 4
+              file: /persistent/.runner
+              labels:
+                - ubuntu-latest:k8spod:/config/podspec-default.yaml
+                - ubuntu-24.04:k8spod:/config/podspec-default.yaml
+                - default:k8spod:/config/podspec-default.yaml
+                - docker:k8spod:/config/podspec-dind.yaml
+              timeout: 3h
           podspec-default.yaml: |-
+            containers:
+              - env:
+                  - name: DEBIAN_FRONTEND
+                    value: noninteractive
+                image: ghcr.io/bjw-s-labs/forgejo-runner:ubuntu-24.04@sha256:190d63b2a5b275f5e0212001966fdce2b30b24a44a185d6d97e5cf43cb3ca4f1
+                imagePullPolicy: IfNotPresent
+                name: main
+                resources:
+                  limits:
+                    memory: 2Gi
+                  requests:
+                    cpu: 100m
+                    memory: 256Mi
+            restartPolicy: Never
+          podspec-dind.yaml: |-
             initContainers:
               - name: dind
                 image: docker:29-dind
@@ -39,7 +76,7 @@ spec:
                     command:
                       - sh
                       - -c
-                      - test -f /certs/client/cert.pem
+                      - test -f /certs/client/ca.pem && test -f /certs/client/cert.pem && test -f /certs/client/key.pem
                   initialDelaySeconds: 2
                   periodSeconds: 1
             containers:
@@ -56,11 +93,11 @@ spec:
                 imagePullPolicy: IfNotPresent
                 name: main
                 resources:
+                  limits:
+                    memory: 2Gi
                   requests:
                     cpu: 100m
                     memory: 256Mi
-                  limits:
-                    memory: 2Gi
                 volumeMounts:
                   - name: docker-certs
                     mountPath: /certs
@@ -71,23 +108,6 @@ spec:
               - name: docker-certs
                 emptyDir: {}
             restartPolicy: Never
-          runner.yaml: |-
-            cache:
-              enabled: false
-            container:
-              k8s_namespace: dev
-              kubernetes: true
-            log:
-              level: info
-            runner:
-              capacity: 4
-              file: /persistent/.runner
-              labels:
-                - ubuntu-latest:k8spod:/config/podspec-default.yaml
-                - ubuntu-24.04:k8spod:/config/podspec-default.yaml
-                - default:k8spod:/config/podspec-default.yaml
-              timeout: 3h
-        suffix: config
     controllers:
       forgejo-runner:
         type: statefulset
@@ -113,8 +133,8 @@ spec:
         initContainers:
           register-runner:
             image:
-              repository: code.forgejo.org/johbo/k8s-runner
-              tag: v9.1.1-21-gd2a8af7d
+              repository: ghcr.io/eleboucher/runner
+              tag: latest@sha256:cc5b545fe13e689aa741775cdc7e0c3f75392ed18e44f9eb4fe0e6efe28e12cd
             command:
               - sh
               - -c
@@ -125,7 +145,7 @@ spec:
                 fi
                 echo "Registering runner..."
                 cd /persistent && forgejo-runner register \
-                  --instance https://git.bjw-s.dev \
+                  --instance http://forgejo-http.dev.svc.cluster.local:3000 \
                   --token "${RUNNER_TOKEN}" \
                   --name k8s-runner \
                   --labels "default:k8spod:/config/podspec-default.yaml" \
@@ -139,8 +159,8 @@ spec:
         containers:
           runner:
             image:
-              repository: code.forgejo.org/johbo/k8s-runner
-              tag: v9.1.1-21-gd2a8af7d
+              repository: ghcr.io/eleboucher/runner
+              tag: latest@sha256:cc5b545fe13e689aa741775cdc7e0c3f75392ed18e44f9eb4fe0e6efe28e12cd
             command:
               - /bin/forgejo-runner
               - daemon
