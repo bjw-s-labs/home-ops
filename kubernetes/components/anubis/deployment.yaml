@@ -82,7 +82,39 @@ spec:
             - name: policy
               mountPath: /etc/anubis
               readOnly: true
-      volumes:
-        - name: policy
-          configMap:
-            name: ${APP}-anubis-policy
+      configMaps:
+        policy:
+          suffix: policy
+          data:
+            policy.yaml: |-
+              bots:
+                - import: (data)/apps/gitea-rss-feeds.yaml
+                - import: (data)/clients/git.yaml
+                - import: (data)/clients/docker-client.yaml
+                - name: allow-api
+                  path_regex: ^/api/.*
+                  action: ALLOW
+                - import: (data)/meta/default-config.yaml
+              dnsbl: false
+      service:
+        anubis:
+          controller: anubis
+          ports:
+            http:
+              port: 8080
+              protocol: HTTP
+            metrics:
+              port: 9090
+              protocol: HTTP
+      serviceMonitor:
+        app:
+          endpoints:
+            - port: metrics
+              interval: 30s
+      persistence:
+        policy:
+          type: configMap
+          identifier: policy
+          globalMounts:
+            - path: /etc/anubis
+              readOnly: true
