@@ -3,12 +3,12 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
-  name: agentgateway-crds
+  name: toolhive-operator
 spec:
   interval: 15m
   layerSelector:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: v2.2.1
-  url: oci://ghcr.io/agentgateway/charts/agentgateway-crds
+    tag: 0.15.0
+  url: oci://ghcr.io/stacklok/toolhive/toolhive-operator

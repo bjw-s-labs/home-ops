@@ -8,6 +8,9 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: ha-mcp
+  dependsOn:
+    - name: toolhive-operator-crds
+      namespace: ai
   interval: 1h
   path: "./kubernetes/apps/ai/ha-mcp/app"
   prune: true

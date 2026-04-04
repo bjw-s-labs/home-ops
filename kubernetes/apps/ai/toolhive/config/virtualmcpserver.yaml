@@ -1,0 +1,59 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/toolhive.stacklok.dev/virtualmcpserver_v1alpha1.json
+apiVersion: toolhive.stacklok.dev/v1alpha1
+kind: VirtualMCPServer
+metadata:
+  name: mcp-gateway
+spec:
+  authServerConfig:
+    issuer: https://mcp.bjw-s.dev
+    signingKeySecretRefs:
+      - name: vmcp-auth-server-secret
+        key: signing-key
+    hmacSecretRefs:
+      - name: vmcp-auth-server-secret
+        key: hmac-key
+    tokenLifespans:
+      accessTokenLifespan: 1h
+      refreshTokenLifespan: 168h
+      authCodeLifespan: 10m
+    upstreamProviders:
+      - name: kanidm
+        type: oidc
+        oidcConfig:
+          issuerUrl: https://idm.bjw-s.dev/oauth2/openid/toolhive
+          clientId: toolhive
+          clientSecretRef:
+            name: vmcp-oidc-client-secret
+            key: client-secret
+          redirectUri: https://mcp.bjw-s.dev/oauth/callback
+          scopes:
+            - openid
+            - profile
+            - email
+  config:
+    groupRef: mcp-tools
+    aggregation:
+      conflictResolution: prefix
+      conflictResolutionConfig:
+        prefixFormat: "{workload}_"
+        # optimizer:
+        #   embeddingService: embedding
+  incomingAuth:
+    type: oidc
+    oidcConfig:
+      type: inline
+      resourceUrl: https://mcp.bjw-s.dev/mcp
+      inline:
+        audience: https://mcp.bjw-s.dev/mcp
+        issuer: https://mcp.bjw-s.dev
+        jwksAllowPrivateIP: true
+  outgoingAuth:
+    source: discovered
+  podTemplateSpec:
+    spec:
+      containers:
+        - name: vmcp
+          env:
+            - name: INSECURE_DISABLE_URL_VALIDATION
+              value: "true"
