@@ -8,15 +8,11 @@ metadata:
 data:
   policy.yaml: |-
     bots:
-      - import: (data)/meta/default-config.yaml
       - import: (data)/apps/gitea-rss-feeds.yaml
-      - name: oci-registry
-        path_regex: ^/v2/.*
+      - import: (data)/clients/git.yaml
+      - import: (data)/clients/docker-client.yaml
+      - name: allow-api
+        path_regex: ^/api/.*
         action: ALLOW
-      - name: catch-all
-        path_regex: .*
-        action: CHALLENGE
-        challenge:
-          algorithm: fast
-          difficulty: 4
-    dnsbl: true
+      - import: (data)/meta/default-config.yaml
+    dnsbl: false
