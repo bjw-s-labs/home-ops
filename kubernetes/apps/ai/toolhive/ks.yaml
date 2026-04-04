@@ -3,18 +3,18 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: agentgateway-crds
+  name: toolhive-operator-crds
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: agentgateway
+      app.kubernetes.io/name: toolhive-operator-crds
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
-      name: agentgateway-crds
+      name: toolhive-operator-crds
       namespace: ai
   interval: 1h
-  path: "./kubernetes/apps/ai/agentgateway/crds"
+  path: "./kubernetes/apps/ai/toolhive/crds"
   prune: true
   sourceRef:
     kind: GitRepository
@@ -27,43 +27,21 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: agentgateway
+  name: toolhive-operator
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: agentgateway
+      app.kubernetes.io/name: toolhive-operator
   dependsOn:
-    - name: agentgateway-crds
+    - name: toolhive-operator-crds
       namespace: ai
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
-      name: agentgateway
+      name: toolhive-operator
       namespace: ai
   interval: 1h
-  path: "./kubernetes/apps/ai/agentgateway/app"
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-    namespace: flux-system
-  targetNamespace: ai
-  timeout: 5m
----
-# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: agentgateway-gateway
-spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: agentgateway
-  dependsOn:
-    - name: agentgateway
-      namespace: ai
-  interval: 1h
-  path: "./kubernetes/apps/ai/agentgateway/gateway"
+  path: "./kubernetes/apps/ai/toolhive/app"
   prune: true
   sourceRef:
     kind: GitRepository
