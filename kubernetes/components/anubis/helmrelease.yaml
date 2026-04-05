@@ -1,0 +1,106 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ${APP}-anubis
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: ${APP}-anubis
+  interval: 1h
+  values:
+    controllers:
+      anubis:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/techarohq/anubis
+              tag: v1.25.0
+            env:
+              BIND: ":8080"
+              DIFFICULTY: "${ANUBIS_DIFFICULTY:=\"4\"}"
+              ED25519_PRIVATE_KEY_HEX:
+                valueFrom:
+                  secretKeyRef:
+                    name: ${APP}-anubis-key-secret
+                    key: ED25519_PRIVATE_KEY_HEX
+              METRICS_BIND: ":9090"
+              OG_EXPIRY_TIME: "24h"
+              OG_PASSTHROUGH: "true"
+              POLICY_FNAME: "/etc/anubis/policy.yaml"
+              SERVE_ROBOTS_TXT: "true"
+              TARGET: "${ANUBIS_TARGET}"
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - "anubis"
+                      - "--healthcheck"
+                  initialDelaySeconds: 1
+                  periodSeconds: 10
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - "anubis"
+                      - "--healthcheck"
+                  initialDelaySeconds: 1
+                  periodSeconds: 5
+            resources:
+              requests:
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+              runAsGroup: 1000
+              runAsNonRoot: true
+              runAsUser: 1000
+              seccompProfile:
+                type: RuntimeDefault
+    configMaps:
+      policy:
+        suffix: policy
+        data:
+          policy.yaml: |-
+            bots:
+              - import: (data)/apps/gitea-rss-feeds.yaml
+              - import: (data)/clients/git.yaml
+              - import: (data)/clients/docker-client.yaml
+              - name: allow-api
+                path_regex: ^/api/.*
+                action: ALLOW
+              - import: (data)/meta/default-config.yaml
+    service:
+      anubis:
+        controller: anubis
+        ports:
+          http:
+            port: 8080
+            protocol: HTTP
+          metrics:
+            port: 9090
+            protocol: HTTP
+    serviceMonitor:
+      app:
+        endpoints:
+          - port: metrics
+            interval: 30s
+    persistence:
+      policy:
+        type: configMap
+        identifier: policy
+        globalMounts:
+          - path: /etc/anubis
+            readOnly: true
