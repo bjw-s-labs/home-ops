@@ -233,7 +233,6 @@ configs:
             TLSVersion: keep
         filePath: /var/log/traefik/access.log
         filters:
-          minDuration: 100ms
           retryAttempts: true
           statusCodes:
             - 200-299
@@ -299,8 +298,6 @@ configs:
                 crowdsecMode: live
                 defaultDecisionSeconds: 15
                 enabled: true
-                forwardedHeadersTrustedIPs:
-                  - 0.0.0.0/0
                 httpTimeoutSeconds: 10
                 logLevel: INFO
                 updateIntervalSeconds: 15
