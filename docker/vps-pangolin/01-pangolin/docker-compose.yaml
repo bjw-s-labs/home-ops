@@ -27,7 +27,6 @@ services:
       retries: 15
 
   crowdsec:
-    command: -t
     container_name: crowdsec
     environment:
       COLLECTIONS: crowdsecurity/traefik crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-generic-rules
@@ -189,55 +188,23 @@ configs:
       experimental:
         plugins:
           badger:
-            moduleName: "github.com/fosrl/badger"
-            version: "v1.3.1"
+            moduleName: github.com/fosrl/badger
+            version: v1.3.1
           crowdsec:
             moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
             version: v1.5.1
 
       log:
-        level: "INFO"
-        format: "common"
-        maxSize: 100
-        maxBackups: 3
-        maxAge: 3
-        compress: true
+        filePath: /var/log/traefik/traefik.log
+        format: json
+        level: INFO
 
       accessLog:
-        bufferingSize: 100
         fields:
-          defaultMode: drop
+          defaultMode: keep
           headers:
-            defaultMode: drop
-            names:
-              Authorization: redact
-              Content-Type: keep
-              Cookie: redact
-              User-Agent: keep
-              X-Forwarded-For: keep
-              X-Forwarded-Proto: keep
-              X-Real-Ip: keep
-          names:
-            ClientAddr: keep
-            ClientHost: keep
-            DownstreamContentSize: keep
-            DownstreamStatus: keep
-            Duration: keep
-            RequestMethod: keep
-            RequestPath: keep
-            RequestProtocol: keep
-            RetryAttempts: keep
-            ServiceName: keep
-            StartUTC: keep
-            TLSCipher: keep
-            TLSVersion: keep
+            defaultMode: keep
         filePath: /var/log/traefik/access.log
-        filters:
-          retryAttempts: true
-          statusCodes:
-            - 200-299
-            - 400-499
-            - 500-599
         format: json
 
       certificatesResolvers:
@@ -308,6 +275,10 @@ configs:
                 - 10.0.0.0/8
                 - 192.168.0.0/16
                 - 172.16.0.0/12
+          badger:
+            plugin:
+              badger:
+                disableForwardAuth: true
           redirect-to-https:
             redirectScheme:
               scheme: https
@@ -337,7 +308,7 @@ configs:
               - web
             middlewares:
               - redirect-to-https
-
+              - badger
           # Next.js router (handles everything except API and WebSocket paths)
           next-router:
             rule: "Host(`pangolin.bjw-s.dev`) && !PathPrefix(`/api/v1`)"
@@ -345,14 +316,13 @@ configs:
             entryPoints:
               - websecure
             middlewares:
-              - security-headers
+              - badger
             tls:
               certResolver: letsencrypt
               domains:
                 - main: "bjw-s.dev"
                   sans:
                     - "*.bjw-s.dev"
-
           # API router (handles /api/v1 paths)
           api-router:
             rule: "Host(`pangolin.bjw-s.dev`) && PathPrefix(`/api/v1`)"
@@ -360,7 +330,7 @@ configs:
             entryPoints:
               - websecure
             middlewares:
-              - security-headers
+              - badger
             tls:
               certResolver: letsencrypt
           int-api-router:
@@ -370,7 +340,6 @@ configs:
               - websecure
             tls:
               certResolver: letsencrypt
-
           # WebSocket router
           ws-router:
             rule: "Host(`pangolin.bjw-s.dev`)"
@@ -378,7 +347,7 @@ configs:
             entryPoints:
               - websecure
             middlewares:
-              - security-headers
+              - badger
             tls:
               certResolver: letsencrypt
 
