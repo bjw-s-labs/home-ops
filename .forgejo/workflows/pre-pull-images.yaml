@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: Pre-pull Images
+name: Image Pull
 
 on:
   pull_request:
@@ -66,16 +66,16 @@ jobs:
         run: |
           echo "${{ matrix.branches }}=$(jq --compact-output '.' images.json)" >> "${FORGEJO_OUTPUT}"
 
-  compare-images:
+  diff:
     name: Compare Images
     runs-on: ubuntu-latest
     needs:
       - extract-images
     outputs:
-      images: ${{ steps.compare-images.outputs.images }}
+      images: ${{ steps.diff.outputs.images }}
     steps:
       - name: Compare Images
-        id: compare-images
+        id: diff
         run: |
           images=$(jq --compact-output --null-input \
               --argjson f1 '${{ needs.extract-images.outputs.default }}' \
@@ -91,15 +91,15 @@ jobs:
               echo '```'
           } >> "${FORGEJO_STEP_SUMMARY}"
 
-  pre-pull-images:
-    if: ${{ needs.compare-images.outputs.images != '[]' }}
-    name: Pre-pull Image ${{ matrix.image }}
+  image-pull:
+    if: ${{ needs.diff.outputs.images != '[]' }}
+    name: Image Pull - ${{ matrix.image }}
     runs-on: docker
     needs:
-      - compare-images
+      - diff
     strategy:
       matrix:
-        image: ${{ fromJSON(needs.compare-images.outputs.images) }}
+        image: ${{ fromJSON(needs.diff.outputs.images) }}
       max-parallel: 4
       fail-fast: false
     env:
@@ -107,3 +107,18 @@ jobs:
     steps:
       - name: Try to pull Image
         run: docker pull "${MATRIX_IMAGE}"
+
+  image-pull-success:
+    needs:
+      - image-pull
+    if: ${{ !cancelled() }}
+    name: Image Pull - Success
+    runs-on: ubuntu-latest
+    steps:
+      - name: Any jobs failed?
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
+
+      - name: All jobs passed or skipped?
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: echo "All jobs passed or skipped" && echo "${{ toJSON(needs.*.result) }}"
