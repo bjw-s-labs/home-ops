@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/toolhive.stacklok.dev/mcpserver_v1alpha1.json
+apiVersion: toolhive.stacklok.dev/v1alpha1
+kind: MCPServer
+metadata:
+  name: memory-mcp
+spec:
+  image: ghcr.io/bjw-s-labs/mcp-memory:2026.1.26
+  transport: stdio
+  groupRef: mcp-tools
+  podTemplateSpec:
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: memory-mcp
+      containers:
+        - name: mcp
+          volumeMounts:
+            - name: data
+              mountPath: /data
