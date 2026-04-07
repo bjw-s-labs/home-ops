@@ -67,7 +67,6 @@ jobs:
           echo "${{ matrix.branches }}=$(jq --compact-output '.' images.json)" >> "${FORGEJO_OUTPUT}"
 
   compare-images:
-    if: ${{ needs.extract-images.outputs.default != needs.extract-images.outputs.pull }}
     name: Compare Images
     runs-on: ubuntu-latest
     needs:
