@@ -12,7 +12,6 @@
         "ghcr.io/bjw-s",
         "ghcr.io/bjw-s-labs",
       ],
-      ignoreTests: false,
     },
     {
       description: "Auto merge minors and patches",
@@ -24,18 +23,16 @@
         "ghcr.io/mogenius/helm-charts/renovate-operator",
         "ghcr.io/bjw-s-labs/wrangler",
       ],
-      ignoreTests: false,
     },
     {
-      description: "Auto merge minors and patches after minimumReleaseAge",
+      description: "Auto-merge high-cadence packages weekly",
       matchDatasources: ["docker"],
       automerge: true,
       matchUpdateTypes: ["minor", "patch"],
       matchPackageNames: [
         "ghcr.io/renovatebot/renovate",
       ],
-      "minimumReleaseAge": "3 days",
-      ignoreTests: false,
+      schedule: ["before 6am on Monday"],
     },
   ],
 }
