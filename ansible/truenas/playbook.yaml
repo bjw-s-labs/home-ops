@@ -18,6 +18,10 @@
       loop:
         - key: Shared/c6itdbmw5gdslnnep2vfihhu54/Service accounts/doco-cd
           var: doco_1pw_sa_token
+        - key: automation/doco-cd/api_secret
+          var: doco_api_secret
+        - key: automation/doco-cd/webhook_secret
+          var: doco_webhook_secret
       check_mode: false
       changed_when: false
       no_log: true
@@ -26,6 +30,8 @@
     - name: Set secret facts
       ansible.builtin.set_fact:
         doco_1pw_sa_token: "{{ secrets_raw.results[0].stdout }}"
+        doco_api_secret: "{{ secrets_raw.results[1].stdout }}"
+        doco_webhook_secret: "{{ secrets_raw.results[2].stdout }}"
       no_log: true
 
     - name: doco-cd
@@ -61,6 +67,10 @@
           loop:
             - name: 1pw_token
               content: "{{ doco_1pw_sa_token }}"
+            - name: api_secret
+              content: "{{ doco_api_secret }}"
+            - name: webhook_secret
+              content: "{{ doco_webhook_secret }}"
 
         - name: doco-cd | Run docker-compose
           community.docker.docker_compose_v2:

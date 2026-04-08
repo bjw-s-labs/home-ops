@@ -4,11 +4,17 @@
 secrets:
   1pw_token:
     file: /home/truenas_admin/.config/doco-cd/1pw_token
+  api_secret:
+    file: /home/truenas_admin/.config/doco-cd/api_secret
+  webhook_secret:
+    file: /home/truenas_admin/.config/doco-cd/webhook_secret
 services:
   app:
     container_name: doco-cd
     environment:
+      API_SECRET_FILE: /run/secrets/api_secret
       DEPLOY_CONFIG_BASE_DIR: ./docker/truenas/
+      HTTP_PORT: 8880
       LOG_LEVEL: info
       POLL_CONFIG: |-
         - url: https://github.com/bjw-s-labs/home-ops.git
@@ -17,6 +23,7 @@ services:
       SECRET_PROVIDER: 1password
       SECRET_PROVIDER_ACCESS_TOKEN_FILE: /run/secrets/1pw_token
       TZ: Europe/Amsterdam
+      WEBHOOK_SECRET_FILE: /run/secrets/webhook_secret
     healthcheck:
       test:
         - CMD
@@ -27,9 +34,13 @@ services:
       timeout: 5s
       retries: 3
     image: ghcr.io/kimdre/doco-cd:0.77.0@sha256:3ca4f69ddf11eabe32cfd09ded1a129195ded93e32ca31b3f808e6c251dc0d51
+    ports:
+      - 8880:8880
     restart: unless-stopped
     secrets:
       - 1pw_token
+      - api_secret
+      - webhook_secret
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - data:/data
