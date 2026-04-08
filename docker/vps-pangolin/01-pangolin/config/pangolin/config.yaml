@@ -1,0 +1,37 @@
+---
+# https://docs.pangolin.net/
+gerbil:
+  start_port: 51820
+  base_endpoint: "pangolin.bjw-s.dev"
+app:
+  dashboard_url: "https://pangolin.bjw-s.dev"
+  log_level: "info"
+  telemetry:
+    anonymous_usage: false
+domains:
+  domain1:
+    base_domain: "bjw-s.dev"
+    cert_resolver: "letsencrypt"
+server:
+  secret: "${PANGOLIN_SERVER_SECRET}"
+  cors:
+    origins:
+      - "https://pangolin.bjw-s.dev"
+    methods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "PATCH"
+    allowed_headers:
+      - "X-CSRF-Token"
+      - "Content-Type"
+    credentials: false
+  maxmind_db_path: "/app/config/GeoLite2/GeoLite2-Country.mmdb"
+  maxmind_asn_path: "/app/config/GeoLite2/GeoLite2-ASN.mmdb"
+flags:
+  require_email_verification: false
+  disable_signup_without_invite: true
+  disable_user_create_org: false
+  allow_raw_resources: true
+  enable_integration_api: true

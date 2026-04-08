@@ -1,0 +1,67 @@
+---
+api:
+  insecure: true
+  dashboard: true
+
+providers:
+  http:
+    endpoint: "http://pangolin:3001/api/v1/traefik-config"
+    pollInterval: "5s"
+  file:
+    filename: "/etc/traefik/dynamic_config.yml"
+
+experimental:
+  plugins:
+    badger:
+      moduleName: github.com/fosrl/badger
+      version: v1.3.1
+    crowdsec:
+      moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+      version: v1.5.1
+
+log:
+  filePath: /var/log/traefik/traefik.log
+  format: json
+  level: INFO
+
+accessLog:
+  fields:
+    defaultMode: keep
+    headers:
+      defaultMode: keep
+  filePath: /var/log/traefik/access.log
+  format: json
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      dnsChallenge:
+        provider: ovh
+      email: "letsencrypt@bjw-s.dev"
+      storage: "/letsencrypt/acme.json"
+      caServer: "https://acme-v02.api.letsencrypt.org/directory"
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+    transport:
+      respondingTimeouts:
+        readTimeout: "30m"
+    http:
+      tls:
+        certResolver: "letsencrypt"
+      middlewares:
+        - crowdsec@file
+      encodedCharacters:
+        allowEncodedSlash: true
+        allowEncodedQuestionMark: true
+  tcp-22:
+    address: ":22"
+
+serversTransport:
+  insecureSkipVerify: true
+
+ping:
+  entryPoint: "web"

@@ -1,0 +1,122 @@
+---
+http:
+  middlewares:
+    crowdsec:
+      plugin:
+        crowdsec:
+          clientTrustedIPs:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+            - 100.89.0.0/16
+          crowdsecAppsecBodyLimit: 10485760
+          crowdsecAppsecEnabled: true
+          crowdsecAppsecFailureBlock: true
+          crowdsecAppsecHost: crowdsec:7422
+          crowdsecAppsecUnreachableBlock: true
+          crowdsecLapiHost: crowdsec:8080
+          crowdsecLapiKey: {{ env "CROWDSEC_API_KEY" }}
+          crowdsecLapiScheme: http
+          crowdsecMode: stream
+          defaultDecisionSeconds: 60
+          enabled: true
+          httpTimeoutSeconds: 10
+          logLevel: INFO
+          updateIntervalSeconds: 60
+          updateMaxFailure: 5
+    default-whitelist:
+      ipWhiteList:
+        sourceRange:
+          - 10.0.0.0/8
+          - 192.168.0.0/16
+          - 172.16.0.0/12
+    badger:
+      plugin:
+        badger:
+          disableForwardAuth: true
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+    security-headers:
+      headers:
+        contentTypeNosniff: true
+        customFrameOptionsValue: SAMEORIGIN
+        customResponseHeaders:
+          Server: ""
+          X-Forwarded-Proto: https
+          X-Powered-By: ""
+        forceSTSHeader: true
+        hostsProxyHeaders:
+          - X-Forwarded-Host
+        referrerPolicy: strict-origin-when-cross-origin
+        sslProxyHeaders:
+          X-Forwarded-Proto: https
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 63072000
+  routers:
+    # HTTP to HTTPS redirect router
+    main-app-router-redirect:
+      rule: "Host(`pangolin.bjw-s.dev`)"
+      service: next-service
+      entryPoints:
+        - web
+      middlewares:
+        - redirect-to-https
+        - badger
+    # Next.js router (handles everything except API and WebSocket paths)
+    next-router:
+      rule: "Host(`pangolin.bjw-s.dev`) && !PathPrefix(`/api/v1`)"
+      service: next-service
+      entryPoints:
+        - websecure
+      middlewares:
+        - badger
+      tls:
+        certResolver: letsencrypt
+        domains:
+          - main: "bjw-s.dev"
+            sans:
+              - "*.bjw-s.dev"
+    # API router (handles /api/v1 paths)
+    api-router:
+      rule: "Host(`pangolin.bjw-s.dev`) && PathPrefix(`/api/v1`)"
+      service: api-service
+      entryPoints:
+        - websecure
+      middlewares:
+        - badger
+      tls:
+        certResolver: letsencrypt
+    int-api-router:
+      rule: "Host(`pangolin-api.bjw-s.dev`)"
+      service: int-api-service
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+    # WebSocket router
+    ws-router:
+      rule: "Host(`pangolin.bjw-s.dev`)"
+      service: api-service
+      entryPoints:
+        - websecure
+      middlewares:
+        - badger
+      tls:
+        certResolver: letsencrypt
+
+  services:
+    next-service:
+      loadBalancer:
+        servers:
+          - url: "http://pangolin:3002"
+
+    api-service:
+      loadBalancer:
+        servers:
+          - url: "http://pangolin:3000"
+    int-api-service:
+      loadBalancer:
+        servers:
+          - url: "http://pangolin:3003"
