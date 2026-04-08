@@ -92,7 +92,6 @@ jobs:
           } >> "${FORGEJO_STEP_SUMMARY}"
 
   image-pull:
-    if: ${{ needs.diff.outputs.images != '[]' }}
     name: Image Pull
     runs-on: docker
     needs:
