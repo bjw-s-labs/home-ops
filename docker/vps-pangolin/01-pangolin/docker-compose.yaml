@@ -57,8 +57,10 @@ services:
     configs:
       - source: crowdsec_acquis
         target: /etc/crowdsec/acquis.yaml
-      - source: crowdsec_whitelist
-        target: /etc/crowdsec/parsers/s02-enrich/my-whitelists.yaml
+      - source: crowdsec_allowlist
+        target: /etc/crowdsec/parsers/s02-enrich/my-allowlists.yaml
+      - source: crowdsec_ban_ai_crawlers
+        target: /etc/crowdsec/scenarios/ban-ai-crawlers.yaml
 
   gerbil:
     image: ghcr.io/fosrl/gerbil:1.3.1
@@ -173,14 +175,29 @@ configs:
       appsec_config: crowdsecurity/virtual-patching
       labels:
         type: appsec
-  crowdsec_whitelist:
+  crowdsec_allowlist:
     content: |
-      name: custom/home-whitelist
-      description: "Whitelist home ISP (AS201290)"
+      name: custom/home-allowlist
+      description: "Allow home ISP (AS201290)"
       whitelist:
         reason: "Home ISP"
         expression:
           - evt.Meta.ASNumber == "201290"
+  crowdsec_ban_ai_crawlers:
+    content: |
+      ---
+      type: trigger
+      name: custom/ban-ai-crawlers
+      description: "Ban AI crawlers and scrapers by user-agent"
+      filter: >-
+        evt.Parsed.http_user_agent != nil
+        && evt.Parsed.http_user_agent matches
+        "(?i)(Meta-ExternalAgent|GPTBot|CCBot|Google-Extended|Bytespider|Amazonbot|Applebot-Extended)"
+      groupby: evt.Meta.source_ip
+      blackhole: 5m
+      labels:
+        remediation: true
+        type: ban
   traefik_config:
     content: |-
       ---
