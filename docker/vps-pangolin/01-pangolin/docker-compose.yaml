@@ -61,6 +61,8 @@ services:
         target: /etc/crowdsec/parsers/s02-enrich/my-allowlists.yaml
       - source: crowdsec_ban_ai_crawlers
         target: /etc/crowdsec/scenarios/ban-ai-crawlers.yaml
+      - source: crowdsec_ban_asn
+        target: /etc/crowdsec/scenarios/ban-asn.yaml
 
   gerbil:
     image: ghcr.io/fosrl/gerbil:1.3.1
@@ -193,6 +195,21 @@ configs:
         evt.Parsed.http_user_agent != nil
         && evt.Parsed.http_user_agent matches
         "(?i)(Meta-ExternalAgent|GPTBot|CCBot|Google-Extended|Bytespider|Amazonbot|Applebot-Extended)"
+      groupby: evt.Meta.source_ip
+      blackhole: 5m
+      labels:
+        remediation: true
+        type: ban
+  crowdsec_ban_asn:
+    content: |
+      ---
+      type: trigger
+      name: custom/ban-asn
+      description: "Ban traffic from AS numbers"
+      filter: >-
+        evt.Meta.ASNumber in [
+          "32934"
+        ]
       groupby: evt.Meta.source_ip
       blackhole: 5m
       labels:
