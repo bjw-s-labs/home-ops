@@ -82,6 +82,12 @@ jobs:
               --argjson f2 '${{ needs.extract-images.outputs.pull }}' \
               '$f2 - $f1' \
           )
+
+          # Ensure matrix is never empty to prevent Forgejo from blocking downstream jobs
+          if [ "${images}" = "[]" ]; then
+              images='["__skip__"]'
+          fi
+
           echo "images=${images}" >> "${FORGEJO_OUTPUT}"
 
           {
@@ -105,7 +111,12 @@ jobs:
       MATRIX_IMAGE: ${{ matrix.image }}
     steps:
       - name: Try to pull Image
-        run: docker pull "${MATRIX_IMAGE}"
+        run: |
+          if [ "${MATRIX_IMAGE}" = "__skip__" ]; then
+              echo "No new images to pull"
+              exit 0
+          fi
+          docker pull "${MATRIX_IMAGE}"
 
   image-pull-success:
     needs:
@@ -119,5 +130,5 @@ jobs:
         run: exit 1
 
       - name: All jobs passed or skipped?
-        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        if: ${{ !contains(needs.*.result, 'failure') }}
         run: echo "All jobs passed or skipped" && echo "${{ toJSON(needs.*.result) }}"
