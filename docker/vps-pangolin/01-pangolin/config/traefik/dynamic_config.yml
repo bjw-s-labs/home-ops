@@ -105,13 +105,29 @@ http:
         - badger
       tls:
         certResolver: letsencrypt
+    # DoCo-CD
+    doco-cd-redirect:
+      rule: "Host(`pangolin-doco.bjw-s.dev`)"
+      service: doco-cd-svc
+      entryPoints:
+        - web
+      middlewares:
+        - redirect-to-https
+
+    doco-cd-router:
+      rule: "Host(`pangolin-doco.bjw-s.dev`)"
+      service: doco-cd-svc
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+
 
   services:
     next-service:
       loadBalancer:
         servers:
           - url: "http://pangolin:3002"
-
     api-service:
       loadBalancer:
         servers:
@@ -120,3 +136,7 @@ http:
       loadBalancer:
         servers:
           - url: "http://pangolin:3003"
+    doco-cd-svc:
+      loadBalancer:
+        servers:
+          - url: "http://doco-cd:8880"
