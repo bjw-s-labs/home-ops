@@ -2,8 +2,15 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: onepassword-secret
+  name: onepassword-connect-credentials-secret
   namespace: external-secrets
 stringData:
-  1password-credentials.json: op://Automation/1password connect/credentials
+  1password-credentials.json: 'op://Automation/1password connect/credentials' # quote
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: onepassword-connect-vault-secret
+  namespace: external-secrets
+stringData:
   token: op://Automation/1password connect/token
