@@ -1,0 +1,61 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: open-webui
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: open-webui
+  interval: 30m
+  values:
+    controllers:
+      open-webui:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/open-webui/open-webui
+              tag: v0.8.12@sha256:8113fa5510020ef05a44afc0c42d33eabeeb2524a996e3e3fb8c437c00f0d792
+            env:
+              # OAuth
+              ENABLE_OAUTH_SIGNUP: true
+              ENABLE_OAUTH_PERSISTENT_CONFIG: false
+              OAUTH_MERGE_ACCOUNTS_BY_EMAIL: true
+              OAUTH_PROVIDER_NAME: Kanidm
+              OPENID_PROVIDER_URL: https://idm.bjw-s.dev/oauth2/openid/openwebui/.well-known/openid-configuration
+              OAUTH_SCOPES: openid email profile
+              OPENID_REDIRECT_URI: https://chat.bjw-s.dev/oauth/oidc/callback
+              # Features
+              ENABLE_LOGIN_FORM: false
+              ENABLE_OLLAMA_API: false
+              ENABLE_OPENAI_API: false
+              ENABLE_SIGNUP: false
+            envFrom:
+              - secretRef:
+                  name: open-webui-secret
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                memory: 2Gi
+    service:
+      app:
+        ports:
+          http:
+            port: 8080
+    route:
+      app:
+        hostnames:
+          - chat.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    persistence:
+      config:
+        enabled: true
+        existingClaim: open-webui
+        globalMounts:
+          - path: /app/backend/data
