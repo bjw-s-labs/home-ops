@@ -3,43 +3,23 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: forgejo-redis
-spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: forgejo-redis
-  healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2
-      kind: HelmRelease
-      name: forgejo-redis
-      namespace: dev
-  interval: 1h
-  path: "./kubernetes/apps/dev/forgejo/redis"
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-    namespace: flux-system
-  targetNamespace: dev
-  timeout: 5m
----
-# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
   name: forgejo
 spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: forgejo
   components:
-    - ../../../../components/volsync
     - ../../../../components/anubis
+    - ../../../../components/dragonfly
+    - ../../../../components/volsync
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
-    - name: forgejo-redis
-      namespace: dev
+  healthCheckExprs:
+    - apiVersion: dragonflydb.io/v1alpha1
+      kind: Dragonfly
+      failed: status.phase != 'ready'
+      current: status.phase == 'ready'
   interval: 1h
   path: "./kubernetes/apps/dev/forgejo/app"
   postBuild:

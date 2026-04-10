@@ -17,7 +17,7 @@ spec:
         cache:
           ENABLED: true
           ADAPTER: redis
-          HOST: redis://forgejo-redis:6379
+          HOST: redis://forgejo-dragonfly:6379?pool_size=100&idle_timeout=180s
         cron.archive_cleanup:
           ENABLED: true
           RUN_AT_START: true
@@ -35,7 +35,7 @@ spec:
           ENABLE_OPENID_SIGNUP: false
         queue:
           TYPE: redis
-          CONN_STR: redis://forgejo-redis:6379
+          CONN_STR: redis://forgejo-dragonfly:6379?pool_size=100&idle_timeout=180s
         repository:
           DEFAULT_REPO_UNITS: repo.code,repo.releases,repo.issues,repo.pulls,repo.actions
           DISABLED_REPO_UNITS: repo.ext_wiki,repo.ext_issues
@@ -69,7 +69,7 @@ spec:
           REQUIRE_SIGNIN_VIEW: true
         session:
           PROVIDER: redis
-          PROVIDER_CONFIG: redis://forgejo-redis:6379
+          PROVIDER_CONFIG: redis://forgejo-dragonfly:6379?pool_size=100&idle_timeout=180s
         webhook:
           ALLOWED_HOST_LIST: "*"
       oauth:
