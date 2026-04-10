@@ -59,11 +59,21 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: toolhive-operator-config
+  components:
+    - ../../../../components/dragonfly
   dependsOn:
     - name: toolhive-operator-crds
       namespace: ai
+  healthCheckExprs:
+    - apiVersion: dragonflydb.io/v1alpha1
+      kind: Dragonfly
+      failed: status.phase != 'ready'
+      current: status.phase == 'ready'
   interval: 1h
   path: "./kubernetes/apps/ai/toolhive/config"
+  postBuild:
+    substitute:
+      APP: toolhive
   prune: true
   sourceRef:
     kind: GitRepository
