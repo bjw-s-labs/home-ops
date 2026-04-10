@@ -29,10 +29,6 @@ spec:
                         - app
                 topologyKey: kubernetes.io/hostname
         successfulJobsHistoryLimit: 1
-        securityContext:
-          runAsGroup: 1022
-          runAsNonRoot: true
-          runAsUser: 1022
     image:
       flavor: fpm-alpine
     nginx:
@@ -47,10 +43,6 @@ spec:
       host: &host files.bjw-s.dev
       mail:
         enabled: false
-      securityContext:
-        runAsGroup: 1022
-        runAsNonRoot: true
-        runAsUser: 1022
       configs:
         proxy.config.php: |-
           <?php
@@ -94,3 +86,18 @@ spec:
     redis:
       enabled: true
       architecture: standalone
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: nextcloud
+            patch: |-
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: nextcloud
+              spec:
+                template:
+                  spec:
+                    hostUsers: false
