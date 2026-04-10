@@ -9,10 +9,16 @@ spec:
     labels:
       app.kubernetes.io/name: open-webui
   components:
+    - ../../../../components/dragonfly
     - ../../../../components/volsync
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
+  healthCheckExprs:
+    - apiVersion: dragonflydb.io/v1alpha1
+      kind: Dragonfly
+      failed: status.phase != 'ready'
+      current: status.phase == 'ready'
   interval: 1h
   path: "./kubernetes/apps/ai/open-webui/app"
   postBuild:
