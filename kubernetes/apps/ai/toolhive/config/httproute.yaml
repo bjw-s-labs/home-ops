@@ -14,3 +14,19 @@ spec:
     - backendRefs:
         - name: vmcp-mcp-gateway
           port: 4483
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/gateway.networking.k8s.io/httproute_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: mcp-gateway-internal
+spec:
+  hostnames:
+    - mcp-internal.bjw-s.dev
+  parentRefs:
+    - name: envoy-internal
+      namespace: network
+  rules:
+    - backendRefs:
+        - name: vmcp-mcp-gateway-internal
+          port: 4483
