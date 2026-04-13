@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: external-secrets-rules
+spec:
+  groups:
+    - name: ExternalSecrets
+      rules:
+        - alert: ExternalSecretSyncError
+          annotations:
+            description: |-
+              The external secret {{ $labels.exported_namespace }}/{{ $labels.name }} failed to synced.
+              Use this command to check the status:
+              kubectl get externalsecret {{ $labels.name }} -n {{ $labels.exported_namespace }}
+            summary: External secret failed to sync
+          labels:
+            severity: warning
+          expr: externalsecret_status_condition{status="False"} == 1
+          for: 5m
