@@ -39,21 +39,26 @@ spec:
             probes:
               liveness:
                 enabled: true
+                custom: true
                 spec:
-                  periodSeconds: 30
-                  timeoutSeconds: 5
-                  failureThreshold: 5
+                  httpGet:
+                    path: /healthz
+                    port: &port 8080
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
               readiness:
                 enabled: true
+                custom: true
                 spec:
+                  httpGet:
+                    path: /readyz
+                    port: *port
+                  initialDelaySeconds: 0
                   periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 5
-              startup:
-                enabled: true
-                spec:
-                  failureThreshold: 30
-                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
             resources:
               requests:
                 cpu: 10m
