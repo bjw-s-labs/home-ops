@@ -29,6 +29,7 @@ spec:
             env:
               BOOKBOSS__DATABASE__DATABASE_URL: sqlite:///data/bookboss.db?mode=rwc
               BOOKBOSS__FRONTEND__BASE_URL: https://bookboss.bjw-s.dev
+              BOOKBOSS__FRONTEND__LISTEN_PORT: &httpPort 8080
               BOOKBOSS__LIBRARY__LIBRARY_PATH: /library/books
               BOOKBOSS__IMPORT__BOOKDROP_PATH: /library/bookdrop
               BOOKBOSS__IMPORT__POLL_INTERVAL_SECS: 60
@@ -43,7 +44,7 @@ spec:
                 spec:
                   httpGet:
                     path: /healthz
-                    port: &port 8080
+                    port: *httpPort
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 1
@@ -54,7 +55,7 @@ spec:
                 spec:
                   httpGet:
                     path: /readyz
-                    port: *port
+                    port: *httpPort
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 1
@@ -103,4 +104,4 @@ spec:
       app:
         ports:
           http:
-            port: 8080
+            port: *httpPort
