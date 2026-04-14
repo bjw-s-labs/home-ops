@@ -1,0 +1,217 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: searxng
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: searxng
+  interval: 30m
+  values:
+    configMaps:
+      config:
+        suffix: config
+        data:
+          limiter.toml: |-
+            [botdetection]
+            # The prefix defines the number of leading bits in an address that are compared
+            # to determine whether or not an address is part of a (client) network.
+            ipv4_prefix = 32
+            ipv6_prefix = 48
+
+            # If the request IP is in trusted_proxies list, the client IP address is
+            # extracted from the X-Forwarded-For and X-Real-IP headers. This should be
+            # used if SearXNG is behind a reverse proxy or load balancer.
+            trusted_proxies = [
+              '127.0.0.0/8',
+              '10.42.0.0/16'
+            ]
+
+            [botdetection.ip_limit]
+            # To get unlimited access in a local network, by default link-local addresses
+            # (networks) are not monitored by the ip_limit
+            filter_link_local = true
+
+            # activate link_token method in the ip_limit method
+            link_token = true
+
+            [botdetection.ip_lists]
+            block_ip = []
+
+            pass_ip = [
+              '192.168.0.0/16',      # IPv4 private network
+              '10.0.0.0/8',          # IPv4 private network
+            ]
+
+            # Activate passlist of (hardcoded) IPs from the SearXNG organization,
+            # e.g. `check.searx.space`.
+            pass_searxng_org = false
+          settings.yml: |-
+            ---
+            use_default_settings: true
+
+            server:
+              limiter: true
+              image_proxy: true
+              method: GET # https://github.com/searxng/searxng/pull/3619
+              public_instance: false
+
+            search:
+              autocomplete: duckduckgo
+              favicon_resolver: duckduckgo
+              languages:
+                - all
+                - en
+                - en-US
+              formats:
+                - html
+                - json
+
+            general:
+              instance_name: BJW-S Search
+
+            ui:
+              default_theme: simple
+              infinite_scroll: true
+              query_in_title: true
+              results_on_new_tab: true
+              static_use_hash: true
+              theme_args:
+                simple_style: auto
+
+            categories_as_tabs:
+              general:
+              images:
+              videos:
+              map:
+
+            plugins:
+              searx.plugins.calculator.SXNGPlugin:
+                active: true
+
+              searx.plugins.hash_plugin.SXNGPlugin:
+                active: true
+
+              searx.plugins.self_info.SXNGPlugin:
+                active: true
+
+              searx.plugins.tracker_url_remover.SXNGPlugin:
+                active: true
+
+              searx.plugins.unit_converter.SXNGPlugin:
+                active: true
+
+              searx.plugins.ahmia_filter.SXNGPlugin:
+                active: true
+
+              searx.plugins.hostnames.SXNGPlugin:
+                active: true
+
+              searx.plugins.oa_doi_rewrite.SXNGPlugin:
+                active: true
+
+              searx.plugins.tor_check.SXNGPlugin:
+                active: false
+
+            hostnames:
+              high_priority:
+                - (.*)\/blog\/(.*)
+                - (.*\.)?wikipedia.org$
+                - (.*\.)?github.com$
+                - (.*\.)?reddit.com$
+                - (.*\.)?docker.com$
+                - (.*\.)?archlinux.org$
+                - (.*\.)?stackoverflow.com$
+                - (.*\.)?askubuntu.com$
+                - (.*\.)?superuser.com$
+    controllers:
+      searxng:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            fsGroup: 977
+            fsGroupChangePolicy: "OnRootMismatch"
+            runAsGroup: 977
+            runAsUser: 977
+        containers:
+          main:
+            image:
+              repository: ghcr.io/searxng/searxng
+              tag: 2025.11.18-576c8ca99@sha256:91da34403fc1d2c7ac23d1459af87870d87810b7d50b0c6a4585ab78846cb534
+            env:
+              SEARXNG_BASE_URL: https://search.bjw-s.dev
+              SEARXNG_PORT: &httpPort 8080
+              SEARXNG_VALKEY_URL: "redis://searxng-dragonfly:6379"
+            envFrom:
+              - secretRef:
+                  name: searxng-secret
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /stats
+                    port: *httpPort
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /stats
+                    port: *httpPort
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+            resources:
+              requests:
+                cpu: 10m
+                memory: 215Mi
+              limits:
+                memory: 4Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                add:
+                  - CHOWN
+                  - DAC_OVERRIDE
+                  - SETGID
+                  - SETUID
+                drop:
+                  - ALL
+              readOnlyRootFilesystem: true
+    persistence:
+      config:
+        type: configMap
+        identifier: config
+        globalMounts:
+          - path: /etc/searxng/limiter.toml
+            subPath: limiter.toml
+            readOnly: true
+          - path: /etc/searxng/settings.yml
+            subPath: settings.yml
+            readOnly: true
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+    route:
+      app:
+        hostnames:
+          - search.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *httpPort
