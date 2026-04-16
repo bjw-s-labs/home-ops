@@ -49,11 +49,6 @@ spec:
               capabilities:
                 drop:
                   - ALL
-    service:
-      app:
-        ports:
-          http:
-            port: 9000
     persistence:
       config:
         existingClaim: thelounge
@@ -64,3 +59,8 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: 9000

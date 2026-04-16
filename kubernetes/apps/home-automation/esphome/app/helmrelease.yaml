@@ -83,18 +83,6 @@ spec:
                 cpu: 10m
               limits:
                 memory: 512Mi
-    service:
-      app:
-        forceRename: "{{.Release.Name}}"
-        controller: esphome
-        ports:
-          http:
-            port: 6052
-      code-server:
-        controller: code-server
-        ports:
-          http:
-            port: 12321
     persistence:
       config:
         existingClaim: esphome
@@ -164,3 +152,15 @@ spec:
         rules:
           - backendRefs:
               - identifier: code-server
+    service:
+      app:
+        controller: esphome
+        forceRename: "{{.Release.Name}}"
+        ports:
+          http:
+            port: 6052
+      code-server:
+        controller: code-server
+        ports:
+          http:
+            port: 12321

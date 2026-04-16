@@ -63,11 +63,6 @@ spec:
               capabilities:
                 drop:
                   - ALL
-    service:
-      app:
-        ports:
-          http:
-            port: *port
     persistence:
       config:
         existingClaim: bazarr-config
@@ -84,3 +79,8 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *port

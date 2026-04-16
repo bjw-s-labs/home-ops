@@ -38,11 +38,6 @@ spec:
                 memory: 128M
               limits:
                 memory: 512M
-    service:
-      app:
-        ports:
-          http:
-            port: *port
     persistence:
       data:
         existingClaim: freshrss
@@ -69,3 +64,8 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *port

@@ -69,13 +69,6 @@ spec:
                   - NET_BIND_SERVICE
                 drop:
                   - ALL
-    service:
-      app:
-        controller: bambuddy
-        ports:
-          http:
-            appProtocol: kubernetes.io/ws
-            port: *httpPort
     persistence:
       config:
         existingClaim: bambuddy
@@ -100,3 +93,10 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
+    service:
+      app:
+        controller: bambuddy
+        ports:
+          http:
+            appProtocol: kubernetes.io/ws
+            port: *httpPort

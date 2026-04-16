@@ -70,12 +70,6 @@ spec:
                 drop:
                   - ALL
 
-    service:
-      app:
-        ports:
-          http:
-            port: *httpPort
-
     persistence:
       data:
         existingClaim: spoolman
@@ -91,3 +85,9 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
+
+    service:
+      app:
+        ports:
+          http:
+            port: *httpPort

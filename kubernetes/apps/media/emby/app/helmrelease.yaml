@@ -41,15 +41,6 @@ spec:
                 cpu: 100m
               limits:
                 memory: 8Gi
-    service:
-      app:
-        type: LoadBalancer
-        annotations:
-          lbipam.cilium.io/ips: 10.1.6.63
-        externalTrafficPolicy: Local
-        ports:
-          http:
-            port: 8096
     persistence:
       config:
         existingClaim: emby
@@ -90,3 +81,12 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
+    service:
+      app:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 10.1.6.63
+        externalTrafficPolicy: Local
+        ports:
+          http:
+            port: 8096

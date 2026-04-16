@@ -36,11 +36,6 @@ spec:
                 memory: 64M
               limits:
                 memory: 64M
-    service:
-      app:
-        ports:
-          http:
-            port: *port
     route:
       app:
         hostnames:
@@ -48,3 +43,8 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *port

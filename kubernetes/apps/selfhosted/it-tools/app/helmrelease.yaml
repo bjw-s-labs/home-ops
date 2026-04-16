@@ -44,12 +44,6 @@ spec:
                   - ALL
               readOnlyRootFilesystem: true
 
-    service:
-      app:
-        ports:
-          http:
-            port: 8080
-
     persistence:
       tmpfs:
         type: emptyDir
@@ -64,3 +58,9 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
+
+    service:
+      app:
+        ports:
+          http:
+            port: 8080

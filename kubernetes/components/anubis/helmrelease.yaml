@@ -10,6 +10,19 @@ spec:
     name: ${APP}-anubis
   interval: 1h
   values:
+    configMaps:
+      policy:
+        suffix: policy
+        data:
+          policy.yaml: |-
+            bots:
+              - import: (data)/apps/gitea-rss-feeds.yaml
+              - import: (data)/clients/git.yaml
+              - import: (data)/clients/docker-client.yaml
+              - name: allow-api
+                path_regex: ^/api/.*
+                action: ALLOW
+              - import: (data)/meta/default-config.yaml
     controllers:
       anubis:
         annotations:
@@ -69,19 +82,13 @@ spec:
               runAsUser: 1000
               seccompProfile:
                 type: RuntimeDefault
-    configMaps:
+    persistence:
       policy:
-        suffix: policy
-        data:
-          policy.yaml: |-
-            bots:
-              - import: (data)/apps/gitea-rss-feeds.yaml
-              - import: (data)/clients/git.yaml
-              - import: (data)/clients/docker-client.yaml
-              - name: allow-api
-                path_regex: ^/api/.*
-                action: ALLOW
-              - import: (data)/meta/default-config.yaml
+        type: configMap
+        identifier: policy
+        globalMounts:
+          - path: /etc/anubis
+            readOnly: true
     service:
       anubis:
         controller: anubis
@@ -97,10 +104,3 @@ spec:
         endpoints:
           - port: metrics
             interval: 30s
-    persistence:
-      policy:
-        type: configMap
-        identifier: policy
-        globalMounts:
-          - path: /etc/anubis
-            readOnly: true

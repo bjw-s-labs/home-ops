@@ -95,20 +95,6 @@ spec:
               limits:
                 memory: 128Mi
 
-    service:
-      app:
-        forceRename: paperless
-        primary: true
-        controller: paperless
-        ports:
-          http:
-            port: 8000
-      redis:
-        controller: redis
-        ports:
-          http:
-            port: 6379
-
     persistence:
       data:
         existingClaim: paperless-data
@@ -136,3 +122,17 @@ spec:
           - backendRefs:
               - identifier: app
                 port: http
+
+    service:
+      app:
+        controller: paperless
+        forceRename: paperless
+        ports:
+          http:
+            port: 8000
+        primary: true
+      redis:
+        controller: redis
+        ports:
+          http:
+            port: 6379

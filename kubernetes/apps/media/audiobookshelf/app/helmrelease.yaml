@@ -61,11 +61,6 @@ spec:
                 cpu: 50m
               limits:
                 memory: 1.5Gi
-    service:
-      app:
-        ports:
-          http:
-            port: 80
     persistence:
       config:
         existingClaim: audiobookshelf
@@ -101,3 +96,8 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: 80

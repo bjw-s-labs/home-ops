@@ -50,11 +50,12 @@ spec:
                 cpu: 100m
               limits:
                 memory: 2Gi
-    service:
-      app:
-        ports:
-          http:
-            port: 8080
+    persistence:
+      config:
+        enabled: true
+        existingClaim: open-webui
+        globalMounts:
+          - path: /app/backend/data
     route:
       app:
         hostnames:
@@ -62,9 +63,8 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-    persistence:
-      config:
-        enabled: true
-        existingClaim: open-webui
-        globalMounts:
-          - path: /app/backend/data
+    service:
+      app:
+        ports:
+          http:
+            port: 8080

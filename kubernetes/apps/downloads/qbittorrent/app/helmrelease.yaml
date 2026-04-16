@@ -27,8 +27,8 @@ spec:
               repository: ghcr.io/home-operations/qbittorrent
               tag: 5.1.4
             env:
-              QBT_WEBUI_PORT: &port 8080
               QBT_TORRENTING_PORT: &torrentPort 50469
+              QBT_WEBUI_PORT: &port 8080
             nameOverride: qbittorrent
             probes:
               liveness:
@@ -64,22 +64,6 @@ spec:
                 drop:
                   - ALL
               readOnlyRootFilesystem: true
-    service:
-      app:
-        forceRename: "{{ .Release.Name }}"
-        primary: true
-        ports:
-          http:
-            port: *port
-      bittorrent:
-        type: LoadBalancer
-        annotations:
-          lbipam.cilium.io/ips: 10.1.6.61
-        externalTrafficPolicy: Local
-        ports:
-          bittorrent-tcp:
-            port: *torrentPort
-            protocol: TCP
     persistence:
       config:
         existingClaim: qbittorrent
@@ -107,3 +91,19 @@ spec:
           - backendRefs:
               - identifier: app
                 port: http
+    service:
+      app:
+        forceRename: "{{ .Release.Name }}"
+        ports:
+          http:
+            port: *port
+        primary: true
+      bittorrent:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 10.1.6.61
+        externalTrafficPolicy: Local
+        ports:
+          bittorrent-tcp:
+            port: *torrentPort
+            protocol: TCP

@@ -122,20 +122,6 @@ spec:
               capabilities:
                 drop:
                   - ALL
-    service:
-      app:
-        forceRename: manyfold
-        primary: true
-        controller: manyfold
-        ports:
-          http:
-            port: *httpPort
-      redis:
-        controller: redis
-        ports:
-          http:
-            port: 6379
-
     persistence:
       data:
         existingClaim: manyfold-data
@@ -174,3 +160,17 @@ spec:
           - backendRefs:
               - identifier: app
                 port: http
+
+    service:
+      app:
+        controller: manyfold
+        forceRename: manyfold
+        ports:
+          http:
+            port: *httpPort
+        primary: true
+      redis:
+        controller: redis
+        ports:
+          http:
+            port: 6379

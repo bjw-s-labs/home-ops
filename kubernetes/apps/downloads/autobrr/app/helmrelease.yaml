@@ -27,8 +27,8 @@ spec:
             env:
               AUTOBRR__CHECK_FOR_UPDATES: "false"
               AUTOBRR__HOST: 0.0.0.0
-              AUTOBRR__PORT: &port 7474
               AUTOBRR__LOG_LEVEL: DEBUG
+              AUTOBRR__PORT: &port 7474
             envFrom:
               - secretRef:
                   name: autobrr-secret
@@ -66,11 +66,6 @@ spec:
               capabilities:
                 drop:
                   - ALL
-    service:
-      app:
-        ports:
-          http:
-            port: *port
     persistence:
       config:
         existingClaim: autobrr
@@ -90,3 +85,8 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *port

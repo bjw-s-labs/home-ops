@@ -64,14 +64,6 @@ spec:
                 memory: 10M
               limits:
                 memory: 64M
-    service:
-      app:
-        ports:
-          http:
-            primary: true
-            port: *port
-          health:
-            port: *hport
     persistence:
       config-file:
         type: configMap
@@ -86,3 +78,11 @@ spec:
         parentRefs:
           - name: envoy-external
             namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+            primary: true
+          health:
+            port: *hport

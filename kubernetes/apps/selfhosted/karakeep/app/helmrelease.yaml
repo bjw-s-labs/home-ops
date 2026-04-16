@@ -137,25 +137,6 @@ spec:
               limits:
                 memory: 4Gi
 
-    service:
-      app:
-        forceRename: karakeep
-        primary: true
-        controller: karakeep
-        ports:
-          http:
-            port: 3000
-      chrome:
-        controller: chrome
-        ports:
-          http:
-            port: 9222
-      meilisearch:
-        controller: meilisearch
-        ports:
-          http:
-            port: 7700
-
     persistence:
       data:
         existingClaim: karakeep-data
@@ -180,3 +161,22 @@ spec:
           - backendRefs:
               - identifier: app
                 port: http
+
+    service:
+      app:
+        controller: karakeep
+        forceRename: karakeep
+        ports:
+          http:
+            port: 3000
+        primary: true
+      chrome:
+        controller: chrome
+        ports:
+          http:
+            port: 9222
+      meilisearch:
+        controller: meilisearch
+        ports:
+          http:
+            port: 7700

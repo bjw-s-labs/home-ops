@@ -56,26 +56,6 @@ spec:
                 memory: 2Gi
               limits:
                 memory: 8Gi
-    service:
-      frigate:
-        type: LoadBalancer
-        annotations:
-          lbipam.cilium.io/ips: 10.1.6.64
-        ports:
-          http:
-            appProtocol: kubernetes.io/ws
-            primary: true
-            port: 5000
-          go2rtc:
-            port: 1984
-          rtsp:
-            port: 8554
-          webrtc-tcp:
-            port: 8555
-            protocol: TCP
-          webrtc-udp:
-            port: 8555
-            protocol: UDP
     persistence:
       config:
         existingClaim: frigate
@@ -120,3 +100,23 @@ spec:
           - backendRefs:
               - identifier: frigate
                 port: go2rtc
+    service:
+      frigate:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 10.1.6.64
+        ports:
+          http:
+            appProtocol: kubernetes.io/ws
+            port: 5000
+            primary: true
+          go2rtc:
+            port: 1984
+          rtsp:
+            port: 8554
+          webrtc-tcp:
+            port: 8555
+            protocol: TCP
+          webrtc-udp:
+            port: 8555
+            protocol: UDP
