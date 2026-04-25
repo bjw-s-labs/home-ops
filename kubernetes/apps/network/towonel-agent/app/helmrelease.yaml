@@ -1,0 +1,92 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: towonel-agent
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: towonel-agent
+  interval: 30m
+  values:
+    defaultPodOptions:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+    controllers:
+      towonel-agent:
+        type: deployment
+        replicas: 2
+        annotations:
+          reloader.stakater.com/auto: 'true'
+        containers:
+          app:
+            image:
+              repository: git.erwanleboucher.dev/eleboucher/towonel-agent
+              tag: 0.0.18
+            env:
+              RUST_LOG: info
+              TOWONEL_AGENT_SERVICES: '[{"hostname":"*.bjw-s.dev","origin":"envoy-external.network.svc.cluster.local:443"}]'
+              TOWONEL_AGENT_TRUSTED_EDGES: '["0a94832b4f2fcaa2a0e2060057fb6251f50edff29726e16bc960dcae20123a7a"]'
+              TOWONEL_INVITE_TOKEN:
+                valueFrom:
+                  secretKeyRef:
+                    name: towonel-agent-secret
+                    key: TOWONEL_INVITE_TOKEN
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: 9090
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+                  timeoutSeconds: 3
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: 9090
+                  initialDelaySeconds: 3
+                  periodSeconds: 10
+                  timeoutSeconds: 3
+                  failureThreshold: 3
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: 9090
+                  initialDelaySeconds: 2
+                  periodSeconds: 2
+                  failureThreshold: 30
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 50m
+                memory: 64Mi
+              limits:
+                cpu: 500m
+                memory: 64Mi
+    service:
+      app:
+        ports:
+          http:
+            port: 9090

@@ -1,0 +1,53 @@
+---
+name: crowdsec
+
+services:
+  crowdsec:
+    # renovate: datasource=docker depName=crowdsecurity/crowdsec
+    image: docker.io/crowdsecurity/crowdsec:v1.7.7
+    container_name: crowdsec
+    restart: unless-stopped
+    environment:
+      COLLECTIONS: "crowdsecurity/linux crowdsecurity/sshd crowdsecurity/iptables"
+      PARSERS: "crowdsecurity/geoip-enrich"
+      GID: "1000"
+    volumes:
+      - /var/log:/var/log:ro
+      - /run/systemd/journal:/run/systemd/journal:ro
+      - crowdsec-db:/var/lib/crowdsec/data
+      - crowdsec-config:/etc/crowdsec
+      - ./scenarios:/etc/crowdsec/scenarios/custom:ro
+      - ./whitelists:/etc/crowdsec/parsers/s02-enrich/custom:ro
+      - ./acquis.d:/etc/crowdsec/acquis.d/custom:ro
+      - ./config/config.yaml.local:/etc/crowdsec/config.yaml.local:ro
+    ports:
+      - "127.0.0.1:8088:8080"
+    healthcheck:
+      test:
+        - "CMD"
+        - "cscli"
+        - "lapi"
+        - "status"
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "1.0"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  crowdsec-db:
+  crowdsec-config:
+
+networks:
+  default:
+    name: edge
+    external: true

@@ -1,0 +1,39 @@
+---
+name: tunnel
+
+services:
+  towonel-node:
+    # renovate: datasource=docker depName=git.erwanleboucher.dev/eleboucher/towonel-node
+    image: registry.erwanleboucher.dev/eleboucher/towonel-node:0.0.18
+    container_name: towonel-node
+    restart: unless-stopped
+    user: "10001:10001"
+    environment:
+      RUST_LOG: info
+      TOWONEL_IDENTITY_KEY_PATH: /data/node.key
+      TOWONEL_INVITE_HASH_KEY: ${TOWONEL_INVITE_HASH_KEY}
+      TOWONEL_HUB_ENABLED: "true"
+      TOWONEL_HUB_DB_DRIVER: sqlite
+      TOWONEL_HUB_DB_DSN: /data/hub.db
+      TOWONEL_HUB_LISTEN_ADDR: 0.0.0.0:8443
+      TOWONEL_HUB_HEALTH_LISTEN_ADDR: 0.0.0.0:9091
+      TOWONEL_HUB_PUBLIC_URL: https://twnl.bjw-s.dev
+      TOWONEL_HUB_OPERATOR_API_KEY_PATH: /data/operator.key
+      TOWONEL_HUB_URL: http://localhost:8443
+      TOWONEL_EDGE_ENABLED: "true"
+      TOWONEL_EDGE_LISTEN_ADDR: 0.0.0.0:4443
+      TOWONEL_EDGE_HEALTH_LISTEN_ADDR: 0.0.0.0:9092
+      TOWONEL_EDGE_PUBLIC_ADDRESSES: tunnel.bjw-s.dev:443
+      TOWONEL_EDGE_TLS_CERT_DIR: /data/certs
+      TOWONEL_EDGE_TLS_ACME_EMAIL: ${TOWONEL_ACME_EMAIL}
+      TOWONEL_EDGE_TLS_HTTP_LISTEN_ADDR: 0.0.0.0:8081
+    ports:
+      - "${VPS_IP}:443:4443"
+      - "${VPS_IP}:80:8081"
+    volumes:
+      - /opt/towonel:/data
+
+networks:
+  default:
+    name: edge
+    external: true

@@ -1,0 +1,15 @@
+mode: iptables
+log_mode: stdout
+log_level: info
+update_frequency: 10s
+api_url: http://127.0.0.1:8088/
+api_key: {{ crowdsec_api_key }}
+disable_ipv6: false
+deny_action: DROP
+deny_log: false
+supported_decisions_types:
+  - ban
+iptables_chains:
+  - INPUT
+  - FORWARD
+  - DOCKER-USER

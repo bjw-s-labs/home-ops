@@ -3,23 +3,18 @@
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
-  name: pangolin
-  namespace: network
+  name: towonel-agent
 spec:
   endpoints:
     - dnsName: ingress-ext.bjw-s.dev
       recordType: A
       targets:
-        - 135.125.53.129
-    - dnsName: pangolin.bjw-s.dev
+        - &vps_ip 135.125.53.129
+    - dnsName: twnl.bjw-s.dev
       recordType: A
       targets:
-        - 135.125.53.129
-    - dnsName: pangolin-doco.bjw-s.dev
+        - *vps_ip
+    - dnsName: tunnel.bjw-s.dev
       recordType: A
       targets:
-        - 135.125.53.129
-    - dnsName: pangolin-api.bjw-s.dev
-      recordType: A
-      targets:
-        - 135.125.53.129
+        - *vps_ip

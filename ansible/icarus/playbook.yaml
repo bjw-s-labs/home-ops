@@ -6,17 +6,15 @@
   vars:
     ansible_user: ubuntu
     ansible_python_interpreter: auto_silent
-    pangolin_hostname: pangolin.bjw-s.dev
-    pangolin_org_id: homelab
-    pangolin_org_name: Homelab
-    pangolin_site_name: k8s-cluster
-    pangolin_org_subnet: 100.89.0.0/16
-    pangolin_org_utility_subnet: 100.90.0.0/24
     host_ssh_port: 22222
 
   tasks:
     - name: Check host connectivity
       ansible.builtin.ping:
+
+    - name: "update hostnames"
+      hostname:
+        name: icarus
 
     - name: Read secrets from 1Password
       ansible.builtin.shell: "op read 'op://{{ item.key }}' < /dev/null"
@@ -29,12 +27,8 @@
           var: doco_api_secret
         - key: automation/doco-cd/webhook_secret
           var: doco_webhook_secret
-        - key: Services/Pangolin/username
-          var: pangolin_admin_email
-        - key: Services/Pangolin/password
-          var: pangolin_admin_password
-        - key: Services/Pangolin/crowdsec_traefik_api_key
-          var: crowdsec_traefik_api_key
+        - key: Automation/crowdsec/api_token
+          var: crowdsec_api_key
       check_mode: false
       changed_when: false
       no_log: true
@@ -45,9 +39,7 @@
         doco_1pw_sa_token: "{{ secrets_raw.results[0].stdout }}"
         doco_api_secret: "{{ secrets_raw.results[1].stdout }}"
         doco_webhook_secret: "{{ secrets_raw.results[2].stdout }}"
-        pangolin_admin_email: "{{ secrets_raw.results[3].stdout }}"
-        pangolin_admin_password: "{{ secrets_raw.results[4].stdout }}"
-        crowdsec_traefik_api_key: "{{ secrets_raw.results[5].stdout }}"
+        crowdsec_api_key: "{{ secrets_raw.results[3].stdout }}"
       no_log: true
 
     - name: packages
@@ -57,6 +49,12 @@
           args:
             executable: /bin/bash
             creates: /usr/bin/docker
+
+        - name: packages | Install ufw
+          ansible.builtin.apt:
+            name: ufw
+            state: present
+            update_cache: false
 
     - name: ssh
       block:
@@ -84,7 +82,7 @@
 
     - name: firewall
       block:
-        - name: "firewall | Allow ports"
+        - name: firewall | Allow ports
           community.general.ufw:
             rule: allow
             port: "{{ item.port }}"
@@ -98,17 +96,31 @@
               port: 80
             - name: HTTPS
               port: 443
-            - name: Wireguard
-              port: 51820
-              protocol: udp
-            - name: Gerbil
-              port: 21820
-              protocol: udp
 
         - name: firewall | Enable UFW
           community.general.ufw:
             state: enabled
             policy: deny
+
+    - name: docker
+      block:
+        - name: docker | Create edge docker network
+          community.docker.docker_network:
+            name: edge
+            driver: bridge
+            state: present
+
+    - name: towonel
+      vars:
+        towonel_config_dir: /opt/towonel
+      block:
+        - name: towonel | Create directory
+          ansible.builtin.file:
+            path: "{{ towonel_config_dir }}"
+            state: directory
+            owner: 10001
+            group: 10001
+            mode: "0755"
 
     - name: doco-cd
       vars:
@@ -166,115 +178,74 @@
           delay: 10
           when: not ansible_check_mode
 
-    - name: pangolin
-      block:
-        - name: pangolin | Wait for healthy
-          community.docker.docker_container_info:
-            name: pangolin
-          register: pangolin_info
-          until: pangolin_info.container.State.Health.Status == "healthy"
-          retries: 30
-          delay: 10
-          when: not ansible_check_mode
-
-        - name: pangolin | set admin credentials
-          community.docker.docker_container_exec:
-            container: pangolin
-            command: >
-              node /app/dist/cli.mjs set-admin-credentials
-              --email "{{ pangolin_admin_email }}"
-              --password "{{ pangolin_admin_password }}"
-          changed_when: false
-
-        - name: Bootstrap Pangolin org
-          ansible.builtin.shell: |
-            docker exec -i pangolin node - << 'JSEOF'
-            const http = require('http');
-
-            const BASE = 'http://localhost:3000/api/v1';
-            const CSRF = 'x-csrf-protection';
-            let cookie = '';
-
-            function api(method, path, body) {
-              return new Promise((resolve, reject) => {
-                const data = body ? JSON.stringify(body) : null;
-                const opts = {
-                  hostname: 'localhost', port: 3000,
-                  path: '/api/v1' + path, method,
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-Token': CSRF,
-                    ...(cookie ? { Cookie: cookie } : {})
-                  }
-                };
-                const req = http.request(opts, res => {
-                  const sc = res.headers['set-cookie'];
-                  if (sc) cookie = sc.map(c => c.split(';')[0]).join('; ');
-                  let buf = '';
-                  res.on('data', d => buf += d);
-                  res.on('end', () => resolve(JSON.parse(buf)));
-                });
-                req.on('error', reject);
-                if (data) req.write(data);
-                req.end();
-              });
-            }
-
-            async function main() {
-              // Login
-              let r = await api('POST', '/auth/login',
-                { email: '{{ pangolin_admin_email }}', password: '{{ pangolin_admin_password }}' });
-              if (!r.success) { console.log('LOGIN_FAILED: ' + r.message); process.exit(1); }
-
-              // Create org (idempotent)
-              r = await api('PUT', '/org', {
-                orgId: '{{ pangolin_org_id }}', name: '{{ pangolin_org_name }}',
-                subnet: '{{ pangolin_org_subnet }}', utilitySubnet: '{{ pangolin_org_utility_subnet }}'
-              });
-              if (!r.success && !r.message.includes('already exists')) {
-                console.log('ORG_FAILED: ' + r.message); process.exit(1);
-              }
-            }
-
-            main().catch(e => { console.log('ERROR: ' + e.message); process.exit(1); });
-            JSEOF
-          args:
-            executable: /bin/bash
-          register: pangolin_bootstrap
-
     - name: crowdsec
       block:
-        - name: crowdsec | Wait for healthy
-          community.docker.docker_container_info:
-            name: crowdsec
-          register: crowdsec_info
-          until: crowdsec_info.container.State.Health.Status == "healthy"
-          retries: 30
-          delay: 10
-          when: not ansible_check_mode
+        - name: crowdsec | Wait for LAPI on loopback
+          ansible.builtin.wait_for:
+            host: 127.0.0.1
+            port: 8088
+            timeout: 180
 
-        - name: crowdsec | Get bouncers
-          community.docker.docker_container_exec:
-            container: crowdsec
-            command: >
-              cscli bouncers list -o json
-          register: crowdsec_bouncers
+        - name: crowdsec | Register firewall bouncer (idempotent)
+          ansible.builtin.shell: |
+            set -e
+            if docker exec crowdsec cscli bouncers list -o json | jq -e '.[] | select(.name=="firewall")' >/dev/null; then
+              echo "ALREADY_REGISTERED"
+            else
+              docker exec crowdsec cscli bouncers add firewall --key "{{ crowdsec_api_key }}"
+            fi
+          register: bouncer_reg
+          changed_when: "'ALREADY_REGISTERED' not in bouncer_reg.stdout"
+
+        - name: crowdsec | Register CAPI (community blocklist)
+          ansible.builtin.shell: |
+            docker exec crowdsec cscli capi status >/dev/null 2>&1 \
+              || docker exec crowdsec cscli capi register
+          register: capi_reg
+          changed_when: "'Successfully' in capi_reg.stdout"
+
+        - name: crowdsec | Ensure /etc/apt/keyrings exists
+          ansible.builtin.file:
+            path: /etc/apt/keyrings
+            state: directory
+            mode: "0755"
+
+        - name: crowdsec | Download apt signing key
+          ansible.builtin.get_url:
+            url: https://packagecloud.io/crowdsec/crowdsec/gpgkey
+            dest: /etc/apt/keyrings/crowdsec.asc
+            mode: "0644"
+
+        - name: crowdsec | Add apt repository
+          ansible.builtin.apt_repository:
+            repo: "deb [signed-by=/etc/apt/keyrings/crowdsec.asc] https://packagecloud.io/crowdsec/crowdsec/any any main"
+            filename: crowdsec
+            state: present
+            update_cache: true
+
+        - name: crowdsec | Install host firewall bouncer
+          ansible.builtin.apt:
+            name: crowdsec-firewall-bouncer-iptables
+            state: present
+
+        - name: crowdsec | Render bouncer config
+          ansible.builtin.template:
+            src: crowdsec-firewall-bouncer.yaml.j2
+            dest: /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml
+            owner: root
+            group: root
+            mode: "0600"
+          notify: Restart crowdsec-firewall-bouncer
+
+        - name: crowdsec | Enable + start bouncer
+          ansible.builtin.systemd:
+            name: crowdsec-firewall-bouncer
+            enabled: true
+            state: started
+
+        - name: crowdsec | Verify bouncer is active
+          ansible.builtin.command: systemctl is-active crowdsec-firewall-bouncer
           changed_when: false
-
-        - name: crowdsec | Register bouncer for Traefik
-          community.docker.docker_container_exec:
-            container: crowdsec
-            command: >
-              cscli bouncers add traefik --key "{{ crowdsec_traefik_api_key }}"
-          when: "'traefik' not in crowdsec_bouncers.stdout"
-
-    - name: Display summary
-      ansible.builtin.debug:
-        msg:
-          - "=== Bootstrap complete ==="
-          - "VPS IP      : {{ inventory_hostname }}"
-          - "Dashboard   : https://{{ pangolin_hostname }}"
-          - "Org         : {{ pangolin_org_id }}"
 
   handlers:
     - name: Reload systemd daemon
@@ -284,4 +255,9 @@
     - name: Restart ssh.socket
       ansible.builtin.service:
         name: ssh.socket
+        state: restarted
+
+    - name: Restart crowdsec-firewall-bouncer
+      ansible.builtin.service:
+        name: crowdsec-firewall-bouncer
         state: restarted

@@ -1,0 +1,17 @@
+---
+type: trigger
+name: custom/gafam-asn
+description: 'Ban traffic from GAFAM (Google, Apple, Facebook/Meta, Amazon, Microsoft) AS numbers'
+filter: >-
+  evt.Meta.ASNumber in [
+    "15169", "396982",
+    "714", "6185",
+    "32934", "63293",
+    "16509", "14618",
+    "8075", "8068", "3598"
+  ]
+groupby: evt.Meta.source_ip
+blackhole: 5m
+labels:
+  remediation: true
+  type: ban
