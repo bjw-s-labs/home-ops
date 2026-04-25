@@ -1,73 +1,30 @@
 ---
-# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/toolhive.stacklok.dev/virtualmcpserver_v1alpha1.json
-apiVersion: toolhive.stacklok.dev/v1alpha1
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/toolhive.stacklok.dev/virtualmcpserver_v1beta1.json
+apiVersion: toolhive.stacklok.dev/v1beta1
 kind: VirtualMCPServer
 metadata:
-  name: mcp-gateway
+  name: mcp-gateway-direct
 spec:
-  authServerConfig:
-    issuer: https://mcp.bjw-s.dev
-    signingKeySecretRefs:
-      - name: vmcp-auth-server-secret
-        key: signing-key
-    hmacSecretRefs:
-      - name: vmcp-auth-server-secret
-        key: hmac-key
-    tokenLifespans:
-      accessTokenLifespan: 1h
-      refreshTokenLifespan: 168h
-      authCodeLifespan: 10m
-    upstreamProviders:
-      - name: kanidm
-        type: oidc
-        oidcConfig:
-          issuerUrl: https://idm.bjw-s.dev/oauth2/openid/toolhive
-          clientId: toolhive
-          clientSecretRef:
-            name: vmcp-oidc-client-secret
-            key: client-secret
-          redirectUri: https://mcp.bjw-s.dev/oauth/callback
-          scopes:
-            - openid
-            - profile
-            - email
+  groupRef:
+    name: mcp-direct
   config:
     aggregation:
       conflictResolution: prefix
       conflictResolutionConfig:
         prefixFormat: "{workload}_"
-  embeddingServerRef:
-    name: mcp-tools-embedding
-  groupRef:
-    name: mcp-tools
   incomingAuth:
-    type: oidc
-    oidcConfig:
-      type: inline
-      resourceUrl: https://mcp.bjw-s.dev/mcp
-      inline:
-        audience: https://mcp.bjw-s.dev/mcp
-        issuer: https://mcp.bjw-s.dev
-        jwksAllowPrivateIP: true
+    type: anonymous
   outgoingAuth:
     source: discovered
-  sessionStorage:
-    provider: redis
-    address: toolhive-dragonfly:6379
-  podTemplateSpec:
-    spec:
-      containers:
-        - name: vmcp
-          env:
-            - name: INSECURE_DISABLE_URL_VALIDATION
-              value: "true"
 ---
-# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/toolhive.stacklok.dev/virtualmcpserver_v1alpha1.json
-apiVersion: toolhive.stacklok.dev/v1alpha1
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/toolhive.stacklok.dev/virtualmcpserver_v1beta1.json
+apiVersion: toolhive.stacklok.dev/v1beta1
 kind: VirtualMCPServer
 metadata:
   name: mcp-gateway-internal
 spec:
+  groupRef:
+    name: mcp-tools
   config:
     aggregation:
       conflictResolution: prefix
@@ -75,8 +32,6 @@ spec:
         prefixFormat: "{workload}_"
   embeddingServerRef:
     name: mcp-tools-embedding
-  groupRef:
-    name: mcp-tools
   incomingAuth:
     type: anonymous
   outgoingAuth:

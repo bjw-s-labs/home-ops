@@ -1,15 +1,15 @@
 ---
-# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/toolhive.stacklok.dev/mcpserver_v1alpha1.json
-apiVersion: toolhive.stacklok.dev/v1alpha1
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/toolhive.stacklok.dev/mcpserver_v1beta1.json
+apiVersion: toolhive.stacklok.dev/v1beta1
 kind: MCPServer
 metadata:
   name: ha-mcp
 spec:
+  groupRef:
+    name: mcp-tools
   env:
     - name: HOMEASSISTANT_URL
       value: http://hestia.bjw-s.internal:8123
-  groupRef:
-    name: mcp-tools
   image: ghcr.io/homeassistant-ai/ha-mcp:7.3.0
   podTemplateSpec:
     spec:
