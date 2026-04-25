@@ -3,22 +3,22 @@
 
 secrets:
   1pw_token:
-    file: /home/truenas_admin/.config/doco-cd/1pw_token
+    file: /opt/doco-cd/1pw_token
   api_secret:
-    file: /home/truenas_admin/.config/doco-cd/api_secret
+    file: /opt/doco-cd/api_secret
   webhook_secret:
-    file: /home/truenas_admin/.config/doco-cd/webhook_secret
+    file: /opt/doco-cd/webhook_secret
 services:
   app:
     container_name: doco-cd
     environment:
       API_SECRET_FILE: /run/secrets/api_secret
-      DEPLOY_CONFIG_BASE_DIR: ./docker/truenas/
+      DEPLOY_CONFIG_BASE_DIR: ./docker/icarus/
       HTTP_PORT: 8880
       LOG_LEVEL: info
       POLL_CONFIG: |-
         - url: https://github.com/bjw-s-labs/home-ops.git
-          reference: refs/heads/main
+          reference: main
           interval: 3600
       SECRET_PROVIDER: 1password
       SECRET_PROVIDER_ACCESS_TOKEN_FILE: /run/secrets/1pw_token
@@ -46,3 +46,7 @@ services:
       - data:/data
 volumes:
   data: {}
+networks:
+  default:
+    name: pangolin
+    external: true
