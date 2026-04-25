@@ -5,18 +5,19 @@ kind: MCPServer
 metadata:
   name: ha-mcp
 spec:
-  image: ghcr.io/homeassistant-ai/ha-mcp:7.3.0
-  transport: streamable-http
-  groupRef: mcp-tools
   env:
     - name: HOMEASSISTANT_URL
       value: http://hestia.bjw-s.internal:8123
-  secrets:
-    - name: ha-mcp-secret
-      key: HOMEASSISTANT_TOKEN
+  groupRef:
+    name: mcp-tools
+  image: ghcr.io/homeassistant-ai/ha-mcp:7.3.0
   podTemplateSpec:
     spec:
       containers:
         - name: mcp
           command:
             - ha-mcp-web
+  secrets:
+    - name: ha-mcp-secret
+      key: HOMEASSISTANT_TOKEN
+  transport: streamable-http

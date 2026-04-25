@@ -32,13 +32,14 @@ spec:
             - profile
             - email
   config:
-    groupRef: mcp-tools
     aggregation:
       conflictResolution: prefix
       conflictResolutionConfig:
         prefixFormat: "{workload}_"
   embeddingServerRef:
     name: mcp-tools-embedding
+  groupRef:
+    name: mcp-tools
   incomingAuth:
     type: oidc
     oidcConfig:
@@ -68,13 +69,14 @@ metadata:
   name: mcp-gateway-internal
 spec:
   config:
-    groupRef: mcp-tools
     aggregation:
       conflictResolution: prefix
       conflictResolutionConfig:
         prefixFormat: "{workload}_"
   embeddingServerRef:
     name: mcp-tools-embedding
+  groupRef:
+    name: mcp-tools
   incomingAuth:
     type: anonymous
   outgoingAuth:
