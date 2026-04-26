@@ -1,5 +1,5 @@
 ---
-- name: Bootstrap pangolin VPS
+- name: Bootstrap Icarus
   hosts: all
   become: true
   gather_facts: false
@@ -13,7 +13,9 @@
       ansible.builtin.ping:
 
     - name: "update hostnames"
-      hostname:
+      tags:
+        - bootstrap
+      ansible.builtin.hostname:
         name: icarus
 
     - name: Read secrets from 1Password
@@ -43,6 +45,8 @@
       no_log: true
 
     - name: packages
+      tags:
+        - packages
       block:
         - name: packages | Install Docker
           ansible.builtin.shell: curl -fsSL https://get.docker.com | sh
@@ -56,7 +60,15 @@
             state: present
             update_cache: false
 
+        - name: packages | Install ipset
+          ansible.builtin.apt:
+            name: ipset
+            state: present
+            update_cache: false
+
     - name: ssh
+      tags:
+        - ssh
       block:
         - name: ssh | Update ssh socket config
           ansible.builtin.replace:
@@ -81,6 +93,8 @@
           notify: Restart ssh.socket
 
     - name: firewall
+      tags:
+        - firewall
       block:
         - name: firewall | Allow ports
           community.general.ufw:
@@ -105,6 +119,8 @@
             policy: deny
 
     - name: docker
+      tags:
+        - docker
       block:
         - name: docker | Create edge docker network
           community.docker.docker_network:
@@ -113,6 +129,8 @@
             state: present
 
     - name: towonel
+      tags:
+        - towonel
       vars:
         towonel_config_dir: /opt/towonel
       block:
@@ -125,6 +143,8 @@
             mode: "0755"
 
     - name: doco-cd
+      tags:
+        - doco-cd
       vars:
         dococd_config_dir: /opt/doco-cd
       block:
@@ -181,6 +201,8 @@
           when: not ansible_check_mode
 
     - name: crowdsec
+      tags:
+        - crowdsec
       block:
         - name: crowdsec | Wait for LAPI on loopback
           ansible.builtin.wait_for:
@@ -248,6 +270,58 @@
         - name: crowdsec | Verify bouncer is active
           ansible.builtin.command: systemctl is-active crowdsec-firewall-bouncer
           changed_when: false
+
+    - name: geo-block
+      tags:
+        - geo-block
+      vars:
+        blocked_countries:
+          - RU
+          - IL
+          - IR
+          - CN
+          - KP
+          - BY
+          - CU
+      block:
+        - name: geo-block | Create directory
+          ansible.builtin.file:
+            path: /opt/geo-block
+            state: directory
+            owner: root
+            group: root
+            mode: "0755"
+
+        - name: geo-block | Render update script
+          ansible.builtin.template:
+            src: update-country-blocks.sh.j2
+            dest: /opt/geo-block/update-country-blocks.sh
+            owner: root
+            group: root
+            mode: "0755"
+
+        - name: geo-block | Run initial block update
+          ansible.builtin.shell:
+            cmd: /opt/geo-block/update-country-blocks.sh "{{ blocked_countries | join(' ') }}"
+            creates: /opt/geo-block/zones
+
+        - name: geo-block | Create weekly cron job
+          ansible.builtin.cron:
+            name: "GeoIP country block weekly refresh"
+            minute: "0"
+            hour: "3"
+            day: "*"
+            month: "*"
+            weekday: "0"
+            job: "/opt/geo-block/update-country-blocks.sh {{ blocked_countries | join(' ') }} >> /var/log/geo-block.log 2>&1"
+            state: present
+
+        - name: geo-block | Create reboot cron job
+          ansible.builtin.cron:
+            name: "GeoIP country block restore on reboot"
+            special_time: reboot
+            job: "/opt/geo-block/update-country-blocks.sh {{ blocked_countries | join(' ') }} >> /var/log/geo-block.log 2>&1"
+            state: present
 
   handlers:
     - name: Reload systemd daemon

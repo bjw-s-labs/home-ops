@@ -1,0 +1,72 @@
+#!/bin/bash
+set -euo pipefail
+
+if [[ -z "${1:-}" ]]; then
+    echo "Usage: $0 <countries>" >&2
+    exit 1
+fi
+
+COUNTRIES="$1"
+IPSET_NAME="countries-blocked"
+LOCK_FILE="/var/run/geo-block.lock"
+LOG_FILE="/var/log/geo-block.log"
+COUNTRY_DIR="/opt/geo-block/zones"
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_FILE"
+}
+
+acquire_lock() {
+    exec 200>"$LOCK_FILE"
+    flock -n 200 || exit 0
+}
+
+acquire_lock
+
+log "Starting country block update"
+
+mkdir -p "$COUNTRY_DIR"
+
+for country in $COUNTRIES; do
+    ZONE_URL="https://www.ipdeny.com/ipblocks/data/countries/${country,,}.zone"
+    ZONE_FILE="$COUNTRY_DIR/${country,,}.zone"
+
+    if curl -sf "$ZONE_URL" -o "$ZONE_FILE"; then
+        log "Downloaded zone file for $country ($(wc -l < "$ZONE_FILE") entries)"
+    else
+        log "ERROR: Failed to download zone file for $country"
+    fi
+done
+
+log "Creating ipset set if not exists"
+ipset create -exist "$IPSET_NAME" hash:net family inet hashsize 16384 maxelem 131072 timeout 0
+
+TEMP_SET="countries-blocked-tmp"
+ipset create "$TEMP_SET" hash:net family inet hashsize 16384 maxelem 131072 timeout 0
+
+for country in $COUNTRIES; do
+    ZONE_FILE="$COUNTRY_DIR/${country,,}.zone"
+    if [[ -f "$ZONE_FILE" ]]; then
+        while IFS= read -r ip; do
+            ipset add "$TEMP_SET" "$ip" 2>/dev/null || true
+        done < "$ZONE_FILE"
+        log "Added IPs from $country zone to temp set"
+    fi
+done
+
+ipset swap "$TEMP_SET" "$IPSET_NAME"
+ipset destroy "$TEMP_SET"
+
+log "Country block update complete. Total entries: $(ipset list "$IPSET_NAME" | grep -c 'Members:')"
+
+# Setup iptables rules
+iptables -N GEO_BLOCK_CHAIN 2>/dev/null || true
+iptables -F GEO_BLOCK_CHAIN
+iptables -A GEO_BLOCK_CHAIN -m set --match-set "$IPSET_NAME" src -j DROP
+
+# Insert jump rules if not already present
+iptables -C INPUT -j GEO_BLOCK_CHAIN 2>/dev/null || iptables -I INPUT -j GEO_BLOCK_CHAIN
+iptables -C FORWARD -j GEO_BLOCK_CHAIN 2>/dev/null || iptables -I FORWARD -j GEO_BLOCK_CHAIN
+iptables -C DOCKER-USER -j GEO_BLOCK_CHAIN 2>/dev/null || iptables -I DOCKER-USER -j GEO_BLOCK_CHAIN
+
+log "Iptables rules updated"
