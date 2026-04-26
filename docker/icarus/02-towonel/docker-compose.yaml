@@ -3,11 +3,12 @@ name: tunnel
 
 services:
   towonel-node:
-    # renovate: datasource=docker depName=git.erwanleboucher.dev/eleboucher/towonel-node
-    image: registry.erwanleboucher.dev/eleboucher/towonel-node:0.0.19
     container_name: towonel-node
-    restart: unless-stopped
-    user: "10001:10001"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "2.0"
     environment:
       RUST_LOG: info
       TOWONEL_IDENTITY_KEY_PATH: /data/node.key
@@ -27,9 +28,29 @@ services:
       TOWONEL_EDGE_TLS_CERT_DIR: /data/certs
       TOWONEL_EDGE_TLS_ACME_EMAIL: ${TOWONEL_ACME_EMAIL}
       TOWONEL_EDGE_TLS_HTTP_LISTEN_ADDR: 0.0.0.0:8081
-    ports:
-      - "${VPS_IP}:443:4443"
-      - "${VPS_IP}:80:8081"
+    expose:
+      - "4443"
+      - "8081"
+    healthcheck:
+      test:
+        - "CMD"
+        - "curl"
+        - "-fsS"
+        - "-o"
+        - "/dev/null"
+        - "http://127.0.0.1:8443/v1/health"
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+    # renovate: datasource=docker depName=git.erwanleboucher.dev/eleboucher/towonel-node
+    image: registry.erwanleboucher.dev/eleboucher/towonel-node:0.0.19
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
+    user: "10001:10001"
     volumes:
       - /opt/towonel:/data
 
