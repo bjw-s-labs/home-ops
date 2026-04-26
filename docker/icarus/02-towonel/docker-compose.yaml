@@ -14,6 +14,7 @@ services:
       TOWONEL_IDENTITY_KEY_PATH: /data/node.key
       TOWONEL_INVITE_HASH_KEY: ${TOWONEL_INVITE_HASH_KEY}
       TOWONEL_HUB_ENABLED: "true"
+      TOWONEL_HUB_ALLOW_PRIVILEGED_PORTS: "true"
       TOWONEL_HUB_DB_DRIVER: sqlite
       TOWONEL_HUB_DB_DSN: /data/hub.db
       TOWONEL_HUB_LISTEN_ADDR: 0.0.0.0:8443
@@ -29,6 +30,7 @@ services:
       TOWONEL_EDGE_TLS_ACME_EMAIL: ${TOWONEL_ACME_EMAIL}
       TOWONEL_EDGE_TLS_HTTP_LISTEN_ADDR: 0.0.0.0:8081
     expose:
+      - "22"
       - "4443"
       - "8081"
     healthcheck:
