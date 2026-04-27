@@ -29,10 +29,6 @@ services:
       TOWONEL_EDGE_TLS_CERT_DIR: /data/certs
       TOWONEL_EDGE_TLS_ACME_EMAIL: ${TOWONEL_ACME_EMAIL}
       TOWONEL_EDGE_TLS_HTTP_LISTEN_ADDR: 0.0.0.0:8081
-    expose:
-      - "22"
-      - "4443"
-      - "8081"
     healthcheck:
       test:
         - "CMD"
@@ -51,6 +47,10 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    ports:
+      - 22:22
+      - 443:4443
+      - 80:8081
     restart: unless-stopped
     user: "10001:10001"
     volumes:
