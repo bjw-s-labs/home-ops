@@ -12,10 +12,8 @@ spec:
   values:
     controllers:
       manyfold:
-        forceRename: manyfold
         annotations:
           secret.reloader.stakater.com/reload: manyfold-secret
-
         pod:
           labels:
             app.kubernetes.io/component: application
@@ -24,7 +22,6 @@ spec:
             fsGroupChangePolicy: "OnRootMismatch"
             runAsGroup: 2000
             runAsUser: 2000
-
         initContainers:
           chown-tmpdirs:
             image:
@@ -38,7 +35,6 @@ spec:
                 chmod o-rwx /tmp
             securityContext:
               runAsUser: 0
-
         containers:
           main:
             image:
@@ -48,7 +44,7 @@ spec:
               DATABASE_URL: sqlite3:/data/database/manyfold.sqlite3
               MULTIUSER: false
               PORT: &httpPort 3214
-              REDIS_URL: redis://manyfold-redis.selfhosted.svc.cluster.local:6379
+              REDIS_URL: redis://manyfold-dragonfly:6379
               REGISTRATION: false
               SECRET_KEY_BASE:
                 valueFrom:
@@ -89,39 +85,6 @@ spec:
               capabilities:
                 drop:
                   - ALL
-
-      redis:
-        pod:
-          labels:
-            app.kubernetes.io/component: redis
-          securityContext:
-            runAsUser: 65534
-            runAsGroup: 65534
-            fsGroup: 65534
-            fsGroupChangePolicy: "OnRootMismatch"
-        strategy: RollingUpdate
-        containers:
-          redis:
-            image:
-              repository: ghcr.io/valkey-io/valkey
-              tag: 9.0.3
-            args:
-              - --save
-              - ""
-              - --appendonly
-              - "no"
-            resources:
-              requests:
-                cpu: 5m
-                memory: 32Mi
-              limits:
-                memory: 128Mi
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
     persistence:
       data:
         existingClaim: manyfold-data
@@ -144,10 +107,6 @@ spec:
               - path: /app/log
                 subPath: app-log
             chown-tmpdirs: *tmpdirs
-          redis:
-            redis:
-              - path: /data
-                subPath: data
     route:
       app:
         hostnames:
@@ -155,22 +114,12 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-
         rules:
           - backendRefs:
               - identifier: app
                 port: http
-
     service:
       app:
-        controller: manyfold
-        forceRename: manyfold
         ports:
           http:
             port: *httpPort
-        primary: true
-      redis:
-        controller: redis
-        ports:
-          http:
-            port: 6379

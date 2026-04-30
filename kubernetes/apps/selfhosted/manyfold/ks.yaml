@@ -10,6 +10,7 @@ spec:
       app.kubernetes.io/name: manyfold
   components:
     - ../../../../components/volsync
+    - ../../../../components/dragonfly
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -20,6 +21,7 @@ spec:
       APP: manyfold
       VOLSYNC_CLAIM: manyfold-data
       VOLSYNC_CAPACITY: 5Gi
+      DRAGONFLY_REPLICAS: "1"
   prune: true
   sourceRef:
     kind: GitRepository
