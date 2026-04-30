@@ -29,6 +29,10 @@ spec:
                         - app
                 topologyKey: kubernetes.io/hostname
         successfulJobsHistoryLimit: 1
+    externalRedis:
+      enabled: true
+      host: nextcloud-dragonfly
+      port: 6379
     image:
       flavor: fpm-alpine
     nginx:
@@ -83,9 +87,6 @@ spec:
     persistence:
       enabled: true
       existingClaim: nextcloud
-    redis:
-      enabled: true
-      architecture: standalone
   postRenderers:
     - kustomize:
         patches:

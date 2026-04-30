@@ -10,6 +10,7 @@ spec:
       app.kubernetes.io/name: nextcloud
   components:
     - ../../../../components/volsync
+    - ../../../../components/dragonfly
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -22,6 +23,7 @@ spec:
       APP_GID: "82"
       VOLSYNC_CLAIM: nextcloud
       VOLSYNC_CAPACITY: 15Gi
+      DRAGONFLY_REPLICAS: "1"
   prune: true
   sourceRef:
     kind: GitRepository
