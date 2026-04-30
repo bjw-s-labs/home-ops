@@ -72,7 +72,7 @@
       block:
         - name: ssh | Update ssh socket config
           ansible.builtin.replace:
-            path: /lib/systemd/system/ssh.socket
+            path: /usr/lib/systemd/system/ssh.socket
             regexp: "^(ListenStream=.+):\\d+$"
             replace: "\\1:{{ host_ssh_port }}"
           notify:
