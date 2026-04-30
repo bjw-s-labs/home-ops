@@ -11,6 +11,7 @@ spec:
   components:
     - ../../../../components/volsync
     - ../../../../components/keda/nas-nfs-scaler
+    - ../../../../components/dragonfly
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -23,6 +24,7 @@ spec:
       APP_GID: "65542"
       VOLSYNC_CLAIM: paperless-data
       VOLSYNC_CAPACITY: 15Gi
+      DRAGONFLY_REPLICAS: "1"
   prune: true
   sourceRef:
     kind: GitRepository
