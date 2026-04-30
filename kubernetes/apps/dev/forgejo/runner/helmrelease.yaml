@@ -21,19 +21,27 @@ spec:
             container:
               docker_host: "-"
               workdir_parent: shared/workdir
+            host:
+              workdir_parent: /data/act
             kubernetes:
               namespace: dev
               poll_timeout: 10m
             log:
               level: info
+            pluginsv2:
+              k8s:
+                path: /plugins/forgejo-runner-k8s
+                options:
+                  namespace: dev
+                  poll_timeout: 10m
             runner:
-              capacity: 4
+              capacity: 2
               file: /persistent/.runner
               labels:
-                - ubuntu-latest:k8spod:/config/podspec-default.yaml
+                - ubuntu-latest:k8s:/config/podspec-default.yaml
                 - ubuntu-24.04:k8spod:/config/podspec-default.yaml
-                - default:k8spod:/config/podspec-default.yaml
-                - docker:k8spod:/config/podspec-dind.yaml
+                - default:k8s:/config/podspec-default.yaml
+                - docker:k8s:/config/podspec-dind.yaml
               timeout: 3h
           podspec-default.yaml: |-
             containers:
@@ -112,6 +120,8 @@ spec:
       forgejo-runner:
         type: statefulset
         replicas: 1
+        annotations:
+          reloader.stakater.com/auto: "true"
         statefulset:
           volumeClaimTemplates:
             - accessMode: ReadWriteOnce
@@ -128,13 +138,25 @@ spec:
             runAsGroup: 1000
             runAsNonRoot: true
             runAsUser: 1000
-        annotations:
-          reloader.stakater.com/auto: "true"
         initContainers:
+          copy-k8s-plugin:
+            image:
+              repository: git.erwanleboucher.dev/eleboucher/runner-k8s-plugin-v2
+              tag: sha-f7ab06b75887e5497c9f9f9bef641aafb2ae3e1c
+            command:
+              - sh
+              - -c
+              - cp /usr/local/bin/forgejo-runner-k8s /plugins/forgejo-runner-k8s
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
           register-runner:
             image:
               repository: git.erwanleboucher.dev/eleboucher/runner
-              tag: latest@sha256:b6bfcf90d4eb2496dcadbc0aa9f640413370f80a23d69dca6bdc77cfdc284e0c
+              tag: sha-63d5504927ba6b9d511c0972beaf4ff5b3705f82
             command:
               - sh
               - -c
@@ -160,7 +182,7 @@ spec:
           runner:
             image:
               repository: git.erwanleboucher.dev/eleboucher/runner
-              tag: latest@sha256:b6bfcf90d4eb2496dcadbc0aa9f640413370f80a23d69dca6bdc77cfdc284e0c
+              tag: sha-63d5504927ba6b9d511c0972beaf4ff5b3705f82
             command:
               - /bin/forgejo-runner
               - daemon
@@ -182,9 +204,12 @@ spec:
         identifier: config
         globalMounts:
           - path: /config
+      plugins:
+        type: emptyDir
+        globalMounts:
+          - path: /plugins
       tmpfs:
         type: emptyDir
-        sizeLimit: 10Gi
         globalMounts:
           - path: /data
             subPath: data
