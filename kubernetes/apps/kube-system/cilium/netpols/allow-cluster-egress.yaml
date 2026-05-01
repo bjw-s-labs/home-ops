@@ -5,7 +5,10 @@ kind: CiliumClusterwideNetworkPolicy
 metadata:
   name: allow-cluster-egress
 spec:
-  endpointSelector: {}
+  endpointSelector:
+    matchExpressions:
+      - key: egress.home.arpa/custom-egress
+        operator: DoesNotExist
   egress:
     - toEndpoints:
         - {}
