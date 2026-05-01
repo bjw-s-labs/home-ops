@@ -1,0 +1,36 @@
+---
+name: caddy-l4
+
+services:
+  caddy:
+    image: ghcr.io/bjw-s-labs/caddy-l4:2.11.2
+    container_name: caddy-l4
+    restart: unless-stopped
+    environment:
+      CADDY_ACME_EMAIL: ${TOWONEL_ACME_EMAIL}
+      VPS_LOCAL_HOSTS: >-
+        icarus-doco-cd.bjw-s.dev
+        tunnel.bjw-s.dev
+        twnl.bjw-s.dev
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+    configs:
+      - source: caddyfile
+        target: /etc/caddy/Caddyfile
+
+volumes:
+  caddy-data:
+  caddy-config:
+
+configs:
+  caddyfile:
+    file: ./config/Caddyfile
+
+networks:
+  default:
+    name: edge
+    external: true

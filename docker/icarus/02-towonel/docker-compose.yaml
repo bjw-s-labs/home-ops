@@ -2,8 +2,8 @@
 name: tunnel
 
 services:
-  towonel-node:
-    container_name: towonel-node
+  towonel-hub:
+    container_name: towonel-hub
     deploy:
       resources:
         limits:
@@ -26,6 +26,7 @@ services:
       TOWONEL_EDGE_LISTEN_ADDR: 0.0.0.0:4443
       TOWONEL_EDGE_HEALTH_LISTEN_ADDR: 0.0.0.0:9092
       TOWONEL_EDGE_PUBLIC_ADDRESSES: tunnel.bjw-s.dev:443
+      TOWONEL_EDGE_PROXY_PROTOCOL: "true"
       TOWONEL_EDGE_TLS_CERT_DIR: /data/certs
       TOWONEL_EDGE_TLS_ACME_EMAIL: ${TOWONEL_ACME_EMAIL}
       TOWONEL_EDGE_TLS_HTTP_LISTEN_ADDR: 0.0.0.0:8081
@@ -49,8 +50,6 @@ services:
         max-file: "3"
     ports:
       - 22:22
-      - 443:4443
-      - 80:8081
     restart: unless-stopped
     user: "10001:10001"
     volumes:

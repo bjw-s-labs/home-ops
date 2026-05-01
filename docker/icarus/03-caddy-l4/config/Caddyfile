@@ -1,0 +1,67 @@
+{
+	email {$CADDY_ACME_EMAIL}
+	http_port 8080
+	https_port 8443
+
+	layer4 {
+		:443 {
+			@local tls sni {$VPS_LOCAL_HOSTS}
+			route @local {
+				proxy {
+					proxy_protocol v2
+					upstream 127.0.0.1:8443
+				}
+			}
+			@tls tls
+			route @tls {
+				proxy {
+					proxy_protocol v2
+					upstream towonel-hub:4443
+				}
+			}
+		}
+		:80 {
+			@local_http http host {$VPS_LOCAL_HOSTS}
+			route @local_http {
+				proxy {
+					proxy_protocol v2
+					upstream 127.0.0.1:8080
+				}
+			}
+			@http http
+			route @http {
+				proxy towonel-hub:8081
+			}
+		}
+	}
+
+	servers :8443 {
+		listener_wrappers {
+			proxy_protocol {
+				timeout 2s
+				allow 127.0.0.1/32
+			}
+			tls
+		}
+	}
+	servers :8080 {
+		listener_wrappers {
+			proxy_protocol {
+				timeout 2s
+				allow 127.0.0.1/32
+			}
+		}
+	}
+}
+
+icarus-doco-cd.bjw-s.dev {
+	reverse_proxy doco-cd:8880
+}
+
+tunnel.bjw-s.dev {
+	reverse_proxy towonel-hub:8443
+}
+
+twnl.bjw-s.dev {
+	reverse_proxy towonel-hub:8443
+}
