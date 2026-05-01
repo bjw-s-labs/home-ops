@@ -20,11 +20,10 @@ spec:
             - protocol: TCP
               port: "3000"
     - # Internet egress
-      toEntities:
-        - world
+      toCIDRSet:
+        # Internet egress
+        - cidrGroupRef: internet
       toPorts:
         - ports:
-            - protocol: TCP
-              port: "80"
             - protocol: TCP
               port: "443"
