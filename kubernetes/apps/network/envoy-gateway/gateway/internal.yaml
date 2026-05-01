@@ -6,6 +6,12 @@ metadata:
   name: envoy-internal
   annotations:
     external-dns.alpha.kubernetes.io/target: &hostname ingress-int.bjw-s.dev
+    gatus.home-operations.com/endpoint: |-
+      group: internal
+      guarded: true
+      ui:
+        hide-hostname: true
+        hide-url: true
 spec:
   gatewayClassName: envoy
   infrastructure:
