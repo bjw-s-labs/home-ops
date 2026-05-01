@@ -1,0 +1,34 @@
+---
+name: gatus
+
+services:
+  gatus:
+    image: ghcr.io/twin/gatus:v5.35.0@sha256:21609f31be8c4e680ce3004b24276305666239c99aff58391503f3fb6142f39d
+    container_name: gatus
+    restart: unless-stopped
+    environment:
+      GATUS_DELAY_START_SECONDS: 5
+      GATUS_CONFIG_PATH: /config
+      GATUS_WEB_PORT: 8080
+      PUSHOVER_TOKEN: ${GATUS_PUSHOVER_TOKEN}
+      PUSHOVER_USER_KEY: ${GATUS_PUSHOVER_KEY}
+      REMOTE_STATUS_HOSTNAME: status.bjw-s.dev
+      REMOTE_DDNS_HOSTNAME: ${GATUS_REMOTE_DDNS_HOSTNAME}
+      REMOTE_HEARTBEAT_TOKEN: ${GATUS_REMOTE_HEARTBEAT_TOKEN}
+    volumes:
+      - gatus-config:/config
+    configs:
+      - source: gatus_config
+        target: /config/config.yaml
+
+volumes:
+  gatus-config:
+
+configs:
+  gatus_config:
+    file: ./config/config.yaml
+
+networks:
+  default:
+    name: edge
+    external: true

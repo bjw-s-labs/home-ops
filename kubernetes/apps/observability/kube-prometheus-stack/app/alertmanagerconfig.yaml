@@ -14,12 +14,15 @@ spec:
     receiver: pushover
     repeatInterval: 12h
     routes:
-      - receiver: "null"
+      - receiver: icarus-heartbeat
+        groupInterval: 2m
+        groupWait: 0s
+        repeatInterval: 2m30s
         matchers:
           - name: alertname
             value: Watchdog
             matchType: =
-      - receiver: "null"
+      - receiver: blackhole
         matchers:
           - name: alertname
             value: InfoInhibitor
@@ -42,7 +45,16 @@ spec:
           value: warning
           matchType: =
   receivers:
-    - name: "null"
+    - name: blackhole
+    - name: icarus-heartbeat
+      webhookConfigs:
+        - httpConfig:
+            bearerTokenSecret:
+              name: alertmanager-secret
+              key: icarus_home_heartbeat_token
+          urlSecret:
+            name: alertmanager-secret
+            key: icarus_home_heartbeat_url
     - name: pushover
       pushoverConfigs:
         - html: true

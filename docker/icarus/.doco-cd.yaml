@@ -5,9 +5,13 @@ auto_discover_opts:
   depth: 1
   delete: true
 external_secrets:
-  VPS_IP: "op://automation/towonel-tunnel/ip"
-  TOWONEL_ACME_EMAIL: "op://automation/towonel-tunnel/acme_email"
-  TOWONEL_INVITE_HASH_KEY: "op://automation/towonel-tunnel/invite_hash_key"
+  GATUS_PUSHOVER_TOKEN: op://Services/Pushover/gatus_token
+  GATUS_PUSHOVER_KEY: op://Services/Pushover/userkey_bernd
+  GATUS_REMOTE_DDNS_HOSTNAME: op://automation/gatus/home_heartbeat_ddns_hostname
+  GATUS_REMOTE_HEARTBEAT_TOKEN: op://automation/gatus/icarus_home_heartbeat_token
+  TOWONEL_ACME_EMAIL: op://automation/towonel-tunnel/acme_email
+  TOWONEL_INVITE_HASH_KEY: op://automation/towonel-tunnel/invite_hash_key
+  VPS_IP: op://automation/towonel-tunnel/ip
 force_recreate: false
 reconciliation:
   enabled: true
