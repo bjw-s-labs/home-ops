@@ -1,0 +1,42 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/cilium.io/ciliumcidrgroup_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: internet
+spec:
+  # Public IP space without private subnets
+  # Script:
+  # python -c 'reserved=["10.0.0.0/8","172.16.0.0/12","192.168.0.0/16"];from netaddr import IPSet,IPNetwork;world=IPSet(IPNetwork("0.0.0.0/0"));excluded=IPSet([IPNetwork(n) for n in reserved]); [print(f"   - {n}") for n in (world ^ excluded).iter_cidrs()]'
+  externalCIDRs:
+    - 0.0.0.0/5
+    - 8.0.0.0/7
+    - 11.0.0.0/8
+    - 12.0.0.0/6
+    - 16.0.0.0/4
+    - 32.0.0.0/3
+    - 64.0.0.0/2
+    - 128.0.0.0/3
+    - 160.0.0.0/5
+    - 168.0.0.0/6
+    - 172.0.0.0/12
+    - 172.32.0.0/11
+    - 172.64.0.0/10
+    - 172.128.0.0/9
+    - 173.0.0.0/8
+    - 174.0.0.0/7
+    - 176.0.0.0/4
+    - 192.0.0.0/9
+    - 192.128.0.0/11
+    - 192.160.0.0/13
+    - 192.169.0.0/16
+    - 192.170.0.0/15
+    - 192.172.0.0/14
+    - 192.176.0.0/12
+    - 192.192.0.0/10
+    - 193.0.0.0/8
+    - 194.0.0.0/7
+    - 196.0.0.0/6
+    - 200.0.0.0/5
+    - 208.0.0.0/4
+    - 224.0.0.0/3
