@@ -1,0 +1,63 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: maintainerr
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: maintainerr
+  interval: 30m
+  values:
+    controllers:
+      maintainerr:
+        pod:
+          securityContext:
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
+        containers:
+          app:
+            image:
+              repository: ghcr.io/maintainerr/maintainerr
+              tag: 3.10.1@sha256:afc7e45c3d32eeea32946420c592802e6daf33f222114ce54c4a086a53b9838e
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+            resources:
+              requests:
+                cpu: 5m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              # readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      config:
+        existingClaim: maintainerr
+        advancedMounts:
+          maintainerr:
+            app:
+              - path: /opt/data
+                subPath: data
+    route:
+      app:
+        hostnames:
+          - maintainerr.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: 6246
