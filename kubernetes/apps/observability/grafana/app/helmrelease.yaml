@@ -44,14 +44,6 @@ spec:
             editable: true
             options:
               path: /var/lib/grafana/dashboards/kubernetes
-          - name: unpoller
-            disableDeletion: false
-            editable: true
-            folder: "UniFi Poller"
-            options:
-              path: /var/lib/grafana/dashboards/unpoller
-            orgId: 1
-            type: file
 
     dashboards:
       default:
@@ -113,19 +105,6 @@ spec:
         kubernetes-volumes:
           datasource: Prometheus
           url: https://grafana.com/api/dashboards/11454/revisions/14/download
-      unpoller:
-        unifi-insights:
-          datasource: Prometheus
-          url: https://grafana.com/api/dashboards/11315/revisions/9/download
-        unifi-network-sites:
-          datasource: Prometheus
-          url: https://grafana.com/api/dashboards/11311/revisions/5/download
-        unifi-usw:
-          datasource: Prometheus
-          url: https://grafana.com/api/dashboards/11312/revisions/9/download
-        unifi-uap:
-          datasource: Prometheus
-          url: https://grafana.com/api/dashboards/11314/revisions/10/download
 
     datasources:
       datasources.yaml:
