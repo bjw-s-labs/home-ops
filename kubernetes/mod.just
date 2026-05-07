@@ -32,14 +32,12 @@ prune-pods:
 [doc('Apply local Flux Kustomization')]
 [script]
 apply-ks ns ks:
-    just k8s render-local-ks "{{ ns }}" "{{ ks }}"
-    | kubectl apply --server-side --force-conflicts --field-manager=kustomize-controller -f -
+    just k8s render-local-ks "{{ ns }}" "{{ ks }}" | kubectl apply --server-side --force-conflicts --field-manager=kustomize-controller -f -
 
 [doc('Delete local Flux Kustomization')]
 [script]
 delete-ks ns ks:
-    just k8s render-local-ks "{{ ns }}" "{{ ks }}"
-    | kubectl delete -f -
+    just k8s render-local-ks "{{ ns }}" "{{ ks }}" | kubectl delete -f -
 
 [doc('Sync single Flux HelmRelease')]
 [script]
