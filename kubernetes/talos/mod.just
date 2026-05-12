@@ -36,8 +36,7 @@ gen-schematic-id:
 [script]
 render-config node:
     export IS_CONTROLPLANE="$(just talos machine-controller {{ node }})"
-    talosctl machineconfig patch <(just template "{{ talos_dir }}/machineconfig.yaml.j2")
-      -p @<(just template "{{ talos_dir }}/nodes/{{ node }}.yaml.j2")
+    talosctl machineconfig patch <(just template "{{ talos_dir }}/machineconfig.yaml.j2") -p @<(just template "{{ talos_dir }}/nodes/{{ node }}.yaml.j2")
 
 [doc('Reboot a node')]
 [script]
