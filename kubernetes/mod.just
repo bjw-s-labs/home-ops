@@ -87,18 +87,6 @@ snapshot-all:
       just k8s snapshot "$ns" "$name"
     done
 
-[doc('Suspend or resume Keda ScaledObjects')]
-[script]
-keda state ns name:
-    kubectl -n "{{ ns }}" annotate --field-manager flux-client-side-apply --overwrite so "{{ name }}" autoscaling.keda.sh/paused{{ if state != "suspend" { "-" } else { "=true" } }}
-
-[doc('Suspend or resume Keda ScaledObjects')]
-[script]
-keda-all state:
-    kubectl get scaledobjects --no-headers -A | while read -r ns name _; do
-      just k8s keda "{{ state }}" "$ns" "$name"
-    done
-
 [private]
 [script]
 render-local-ks ns ks:
