@@ -3,24 +3,6 @@
 apiVersion: toolhive.stacklok.dev/v1beta1
 kind: VirtualMCPServer
 metadata:
-  name: mcp-gateway-direct
-spec:
-  groupRef:
-    name: mcp-direct
-  config:
-    aggregation:
-      conflictResolution: prefix
-      conflictResolutionConfig:
-        prefixFormat: "{workload}_"
-  incomingAuth:
-    type: anonymous
-  outgoingAuth:
-    source: discovered
----
-# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/toolhive.stacklok.dev/virtualmcpserver_v1beta1.json
-apiVersion: toolhive.stacklok.dev/v1beta1
-kind: VirtualMCPServer
-metadata:
   name: mcp-gateway-internal
 spec:
   groupRef:
