@@ -17,10 +17,8 @@ spec:
     bgpControlPlane:
       enabled: true
     bpf:
-      datapathMode: netkit
       masquerade: true
       preallocateMaps: true
-    bpfClockProbe: true
     cgroup:
       autoMount:
         enabled: false
@@ -33,18 +31,16 @@ spec:
         grafana_folder: Cilium
     devices: bond+
     enableIPv4BIGTCP: true
-    endpointRoutes:
-      enabled: true
     envoy:
-      enabled: false
-    gatewayAPI:
       enabled: false
     hubble:
       enabled: true
       relay:
         enabled: true
+        rollOutPods: true
       ui:
         enabled: true
+        rollOutPods: true
     ipam:
       mode: kubernetes
     ipv4NativeRoutingCIDR: 10.244.0.0/16
@@ -52,14 +48,9 @@ spec:
     k8sServicePort: 7445
     kubeProxyReplacement: true
     kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
-    l2announcements:
-      enabled: false
     loadBalancer:
-      acceleration: best-effort
       algorithm: maglev
       mode: dsr
-    localRedirectPolicies:
-      enabled: true
     operator:
       dashboards:
         enabled: true
@@ -71,8 +62,6 @@ spec:
           enabled: true
       replicas: 2
       rollOutPods: true
-    pmtuDiscovery:
-      enabled: true
     prometheus:
       enabled: true
       serviceMonitor:
