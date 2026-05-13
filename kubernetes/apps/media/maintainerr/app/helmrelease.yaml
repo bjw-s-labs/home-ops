@@ -29,12 +29,17 @@ spec:
                 enabled: true
               readiness:
                 enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 cpu: 5m
                 memory: 128Mi
               limits:
-                memory: 1Gi
+                memory: 512Mi
             securityContext:
               allowPrivilegeEscalation: false
               # readOnlyRootFilesystem: true
