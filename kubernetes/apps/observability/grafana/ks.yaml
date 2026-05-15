@@ -9,7 +9,7 @@ spec:
     labels:
       app.kubernetes.io/name: grafana-operator
   interval: 1h
-  path: "./kubernetes/apps/observability/grafana-operator/app"
+  path: "./kubernetes/apps/observability/grafana/operator"
   prune: true
   sourceRef:
     kind: GitRepository
@@ -23,17 +23,17 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: grafana-operator-instance
+  name: grafana-instance
 spec:
   commonMetadata:
     labels:
-      app.kubernetes.io/name: grafana-operator-instance
+      app.kubernetes.io/name: grafana-instance
   dependsOn:
     - name: grafana-operator
     - name: rook-ceph-cluster
       namespace: rook-ceph
   interval: 1h
-  path: "./kubernetes/apps/observability/grafana-operator/instance"
+  path: "./kubernetes/apps/observability/grafana/instance"
   prune: true
   sourceRef:
     kind: GitRepository
