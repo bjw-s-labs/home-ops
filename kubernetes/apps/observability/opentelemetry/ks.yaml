@@ -1,0 +1,42 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: opentelemetry-operator
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: opentelemetry-operator
+  interval: 1h
+  path: "./kubernetes/apps/observability/opentelemetry/operator"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: observability
+  timeout: 5m
+  wait: true
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: opentelemetry-collector
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: opentelemetry-collector
+  dependsOn:
+    - name: opentelemetry-operator
+  interval: 1h
+  path: "./kubernetes/apps/observability/opentelemetry/collector"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: observability
+  timeout: 5m
+  wait: true

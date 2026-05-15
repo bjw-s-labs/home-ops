@@ -1,0 +1,112 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/opentelemetry.io/opentelemetrycollector_v1beta1.json
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: k8s-events
+spec:
+  image: otel/opentelemetry-collector-contrib:0.152.0
+  config:
+    receivers:
+      k8s_events:
+        auth_type: serviceAccount
+    processors:
+      batch:
+        timeout: 10s
+      filter:
+        logs:
+          exclude:
+            match_type: regexp
+            resource_attributes:
+              - key: k8s.namespace.name
+                value: ^(kube-system|kube-public|kube-node-lease)$
+      groupbyattrs:
+        keys:
+          - k8s.event.reason
+          - k8s.object.name
+          - k8s.namespace.name
+      k8sattributes:
+        auth_type: serviceAccount
+        extract:
+          metadata:
+            - k8s.namespace.name
+            - k8s.pod.name
+            - k8s.container.name
+            - k8s.node.name
+    exporters:
+      otlphttp/vlogs:
+        logs_endpoint: http://victoria-logs-server.observability.svc.cluster.local:9428/insert/opentelemetry/v1/logs
+        tls:
+          insecure: true
+      debug:
+        verbosity: detailed
+    service:
+      pipelines:
+        logs/events:
+          receivers:
+            - k8s_events
+          processors:
+            - k8sattributes
+            - filter
+            - groupbyattrs
+            - batch
+          exporters:
+            - otlphttp/vlogs
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/opentelemetry.io/opentelemetrycollector_v1beta1.json
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: k8s-logs
+spec:
+  image: otel/opentelemetry-collector-contrib:0.152.0
+  mode: daemonset
+  volumeMounts:
+    - name: varlogpods
+      mountPath: /var/log/pods
+      readOnly: true
+  volumes:
+    - name: varlogpods
+      hostPath:
+        path: /var/log/pods
+  config:
+    receivers:
+      filelog:
+        include:
+          - /var/log/pods/*/*/*.log
+        exclude:
+          - /var/log/pods/*/*k8s-logs-collector*/*
+        include_file_path: true
+        operators:
+          - type: container
+        poll_interval: 100ms
+        retry_on_failure:
+          enabled: true
+          max_elapsed_time: 0
+    processors:
+      batch:
+        timeout: 10s
+      k8sattributes:
+        auth_type: serviceAccount
+        extract:
+          metadata:
+            - k8s.namespace.name
+            - k8s.pod.name
+            - k8s.container.name
+            - k8s.node.name
+    exporters:
+      otlphttp/vlogs:
+        logs_endpoint: http://victoria-logs-server.observability.svc.cluster.local:9428/insert/opentelemetry/v1/logs
+        tls:
+          insecure: true
+      debug: {}
+    service:
+      pipelines:
+        logs:
+          receivers:
+            - filelog
+          processors:
+            - k8sattributes
+            - batch
+          exporters:
+            - otlphttp/vlogs

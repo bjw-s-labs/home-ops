@@ -1,0 +1,15 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: opentelemetry-operator
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: opentelemetry-operator
+  interval: 30m
+  values:
+    manager:
+      collectorImage:
+        repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s
