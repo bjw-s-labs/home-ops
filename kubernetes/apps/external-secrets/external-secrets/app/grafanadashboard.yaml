@@ -1,0 +1,18 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/grafana.integreatly.org/grafanadashboard_v1beta1.json
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: external-secrets
+spec:
+  allowCrossNamespaceImport: true
+  configMapRef:
+    name: external-secrets-dashboard
+    key: external-secrets.json
+  datasources:
+    - datasourceName: prometheus
+      inputName: DS_PROMETHEUS
+  folderRef: external-secrets
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana

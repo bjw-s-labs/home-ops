@@ -3,18 +3,14 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: dragonfly-operator
+  name: grafana
 spec:
   chartRef:
     kind: OCIRepository
-    name: dragonfly-operator
+    name: grafana-operator
   interval: 30m
   values:
-    manager:
-      image:
-        repository: ghcr.io/dragonflydb/operator
-    grafanaDashboard:
+    dashboard:
       enabled: true
-      grafanaOperator:
-        enabled: true
-      folder: Dragonfly
+    serviceMonitor:
+      enabled: true

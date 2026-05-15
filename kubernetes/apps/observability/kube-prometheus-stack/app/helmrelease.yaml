@@ -91,10 +91,11 @@ spec:
     grafana:
       enabled: false
       forceDeployDashboards: true
-      sidecar:
-        dashboards:
-          annotations:
-            grafana_folder: Kubernetes
+      operator:
+        dashboardsConfigMapRefEnabled: true
+        folder: Kubernetes
+        matchLabels:
+          dashboards: grafana
 
     ###
     ### Prometheus operator values

@@ -24,12 +24,11 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-
       serviceMonitor:
         enabled: true
     dashboards:
       enabled: true
-      annotations:
-        grafana_folder: observability
-      labels:
-        grafana_dashboard: "1"
+      grafanaOperator:
+        enabled: true
+        spec:
+          folderRef: victoria-logs

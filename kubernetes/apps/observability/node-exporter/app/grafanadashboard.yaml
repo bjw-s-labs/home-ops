@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/grafana.integreatly.org/grafanafolder_v1beta1.json
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: node-exporter
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  title: Node Exporter
+---
+# yaml-language-server: $schema=https://k8s-schemas.bjw-s.dev/grafana.integreatly.org/grafanadashboard_v1beta1.json
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: node-exporter
+spec:
+  allowCrossNamespaceImport: true
+  datasources:
+    - datasourceName: prometheus
+      inputName: DS_PROMETHEUS
+  folderRef: node-exporter
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  url: https://grafana.com/api/dashboards/1860/revisions/45/download
