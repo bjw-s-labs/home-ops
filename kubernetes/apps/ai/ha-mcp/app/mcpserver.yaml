@@ -17,6 +17,11 @@ spec:
         - name: mcp
           command:
             - ha-mcp-web
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmpfs
+      volumes:
+        - name: tmpfs
   secrets:
     - name: ha-mcp-secret
       key: HOMEASSISTANT_TOKEN
