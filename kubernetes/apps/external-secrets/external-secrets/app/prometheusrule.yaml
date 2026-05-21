@@ -17,5 +17,5 @@ spec:
             summary: External secret failed to sync
           labels:
             severity: warning
-          expr: externalsecret_status_condition{status="False"} == 1
+          expr: externalsecret_status_condition{status="False", condition!="Deleted"} == 1
           for: 5m
