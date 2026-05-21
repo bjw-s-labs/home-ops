@@ -126,23 +126,6 @@ cluster:
     disabled: true
     image: registry.k8s.io/kube-proxy:v1.36.1
   scheduler:
-    config:
-      apiVersion: kubescheduler.config.k8s.io/v1
-      kind: KubeSchedulerConfiguration
-      profiles:
-        - pluginConfig:
-            - args:
-                defaultConstraints:
-                  - maxSkew: 1
-                    topologyKey: kubernetes.io/hostname
-                    whenUnsatisfiable: ScheduleAnyway
-                defaultingType: List
-              name: PodTopologySpread
-          plugins:
-            score:
-              disabled:
-                - name: ImageLocality
-          schedulerName: default-scheduler
     extraArgs:
       bind-address: 0.0.0.0
     image: registry.k8s.io/kube-scheduler:v1.36.1
@@ -193,14 +176,6 @@ apiVersion: v1alpha1
 kind: VLANConfig
 name: bond0.303
 vlanID: 303
-parent: bond0
-mtu: 9000
----
-# VPN
-apiVersion: v1alpha1
-kind: VLANConfig
-name: bond0.305
-vlanID: 305
 parent: bond0
 mtu: 9000
 ---

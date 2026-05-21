@@ -12,7 +12,7 @@ spec:
   values:
     namespace: null
     createNamespace: false
-    replicaCount: 2
+    replicaCount: 1
     timezone: Europe/Amsterdam
     cronJobTimeZone: true
     webhook:
@@ -21,12 +21,3 @@ spec:
         issuerRef:
           name: k8tz-webhook-issuer
           kind: Issuer
-    affinity:
-      podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 1
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: k8tz
-              topologyKey: kubernetes.io/hostname

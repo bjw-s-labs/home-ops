@@ -6,7 +6,7 @@ metadata:
   name: ${APP}-dragonfly
 spec:
   image: ghcr.io/dragonflydb/dragonfly:v1.38.1
-  replicas: ${DRAGONFLY_REPLICAS:=2}
+  replicas: ${DRAGONFLY_REPLICAS:=1}
   env:
     - name: MAX_MEMORY
       valueFrom:
@@ -22,11 +22,3 @@ spec:
       cpu: 25m
     limits:
       memory: 768Mi
-  topologySpreadConstraints:
-    - maxSkew: 1
-      topologyKey: "kubernetes.io/hostname"
-      whenUnsatisfiable: "DoNotSchedule"
-      nodeTaintsPolicy: Honor
-      labelSelector:
-        matchLabels:
-          app.kubernetes.io/part-of: dragonfly
