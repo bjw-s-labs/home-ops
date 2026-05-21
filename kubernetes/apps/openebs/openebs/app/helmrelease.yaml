@@ -10,6 +10,19 @@ spec:
     name: openebs
   interval: 30m
   values:
+    analytics:
+      enabled: false
+    alloy:
+      enabled: false
+    engines:
+      local:
+        lvm:
+          enabled: false
+        zfs:
+          enabled: true
+      replicated:
+        mayastor:
+          enabled: false
     localpv-provisioner:
       helperPod:
         image:
@@ -64,21 +77,6 @@ spec:
               memory: 32Mi
             limits:
               memory: 32Mi
-
-    # Disable everything else
-    analytics:
-      enabled: false
-    alloy:
-      enabled: false
-    engines:
-      local:
-        lvm:
-          enabled: false
-        zfs:
-          enabled: false
-      replicated:
-        mayastor:
-          enabled: false
     loki:
       enabled: false
     lvm-localpv:
