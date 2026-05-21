@@ -1,0 +1,16 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-zfs
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: zfs.csi.openebs.io
+allowVolumeExpansion: true
+parameters:
+  compression: "zstd"
+  dedup: "off"
+  fstype: "zfs"
+  poolname: "data-pool"
+  shared: "yes"
+  recordsize: "16k"

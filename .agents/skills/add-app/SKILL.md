@@ -18,7 +18,7 @@ Use the `question` tool to gather:
 3. **Image repository** - full container image URL (e.g., `ghcr.io/autobrr/autobrr`)
 4. **Image tag** - version tag (e.g., `v1.76.0`)
 5. **Port** - application port number (e.g., `7474`)
-6. **Dependencies** - any Flux Kustomization dependencies (e.g., `rook-ceph-cluster`)
+6. **Dependencies** - any Flux Kustomization dependencies (e.g., `volsync`)
 7. **Has secrets** - whether to create an ExternalSecret (yes/no)
 
 ### Step 2: Create Directory Structure
@@ -45,9 +45,6 @@ spec:
       app.kubernetes.io/name: <app-name>
   components:
     - ../../../../components/volsync
-  dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
   interval: 1h
   path: "./kubernetes/apps/<namespace>/<app-name>/app"
   postBuild:
