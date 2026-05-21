@@ -13,6 +13,12 @@ releases:
     version: 1.19.4
     values:
       - templates/values.yaml.gotmpl
+      - hubble:
+          enabled: false
+          relay:
+            enabled: false
+          ui:
+            enabled: false
     hooks:
       - # Wait for Cilium CRDs to be available
         command: bash
@@ -44,10 +50,10 @@ releases:
     needs:
       - kube-system/cilium
 
-  - name: spegel
-    namespace: system
-    chart: oci://ghcr.io/spegel-org/helm-charts/spegel
-    version: 0.7.0
+  - name: cert-manager
+    namespace: cert-manager
+    chart: oci://quay.io/jetstack/charts/cert-manager
+    version: v1.20.2
     values:
       - templates/values.yaml.gotmpl
     needs:
@@ -60,16 +66,7 @@ releases:
     values:
       - templates/values.yaml.gotmpl
     needs:
-      - system/spegel
-
-  - name: cert-manager
-    namespace: cert-manager
-    chart: oci://quay.io/jetstack/charts/cert-manager
-    version: v1.20.2
-    values:
-      - templates/values.yaml.gotmpl
-    needs:
-      - cert-manager/cert-manager-webhook-ovh
+      - cert-manager/cert-manager
 
   - name: external-secrets
     namespace: external-secrets
@@ -78,7 +75,7 @@ releases:
     values:
       - templates/values.yaml.gotmpl
     needs:
-      - cert-manager/cert-manager
+      - cert-manager/cert-manager-webhook-ovh
 
   - name: onepassword-connect
     namespace: external-secrets
