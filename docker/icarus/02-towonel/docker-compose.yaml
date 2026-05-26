@@ -34,8 +34,8 @@ services:
       interval: 30s
       timeout: 5s
       start_period: 30s
-    # renovate: datasource=docker depName=registry.erwanleboucher.dev/erwanleboucher.dev/eleboucher/towonel-node
-    image: registry.erwanleboucher.dev/eleboucher/towonel-node:0.0.43
+    # renovate: datasource=docker depName=codeberg.org/towonel/towonel-node
+    image: codeberg.org/towonel/towonel-node:0.1.5
     logging:
       driver: json-file
       options:
@@ -43,6 +43,7 @@ services:
         max-file: "3"
     ports:
       - 22:22
+      - "51820:51820/udp"
     restart: unless-stopped
     user: "10001:10001"
     volumes:
