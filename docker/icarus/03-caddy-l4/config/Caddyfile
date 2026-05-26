@@ -28,10 +28,6 @@
 					upstream 127.0.0.1:8080
 				}
 			}
-			@http http
-			route @http {
-				proxy towonel-hub:8081
-			}
 		}
 	}
 
@@ -54,10 +50,17 @@
 	}
 }
 
+towonel.bjw-s.dev {
+  log
+	reverse_proxy towonel-hub:8443
+}
+
 icarus-doco-cd.bjw-s.dev {
+  log
 	reverse_proxy doco-cd:8880
 }
 
 icarus-gatus.bjw-s.dev {
+  log
 	reverse_proxy gatus:8080
 }
