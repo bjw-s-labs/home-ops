@@ -31,7 +31,16 @@ spec:
               repository: codeberg.org/towonel/towonel-agent
               tag: 0.1.5
             env:
+              NODE_NAME:
+                valueFrom:
+                  fieldRef:
+                    fieldPath: spec.nodeName
+              POD_NAMESPACE:
+                valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.namespace
               RUST_LOG: info
+              TOWONEL_AGENT_HEALTH_LISTEN_ADDR: 0.0.0.0:9090
               TOWONEL_AGENT_SERVICES: '[{"hostname":"*.bjw-s.dev","origin":"envoy-external.network.svc.cluster.local:443"}]'
               TOWONEL_AGENT_TCP_SERVICES: '[{"name":"forgejo-ssh", "origin":"forgejo-ssh.dev.svc.cluster.local:22", "listen_port":22}]'
               TOWONEL_INVITE_TOKEN:
@@ -47,7 +56,6 @@ spec:
                   httpGet:
                     path: /healthz
                     port: 9090
-                  initialDelaySeconds: 10
                   periodSeconds: 30
                   timeoutSeconds: 3
                   failureThreshold: 3
@@ -58,10 +66,7 @@ spec:
                   httpGet:
                     path: /healthz
                     port: 9090
-                  initialDelaySeconds: 3
                   periodSeconds: 10
-                  timeoutSeconds: 3
-                  failureThreshold: 3
               startup:
                 enabled: true
                 custom: true
@@ -69,9 +74,8 @@ spec:
                   httpGet:
                     path: /healthz
                     port: 9090
-                  initialDelaySeconds: 2
-                  periodSeconds: 2
-                  failureThreshold: 30
+                  periodSeconds: 5
+                  failureThreshold: 60
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
