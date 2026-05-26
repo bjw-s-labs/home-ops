@@ -41,8 +41,14 @@ spec:
                     fieldPath: metadata.namespace
               RUST_LOG: info
               TOWONEL_AGENT_HEALTH_LISTEN_ADDR: 0.0.0.0:9090
-              TOWONEL_AGENT_SERVICES: '[{"hostname":"*.bjw-s.dev","origin":"envoy-external.network.svc.cluster.local:443"}]'
-              TOWONEL_AGENT_TCP_SERVICES: '[{"name":"forgejo-ssh", "origin":"forgejo-ssh.dev.svc.cluster.local:22", "listen_port":22}]'
+              TOWONEL_AGENT_SERVICES: |
+                [
+                  {"hostname":"*.bjw-s.dev","origin":"envoy-external.network.svc.cluster.local:443"}
+                ]
+              TOWONEL_AGENT_TCP_SERVICES: |
+                [
+                  {"name":"forgejo-ssh", "origin":"forgejo-ssh.dev.svc.cluster.local:22", "listen_port":22}
+                ]
               TOWONEL_INVITE_TOKEN:
                 valueFrom:
                   secretKeyRef:
