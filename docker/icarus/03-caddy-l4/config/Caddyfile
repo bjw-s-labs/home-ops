@@ -5,6 +5,7 @@
 
 	layer4 {
 		:443 {
+      matching_timeout 15s
 			@local tls sni {$VPS_LOCAL_HOSTS}
 			route @local {
 				proxy {
@@ -48,6 +49,11 @@
 			}
 		}
 	}
+
+	log default {
+		output stdout
+		format json
+	}
 }
 
 twnl.bjw-s.dev {
@@ -56,11 +62,9 @@ twnl.bjw-s.dev {
 }
 
 icarus-doco-cd.bjw-s.dev {
-  log
 	reverse_proxy doco-cd:8880
 }
 
 icarus-gatus.bjw-s.dev {
-  log
 	reverse_proxy gatus:8080
 }
