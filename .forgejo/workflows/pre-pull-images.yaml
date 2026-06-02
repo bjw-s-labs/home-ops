@@ -30,58 +30,34 @@ jobs:
 
   extract-images:
     if: ${{ needs.filter-changes.outputs.changed-files != '[]' }}
-    name: Extract Images (${{ matrix.branches }})
+    name: Extract Images
     runs-on: ubuntu-latest
     needs:
       - filter-changes
-    strategy:
-      matrix:
-        branches:
-          - default
-          - pull
-      fail-fast: false
     outputs:
-      default: ${{ steps.extract-images.outputs.default }}
-      pull: ${{ steps.extract-images.outputs.pull }}
+      images: ${{ steps.extract-images.outputs.images }}
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          ref: "${{ matrix.branches == 'default' && github.event.repository.default_branch || '' }}"
+          fetch-depth: 0
           persist-credentials: false
 
-      - name: Gather Images
-        shell: bash
-        run: |-
-          flux-local get cluster \
-            --all-namespaces \
-            --path kubernetes/flux/cluster \
-            --enable-images \
-            --only-images \
-            --output json \
-            --output-file images.json
+      - name: Install flate
+        uses: https://github.com/home-operations/flate/action@2df8349356dd1b40a56be5bce8bc4b2b4a951962 # 0.1.38
+        with:
+          token: ""
 
       - name: Extract Images
         id: extract-images
+        env:
+          FLATE_OUTPUT: json
+          FLATE_PATH: ./kubernetes/flux/cluster
         run: |
-          echo "${{ matrix.branches }}=$(jq --compact-output '.' images.json)" >> "${FORGEJO_OUTPUT}"
+          images=$(flate diff images)
 
-  diff:
-    name: Compare Images
-    runs-on: ubuntu-latest
-    needs:
-      - extract-images
-    outputs:
-      images: ${{ steps.diff.outputs.images }}
-    steps:
-      - name: Compare Images
-        id: diff
-        run: |
-          images=$(jq --compact-output --null-input \
-              --argjson f1 '${{ needs.extract-images.outputs.default }}' \
-              --argjson f2 '${{ needs.extract-images.outputs.pull }}' \
-              '$f2 - $f1' \
-          )
+          echo "Images to pull:"
+          echo "${images}" | yq --prettyPrint
 
           # Ensure matrix is never empty to prevent Forgejo from blocking downstream jobs
           if [ "${images}" = "[]" ]; then
@@ -90,21 +66,14 @@ jobs:
 
           echo "images=${images}" >> "${FORGEJO_OUTPUT}"
 
-          {
-              echo "## New images to Pull"
-              echo '```json'
-              echo "${images}" | jq
-              echo '```'
-          } >> "${FORGEJO_STEP_SUMMARY}"
-
   image-pull:
     name: Image Pull
     runs-on: docker
     needs:
-      - diff
+      - extract-images
     strategy:
       matrix:
-        image: ${{ fromJSON(needs.diff.outputs.images) }}
+        image: ${{ fromJSON(needs.extract-images.outputs.images) }}
       max-parallel: 4
       fail-fast: false
     env:

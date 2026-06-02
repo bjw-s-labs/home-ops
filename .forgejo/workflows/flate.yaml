@@ -1,0 +1,99 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Flate
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ forgejo.workflow }}-${{ forgejo.event.number || forgejo.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  filter-changes:
+    name: Filter changes
+    runs-on: ubuntu-latest
+    outputs:
+      changed-files: ${{ steps.changed-files.outputs.changed_files }}
+    steps:
+      - name: Get changed files
+        id: changed-files
+        uses: https://github.com/bjw-s-labs/action-changed-files@a9a36fb08ce06db9b02fbd8026cc2c0945eb9841 # v0.6.0
+        with:
+          patterns: |-
+            kubernetes/**/*
+
+  flate:
+    if: ${{ needs.filter-changes.outputs.changed-files != '[]' }}
+    name: Flate ${{ matrix.resource }}
+    runs-on: ubuntu-latest
+    needs:
+      - filter-changes
+    permissions:
+      contents: read
+      pull-requests: write
+    strategy:
+      matrix:
+        resource:
+          - helmrelease
+          - kustomization
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install flate
+        uses: https://github.com/home-operations/flate/action@2df8349356dd1b40a56be5bce8bc4b2b4a951962 # 0.1.38
+        with:
+          token: ""
+
+      - name: Run flate test
+        run: flate test ${{ matrix.resource }} --path ./kubernetes/flux/cluster --base ${{ forgejo.event.repository.default_branch }}
+
+      - name: Run flate diff
+        id: diff
+        run: |-
+          {
+            echo 'diff<<EOF'
+            flate diff ${{ matrix.resource }} --path ./kubernetes/flux/cluster
+            echo 'EOF'
+          } >> "${FORGEJO_OUTPUT}"
+
+      - name: Add Comment
+        if: ${{ steps.diff.outputs.diff != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+          PR_NUMBER: ${{ forgejo.event.pull_request.number }}
+          HEADER: "${{ forgejo.event.pull_request.number }}/kubernetes/${{ matrix.resource }}"
+          DIFF_CONTENT: ${{ steps.diff.outputs.diff }}
+        run: |-
+          MARKER="<!-- sticky-comment: ${HEADER} -->"
+          BODY=$(printf $'%s\n```diff\n%s\n```' "${MARKER}" "${DIFF_CONTENT}")
+          BODY_JSON=$(jq -Rs '{"body": .}' <<< "${BODY}")
+
+          COMMENT_ID=$(curl -s \
+            -H "Authorization: token ${GH_TOKEN}" \
+            "${{ forgejo.api_url }}/repos/${{ forgejo.repository }}/issues/${PR_NUMBER}/comments" \
+            | jq -r --arg marker "${MARKER}" '.[] | select(.body | startswith($marker)) | .id' | head -1)
+
+          if [[ -n "${COMMENT_ID}" ]]; then
+            curl -s -X PATCH \
+              -H "Authorization: token ${GH_TOKEN}" \
+              -H "Content-Type: application/json" \
+              "${{ forgejo.api_url }}/repos/${{ forgejo.repository }}/issues/comments/${COMMENT_ID}" \
+              -d "${BODY_JSON}"
+          else
+            curl -s -X POST \
+              -H "Authorization: token ${GH_TOKEN}" \
+              -H "Content-Type: application/json" \
+              "${{ forgejo.api_url }}/repos/${{ forgejo.repository }}/issues/${PR_NUMBER}/comments" \
+              -d "${BODY_JSON}"
+          fi

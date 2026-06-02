@@ -90,4 +90,4 @@ snapshot-all:
 [private]
 [script]
 render-local-ks ns ks:
-    flux-local build ks --namespace "{{ ns }}" --path "{{ kubernetes_dir }}/flux/cluster" "{{ ks }}"
+    flate build ks --namespace "{{ ns }}" --output yaml "{{ ks }}"
