@@ -64,7 +64,9 @@ jobs:
               images='["__skip__"]'
           fi
 
-          echo "images=${images}" >> "${FORGEJO_OUTPUT}"
+          echo 'images<<EOF' >> "${FORGEJO_OUTPUT}"
+          echo "${images}" >> "${FORGEJO_OUTPUT}"
+          echo 'EOF' >> "${FORGEJO_OUTPUT}"
 
   image-pull:
     name: Image Pull
@@ -89,6 +91,7 @@ jobs:
 
   image-pull-success:
     needs:
+      - extract-images
       - image-pull
     if: ${{ !cancelled() }}
     name: Image Pull - Success

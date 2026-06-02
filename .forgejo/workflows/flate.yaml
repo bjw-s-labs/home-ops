@@ -34,14 +34,11 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - filter-changes
-    permissions:
-      contents: read
-      pull-requests: write
     strategy:
       matrix:
         resource:
-          - helmrelease
           - kustomization
+          - helmrelease
       fail-fast: false
     steps:
       - name: Checkout
@@ -72,11 +69,21 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
           PR_NUMBER: ${{ forgejo.event.pull_request.number }}
-          HEADER: "${{ forgejo.event.pull_request.number }}/kubernetes/${{ matrix.resource }}"
+          MARKER: "<!-- sticky-comment: flate ${{ matrix.resource }} -->"
+          HEADER: "${{ matrix.resource }}"
           DIFF_CONTENT: ${{ steps.diff.outputs.diff }}
         run: |-
-          MARKER="<!-- sticky-comment: ${HEADER} -->"
-          BODY=$(printf $'%s\n```diff\n%s\n```' "${MARKER}" "${DIFF_CONTENT}")
+          DIFF_LENGTH=${#DIFF_CONTENT}
+
+          if [[ ${DIFF_LENGTH} -gt 60000 ]]; then
+            RUN_URL="${{ forgejo.api_url }}/repos/${{ forgejo.repository }}/actions/runs/${{ forgejo.run_id }}"
+            BODY=$(printf $'%%s\n<details open>\n  <summary>%s diff (%%d chars — too large to post)</summary>\n\nDiff exceeds size limit. View the [workflow run](%%s) for full output.</details>' \
+              "${MARKER}" "${HEADER}" "${DIFF_LENGTH}" "${RUN_URL}")
+          else
+            BODY=$(printf $'%s\n<details open>\n  <summary>%s diff</summary>\n\n```diff\n%s\n```\n\n</details>' \
+              "${MARKER}" "${HEADER}" "${DIFF_CONTENT}")
+          fi
+
           BODY_JSON=$(jq -Rs '{"body": .}' <<< "${BODY}")
 
           COMMENT_ID=$(curl -s \
