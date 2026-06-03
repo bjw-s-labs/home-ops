@@ -2,16 +2,19 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/home-operations/kromgo/main/config.schema.json
 badges:
   - id: talos_version
+    icon: si:talos
     query: label_replace(node_os_info{name="Talos"}, "version_id", "$1", "version_id", "v(.+)")
     title: Talos
     valueExpr: labels["version_id"]
 
   - id: kubernetes_version
+    icon: si:kubernetes
     query: label_replace(kubernetes_build_info{service="kubernetes"}, "git_version", "$1", "git_version", "v(.+)")
     title: Kubernetes
     valueExpr: labels["git_version"]
 
   - id: flux_version
+    icon: si:flux
     query: label_replace(flux_instance_info, "revision", "$1", "revision", "v(.+)@sha256:.+")
     title: Flux
     valueExpr: labels["revision"]
