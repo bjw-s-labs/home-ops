@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: Image Pull
+name: Validate Images
 
 on:
   pull_request:
@@ -55,8 +55,7 @@ jobs:
           FLATE_PATH: ./kubernetes/flux/cluster
         run: |
           images=$(flate diff images)
-
-          echo "Images to pull:"
+          echo "Changed images:"
           echo "${images}" | yq --prettyPrint
 
           # Ensure matrix is never empty to prevent Forgejo from blocking downstream jobs
@@ -64,12 +63,14 @@ jobs:
               images='["__skip__"]'
           fi
 
-          echo 'images<<EOF' >> "${FORGEJO_OUTPUT}"
-          echo "${images}" >> "${FORGEJO_OUTPUT}"
-          echo 'EOF' >> "${FORGEJO_OUTPUT}"
+          {
+            echo 'images<<EOF'
+            echo "${images}"
+            echo 'EOF'
+          } >> "${FORGEJO_OUTPUT}"
 
-  image-pull:
-    name: Image Pull
+  image-availability-check:
+    name: Image Availability Check
     runs-on: docker
     needs:
       - extract-images
@@ -81,20 +82,20 @@ jobs:
     env:
       MATRIX_IMAGE: ${{ matrix.image }}
     steps:
-      - name: Try to pull Image
+      - name: Validate Image Availability
         run: |
           if [ "${MATRIX_IMAGE}" = "__skip__" ]; then
-              echo "No new images to pull"
+              echo "No new images to validate"
               exit 0
           fi
           docker pull "${MATRIX_IMAGE}"
 
-  image-pull-success:
+  validation-result:
     needs:
       - extract-images
-      - image-pull
+      - image-availability-check
     if: ${{ !cancelled() }}
-    name: Image Pull - Success
+    name: Validation Result
     runs-on: ubuntu-latest
     steps:
       - name: Any jobs failed?
