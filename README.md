@@ -11,16 +11,16 @@ _... managed by Flux, Renovate and GitHub Actions_ :robot:
 
 Kubernetes cluster stats:
 
-[![Talos](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.bjw-s.dev%2Ftalos_version&style=for-the-badge&logo=talos&logoColor=white&color=orange&label=talos)](https://talos.dev)&nbsp;
-[![Kubernetes](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.bjw-s.dev%2Fkubernetes_version&style=for-the-badge&logo=kubernetes&logoColor=white&color=blue&label=k8s)](https://kubernetes.io)&nbsp;&nbsp;
-[![Flux](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.bjw-s.dev%2Fflux_version&style=for-the-badge&logo=flux&logoColor=white&color=blue&label=flux)](https://fluxcd.io)
+[![Talos](https://kromgo.bjw-s.dev/badges/talos_version)](https://talos.dev)&nbsp;
+[![Kubernetes](https://kromgo.bjw-s.dev/badges/kubernetes_version)](https://kubernetes.io)&nbsp;&nbsp;
+[![Flux](https://kromgo.bjw-s.dev/badges/flux_version)](https://fluxcd.io)
 
-[![Age-Days](https://kromgo.bjw-s.dev/cluster_age_days?format=badge)](https://github.com/kashalls/kromgo/)&nbsp;
-[![Node-Count](https://kromgo.bjw-s.dev/cluster_node_count?format=badge)](https://github.com/kashalls/kromgo/)&nbsp;
-[![Alerts](https://kromgo.bjw-s.dev/cluster_alert_count?format=badge)](https://github.com/kashalls/kromgo/)&nbsp;
-[![Pod-Count](https://kromgo.bjw-s.dev/cluster_pod_count?format=badge)](https://github.com/kashalls/kromgo/)&nbsp;
-[![CPU-Usage](https://kromgo.bjw-s.dev/cluster_cpu_usage?format=badge)](https://github.com/kashalls/kromgo/)&nbsp;
-[![Memory-Usage](https://kromgo.bjw-s.dev/cluster_memory_usage?format=badge)](https://github.com/kashalls/kromgo/)
+[![Age-Days](https://kromgo.bjw-s.dev/badges/cluster_age_days)](https://github.com/home-operations/kromgo/)&nbsp;
+[![Nodes](https://kromgo.bjw-s.dev/badges/cluster_node_count)](https://github.com/home-operations/kromgo/)&nbsp;
+[![Alerts](https://kromgo.bjw-s.dev/badges/cluster_alert_count)](https://github.com/home-operations/kromgo/)&nbsp;
+[![Pod-Count](https://kromgo.bjw-s.dev/badges/cluster_pod_count)](https://github.com/home-operations/kromgo/)&nbsp;
+[![CPU-Usage](https://kromgo.bjw-s.dev/badges/cluster_cpu_usage)](https://github.com/home-operations/kromgo/)&nbsp;
+[![Memory-Usage](https://kromgo.bjw-s.dev/badges/cluster_memory_usage)](https://github.com/home-operations/kromgo/)
 
 </div>
 <br>
