@@ -80,14 +80,15 @@ spec:
                     mountPath: /var/lib/docker
                   - name: docker-certs
                     mountPath: /certs
-                readinessProbe:
+                startupProbe:
                   exec:
                     command:
                       - sh
                       - -c
-                      - test -f /certs/client/ca.pem && test -f /certs/client/cert.pem && test -f /certs/client/key.pem
-                  initialDelaySeconds: 2
+                      - docker --tlsverify --tlscacert=/certs/client/ca.pem --tlscert=/certs/client/cert.pem --tlskey=/certs/client/key.pem -H tcp://localhost:2376 info
+                  initialDelaySeconds: 5
                   periodSeconds: 1
+                  failureThreshold: 30
             containers:
               - env:
                   - name: DEBIAN_FRONTEND
