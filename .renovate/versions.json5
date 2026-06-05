@@ -1,0 +1,18 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  packageRules: [
+    {
+      description: ["Loose versioning for bambuddy"],
+      matchDatasources: ["docker"],
+      allowedVersions: "/^\\d+\\.\\d+\\.\\d+(\\.\\d+)?$/",
+      versioning: "loose",
+      matchPackageNames: ["ghcr.io/maziggy/bambuddy"],
+    },
+    {
+      description: ["Loose versioning for non-semver packages"],
+      matchDatasources: ["docker"],
+      versioning: "loose",
+      matchPackagePatterns: ["searxng"]
+    }
+  ]
+}

@@ -6,6 +6,7 @@
     "github>bjw-s-labs/home-ops//.renovate/groups.json5",
     "github>bjw-s-labs/home-ops//.renovate/autoMerge.json5",
     "github>bjw-s-labs/home-ops//.renovate/customManagers.json5",
+    "github>bjw-s-labs/home-ops//.renovate/versions.json5",
     "github>bjw-s-labs/home-ops//.renovate/grafanaDashboards.json5",
   ],
   flux: {
@@ -16,13 +17,5 @@
   },
   kubernetes: {
     managerFilePatterns: ["/^kubernetes/.+\\.yaml(?:\\.j2)?$/"],
-  },
-  packageRules: [
-    {
-      description: "Configure loose versioning for packages",
-      matchDatasources: ["docker"],
-      matchPackageNames: ["ghcr.io/home-operations/emby", "ghcr.io/maziggy/bambuddy"],
-      versioning: "loose",
-    },
-  ],
+  }
 }
