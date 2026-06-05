@@ -1,7 +1,8 @@
 ---
 customization:
   extraKernelArgs:
-    - initcall_blacklist=algif_aead_init
+    - initcall_blacklist=algif_aead_init # copy.fail fix
+    - zfs.zfs_arc_max=8589934592 # Cap ZFS ARC at 8GiB
   systemExtensions:
     officialExtensions:
       - siderolabs/i915

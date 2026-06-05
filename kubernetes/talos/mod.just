@@ -29,13 +29,15 @@ apply-cluster *args:
 
 [doc('Generate schematic ID from Talos schematic')]
 [script]
-gen-schematic-id:
+schematic-id:
     curl -sX POST --data-binary "@{{ talos_dir }}/schematic.yaml" "https://factory.talos.dev/schematics" | jq -r '.id'
 
 [doc('Render Talos config for a node')]
 [script]
 render-config node:
     export IS_CONTROLPLANE="$(just talos machine-controller {{ node }})"
+    export SCHEMATIC="$(just talos schematic-id)"
+    export TALOS_VERSION="$(just talos version)"
     talosctl machineconfig patch <(just template "{{ talos_dir }}/machineconfig.yaml.j2") -p @<(just template "{{ talos_dir }}/nodes/{{ node }}.yaml.j2")
 
 [doc('Reboot a node')]
@@ -84,3 +86,9 @@ machine-controller node:
 [script]
 machine-image node:
     talosctl --nodes {{ node }} get machineconfig -o yaml | yq -e 'select(.metadata.id == "v1alpha1") | .spec' | yq -e 'select(.machine) | .machine.install.image'
+
+[doc('Fetch Talos version from configuration')]
+[private]
+[script]
+version:
+    yq eval '.version' "{{ talos_dir }}/version.yaml"
