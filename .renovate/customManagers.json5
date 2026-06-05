@@ -1,16 +1,8 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  customManagers: [
-    {
-      customType: "regex",
-      description: "Process OCI dependencies",
-      managerFilePatterns: [
-        "/^kubernetes/.+\\.yaml(?:\\.j2)?$/"
-      ],
-      matchStrings: [
-        "oci://(?<depName>[^:]+):(?<currentValue>\\S+)",
-      ],
-      datasourceTemplate: "docker",
-    }
-  ]
+  extends: [
+    "github>home-operations/renovate-presets//managers/oci.json5#1.3.1",
+    "github>home-operations/renovate-presets//managers/grafanaDashboards.json5#1.3.1",
+    "github>home-operations/renovate-presets//managers/talosFactory.json5#1.3.1",
+  ],
 }
