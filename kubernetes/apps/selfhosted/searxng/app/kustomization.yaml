@@ -7,3 +7,12 @@ resources:
   - ./ocirepository.yaml
   - ./helmrelease.yaml
   - ./ciliumnetworkpolicy.yaml
+configMapGenerator:
+  - name: searxng-config
+    files:
+      - ./resources/limiter.toml
+      - ./resources/settings.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
