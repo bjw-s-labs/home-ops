@@ -51,7 +51,7 @@ machine:
         rsize=1048576
         wsize=1048576
   install:
-    image: factory.talos.dev/metal-installer/{{ ENV.SCHEMATIC }}:v1.13.2
+    image: factory.talos.dev/metal-installer/{{ ENV.SCHEMATIC }}:{{ ENV.TALOS_VERSION }}
   kernel:
     modules:
       - name: nbd
@@ -62,7 +62,7 @@ machine:
     extraConfig:
       maxPods: 150
       serializeImagePulls: false
-    image: ghcr.io/siderolabs/kubelet:v1.36.1
+    image: ghcr.io/siderolabs/kubelet:{{ ENV.K8S_VERSION }}
     nodeIP:
       validSubnets:
         - 10.1.1.0/24
@@ -96,7 +96,7 @@ cluster:
     key: op://automation/talos/CLUSTER_AGGREGATORCA_KEY
   allowSchedulingOnControlPlanes: true
   apiServer:
-    image: registry.k8s.io/kube-apiserver:v1.36.1
+    image: registry.k8s.io/kube-apiserver:{{ ENV.K8S_VERSION }}
     extraArgs:
       enable-aggregator-routing: "true"
       feature-gates: HPAScaleToZero=true
@@ -106,7 +106,7 @@ cluster:
       - k8s.bjw-s.internal
     disablePodSecurityPolicy: true
   controllerManager:
-    image: registry.k8s.io/kube-controller-manager:v1.36.1
+    image: registry.k8s.io/kube-controller-manager:{{ ENV.K8S_VERSION }}
     extraArgs:
       bind-address: 0.0.0.0
       feature-gates: HPAScaleToZero=true
@@ -122,11 +122,11 @@ cluster:
       listen-metrics-urls: http://0.0.0.0:2381
   proxy:
     disabled: true
-    image: registry.k8s.io/kube-proxy:v1.36.1
+    image: registry.k8s.io/kube-proxy:{{ ENV.K8S_VERSION }}
   scheduler:
     extraArgs:
       bind-address: 0.0.0.0
-    image: registry.k8s.io/kube-scheduler:v1.36.1
+    image: registry.k8s.io/kube-scheduler:{{ ENV.K8S_VERSION }}
   secretboxEncryptionSecret: op://automation/talos/CLUSTER_SECRETBOXENCRYPTIONSECRET
   serviceAccount:
     key: op://automation/talos/CLUSTER_SERVICEACCOUNT_KEY
@@ -168,6 +168,11 @@ apiVersion: v1alpha1
 kind: DHCPv4Config
 name: bond0
 clientIdentifier: mac
+---
+apiVersion: v1alpha1
+kind: ResolverConfig
+nameservers:
+  - address: 10.1.1.1
 ---
 # IOT
 apiVersion: v1alpha1

@@ -37,7 +37,8 @@ schematic-id:
 render-config node:
     export IS_CONTROLPLANE="$(just talos machine-controller {{ node }})"
     export SCHEMATIC="$(just talos schematic-id)"
-    export TALOS_VERSION="$(just talos version)"
+    export TALOS_VERSION="$(just talos talos-version)"
+    export K8S_VERSION="$(just talos k8s-version)"
     talosctl machineconfig patch <(just template "{{ talos_dir }}/machineconfig.yaml.j2") -p @<(just template "{{ talos_dir }}/nodes/{{ node }}.yaml.j2")
 
 [doc('Reboot a node')]
@@ -90,5 +91,11 @@ machine-image node:
 [doc('Fetch Talos version from configuration')]
 [private]
 [script]
-version:
-    yq eval '.version' "{{ talos_dir }}/version.yaml"
+talos-version:
+    yq eval '.talos_version' "{{ talos_dir }}/version.yaml"
+
+[doc('Fetch Kubernetes version from configuration')]
+[private]
+[script]
+k8s-version:
+    yq eval '.k8s_version' "{{ talos_dir }}/version.yaml"
