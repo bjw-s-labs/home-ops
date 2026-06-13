@@ -44,6 +44,7 @@ spec:
                 - default:k8s:/config/podspec-default.yaml
                 - docker:k8s:/config/podspec-dind.yaml
               timeout: 3h
+              shutdown_timeout: 3m
           podspec-default.yaml: |-
             containers:
               - env:
@@ -134,6 +135,31 @@ spec:
             runAsGroup: 1000
             runAsNonRoot: true
             runAsUser: 1000
+          # must cover runner.shutdown_timeout plus the plugin's 60s cleanup budget
+          terminationGracePeriodSeconds: 300
+        initContainers:
+          # native sidecar: started before, and terminated after, the runner
+          # container, so the plugin socket outlives job draining on shutdown
+          k8s-plugin:
+            image:
+              repository: registry.erwanleboucher.dev/erwanleboucher.dev/eleboucher/runner-k8s-plugin
+              tag: 12.10.6@sha256:b0ffe279448c70fb3327485163da8da2ce12fa9cc39a29231edd676c9025c036
+            args:
+              - --listen
+              - unix:///plugin/forgejo-runner-k8s.sock}
+            restartPolicy: Always
+            resources:
+              requests:
+                cpu: 5m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
         containers:
           runner:
             image:
@@ -158,24 +184,6 @@ spec:
                 drop:
                   - ALL
               readOnlyRootFilesystem: true
-          k8s-plugin:
-            image:
-              pullPolicy: Always
-              repository: registry.erwanleboucher.dev/erwanleboucher.dev/eleboucher/runner-k8s-plugin
-              tag: 12.10.5@sha256:1f29ce6eb4f0579a01c25af2dd5442dffb1e86ca79dcbbfd62fa655a6d1418ee
-            args:
-              - --listen
-              - unix:///plugin/forgejo-runner-k8s.sock
-            resources:
-              requests:
-                cpu: 5m
-                memory: 32Mi
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
     persistence:
       config:
         type: configMap
