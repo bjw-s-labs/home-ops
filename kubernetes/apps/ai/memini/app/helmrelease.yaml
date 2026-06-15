@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -30,9 +30,11 @@ spec:
                     name: memini-secret
                     key: MEMINI_API_KEY
               MEMINI_BACKEND: sqlite
+              MEMINI_DEFAULT_NAMESPACE: "default"
               MEMINI_LOG_FORMAT: json
               MEMINI_EMBED_BASE_URL: http://text-embeddings-inference.ai.svc.cluster.local:8080/v1
-              MEMINI_EMBED_MODEL: all-MiniLM-L6-v2
+              MEMINI_EMBED_DIMS: "384"
+              MEMINI_EMBED_MODEL: sentence-transformers/all-MiniLM-L6-v2
               MEMINI_RERANK: http://qwen3-reranker-0-6b.ai.svc.cluster.local:8080/v1
               MEMINI_RERANK_MODEL: qwen3-reranker-0.6b
               MEMINI_RERANK_TOP_N: "20"
@@ -49,6 +51,10 @@ spec:
               capabilities:
                 drop:
                   - ALL
+      fsck:
+        enabled: true
+        cronjob:
+          schedule: "0 5 * * *"
     persistence:
       data:
         existingClaim: memini
