@@ -1,0 +1,68 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: memini
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: memini
+  interval: 30m
+  values:
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
+        containers:
+          main:
+            env:
+              MEMINI_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: memini-secret
+                    key: MEMINI_API_KEY
+              MEMINI_BACKEND: sqlite
+              MEMINI_LOG_FORMAT: json
+              MEMINI_EMBED_BASE_URL: http://mcp-tools-embedding.ai.svc.cluster.local:8080/v1
+              MEMINI_EMBED_MODEL: all-MiniLM-L6-v2
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      data:
+        existingClaim: memini
+    route:
+      internal:
+        enabled: true
+        hostnames:
+          - memini.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+        rules:
+          - backendRefs:
+              - identifier: main
+                port: http
+    serviceMonitor:
+      main:
+        enabled: true
+    grafanaDashboards:
+      enabled: true
+      folder: llm

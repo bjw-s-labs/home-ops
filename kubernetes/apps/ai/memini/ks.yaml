@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: memini
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: memini
+  components:
+    - ../../../../components/volsync
+  dependsOn:
+    - name: volsync
+      namespace: system
+  interval: 1h
+  path: "./kubernetes/apps/ai/memini/app"
+  postBuild:
+    substitute:
+      APP: memini
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: ai
+  timeout: 5m
+  wait: false
