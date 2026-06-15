@@ -3,22 +3,24 @@ model_list:
   - model_name: minimax/MiniMax-M3
     litellm_params:
       model: minimax/MiniMax-M3
-      api_base: https://api.minimax.io/v1
       api_key: os.environ/MINIMAX_API_KEY
     model_info:
-      max_tokens: 1000000
-      max_input_tokens: 192000
-      max_output_tokens: 16384
+      mode: chat
+      max_input_tokens: 1000000
+      supports_function_calling: true
+      supports_prompt_caching: true
+      supports_vision: true
 
   - model_name: minimax/MiniMax-M2.7
     litellm_params:
       model: minimax/MiniMax-M2.7
-      api_base: https://api.minimax.io/v1
       api_key: os.environ/MINIMAX_API_KEY
     model_info:
-      max_tokens: 204800
-      max_input_tokens: 192000
-      max_output_tokens: 16384
+      mode: chat
+      max_input_tokens: 204800
+      supports_function_calling: true
+      supports_prompt_caching: true
+      supports_vision: false
 
 general_settings:
   health_check_endpoint: /v1/health
@@ -29,7 +31,12 @@ router_settings:
   routing_strategy: simple-shuffle
 
 litellm_settings:
-  success_callback: ["prometheus"]
+  callbacks:
+    - prometheus
+  success_callback:
+    - prometheus
+  failure_callback:
+    - prometheus
   prometheus_adapter: true
   require_auth_for_metrics_endpoint: false
   cache: true
@@ -39,8 +46,6 @@ litellm_settings:
     port: os.environ/REDIS_PORT
   drop_params: true
   set_verbose: false
-
-environment:
-  - MINIMAX_API_KEY
-  - REDIS_HOST
-  - REDIS_PORT
+  telemetry: false
+  request_timeout: 3600
+  num_retries: 1
