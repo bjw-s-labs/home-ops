@@ -55,6 +55,21 @@ spec:
         enabled: true
         cronjob:
           schedule: "0 5 * * *"
+        pod:
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/controller
+                        operator: In
+                        values:
+                          - main
+                      - key: app.kubernetes.io/instance
+                        operator: In
+                        values:
+                          - memini
+                  topologyKey: kubernetes.io/hostname
         containers:
           fsck:
             env:
