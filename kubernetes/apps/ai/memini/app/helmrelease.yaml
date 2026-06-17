@@ -55,6 +55,14 @@ spec:
         enabled: true
         cronjob:
           schedule: "0 5 * * *"
+        containers:
+          fsck:
+            env:
+              MEMINI_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: memini-secret
+                    key: MEMINI_API_KEY
     persistence:
       data:
         existingClaim: memini
