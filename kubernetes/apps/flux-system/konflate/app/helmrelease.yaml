@@ -1,0 +1,37 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: konflate
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: konflate
+  interval: 1h
+  values:
+    config:
+      repo: forgejo://git.bjw-s.dev/bjw-s/home-ops
+      statusChecks: true
+      prComments: true
+      publicUrl: https://konflate.bjw-s.dev
+      mcp: true
+    image:
+      repository: ghcr.io/home-operations/konflate
+      tag: 0.2.27@sha256:0f70530392e56988479c126a47bdecac81bf9006172b7a4011a13455858f225a
+    secret:
+      existingSecret: konflate-secret
+    httpRoute:
+      enabled: true
+      hostnames:
+        - konflate.bjw-s.dev
+      parentRefs:
+        - name: envoy-internal
+          namespace: network
+    resources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+      limits:
+        cpu: 2000m
+        memory: 2Gi
