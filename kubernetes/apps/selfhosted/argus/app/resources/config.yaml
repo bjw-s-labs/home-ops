@@ -2,15 +2,6 @@
 settings:
   log:
     level: INFO
-  web:
-    disabled_routes:
-      - service_create
-      - service_update
-      - service_delete
-      - service_actions
-      - dv_refresh
-      - lv_refresh_new
-      - dv_refresh_new
 
 defaults:
   service:
@@ -133,6 +124,9 @@ service:
       type: github
       access_token: ${GITHUB_ACCESS_TOKEN}
       url: siderolabs/talos
+      url_commands:
+        - type: regex
+          regex: ^v?([0-9.]+\.[0-9.]+\.[0-9.]+)$
     dashboard:
       icon: https://avatars.githubusercontent.com/u/13804887?s=200&v=4
     notify:
