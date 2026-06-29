@@ -32,11 +32,18 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: llmkube-models
+  components:
+    - ../../../../components/gpu
   dependsOn:
     - name: llmkube
       namespace: ai
+    - name: intel-gpu-resource-driver
+      namespace: kube-system
   interval: 1h
   path: "./kubernetes/apps/ai/llmkube/models"
+  postBuild:
+    substitute:
+      APP: llmkube-models
   prune: true
   sourceRef:
     kind: GitRepository
