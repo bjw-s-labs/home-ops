@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: minimax-m2-7
+spec:
+  modelName: minimax/MiniMax-M2.7
+  params:
+    model: minimax/MiniMax-M2.7
+    apiBase: https://api.minimax.io/v1
+    apiKeyRef:
+      name: litellm
+      key: MINIMAX_API_KEY
+  info:
+    maxTokens: 204800
+    maxInputTokens: 192000
+    maxOutputTokens: 16384
+    supportsFunctionCalling: true

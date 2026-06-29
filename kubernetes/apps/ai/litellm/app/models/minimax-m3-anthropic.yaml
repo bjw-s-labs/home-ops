@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: minimax-m3-anthropic
+spec:
+  modelName: minimax/MiniMax-M3-anthropic
+  params:
+    model: anthropic/MiniMax-M3
+    apiBase: https://api.minimax.io/anthropic
+    apiKeyRef:
+      name: litellm
+      key: MINIMAX_API_KEY
+    dropParams: true
+  info:
+    maxInputTokens: 1000000
+    maxOutputTokens: 131072
+    supportsFunctionCalling: true
+    supportsPromptCaching: true
+    supportsVision: true
