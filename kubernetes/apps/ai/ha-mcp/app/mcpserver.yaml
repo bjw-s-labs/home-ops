@@ -1,28 +1,27 @@
 ---
-# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/toolhive.stacklok.dev/mcpserver_v1beta1.json
-apiVersion: toolhive.stacklok.dev/v1beta1
-kind: MCPServer
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmcpserver_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMMCPServer
 metadata:
   name: ha-mcp
 spec:
-  groupRef:
-    name: mcp-tools
-  env:
-    - name: HOMEASSISTANT_URL
-      value: http://hestia.bjw-s.internal:8123
-  image: ghcr.io/homeassistant-ai/ha-mcp:7.9.0
-  podTemplateSpec:
-    spec:
-      containers:
-        - name: mcp
-          command:
-            - ha-mcp-web
-          volumeMounts:
-            - mountPath: /tmp
-              name: tmpfs
-      volumes:
-        - name: tmpfs
-  secrets:
-    - name: ha-mcp-secret
-      key: HOMEASSISTANT_TOKEN
-  transport: streamable-http
+  alias: ha_mcp
+  workload:
+    image: ghcr.io/homeassistant-ai/ha-mcp:7.9.0
+    port: 8086
+    command:
+      - ha-mcp-web
+    env:
+      - name: HOMEASSISTANT_URL
+        value: https://hass.bjw-s.dev
+      - name: HOMEASSISTANT_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: ha-mcp-secret
+            key: HOMEASSISTANT_TOKEN
+    volumes:
+      - name: tmp
+        emptyDir: {}
+    volumeMounts:
+      - name: tmp
+        mountPath: /tmp

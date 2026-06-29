@@ -1,16 +1,14 @@
 ---
-# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/toolhive.stacklok.dev/mcpserver_v1beta1.json
-apiVersion: toolhive.stacklok.dev/v1beta1
-kind: MCPServer
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmcpserver_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMMCPServer
 metadata:
-  name: context7-mcp
+  name: context7
 spec:
-  groupRef:
-    name: mcp-tools
-  image: ghcr.io/stacklok/dockyard/npx/context7:2.2.4
-  proxyPort: 8080
-  secrets:
-    - name: context7-mcp-secret
-      key: api_key
-      targetEnvName: CONTEXT7_API_KEY
-  transport: stdio
+  alias: context7
+  url: https://mcp.context7.com/mcp
+  transport: http
+  authType: bearer_token
+  authTokenRef:
+    name: context7-mcp-secret
+    key: api_key
