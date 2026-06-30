@@ -5,13 +5,16 @@ kind: LiteLLMModel
 metadata:
   name: minimax-m2-7
 spec:
-  modelName: minimax/MiniMax-M2.7
+  modelName: minimax/MiniMax-M2-7
   params:
     model: minimax/MiniMax-M2.7
     apiBase: https://api.minimax.io/v1
     apiKeyRef:
       name: litellm
       key: MINIMAX_API_KEY
+    additional:
+      extra_body:
+        reasoning_split: true
   info:
     maxTokens: 204800
     maxInputTokens: 192000

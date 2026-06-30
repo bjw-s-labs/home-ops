@@ -3,22 +3,19 @@
 apiVersion: litellm.home-operations.com/v1alpha1
 kind: LiteLLMModel
 metadata:
-  name: minimax-m3
+  name: minimax-m2-7-anthropic
 spec:
-  modelName: minimax/MiniMax-M3
+  modelName: minimax/MiniMax-M2-7-anthropic
   params:
-    model: minimax/MiniMax-M3
-    apiBase: https://api.minimax.io/v1
+    model: anthropic/MiniMax-M2.7
+    apiBase: https://api.minimax.io/anthropic
     apiKeyRef:
       name: litellm
       key: MINIMAX_API_KEY
-    additional:
-      extra_body:
-        reasoning_split: true
+    dropParams: true
   info:
-    maxTokens: 1000000
-    maxInputTokens: 1000000
-    maxOutputTokens: 131072
-    supportsFunctionCalling: true
+    maxTokens: 204800
+    maxInputTokens: 192000
+    maxOutputTokens: 16384
     supportsPromptCaching: true
-    supportsVision: true
+    supportsFunctionCalling: true
