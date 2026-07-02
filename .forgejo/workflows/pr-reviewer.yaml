@@ -1,0 +1,75 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: AI PR Review
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - labeled
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ${{ forgejo.workflow }}-${{ forgejo.event.pull_request.number || forgejo.ref }}${{ forgejo.event.action == 'labeled' && format('-label-{0}', forgejo.run_id) || '' }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: AI PR Review
+    if: ${{ !forgejo.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout PR
+        uses: https://github.com/actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          ref: ${{ forgejo.event.pull_request.head.sha }}
+
+      - name: AI PR Review
+        uses: https://github.com/misospace/pr-reviewer-action@b36ea146c6563a3f49a5b9a232d411f6cf970474 # v2.0.5
+        with:
+          github_token: ${{ secrets.FORGEJO_TOKEN }}
+          platform: forgejo
+          forgejo_api_url: http://forgejo-http.dev.svc.cluster.local:3000/
+          forgejo_token: ${{ secrets.FORGEJO_TOKEN }}
+          allowed_source_hosts: github.com,api.github.com,gitlab.com,registry.terraform.io,artifacthub.io,git.bjw-s.dev,codeberg.org
+          ai_base_url: http://litellm.ai.svc.cluster.local:4000/v1
+          ai_api_format: anthropic
+          ai_model: minimax/MiniMax-M3-anthropic
+          ai_api_key: ${{ secrets.LITELLM_API_KEY }}
+          ai_max_tokens: "16000"
+          ai_primary_retries: "2"
+          ai_primary_retry_delay_sec: "5"
+          ai_connect_timeout_sec: "10"
+          ai_fallback_base_url: http://litellm.ai.svc.cluster.local:4000/v1
+          ai_fallback_api_format: openai
+          ai_fallback_model: neuralwatt/qwen3.6-35b
+          ai_fallback_api_key: ${{ secrets.LITELLM_API_KEY }}
+          on_model_failure: notice
+          tool_mode: native_loop
+          tool_max_requests: "4"
+          tool_max_rounds: "2"
+          tool_loop_wall_clock_sec: "180"
+          tool_request_timeout_sec: "15"
+          tool_max_response_bytes: "12000"
+          tool_planning_timeout_sec: "60"
+          tool_planning_max_context_bytes: "30000"
+          tool_planning_max_tokens: "8000"
+          tool_allowed_gh_api_repos: "bjw-s/home-ops"
+          tool_enable_for_forks: "false"
+          tool_mcp_servers: "tools=http://litellm.ai.svc.cluster.local:4000/mcp/,konflate=http://konflate.flux-system.svc.cluster.local:8080/mcp"
+          tool_mcp_token: ${{ secrets.LITELLM_API_KEY }}
+          tool_mcp_name_prefixes: "context7"
+          publish_review_comment: "true"
