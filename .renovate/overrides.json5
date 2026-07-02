@@ -12,6 +12,12 @@
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/mogenius/helm-charts/renovate-operator"],
       sourceUrl: "https://github.com/mogenius/renovate-operator"
+    },
+    {
+      description: "Override Actual Budget changelog URL",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/actualbudget/actual"],
+      changelogUrl: "https://actualbudget.org/blog/release-{{{replace '^v' '' newVersion}}}"
     }
-  ],
+  ]
 }
