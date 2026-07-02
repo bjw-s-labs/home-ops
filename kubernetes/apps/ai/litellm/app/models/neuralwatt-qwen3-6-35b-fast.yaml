@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: neuralwatt-qwen3-6-35b-fast
+spec:
+  modelName: neuralwatt/qwen3.6-35b-fast
+  params:
+    model: openai/qwen3.6-35b-fast
+    apiBase: https://api.neuralwatt.com/v1
+    apiKeyRef:
+      name: litellm
+      key: NEURALWATT_API_KEY
+    dropParams: true
+    additional:
+      temperature: 0.7
+  info:
+    maxInputTokens: 131056
+    maxOutputTokens: 32768
+    supportsFunctionCalling: true
+    supportsVision: true
+    supportsPromptCaching: true

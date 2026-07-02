@@ -5,7 +5,8 @@ kind: LiteLLMProxy
 metadata:
   name: litellm
 spec:
-  image: ghcr.io/berriai/litellm:v1.83.14-stable@sha256:d6401c001f90f3bab4bb23c5fd6d9302a7df58999ec6fa9e3f175e1f5f26544b
+  # renovate: datasource=docker depName=ghcr.io/berriai/litellm
+  image: ghcr.io/berriai/litellm:v1.90.2@sha256:19a879f9c4ed466f2438aa08b22e2b472053ab57c6325db73c71d0624d2d4953
   replicas: 1
   generalSettings:
     health_check_endpoint: /v1/health
@@ -15,6 +16,16 @@ spec:
     redis_port: os.environ/REDIS_PORT
     num_retries: 3
     timeout: 600
+    context_window_fallbacks:
+      - neuralwatt/qwen3.6-35b-fast: ["neuralwatt/kimi-k2.6-fast", "neuralwatt/glm-5.2-fast"]
+      - neuralwatt/qwen3.6-35b: ["neuralwatt/kimi-k2.6", "neuralwatt/glm-5.2"]
+      - neuralwatt/qwen3.5-397b-fast: ["neuralwatt/glm-5.2-fast"]
+      - neuralwatt/qwen3.5-397b: ["neuralwatt/glm-5.2"]
+      - neuralwatt/glm-5.2-short-fast: ["neuralwatt/glm-5.2-fast"]
+      - neuralwatt/glm-5.2-short: ["neuralwatt/glm-5.2"]
+      - neuralwatt/kimi-k2.6-fast: ["neuralwatt/glm-5.2-fast"]
+      - neuralwatt/kimi-k2.6: ["neuralwatt/glm-5.2"]
+      - neuralwatt/kimi-k2.7-code: ["neuralwatt/glm-5.2"]
   litellmSettings:
     success_callback:
       - prometheus
@@ -32,7 +43,7 @@ spec:
     - name: LITELLM_MODE
       value: PRODUCTION
     - name: REDIS_HOST
-      value: litellm-dragonfly
+      value: litellm-dragonfly.ai.svc.cluster.local
     - name: REDIS_PORT
       value: "6379"
     - name: LITELLM_MASTER_KEY
