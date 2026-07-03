@@ -60,7 +60,9 @@ jobs:
           ci_status_check: "true"
           ci_timeout_sec: "600"
           evidence_providers_file: .forgejo/konflate-evidence-providers.json
+          inline_findings: "true"
           on_model_failure: notice
+          publish_review_comment: "true"
           system_prompt_file: .agents/instructions/pr-review.instructions.md
           system_prompt_mode: append
           tool_mode: native_loop
@@ -75,4 +77,3 @@ jobs:
           tool_allowed_gh_api_repos: "bjw-s/home-ops"
           tool_enable_for_forks: "false"
           tool_mcp_servers: "konflate=http://konflate.flux-system.svc.cluster.local:8080/mcp"
-          publish_review_comment: "true"
