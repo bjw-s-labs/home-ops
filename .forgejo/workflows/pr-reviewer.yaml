@@ -57,6 +57,9 @@ jobs:
           ai_fallback_api_format: openai
           ai_fallback_model: neuralwatt/qwen3.6-35b
           ai_fallback_api_key: ${{ secrets.LITELLM_API_KEY }}
+          ci_status_check: "true"
+          ci_timeout_sec: "600"
+          evidence_providers_file: .forgejo/konflate-evidence-providers.json
           on_model_failure: notice
           system_prompt_file: .agents/instructions/pr-review.instructions.md
           system_prompt_mode: append
