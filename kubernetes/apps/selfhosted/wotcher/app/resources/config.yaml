@@ -1,0 +1,100 @@
+---
+# yaml-language-server: $schema=https://git.bjw-s.dev/bjw-s/wotcher/raw/commit/96313c482bcfaefb066a83a7ede944c17a004bee/config.schema.json
+server:
+  interval: "5m"
+  state_dir: "/state"
+
+discord:
+  webhook_name: wotcher
+  default_username: wotcher
+  default_avatar_url: ""
+
+destinations:
+  bjw-s-releases:
+    channel_id: "1399381498095730820"
+    type: text
+  home-operations-app-template:
+    channel_id: "1511472770616131805"
+    type: forum
+    thread_id: "1511771940568698971"
+  home-operations-flux:
+    channel_id: "1097927308762939493"
+    type: text
+  home-operations-kguardian:
+    channel_id: "1511472770616131805"
+    type: forum
+    thread_id: "1511473620189446265"
+  home-operations-talos:
+    channel_id: "942576972943491113"
+    type: text
+
+repos:
+  kguardian-dev/kguardian:
+    owner: kguardian-dev
+    name: kguardian
+    alias: kguardian
+    destinations:
+      - home-operations-kguardian
+    include_prereleases: false
+    username: kguardian
+    avatar_url: https://avatars.githubusercontent.com/u/121204085?s=200&v=4
+    color: "5322961"
+
+  siderolabs/talos:
+    owner: siderolabs
+    name: talos
+    alias: Talos
+    destinations:
+      - home-operations-talos
+    include_prereleases: false
+    username: Talos
+    avatar_url: https://avatars.githubusercontent.com/u/13804887?s=200&v=4
+    color: "16098851"
+    tag_filter: >-
+      ^v?\d+\.\d+\.\d+$
+
+  controlplaneio-fluxcd/flux-operator:
+    owner: controlplaneio-fluxcd
+    name: flux-operator
+    alias: Flux Operator
+    destinations:
+      - home-operations-flux
+    include_prereleases: false
+    username: Flux Operator
+    avatar_url: https://avatars.githubusercontent.com/u/52158677?s=200&v=4
+    color: "3612660"
+
+  fluxcd/flux2:
+    owner: fluxcd
+    name: flux2
+    alias: Flux
+    destinations:
+      - home-operations-flux
+    include_prereleases: false
+    username: Flux
+    avatar_url: https://avatars.githubusercontent.com/u/52158677?s=200&v=4
+    color: "3612660"
+
+  bjw-s-labs/app-template:
+    owner: bjw-s-labs
+    name: helm-charts
+    alias: app-template
+    destinations:
+      - home-operations-app-template
+    include_prereleases: false
+    username: app-template
+    avatar_url: https://avatars.githubusercontent.com/u/6213398?s=200&v=4
+    color: "16753920"
+    tag_filter: >-
+      ^app-template-?([0-9.]+)$
+
+  Hypfer/valetudo:
+    owner: Hypfer
+    name: valetudo
+    alias: Valetudo
+    destinations:
+      - bjw-s-releases
+    include_prereleases: false
+    username: valetudo
+    avatar_url: https://raw.githubusercontent.com/Hypfer/Valetudo/refs/heads/master/assets/logo/valetudo_logo_small.svg
+    color: "1012882"
