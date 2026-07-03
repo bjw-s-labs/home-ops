@@ -35,23 +35,13 @@ Do not include internal planner/tool-harness diagnostics such as missing `reques
 
 Missing OCI revision/source labels are a non-blocking caveat for same-tag digest refreshes when repository, tag, and created timestamp evidence are consistent.
 
-### Konflate rendered-diff input
+### Konflate rendered-diff tools
 
-A Konflate MCP server is configured. Konflate renders Helm charts and Kustomizations into their final Kubernetes manifests, so its rendered diff shows the **actual cluster impact** of a PR — not just the raw git changes.
+A Konflate MCP server is configured. Konflate renders Helm charts and Kustomizations into their final Kubernetes manifests, so its rendered diff shows the actual cluster impact of a PR — not just the raw git changes. A rendered-diff summary is usually already injected into the corpus by the konflate evidence provider; use the MCP tools when you need more than the summary provides.
 
-**Proactively call Konflate MCP tools at the start of each review:**
+- `mcp__konflate__get_pr_summary` — pass the current PR `number`. Blast radius (added/changed/removed resources), caution lint (data-loss, immutable-field, RBAC, suspend/prune), image changes, render failures. Cheap and high-value; call this first if the evidence section is missing or stale.
+- `mcp__konflate__get_pr_diff` — pass the current PR `number`. The full rendered manifest diff (Kubernetes YAML at PR head vs merge-base). Use it when the raw git diff hides the real change — e.g. a HelmRelease version bump or a one-line `values` change that fans out across many resources.
 
-1. `mcp_konflate_get_pr_summary` — pass the current PR `number`. Returns the blast radius (added/changed/removed resources), caution lint (data-loss, immutable-field, RBAC, suspend/prune), image changes (from → to), and render failures. This is your fastest, highest-value input.
-
-2. `mcp_konflate_get_pr_diff` — pass the current PR `number`. Returns the rendered manifest diff (the actual Kubernetes YAML at PR head vs merge-base). Use this when the raw git diff is uninformative on its own — e.g. a HelmRelease version bump or values change where the downstream manifest changes are not visible in git.
-
-Both calls count toward `tool_max_requests` (4) and `tool_max_rounds` (2). Prioritize `get_pr_summary` first — it is cheap and high-value. Call `get_pr_diff` only when you need to inspect specific resource changes the summary flags.
-
-**Using Konflate signals in the review:**
-
-- Surface Konflate cautions (data-loss, immutable-field, RBAC, suspend/prune) in the review as non-blocking caveats or blockers depending on severity.
-- Use the rendered diff to identify real changes that a raw git diff hides — e.g. a one-line `values` change that alters many fields across multiple Deployments.
-- If Konflate reports render failures, note them as a blocker — the manifests may not apply cleanly.
-- For Renovate digest-only image bumps where Konflate shows only `@sha256:` changes with no other manifest differences, keep the review compact (see section above).
+Konflate signals in the review: surface cautions as caveats or blockers by severity; treat render failures as blockers (the manifests may not apply cleanly). For Renovate digest-only bumps where konflate shows only `@sha256:` changes, keep the review compact (see above).
 
 Check upstream for breaking changes. As the PR-Reviewer that's part of your job.
