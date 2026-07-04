@@ -10,6 +10,7 @@ spec:
       app.kubernetes.io/name: atuin
   components:
     - ../../../../components/volsync
+    - ../../../../components/kopiur
   dependsOn:
     - name: volsync
       namespace: system
@@ -18,8 +19,8 @@ spec:
   postBuild:
     substitute:
       APP: atuin
-      VOLSYNC_CLAIM: atuin
       VOLSYNC_CAPACITY: 5Gi
+      KOPIUR_CAPACITY: 5Gi
   prune: true
   sourceRef:
     kind: GitRepository

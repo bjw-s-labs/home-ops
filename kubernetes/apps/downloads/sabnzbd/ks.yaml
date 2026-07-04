@@ -10,6 +10,7 @@ spec:
       app.kubernetes.io/name: sabnzbd
   components:
     - ../../../../components/volsync
+    - ../../../../components/kopiur
     - ../../../../components/zeroscaler
   dependsOn:
     - name: volsync
@@ -22,6 +23,7 @@ spec:
     substitute:
       APP: sabnzbd
       VOLSYNC_CLAIM: sabnzbd-config
+      KOPIUR_CLAIM: sabnzbd-config
   prune: true
   sourceRef:
     kind: GitRepository

@@ -10,6 +10,7 @@ spec:
       app.kubernetes.io/name: paperless
   components:
     - ../../../../components/volsync
+    - ../../../../components/kopiur
     - ../../../../components/zeroscaler
     - ../../../../components/dragonfly
   dependsOn:
@@ -20,10 +21,12 @@ spec:
   postBuild:
     substitute:
       APP: paperless
-      APP_UID: "1000"
-      APP_GID: "65542"
       VOLSYNC_CLAIM: paperless-data
+      KOPIUR_CLAIM: paperless-data
       VOLSYNC_CAPACITY: 15Gi
+      KOPIUR_CAPACITY: 15Gi
+      KOPIUR_MOVER_UID: "1000"
+      KOPIUR_MOVER_GID: "65542"
       DRAGONFLY_REPLICAS: "1"
   prune: true
   sourceRef:

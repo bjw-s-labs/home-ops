@@ -11,6 +11,7 @@ spec:
   components:
     - ../../../../components/gpu
     - ../../../../components/volsync
+    - ../../../../components/kopiur
     - ../../../../components/zeroscaler
   dependsOn:
     - name: intel-gpu-resource-driver
@@ -22,8 +23,8 @@ spec:
   postBuild:
     substitute:
       APP: jellyfin
-      VOLSYNC_CLAIM: jellyfin
       VOLSYNC_CAPACITY: 20Gi
+      KOPIUR_CAPACITY: 20Gi
   prune: true
   sourceRef:
     kind: GitRepository

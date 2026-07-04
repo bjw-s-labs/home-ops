@@ -11,6 +11,7 @@ spec:
   components:
     - ../../../../components/gpu
     - ../../../../components/volsync
+    - ../../../../components/kopiur
   dependsOn:
     - name: intel-gpu-resource-driver
       namespace: kube-system
@@ -21,8 +22,10 @@ spec:
   postBuild:
     substitute:
       APP: dispatcharr
-      VOLSYNC_CLAIM: dispatcharr
       VOLSYNC_CAPACITY: 10Gi
+      KOPIUR_CAPACITY: 10Gi
+      KOPIUR_MOVER_UID: "1000"
+      KOPIUR_MOVER_GID: "1000"
   prune: true
   sourceRef:
     kind: GitRepository

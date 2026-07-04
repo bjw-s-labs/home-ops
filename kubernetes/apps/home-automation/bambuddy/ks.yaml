@@ -10,6 +10,7 @@ spec:
       app.kubernetes.io/name: bambuddy
   components:
     - ../../../../components/volsync
+    - ../../../../components/kopiur
   dependsOn:
     - name: multus-networks
       namespace: network
@@ -20,8 +21,8 @@ spec:
   postBuild:
     substitute:
       APP: bambuddy
-      VOLSYNC_CLAIM: bambuddy
       VOLSYNC_CAPACITY: 5Gi
+      KOPIUR_CAPACITY: 5Gi
   prune: true
   sourceRef:
     kind: GitRepository

@@ -7,6 +7,10 @@ metadata:
 spec:
   credentialProjection:
     enabled: true
+  mover:
+    securityContext:
+      runAsUser: ${KOPIUR_MOVER_UID:=2000}
+      runAsGroup: ${KOPIUR_MOVER_GID:=2000}
   repository:
     kind: ClusterRepository
     name: nas
@@ -15,7 +19,7 @@ spec:
     keepHourly: 24
   sources:
     - pvc:
-        name: ${APP}
+        name: "${KOPIUR_CLAIM:-${APP}}"
   verification:
     deep:
       schedule:
@@ -23,4 +27,4 @@ spec:
     quick:
       schedule:
         cron: H 3 * * *
-  volumeSnapshotClassName: ${KOPIUR_SNAPSHOTCLASS:=csi-ceph-blockpool}
+  volumeSnapshotClassName: ${KOPIUR_SNAPSHOTCLASS:=openebs-snapshots}
