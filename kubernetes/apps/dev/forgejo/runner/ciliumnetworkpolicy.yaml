@@ -45,9 +45,11 @@ spec:
         - ports:
             - protocol: TCP
               port: "8080"
-    - # Forgejo (External URL)
-      toFQDNs:
-        - matchName: git.bjw-s.dev
+    - # Hairpinned in-cluster external services
+      toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-external
     - # Internet egress
       toCIDRSet:
         # Internet egress
