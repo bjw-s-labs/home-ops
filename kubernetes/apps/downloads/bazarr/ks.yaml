@@ -9,18 +9,16 @@ spec:
     labels:
       app.kubernetes.io/name: bazarr
   components:
-    - ../../../../components/volsync
     - ../../../../components/kopiur
     - ../../../../components/zeroscaler
   dependsOn:
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/downloads/bazarr/app"
   postBuild:
     substitute:
       APP: bazarr
-      VOLSYNC_CLAIM: bazarr-config
       KOPIUR_CLAIM: bazarr-config
   prune: true
   sourceRef:

@@ -9,17 +9,15 @@ spec:
     labels:
       app.kubernetes.io/name: karakeep
   components:
-    - ../../../../components/volsync
     - ../../../../components/kopiur
   dependsOn:
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/selfhosted/karakeep/app"
   postBuild:
     substitute:
       APP: karakeep
-      VOLSYNC_CLAIM: karakeep-data
       KOPIUR_CLAIM: karakeep-data
   prune: true
   sourceRef:

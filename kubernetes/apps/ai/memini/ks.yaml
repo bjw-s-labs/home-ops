@@ -9,10 +9,9 @@ spec:
     labels:
       app.kubernetes.io/name: memini
   components:
-    - ../../../../components/volsync
     - ../../../../components/kopiur
   dependsOn:
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/ai/memini/app"

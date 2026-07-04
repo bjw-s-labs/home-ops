@@ -9,18 +9,16 @@ spec:
     labels:
       app.kubernetes.io/name: sonarr
   components:
-    - ../../../../components/volsync
     - ../../../../components/kopiur
     - ../../../../components/zeroscaler
   dependsOn:
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/downloads/sonarr/app"
   postBuild:
     substitute:
       APP: sonarr
-      VOLSYNC_CLAIM: sonarr-config
       KOPIUR_CLAIM: sonarr-config
   prune: true
   sourceRef:

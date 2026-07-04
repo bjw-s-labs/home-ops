@@ -9,18 +9,16 @@ spec:
     labels:
       app.kubernetes.io/name: qbittorrent
   components:
-    - ../../../../components/volsync
     - ../../../../components/kopiur
     - ../../../../components/zeroscaler
   dependsOn:
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/downloads/qbittorrent/app"
   postBuild:
     substitute:
       APP: qbittorrent
-      VOLSYNC_CAPACITY: 2Gi
       KOPIUR_CAPACITY: 2Gi
   prune: true
   sourceRef:

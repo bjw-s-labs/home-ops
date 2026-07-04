@@ -9,17 +9,15 @@ spec:
     labels:
       app.kubernetes.io/name: recyclarr
   components:
-    - ../../../../components/volsync
     - ../../../../components/kopiur
   dependsOn:
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/downloads/recyclarr/app"
   postBuild:
     substitute:
       APP: recyclarr
-      VOLSYNC_CLAIM: recyclarr-config
       KOPIUR_CLAIM: recyclarr-config
   prune: true
   sourceRef:

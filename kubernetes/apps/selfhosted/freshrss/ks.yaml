@@ -9,17 +9,15 @@ spec:
     labels:
       app.kubernetes.io/name: freshrss
   components:
-    - ../../../../components/volsync
     - ../../../../components/kopiur
   dependsOn:
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/selfhosted/freshrss/app"
   postBuild:
     substitute:
       APP: freshrss
-      VOLSYNC_CAPACITY: 2Gi
       KOPIUR_CAPACITY: 2Gi
       KOPIUR_MOVER_UID: "0"
       KOPIUR_MOVER_GID: "82"

@@ -9,11 +9,10 @@ spec:
     labels:
       app.kubernetes.io/name: nextcloud
   components:
-    - ../../../../components/volsync
     - ../../../../components/kopiur
     - ../../../../components/dragonfly
   dependsOn:
-    - name: volsync
+    - name: kopiur
       namespace: system
     - name: dragonfly-operator
       namespace: database
@@ -22,7 +21,6 @@ spec:
   postBuild:
     substitute:
       APP: nextcloud
-      VOLSYNC_CAPACITY: 15Gi
       KOPIUR_CAPACITY: 15Gi
       KOPIUR_MOVER_UID: "0"
       KOPIUR_MOVER_GID: "82"

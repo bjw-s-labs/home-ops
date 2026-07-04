@@ -9,21 +9,18 @@ spec:
     labels:
       app.kubernetes.io/name: paperless
   components:
-    - ../../../../components/volsync
     - ../../../../components/kopiur
     - ../../../../components/zeroscaler
     - ../../../../components/dragonfly
   dependsOn:
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/selfhosted/paperless/app"
   postBuild:
     substitute:
       APP: paperless
-      VOLSYNC_CLAIM: paperless-data
       KOPIUR_CLAIM: paperless-data
-      VOLSYNC_CAPACITY: 15Gi
       KOPIUR_CAPACITY: 15Gi
       KOPIUR_MOVER_UID: "1000"
       KOPIUR_MOVER_GID: "65542"

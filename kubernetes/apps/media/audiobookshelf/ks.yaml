@@ -9,13 +9,12 @@ spec:
     labels:
       app.kubernetes.io/name: audiobookshelf
   components:
-    - ../../../../components/volsync
     - ../../../../components/kopiur
     - ../../../../components/zeroscaler
   dependsOn:
     - name: intel-gpu-resource-driver
       namespace: kube-system
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/media/audiobookshelf/app"

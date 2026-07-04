@@ -10,19 +10,17 @@ spec:
       app.kubernetes.io/name: dispatcharr
   components:
     - ../../../../components/gpu
-    - ../../../../components/volsync
     - ../../../../components/kopiur
   dependsOn:
     - name: intel-gpu-resource-driver
       namespace: kube-system
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/media/dispatcharr/app"
   postBuild:
     substitute:
       APP: dispatcharr
-      VOLSYNC_CAPACITY: 10Gi
       KOPIUR_CAPACITY: 10Gi
       KOPIUR_MOVER_UID: "1000"
       KOPIUR_MOVER_GID: "1000"

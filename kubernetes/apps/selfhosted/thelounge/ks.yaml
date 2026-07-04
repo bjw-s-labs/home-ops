@@ -9,17 +9,15 @@ spec:
     labels:
       app.kubernetes.io/name: thelounge
   components:
-    - ../../../../components/volsync
     - ../../../../components/kopiur
   dependsOn:
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/selfhosted/thelounge/app"
   postBuild:
     substitute:
       APP: thelounge
-      VOLSYNC_CAPACITY: 5Gi
       KOPIUR_CAPACITY: 5Gi
   prune: true
   sourceRef:

@@ -10,7 +10,6 @@ spec:
       app.kubernetes.io/name: frigate
   components:
     - ../../../../components/gpu
-    - ../../../../components/volsync
     - ../../../../components/kopiur
     - ../../../../components/zeroscaler
   dependsOn:
@@ -18,14 +17,13 @@ spec:
       namespace: kube-system
     - name: multus-networks
       namespace: network
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/home-automation/frigate/app"
   postBuild:
     substitute:
       APP: frigate
-      VOLSYNC_CAPACITY: 5Gi
       KOPIUR_CAPACITY: 5Gi
   prune: true
   sourceRef:

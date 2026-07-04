@@ -75,17 +75,12 @@ sync-all-es:
       just k8s sync-es "$ns" "$name"
     done
 
-[doc('Snapshot all VolSync ReplicationSource')]
-[script]
-snapshot ns name:
-    kubectl -n "{{ ns }}" patch replicationsources "{{ name }}" --type merge -p '{"spec":{"trigger":{"manual":"$(date +%s)"}}}'
-
 [doc('Trigger Kopiur Snapshotpolicy')]
 [script]
 snapshot-kopiur ns name:
     kubectl kopiur -n "{{ ns }}" snapshot now --policy "{{ name }}"
 
-[doc('Snapshot all VolSync ReplicationSources')]
+[doc('Trigger all Kopiur Snapshotpolicies')]
 [script]
 snapshot-kopiur-all:
     kubectl get snapshotpolicies.kopiur.home-operations.com --no-headers -A | while read -r ns name _; do

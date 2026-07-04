@@ -9,19 +9,17 @@ spec:
     labels:
       app.kubernetes.io/name: bambuddy
   components:
-    - ../../../../components/volsync
     - ../../../../components/kopiur
   dependsOn:
     - name: multus-networks
       namespace: network
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/home-automation/bambuddy/app"
   postBuild:
     substitute:
       APP: bambuddy
-      VOLSYNC_CAPACITY: 5Gi
       KOPIUR_CAPACITY: 5Gi
   prune: true
   sourceRef:

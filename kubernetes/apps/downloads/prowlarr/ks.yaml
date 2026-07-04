@@ -9,17 +9,15 @@ spec:
     labels:
       app.kubernetes.io/name: prowlarr
   components:
-    - ../../../../components/volsync
     - ../../../../components/kopiur
   dependsOn:
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/downloads/prowlarr/app"
   postBuild:
     substitute:
       APP: prowlarr
-      VOLSYNC_CLAIM: prowlarr-config
       KOPIUR_CLAIM: prowlarr-config
   prune: true
   sourceRef:
