@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -10,68 +10,78 @@ spec:
     name: kromgo
   interval: 30m
   values:
-    controllers:
-      kromgo:
-        annotations:
-          reloader.stakater.com/auto: "true"
-        pod:
-          securityContext:
-            runAsGroup: 2000
-            runAsNonRoot: true
-            runAsUser: 2000
-        containers:
-          kromgo:
-            image:
-              repository: ghcr.io/home-operations/kromgo
-              tag: 0.14.12@sha256:f25f94610ba3b7e71753d3a33fdd9c47a2d94aab0b16eac15d0e53cfe52bf4fe
-            env:
-              PROMETHEUS_URL: http://prometheus-operated.observability.svc.cluster.local:9090
-              SERVER_PORT: &port 8080
-              HEALTH_PORT: &healthPort 8888
-            probes:
-              liveness: &probes
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /readyz
-                    port: *healthPort
-                  initialDelaySeconds: 0
-                  periodSeconds: 10
-                  timeoutSeconds: 1
-                  failureThreshold: 3
-              readiness: *probes
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - "ALL"
-            resources:
-              requests:
-                cpu: 5m
-                memory: 10M
-              limits:
-                memory: 64M
-    persistence:
-      config-file:
-        type: configMap
-        name: kromgo-configmap
-        globalMounts:
-          - path: /config/config.yaml
-            subPath: config.yaml
-    route:
-      app:
-        hostnames:
-          - kromgo.bjw-s.dev
-        parentRefs:
-          - name: envoy-external
-            namespace: network
-    service:
-      app:
-        ports:
-          http:
-            port: *port
-            primary: true
-          health:
-            port: *healthPort
+    config:
+      prometheus: http://prometheus-operated.observability.svc.cluster.local:9090
+      badges:
+        - id: talos_version
+          icon: si:talos
+          query: label_replace(node_os_info{name="Talos"}, "version_id", "$1", "version_id", "v(.+)")
+          title: Talos
+          valueExpr: labels["version_id"]
+
+        - id: kubernetes_version
+          icon: si:kubernetes
+          query: label_replace(kubernetes_build_info{service="kubernetes"}, "git_version", "$1", "git_version", "v(.+)")
+          title: Kubernetes
+          valueExpr: labels["git_version"]
+
+        - id: flux_version
+          icon: si:flux
+          query: label_replace(flux_instance_info, "revision", "$1", "revision", "v(.+)@sha256:.+")
+          title: Flux
+          valueExpr: labels["revision"]
+
+        - id: cluster_node_count
+          colorExpr: '"green"'
+          query: count(count by (node) (kube_node_status_condition{condition="Ready"}))
+          title: Nodes
+
+        - id: cluster_pod_count
+          colorExpr: '"green"'
+          query: sum(kube_pod_status_phase{phase="Running"})
+          title: Pods
+          valueExpr: humanizeCommas(result)
+
+        - id: cluster_cpu_usage
+          colorExpr: 'colorScale(result, [35.0, 75.0], ["green", "orange", "red"])'
+          query: round(avg(instance:node_cpu_utilisation:rate5m{pod!=""}) * 100, 0.1)
+          valueExpr: string(result) + "%"
+          title: CPU
+
+        - id: cluster_memory_usage
+          colorExpr: 'colorScale(result, [400.0, 750.0], ["green", "orange", "red"])'
+          query: round(sum(node_memory_MemTotal_bytes{pod!=""} - node_memory_MemAvailable_bytes{pod!=""}) / sum(node_memory_MemTotal_bytes{pod!=""}) * 100, 0.1)
+          title: Memory
+          valueExpr: string(result) + "%"
+
+        - id: cluster_age_days
+          colorExpr: 'colorScale(result, [15552000.0, 31104000.0], ["green", "orange", "red"])'
+          query: round(time() - min(kube_node_created))
+          title: Age
+          valueExpr: humanizeDurationDays(result)
+
+        - id: cluster_uptime_days
+          colorExpr: 'colorScale(result, [15552000.0, 31104000.0], ["green", "orange", "red"])'
+          query: round(avg(node_time_seconds{pod!=""} - node_boot_time_seconds{pod!=""}))
+          title: Uptime
+          valueExpr: humanizeDurationDays(result)
+
+        - id: cluster_alert_count
+          query: alertmanager_alerts{state="active"} - 1 # Ignore Watchdog
+          colorExpr: 'colorScale(result, [1.0], ["green", "red"])'
+          title: Alerts
+    httpRoute:
+      enabled: true
+      annotations:
+        gatus.home-operations.com/endpoint: |-
+          conditions: ["[STATUS] == 200"]
+      parentRefs:
+        - name: envoy-external
+          namespace: network
+      hostnames:
+        - kromgo.bjw-s.dev
+    resources:
+      requests:
+        cpu: 10m
+      limits:
+        memory: 64Mi

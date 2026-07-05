@@ -5,11 +5,3 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./ocirepository.yaml
-configMapGenerator:
-  - name: kromgo-configmap
-    files:
-      - config/config.yaml
-generatorOptions:
-  disableNameSuffixHash: true
-  annotations:
-    kustomize.toolkit.fluxcd.io/substitute: disabled
