@@ -5,6 +5,10 @@ kind: Restore
 metadata:
   name: ${APP}
 spec:
+  mover:
+    securityContext:
+      runAsUser: ${KOPIUR_MOVER_UID:=2000}
+      runAsGroup: ${KOPIUR_MOVER_GID:=2000}
   policy:
     onMissingSnapshot: Continue
   source:
