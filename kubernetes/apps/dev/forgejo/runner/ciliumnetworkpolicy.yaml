@@ -27,6 +27,16 @@ spec:
         - ports:
             - protocol: TCP
               port: "38809"
+    - # Forgejo runner cache & proxy
+      toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: forgejo-runner
+      toPorts:
+        - ports:
+            - port: "8088"
+              protocol: TCP
+            - port: "8089"
+              protocol: TCP
     - # LiteLLM
       toEndpoints:
         - matchLabels:
