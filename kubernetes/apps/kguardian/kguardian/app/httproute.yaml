@@ -15,3 +15,11 @@ spec:
         - name: kguardian-frontend
           namespace: kguardian
           port: 5173
+    - backendRefs:
+        - name: kguardian-mcp-server
+          namespace: kguardian
+          port: 8081
+      matches:
+        - path:
+            type: PathPrefix
+            value: /mcp/
