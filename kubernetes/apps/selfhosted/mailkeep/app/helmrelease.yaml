@@ -1,0 +1,99 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mailkeep
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: mailkeep
+  interval: 30m
+  values:
+    controllers:
+      mailkeep:
+        annotations:
+          secret.reloader.stakater.com/reload: mailkeep-secret
+        pod:
+          securityContext:
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
+        containers:
+          app:
+            image:
+              repository: ghcr.io/szinn/mailkeep
+              tag: v0.1.9@sha256:ab8edfb9c0b0fbef82e9e58bd758a1c352dc95cb591d5bd5d358114f48232d5c
+            env:
+              MAILKEEP__FRONTEND__BASE_URL: "https://mailkeep.bjw-s.dev"
+              MAILKEEP__METADATA_PATH: /data
+              MAILKEEP__STORAGE_PATH: /storage
+              RUST_LOG: INFO
+              TZ: Europe/Amsterdam
+            envFrom:
+              - secretRef:
+                  name: mailkeep-secret
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: &port 8080
+                  failureThreshold: 3
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /readyz
+                    port: *port
+                  failureThreshold: 3
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+              readOnlyRootFilesystem: true
+    persistence:
+      data:
+        existingClaim: mailkeep
+        globalMounts:
+          - path: /data
+      storage:
+        type: nfs
+        server: gladius.bjw-s.internal
+        path: /mnt/tank/apps/mailkeep
+        globalMounts:
+          - path: /storage
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+    route:
+      app:
+        hostnames:
+          - mailkeep.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *port
