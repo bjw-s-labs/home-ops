@@ -10,35 +10,24 @@ spec:
     name: kopiur
   interval: 30m
   values:
-    controller:
-      extraVolumes:
-        - name: repo
-          nfs:
-            path: /mnt/drone/backup/kopiur
-            server: gladius.bjw-s.internal
-      extraVolumeMounts:
-        - name: repo
-          mountPath: /repo
-      resources:
-        requests:
-          cpu: 100m
-        limits:
-          memory: 2Gi
-      streamingLists: true
-    features:
-      credentialProjection:
+    extraVolumes:
+      - name: repo
+        nfs:
+          path: /mnt/drone/backup/kopiur
+          server: gladius.bjw-s.internal
+    extraVolumeMounts:
+      - name: repo
+        mountPath: /repo
+    monitoring:
+      dashboards:
         enabled: true
-    grafanaDashboard:
-      enabled: true
-      grafanaOperator:
-        enabled: true
-        matchLabels:
-          dashboards: grafana
-    installScope: cluster
-    metrics:
-      serviceMonitor:
-        enabled: true
+        grafanaOperator:
+          enabled: true
+          matchLabels:
+            dashboards: grafana
       prometheusRule:
+        enabled: true
+      serviceMonitor:
         enabled: true
     podSecurityContext:
       runAsNonRoot: true
@@ -46,6 +35,8 @@ spec:
       runAsGroup: 1000
       fsGroup: 1000
       fsGroupChangePolicy: OnRootMismatch
-    webhook:
-      serviceMonitor:
-        enabled: true
+    resources:
+      requests:
+        cpu: 100m
+      limits:
+        memory: 2Gi
