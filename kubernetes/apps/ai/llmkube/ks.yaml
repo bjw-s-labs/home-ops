@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: llmkube
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: llmkube
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
@@ -21,7 +18,6 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: ai
-  timeout: 5m
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -29,9 +25,6 @@ kind: Kustomization
 metadata:
   name: llmkube-models
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: llmkube-models
   components:
     - ../../../../components/gpu
   dependsOn:
@@ -50,4 +43,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: ai
-  timeout: 5m

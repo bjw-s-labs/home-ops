@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: manyfold
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: manyfold
   components:
     - ../../../../components/kopiur/backup
     - ../../../../components/dragonfly
@@ -30,5 +27,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: selfhosted
-  timeout: 5m
-  wait: false

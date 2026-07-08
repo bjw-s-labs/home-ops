@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: sonarr
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: sonarr
   components:
     - ../../../../components/kopiur/backup
     - ../../../../components/zeroscaler
@@ -26,5 +23,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: downloads
-  timeout: 5m
-  wait: false

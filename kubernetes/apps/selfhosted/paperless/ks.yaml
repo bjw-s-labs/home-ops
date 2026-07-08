@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: paperless
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: paperless
   components:
     - ../../../../components/kopiur/backup
     - ../../../../components/zeroscaler
@@ -31,5 +28,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: selfhosted
-  timeout: 5m
-  wait: false

@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: blackbox-exporter
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: blackbox-exporter
   interval: 1h
   path: "./kubernetes/apps/observability/blackbox-exporter/app"
   prune: true
@@ -16,5 +13,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: observability
-  timeout: 5m
-  wait: false

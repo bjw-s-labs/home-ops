@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: kube-state-metrics
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: kube-state-metrics
   interval: 1h
   path: ./kubernetes/apps/observability/kube-state-metrics/app
   prune: true
@@ -16,5 +13,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: observability
-  timeout: 5m
-  wait: false

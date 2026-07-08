@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: actual
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: actual
   components:
     - ../../../../components/kopiur/backup
   dependsOn:
@@ -25,5 +22,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: selfhosted
-  timeout: 5m
-  wait: false

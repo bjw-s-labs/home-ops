@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: grafana-operator
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: grafana-operator
   interval: 1h
   path: "./kubernetes/apps/observability/grafana/operator"
   prune: true
@@ -16,7 +13,6 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: observability
-  timeout: 5m
   wait: true
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
@@ -25,9 +21,6 @@ kind: Kustomization
 metadata:
   name: grafana-instance
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: grafana-instance
   dependsOn:
     - name: grafana-operator
   interval: 1h
@@ -38,5 +31,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: observability
-  timeout: 5m
-  wait: true

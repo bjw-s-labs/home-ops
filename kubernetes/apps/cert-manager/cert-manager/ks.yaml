@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: cert-manager
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: cert-manager
   dependsOn:
     - name: cert-manager-webhook-ovh
   healthChecks:
@@ -31,4 +28,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: cert-manager
-  timeout: 5m

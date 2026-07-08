@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: reloader
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: reloader
   interval: 1h
   path: "./kubernetes/apps/system/reloader/app"
   prune: true
@@ -16,5 +13,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: system
-  timeout: 5m
-  wait: false

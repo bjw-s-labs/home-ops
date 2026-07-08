@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: jellyfin
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: jellyfin
   components:
     - ../../../../components/gpu
     - ../../../../components/kopiur/backup
@@ -29,5 +26,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: media
-  timeout: 5m
-  wait: false

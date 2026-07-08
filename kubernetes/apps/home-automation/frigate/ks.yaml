@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: frigate
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: frigate
   components:
     - ../../../../components/gpu
     - ../../../../components/kopiur/backup
@@ -31,5 +28,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: home-automation
-  timeout: 5m
-  wait: false

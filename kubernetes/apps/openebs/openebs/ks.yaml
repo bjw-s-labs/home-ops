@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: openebs
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: openebs
   dependsOn:
     - name: snapshot-controller
       namespace: kube-system
@@ -24,4 +21,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: openebs
-  timeout: 5m

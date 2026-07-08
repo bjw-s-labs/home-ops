@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: cilium
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: cilium
   interval: 1h
   path: "./kubernetes/apps/kube-system/cilium/app"
   prune: true
@@ -16,8 +13,6 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: kube-system
-  timeout: 5m
-  wait: false
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -25,10 +20,6 @@ kind: Kustomization
 metadata:
   name: cilium-config
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: cilium
-      app.kubernetes.io/component: config
   interval: 1h
   path: "./kubernetes/apps/kube-system/cilium/config"
   prune: true
@@ -37,8 +28,6 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: kube-system
-  timeout: 5m
-  wait: false
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -46,10 +35,6 @@ kind: Kustomization
 metadata:
   name: cilium-netpols
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: cilium
-      app.kubernetes.io/component: config
   interval: 1h
   path: "./kubernetes/apps/kube-system/cilium/netpols"
   prune: true
@@ -58,5 +43,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: kube-system
-  timeout: 5m
-  wait: false

@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: metrics-server
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: metrics-server
   interval: 1h
   path: "./kubernetes/apps/kube-system/metrics-server/app"
   prune: true
@@ -16,5 +13,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: kube-system
-  timeout: 5m
-  wait: false

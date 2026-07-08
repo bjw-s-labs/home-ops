@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: ha-mcp
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: ha-mcp
   dependsOn:
     - name: litellm-operator
       namespace: ai
@@ -19,4 +16,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: ai
-  timeout: 5m

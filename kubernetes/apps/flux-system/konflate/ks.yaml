@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: konflate
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: konflate
   interval: 1h
   path: ./kubernetes/apps/flux-system/konflate/app
   prune: true
@@ -16,5 +13,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: flux-system
-  timeout: 5m
-  wait: false

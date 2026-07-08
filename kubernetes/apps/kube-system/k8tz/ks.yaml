@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: k8tz
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: k8tz
   dependsOn:
     - name: cert-manager
       namespace: cert-manager
@@ -19,5 +16,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: kube-system
-  timeout: 5m
-  wait: false

@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: prometheus-adapter
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: prometheus-adapter
   interval: 1h
   path: "./kubernetes/apps/observability/prometheus-adapter/app"
   prune: true
@@ -16,5 +13,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: observability
-  timeout: 5m
-  wait: false

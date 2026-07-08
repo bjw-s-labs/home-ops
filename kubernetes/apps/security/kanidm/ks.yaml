@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: kanidm
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: kanidm
   components:
     - ../../../../components/kopiur/backup
   dependsOn:
@@ -24,4 +21,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: security
-  timeout: 5m

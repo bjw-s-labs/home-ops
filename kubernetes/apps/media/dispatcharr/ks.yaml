@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: dispatcharr
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: dispatcharr
   components:
     - ../../../../components/gpu
     - ../../../../components/kopiur/backup
@@ -30,5 +27,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: media
-  timeout: 5m
-  wait: false

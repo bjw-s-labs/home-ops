@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: flux-instance
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: flux-instance
   dependsOn:
     - name: flux-operator
   interval: 1h
@@ -18,5 +15,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: flux-system
-  timeout: 5m
-  wait: false
