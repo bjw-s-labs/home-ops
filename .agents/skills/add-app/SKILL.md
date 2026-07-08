@@ -50,9 +50,6 @@ kind: Kustomization
 metadata:
   name: <app>
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: <app>
   interval: 1h
   path: "./kubernetes/apps/<namespace>/<app>/app"
   prune: true
@@ -61,9 +58,11 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: <namespace>
-  timeout: 5m
-  wait: false
 ```
+
+**`wait`:** omit it for a normal leaf app — it defaults to `false`, and explicit `wait: false` is redundant boilerplate we no longer keep. Only add `wait: true` when *another* Kustomization will `dependsOn` this one AND this Kustomization defines no `healthChecks`/`healthCheckExprs` — that is what gives the dependent a real readiness gate. If this Kustomization does define `healthChecks`, leave `wait` unset (setting `wait: true` would make Flux ignore those checks). Depending on another app (e.g. `kopiur` for persistence) does not by itself call for `wait`.
+
+Do not add `commonMetadata` or `timeout` — both were dropped as boilerplate; the app-template chart sets `app.kubernetes.io/*` labels on the workloads, and `timeout` falls back to the Flux default.
 
 **If the app has persistence**, add these to `spec` (components use `${APP}` and `${KOPIUR_*}` substitutions — see `kubernetes/components/kopiur/backup/` for all knobs and their defaults):
 
@@ -293,3 +292,4 @@ Show the user the created files and get confirmation before committing. Commit s
 - **`readOnlyRootFilesystem: true` without a tmpfs** — apps that write to `/tmp` will crash; mount an emptyDir.
 - **Skipping the sorting conventions** — HelmRelease values follow `.agents/instructions/sorting.instructions.md`.
 - **Adding a CiliumNetworkPolicy by default** — only some apps lock down ingress; copy `searxng`'s if the user asks for one.
+- **Adding `wait`, `commonMetadata`, or `timeout` to `ks.yaml`** — all three are boilerplate now. Leave `wait` unset unless another Kustomization depends on this one and it has no `healthChecks` (then, and only then, `wait: true`).
