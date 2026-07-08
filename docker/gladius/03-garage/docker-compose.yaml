@@ -1,0 +1,33 @@
+---
+services:
+  garage:
+    command:
+      - /garage
+      - '-c'
+      - /etc/garage/garage.toml
+      - server
+    container_name: garage
+    environment:
+      GARAGE_ADMIN_TOKEN: ${GARAGE_ADMIN_TOKEN}
+      GARAGE_RPC_SECRET: ${GARAGE_RPC_SECRET}
+    image: docker.io/dxflrs/garage:v2.3.0
+    network_mode: host
+    restart: unless-stopped
+    user: '3000:4000'
+    volumes:
+      - ./config/garage.toml:/etc/garage/garage.toml:ro
+      - meta:/var/lib/garage/meta
+      - data:/var/lib/garage/data
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      device: /mnt/tank/apps/garage/data
+      o: bind
+      type: none
+  meta:
+    driver: local
+    driver_opts:
+      device: /mnt/tank/apps/garage/meta
+      o: bind
+      type: none
