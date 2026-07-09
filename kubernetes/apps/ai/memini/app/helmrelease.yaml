@@ -12,6 +12,8 @@ spec:
   values:
     controllers:
       main:
+        type: deployment
+        replicas: 1
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
@@ -34,12 +36,10 @@ spec:
               MEMINI_DEDUP_SIMILARITY: "0.80"
               MEMINI_SHORT_TERM_CAP: "300"
               MEMINI_DEMOTE_AFTER: 1440h
-              MEMINI_DISTILL_ON_WRITE: "true"
               MEMINI_EMBED_BASE_URL: http://qwen3-embedding-0-6b.ai.svc.cluster.local:8080/v1
               MEMINI_EMBED_MODEL: qwen3-embedding
               MEMINI_EMBED_DIMS: "1024"
               MEMINI_EMBED_MAX_CONCURRENCY: "2"
-              MEMINI_EMBED_MAX_ITEM_CHARS: "6000"
               MEMINI_EMBED_QUERY_PREFIX: "Instruct: Given a user message, retrieve relevant past memories\nQuery: "
               MEMINI_LOG_FORMAT: json
               MEMINI_LLM_API: openai
@@ -51,7 +51,6 @@ spec:
                     name: memini-secret
                     key: LITELLM_API_KEY
               MEMINI_RECALL_EMBED_TIMEOUT: "10s"
-              MEMINI_RECALL_MIN_SEMANTIC_SCORE: "0.46"
               MEMINI_TOMBSTONE_TTL: 720h
             resources:
               requests:
@@ -81,17 +80,15 @@ spec:
       data:
         existingClaim: memini
     route:
-      internal:
+      ui:
         enabled: true
-        hostnames:
-          - memini.bjw-s.dev
+        annotations:
+          gatus.home-operations.com/enabled: "false"
         parentRefs:
           - name: envoy-internal
             namespace: network
-        rules:
-          - backendRefs:
-              - identifier: main
-                port: http
+        hostnames:
+          - memini.bjw-s.dev
     serviceMonitor:
       main:
         enabled: true
