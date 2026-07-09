@@ -42,12 +42,15 @@ spec:
               MEMINI_EMBED_MAX_ITEM_CHARS: "6000"
               MEMINI_EMBED_QUERY_PREFIX: "Instruct: Given a user message, retrieve relevant past memories\nQuery: "
               MEMINI_LOG_FORMAT: json
+              MEMINI_LLM_API: openai
+              MEMINI_LLM_BASE_URL: http://litellm.ai.svc.cluster.local:4000/v1
+              MEMINI_LLM_MODEL: neuralwatt/qwen3.6-35b-fast
+              MEMINI_LLM_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: memini-secret
+                    key: LITELLM_API_KEY
               MEMINI_RECALL_MIN_SEMANTIC_SCORE: "0.46"
-              MEMINI_RERANK: http://qwen3-reranker-0-6b.ai.svc.cluster.local:8080/v1
-              MEMINI_RERANK_MODEL: qwen3-reranker
-              MEMINI_RERANK_MAX_CONCURRENCY: "2"
-              MEMINI_RERANK_MAX_DOC_CHARS: "4000"
-              MEMINI_RERANK_TIMEOUT: "8s"
               MEMINI_TOMBSTONE_TTL: 720h
             resources:
               requests:
