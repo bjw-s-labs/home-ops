@@ -54,6 +54,11 @@ machine:
     image: factory.talos.dev/metal-installer/{{ ENV.SCHEMATIC }}:{{ ENV.TALOS_VERSION }}
   kernel:
     modules:
+      - name: dm_thin_pool # miroir lvmthin backend
+      - name: drbd # miroir replication
+        parameters:
+          - usermode_helper=disabled # required on Talos (no usermodehelper)
+      - name: drbd_transport_tcp
       - name: nbd
       - name: zfs
   kubelet:
