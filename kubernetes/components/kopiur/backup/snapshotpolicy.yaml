@@ -8,6 +8,10 @@ metadata:
     kopiur.home-operations.com/allow-identity-change: "true"
 spec:
   mover:
+    cache:
+      capacity: ${KOPIUR_CAPACITY:=5Gi}
+      mode: Persistent
+      storageClassName: miroir-local
     securityContext:
       runAsUser: ${KOPIUR_MOVER_UID:=2000}
       runAsGroup: ${KOPIUR_MOVER_GID:=2000}
