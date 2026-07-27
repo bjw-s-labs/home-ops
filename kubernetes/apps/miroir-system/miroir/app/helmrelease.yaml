@@ -24,8 +24,10 @@ spec:
         enabled: true
     nodes:
       delta:
-        backend: zfs
-        zfsDataset: data-pool/miroir
+        pools:
+          default:
+            backend: zfs
+            zfsDataset: data-pool/miroir
     storageClasses:
       - name: miroir-local
         isDefault: true
