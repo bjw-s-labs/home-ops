@@ -9,6 +9,10 @@ spec:
     kind: OCIRepository
     name: miroir
   interval: 30m
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
   values:
     autoTieBreaker: false
     monitoring:
@@ -22,18 +26,3 @@ spec:
         enabled: true
       prometheusRule:
         enabled: true
-    nodes:
-      delta:
-        pools:
-          default:
-            backend: zfs
-            zfsDataset: data-pool/miroir
-    storageClasses:
-      - name: miroir-local
-        isDefault: true
-      - name: miroir-replicated
-        isDefault: false
-        quorum: last-man-standing
-        replicas: 2
-    volumeSnapshotClasses:
-      - name: miroir-snap
