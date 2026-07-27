@@ -10,21 +10,28 @@ spec:
     name: miroir
   interval: 30m
   values:
-    controller:
-      autoTieBreaker: false     
+    autoTieBreaker: false
+    monitoring:
+      dashboards:
+        enabled: true
+        grafanaOperator:
+          enabled: true
+          matchLabels:
+            dashboards: grafana
+      podMonitor:
+        enabled: true
+      prometheusRule:
+        enabled: true
     nodes:
       delta:
         backend: zfs
         zfsDataset: data-pool/miroir
-    storageClass:
-      create: true
-      name: miroir-local
-      isDefault: true
-    replicatedStorageClass:
-      create: true
-      name: miroir-replicated
-      isDefault: false
-      quorum: last-man-standing
-    volumeSnapshotClass:
-      create: true
-      name: miroir-snap
+    storageClasses:
+      - name: miroir-local
+        isDefault: true
+      - name: miroir-replicated
+        isDefault: false
+        quorum: last-man-standing
+        replicas: 2
+    volumeSnapshotClasses:
+      - name: miroir-snap
