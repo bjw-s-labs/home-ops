@@ -3,20 +3,21 @@
 apiVersion: litellm.home-operations.com/v1alpha1
 kind: LiteLLMModel
 metadata:
-  name: neuralwatt-glm-5-2-fast
+  name: opencode-go-kimi-k2-6
 spec:
-  modelName: neuralwatt/glm-5.2-fast
+  modelName: opencode-go/kimi-k2.6
   params:
-    model: openai/glm-5.2-fast
-    apiBase: https://api.neuralwatt.com/v1
+    model: openai/kimi-k2.6
+    apiBase: https://opencode.ai/zen/go/v1
     apiKeyRef:
       name: litellm
-      key: NEURALWATT_API_KEY
+      key: OPENCODE_GO_API_KEY
     dropParams: true
-    additional:
-      temperature: 1.0
   info:
-    maxInputTokens: 1048560
+    maxInputTokens: 262128
     maxOutputTokens: 131072
     supportsFunctionCalling: true
     supportsPromptCaching: true
+    supportsVision: true
+    extra:
+      supports_reasoning: true

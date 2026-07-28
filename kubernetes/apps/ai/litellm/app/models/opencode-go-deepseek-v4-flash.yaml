@@ -3,20 +3,18 @@
 apiVersion: litellm.home-operations.com/v1alpha1
 kind: LiteLLMModel
 metadata:
-  name: neuralwatt-glm-5-2-short
+  name: opencode-go-deepseek-v4-flash
 spec:
-  modelName: neuralwatt/glm-5.2-short
+  modelName: opencode-go/deepseek-v4-flash
   params:
-    model: openai/glm-5.2-short
-    apiBase: https://api.neuralwatt.com/v1
+    model: openai/deepseek-v4-flash
+    apiBase: https://opencode.ai/zen/go/v1
     apiKeyRef:
       name: litellm
-      key: NEURALWATT_API_KEY
+      key: OPENCODE_GO_API_KEY
     dropParams: true
   info:
-    maxInputTokens: 199984
-    maxOutputTokens: 131072
+    maxInputTokens: 131072
+    maxOutputTokens: 65536
     supportsFunctionCalling: true
     supportsPromptCaching: true
-    extra:
-      supports_reasoning: true

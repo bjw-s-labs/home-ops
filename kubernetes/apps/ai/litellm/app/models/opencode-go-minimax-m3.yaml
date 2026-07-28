@@ -3,20 +3,21 @@
 apiVersion: litellm.home-operations.com/v1alpha1
 kind: LiteLLMModel
 metadata:
-  name: neuralwatt-glm-5-2
+  name: opencode-go-minimax-m3
 spec:
-  modelName: neuralwatt/glm-5.2
+  modelName: opencode-go/minimax-m3
   params:
-    model: openai/glm-5.2
-    apiBase: https://api.neuralwatt.com/v1
+    model: anthropic/minimax-m3
+    apiBase: https://opencode.ai/zen/go
     apiKeyRef:
       name: litellm
-      key: NEURALWATT_API_KEY
+      key: OPENCODE_GO_API_KEY
     dropParams: true
   info:
-    maxInputTokens: 1048560
+    maxInputTokens: 1000000
     maxOutputTokens: 131072
     supportsFunctionCalling: true
     supportsPromptCaching: true
+    supportsVision: true
     extra:
       supports_reasoning: true
