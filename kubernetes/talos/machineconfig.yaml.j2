@@ -133,6 +133,8 @@ cluster:
       key: op://automation/talos/CLUSTER_ETCD_CA_KEY
     extraArgs:
       listen-metrics-urls: http://0.0.0.0:2381
+      auto-compaction-mode: periodic
+      auto-compaction-retention: 1h
   proxy:
     disabled: true
     image: registry.k8s.io/kube-proxy:{{ ENV.K8S_VERSION }}
