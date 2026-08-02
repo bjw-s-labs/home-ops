@@ -13,6 +13,8 @@ on:
       - ready_for_review
       - labeled
 
+enable-openid-connect: true
+
 concurrency:
   group: ${{ forgejo.workflow }}-${{ forgejo.event.pull_request.number || forgejo.ref }}${{ forgejo.event.action == 'labeled' && format('-label-{0}', forgejo.run_id) || '' }}
   cancel-in-progress: true
@@ -30,13 +32,29 @@ jobs:
           fetch-depth: 0
           ref: ${{ forgejo.event.pull_request.head.sha }}
 
+      - name: fetch jwt
+        id: jwt
+        env:
+          AUD: u:1:4d0d470c-48b2-4033-b9e9-a15b896ef950
+        run: |
+          jwt=$( \
+            curl --fail \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$AUD" \
+            | jq -r ".value" \
+          )
+          # ::add-mask:: tells Forgejo Runner that the JWT
+          # is a secret which should be masked in the logs.
+          echo "::add-mask::$jwt"
+          echo "jwt=$jwt" >> $FORGEJO_OUTPUT
+
       - name: AI PR Review
         uses: https://github.com/misospace/pr-reviewer-action@a14a8bb4e15ac6765eba782b2b21c7bcb351ffee # v2.1.8
         with:
           github_token: ${{ secrets.FORGEJO_TOKEN }}
           platform: forgejo
           forgejo_api_url: http://forgejo-http.dev.svc.cluster.local:3000/
-          forgejo_token: ${{ secrets.FORGEJO_TOKEN }}
+          forgejo_token: ${{ steps.jwt.outputs.jwt }}
           allowed_source_hosts: github.com,api.github.com,gitlab.com,registry.terraform.io,artifacthub.io,git.bjw-s.dev,codeberg.org,actualbudget.org
           ai_base_url: http://litellm.ai.svc.cluster.local:4000/v1
           ai_api_format: anthropic
