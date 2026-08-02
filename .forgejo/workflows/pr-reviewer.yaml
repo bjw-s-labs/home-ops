@@ -13,10 +13,6 @@ on:
       - ready_for_review
       - labeled
 
-permissions:
-  contents: read
-  pull-requests: write
-
 concurrency:
   group: ${{ forgejo.workflow }}-${{ forgejo.event.pull_request.number || forgejo.ref }}${{ forgejo.event.action == 'labeled' && format('-label-{0}', forgejo.run_id) || '' }}
   cancel-in-progress: true
@@ -27,9 +23,6 @@ jobs:
     if: ${{ !forgejo.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    permissions:
-      contents: read
-      pull-requests: write
     steps:
       - name: Checkout PR
         uses: https://github.com/actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -55,7 +48,7 @@ jobs:
           ai_connect_timeout_sec: "10"
           ai_fallback_base_url: http://litellm.ai.svc.cluster.local:4000/v1
           ai_fallback_api_format: openai
-          ai_fallback_model: neuralwatt/qwen3.6-35b
+          ai_fallback_model: opencode-go/qwen3.6-plus
           ai_fallback_api_key: ${{ secrets.LITELLM_API_KEY }}
           evidence_providers_file: .forgejo/konflate-evidence-providers.json
           inline_findings: "true"
