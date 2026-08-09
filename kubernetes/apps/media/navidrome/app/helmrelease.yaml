@@ -1,0 +1,87 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: navidrome
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: navidrome
+  interval: 30m
+  values:
+    controllers:
+      navidrome:
+        pod:
+          securityContext:
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
+        containers:
+          app:
+            image:
+              repository: ghcr.io/navidrome/navidrome
+              tag: 0.63.2
+            env:
+              ND_BASEURL: https://navidrome.bjw-s.dev
+              ND_ENABLEINSIGHTSCOLLECTOR: false
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
+            resources:
+              requests:
+                cpu: 50m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      data:
+        existingClaim: navidrome
+        advancedMounts:
+          navidrome:
+            app:
+              - path: /data
+                subPath: data
+      nfs-nas-media:
+        type: nfs
+        path: /mnt/tank/media
+        server: gladius.bjw-s.internal
+        advancedMounts:
+          navidrome:
+            app:
+              - path: /music
+                subPath: Library/Main/Music
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          navidrome:
+            app:
+              - path: /tmp
+                subPath: tmp
+    route:
+      app:
+        hostnames:
+          - navidrome.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: 4533
