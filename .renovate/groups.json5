@@ -12,19 +12,6 @@
       minimumGroupSize: 2,
     },
     {
-      description: "Actions Runner Controller group",
-      groupName: "Actions Runner Controller",
-      matchDatasources: ["docker"],
-      matchPackageNames: [
-        "/gha-runner-scale-set-controller/",
-        "/gha-runner-scale-set/",
-      ],
-      group: {
-        commitMessageTopic: "{{{groupName}}} group",
-      },
-      minimumGroupSize: 2,
-    },
-    {
       description: "Flux Operator group",
       groupName: "Flux Operator",
       matchDatasources: ["docker"],
@@ -60,20 +47,16 @@
       minimumGroupSize: 5,
     },
     {
+      description: "Mise Tools Group",
+      matchManagers: ["mise"],
+      groupName: "mise tools",
+      groupSlug: "mise-tools",
+    },
+    {
       description: "Talos group",
       groupName: "Talos",
       matchDatasources: ["docker"],
       matchPackageNames: ["/installer/", "/talosctl/"],
-      group: {
-        commitMessageTopic: "{{{groupName}}} group",
-      },
-      minimumGroupSize: 2,
-    },
-    {
-      description: "Toolhive group",
-      groupName: "Toolhive",
-      matchDatasources: ["docker"],
-      matchPackageNames: ["/toolhive-operator/"],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
