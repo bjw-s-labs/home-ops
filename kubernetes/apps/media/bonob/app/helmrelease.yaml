@@ -1,0 +1,70 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: bonob
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: bonob
+  interval: 30m
+  values:
+    controllers:
+      bonob:
+        pod:
+          securityContext:
+            fsGroup: 65534
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 65534
+            runAsNonRoot: true
+            runAsUser: 65534
+        containers:
+          app:
+            image:
+              repository: ghcr.io/simojenki/bonob
+              tag: v0.12.0
+            env:
+              BNB_PORT: &port 4534
+              BNB_SUBSONIC_URL: http://navidrome.media.svc.cluster.local:4533
+              BNB_URL: https://bonob.bjw-s.dev
+            envFrom:
+              - secretRef:
+                  name: bonob-secret
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+            resources:
+              requests:
+                cpu: 5m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+            subPath: tmp
+    route:
+      app:
+        hostnames:
+          - bonob.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *port
