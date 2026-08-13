@@ -28,6 +28,7 @@ spec:
               BNB_PORT: &port 4534
               BNB_SUBSONIC_URL: http://navidrome.media.svc.cluster.local:4533
               BNB_URL: https://bonob.bjw-s.dev
+              BNB_LOGIN_THEME: navidrome-ish
             envFrom:
               - secretRef:
                   name: bonob-secret
@@ -67,4 +68,5 @@ spec:
       app:
         ports:
           http:
+            appProtocol: kubernetes.io/wss
             port: *port
