@@ -16,6 +16,8 @@ spec:
           secret.reloader.stakater.com/reload: autobrr-secret
         pod:
           securityContext:
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
             runAsGroup: 2000
             runAsNonRoot: true
             runAsUser: 2000
