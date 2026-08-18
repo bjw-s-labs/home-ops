@@ -1,0 +1,23 @@
+---
+services:
+  bootimus:
+    container_name: bootimus
+    image: garybowers/bootimus:0.1.76
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      BOOTIMUS_DATA_DIR: /data
+      BOOTIMUS_HTTP_PORT: 8080
+      BOOTIMUS_ADMIN_PORT: 8082
+      BOOTIMUS_PROXY_DHCP_ENABLED: "true"
+    volumes:
+      - data:/data
+    cap_add:
+      - NET_BIND_SERVICE
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      device: /mnt/tank/apps/bootimus/data
+      o: bind
+      type: none
