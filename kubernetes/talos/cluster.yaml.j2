@@ -1,0 +1,177 @@
+---
+version: v1alpha1
+machine:
+  ca:
+    crt: op://automation/talos/MACHINE_CA_CRT
+  features:
+    apidCheckExtKeyUsage: true
+    diskQuotaSupport: true
+    rbac: true
+  token: op://automation/talos/MACHINE_TOKEN
+cluster:
+  ca:
+    crt: op://automation/talos/CLUSTER_CA_CRT
+  clusterName: home-ops
+  controlPlane:
+    endpoint: https://k8s.bjw-s.internal:6443
+  token: op://automation/talos/CLUSTER_TOKEN
+---
+apiVersion: v1alpha1
+kind: BondConfig
+name: bond0
+links:
+  - net0
+bondMode: active-backup
+mtu: 9000
+---
+apiVersion: v1alpha1
+kind: DHCPv4Config
+name: bond0
+clientIdentifier: mac
+---
+# IOT
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.303
+vlanID: 303
+parent: bond0
+mtu: 9000
+---
+apiVersion: v1alpha1
+kind: ResolverConfig
+hostDNS:
+  enabled: true
+  forwardKubeDNSToHost: false
+  resolveMemberNames: true
+nameservers:
+  - address: 10.1.1.1
+---
+apiVersion: v1alpha1
+kind: DiscoveryServiceConfig
+name: default
+endpoint: https://discovery.talos.dev/
+---
+apiVersion: v1alpha1
+kind: DiscoveryIdentityConfig
+clusterID: op://automation/talos/CLUSTER_ID
+clusterSecret: op://automation/talos/CLUSTER_SECRET
+---
+apiVersion: v1alpha1
+kind: UnattendedInstallConfig
+installer:
+  image: factory.talos.dev/metal-installer/{{ ENV.SCHEMATIC }}:{{ ENV.TALOS_VERSION }}
+provisioning:
+  wipe: false
+---
+apiVersion: v1alpha1
+kind: FilesystemTrimConfig
+interval: 168h0m0s
+---
+apiVersion: v1alpha1
+kind: FilesystemScrubConfig
+interval: 168h0m0s
+---
+apiVersion: v1alpha1
+kind: WatchdogTimerConfig
+device: /dev/watchdog0
+timeout: 5m
+---
+apiVersion: v1alpha1
+kind: KernelModuleConfig
+name: dm_thin_pool
+---
+apiVersion: v1alpha1
+kind: KernelModuleConfig
+name: drbd
+parameters:
+  - usermode_helper=disabled
+---
+apiVersion: v1alpha1
+kind: KernelModuleConfig
+name: drbd_transport_tcp
+---
+apiVersion: v1alpha1
+kind: KernelModuleConfig
+name: nbd
+---
+apiVersion: v1alpha1
+kind: SysctlConfig
+params:
+  fs.inotify.max_user_instances: "8192"
+  fs.inotify.max_user_watches: "1048576"
+  net.core.default_qdisc: fq
+  net.core.rmem_max: "67108864"
+  net.core.wmem_max: "67108864"
+  net.ipv4.neigh.default.gc_thresh1: "4096"
+  net.ipv4.neigh.default.gc_thresh2: "8192"
+  net.ipv4.neigh.default.gc_thresh3: "16384"
+  net.ipv4.ping_group_range: 0 2147483647
+  net.ipv4.tcp_congestion_control: bbr
+  net.ipv4.tcp_fastopen: "3"
+  net.ipv4.tcp_mtu_probing: "1"
+  net.ipv4.tcp_notsent_lowat: "131072"
+  net.ipv4.tcp_rmem: 4096 87380 33554432
+  net.ipv4.tcp_slow_start_after_idle: "0"
+  net.ipv4.tcp_window_scaling: "1"
+  net.ipv4.tcp_wmem: 4096 65536 33554432
+  sunrpc.tcp_max_slot_table_entries: "128"
+  sunrpc.tcp_slot_table_entries: "128"
+  user.max_user_namespaces: "11255"
+  vm.nr_hugepages: "1024"
+---
+apiVersion: v1alpha1
+kind: EtcFileConfig
+name: nfsmount.conf
+mode: 0o644
+contents: |
+  [ NFSMount_Global_Options ]
+  nfsvers=4.2
+  hard=True
+  nconnect=8
+  noatime=True
+  rsize=1048576
+  wsize=1048576
+---
+apiVersion: v1alpha1
+kind: CRICustomizationConfig
+name: cri-opts
+content: |
+  [plugins]
+    [plugins."io.containerd.grpc.v1.cri"]
+      enable_unprivileged_ports = true
+      enable_unprivileged_icmp = true
+  [plugins."io.containerd.cri.v1.images"]
+    discard_unpacked_layers = false
+  [plugins."io.containerd.cri.v1.runtime"]
+    device_ownership_from_security_context = true
+---
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+nodeIP:
+  validSubnets:
+    - 10.1.1.0/24
+---
+apiVersion: v1alpha1
+kind: KubeletConfig
+config:
+  crashLoopBackOff:
+    maxContainerRestartPeriod: 60s
+  imageMaximumGCAge: 168h
+  maxParallelImagePulls: 3
+  serializeImagePulls: false
+  shutdownGracePeriod: 90s
+  shutdownGracePeriodCriticalPods: 60s
+defaultRuntimeSeccompProfileEnabled: true
+image: ghcr.io/siderolabs/kubelet:{{ ENV.K8S_VERSION }}
+---
+apiVersion: v1alpha1
+kind: KubeNetworkConfig
+dnsDomain: cluster.local
+podSubnets:
+  - 10.244.0.0/16
+serviceSubnets:
+  - 10.96.0.0/12
+---
+apiVersion: v1alpha1
+kind: KubePrismConfig
+port: 7445

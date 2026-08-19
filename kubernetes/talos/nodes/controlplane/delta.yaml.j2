@@ -1,0 +1,34 @@
+---
+machine:
+  type: controlplane
+---
+apiVersion: v1alpha1
+kind: UnattendedInstallConfig
+provisioning:
+  diskSelector:
+    match: disk.model == "Micron_7450_MTFDKBA960TFR"
+---
+apiVersion: v1alpha1
+kind: HostnameConfig
+hostname: delta
+---
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: EPHEMERAL
+provisioning:
+  maxSize: 150GiB
+---
+apiVersion: v1alpha1
+kind: RawVolumeConfig
+name: miroir
+provisioning:
+  diskSelector:
+    match: system_disk
+  grow: true
+  minSize: 1GiB
+---
+apiVersion: v1alpha1
+kind: LinkAliasConfig
+name: net0
+selector:
+    match: link.driver == "igc" && mac(link.permanent_addr).startsWith("48:21:0b:55:")

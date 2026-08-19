@@ -35,11 +35,16 @@ schematic-id:
 [doc('Render Talos config for a node')]
 [script]
 render-config node:
-    export IS_CONTROLPLANE="$(just talos machine-controller {{ node }})"
     export SCHEMATIC="$(just talos schematic-id)"
+    role="controlplane"
+    if [[ -f "{{ talos_dir }}/nodes/workers/{{ node }}.yaml.j2" ]]; then
+        role="workers"
+    fi
     export TALOS_VERSION="$(just talos talos-version)"
     export K8S_VERSION="$(just talos k8s-version)"
-    talosctl machineconfig patch <(just template "{{ talos_dir }}/machineconfig.yaml.j2") -p @<(just template "{{ talos_dir }}/nodes/{{ node }}.yaml.j2")
+    talosctl machineconfig patch <(just template "{{ talos_dir }}/cluster.yaml.j2") \
+      -p @<(just template "{{ talos_dir }}/${role}.yaml.j2") \
+      -p @<(just template "{{ talos_dir }}/nodes/${role}/{{ node }}.yaml.j2")
 
 [doc('Reboot a node')]
 [script]
@@ -71,9 +76,9 @@ upgrade-node node:
 [doc('Download Talos machine image')]
 [script]
 download-image version schematic:
-    gum spin --title "Downloading Talos {{ version }} ..." --
-    curl -sfL --remove-on-error --retry 5 --retry-delay 5 --retry-all-errors
-        -o "{{ talos_dir }}/talos-{{ version }}-{{ replace_regex(schematic, '^(.{8}).*', '$1') }}.iso"
+    gum spin --title "Downloading Talos {{ version }} ..." -- \
+    curl -sfL --remove-on-error --retry 5 --retry-delay 5 --retry-all-errors \
+        -o "{{ talos_dir }}/talos-{{ version }}-{{ replace_regex(schematic, '^(.{8}).*', '$1') }}.iso" \
         "https://factory.talos.dev/image/{{ schematic }}/{{ version }}/metal-amd64.iso"
     just log info "Downloaded Talos" version "{{ version }}" schematic "{{ schematic }}"
 

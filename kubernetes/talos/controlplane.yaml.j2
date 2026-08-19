@@ -1,0 +1,111 @@
+---
+machine:
+  type: controlplane
+  ca:
+    crt: op://automation/talos/MACHINE_CA_CRT
+    key: op://automation/talos/MACHINE_CA_KEY
+cluster:
+  ca:
+    crt: op://automation/talos/CLUSTER_CA_CRT
+    key: op://automation/talos/CLUSTER_CA_KEY
+  aggregatorCA:
+    crt: op://automation/talos/CLUSTER_AGGREGATORCA_CRT
+    key: op://automation/talos/CLUSTER_AGGREGATORCA_KEY
+  etcd:
+    advertisedSubnets:
+      - 10.1.1.0/24
+    ca:
+      crt: op://automation/talos/CLUSTER_ETCD_CA_CRT
+      key: op://automation/talos/CLUSTER_ETCD_CA_KEY
+    extraArgs:
+      listen-metrics-urls: http://0.0.0.0:2381
+      auto-compaction-mode: periodic
+      auto-compaction-retention: 1h
+  serviceAccount:
+    key: op://automation/talos/CLUSTER_SERVICEACCOUNT_KEY
+---
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+labels:
+  node-role.kubernetes.io/control-plane: ""
+---
+apiVersion: v1alpha1
+kind: KubeAPIServerConfig
+image: registry.k8s.io/kube-apiserver:{{ ENV.K8S_VERSION }}
+extraArgs:
+  enable-aggregator-routing: "true"
+  feature-gates: HPAScaleToZero=true
+certExtraSANs:
+  - 127.0.0.1 # KubePrism
+  - k8s.bjw-s.internal
+---
+apiVersion: v1alpha1
+kind: KubeAuditPolicyConfig
+configuration:
+  apiVersion: audit.k8s.io/v1
+  kind: Policy
+  rules:
+    - level: Metadata
+---
+apiVersion: v1alpha1
+kind: KubeAuthenticationConfig
+configuration:
+  anonymous:
+    conditions:
+      - path: /livez
+      - path: /readyz
+      - path: /healthz
+    enabled: true
+  jwt: []
+---
+apiVersion: v1alpha1
+kind: KubeAuthorizerConfig
+name: node
+type: Node
+---
+apiVersion: v1alpha1
+kind: KubeAuthorizerConfig
+name: rbac
+type: RBAC
+---
+apiVersion: v1alpha1
+kind: KubeControllerManagerConfig
+extraArgs:
+  bind-address: 0.0.0.0
+  feature-gates: HPAScaleToZero=true
+image: registry.k8s.io/kube-controller-manager:{{ ENV.K8S_VERSION }}
+---
+apiVersion: v1alpha1
+kind: KubeCoreDNSConfig
+enabled: false
+---
+apiVersion: v1alpha1
+kind: KubeEtcdEncryptionConfig
+config:
+  resources:
+    - providers:
+        - secretbox:
+            keys:
+              - name: key2
+                secret: op://automation/talos/CLUSTER_SECRETBOXENCRYPTIONSECRET
+        - identity: {}
+      resources:
+        - secrets
+---
+apiVersion: v1alpha1
+kind: KubeProxyConfig
+enabled: false
+image: registry.k8s.io/kube-proxy:{{ ENV.K8S_VERSION }}
+---
+apiVersion: v1alpha1
+kind: KubeSchedulerConfig
+extraArgs:
+  bind-address: 0.0.0.0
+image: registry.k8s.io/kube-scheduler:{{ ENV.K8S_VERSION }}
+---
+apiVersion: v1alpha1
+kind: KubeTalosAPIAccessConfig
+allowedRoles:
+  - os:admin
+allowedKubernetesNamespaces:
+  - system-upgrade
