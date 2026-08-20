@@ -1,25 +1,27 @@
 ---
 # yaml-language-server: $schema=https://json.schemastore.org/helmfile
 helmDefaults:
-  cleanupOnFail: true
-  wait: true
-  waitForJobs: true
   args:
     - --include-crds
     - --no-hooks
 
+bases:
+  - default.yaml
+
+defaultInherit: default
+
 releases:
   - name: envoy-gateway
     namespace: network
-    chart: oci://mirror.gcr.io/envoyproxy/gateway-helm
-    version: v1.9.0
 
   - name: grafana-operator
     namespace: observability
-    chart: oci://ghcr.io/grafana/helm-charts/grafana-operator
-    version: 5.24.0
+
+  - name: kopiur
+    namespace: system
 
   - name: kube-prometheus-stack
     namespace: observability
-    chart: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
-    version: 88.3.0
+
+  - name: snapshot-controller
+    namespace: kube-system

@@ -5,11 +5,11 @@ kind: Kustomization
 namespace: observability
 components:
   - ../../components/flux-alerts
+  - ../../components/namespace
 resources:
-  - ./namespace.yaml
   - ./blackbox-exporter/ks.yaml
-  - ./grafana/ks.yaml
   - ./gatus/ks.yaml
+  - ./grafana-operator/ks.yaml
   - ./kromgo/ks.yaml
   - ./kube-state-metrics/ks.yaml
   - ./kube-prometheus-stack/ks.yaml

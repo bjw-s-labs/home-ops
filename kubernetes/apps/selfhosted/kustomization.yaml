@@ -6,8 +6,15 @@ namespace: selfhosted
 components:
   - ../../components/flux-alerts
   - ../../components/kopiur/secret
+  - ../../components/namespace
+patches:
+  - target:
+      kind: Namespace
+    patch: |
+      - op: add
+        path: /metadata/annotations/kopiur.home-operations.com~1privileged-movers
+        value: "true"
 resources:
-  - ./namespace.yaml
   - ./actual/ks.yaml
   - ./atuin/ks.yaml
   - ./freshrss/ks.yaml

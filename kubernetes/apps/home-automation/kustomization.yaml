@@ -6,8 +6,16 @@ namespace: home-automation
 components:
   - ../../components/flux-alerts
   - ../../components/kopiur/secret
+  - ../../components/namespace
+patches:
+  - target:
+      kind: Namespace
+    patch: |
+      - op: add
+        path: /metadata/labels
+        value:
+          resource.kubernetes.io/admin-access: "true"
 resources:
-  - ./namespace.yaml
   - ./bambuddy/ks.yaml
   - ./frigate/ks.yaml
   - ./home-assistant/ks.yaml

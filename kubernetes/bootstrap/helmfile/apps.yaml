@@ -1,0 +1,98 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/helmfile
+
+helmDefaults:
+  cleanupOnFail: true
+  forceConflicts: true
+  wait: true
+  waitForJobs: true
+
+bases:
+  - default.yaml
+
+defaultInherit: default
+
+releases:
+  - name: cilium
+    namespace: kube-system
+    hooks:
+      - # Wait for Cilium CRDs to be available
+        command: kubectl
+        args:
+          - wait
+          - --for=create
+          - crd/ciliumbgpadvertisements.cilium.io
+          - crd/ciliumbgpclusterconfigs.cilium.io
+          - crd/ciliumbgppeerconfigs.cilium.io
+          - crd/ciliumloadbalancerippools.cilium.io
+          - --timeout=2m
+        events:
+          - postsync
+        showlogs: true
+      - # Apply cilium network configuration
+        command: kubectl
+        args:
+          - apply
+          - --namespace={{ .Release.Namespace }}
+          - --server-side
+          - --force-conflicts
+          - --kustomize=../../apps/kube-system/cilium/config/
+        events:
+          - postsync
+        showlogs: true
+
+  - name: coredns
+    namespace: kube-system
+    needs:
+      - kube-system/cilium
+
+  - name: cert-manager
+    namespace: cert-manager
+    needs:
+      - kube-system/coredns
+
+  - name: cert-manager-webhook-ovh
+    namespace: cert-manager
+    needs:
+      - cert-manager/cert-manager
+
+  - name: external-secrets
+    namespace: external-secrets
+    needs:
+      - cert-manager/cert-manager-webhook-ovh
+
+  - name: onepassword-connect
+    namespace: external-secrets
+    needs:
+      - external-secrets/external-secrets
+    hooks:
+      - # Wait for CRDs to be available
+        command: kubectl
+        args:
+          - wait
+          - --for=create
+          - crd/clustersecretstores.external-secrets.io
+          - --timeout=2m
+        events:
+          - postsync
+        showlogs: true
+      - # Apply ClusterSecretStore
+        command: kubectl
+        args:
+          - apply
+          - --server-side
+          - --force-conflicts
+          - --filename=../../apps/external-secrets/onepassword-connect/app/clustersecretstore.yaml
+        events:
+          - postsync
+        showlogs: true
+
+  - name: flux-operator
+    namespace: flux-system
+    needs:
+      - external-secrets/onepassword-connect
+
+  - name: flux-instance
+    namespace: flux-system
+    needs:
+      - flux-system/flux-operator
