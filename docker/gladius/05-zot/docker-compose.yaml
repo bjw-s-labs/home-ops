@@ -1,16 +1,21 @@
 ---
+configs:
+  zot_htpasswd:
+    environment: ZOT_HTPASSWD
+name: zot
 networks:
   apps:
     name: apps
     external: true
 services:
   zot:
+    configs:
+      - source: zot_htpasswd
+        target: /etc/zot/htpasswd
     container_name: zot
-    environment:
-      ZOT_OIDC_CLIENT_ID: ${ZOT_OIDC_CLIENT_ID}
-      ZOT_OIDC_CLIENT_SECRET: ${ZOT_OIDC_CLIENT_SECRET}
     image: ghcr.io/project-zot/zot-linux-amd64:v2.1.20
     labels:
+      dexd.enabled: 'true'
       traefik.enable: 'true'
       traefik.http.routers.zot.rule: Host(`registry.bjw-s.dev`)
       traefik.http.services.zot.loadbalancer.server.port: '5000'
@@ -18,7 +23,7 @@ services:
       - apps
     restart: unless-stopped
     volumes:
-      - ./config/zot-config.json:/etc/zot/config.json:ro
+      - ./config/config.json:/etc/zot/config.json:ro
       - data:/var/lib/registry
 volumes:
   data:
