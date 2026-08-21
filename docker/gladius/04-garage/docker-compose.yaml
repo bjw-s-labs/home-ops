@@ -28,24 +28,36 @@ services:
       - ./config/garage.toml:/etc/garage/garage.toml:ro
       - meta:/var/lib/garage/meta
       - data:/var/lib/garage/data
-  garage-webui:
-    container_name: garage-webui
+  garage-ui:
+    container_name: garage-ui
     environment:
-      API_ADMIN_KEY: ${GARAGE_ADMIN_TOKEN}
-      API_BASE_URL: http://garage:9002
-      S3_ENDPOINT_URL: http://garage:9000
-      S3_REGION: us-east-1
-    image: docker.io/khairul169/garage-webui:1.1.0
+      GARAGE_UI_AUTH_OIDC_ADMIN_ROLE: garage-users@idm.bjw-s.dev
+      GARAGE_UI_AUTH_OIDC_CLIENT_ID: ${GARAGE_UI_OIDC_CLIENT_ID}
+      GARAGE_UI_AUTH_OIDC_CLIENT_SECRET: ${GARAGE_UI_OIDC_CLIENT_SECRET}
+      GARAGE_UI_AUTH_OIDC_COOKIE_SECURE: 'true'
+      GARAGE_UI_AUTH_OIDC_ENABLED: 'true'
+      GARAGE_UI_AUTH_OIDC_ISSUER_URL: https://idm.bjw-s.dev/oauth2/openid/garage-ui
+      GARAGE_UI_AUTH_OIDC_PROVIDER_NAME: Kanidm
+      GARAGE_UI_AUTH_OIDC_ROLE_ATTRIBUTE_PATH: groups
+      GARAGE_UI_AUTH_OIDC_SCOPES: 'openid email profile groups'
+      GARAGE_UI_GARAGE_ADMIN_ENDPOINT: http://garage:9002
+      GARAGE_UI_GARAGE_ADMIN_TOKEN: ${GARAGE_ADMIN_TOKEN}
+      GARAGE_UI_GARAGE_ENDPOINT: http://garage:9000
+      GARAGE_UI_GARAGE_REGION: us-east-1
+      GARAGE_UI_SERVER_DOMAIN: garage.bjw-s.dev
+      GARAGE_UI_SERVER_ENVIRONMENT: production
+      GARAGE_UI_SERVER_HOST: 0.0.0.0
+      GARAGE_UI_SERVER_PORT: 8080
+      GARAGE_UI_SERVER_ROOT_URL: https://garage.bjw-s.dev
+    image: docker.io/noooste/garage-ui:v0.12.1
     labels:
       dexd.enabled: 'true'
       traefik.enable: 'true'
-      traefik.http.routers.garage-webui.rule: Host(`garage.bjw-s.dev`)
-      traefik.http.services.garage-webui.loadbalancer.server.port: '3909'
+      traefik.http.routers.garage-ui.rule: Host(`garage.bjw-s.dev`)
+      traefik.http.services.garage-ui.loadbalancer.server.port: '8080'
     networks:
       - apps
     restart: unless-stopped
-    volumes:
-      - ./config/garage.toml:/etc/garage.toml:ro
 volumes:
   data:
     driver: local
