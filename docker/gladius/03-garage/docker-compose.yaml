@@ -1,4 +1,8 @@
 ---
+networks:
+  apps:
+    name: apps
+    external: true
 services:
   garage:
     command:
@@ -11,13 +15,33 @@ services:
       GARAGE_ADMIN_TOKEN: ${GARAGE_ADMIN_TOKEN}
       GARAGE_RPC_SECRET: ${GARAGE_RPC_SECRET}
     image: docker.io/dxflrs/garage:v2.3.0
-    network_mode: host
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.garage-s3.rule: Host(`s3.bjw-s.dev`)
+      traefik.http.services.garage-s3.loadbalancer.server.port: '9000'
+    networks:
+      - apps
     restart: unless-stopped
     user: '3000:4000'
     volumes:
       - ./config/garage.toml:/etc/garage/garage.toml:ro
       - meta:/var/lib/garage/meta
       - data:/var/lib/garage/data
+  garage-webui:
+    container_name: garage-webui
+    environment:
+      API_ADMIN_KEY: ${GARAGE_ADMIN_TOKEN}
+      API_BASE_URL: http://garage:9002
+      S3_ENDPOINT_URL: http://garage:9000
+      S3_REGION: us-east-1
+    image: docker.io/khairul169/garage-webui:1.1.0
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.garage-webui.rule: Host(`garage.bjw-s.dev`)
+      traefik.http.services.garage-webui.loadbalancer.server.port: '3909'
+    networks:
+      - apps
+    restart: unless-stopped
 volumes:
   data:
     driver: local
