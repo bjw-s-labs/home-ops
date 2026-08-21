@@ -16,16 +16,9 @@ spec:
     redis_port: os.environ/REDIS_PORT
     num_retries: 3
     timeout: 600
-    context_window_fallbacks:
-      - neuralwatt/qwen3.6-35b-fast: ["neuralwatt/kimi-k2.6-fast", "neuralwatt/glm-5.2-fast"]
-      - neuralwatt/qwen3.6-35b: ["neuralwatt/kimi-k2.6", "neuralwatt/glm-5.2"]
-      - neuralwatt/qwen3.5-397b-fast: ["neuralwatt/glm-5.2-fast"]
-      - neuralwatt/qwen3.5-397b: ["neuralwatt/glm-5.2"]
-      - neuralwatt/glm-5.2-short-fast: ["neuralwatt/glm-5.2-fast"]
-      - neuralwatt/glm-5.2-short: ["neuralwatt/glm-5.2"]
-      - neuralwatt/kimi-k2.6-fast: ["neuralwatt/glm-5.2-fast"]
-      - neuralwatt/kimi-k2.6: ["neuralwatt/glm-5.2"]
-      - neuralwatt/kimi-k2.7-code: ["neuralwatt/glm-5.2"]
+    fallbacks:
+      # direct same-model failover
+      - opencode-go/minimax-m3: ["minimaxai/minimax-m3"]
   litellmSettings:
     success_callback:
       - prometheus
@@ -37,6 +30,7 @@ spec:
       port: os.environ/REDIS_PORT
     drop_params: true
     merge_reasoning_content_in_choices: true
+    set_verbose: false
   env:
     - name: LITELLM_LOG
       value: INFO
