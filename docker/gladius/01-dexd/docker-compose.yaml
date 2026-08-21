@@ -1,0 +1,13 @@
+---
+name: dexd
+services:
+  dexd:
+    container_name: dexd
+    environment:
+      DEFAULT_TARGET: 10.1.6.21
+      UNIFI_API_KEY: ${UNIFI_API_KEY}
+      UNIFI_HOST: https://10.1.1.1
+    image: ghcr.io/ishioni/dexd:0.4.2
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro

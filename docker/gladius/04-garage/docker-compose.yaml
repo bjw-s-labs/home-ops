@@ -16,6 +16,7 @@ services:
       GARAGE_RPC_SECRET: ${GARAGE_RPC_SECRET}
     image: docker.io/dxflrs/garage:v2.3.0
     labels:
+      dexd.enabled: 'true'
       traefik.enable: 'true'
       traefik.http.routers.garage-s3.rule: Host(`s3.bjw-s.dev`)
       traefik.http.services.garage-s3.loadbalancer.server.port: '9000'
@@ -36,6 +37,7 @@ services:
       S3_REGION: us-east-1
     image: docker.io/khairul169/garage-webui:1.1.0
     labels:
+      dexd.enabled: 'true'
       traefik.enable: 'true'
       traefik.http.routers.garage-webui.rule: Host(`garage.bjw-s.dev`)
       traefik.http.services.garage-webui.loadbalancer.server.port: '3909'
