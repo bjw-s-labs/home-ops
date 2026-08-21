@@ -1,0 +1,29 @@
+---
+networks:
+  apps:
+    name: apps
+    external: true
+services:
+  zot:
+    container_name: zot
+    environment:
+      ZOT_OIDC_CLIENT_ID: ${ZOT_OIDC_CLIENT_ID}
+      ZOT_OIDC_CLIENT_SECRET: ${ZOT_OIDC_CLIENT_SECRET}
+    image: ghcr.io/project-zot/zot-linux-amd64:v2.1.20
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.zot.rule: Host(`registry.bjw-s.dev`)
+      traefik.http.services.zot.loadbalancer.server.port: '5000'
+    networks:
+      - apps
+    restart: unless-stopped
+    volumes:
+      - ./config/zot-config.json:/etc/zot/config.json:ro
+      - data:/var/lib/registry
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      device: /mnt/tank/apps/zot/data
+      o: bind
+      type: none
