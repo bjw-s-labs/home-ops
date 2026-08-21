@@ -1,29 +1,73 @@
 ---
+configs:
+  zot_htpasswd:
+    environment: ZOT_HTPASSWD
+name: zot
 networks:
   apps:
     name: apps
     external: true
 services:
-  zot:
-    container_name: zot
+  registry-ui:
+    container_name: registry-ui
     environment:
-      ZOT_OIDC_CLIENT_ID: ${ZOT_OIDC_CLIENT_ID}
-      ZOT_OIDC_CLIENT_SECRET: ${ZOT_OIDC_CLIENT_SECRET}
+      DATABASE_URL: /app/data/ui.db
+      DISABLE_TAG_DELETION: 'true'
+      OIDC_ALLOWED_GROUPS: registry-ui-users
+      OIDC_CLAIM_EMAIL: email
+      OIDC_CLAIM_GROUPS: registry_ui_groups
+      OIDC_CLAIM_NAME: name
+      OIDC_CLIENT_ID: ${REGISTRY_UI_OIDC_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${REGISTRY_UI_OIDC_CLIENT_SECRET}
+      OIDC_ISSUER_URL: https://idm.bjw-s.dev/oauth2/openid/registry-ui
+      OIDC_REDIRECT_URI: https://registry.bjw-s.dev/oauth/callback
+      REGISTRY_AUTH: ${REGISTRY_UI_REGISTRY_AUTH}
+      REGISTRY_SETTINGS_PUBLIC_HOST: registry.bjw-s.dev
+      REGISTRY_URL: http://zot:5000
+      SCRAPER_MAX_PER_REGISTRY: '4'
+      SCRAPER_WORKERS: '4'
+      SESSION_SECRET: ${REGISTRY_UI_SESSION_SECRET}
+    image: ghcr.io/eznix86/docker-registry-ui:1.6.0
+    labels:
+      dexd.enabled: 'true'
+      traefik.enable: 'true'
+      traefik.http.routers.registry-ui.rule: Host(`registry.bjw-s.dev`)
+      traefik.http.routers.registry-ui.priority: '10'
+      traefik.http.services.registry-ui.loadbalancer.server.port: '3000'
+    networks:
+      - apps
+    restart: unless-stopped
+    volumes:
+      - ui-data:/app/data
+  zot:
+    configs:
+      - source: zot_htpasswd
+        target: /etc/zot/htpasswd
+    container_name: zot
     image: ghcr.io/project-zot/zot-linux-amd64:v2.1.20
     labels:
+      dexd.enabled: 'true'
       traefik.enable: 'true'
-      traefik.http.routers.zot.rule: Host(`registry.bjw-s.dev`)
+      traefik.http.routers.zot.rule: >-
+        Host(`registry.bjw-s.dev`) && PathPrefix(`/v2`)
+      traefik.http.routers.zot.priority: '100'
       traefik.http.services.zot.loadbalancer.server.port: '5000'
     networks:
       - apps
     restart: unless-stopped
     volumes:
-      - ./config/zot-config.json:/etc/zot/config.json:ro
+      - ./config/config.json:/etc/zot/config.json:ro
       - data:/var/lib/registry
 volumes:
   data:
     driver: local
     driver_opts:
       device: /mnt/tank/apps/zot/data
+      o: bind
+      type: none
+  ui-data:
+    driver: local
+    driver_opts:
+      device: /mnt/tank/apps/zot/docker-registry-ui
       o: bind
       type: none
