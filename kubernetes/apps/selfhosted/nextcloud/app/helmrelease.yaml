@@ -14,6 +14,10 @@ spec:
       enabled: true
       type: cronjob
       cronjob:
+        securityContext:
+          runAsUser: 82
+          runAsGroup: 82
+          runAsNonRoot: true
         affinity:
           podAffinity:
             requiredDuringSchedulingIgnoredDuringExecution:
@@ -39,6 +43,28 @@ spec:
       enabled: true
     nextcloud:
       datadir: /var/www/data
+      securityContext:
+        runAsUser: 82
+        runAsGroup: 82
+        runAsNonRoot: true
+      # Allow the entrypoint (running as www-data) to write redis-session.ini
+      # by placing it on a writable volume, mirroring the chart's bundled-redis pattern
+      extraInitContainers:
+        - name: init-redis-session-ini
+          image: docker.io/library/alpine:3.24
+          command:
+            - /bin/sh
+            - -c
+            - touch /php-confd/redis-session.ini
+          securityContext:
+            runAsUser: 82
+            runAsGroup: 82
+          volumeMounts:
+            - name: php-confd
+              mountPath: /php-confd
+      extraVolumes:
+        - name: php-confd
+          emptyDir: {}
       existingSecret:
         enabled: true
         secretName: nextcloud-secret
@@ -102,3 +128,9 @@ spec:
                 template:
                   spec:
                     hostUsers: false
+                    containers:
+                      - name: nextcloud
+                        volumeMounts:
+                          - name: php-confd
+                            mountPath: /usr/local/etc/php/conf.d/redis-session.ini
+                            subPath: redis-session.ini
