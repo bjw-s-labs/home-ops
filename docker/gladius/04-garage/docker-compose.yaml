@@ -44,6 +44,8 @@ services:
     networks:
       - apps
     restart: unless-stopped
+    volumes:
+      - ./config/garage.toml:/etc/garage.toml:ro
 volumes:
   data:
     driver: local
