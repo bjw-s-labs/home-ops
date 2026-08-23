@@ -1,0 +1,28 @@
+---
+apiVersion: kaniop.rs/v1beta1
+kind: KanidmOAuth2Client
+metadata:
+  name: forgejo
+spec:
+  kanidmRef:
+    name: kanidm
+  displayname: Forgejo
+  origin: https://git.bjw-s.dev/
+  redirectUrl:
+    - https://git.bjw-s.dev/user/oauth2/kanidm/callback
+  scopeMap:
+    - group: forgejo_admins@idm.bjw-s.dev
+      scopes:
+        - openid
+        - profile
+        - email
+        - groups
+    - group: forgejo_users@idm.bjw-s.dev
+      scopes:
+        - openid
+        - profile
+        - email
+        - groups
+  strictRedirectUrl: true
+  preferShortUsername: true
+  disableConsentPrompt: true

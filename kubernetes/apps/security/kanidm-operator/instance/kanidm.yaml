@@ -1,0 +1,54 @@
+---
+apiVersion: kaniop.rs/v1beta1
+kind: Kanidm
+metadata:
+  name: kanidm
+spec:
+  domain: idm.bjw-s.dev
+  origin: https://idm.bjw-s.dev
+  replicaGroups:
+    - name: default
+      replicas: 1
+      primaryNode: true
+      resources:
+        requests:
+          cpu: 10m
+        limits:
+          memory: 1Gi
+  image: kanidm/server:1.11.1
+  logLevel: info
+  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+        storageClassName: miroir-local
+  tlsSecretName: idm-bjw-s-dev-tls
+  securityContext:
+    fsGroup: 2000
+    fsGroupChangePolicy: OnRootMismatch
+    runAsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 2000
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: kanidm
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+  gateway:
+    parentRefs:
+      - name: envoy-external
+        namespace: network
+    hostnames:
+      - idm.bjw-s.dev
+    backendTlsPolicy:
+      validation:
+        hostname: idm.bjw-s.dev
+        wellKnownCaCertificates: System

@@ -1,0 +1,29 @@
+---
+apiVersion: kaniop.rs/v1beta1
+kind: KanidmOAuth2Client
+metadata:
+  name: registry-ui
+spec:
+  kanidmRef:
+    name: kanidm
+  displayname: Registry UI
+  origin: https://registry.bjw-s.dev/
+  redirectUrl:
+    - https://registry.bjw-s.dev/oauth/callback
+  scopeMap:
+    - group: registry-ui-users@idm.bjw-s.dev
+      scopes:
+        - openid
+        - profile
+        - email
+        - groups
+  claimMap:
+    - name: registry_ui_groups
+      valuesMap:
+        - group: registry-ui-users@idm.bjw-s.dev
+          values:
+            - registry-ui-users
+      joinStrategy: array
+  strictRedirectUrl: true
+  allowInsecureClientDisablePkce: true
+  disableConsentPrompt: true
