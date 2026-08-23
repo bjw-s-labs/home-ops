@@ -9,7 +9,24 @@
       "repositories": {
         "**": {
           "anonymousPolicy": ["read"],
-          "defaultPolicy": ["read", "create", "update", "delete"]
+          "defaultPolicy": ["read"]
+        },
+        "bjw-s/**": {
+          "policies": [
+            {
+              "users": ["zot-push"],
+              "actions": ["read", "create", "update"]
+            }
+          ],
+          "defaultPolicy": ["read"]
+        },
+        "docker-hub/**": {
+          "anonymousPolicy": ["read"],
+          "defaultPolicy": ["read"]
+        },
+        "ghcr/**": {
+          "anonymousPolicy": ["read"],
+          "defaultPolicy": ["read"]
         }
       }
     },
@@ -60,7 +77,7 @@
       ]
     },
     "ui": {
-      "enable": true
+      "enable": false
     }
   }
 }

@@ -1,0 +1,23 @@
+---
+apiVersion: kaniop.rs/v1beta1
+kind: KanidmOAuth2Client
+metadata:
+  name: garage-ui
+spec:
+  kanidmRef:
+    name: kanidm
+  displayname: Garage UI
+  origin: https://garage.bjw-s.dev/
+  redirectUrl:
+    - https://garage.bjw-s.dev/auth/oidc/callback
+  scopeMap:
+    - group: garage-users@idm.bjw-s.dev
+      scopes:
+        - openid
+        - profile
+        - email
+        - groups
+  strictRedirectUrl: true
+  preferShortUsername: true
+  allowInsecureClientDisablePkce: true
+  disableConsentPrompt: true

@@ -1,0 +1,20 @@
+---
+apiVersion: kaniop.rs/v1beta1
+kind: KanidmOAuth2Client
+metadata:
+  name: openwebui
+spec:
+  kanidmRef:
+    name: kanidm
+  displayname: Open WebUI
+  origin: https://chat.bjw-s.dev/oauth/oidc/callback
+  redirectUrl: []
+  scopeMap:
+    - group: openwebui_users@idm.bjw-s.dev
+      scopes:
+        - openid
+        - profile
+        - email
+  strictRedirectUrl: true
+  allowInsecureClientDisablePkce: true
+  disableConsentPrompt: true
