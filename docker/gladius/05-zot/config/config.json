@@ -2,6 +2,41 @@
   "distSpecVersion": "1.1.0",
   "storage": {
     "gc": true,
+    "gcDelay": "1h",
+    "gcInterval": "24h",
+    "retention": {
+      "dryRun": false,
+      "delay": "24h",
+      "policies": [
+        {
+          "repositories": [
+            "docker-hub/**",
+            "ghcr/**"
+          ],
+          "deleteReferrers": true,
+          "deleteUntagged": true,
+          "keepUntagged": {
+            "pulledWithin": "2920h"
+          },
+          "keepTags": [
+            {
+              "patterns": [".*"],
+              "pulledWithin": "4380h"
+            }
+          ]
+        },
+        {
+          "repositories": ["**"],
+          "deleteReferrers": true,
+          "deleteUntagged": true,
+          "keepTags": [
+            {
+              "patterns": [".*"]
+            }
+          ]
+        }
+      ]
+    },
     "rootDirectory": "/var/lib/registry"
   },
   "http": {
