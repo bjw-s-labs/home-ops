@@ -16,17 +16,33 @@
             {
               "users": ["zot-push"],
               "actions": ["read", "create", "update"]
+            },
+            {
+              "users": ["registry-ui"],
+              "actions": ["read", "delete"]
             }
           ],
           "defaultPolicy": ["read"]
         },
         "docker-hub/**": {
           "anonymousPolicy": ["read"],
-          "defaultPolicy": ["read"]
+          "defaultPolicy": ["read"],
+          "policies": [
+            {
+              "users": ["registry-ui"],
+              "actions": ["read", "delete"]
+            }
+          ]
         },
         "ghcr/**": {
           "anonymousPolicy": ["read"],
-          "defaultPolicy": ["read"]
+          "defaultPolicy": ["read"],
+          "policies": [
+            {
+              "users": ["registry-ui"],
+              "actions": ["read", "delete"]
+            }
+          ]
         }
       }
     },
