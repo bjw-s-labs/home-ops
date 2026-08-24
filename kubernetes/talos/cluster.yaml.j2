@@ -146,6 +146,20 @@ content: |
     device_ownership_from_security_context = true
 ---
 apiVersion: v1alpha1
+kind: RegistryMirrorConfig
+name: docker.io
+endpoints:
+  - url: https://registry.bjw-s.dev/v2/docker-hub/
+    overridePath: true
+---
+apiVersion: v1alpha1
+kind: RegistryMirrorConfig
+name: ghcr.io
+endpoints:
+  - url: https://registry.bjw-s.dev/v2/ghcr/
+    overridePath: true
+---
+apiVersion: v1alpha1
 kind: KubeNodeConfig
 nodeIP:
   validSubnets:

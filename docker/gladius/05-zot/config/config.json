@@ -8,39 +8,74 @@
     "accessControl": {
       "repositories": {
         "**": {
-          "anonymousPolicy": ["read"],
-          "defaultPolicy": ["read"]
+          "anonymousPolicy": [
+            "read"
+          ],
+          "defaultPolicy": [
+            "read"
+          ]
         },
         "bjw-s/**": {
           "policies": [
             {
-              "users": ["zot-push"],
-              "actions": ["read", "create", "update"]
+              "users": [
+                "registry-push"
+              ],
+              "actions": [
+                "read",
+                "create",
+                "update"
+              ]
             },
             {
-              "groups": ["registry-ui-users"],
-              "actions": ["read", "delete"]
+              "groups": [
+                "registry-ui-users"
+              ],
+              "actions": [
+                "read",
+                "delete"
+              ]
             }
           ],
-          "defaultPolicy": ["read"]
+          "defaultPolicy": [
+            "read"
+          ]
         },
         "docker-hub/**": {
-          "anonymousPolicy": ["read"],
-          "defaultPolicy": ["read"],
+          "anonymousPolicy": [
+            "read"
+          ],
+          "defaultPolicy": [
+            "read"
+          ],
           "policies": [
             {
-              "groups": ["registry-ui-users"],
-              "actions": ["read", "delete"]
+              "groups": [
+                "registry-ui-users"
+              ],
+              "actions": [
+                "read",
+                "delete"
+              ]
             }
           ]
         },
         "ghcr/**": {
-          "anonymousPolicy": ["read"],
-          "defaultPolicy": ["read"],
+          "anonymousPolicy": [
+            "read"
+          ],
+          "defaultPolicy": [
+            "read"
+          ],
           "policies": [
             {
-              "groups": ["registry-ui-users"],
-              "actions": ["read", "delete"]
+              "groups": [
+                "registry-ui-users"
+              ],
+              "actions": [
+                "read",
+                "delete"
+              ]
             }
           ]
         }
@@ -53,13 +88,20 @@
         "path": "/etc/zot/htpasswd"
       },
       "openid": {
-        "callbackAllowOrigins": ["https://registry.bjw-s.dev"],
+        "callbackAllowOrigins": [
+          "https://registry.bjw-s.dev"
+        ],
         "providers": {
           "oidc": {
             "name": "Kanidm",
             "issuer": "https://idm.bjw-s.dev/oauth2/openid/zot",
             "credentialsFile": "/etc/zot/openid-credentials.json",
-            "scopes": ["openid", "profile", "email", "groups"],
+            "scopes": [
+              "openid",
+              "profile",
+              "email",
+              "groups"
+            ],
             "claimMapping": {
               "username": "preferred_username",
               "groups": "zot_groups"
@@ -83,7 +125,9 @@
       "enable": true,
       "registries": [
         {
-          "urls": ["https://index.docker.io"],
+          "urls": [
+            "https://index.docker.io"
+          ],
           "onDemand": true,
           "tlsVerify": true,
           "maxRetries": 3,
@@ -96,7 +140,9 @@
           ]
         },
         {
-          "urls": ["https://ghcr.io"],
+          "urls": [
+            "https://ghcr.io"
+          ],
           "onDemand": true,
           "tlsVerify": true,
           "maxRetries": 3,
