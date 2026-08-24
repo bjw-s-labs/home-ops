@@ -18,7 +18,7 @@
               "actions": ["read", "create", "update"]
             },
             {
-              "users": ["registry-ui"],
+              "groups": ["registry-ui-users"],
               "actions": ["read", "delete"]
             }
           ],
@@ -29,7 +29,7 @@
           "defaultPolicy": ["read"],
           "policies": [
             {
-              "users": ["registry-ui"],
+              "groups": ["registry-ui-users"],
               "actions": ["read", "delete"]
             }
           ]
@@ -39,7 +39,7 @@
           "defaultPolicy": ["read"],
           "policies": [
             {
-              "users": ["registry-ui"],
+              "groups": ["registry-ui-users"],
               "actions": ["read", "delete"]
             }
           ]
@@ -48,10 +48,28 @@
     },
     "address": "0.0.0.0",
     "auth": {
+      "apikey": true,
       "htpasswd": {
         "path": "/etc/zot/htpasswd"
-      }
+      },
+      "openid": {
+        "callbackAllowOrigins": ["https://registry.bjw-s.dev"],
+        "providers": {
+          "oidc": {
+            "name": "Kanidm",
+            "issuer": "https://idm.bjw-s.dev/oauth2/openid/zot",
+            "credentialsFile": "/etc/zot/openid-credentials.json",
+            "scopes": ["openid", "profile", "email", "groups"],
+            "claimMapping": {
+              "username": "preferred_username",
+              "groups": "zot_groups"
+            }
+          }
+        }
+      },
+      "sessionKeysFile": "/etc/zot/sessionKeys.json"
     },
+    "externalUrl": "https://registry.bjw-s.dev",
     "port": "5000"
   },
   "log": {
@@ -93,7 +111,7 @@
       ]
     },
     "ui": {
-      "enable": false
+      "enable": true
     }
   }
 }

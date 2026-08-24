@@ -2,14 +2,14 @@
 apiVersion: kaniop.rs/v1beta1
 kind: KanidmOAuth2Client
 metadata:
-  name: registry-ui
+  name: zot
 spec:
   kanidmRef:
     name: kanidm
-  displayname: Registry UI
+  displayname: Zot
   origin: https://registry.bjw-s.dev/
   redirectUrl:
-    - https://registry.bjw-s.dev/oauth/callback
+    - https://registry.bjw-s.dev/zot/auth/callback/oidc
   scopeMap:
     - group: registry-ui-users@idm.bjw-s.dev
       scopes:
@@ -18,7 +18,7 @@ spec:
         - email
         - groups
   claimMap:
-    - name: registry_ui_groups
+    - name: zot_groups
       valuesMap:
         - group: registry-ui-users@idm.bjw-s.dev
           values:
