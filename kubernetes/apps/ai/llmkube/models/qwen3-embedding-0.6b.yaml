@@ -4,9 +4,7 @@ kind: Model
 metadata:
   name: qwen3-embedding-0.6b
 spec:
-  source: hf://Qwen/Qwen3-Embedding-0.6B-GGUF
-  files:
-    - Qwen3-Embedding-0.6B-Q8_0.gguf
+  source: https://huggingface.co/Qwen/Qwen3-Embedding-0.6B-GGUF/resolve/main/Qwen3-Embedding-0.6B-Q8_0.gguf
   format: gguf
   quantization: Q8_0
   hardware:
@@ -29,10 +27,10 @@ spec:
   image: ghcr.io/ggml-org/llama.cpp:server-vulkan@sha256:003fba3374b3452e5832524f82b29aa48767c1f598311aa8a0cf55075a4314a6
   replicas: 1
   priority: normal
-  contextSize: 32768
+  contextSize: 8192
   parallelSlots: 2
-  batchSize: 16384
-  uBatchSize: 16384
+  batchSize: 2048
+  uBatchSize: 2048
   env:
     - name: ZES_ENABLE_SYSMAN
       value: "1"
@@ -46,6 +44,8 @@ spec:
     - --embeddings
     - --pooling
     - last
+    - --cache-ram
+    - "0"
     - --cont-batching
     - --threads
     - "6"
