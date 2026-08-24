@@ -2,6 +2,9 @@
 customization:
   extraKernelArgs:
     - initcall_blacklist=algif_aead_init # copy.fail fix
+    - intel_iommu=on # PCI Passthrough
+    - iommu=pt # PCI Passthrough
+    - lsm=lockdown,capability,yama,safesetid,bpf,landlock # disable permissive-only SELinux (selinux=0 is not a recognized boot param on this kernel); was flooding kernel audit log with no enforcement benefit
   systemExtensions:
     officialExtensions:
       - siderolabs/drbd
