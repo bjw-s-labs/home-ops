@@ -7,11 +7,11 @@ description: Use when deploying a new application to the cluster — scaffolding
 
 Scaffolds `kubernetes/apps/<namespace>/<app>/` with a Flux Kustomization (`ks.yaml`) and an app-template HelmRelease. Every value below comes from current repo conventions — when in doubt, mirror a recent real app instead of inventing structure:
 
-| Reference app | Shows |
-|---|---|
-| `kubernetes/apps/network/echo-server` | Minimal stateless app + route |
-| `kubernetes/apps/selfhosted/wotcher` | Secrets, config file via configMapGenerator, kopiur-backed persistence |
-| `kubernetes/apps/selfhosted/searxng` | Custom probes, CiliumNetworkPolicy, dragonfly dependency |
+| Reference app                         | Shows                                                                  |
+| ------------------------------------- | ---------------------------------------------------------------------- |
+| `kubernetes/apps/network/echo-server` | Minimal stateless app + route                                          |
+| `kubernetes/apps/selfhosted/wotcher`  | Secrets, config file via configMapGenerator, kopiur-backed persistence |
+| `kubernetes/apps/selfhosted/searxng`  | Custom probes, CiliumNetworkPolicy, dragonfly dependency               |
 
 ## Step 1: Gather details
 
@@ -60,26 +60,23 @@ spec:
   targetNamespace: <namespace>
 ```
 
-**`wait`:** omit it for a normal leaf app — it defaults to `false`, and explicit `wait: false` is redundant boilerplate we no longer keep. Only add `wait: true` when *another* Kustomization will `dependsOn` this one AND this Kustomization defines no `healthChecks`/`healthCheckExprs` — that is what gives the dependent a real readiness gate. If this Kustomization does define `healthChecks`, leave `wait` unset (setting `wait: true` would make Flux ignore those checks). Depending on another app (e.g. `kopiur` for persistence) does not by itself call for `wait`.
+**`wait`:** omit it for a normal leaf app — it defaults to `false`, and explicit `wait: false` is redundant boilerplate we no longer keep. Only add `wait: true` when _another_ Kustomization will `dependsOn` this one AND this Kustomization defines no `healthChecks`/`healthCheckExprs` — that is what gives the dependent a real readiness gate. If this Kustomization does define `healthChecks`, leave `wait` unset (setting `wait: true` would make Flux ignore those checks). Depending on another app (e.g. `kopiur` for persistence) does not by itself call for `wait`.
 
 Do not add `commonMetadata` or `timeout` — both were dropped as boilerplate; the app-template chart sets `app.kubernetes.io/*` labels on the workloads, and `timeout` falls back to the Flux default.
 
 **If the app has persistence**, add these to `spec` (components use `${APP}` and `${KOPIUR_*}` substitutions — see `kubernetes/components/kopiur/backup/` for all knobs and their defaults):
 
 ```yaml
-  components:
-    - ../../../../components/kopiur/backup
-  dependsOn:
-    - name: kopiur
-      namespace: system
-  postBuild:
-    substitute:
-      APP: <app>
-      # Optional overrides, only when defaults don't fit:
-      # KOPIUR_CLAIM: <app>-data      # PVC name (default: <app>)
-      # KOPIUR_CAPACITY: 15Gi         # default: 5Gi
-      # KOPIUR_MOVER_UID: "1000"      # default: 2000
-      # KOPIUR_MOVER_GID: "1000"      # default: 2000
+components:
+  - ../../../../components/kopiur/backup
+postBuild:
+  substitute:
+    APP: <app>
+    # Optional overrides, only when defaults don't fit:
+    # KOPIUR_CLAIM: <app>-data      # PVC name (default: <app>)
+    # KOPIUR_CAPACITY: 15Gi         # default: 5Gi
+    # KOPIUR_MOVER_UID: "1000"      # default: 2000
+    # KOPIUR_MOVER_GID: "1000"      # default: 2000
 ```
 
 Add user-specified dependencies to `dependsOn`. Include `postBuild.substitute.APP` whenever any component is used; omit `components`/`postBuild` entirely otherwise.
@@ -92,7 +89,7 @@ Add user-specified dependencies to `dependsOn`. Include `postBuild.substitute.AP
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./externalsecret.yaml   # only if secrets
+  - ./externalsecret.yaml # only if secrets
   - ./ocirepository.yaml
   - ./helmrelease.yaml
 ```
@@ -194,48 +191,48 @@ Adjust `runAsUser`/`runAsGroup` (and capabilities) to what the image requires; d
 Route (web UI/API):
 
 ```yaml
-    route:
-      app:
-        hostnames:
-          - <app>.bjw-s.dev
-        parentRefs:
-          - name: envoy-internal    # envoy-external for public apps
-            namespace: network
+route:
+  app:
+    hostnames:
+      - <app>.bjw-s.dev
+    parentRefs:
+      - name: envoy-internal # envoy-external for public apps
+        namespace: network
 ```
 
 Persistence (pairs with the kopiur block in ks.yaml; also add `fsGroup: 2000` + `fsGroupChangePolicy: OnRootMismatch` to the pod securityContext):
 
 ```yaml
-    persistence:
-      data:
-        existingClaim: <app>       # must match KOPIUR_CLAIM if overridden
-        globalMounts:
-          - path: /data
-      tmpfs:                       # writable /tmp for readOnlyRootFilesystem
-        type: emptyDir
-        globalMounts:
-          - path: /tmp
+persistence:
+  data:
+    existingClaim: <app> # must match KOPIUR_CLAIM if overridden
+    globalMounts:
+      - path: /data
+  tmpfs: # writable /tmp for readOnlyRootFilesystem
+    type: emptyDir
+    globalMounts:
+      - path: /tmp
 ```
 
 Config file mount (pairs with configMapGenerator):
 
 ```yaml
-    persistence:
-      config:
-        type: configMap
-        name: <app>-configmap
-        globalMounts:
-          - path: /config/config.yaml
-            subPath: config.yaml
-            readOnly: true
+persistence:
+  config:
+    type: configMap
+    name: <app>-configmap
+    globalMounts:
+      - path: /config/config.yaml
+        subPath: config.yaml
+        readOnly: true
 ```
 
 Secrets: add to the container:
 
 ```yaml
-            envFrom:
-              - secretRef:
-                  name: <app>-secret
+envFrom:
+  - secretRef:
+      name: <app>-secret
 ```
 
 ### app/externalsecret.yaml (only if secrets)
