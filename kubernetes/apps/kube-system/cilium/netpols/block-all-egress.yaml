@@ -3,16 +3,10 @@
 apiVersion: cilium.io/v2
 kind: CiliumClusterwideNetworkPolicy
 metadata:
-  name: allow-cluster-egress
+  name: block-all-egress
 spec:
   endpointSelector:
-    matchExpressions:
-      - key: egress.home.arpa/custom-egress
-        operator: DoesNotExist
+    matchLabels:
+      egress.policy.home.arpa/block-all: "true"
   egress:
-    - toEndpoints:
-        - {}
-    - toEntities:
-        - cluster
-    - toEntities:
-        - world
+    - {}

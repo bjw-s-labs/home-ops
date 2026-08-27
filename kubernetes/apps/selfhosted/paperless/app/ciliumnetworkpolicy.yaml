@@ -10,6 +10,14 @@ spec:
       app.kubernetes.io/name: paperless
       app.kubernetes.io/instance: paperless
       app.kubernetes.io/controller: paperless
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:app: paperless-dragonfly
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
   ingress:
     - fromEndpoints:
         - matchLabels:

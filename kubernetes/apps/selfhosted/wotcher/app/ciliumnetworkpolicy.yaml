@@ -1,0 +1,13 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: wotcher
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: wotcher
+      app.kubernetes.io/instance: wotcher
+  ingress:
+    - {}

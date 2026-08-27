@@ -14,7 +14,7 @@ spec:
       maintainerr:
         pod:
           labels:
-            egress.home.arpa/custom-egress: "true"
+            egress.policy.home.arpa/block-all: "true"
           securityContext:
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
@@ -26,6 +26,8 @@ spec:
             image:
               repository: ghcr.io/maintainerr/maintainerr
               tag: 3.25.0@sha256:f96e37e04a5e2da56edc39d96774102599de7d7617e2cc00a49a1581b01be136
+            env:
+              TELEMETRY: "off"
             probes:
               liveness:
                 enabled: true

@@ -9,6 +9,14 @@ spec:
     matchLabels:
       app.kubernetes.io/name: nextcloud
       app.kubernetes.io/instance: nextcloud
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:app: nextcloud-dragonfly
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
   ingress:
     - fromEndpoints:
         - matchLabels:

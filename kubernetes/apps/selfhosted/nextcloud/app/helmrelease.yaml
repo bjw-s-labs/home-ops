@@ -14,6 +14,8 @@ spec:
       enabled: true
       type: cronjob
       cronjob:
+        podLabels:
+          egress.policy.home.arpa/internet: "true"
         securityContext:
           runAsUser: 82
           runAsGroup: 82
@@ -113,6 +115,8 @@ spec:
     persistence:
       enabled: true
       existingClaim: nextcloud
+    podLabels:
+      egress.policy.home.arpa/internet: "true"
   postRenderers:
     - kustomize:
         patches:

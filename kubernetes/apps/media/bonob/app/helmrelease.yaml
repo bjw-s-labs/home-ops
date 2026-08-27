@@ -13,6 +13,8 @@ spec:
     controllers:
       bonob:
         pod:
+          labels:
+            egress.policy.home.arpa/block-all: "true"
           securityContext:
             fsGroup: 65534
             fsGroupChangePolicy: OnRootMismatch

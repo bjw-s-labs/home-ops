@@ -9,23 +9,21 @@ spec:
     kind: OCIRepository
     name: it-tools
   interval: 30m
-
   values:
     controllers:
       it-tools:
         replicas: 1
         strategy: RollingUpdate
-
         annotations:
           reloader.stakater.com/auto: "true"
-
         pod:
+          labels:
+            egress.policy.home.arpa/block-all: "true"
           securityContext:
             fsGroup: 1000
             fsGroupChangePolicy: "OnRootMismatch"
             runAsGroup: 1000
             runAsUser: 1000
-
         containers:
           app:
             image:
@@ -43,14 +41,12 @@ spec:
                 drop:
                   - ALL
               readOnlyRootFilesystem: true
-
     persistence:
       tmpfs:
         type: emptyDir
         globalMounts:
           - path: /tmp
             subPath: tmp
-
     route:
       app:
         hostnames:
@@ -58,7 +54,6 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-
     service:
       app:
         ports:

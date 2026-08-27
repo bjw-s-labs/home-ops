@@ -17,7 +17,6 @@ spec:
         runAsGroup: 1000
         runAsNonRoot: true
         runAsUser: 1000
-
     controllers:
       karakeep:
         forceRename: karakeep
@@ -26,6 +25,7 @@ spec:
         pod:
           labels:
             app.kubernetes.io/component: application
+            egress.policy.home.arpa/internet: "true"
         containers:
           app:
             image:
@@ -64,13 +64,13 @@ spec:
                 cpu: 10m
               limits:
                 memory: 1Gi
-
       chrome:
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
           labels:
             app.kubernetes.io/component: chrome
+            egress.policy.home.arpa/internet: "true"
         containers:
           app:
             image:
@@ -95,13 +95,13 @@ spec:
                 cpu: 10m
               limits:
                 memory: 1Gi
-
       meilisearch:
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
           labels:
             app.kubernetes.io/component: meilisearch
+            egress.policy.home.arpa/block-all: "true"
           affinity:
             podAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -136,7 +136,6 @@ spec:
                 cpu: 10m
               limits:
                 memory: 2Gi
-
     persistence:
       data:
         existingClaim: karakeep-data
@@ -149,7 +148,6 @@ spec:
             app:
               - path: /meili_data
                 subPath: meilisearch
-
     route:
       app:
         hostnames:
@@ -161,7 +159,6 @@ spec:
           - backendRefs:
               - identifier: app
                 port: http
-
     service:
       app:
         controller: karakeep

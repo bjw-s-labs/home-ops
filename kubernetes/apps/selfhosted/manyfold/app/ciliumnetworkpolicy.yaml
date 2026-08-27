@@ -10,6 +10,14 @@ spec:
       app.kubernetes.io/name: manyfold
       app.kubernetes.io/instance: manyfold
       app.kubernetes.io/controller: manyfold
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:app: manyfold-dragonfly
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
   ingress:
     - fromEndpoints:
         - matchLabels:

@@ -1,0 +1,84 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: karakeep
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: karakeep
+      app.kubernetes.io/instance: karakeep
+      app.kubernetes.io/controller: karakeep
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:app.kubernetes.io/name: karakeep
+            k8s:app.kubernetes.io/instance: karakeep
+            k8s:app.kubernetes.io/controller: chrome
+      toPorts:
+        - ports:
+            - port: "9222"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:app.kubernetes.io/name: karakeep
+            k8s:app.kubernetes.io/instance: karakeep
+            k8s:app.kubernetes.io/controller: meilisearch
+      toPorts:
+        - ports:
+            - port: "7700"
+              protocol: TCP
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: karakeep-chrome
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: karakeep
+      app.kubernetes.io/instance: karakeep
+      app.kubernetes.io/controller: chrome
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:app.kubernetes.io/name: karakeep
+            k8s:app.kubernetes.io/instance: karakeep
+            k8s:app.kubernetes.io/controller: karakeep
+      toPorts:
+        - ports:
+            - port: "9222"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: karakeep-meilisearch
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: karakeep
+      app.kubernetes.io/instance: karakeep
+      app.kubernetes.io/controller: meilisearch
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:app.kubernetes.io/name: karakeep
+            k8s:app.kubernetes.io/instance: karakeep
+            k8s:app.kubernetes.io/controller: karakeep
+      toPorts:
+        - ports:
+            - port: "7700"
+              protocol: TCP

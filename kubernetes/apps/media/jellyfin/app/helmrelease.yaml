@@ -13,6 +13,8 @@ spec:
     controllers:
       jellyfin:
         pod:
+          labels:
+            egress.policy.home.arpa/internet: "true"
           resourceClaims:
             - name: gpu
               resourceClaimTemplateName: jellyfin-gpu

@@ -13,6 +13,8 @@ spec:
     controllers:
       navidrome:
         pod:
+          labels:
+            egress.policy.home.arpa/block-all: "true"
           securityContext:
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
