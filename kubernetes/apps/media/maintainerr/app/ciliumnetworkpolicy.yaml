@@ -9,6 +9,34 @@ spec:
     matchLabels:
       app.kubernetes.io/name: maintainerr
       app.kubernetes.io/instance: maintainerr
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:app.kubernetes.io/controller: jellyfin
+            k8s:app.kubernetes.io/instance: jellyfin
+            k8s:app.kubernetes.io/name: jellyfin
+      toPorts:
+        - ports:
+            - port: "8096"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:app.kubernetes.io/controller: radarr
+            k8s:app.kubernetes.io/instance: radarr
+            k8s:app.kubernetes.io/name: radarr
+      toPorts:
+        - ports:
+            - port: "7878"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:app.kubernetes.io/controller: sonarr
+            k8s:app.kubernetes.io/instance: sonarr
+            k8s:app.kubernetes.io/name: sonarr
+      toPorts:
+        - ports:
+            - port: "8989"
+              protocol: TCP
   ingress:
     - fromEndpoints:
         - matchLabels:
