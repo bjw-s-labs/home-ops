@@ -30,6 +30,16 @@ spec:
   dependsOn:
     - name: kanidm-operator
       namespace: security
+  healthChecks:
+    - apiVersion: kaniop.rs/v1beta1
+      kind: Kanidm
+      name: kanidm
+      namespace: security
+  healthCheckExprs:
+    - apiVersion: kaniop.rs/v1beta1
+      kind: Kanidm
+      failed: status.conditions.exists(c, c.type == 'Available' && c.status == 'False')
+      current: status.conditions.exists(c, c.type == 'Available' && c.status == 'True')
   interval: 1h
   path: "./kubernetes/apps/security/kanidm-operator/instance"
   postBuild:

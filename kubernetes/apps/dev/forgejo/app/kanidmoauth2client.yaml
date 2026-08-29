@@ -6,6 +6,7 @@ metadata:
 spec:
   kanidmRef:
     name: kanidm
+    namespace: security
   displayname: Forgejo
   origin: https://git.bjw-s.dev/
   redirectUrl:
@@ -25,4 +26,9 @@ spec:
         - groups
   strictRedirectUrl: true
   preferShortUsername: true
+  secretKeyAliases:
+    clientId:
+      - key
+    clientSecret:
+      - secret
   disableConsentPrompt: true
