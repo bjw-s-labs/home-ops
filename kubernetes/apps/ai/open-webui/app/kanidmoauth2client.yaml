@@ -6,6 +6,7 @@ metadata:
 spec:
   kanidmRef:
     name: kanidm
+    namespace: security
   displayname: Open WebUI
   origin: https://chat.bjw-s.dev/oauth/oidc/callback
   redirectUrl: []
@@ -17,4 +18,9 @@ spec:
         - email
   strictRedirectUrl: true
   allowInsecureClientDisablePkce: true
+  secretKeyAliases:
+    clientId:
+      - OAUTH_CLIENT_ID
+    clientSecret:
+      - OAUTH_CLIENT_SECRET
   disableConsentPrompt: true
