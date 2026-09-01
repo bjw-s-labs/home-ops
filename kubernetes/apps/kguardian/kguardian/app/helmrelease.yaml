@@ -1,0 +1,41 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kguardian
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: kguardian
+  interval: 30m
+  values:
+    ai:
+      enabled: true
+      provider: openai
+      baseUrl: http://litellm.ai.svc.cluster.local:4000/v1
+      model: minimax/MiniMax-M2-7-anthropic
+      mcp:
+        enabled: true
+        auth:
+          allowUnauthenticated: true
+      secret: kguardian-secret
+    broker:
+      resources:
+        limits:
+          memory: 2Gi
+    controller:
+      excludedNamespaces:
+        - kguardian
+    database:
+      persistence:
+        storageClassName: miroir-local
+        size: 10Gi
+      resources:
+        limits:
+          cpu: 4
+          memory: 1Gi
+    llmBridge:
+      replicaCount: 1
+    telemetry:
+      enabled: false
