@@ -7,6 +7,15 @@ metadata:
 spec:
   image: ghcr.io/dragonflydb/dragonfly:v1.40.2
   replicas: ${DRAGONFLY_REPLICAS:=1}
+  snapshot:
+    cron: ${DRAGONFLY_SNAPSHOT_CRON:="*/5 * * * *"}
+    persistentVolumeClaimSpec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: ${DRAGONFLY_SNAPSHOT_CAPACITY:=512Mi}
+      storageClassName: ${DRAGONFLY_SNAPSHOT_STORAGECLASS:=miroir-local}
   env:
     - name: MAX_MEMORY
       valueFrom:
