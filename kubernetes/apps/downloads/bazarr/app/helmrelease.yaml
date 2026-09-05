@@ -24,11 +24,15 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/home-operations/bazarr
-              tag: 1.6.0
-            envFrom:
-              - secretRef:
-                  name: bazarr-secret
+              repository: ghcr.io/lavx/bazarr
+              tag: 2.6.1
+            command:
+              - python
+            args:
+              - docker/supervisor.py
+              - --no-update
+              - --config
+              - /config
             probes:
               liveness:
                 enabled: true
