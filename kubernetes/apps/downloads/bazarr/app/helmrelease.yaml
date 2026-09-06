@@ -76,6 +76,11 @@ spec:
         server: gladius.bjw-s.internal
         globalMounts:
           - path: /data/nas-media
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+            subPath: tmp
     route:
       app:
         hostnames:
