@@ -13,8 +13,18 @@ spec:
       accessModes:
         - ReadWriteOnce
       resources:
+        # Sized for a single snapshot set plus headroom, not for history: with
+        # the default fixed --dbfilename below, each snapshot overwrites the
+        # previous one, so usage stays flat at roughly the dataset size (~1Mi
+        # for these caches).
+        #
+        # If DRAGONFLY_SNAPSHOT_DBFILENAME is overridden with a {timestamp}
+        # macro, every run instead writes a NEW set that Dragonfly never
+        # prunes. Capacity then bounds retention and the volume will fill --
+        # at the default */5 cron that is 288 sets/day. Size for the intended
+        # retention window and add a pruner before doing that.
         requests:
-          storage: ${DRAGONFLY_SNAPSHOT_CAPACITY:=512Mi}
+          storage: ${DRAGONFLY_SNAPSHOT_CAPACITY:=128Mi}
       storageClassName: ${DRAGONFLY_SNAPSHOT_STORAGECLASS:=miroir-local}
   env:
     - name: MAX_MEMORY
@@ -23,6 +33,7 @@ spec:
           resource: limits.memory
           divisor: 1Mi
   args:
+    - --dbfilename=${DRAGONFLY_SNAPSHOT_DBFILENAME:=dump}
     - --maxmemory=$(MAX_MEMORY)Mi
     - --proactor_threads=2
     - --cluster_mode=emulated
