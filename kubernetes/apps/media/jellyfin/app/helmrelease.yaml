@@ -23,6 +23,8 @@ spec:
             runAsGroup: 2000
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"
+          # jellyfin/jellyfin#17831: default 30s can SIGKILL the shutdown VACUUM+ANALYZE on v12
+          terminationGracePeriodSeconds: 120
         containers:
           app:
             image:
@@ -61,7 +63,16 @@ spec:
                   timeoutSeconds: 1
                   failureThreshold: 3
               startup:
-                enabled: false
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  # covers the v12 first-boot DB migration + full library scan,
+                  # which upstream documents as 30+ min on a real library
+                  periodSeconds: 30
+                  failureThreshold: 80
             resources:
               claims:
                 - name: gpu
