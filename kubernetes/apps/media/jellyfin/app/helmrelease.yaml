@@ -47,10 +47,9 @@ spec:
                   httpGet:
                     path: /health
                     port: &port 8096
-                  initialDelaySeconds: 0
-                  periodSeconds: 10
-                  timeoutSeconds: 1
-                  failureThreshold: 3
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 5
               readiness:
                 enabled: true
                 custom: true
@@ -58,10 +57,9 @@ spec:
                   httpGet:
                     path: /health
                     port: *port
-                  initialDelaySeconds: 0
-                  periodSeconds: 10
-                  timeoutSeconds: 1
-                  failureThreshold: 3
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 5
               startup:
                 enabled: true
                 custom: true
@@ -69,10 +67,8 @@ spec:
                   httpGet:
                     path: /health
                     port: *port
-                  # covers the v12 first-boot DB migration + full library scan,
-                  # which upstream documents as 30+ min on a real library
-                  periodSeconds: 30
-                  failureThreshold: 80
+                  periodSeconds: 10
+                  failureThreshold: 30
             resources:
               claims:
                 - name: gpu
