@@ -34,11 +34,11 @@ jobs:
             .forgejo/workflows/*.yml
 
       - name: Run actionlint
-        if: steps.changed-files.outputs.changed_files != '[]'
+        if: steps.changed-files.outputs.changed_files && steps.changed-files.outputs.changed_files != '[]'
         uses: https://github.com/bjw-s-labs/action-actionlint@b346813e82708106544f48a93a5b3fbeeb8e37eb # v0.1.1
         with:
           actionlint_config: .forgejo/actionlint.yaml
-          file_pattern: ${{ join(fromJSON(steps.changed-files.outputs.changed_files), ' ') }}
+          file_pattern: ${{ join(fromJSON(steps.changed-files.outputs.changed_files || '[]'), ' ') }}
 
   yamllint:
     name: yamllint
@@ -58,14 +58,17 @@ jobs:
             **/*.yml
 
       - name: Install yamllint
-        if: steps.changed-files.outputs.changed_files != '[]'
+        if: steps.changed-files.outputs.changed_files && steps.changed-files.outputs.changed_files != '[]'
         shell: bash
         run: |
           pipx install yamllint
           yamllint --version
 
       - name: Run yamllint
-        if: steps.changed-files.outputs.changed_files != '[]'
+        if: steps.changed-files.outputs.changed_files && steps.changed-files.outputs.changed_files != '[]'
         shell: bash
-        run: |-
-          yamllint --config-file .yamllint.yaml --format github ${{ join(fromJSON(steps.changed-files.outputs.changed_files), ' ') }}
+        run: >-
+          yamllint
+          --config-file .yamllint.yaml
+          --format github
+          ${{ join(fromJSON(steps.changed-files.outputs.changed_files || '[]'), ' ') }}
