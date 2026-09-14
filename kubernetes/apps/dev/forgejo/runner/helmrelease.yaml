@@ -14,8 +14,8 @@ spec:
       url: http://forgejo-http.dev.svc.cluster.local:3000
       existingSecret: forgejo-runner-secret
     image:
-      repository: registry.erwanleboucher.dev/eleboucher/runner
-      tag: 12.13.0
+      repository: data.forgejo.org/forgejo/runner
+      tag: 13.1.0
     plugin:
       image:
         repository: registry.erwanleboucher.dev/eleboucher/runner-k8s-plugin
@@ -53,10 +53,10 @@ spec:
       runner:
         capacity: 4
         labels:
-          - ubuntu-latest:k8s:/config/podspec-default.yaml
-          - ubuntu-24.04:k8spod:/config/podspec-default.yaml
-          - default:k8s:/config/podspec-default.yaml
-          - docker:k8s:/config/podspec-dind.yaml
+          - ubuntu-latest:k8s:///config/podspec-default.yaml
+          - ubuntu-24.04:k8s:///config/podspec-default.yaml
+          - default:k8s:///config/podspec-default.yaml
+          - docker:k8s:///config/podspec-dind.yaml
         timeout: 3h
         shutdown_timeout: 3m
     podSpecs:
