@@ -14,6 +14,14 @@ spec:
     - name: RENOVATE_ALLOWED_COMMANDS
       value: |-
         ["pnpm run bundle"]
+    - name: RENOVATE_HOST_RULES
+      value: >-
+        [
+          {
+            "matchHost": "https://git.bjw-s.dev",
+            "allowInternal": true
+          }
+        ]
   image: ghcr.io/renovatebot/renovate:44.83.1
   parallelism: 5
   provider:
