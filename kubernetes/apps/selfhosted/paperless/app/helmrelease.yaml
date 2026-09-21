@@ -10,6 +10,50 @@ spec:
     name: paperless
   interval: 30m
   values:
+    externalSecrets:
+      paperless:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        target:
+          template:
+            data:
+              PAPERLESS_ADMIN_USER: "{{ .paperless_admin_username }}"
+              PAPERLESS_ADMIN_PASSWORD: "{{ .paperless_admin_password }}"
+              PAPERLESS_SECRET_KEY: "{{ .paperless_config_secret_key }}"
+        dataFrom:
+          - extract:
+              key: Paperless
+            rewrite:
+              - regexp:
+                  source: "(.*)"
+                  target: "paperless_$1"
+    networkpolicies:
+      paperless:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: paperless
+            app.kubernetes.io/instance: paperless
+            app.kubernetes.io/controller: paperless
+        egress:
+          - toEndpoints:
+              - matchLabels:
+                  k8s:app: paperless-dragonfly
+            toPorts:
+              - ports:
+                  - port: "6379"
+                    protocol: TCP
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+            toPorts:
+              - ports:
+                  - port: "8000"
+                    protocol: TCP
     controllers:
       paperless:
         annotations:
@@ -28,7 +72,7 @@ spec:
               PAPERLESS_SECRET_KEY:
                 valueFrom:
                   secretKeyRef:
-                    name: paperless-secret
+                    name: "{{ .Release.Name }}"
                     key: PAPERLESS_SECRET_KEY
               PAPERLESS_URL: https://paperless.bjw-s.dev
               PAPERLESS_PORT: "8000"
@@ -55,12 +99,12 @@ spec:
               PAPERLESS_ADMIN_USER:
                 valueFrom:
                   secretKeyRef:
-                    name: paperless-secret
+                    name: "{{ .Release.Name }}"
                     key: PAPERLESS_ADMIN_USER
               PAPERLESS_ADMIN_PASSWORD:
                 valueFrom:
                   secretKeyRef:
-                    name: paperless-secret
+                    name: "{{ .Release.Name }}"
                     key: PAPERLESS_ADMIN_PASSWORD
             probes:
               liveness:

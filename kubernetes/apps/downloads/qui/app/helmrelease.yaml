@@ -10,6 +10,23 @@ spec:
     name: qui
   interval: 30m
   values:
+    externalSecrets:
+      qui:
+        refreshInterval: 5m
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        target:
+          template:
+            data:
+              QUI__SESSION_SECRET: "{{ .qui_session_secret }}"
+        dataFrom:
+          - extract:
+              key: qui
+            rewrite:
+              - regexp:
+                  source: "(.*)"
+                  target: "qui_$1"
     controllers:
       qui:
         annotations:
@@ -30,8 +47,8 @@ spec:
               QUI__HOST: 0.0.0.0
               QUI__PORT: &port 8080
             envFrom:
-              - secretRef:
-                  name: "{{ .Release.Name }}-secret"
+              - externalSecretRef:
+                  identifier: qui
             probes:
               liveness:
                 enabled: true

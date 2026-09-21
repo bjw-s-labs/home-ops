@@ -10,6 +10,21 @@ spec:
     name: recyclarr
   interval: 30m
   values:
+    externalSecrets:
+      recyclarr:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        data:
+          - secretKey: RADARR_API_KEY
+            remoteRef:
+              key: radarr
+              property: api_key
+          - secretKey: SONARR_API_KEY
+            remoteRef:
+              key: sonarr
+              property: api_key
     controllers:
       recyclarr:
         type: cronjob
@@ -36,8 +51,8 @@ spec:
             env:
               RECYCLARR_DATA_DIR: /tmp
             envFrom:
-              - secretRef:
-                  name: recyclarr-secret
+              - externalSecretRef:
+                  identifier: recyclarr
             resources:
               requests:
                 cpu: 5m

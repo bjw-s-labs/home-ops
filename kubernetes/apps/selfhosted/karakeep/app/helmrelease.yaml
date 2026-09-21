@@ -10,6 +10,97 @@ spec:
     name: karakeep
   interval: 30m
   values:
+    externalSecrets:
+      karakeep:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        target:
+          template:
+            data:
+              encryption_key: "{{ .karakeep_encryption_key }}"
+              meilisearch_master_key: "{{ .karakeep_meilisearch_master_key }}"
+        dataFrom:
+          - extract:
+              key: karakeep
+            rewrite:
+              - regexp:
+                  source: "[^a-zA-Z0-9 -]"
+                  target: "_"
+              - regexp:
+                  source: "(.*)"
+                  target: "karakeep_$1"
+    networkpolicies:
+      karakeep:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: karakeep
+            app.kubernetes.io/instance: karakeep
+            app.kubernetes.io/controller: karakeep
+        egress:
+          - toEndpoints:
+              - matchLabels:
+                  k8s:app.kubernetes.io/name: karakeep
+                  k8s:app.kubernetes.io/instance: karakeep
+                  k8s:app.kubernetes.io/controller: chrome
+            toPorts:
+              - ports:
+                  - port: "9222"
+                    protocol: TCP
+          - toEndpoints:
+              - matchLabels:
+                  k8s:app.kubernetes.io/name: karakeep
+                  k8s:app.kubernetes.io/instance: karakeep
+                  k8s:app.kubernetes.io/controller: meilisearch
+            toPorts:
+              - ports:
+                  - port: "7700"
+                    protocol: TCP
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+            toPorts:
+              - ports:
+                  - port: "3000"
+                    protocol: TCP
+      chrome:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: karakeep
+            app.kubernetes.io/instance: karakeep
+            app.kubernetes.io/controller: chrome
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:app.kubernetes.io/name: karakeep
+                  k8s:app.kubernetes.io/instance: karakeep
+                  k8s:app.kubernetes.io/controller: karakeep
+            toPorts:
+              - ports:
+                  - port: "9222"
+                    protocol: TCP
+      meilisearch:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: karakeep
+            app.kubernetes.io/instance: karakeep
+            app.kubernetes.io/controller: meilisearch
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:app.kubernetes.io/name: karakeep
+                  k8s:app.kubernetes.io/instance: karakeep
+                  k8s:app.kubernetes.io/controller: karakeep
+            toPorts:
+              - ports:
+                  - port: "7700"
+                    protocol: TCP
     defaultPodOptions:
       securityContext:
         fsGroup: 1000
@@ -42,12 +133,12 @@ spec:
               MEILI_MASTER_KEY:
                 valueFrom:
                   secretKeyRef:
-                    name: karakeep-secret
+                    name: "{{ .Release.Name }}"
                     key: meilisearch_master_key
               NEXTAUTH_SECRET:
                 valueFrom:
                   secretKeyRef:
-                    name: karakeep-secret
+                    name: "{{ .Release.Name }}"
                     key: encryption_key
               NEXTAUTH_URL: https://karakeep.bjw-s.dev
               DISABLE_NEW_RELEASE_CHECK: true
@@ -129,7 +220,7 @@ spec:
               MEILI_MASTER_KEY:
                 valueFrom:
                   secretKeyRef:
-                    name: karakeep-secret
+                    name: "{{ .Release.Name }}"
                     key: meilisearch_master_key
             resources:
               requests:

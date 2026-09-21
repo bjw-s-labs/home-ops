@@ -10,6 +10,21 @@ spec:
     name: minimax-shim
   interval: 30m
   values:
+    externalSecrets:
+      minimax-shim:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        data:
+          - secretKey: MINIMAX_API_KEY
+            remoteRef:
+              key: MiniMax
+              property: subscription_key
+          - secretKey: SHIM_API_KEY
+            remoteRef:
+              key: minimax-shim
+              property: password
     controllers:
       minimax-shim:
         annotations:
@@ -36,12 +51,12 @@ spec:
               MINIMAX_API_KEY:
                 valueFrom:
                   secretKeyRef:
-                    name: minimax-shim-secret
+                    name: "{{ .Release.Name }}"
                     key: MINIMAX_API_KEY
               SHIM_API_KEY:
                 valueFrom:
                   secretKeyRef:
-                    name: minimax-shim-secret
+                    name: "{{ .Release.Name }}"
                     key: SHIM_API_KEY
             probes:
               liveness:

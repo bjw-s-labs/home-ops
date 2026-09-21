@@ -10,6 +10,17 @@ spec:
     name: towonel-agent
   interval: 30m
   values:
+    externalSecrets:
+      towonel-agent:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        data:
+          - secretKey: TOWONEL_INVITE_TOKEN
+            remoteRef:
+              key: towonel-tunnel
+              property: invite_token
     defaultPodOptions:
       automountServiceAccountToken: false
       securityContext:
@@ -52,7 +63,7 @@ spec:
               TOWONEL_INVITE_TOKEN:
                 valueFrom:
                   secretKeyRef:
-                    name: towonel-agent-secret
+                    name: '{{ .Release.Name }}'
                     key: TOWONEL_INVITE_TOKEN
             probes:
               liveness:

@@ -10,6 +10,39 @@ spec:
     name: wotcher
   interval: 30m
   values:
+    externalSecrets:
+      wotcher:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        target:
+          template:
+            data:
+              WOTCHER_GITHUB_TOKEN: "{{ .github_pat_wotcher }}"
+              WOTCHER_DISCORD_BOT_TOKEN: "{{ .wotcher_discord_bot_token }}"
+        dataFrom:
+          - extract:
+              key: Github
+            rewrite:
+              - regexp:
+                  source: "(.*)"
+                  target: "github_$1"
+          - extract:
+              key: wotcher
+            rewrite:
+              - regexp:
+                  source: "(.*)"
+                  target: "wotcher_$1"
+    networkpolicies:
+      wotcher:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: wotcher
+            app.kubernetes.io/instance: wotcher
+        ingress:
+          - {}
     controllers:
       wotcher:
         annotations:
@@ -29,8 +62,8 @@ spec:
               repository: ghcr.io/bjw-s-labs/wotcher
               tag: 0.0.4@sha256:1634e335238c27105f8804fa19dd0e4a2881491a0e1e326b50344dda919763c8
             envFrom:
-              - secretRef:
-                  name: wotcher-secret
+              - externalSecretRef:
+                  identifier: wotcher
             resources:
               requests:
                 cpu: 10m

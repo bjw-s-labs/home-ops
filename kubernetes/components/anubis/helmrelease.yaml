@@ -10,6 +10,27 @@ spec:
     name: ${APP}-anubis
   interval: 1h
   values:
+    externalSecrets:
+      key:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        target:
+          template:
+            data:
+              ED25519_PRIVATE_KEY_HEX: "{{ .anubis_ed25519_private_key_hex }}"
+        dataFrom:
+          - extract:
+              key: anubis
+            rewrite:
+              - regexp:
+                  source: "[^a-zA-Z0-9-]"
+                  target: "_"
+              - regexp:
+                  source: "(.*)"
+                  target: "anubis_$1"
+        suffix: key
     configMaps:
       policy:
         suffix: policy
@@ -38,7 +59,7 @@ spec:
               ED25519_PRIVATE_KEY_HEX:
                 valueFrom:
                   secretKeyRef:
-                    name: ${APP}-anubis-key-secret
+                    name: "{{ .Release.Name }}-key"
                     key: ED25519_PRIVATE_KEY_HEX
               METRICS_BIND: ":9090"
               OG_EXPIRY_TIME: "24h"

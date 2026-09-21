@@ -10,6 +10,22 @@ spec:
     name: dispatcharr
   interval: 30m
   values:
+    networkpolicies:
+      dispatcharr:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: dispatcharr
+            app.kubernetes.io/instance: dispatcharr
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+            toPorts:
+              - ports:
+                  - port: "9191"
+                    protocol: TCP
     controllers:
       dispatcharr:
         pod:

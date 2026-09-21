@@ -10,10 +10,52 @@ spec:
     name: manyfold
   interval: 30m
   values:
+    externalSecrets:
+      manyfold:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        target:
+          template:
+            data:
+              MANYFOLD_SECRET_KEY: "{{ .manyfold_config_secret_key }}"
+        dataFrom:
+          - extract:
+              key: manyfold
+            rewrite:
+              - regexp:
+                  source: "(.*)"
+                  target: "manyfold_$1"
+    networkpolicies:
+      manyfold:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: manyfold
+            app.kubernetes.io/instance: manyfold
+            app.kubernetes.io/controller: manyfold
+        egress:
+          - toEndpoints:
+              - matchLabels:
+                  k8s:app: manyfold-dragonfly
+            toPorts:
+              - ports:
+                  - port: "6379"
+                    protocol: TCP
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+            toPorts:
+              - ports:
+                  - port: "3214"
+                    protocol: TCP
     controllers:
       manyfold:
         annotations:
-          secret.reloader.stakater.com/reload: manyfold-secret
+          reloader.stakater.com/auto: "true"
         pod:
           labels:
             app.kubernetes.io/component: application
@@ -50,7 +92,7 @@ spec:
               SECRET_KEY_BASE:
                 valueFrom:
                   secretKeyRef:
-                    name: manyfold-secret
+                    name: "{{ .Release.Name }}"
                     key: MANYFOLD_SECRET_KEY
             probes:
               liveness:

@@ -10,6 +10,22 @@ spec:
     name: bambuddy
   interval: 30m
   values:
+    networkpolicies:
+      bambuddy:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: bambuddy
+            app.kubernetes.io/instance: bambuddy
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+            toPorts:
+              - ports:
+                  - port: "8000"
+                    protocol: TCP
     defaultPodOptions:
       securityContext:
         fsGroup: 2000

@@ -10,6 +10,50 @@ spec:
     name: searxng
   interval: 30m
   values:
+    externalSecrets:
+      searxng:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        target:
+          template:
+            data:
+              SEARXNG_SECRET: "{{ .searxng_secret_key }}"
+        dataFrom:
+          - extract:
+              key: searxng
+            rewrite:
+              - regexp:
+                  source: "(.*)"
+                  target: "searxng_$1"
+    networkpolicies:
+      searxng:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: searxng
+            app.kubernetes.io/instance: searxng
+        egress:
+          - toEndpoints:
+              - matchLabels:
+                  k8s:app: searxng-dragonfly
+            toPorts:
+              - ports:
+                  - port: "6379"
+                    protocol: TCP
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: ai
+                  app.kubernetes.io/name: open-webui
+            toPorts:
+              - ports:
+                  - port: "8080"
+                    protocol: TCP
     controllers:
       searxng:
         annotations:
@@ -32,8 +76,8 @@ spec:
               SEARXNG_PORT: &httpPort 8080
               SEARXNG_VALKEY_URL: "redis://searxng-dragonfly:6379"
             envFrom:
-              - secretRef:
-                  name: searxng-secret
+              - externalSecretRef:
+                  identifier: searxng
             probes:
               liveness:
                 enabled: true

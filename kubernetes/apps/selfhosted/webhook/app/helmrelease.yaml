@@ -10,6 +10,46 @@ spec:
     name: webhook
   interval: 30m
   values:
+    externalSecrets:
+      webhook:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        target:
+          template:
+            data:
+              APPRISE_RADARR_PUSHOVER_URL: pover://{{ .pushover_userkey_bernd }}@{{ .pushover_radarr_token }}
+              APPRISE_SONARR_PUSHOVER_URL: pover://{{ .pushover_userkey_bernd }}@{{ .pushover_sonarr_token }}
+        dataFrom:
+          - extract:
+              key: Pushover
+            rewrite:
+              - regexp:
+                  source: "(.*)"
+                  target: "pushover_$1"
+    networkpolicies:
+      webhook:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: webhook
+            app.kubernetes.io/instance: webhook
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-external
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: downloads
+                  k8s:app.kubernetes.io/name: radarr
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: downloads
+                  k8s:app.kubernetes.io/name: sonarr
+            toPorts:
+              - ports:
+                  - port: "8080"
+                    protocol: TCP
     controllers:
       webhook:
         replicas: 1
@@ -33,8 +73,8 @@ spec:
             env:
               WEBHOOK__PORT: &port 8080
             envFrom:
-              - secretRef:
-                  name: webhook-secret
+              - externalSecretRef:
+                  identifier: webhook
             probes:
               liveness:
                 enabled: true

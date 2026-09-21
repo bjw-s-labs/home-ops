@@ -10,10 +10,50 @@ spec:
     name: bookboss
   interval: 30m
   values:
+    externalSecrets:
+      bookboss:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        target:
+          template:
+            data:
+              BOOKBOSS__ENCRYPTION_SECRET: "{{ .bookboss_encryption_secret }}"
+              BOOKBOSS__METADATA__HARDCOVER_API_TOKEN: "{{ .hardcover_api_token }}"
+        dataFrom:
+          - extract:
+              key: bookboss
+            rewrite:
+              - regexp:
+                  source: "(.*)"
+                  target: "bookboss_$1"
+          - extract:
+              key: Hardcover
+            rewrite:
+              - regexp:
+                  source: "(.*)"
+                  target: "hardcover_$1"
+    networkpolicies:
+      bookboss:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: bookboss
+            app.kubernetes.io/instance: bookboss
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+            toPorts:
+              - ports:
+                  - port: "8080"
+                    protocol: TCP
     controllers:
       bookboss:
         annotations:
-          secret.reloader.stakater.com/reload: bookboss-secret
+          reloader.stakater.com/auto: "true"
         pod:
           labels:
             egress.policy.home.arpa/internet: "true"
@@ -37,8 +77,8 @@ spec:
               BOOKBOSS__IMPORT__POLL_INTERVAL_SECS: 60
               BOOKBOSS__IMPORT__WORKER_POLL_INTERVAL_SECS: 5
             envFrom:
-              - secretRef:
-                  name: bookboss-secret
+              - externalSecretRef:
+                  identifier: bookboss
             probes:
               liveness:
                 enabled: true

@@ -10,6 +10,49 @@ spec:
     name: bonob
   interval: 30m
   values:
+    externalSecrets:
+      bonob:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        target:
+          template:
+            data:
+              BNB_SECRET: "{{ .bonob_encrypt_key }}"
+        dataFrom:
+          - extract:
+              key: bonob
+            rewrite:
+              - regexp:
+                  source: "(.*)"
+                  target: "bonob_$1"
+    networkpolicies:
+      bonob:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: bonob
+            app.kubernetes.io/instance: bonob
+        egress:
+          - toEndpoints:
+              - matchLabels:
+                  k8s:app.kubernetes.io/controller: navidrome
+                  k8s:app.kubernetes.io/instance: navidrome
+                  k8s:app.kubernetes.io/name: navidrome
+            toPorts:
+              - ports:
+                  - port: "4533"
+                    protocol: TCP
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-external
+            toPorts:
+              - ports:
+                  - port: "4534"
+                    protocol: TCP
     controllers:
       bonob:
         pod:
@@ -32,8 +75,8 @@ spec:
               BNB_URL: https://bonob.bjw-s.dev
               BNB_LOGIN_THEME: navidrome-ish
             envFrom:
-              - secretRef:
-                  name: bonob-secret
+              - externalSecretRef:
+                  identifier: bonob
             probes:
               liveness:
                 enabled: true

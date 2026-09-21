@@ -10,10 +10,73 @@ spec:
     name: autobrr
   interval: 30m
   values:
+    externalSecrets:
+      autobrr:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        data:
+          - secretKey: AUTOBRR__SESSION_SECRET
+            remoteRef:
+              key: autobrr
+              property: session_secret
+    networkpolicies:
+      autobrr:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: autobrr
+            app.kubernetes.io/instance: autobrr
+        egress:
+          - toEndpoints:
+              - matchLabels:
+                  k8s:app.kubernetes.io/controller: prowlarr
+                  k8s:app.kubernetes.io/instance: prowlarr
+                  k8s:app.kubernetes.io/name: prowlarr
+            toPorts:
+              - ports:
+                  - port: "9696"
+                    protocol: TCP
+          - toEndpoints:
+              - matchLabels:
+                  k8s:app.kubernetes.io/controller: radarr
+                  k8s:app.kubernetes.io/instance: radarr
+                  k8s:app.kubernetes.io/name: radarr
+            toPorts:
+              - ports:
+                  - port: "7878"
+                    protocol: TCP
+          - toEndpoints:
+              - matchLabels:
+                  k8s:app.kubernetes.io/instance: qui
+                  k8s:app.kubernetes.io/name: qui
+            toPorts:
+              - ports:
+                  - port: "8080"
+                    protocol: TCP
+          - toEndpoints:
+              - matchLabels:
+                  k8s:app.kubernetes.io/controller: sonarr
+                  k8s:app.kubernetes.io/instance: sonarr
+                  k8s:app.kubernetes.io/name: sonarr
+            toPorts:
+              - ports:
+                  - port: "8989"
+                    protocol: TCP
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+            toPorts:
+              - ports:
+                  - port: "7474"
+                    protocol: TCP
     controllers:
       autobrr:
         annotations:
-          secret.reloader.stakater.com/reload: autobrr-secret
+          reloader.stakater.com/auto: "true"
         pod:
           securityContext:
             fsGroup: 2000
@@ -32,8 +95,8 @@ spec:
               AUTOBRR__LOG_LEVEL: DEBUG
               AUTOBRR__PORT: &port 7474
             envFrom:
-              - secretRef:
-                  name: autobrr-secret
+              - externalSecretRef:
+                  identifier: autobrr
             probes:
               liveness:
                 enabled: true

@@ -10,6 +10,17 @@ spec:
     name: sonarr
   interval: 30m
   values:
+    externalSecrets:
+      sonarr:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        data:
+          - secretKey: api_key
+            remoteRef:
+              key: sonarr
+              property: api_key
     controllers:
       sonarr:
         annotations:
@@ -31,7 +42,7 @@ spec:
               SONARR__AUTH__APIKEY:
                 valueFrom:
                   secretKeyRef:
-                    name: sonarr-secret
+                    name: "{{ .Release.Name }}"
                     key: api_key
               SONARR__AUTH__METHOD: External
               SONARR__AUTH__REQUIRED: Enabled

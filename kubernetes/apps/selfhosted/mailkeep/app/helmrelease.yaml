@@ -10,10 +10,43 @@ spec:
     name: mailkeep
   interval: 30m
   values:
+    externalSecrets:
+      mailkeep:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        target:
+          template:
+            data:
+              MAILKEEP__ENCRYPTION_SECRET: "{{ .mailkeep_encryption_secret }}"
+        dataFrom:
+          - extract:
+              key: mailkeep
+            rewrite:
+              - regexp:
+                  source: "(.*)"
+                  target: "mailkeep_$1"
+    networkpolicies:
+      mailkeep:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: mailkeep
+            app.kubernetes.io/instance: mailkeep
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+            toPorts:
+              - ports:
+                  - port: "8080"
+                    protocol: TCP
     controllers:
       mailkeep:
         annotations:
-          secret.reloader.stakater.com/reload: mailkeep-secret
+          reloader.stakater.com/auto: "true"
         pod:
           labels:
             egress.policy.home.arpa/internet: "true"
@@ -35,8 +68,8 @@ spec:
               RUST_LOG: INFO
               TZ: Europe/Amsterdam
             envFrom:
-              - secretRef:
-                  name: mailkeep-secret
+              - externalSecretRef:
+                  identifier: mailkeep
             probes:
               liveness:
                 enabled: true

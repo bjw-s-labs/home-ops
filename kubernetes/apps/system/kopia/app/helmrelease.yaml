@@ -10,6 +10,17 @@ spec:
     name: kopia
   interval: 30m
   values:
+    externalSecrets:
+      kopia:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        data:
+          - secretKey: KOPIA_PASSWORD
+            remoteRef:
+              key: kopiur
+              property: KOPIA_PASSWORD
     configMaps:
       config:
         data:
@@ -44,8 +55,8 @@ spec:
               KOPIA_WEB_ENABLED: true
               KOPIA_WEB_PORT: &port 8080
             envFrom:
-              - secretRef:
-                  name: kopia-secret
+              - externalSecretRef:
+                  identifier: kopia
             args:
               - --refresh-interval=5m
               - --without-password

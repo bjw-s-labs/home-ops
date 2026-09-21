@@ -10,6 +10,40 @@ spec:
     name: jellyfin
   interval: 30m
   values:
+    networkpolicies:
+      jellyfin:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: jellyfin
+            app.kubernetes.io/instance: jellyfin
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: media
+                  app.kubernetes.io/name: mumc
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: downloads
+                  app.kubernetes.io/name: bazarr
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: downloads
+                  app.kubernetes.io/name: sonarr
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: downloads
+                  app.kubernetes.io/name: radarr
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: media
+                  app.kubernetes.io/name: jellyplex-watched
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: media
+                  app.kubernetes.io/name: maintainerr
+            toPorts:
+              - ports:
+                  - port: "8096"
+                    protocol: TCP
     controllers:
       jellyfin:
         pod:

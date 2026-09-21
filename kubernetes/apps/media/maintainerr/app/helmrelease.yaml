@@ -10,6 +10,52 @@ spec:
     name: maintainerr
   interval: 30m
   values:
+    networkpolicies:
+      maintainerr:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: maintainerr
+            app.kubernetes.io/instance: maintainerr
+        egress:
+          - toEndpoints:
+              - matchLabels:
+                  k8s:app.kubernetes.io/controller: jellyfin
+                  k8s:app.kubernetes.io/instance: jellyfin
+                  k8s:app.kubernetes.io/name: jellyfin
+            toPorts:
+              - ports:
+                  - port: "8096"
+                    protocol: TCP
+          - toEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: downloads
+                  k8s:app.kubernetes.io/controller: radarr
+                  k8s:app.kubernetes.io/instance: radarr
+                  k8s:app.kubernetes.io/name: radarr
+            toPorts:
+              - ports:
+                  - port: "7878"
+                    protocol: TCP
+          - toEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: downloads
+                  k8s:app.kubernetes.io/controller: sonarr
+                  k8s:app.kubernetes.io/instance: sonarr
+                  k8s:app.kubernetes.io/name: sonarr
+            toPorts:
+              - ports:
+                  - port: "8989"
+                    protocol: TCP
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+            toPorts:
+              - ports:
+                  - port: "6246"
+                    protocol: TCP
     controllers:
       maintainerr:
         pod:

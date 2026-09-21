@@ -10,6 +10,17 @@ spec:
     name: prowlarr
   interval: 30m
   values:
+    externalSecrets:
+      prowlarr:
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: onepassword-connect
+        data:
+          - secretKey: api_key
+            remoteRef:
+              key: prowlarr
+              property: api_key
     controllers:
       prowlarr:
         annotations:
@@ -31,7 +42,7 @@ spec:
               PROWLARR__AUTH__APIKEY:
                 valueFrom:
                   secretKeyRef:
-                    name: prowlarr-secret
+                    name: "{{ .Release.Name }}"
                     key: api_key
               PROWLARR__AUTH__METHOD: External
               PROWLARR__AUTH__REQUIRED: Enabled

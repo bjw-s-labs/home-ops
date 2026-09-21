@@ -10,6 +10,25 @@ spec:
     name: navidrome
   interval: 30m
   values:
+    networkpolicies:
+      navidrome:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/name: navidrome
+            app.kubernetes.io/instance: navidrome
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: media
+                  app.kubernetes.io/name: bonob
+            toPorts:
+              - ports:
+                  - port: "4533"
+                    protocol: TCP
     controllers:
       navidrome:
         pod:
