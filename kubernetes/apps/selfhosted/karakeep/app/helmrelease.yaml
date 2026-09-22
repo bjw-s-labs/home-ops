@@ -34,11 +34,7 @@ spec:
     networkpolicies:
       karakeep:
         type: cilium
-        endpointSelector:
-          matchLabels:
-            app.kubernetes.io/name: karakeep
-            app.kubernetes.io/instance: karakeep
-            app.kubernetes.io/controller: karakeep
+        controller: karakeep
         egress:
           - toEndpoints:
               - matchLabels:
@@ -69,11 +65,7 @@ spec:
                     protocol: TCP
       chrome:
         type: cilium
-        endpointSelector:
-          matchLabels:
-            app.kubernetes.io/name: karakeep
-            app.kubernetes.io/instance: karakeep
-            app.kubernetes.io/controller: chrome
+        controller: chrome
         ingress:
           - fromEndpoints:
               - matchLabels:
@@ -86,11 +78,7 @@ spec:
                     protocol: TCP
       meilisearch:
         type: cilium
-        endpointSelector:
-          matchLabels:
-            app.kubernetes.io/name: karakeep
-            app.kubernetes.io/instance: karakeep
-            app.kubernetes.io/controller: meilisearch
+        controller: meilisearch
         ingress:
           - fromEndpoints:
               - matchLabels:

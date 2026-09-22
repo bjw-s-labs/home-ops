@@ -32,11 +32,6 @@ spec:
     networkpolicies:
       paperless:
         type: cilium
-        endpointSelector:
-          matchLabels:
-            app.kubernetes.io/name: paperless
-            app.kubernetes.io/instance: paperless
-            app.kubernetes.io/controller: paperless
         egress:
           - toEndpoints:
               - matchLabels:

@@ -13,10 +13,6 @@ spec:
     networkpolicies:
       jellyfin:
         type: cilium
-        endpointSelector:
-          matchLabels:
-            app.kubernetes.io/name: jellyfin
-            app.kubernetes.io/instance: jellyfin
         ingress:
           - fromEndpoints:
               - matchLabels:

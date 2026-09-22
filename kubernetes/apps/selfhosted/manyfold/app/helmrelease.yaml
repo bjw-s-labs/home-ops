@@ -30,11 +30,6 @@ spec:
     networkpolicies:
       manyfold:
         type: cilium
-        endpointSelector:
-          matchLabels:
-            app.kubernetes.io/name: manyfold
-            app.kubernetes.io/instance: manyfold
-            app.kubernetes.io/controller: manyfold
         egress:
           - toEndpoints:
               - matchLabels:

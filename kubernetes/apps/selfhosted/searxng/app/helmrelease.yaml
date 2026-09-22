@@ -30,10 +30,6 @@ spec:
     networkpolicies:
       searxng:
         type: cilium
-        endpointSelector:
-          matchLabels:
-            app.kubernetes.io/name: searxng
-            app.kubernetes.io/instance: searxng
         egress:
           - toEndpoints:
               - matchLabels:

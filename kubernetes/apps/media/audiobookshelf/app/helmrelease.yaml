@@ -13,10 +13,6 @@ spec:
     networkpolicies:
       audiobookshelf:
         type: cilium
-        endpointSelector:
-          matchLabels:
-            app.kubernetes.io/name: audiobookshelf
-            app.kubernetes.io/instance: audiobookshelf
         ingress:
           - fromEndpoints:
               - matchLabels:
