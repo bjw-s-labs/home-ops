@@ -14,9 +14,13 @@ spec:
     - name: envoy-external
       namespace: network
       sectionName: http
+    - name: envoy-external
+      namespace: network
+      sectionName: http-proxy
   rules:
     - filters:
         - type: RequestRedirect
           requestRedirect:
             scheme: https
+            port: 443
             statusCode: 301

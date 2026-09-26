@@ -1,0 +1,29 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.envoyproxy.io/clienttrafficpolicy_v1alpha1.json
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: ClientTrafficPolicy
+metadata:
+  name: envoy-external-https-proxy
+spec:
+  headers:
+    earlyRequestHeaders:
+      remove:
+        - x-forwarded-for
+  http2:
+    onInvalidMessage: TerminateStream
+  proxyProtocol:
+    optional: false
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: envoy-external
+      sectionName: https-proxy
+  tcpKeepalive: {}
+  timeout:
+    http:
+      idleTimeout: 60s
+  tls:
+    alpnProtocols:
+      - h2
+      - http/1.1
+    minVersion: "1.2"

@@ -1,0 +1,14 @@
+[Unit]
+Description=Fail-closed public edge WireGuard forwarding boundary and narrow SNAT
+After=firewalld.service
+Before=wg-quick@wg-public-edge.service
+Wants=firewalld.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/nft -f /etc/nftables/public-edge.nft
+ExecReload=/usr/sbin/nft -f /etc/nftables/public-edge.nft
+
+[Install]
+WantedBy=multi-user.target

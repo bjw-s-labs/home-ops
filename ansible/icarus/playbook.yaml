@@ -4,6 +4,7 @@
   become: true
   gather_facts: false
   vars:
+    ansible_port: 22222
     ansible_user: ubuntu
     ansible_python_interpreter: auto_silent
     host_ssh_port: 22222
@@ -66,6 +67,12 @@
             state: present
             update_cache: false
 
+        - name: packages | Install WireGuard
+          ansible.builtin.apt:
+            name: wireguard-tools
+            state: present
+            update_cache: false
+
     - name: ssh
       tags:
         - ssh
@@ -110,8 +117,8 @@
               port: 80
             - name: HTTPS
               port: 443
-            - name: towonel-iroh
-              port: 51820
+            - name: public-edge-wireguard
+              port: 51821
               protocol: udp
 
         - name: firewall | Enable UFW
@@ -129,19 +136,51 @@
             driver: bridge
             state: present
 
-    - name: towonel
+    - name: wireguard
       tags:
-        - towonel
-      vars:
-        towonel_config_dir: /opt/towonel
+        - wireguard
       block:
-        - name: towonel | Create directory
+        - name: wireguard | Read keys from 1Password
+          ansible.builtin.shell: "op read 'op://{{ item.key }}' < /dev/null"
+          delegate_to: localhost
+          become: false
+          loop:
+            - key: Infrastructure/Icarus - Wireguard - Server/private_key
+            - key: Infrastructure/Icarus - Wireguard - Janus/public_key
+          check_mode: false
+          changed_when: false
+          no_log: true
+          register: wg_keys_raw
+
+        - name: wireguard | Set key facts
+          ansible.builtin.set_fact:
+            wg_icarus_private_key: "{{ wg_keys_raw.results[0].stdout }}"
+            wg_janus_public_key: "{{ wg_keys_raw.results[1].stdout }}"
+          no_log: true
+
+        - name: wireguard | Create configuration directory
           ansible.builtin.file:
-            path: "{{ towonel_config_dir }}"
+            path: /etc/wireguard
             state: directory
-            owner: 10001
-            group: 10001
-            mode: "0755"
+            owner: root
+            group: root
+            mode: "0700"
+
+        - name: wireguard | Render interface
+          ansible.builtin.template:
+            src: wg-public-edge.conf.j2
+            dest: /etc/wireguard/wg-public-edge.conf
+            owner: root
+            group: root
+            mode: "0600"
+          no_log: true
+          notify: Restart WireGuard
+
+        - name: wireguard | Enable and start interface
+          ansible.builtin.systemd:
+            name: wg-quick@wg-public-edge.service
+            enabled: true
+            state: started
 
     - name: doco-cd
       tags:
@@ -242,11 +281,21 @@
             mode: "0644"
 
         - name: crowdsec | Add apt repository
-          ansible.builtin.apt_repository:
-            repo: "deb [signed-by=/etc/apt/keyrings/crowdsec.asc] https://packagecloud.io/crowdsec/crowdsec/any any main"
-            filename: crowdsec
+          ansible.builtin.deb822_repository:
+            name: crowdsec
+            types: deb
+            uris: https://packagecloud.io/crowdsec/crowdsec/any
+            suites: any
+            components: main
+            signed_by: /etc/apt/keyrings/crowdsec.asc
             state: present
+          register: crowdsec_repository
+
+        - name: crowdsec | Update apt cache after repository changes
+          ansible.builtin.apt:
             update_cache: true
+          when: crowdsec_repository.changed
+          changed_when: false
 
         - name: crowdsec | Install host firewall bouncer
           ansible.builtin.apt:
@@ -337,4 +386,9 @@
     - name: Restart crowdsec-firewall-bouncer
       ansible.builtin.service:
         name: crowdsec-firewall-bouncer
+        state: restarted
+
+    - name: Restart WireGuard
+      ansible.builtin.systemd:
+        name: wg-quick@wg-public-edge.service
         state: restarted

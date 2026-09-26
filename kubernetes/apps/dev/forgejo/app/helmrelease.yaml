@@ -59,6 +59,7 @@ spec:
           SSH_DOMAIN: git.bjw-s.dev
           SSH_PORT: &sshPort 22
           SSH_SERVER_HOST_KEYS: ssh/ssh_host_ed25519_key
+          SSH_SERVER_USE_PROXY_PROTOCOL: true
         service:
           ALLOW_ONLY_EXTERNAL_REGISTRATION: true
           DEFAULT_ENABLE_TIMETRACKING: false
@@ -119,3 +120,6 @@ spec:
         - name: envoy-external
           namespace: network
           sectionName: ssh
+        - name: envoy-external
+          namespace: network
+          sectionName: ssh-proxy

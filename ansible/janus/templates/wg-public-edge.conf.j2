@@ -1,0 +1,10 @@
+# Private key and peer public key are read from 1Password by Ansible.
+[Interface]
+Address = 10.254.41.2/30
+PrivateKey = {{ wg_janus_private_key }}
+
+[Peer]
+PublicKey = {{ wg_icarus_public_key }}
+AllowedIPs = 10.254.41.1/32
+Endpoint = 135.125.53.129:51821
+PersistentKeepalive = 25

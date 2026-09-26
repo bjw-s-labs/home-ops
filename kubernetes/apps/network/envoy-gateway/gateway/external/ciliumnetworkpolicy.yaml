@@ -1,0 +1,42 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: envoy-external-ingress
+spec:
+  endpointSelector:
+    matchLabels:
+      gateway.networking.k8s.io/gateway-name: envoy-external
+  ingress:
+    # Existing direct listeners, health checks, and metrics retain their normal reachability.
+    - fromEntities:
+        - all
+      toPorts:
+        - ports:
+            - port: "10022"
+              protocol: TCP
+            - port: "10080"
+              protocol: TCP
+            - port: "10443"
+              protocol: TCP
+            - port: "10443"
+              protocol: UDP
+            - port: "19001"
+              protocol: TCP
+            - port: "19002"
+              protocol: TCP
+            - port: "19003"
+              protocol: TCP
+    # These unprivileged Gateway ports remain :8022/:8080/:8443 on the dataplane.
+    # Match the real TCP source before Envoy reads any PROXY v2 metadata.
+    - fromCIDR:
+        - 10.1.1.41/32
+      toPorts:
+        - ports:
+            - port: "8022"
+              protocol: TCP
+            - port: "8080"
+              protocol: TCP
+            - port: "8443"
+              protocol: TCP

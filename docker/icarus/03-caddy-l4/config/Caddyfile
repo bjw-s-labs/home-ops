@@ -13,11 +13,10 @@
 					upstream 127.0.0.1:8443
 				}
 			}
-			@tls tls
-			route @tls {
+			route {
 				proxy {
 					proxy_protocol v2
-					upstream towonel-hub:4443
+					upstream 10.1.6.41:8443
 				}
 			}
 		}
@@ -27,6 +26,20 @@
 				proxy {
 					proxy_protocol v2
 					upstream 127.0.0.1:8080
+				}
+			}
+			route {
+				proxy {
+					proxy_protocol v2
+					upstream 10.1.6.41:8080
+				}
+			}
+		}
+		:22 {
+			route {
+				proxy {
+					proxy_protocol v2
+					upstream 10.1.6.41:8022
 				}
 			}
 		}
@@ -54,11 +67,6 @@
 		output stdout
 		format json
 	}
-}
-
-twnl.bjw-s.dev {
-  log
-	reverse_proxy towonel-hub:8443
 }
 
 icarus-doco-cd.bjw-s.dev {
