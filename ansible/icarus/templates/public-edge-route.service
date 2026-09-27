@@ -1,0 +1,14 @@
+[Unit]
+Description=Route public ingress VIP through dedicated WireGuard
+After=network-online.target wg-quick@public-edge.service
+Requires=wg-quick@public-edge.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/ip route replace 10.1.6.41/32 dev public-edge src 10.254.45.2
+ExecStop=-/usr/sbin/ip route del 10.1.6.41/32 dev public-edge
+
+[Install]
+WantedBy=multi-user.target

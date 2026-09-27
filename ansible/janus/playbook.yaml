@@ -1,5 +1,5 @@
 ---
-- name: Configure Janus public edge ingress boundary
+- name: Configure Janus Tailscale router
   hosts: all
   become: true
   gather_facts: false
@@ -32,14 +32,14 @@
             group: root
             mode: "0644"
 
-        - name: packages | Check required network and diagnostic packages
-          ansible.builtin.command: rpm -q wireguard-tools tcpdump conntrack-tools tailscale firewalld NetworkManager
-          register: edge_tools_installed
+        - name: packages | Check required networking packages
+          ansible.builtin.command: rpm -q tailscale firewalld NetworkManager
+          register: network_packages_installed
           check_mode: false
           failed_when: false
           changed_when: false
 
-        - name: packages | Stage network and diagnostic packages in the next rpm-ostree deployment
+        - name: packages | Stage required networking packages in the next rpm-ostree deployment
           ansible.builtin.command:
             argv:
               - rpm-ostree
@@ -47,26 +47,23 @@
               - --assumeyes
               - --idempotent
               - --unchanged-exit-77
-              - wireguard-tools
-              - tcpdump
-              - conntrack-tools
               - tailscale
               - firewalld
               - NetworkManager
-          register: edge_tools_layering
-          failed_when: edge_tools_layering.rc not in [0, 77]
-          changed_when: edge_tools_layering.rc == 0
-          when: not ansible_check_mode and edge_tools_installed.rc != 0
+          register: network_packages_layering
+          failed_when: network_packages_layering.rc not in [0, 77]
+          changed_when: network_packages_layering.rc == 0
+          when: not ansible_check_mode and network_packages_installed.rc != 0
 
         - name: packages | Reboot into the staged rpm-ostree deployment
           ansible.builtin.reboot:
             msg: Rebooting Janus into the deployment containing required network packages
             reboot_timeout: 1800
             test_command: rpm-ostree status --booted
-          when: not ansible_check_mode and edge_tools_layering is changed
+          when: not ansible_check_mode and network_packages_layering is changed
 
         - name: packages | Verify required packages after reboot
-          ansible.builtin.command: rpm -q wireguard-tools tcpdump conntrack-tools tailscale firewalld NetworkManager
+          ansible.builtin.command: rpm -q tailscale firewalld NetworkManager
           changed_when: false
           check_mode: false
           when: not ansible_check_mode
@@ -153,134 +150,14 @@
             immediate: true
             state: enabled
 
-        - name: firewall | Assert nftables is available
-          ansible.builtin.command: nft --version
-          check_mode: false
-          changed_when: false
-
-        - name: firewall | Create dedicated nftables directory
-          ansible.builtin.file:
-            path: /etc/nftables
-            state: directory
-            owner: root
-            group: root
-            mode: "0700"
-
-        - name: firewall | Install dedicated rules
+        - name: firewall | Persist Tailscale routing sysctls
           ansible.builtin.copy:
-            src: templates/public-edge.nft
-            dest: /etc/nftables/public-edge.nft
+            src: templates/tailscale-forward.conf
+            dest: /etc/sysctl.d/90-tailscale-forward.conf
             owner: root
             group: root
             mode: "0644"
-          notify: Reload public edge firewall
-
-        - name: firewall | Validate rules without loading them
-          ansible.builtin.command: nft -c -f /etc/nftables/public-edge.nft
-          changed_when: false
-
-        - name: firewall | Persist routing sysctls
-          ansible.builtin.copy:
-            src: templates/public-edge-forward.conf
-            dest: /etc/sysctl.d/90-public-edge-forward.conf
-            owner: root
-            group: root
-            mode: "0644"
-          notify: Apply routing sysctls
-
-        - name: firewall | Install dedicated service
-          ansible.builtin.copy:
-            src: templates/public-edge-firewall.service
-            dest: /etc/systemd/system/public-edge-firewall.service
-            owner: root
-            group: root
-            mode: "0644"
-          notify: Reload systemd
-
-        - name: firewall | Activate boundary before tunnel provisioning
-          ansible.builtin.systemd:
-            name: public-edge-firewall.service
-            enabled: true
-            state: started
-            daemon_reload: true
-          when: not ansible_check_mode
-
-        - name: firewall | Apply changes before verification
-          ansible.builtin.meta: flush_handlers
-
-        - name: firewall | Verify active nftables table
-          ansible.builtin.command: nft list table inet public_edge
-          changed_when: false
-          when: not ansible_check_mode
-
-    - name: wireguard
-      tags:
-        - wireguard
-      block:
-        - name: wireguard | Assert tools are available after rpm-ostree reboot
-          ansible.builtin.command: wg --version
-          check_mode: false
-          changed_when: false
-
-        - name: wireguard | Read keys from 1Password
-          ansible.builtin.shell: "op read 'op://{{ item.key }}' < /dev/null"
-          delegate_to: localhost
-          become: false
-          loop:
-            - key: Infrastructure/Icarus - Wireguard - Janus/private_key
-            - key: Infrastructure/Icarus - Wireguard - Server/public_key
-          check_mode: false
-          changed_when: false
-          no_log: true
-          register: wg_keys_raw
-
-        - name: wireguard | Set key facts
-          ansible.builtin.set_fact:
-            wg_janus_private_key: "{{ wg_keys_raw.results[0].stdout }}"
-            wg_icarus_public_key: "{{ wg_keys_raw.results[1].stdout }}"
-          no_log: true
-
-        - name: wireguard | Create configuration directory
-          ansible.builtin.file:
-            path: /etc/wireguard
-            state: directory
-            owner: root
-            group: root
-            mode: "0700"
-
-        - name: wireguard | Install systemd dependency
-          ansible.builtin.file:
-            path: /etc/systemd/system/wg-quick@wg-public-edge.service.d
-            state: directory
-            owner: root
-            group: root
-            mode: "0755"
-
-        - name: wireguard | Require the fail-closed firewall
-          ansible.builtin.copy:
-            src: templates/wg-quick-override.conf
-            dest: /etc/systemd/system/wg-quick@wg-public-edge.service.d/override.conf
-            owner: root
-            group: root
-            mode: "0644"
-          notify: Reload systemd
-
-        - name: wireguard | Render Janus interface
-          ansible.builtin.template:
-            src: templates/wg-public-edge.conf.j2
-            dest: /etc/wireguard/wg-public-edge.conf
-            owner: root
-            group: root
-            mode: "0600"
-          no_log: true
-          notify: Restart WireGuard
-
-        - name: wireguard | Enable and start interface
-          ansible.builtin.systemd:
-            name: wg-quick@wg-public-edge.service
-            enabled: true
-            state: started
-            daemon_reload: true
+          notify: Apply Tailscale routing sysctls
 
     - name: tailscale
       tags:
@@ -324,23 +201,6 @@
           changed_when: false
 
   handlers:
-    - name: Reload systemd
-      ansible.builtin.systemd:
-        daemon_reload: true
-      when: not ansible_check_mode
-
-    - name: Reload public edge firewall
-      ansible.builtin.systemd:
-        name: public-edge-firewall.service
-        state: reloaded
-      when: not ansible_check_mode
-
-    - name: Restart WireGuard
-      ansible.builtin.systemd:
-        name: wg-quick@wg-public-edge.service
-        state: restarted
-      when: not ansible_check_mode
-
-    - name: Apply routing sysctls
-      ansible.builtin.command: sysctl -p /etc/sysctl.d/90-public-edge-forward.conf
+    - name: Apply Tailscale routing sysctls
+      ansible.builtin.command: sysctl -p /etc/sysctl.d/90-tailscale-forward.conf
       when: not ansible_check_mode

@@ -1,0 +1,12 @@
+# The private key and peer public key are read from 1Password by Ansible.
+[Interface]
+Address = 10.254.45.2/32
+MTU = 1420
+PrivateKey = {{ public_edge_private_key }}
+Table = off
+
+[Peer]
+AllowedIPs = 10.1.6.41/32
+Endpoint = ipv4.bjw-s.dev:51822
+PersistentKeepalive = 25
+PublicKey = {{ public_edge_server_public_key }}
