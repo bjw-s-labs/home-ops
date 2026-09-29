@@ -5,7 +5,7 @@ kind: Gateway
 metadata:
   name: envoy-external
   annotations:
-    external-dns.alpha.kubernetes.io/target: &hostname ingress-ext.bjw-s.dev
+    external-dns.kubernetes.io/target: &hostname ingress-ext.bjw-s.dev
     gatus.home-operations.com/endpoint: |-
       client:
         dns-resolver: tcp://1.1.1.1:53
@@ -14,7 +14,7 @@ spec:
   gatewayClassName: envoy
   infrastructure:
     annotations:
-      external-dns.alpha.kubernetes.io/hostname: *hostname
+      external-dns.kubernetes.io/hostname: *hostname
       lbipam.cilium.io/ips: 10.1.6.41
   listeners:
     - name: http
