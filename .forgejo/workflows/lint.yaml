@@ -33,6 +33,7 @@ jobs:
             .forgejo/workflows/*.yaml
             .forgejo/workflows/*.yml
           json: true
+          escape_json: false
 
       - name: Run actionlint
         if: steps.changed-files.outputs.any_changed == 'true'
@@ -58,6 +59,7 @@ jobs:
             **/*.yaml
             **/*.yml
           json: true
+          escape_json: false
 
       - name: Install yamllint
         if: steps.changed-files.outputs.any_changed == 'true'
