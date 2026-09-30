@@ -10,6 +10,133 @@ spec:
     name: karakeep
   interval: 30m
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: "OnRootMismatch"
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+    controllers:
+      karakeep:
+        forceRename: karakeep
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          labels:
+            app.kubernetes.io/component: application
+            egress.policy.home.arpa/internet: "true"
+        containers:
+          karakeep:
+            image:
+              repository: ghcr.io/karakeep-app/karakeep
+              tag: 0.33.2@sha256:b069e4307dec06ea06d16989c6861c30a1ff208568be44ed5fb5d422cd3e950c
+            env:
+              BROWSER_WEB_URL: http://karakeep-chrome.selfhosted.svc.cluster.local:9222
+              COREPACK_INTEGRITY_KEYS: 0
+              CRAWLER_DOWNLOAD_BANNER_IMAGE: true
+              CRAWLER_ENABLE_ADBLOCKER: true
+              CRAWLER_STORE_SCREENSHOT: true
+              DATA_DIR: /data
+              DISABLE_NEW_RELEASE_CHECK: true
+              DISABLE_SIGNUPS: true
+              MEILI_ADDR: http://karakeep-meilisearch.selfhosted.svc.cluster.local:7700
+              MEILI_MASTER_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Release.Name }}"
+                    key: meilisearch_master_key
+              NEXTAUTH_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Release.Name }}"
+                    key: encryption_key
+              NEXTAUTH_URL: https://karakeep.bjw-s.dev
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 1Gi
+      chrome:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          labels:
+            app.kubernetes.io/component: chrome
+            egress.policy.home.arpa/internet: "true"
+        containers:
+          chrome:
+            image:
+              repository: ghcr.io/karakeep-app/karakeep-chrome
+              tag: release
+            args:
+              - --headless
+              - --disable-gpu
+              - --disable-dev-shm-usage
+              - --hide-scrollbars
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 1Gi
+            securityContext:
+              capabilities:
+                drop:
+                  - ALL
+      meilisearch:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          labels:
+            app.kubernetes.io/component: meilisearch
+            egress.policy.home.arpa/block-all: "true"
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values:
+                          - karakeep
+                      - key: app.kubernetes.io/controller
+                        operator: In
+                        values:
+                          - karakeep
+                  topologyKey: kubernetes.io/hostname
+        containers:
+          meilisearch:
+            image:
+              repository: mirror.gcr.io/getmeili/meilisearch
+              tag: v1.54.2@sha256:1c9dc9b037162d59224a4fc8b1fadd96e343213acf7c828e5d380e28407443fb
+            args:
+              - /bin/meilisearch
+              - --upgrade-db
+            env:
+              MEILI_NO_ANALYTICS: true
+              MEILI_MASTER_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Release.Name }}"
+                    key: meilisearch_master_key
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 2Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
     externalSecrets:
       karakeep:
         refreshInterval: 12h
@@ -89,146 +216,35 @@ spec:
               - ports:
                   - port: "7700"
                     protocol: TCP
-    defaultPodOptions:
-      securityContext:
-        fsGroup: 1000
-        fsGroupChangePolicy: "OnRootMismatch"
-        runAsGroup: 1000
-        runAsNonRoot: true
-        runAsUser: 1000
-    controllers:
-      karakeep:
-        forceRename: karakeep
-        annotations:
-          reloader.stakater.com/auto: "true"
-        pod:
-          labels:
-            app.kubernetes.io/component: application
-            egress.policy.home.arpa/internet: "true"
-        containers:
-          app:
-            image:
-              repository: ghcr.io/karakeep-app/karakeep
-              tag: 0.33.2@sha256:b069e4307dec06ea06d16989c6861c30a1ff208568be44ed5fb5d422cd3e950c
-            env:
-              BROWSER_WEB_URL: http://karakeep-chrome.selfhosted.svc.cluster.local:9222
-              CRAWLER_DOWNLOAD_BANNER_IMAGE: true
-              CRAWLER_ENABLE_ADBLOCKER: true
-              CRAWLER_STORE_SCREENSHOT: true
-              DATA_DIR: /data
-              DISABLE_SIGNUPS: true
-              MEILI_ADDR: http://karakeep-meilisearch.selfhosted.svc.cluster.local:7700
-              MEILI_MASTER_KEY:
-                valueFrom:
-                  secretKeyRef:
-                    name: "{{ .Release.Name }}"
-                    key: meilisearch_master_key
-              NEXTAUTH_SECRET:
-                valueFrom:
-                  secretKeyRef:
-                    name: "{{ .Release.Name }}"
-                    key: encryption_key
-              NEXTAUTH_URL: https://karakeep.bjw-s.dev
-              DISABLE_NEW_RELEASE_CHECK: true
-              COREPACK_INTEGRITY_KEYS: 0
-            probes:
-              liveness:
-                enabled: true
-              readiness:
-                enabled: true
-              startup:
-                enabled: true
-            resources:
-              requests:
-                cpu: 10m
-              limits:
-                memory: 1Gi
-      chrome:
-        annotations:
-          reloader.stakater.com/auto: "true"
-        pod:
-          labels:
-            app.kubernetes.io/component: chrome
-            egress.policy.home.arpa/internet: "true"
-        containers:
-          app:
-            image:
-              repository: docker.io/zenika/alpine-chrome
-              tag: 124@sha256:eb3378c1ed0079f94db054a5fe1aaa790a254ec0d6bbc67eda052420d86a179d
-            command:
-              - chromium-browser
-            args:
-              - --headless
-              - --no-sandbox
-              - --disable-gpu
-              - --disable-dev-shm-usage
-              - --remote-debugging-address=0.0.0.0
-              - --remote-debugging-port=9222
-              - --hide-scrollbars
-            securityContext:
-              capabilities:
-                drop:
-                  - ALL
-            resources:
-              requests:
-                cpu: 10m
-              limits:
-                memory: 1Gi
-      meilisearch:
-        annotations:
-          reloader.stakater.com/auto: "true"
-        pod:
-          labels:
-            app.kubernetes.io/component: meilisearch
-            egress.policy.home.arpa/block-all: "true"
-          affinity:
-            podAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                - labelSelector:
-                    matchExpressions:
-                      - key: app.kubernetes.io/name
-                        operator: In
-                        values:
-                          - karakeep
-                      - key: app.kubernetes.io/controller
-                        operator: In
-                        values:
-                          - karakeep
-                  topologyKey: kubernetes.io/hostname
-        containers:
-          app:
-            image:
-              repository: docker.io/getmeili/meilisearch
-              tag: v1.54.2@sha256:1c9dc9b037162d59224a4fc8b1fadd96e343213acf7c828e5d380e28407443fb
-            args:
-              - /bin/meilisearch
-              - --upgrade-db
-            env:
-              MEILI_NO_ANALYTICS: true
-              MEILI_MASTER_KEY:
-                valueFrom:
-                  secretKeyRef:
-                    name: "{{ .Release.Name }}"
-                    key: meilisearch_master_key
-            resources:
-              requests:
-                cpu: 10m
-              limits:
-                memory: 2Gi
     persistence:
       data:
         existingClaim: karakeep-data
         advancedMounts:
           karakeep:
-            app:
+            karakeep:
               - path: /data
                 subPath: karakeep
           meilisearch:
-            app:
+            meilisearch:
               - path: /meili_data
                 subPath: meilisearch
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          karakeep:
+            karakeep:
+              - path: /tmp
+                subPath: tmp_karakeep
+          chrome:
+            chrome:
+              - path: /tmp
+                subPath: tmp_chrome
+          meilisearch:
+            meilisearch:
+              - path: /tmp
+                subPath: tmp_meilisearch
     route:
-      app:
+      karakeep:
         hostnames:
           - karakeep.bjw-s.dev
         parentRefs:
@@ -236,12 +252,11 @@ spec:
             namespace: network
         rules:
           - backendRefs:
-              - identifier: app
+              - identifier: karakeep
                 port: http
     service:
-      app:
+      karakeep:
         controller: karakeep
-        forceRename: karakeep
         ports:
           http:
             port: 3000
