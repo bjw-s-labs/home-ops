@@ -10,19 +10,19 @@ spec:
     name: bazarr
   interval: 30m
   values:
+    defaultPodOptions:
+      annotations:
+        reloader.stakater.com/auto: "true"
+      securityContext:
+        fsGroup: 2000
+        fsGroupChangePolicy: "OnRootMismatch"
+        runAsGroup: 2000
+        runAsNonRoot: true
+        runAsUser: 2000
     controllers:
       bazarr:
-        annotations:
-          reloader.stakater.com/auto: "true"
-        pod:
-          securityContext:
-            fsGroup: 2000
-            fsGroupChangePolicy: "OnRootMismatch"
-            runAsGroup: 2000
-            runAsNonRoot: true
-            runAsUser: 2000
         containers:
-          app:
+          bazarr:
             image:
               repository: ghcr.io/lavx/bazarr
               tag: 2.7.0
@@ -42,11 +42,10 @@ spec:
                   failureThreshold: 5
               readiness:
                 enabled: true
-                custom: true
+                type: HTTP
+                path: /health
+                port: &port 6767
                 spec:
-                  httpGet:
-                    path: /health
-                    port: &port 6767
                   periodSeconds: 10
                   timeoutSeconds: 5
                   failureThreshold: 5
@@ -67,29 +66,73 @@ spec:
               capabilities:
                 drop:
                   - ALL
+      ai-subtitle-translator:
+        containers:
+          ai-subtitle-translator:
+            image:
+              repository: ghcr.io/lavx/ai-subtitle-translator
+              tag: v2.1.1
+            env:
+              OPENROUTER_DEFAULT_MODEL: openai/gpt-5.6-luna
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+                type: HTTP
+                path: /health
+                port: 8765
+              startup:
+                enabled: true
+            resources:
+              requests:
+                cpu: 15m
+              limits:
+                memory: 512Mi
     persistence:
       config:
-        existingClaim: bazarr-config
+        existingClaim: bazarr
+        advancedMounts:
+          bazarr:
+            bazarr:
+              - path: /config
+                subPath: bazarr
+          ai-subtitle-translator:
+            ai-subtitle-translator:
+              - path: /app/data
+                subPath: ai_subtitle_translator
       media:
         type: nfs
         path: /mnt/tank/media
         server: gladius.bjw-s.internal
-        globalMounts:
-          - path: /data/nas-media
+        advancedMounts:
+          bazarr:
+            bazarr:
+              - path: /data/nas-media
       tmpfs:
         type: emptyDir
         globalMounts:
           - path: /tmp
             subPath: tmp
     route:
-      app:
+      bazarr:
         hostnames:
           - bazarr.bjw-s.dev
         parentRefs:
           - name: envoy-internal
             namespace: network
+        rules:
+          - backendRefs:
+              - identifier: bazarr
+                port: http
     service:
-      app:
+      bazarr:
+        controller: bazarr
         ports:
           http:
             port: *port
+      ai-subtitle-translator:
+        controller: ai-subtitle-translator
+        ports:
+          ai-subtitle-translator:
+            port: 8765
