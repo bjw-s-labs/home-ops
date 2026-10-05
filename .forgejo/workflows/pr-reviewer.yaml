@@ -47,13 +47,32 @@ jobs:
           fetch-depth: 0
           ref: ${{ forgejo.event.pull_request.head.sha || steps.prctx.outputs.head_sha }}
 
+      - name: Resolve own CI status context
+        id: ctx
+        env:
+          FJO_HOST: http://forgejo-http.dev.svc.cluster.local:3000/
+          RUN_URL_PATH: /actions/runs/${{ forgejo.run_number }}
+          SHA: ${{ forgejo.event.pull_request.head.sha || steps.prctx.outputs.head_sha }}
+        run: |
+          # Forgejo names a job's status "<workflow> / <job> (<event>)". Rather
+          # than hardcode that, find the status this run published - matched on
+          # the run number in its target_url - and reuse its exact context.
+          filter="[.[] | select((.target_url // \"\") | contains(\"${RUN_URL_PATH}/\") or endswith(\"${RUN_URL_PATH}\"))][0].context // empty"
+          for _ in 1 2 3 4 5; do
+            ctx="$(fjo api "repos/${FORGEJO_REPOSITORY}/commits/${SHA}/statuses" --jq "$filter" || true)"
+            [ -n "$ctx" ] && break
+            sleep 2
+          done
+          [ -n "$ctx" ] || echo "::warning::no status found for ${RUN_URL_PATH}; CI gate will wait on itself until it times out"
+          echo "ci_status_context=${ctx}" >> "$FORGEJO_OUTPUT"
+
       - name: AI PR Review
         uses: https://github.com/misospace/pr-reviewer-action@829f395f7154b4d87c229500fd09b30a8ad2224d # v3.3.0
         env:
           # The CI gate excludes its own commit status by exact context match.
           # Forgejo has no check-runs API, so run-id self-exclusion never fires
           # and this job would otherwise wait on itself until the timeout.
-          CI_STATUS_CONTEXT: AI PR Review / AI PR Review (pull_request)
+          CI_STATUS_CONTEXT: ${{ steps.ctx.outputs.ci_status_context }}
         with:
           # Platform
           platform: forgejo
