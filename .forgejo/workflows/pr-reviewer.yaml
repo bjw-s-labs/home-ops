@@ -27,7 +27,7 @@ concurrency:
 jobs:
   review:
     name: AI PR Review
-    if: ${{ !forgejo.pull_request.draft }}
+    if: ${{ (forgejo.event_name == 'pull_request' && forgejo.event.pull_request.head.repo.full_name == forgejo.repository && !forgejo.event.pull_request.draft) || forgejo.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -49,6 +49,11 @@ jobs:
 
       - name: AI PR Review
         uses: https://github.com/misospace/pr-reviewer-action@829f395f7154b4d87c229500fd09b30a8ad2224d # v3.3.0
+        env:
+          # The CI gate excludes its own commit status by exact context match.
+          # Forgejo has no check-runs API, so run-id self-exclusion never fires
+          # and this job would otherwise wait on itself until the timeout.
+          CI_STATUS_CONTEXT: AI PR Review / AI PR Review (pull_request)
         with:
           # Platform
           platform: forgejo
