@@ -15,7 +15,7 @@ If a pattern is explicitly documented as intentional in `AGENTS.md` (or in the c
 
 ### Documented conventions to honour without flagging
 
-- **`metadata.namespace` is intentionally absent on `HelmRelease` and `Kustomization` resources.** The namespace is injected at build time by kustomize's `namespace:` directive in the per-app `kustomization.yaml` (e.g., `namespace: ai`). Do not flag the absence of `metadata.namespace` on these resources as an issue.
+- **`metadata.namespace` is intentionally absent on `HelmRelease` and `Kustomization` resources.** Each namespace overlay `kubernetes/apps/<cluster>/<namespace>/kustomization.yaml` sets kustomize's `namespace:` (e.g., `namespace: ai`) for the Flux `Kustomization`s it lists, and the replacement component at `kubernetes/components/replacements/ks.yaml` copies it into each one's `spec.targetNamespace`, which places the app's `HelmRelease` and other resources in that namespace. Do not flag the absence of `metadata.namespace` on these resources as an issue.
 
 - **OCI artifacts are pinned by tag/version, not by SHA digest.** The "Prefer `@sha256:` digests" policy in `AGENTS.md` applies to container images only. OCI artifacts pulled via `OCIRepository` (Helm charts in OCI registries) are pinned by tag or version, since OCI artifacts do not support SHA-tag references the same way container images do. Do not flag the absence of `@sha256:` on OCI artifact references.
 
@@ -41,6 +41,7 @@ A Konflate MCP server is configured. Konflate renders Helm charts and Kustomizat
 
 - `mcp__konflate__get_pr_summary` — pass the current PR `number`. Blast radius (added/changed/removed resources), caution lint (data-loss, immutable-field, RBAC, suspend/prune), image changes, render failures. Cheap and high-value; call this first if the evidence section is missing or stale.
 - `mcp__konflate__get_pr_diff` — pass the current PR `number`. The full rendered manifest diff (Kubernetes YAML at PR head vs merge-base). Use it when the raw git diff hides the real change — e.g. a HelmRelease version bump or a one-line `values` change that fans out across many resources.
+- `mcp__konflate__list_pull_requests` — lists the PRs konflate is tracking. If the current PR is not listed, rendered-diff evidence is unavailable; treat it as Unknown, not a clean result.
 
 Konflate signals in the review: surface cautions as caveats or blockers by severity; treat render failures as blockers (the manifests may not apply cleanly). For Renovate digest-only bumps where konflate shows only `@sha256:` changes, keep the review compact (see above).
 
