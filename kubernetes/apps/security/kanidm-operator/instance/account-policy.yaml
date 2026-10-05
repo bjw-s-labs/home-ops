@@ -1,0 +1,30 @@
+---
+# Kanidm folds account policy across every group an account belongs to and keeps the
+# SMALLEST value for each setting (server/lib/src/idm/accountpolicy.rs). Both builtin
+# policy groups must therefore be raised together: leaving idm_all_accounts at its
+# 86400 default silently caps every person at a 1 day session regardless of what
+# idm_all_persons says.
+#
+# These adopt builtin system dyngroups. `members` is deliberately omitted so kaniop
+# leaves the dynamic membership alone.
+apiVersion: kaniop.rs/v1beta1
+kind: KanidmGroup
+metadata:
+  name: idm-all-accounts
+spec:
+  kanidmRef:
+    name: kanidm
+  kanidmName: idm_all_accounts
+  accountPolicy:
+    authSessionExpiry: 2592000
+---
+apiVersion: kaniop.rs/v1beta1
+kind: KanidmGroup
+metadata:
+  name: idm-all-persons
+spec:
+  kanidmRef:
+    name: kanidm
+  kanidmName: idm_all_persons
+  accountPolicy:
+    authSessionExpiry: 2592000
