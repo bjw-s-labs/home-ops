@@ -1,0 +1,28 @@
+---
+apiVersion: kaniop.rs/v1beta1
+kind: KanidmOAuth2Client
+metadata:
+  name: grafana
+spec:
+  kanidmRef:
+    name: kanidm
+    namespace: security
+  displayname: Grafana
+  origin: https://grafana.bjw-s.dev/
+  redirectUrl:
+    - https://grafana.bjw-s.dev/login/generic_oauth
+  scopeMap:
+    - group: grafana_admins@idm.bjw-s.dev
+      scopes:
+        - openid
+        - profile
+        - email
+        - groups
+  strictRedirectUrl: true
+  preferShortUsername: true
+  secretKeyAliases:
+    clientId:
+      - key
+    clientSecret:
+      - secret
+  disableConsentPrompt: true

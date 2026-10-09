@@ -14,7 +14,24 @@ spec:
       feedback_links_enabled: "false"
       reporting_enabled: "false"
     auth:
-      disable_login_form: "false"
+      disable_login_form: "true"
+    auth.basic:
+      enabled: "false"
+    auth.generic_oauth:
+      allow_assign_grafana_admin: "true"
+      allow_sign_up: "true"
+      auto_login: "true"
+      api_url: https://idm.bjw-s.dev/oauth2/openid/grafana/userinfo
+      auth_url: https://idm.bjw-s.dev/ui/oauth2
+      client_id: $__env{GF_AUTH_GENERIC_OAUTH_CLIENT_ID}
+      client_secret: $__env{GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}
+      enabled: "true"
+      name: Kanidm
+      role_attribute_path: "contains(groups[*], 'grafana_admins@idm.bjw-s.dev') && 'GrafanaAdmin' || 'None'"
+      role_attribute_strict: "true"
+      scopes: openid profile email groups
+      token_url: https://idm.bjw-s.dev/oauth2/token
+      use_pkce: "true"
     log:
       mode: console
     metrics:
@@ -27,6 +44,7 @@ spec:
       angular_support_enabled: "true"
     server:
       enable_gzip: "true"
+      root_url: https://grafana.bjw-s.dev/
   disableDefaultAdminSecret: true
   disableDefaultSecurityContext: All
   deployment:
@@ -48,6 +66,16 @@ spec:
                     secretKeyRef:
                       name: grafana-admin-secret
                       key: admin-user
+                - name: GF_AUTH_GENERIC_OAUTH_CLIENT_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-kanidm-oauth2-credentials
+                      key: key
+                - name: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-kanidm-oauth2-credentials
+                      key: secret
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: true
