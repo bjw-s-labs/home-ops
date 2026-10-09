@@ -21,13 +21,19 @@ spec:
             data:
               APPRISE_RADARR_PUSHOVER_URL: pover://{{ .pushover_userkey_bernd }}@{{ .pushover_radarr_token }}
               APPRISE_SONARR_PUSHOVER_URL: pover://{{ .pushover_userkey_bernd }}@{{ .pushover_sonarr_token }}
-        dataFrom:
-          - extract:
+        data:
+          - secretKey: pushover_userkey_bernd
+            remoteRef:
               key: Pushover
-            rewrite:
-              - regexp:
-                  source: "(.*)"
-                  target: "pushover_$1"
+              property: userkey_bernd
+          - secretKey: pushover_radarr_token
+            remoteRef:
+              key: Pushover - Radarr
+              property: password
+          - secretKey: pushover_sonarr_token
+            remoteRef:
+              key: Pushover - Sonarr
+              property: password
     networkpolicies:
       webhook:
         type: cilium

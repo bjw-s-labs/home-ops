@@ -20,16 +20,16 @@ spec:
           template:
             data:
               BOOKBOSS__ENCRYPTION_SECRET: "{{ .bookboss_encryption_secret }}"
-              BOOKBOSS__METADATA__HARDCOVER_API_TOKEN: "{{ .hardcover_api_token }}"
+              BOOKBOSS__METADATA__HARDCOVER_API_TOKEN: "{{ .hardcover_password }}"
         dataFrom:
           - extract:
-              key: bookboss
+              key: BookBoss
             rewrite:
               - regexp:
                   source: "(.*)"
                   target: "bookboss_$1"
           - extract:
-              key: Hardcover
+              key: Hardcover - BookBoss
             rewrite:
               - regexp:
                   source: "(.*)"

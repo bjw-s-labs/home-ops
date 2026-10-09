@@ -24,13 +24,13 @@
       delegate_to: localhost
       become: false
       loop:
-        - key: Shared/c6itdbmw5gdslnnep2vfihhu54/Service accounts/doco-cd
+        - key: Infrastructure/1Password - Doco-CD/password
           var: doco_1pw_sa_token
-        - key: automation/doco-cd/api_secret
+        - key: Infrastructure/Doco-CD/api_secret
           var: doco_api_secret
-        - key: automation/doco-cd/webhook_secret
+        - key: Infrastructure/Doco-CD/webhook_secret
           var: doco_webhook_secret
-        - key: Automation/crowdsec/api_token
+        - key: Infrastructure/CrowdSec - Icarus Firewall Bouncer/password
           var: crowdsec_api_key
       check_mode: false
       changed_when: false

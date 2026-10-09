@@ -19,21 +19,21 @@ spec:
         target:
           template:
             data:
-              WOTCHER_GITHUB_TOKEN: "{{ .github_pat_wotcher }}"
-              WOTCHER_DISCORD_BOT_TOKEN: "{{ .wotcher_discord_bot_token }}"
+              WOTCHER_GITHUB_TOKEN: "{{ .github_password }}"
+              WOTCHER_DISCORD_BOT_TOKEN: "{{ .discord_password }}"
         dataFrom:
           - extract:
-              key: Github
+              key: GitHub - Wotcher
             rewrite:
               - regexp:
                   source: "(.*)"
                   target: "github_$1"
           - extract:
-              key: wotcher
+              key: Discord - Wotcher
             rewrite:
               - regexp:
                   source: "(.*)"
-                  target: "wotcher_$1"
+                  target: "discord_$1"
     networkpolicies:
       wotcher:
         type: cilium
