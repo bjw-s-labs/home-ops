@@ -6,6 +6,9 @@ metadata:
 spec:
   domain: idm.bjw-s.dev
   origin: https://idm.bjw-s.dev
+  env:
+    - name: KANIDM_DB_ARC_SIZE
+      value: "2048"
   replicaGroups:
     - name: default
       replicas: 1
@@ -13,8 +16,6 @@ spec:
       resources:
         requests:
           cpu: 10m
-        limits:
-          memory: 1Gi
   image: kanidm/server:1.11.2
   logLevel: info
   groupNamespaceSelector: {}
