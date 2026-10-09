@@ -17,6 +17,14 @@ spec:
           kind: ClusterSecretStore
           name: onepassword-connect
         data:
+          - secretKey: AWS_ACCESS_KEY_ID
+            remoteRef:
+              key: Garage - Kopiur
+              property: username
+          - secretKey: AWS_SECRET_ACCESS_KEY
+            remoteRef:
+              key: Garage - Kopiur
+              property: password
           - secretKey: KOPIA_PASSWORD
             remoteRef:
               key: Kopiur
@@ -27,9 +35,13 @@ spec:
           repository.config: |-
             {
               "storage": {
-                "type": "filesystem",
+                "type": "s3",
                 "config": {
-                  "path": "/repository"
+                  "bucket": "kopiur",
+                  "endpoint": "s3.bjw-s.dev",
+                  "region": "us-east-1",
+                  "doNotUseTLS": false,
+                  "doNotVerifyTLS": false
                 }
               },
               "hostname": "volsync.{{ .Release.Namespace }}.svc.cluster.local",
@@ -105,12 +117,6 @@ spec:
         globalMounts:
           - path: /config/repository.config
             subPath: repository.config
-      repository:
-        type: nfs
-        path: /mnt/drone/backup/kopiur
-        server: gladius.bjw-s.internal
-        globalMounts:
-          - path: /repository
       tmpfs:
         type: emptyDir
         advancedMounts:

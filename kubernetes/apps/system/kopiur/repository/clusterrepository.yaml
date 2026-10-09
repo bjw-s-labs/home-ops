@@ -8,12 +8,16 @@ spec:
   allowedNamespaces:
     all: true
   backend:
-    filesystem:
-      path: /repo
-      volume:
-        nfs:
-          path: /mnt/drone/backup/kopiur
-          server: gladius.bjw-s.internal
+    s3:
+      auth:
+        secretRef:
+          name: kopiur-nas-secret
+          namespace: system
+      bucket: kopiur
+      endpoint: s3.bjw-s.dev
+      region: us-east-1
+  create:
+    enabled: false
   encryption:
     passwordSecretRef:
       name: kopiur-nas-secret
