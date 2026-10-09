@@ -25,15 +25,13 @@ kind: Kustomization
 metadata:
   name: kanidm-instance
 spec:
-  components:
-    - ../../../../components/kopiur/backup
   dependsOn:
     - name: kanidm-operator
       namespace: security
   healthChecks:
     - apiVersion: kaniop.rs/v1beta1
       kind: Kanidm
-      name: kanidm
+      name: sso
       namespace: security
   healthCheckExprs:
     - apiVersion: kaniop.rs/v1beta1
@@ -45,7 +43,6 @@ spec:
   postBuild:
     substitute:
       APP: kanidm
-      KOPIUR_CLAIM: kanidm-data-kanidm-default-0
   prune: true
   sourceRef:
     kind: GitRepository

@@ -2,13 +2,10 @@
 apiVersion: kaniop.rs/v1beta1
 kind: Kanidm
 metadata:
-  name: kanidm
+  name: sso
 spec:
   domain: idm.bjw-s.dev
   origin: https://idm.bjw-s.dev
-  env:
-    - name: KANIDM_DB_ARC_SIZE
-      value: "2048"
   replicaGroups:
     - name: default
       replicas: 1
@@ -16,6 +13,8 @@ spec:
       resources:
         requests:
           cpu: 10m
+        limits:
+          memory: 512Mi
   image: kanidm/server:1.11.2
   logLevel: info
   groupNamespaceSelector: {}
@@ -27,24 +26,9 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 5Gi
+            storage: 1Gi
         storageClassName: miroir-local
   tlsSecretName: idm-bjw-s-dev-tls
-  securityContext:
-    fsGroup: 2000
-    fsGroupChangePolicy: OnRootMismatch
-    runAsGroup: 2000
-    runAsNonRoot: true
-    runAsUser: 2000
-    seccompProfile:
-      type: RuntimeDefault
-  containers:
-    - name: kanidm
-      securityContext:
-        allowPrivilegeEscalation: false
-        capabilities:
-          drop:
-            - ALL
   gateway:
     parentRefs:
       - name: envoy-external
