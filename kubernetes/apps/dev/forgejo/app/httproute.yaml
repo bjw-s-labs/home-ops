@@ -11,6 +11,19 @@ spec:
     - name: envoy-external
       namespace: network
   rules:
+    - matches:
+        - method: GET
+          path:
+            type: Exact
+            value: /user/login
+      filters:
+        - type: RequestRedirect
+          requestRedirect:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /user/oauth2/kanidm
+            port: 443
+            statusCode: 302
     - backendRefs:
         - name: forgejo-anubis
           port: 8080
