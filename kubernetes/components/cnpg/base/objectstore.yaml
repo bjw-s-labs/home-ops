@@ -1,0 +1,31 @@
+---
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: ${APP}-postgres
+spec:
+  configuration:
+    # NOTE: serverName must NOT be set here. The CRD enforces !has(self.serverName)
+    # and tells you to use the serverName plugin parameter on the Cluster instead,
+    # which is what gives every database its own prefix inside the shared bucket.
+    destinationPath: s3://${CNPG_BUCKET:=cnpg}/
+    endpointURL: ${CNPG_ENDPOINT:=https://s3.bjw-s.dev}
+    s3Credentials:
+      accessKeyId:
+        name: ${APP}-postgres-objectstore-secret
+        key: AWS_ACCESS_KEY_ID
+      secretAccessKey:
+        name: ${APP}-postgres-objectstore-secret
+        key: AWS_SECRET_ACCESS_KEY
+    data:
+      compression: gzip
+    wal:
+      compression: gzip
+      maxParallel: 2
+  instanceSidecarConfiguration:
+    resources:
+      requests:
+        cpu: 10m
+      limits:
+        memory: 256Mi
+  retentionPolicy: ${CNPG_RETENTION:=30d}

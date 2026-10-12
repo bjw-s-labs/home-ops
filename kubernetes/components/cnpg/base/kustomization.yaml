@@ -1,0 +1,11 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/component.json
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+# Everything here is independent of the PostgreSQL major version. Apps never
+# reference this directly -- they pull in a ./pgNN component, which includes it.
+resources:
+  - ./externalsecret.yaml
+  - ./objectstore.yaml
+  - ./podmonitor.yaml
+  - ./scheduledbackup.yaml

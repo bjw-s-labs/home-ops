@@ -1,0 +1,76 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: ${APP}-postgres
+  annotations:
+    # Every incarnation of this cluster recovers from, and then archives back into,
+    # the same serverName prefix -- so the prefix is permanently non-empty and the
+    # empty-WAL-archive check would otherwise refuse to start archiving. Skipping
+    # it is what makes the recovery stanza below reusable instead of one-shot.
+    cnpg.io/skipEmptyWalArchiveCheck: "enabled"
+spec:
+  # Permanent disaster-recovery stanza. `bootstrap` and `externalClusters` are read
+  # ONLY when the Cluster is first created, so this is inert for the whole life of a
+  # running cluster and never needs touching in git.
+  #
+  #   - no recoveryTarget  -> latest base backup, WAL replayed to the latest timeline
+  #   - no secret          -> CNPG generates ${APP}-postgres-app with a fresh random
+  #                           password and, because `owner` matches its `username`
+  #                           key, resets the restored role's password to match once
+  #                           the cluster is promoted. Credentials self-heal.
+  #
+  # Recovery only fires when CNPG creates a NEW data directory. To actually restore
+  # from the object store you must delete the Cluster *and* its PVCs -- leaving a
+  # dangling PVC behind makes CNPG reuse it instead.
+  bootstrap:
+    recovery:
+      source: ${APP}-postgres
+      database: ${CNPG_DATABASE:=${APP}}
+      owner: ${CNPG_OWNER:=${APP}}
+  enablePDB: false
+  enableSuperuserAccess: false
+  externalClusters:
+    - name: ${APP}-postgres
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: ${APP}-postgres
+          serverName: ${CNPG_SERVER_NAME:=${APP}-postgres-pg18}
+  # The "minimal" flavour is the right one here: it is built for backup plugins,
+  # whereas the operator's default "system" flavour only exists to carry the
+  # in-core Barman Cloud binaries and is deprecated along with them.
+  #
+  # MAJOR UPGRADES: do not edit this in place. Copy this directory to ../pg19, change
+  # the image major and the -pgNN suffix on CNPG_SERVER_NAME there, and repoint the
+  # app's ks.yaml at it. pg_upgrade resets the timeline to 1 and the barman-cloud
+  # plugin does not separate archives on its own, so reusing the prefix would let the
+  # upgraded cluster overwrite the old one's WAL -- keeping both in one folder is what
+  # makes that impossible. Renovate is barred from major bumps on this image.
+  # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6-minimal-trixie
+  instances: ${CNPG_INSTANCES:=1}
+  plugins:
+    # serverName is pinned rather than left to default to the cluster name, because
+    # the seed cluster (${APP}-postgres-seed) has to write into this same prefix, and
+    # because it has to stay changeable for major upgrades. One variable feeds both
+    # the archiver here and the recovery source above, so the two cannot drift.
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: ${APP}-postgres
+        serverName: ${CNPG_SERVER_NAME:=${APP}-postgres-pg18}
+  postgresql:
+    parameters:
+      max_slot_wal_keep_size: 2GB
+  primaryUpdateMethod: switchover
+  primaryUpdateStrategy: unsupervised
+  resources:
+    requests:
+      cpu: ${CNPG_CPU_REQUEST:=50m}
+    limits:
+      memory: ${CNPG_MEMORY_LIMIT:=1Gi}
+  storage:
+    size: ${CNPG_CAPACITY:=8Gi}
+    storageClass: ${CNPG_STORAGECLASS:=miroir-local}

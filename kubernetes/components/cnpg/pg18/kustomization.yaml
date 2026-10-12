@@ -1,0 +1,12 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/component.json
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+# The PostgreSQL major version is encoded in this directory, not in a variable.
+# A major upgrade is therefore a one-line change in the consuming app's ks.yaml
+# (.../cnpg/pg18 -> .../cnpg/pg19), and the operand image and the object store
+# prefix cannot be bumped independently, because they live in the same folder.
+components:
+  - ../base
+resources:
+  - ./cluster.yaml
