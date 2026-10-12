@@ -48,14 +48,13 @@ spec:
               # empty account instead of failing loudly with a 403, hiding the fact
               # that the restore went wrong.
               OAUTH2_USER_CREATION: 0
-              POLLING_FREQUENCY: 10
+              POLLING_FREQUENCY: 5
               POLLING_LIMIT_PER_HOST: 5
               POLLING_PARSING_ERROR_LIMIT: 0
               POLLING_SCHEDULER: entry_frequency
               PORT: &port 8080
               RUN_MIGRATIONS: 1
-              SCHEDULER_ENTRY_FREQUENCY_MAX_INTERVAL: 1440
-              SCHEDULER_ENTRY_FREQUENCY_MIN_INTERVAL: 5
+              SCHEDULER_ENTRY_FREQUENCY_MAX_INTERVAL: 240
               WORKER_POOL_SIZE: 5
             envFrom:
               - secretRef:
