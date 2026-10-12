@@ -1,0 +1,54 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/external-secrets.io/externalsecret_v1.json
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kanidm-backup
+spec:
+  refreshInterval: 12h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: onepassword-connect
+  target:
+    name: kanidm-backup-secret
+    creationPolicy: Owner
+  data:
+    - secretKey: AWS_ACCESS_KEY_ID
+      remoteRef:
+        key: Garage - kanidm
+        property: username
+    - secretKey: AWS_SECRET_ACCESS_KEY
+      remoteRef:
+        key: Garage - kanidm
+        property: password
+    - secretKey: encryption-key
+      remoteRef:
+        key: Kanidm
+        property: backup_encryption_key
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kaniop.rs/kanidmbackuprepository_v1alpha1.json
+apiVersion: kaniop.rs/v1alpha1
+kind: KanidmBackupRepository
+metadata:
+  name: nas
+spec:
+  authentication:
+    deleter:
+      secretRef:
+        name: kanidm-backup-secret
+    reader:
+      secretRef:
+        name: kanidm-backup-secret
+    writer:
+      secretRef:
+        name: kanidm-backup-secret
+  encryption:
+    mode: clientSide
+    keyRef:
+      name: kanidm-backup-secret
+  s3:
+    bucket: kanidm
+    endpoint: https://s3.bjw-s.dev
+    forcePathStyle: true
+    prefix: sso
+    region: us-east-1

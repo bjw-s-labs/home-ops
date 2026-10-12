@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kaniop.rs/kanidmbackupschedule_v1alpha1.json
+apiVersion: kaniop.rs/v1alpha1
+kind: KanidmBackupSchedule
+metadata:
+  name: sso
+spec:
+  jitterSeconds: 300
+  kanidmRef:
+    name: sso
+  localVersions: 7
+  repositoryRef:
+    name: nas
+  # schedule, repositoryRef, kanidmRef and retention are all IMMUTABLE after
+  # creation -- changing any of them means deleting this Schedule and creating a
+  # new one. Existing Backup CRs and the remote S3 data survive that.
+  retention:
+    keepLast: 8
+    daily: 7
+    weekly: 4
+    monthly: 6
+    minAge: 24h
+  # Standard 5-field cron (unlike CloudNativePG's six). 02:30 sits in the gap
+  # between the CNPG backups at 02:00 and Kopia's full maintenance at 03:00.
+  schedule: 30 2 * * *
+  timeZone: Europe/Amsterdam
