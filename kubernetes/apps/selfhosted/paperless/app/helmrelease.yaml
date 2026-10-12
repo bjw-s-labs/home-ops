@@ -89,7 +89,8 @@ spec:
               # Configure redis integration
               PAPERLESS_REDIS: redis://paperless-dragonfly:6379
               # Configure user permissions
-              USERMAP_GID: "100" # gladius:users
+              # Only affects local storage; NFS access is mapall'd to k8s_user:truenas_user (3002:4000) on gladius
+              USERMAP_GID: "100"
               # Configure admin user
               PAPERLESS_ADMIN_USER:
                 valueFrom:
