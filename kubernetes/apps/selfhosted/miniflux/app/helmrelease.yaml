@@ -1,0 +1,150 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: miniflux
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: miniflux
+  interval: 30m
+  values:
+    controllers:
+      miniflux:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          labels:
+            egress.policy.home.arpa/internet: "true"
+          securityContext:
+            runAsGroup: 65534
+            runAsNonRoot: true
+            runAsUser: 65534
+        containers:
+          app:
+            image:
+              repository: ghcr.io/miniflux/miniflux
+              tag: 2.3.3
+            env:
+              BASE_URL: https://miniflux.bjw-s.dev
+              BATCH_SIZE: 100
+              CLEANUP_ARCHIVE_READ_DAYS: 60
+              CLEANUP_ARCHIVE_UNREAD_DAYS: 180
+              DATABASE_URL:
+                valueFrom:
+                  secretKeyRef:
+                    name: miniflux-postgres-app
+                    key: uri
+              DISABLE_LOCAL_AUTH: 1
+              LOG_FORMAT: json
+              OAUTH2_OIDC_DISCOVERY_ENDPOINT: https://idm.bjw-s.dev/oauth2/openid/miniflux
+              OAUTH2_OIDC_PROVIDER_NAME: Kanidm
+              OAUTH2_PROVIDER: oidc
+              OAUTH2_REDIRECT_URL: https://miniflux.bjw-s.dev/oauth2/oidc/callback
+              # BOOTSTRAP ONLY -- Keeping this on 1 afterwards it is a liability:
+              # during a recovery where the username does not match, or where the
+              # database came back empty, a 1 here silently creates a second,
+              # empty account instead of failing loudly with a 403, hiding the fact
+              # that the restore went wrong.
+              OAUTH2_USER_CREATION: 0
+              POLLING_FREQUENCY: 10
+              POLLING_LIMIT_PER_HOST: 5
+              POLLING_PARSING_ERROR_LIMIT: 0
+              POLLING_SCHEDULER: entry_frequency
+              PORT: &port 8080
+              RUN_MIGRATIONS: 1
+              SCHEDULER_ENTRY_FREQUENCY_MAX_INTERVAL: 1440
+              SCHEDULER_ENTRY_FREQUENCY_MIN_INTERVAL: 5
+              WORKER_POOL_SIZE: 5
+            envFrom:
+              - secretRef:
+                  name: miniflux-kanidm-oauth2-credentials
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /readyz
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+                  failureThreshold: 3
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /readyz
+                    port: *port
+                  initialDelaySeconds: 5
+                  periodSeconds: 5
+                  failureThreshold: 60
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    networkpolicies:
+      miniflux:
+        type: cilium
+        egress:
+          - toEndpoints:
+              - matchLabels:
+                  k8s:cnpg.io/cluster: miniflux-postgres
+            toPorts:
+              - ports:
+                  - port: "5432"
+                    protocol: TCP
+          - toEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-external
+            toPorts:
+              - ports:
+                  - port: "10443"
+                    protocol: TCP
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+            toPorts:
+              - ports:
+                  - port: "8080"
+                    protocol: TCP
+    persistence:
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+    route:
+      app:
+        hostnames:
+          - miniflux.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *port

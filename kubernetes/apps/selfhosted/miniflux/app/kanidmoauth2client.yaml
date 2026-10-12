@@ -1,0 +1,35 @@
+---
+apiVersion: kaniop.rs/v1beta1
+kind: KanidmOAuth2Client
+metadata:
+  name: miniflux
+spec:
+  kanidmRef:
+    name: sso
+    namespace: security
+  displayname: Miniflux
+  origin: https://miniflux.bjw-s.dev/
+  redirectUrl:
+    - https://miniflux.bjw-s.dev/oauth2/oidc/callback
+  # Exactly the scopes Miniflux requests (hardcoded in internal/oauth2/oidc.go).
+  # Kanidm requires every requested scope to be granted, and Miniflux never asks
+  # for `groups` -- it has no group-to-role mapping -- so granting it is noise.
+  scopeMap:
+    - group: miniflux_users@idm.bjw-s.dev
+      scopes:
+        - openid
+        - profile
+        - email
+  # NOTE: deliberately no allowInsecureClientDisablePkce, unlike oauth2-zot.yaml.
+  # Miniflux sends a real S256 challenge (internal/oauth2/authorization.go), so
+  # Kanidm's default PKCE enforcement is satisfied.
+  preferShortUsername: true
+  strictRedirectUrl: true
+  disableConsentPrompt: true
+  # Adds OAUTH2_* keys alongside the canonical CLIENT_ID/CLIENT_SECRET, so the
+  # generated secret can be consumed with a plain envFrom.
+  secretKeyAliases:
+    clientId:
+      - OAUTH2_CLIENT_ID
+    clientSecret:
+      - OAUTH2_CLIENT_SECRET
