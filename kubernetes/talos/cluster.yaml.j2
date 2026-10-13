@@ -2,19 +2,19 @@
 version: v1alpha1
 machine:
   ca:
-    crt: op://automation/talos/MACHINE_CA_CRT
+    crt: op://infrastructure/talos/MACHINE_CA_CRT
   features:
     apidCheckExtKeyUsage: true
     diskQuotaSupport: true
     rbac: true
-  token: op://automation/talos/MACHINE_TOKEN
+  token: op://infrastructure/talos/MACHINE_TOKEN
 cluster:
   ca:
-    crt: op://automation/talos/CLUSTER_CA_CRT
+    crt: op://infrastructure/talos/CLUSTER_CA_CRT
   clusterName: home-ops
   controlPlane:
     endpoint: https://k8s.bjw-s.internal:6443
-  token: op://automation/talos/CLUSTER_TOKEN
+  token: op://infrastructure/talos/CLUSTER_TOKEN
 ---
 apiVersion: v1alpha1
 kind: BondConfig
@@ -53,8 +53,8 @@ endpoint: https://discovery.talos.dev/
 ---
 apiVersion: v1alpha1
 kind: DiscoveryIdentityConfig
-clusterID: op://automation/talos/CLUSTER_ID
-clusterSecret: op://automation/talos/CLUSTER_SECRET
+clusterID: op://infrastructure/talos/CLUSTER_ID
+clusterSecret: op://infrastructure/talos/CLUSTER_SECRET
 ---
 apiVersion: v1alpha1
 kind: UnattendedInstallConfig
