@@ -49,7 +49,7 @@ services:
       GARAGE_UI_SERVER_HOST: 0.0.0.0
       GARAGE_UI_SERVER_PORT: 8080
       GARAGE_UI_SERVER_ROOT_URL: https://garage.bjw-s.dev
-    image: docker.io/noooste/garage-ui:v0.13.0
+    image: docker.io/noooste/garage-ui:v0.14.0
     labels:
       dexd.enabled: 'true'
       traefik.enable: 'true'
@@ -58,6 +58,8 @@ services:
     networks:
       - apps
     restart: unless-stopped
+    volumes:
+      - garage-ui-data:/app/data
 volumes:
   data:
     driver: local
@@ -71,3 +73,4 @@ volumes:
       device: /mnt/tank/apps/garage/meta
       o: bind
       type: none
+  garage-ui-data:
