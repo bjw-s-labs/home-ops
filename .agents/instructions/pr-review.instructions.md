@@ -35,6 +35,12 @@ Do not include internal planner/tool-harness diagnostics such as missing `reques
 
 Missing OCI revision/source labels are a non-blocking caveat for same-tag digest refreshes when repository, tag, and created timestamp evidence are consistent.
 
+### Tool call discipline
+
+- Supply every required argument for each tool call, using the current PR context where applicable.
+- After a tool error, correct the arguments before trying again; do not repeat an identical call.
+- Reuse successful tool results and stop calling tools once they provide enough evidence for the review.
+
 ### Konflate rendered-diff tools
 
 A Konflate MCP server is configured. Konflate renders Helm charts and Kustomizations into their final Kubernetes manifests, so its rendered diff shows the actual cluster impact of a PR — not just the raw git changes. A rendered-diff summary is usually already injected into the corpus by the konflate evidence provider; use the MCP tools when you need more than the summary provides.

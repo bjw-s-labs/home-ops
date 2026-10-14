@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: chatgpt-gpt-6-astra
+spec:
+  modelName: chatgpt/gpt-6-astra
+  proxyRef: litellm
+  params:
+    model: chatgpt/gpt-6-astra
+    additional:
+      additional_drop_params:
+      - temperature
+  info:
+    mode: responses
+    maxInputTokens: 272000
+    maxOutputTokens: 128000
+    supportsFunctionCalling: true
+    supportsVision: true
+    supportsPromptCaching: true
+    extra:
+      input_cost_per_token: 1.0e-05
+      cache_creation_input_token_cost: 1.25e-05
+      cache_read_input_token_cost: 1.0e-06
+      output_cost_per_token: 5.0e-05

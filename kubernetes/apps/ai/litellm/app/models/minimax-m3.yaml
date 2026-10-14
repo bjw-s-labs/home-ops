@@ -5,22 +5,29 @@ kind: LiteLLMModel
 metadata:
   name: minimax-m3
 spec:
-  modelName: minimax/MiniMax-M3
+  modelName: minimax/m3
+  proxyRef: litellm
   params:
     model: minimax/MiniMax-M3
-    apiBase: https://api.minimax.io/v1
+    apiBase: https://api.minimax.io/anthropic/v1/messages
     apiKeyRef:
       name: litellm
       key: MINIMAX_API_KEY
     additional:
-      extra_body:
-        reasoning_split: true
+      cache_control_injection_points:
+      - location: message
+        role: system
+      - location: message
+        index: -1
   info:
-    maxTokens: 1000000
+    mode: messages
     maxInputTokens: 1000000
     maxOutputTokens: 131072
     supportsFunctionCalling: true
     supportsPromptCaching: true
     supportsVision: true
     extra:
-      supports_reasoning: true
+      input_cost_per_token: 3.0e-07
+      cache_creation_input_token_cost: 3.0e-07
+      cache_read_input_token_cost: 6.0e-08
+      output_cost_per_token: 1.2e-06

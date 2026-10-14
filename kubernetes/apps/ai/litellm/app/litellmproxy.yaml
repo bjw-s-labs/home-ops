@@ -5,55 +5,74 @@ kind: LiteLLMProxy
 metadata:
   name: litellm
 spec:
-  # renovate: datasource=docker depName=ghcr.io/berriai/litellm
   image: ghcr.io/berriai/litellm:v1.105.1@sha256:b7b9e2c306343721802253d0dd9436b9634a2eb4e14da7c7cf06c5c7b7530802
   replicas: 1
-  generalSettings:
-    health_check_endpoint: /v1/health
-  routerSettings:
-    routing_strategy: simple-shuffle
-    redis_host: os.environ/REDIS_HOST
-    redis_port: os.environ/REDIS_PORT
-    num_retries: 3
-    timeout: 600
-  litellmSettings:
-    success_callback:
-      - prometheus
-    prometheus_adapter: true
-    cache: true
-    cache_params:
-      type: redis
-      host: os.environ/REDIS_HOST
-      port: os.environ/REDIS_PORT
-    drop_params: true
-    merge_reasoning_content_in_choices: true
-    set_verbose: false
   env:
+    - name: CHATGPT_TOKEN_DIR
+      value: /app/chatgpt_tokens
     - name: LITELLM_LOG
       value: INFO
-    - name: LITELLM_MODE
-      value: PRODUCTION
-    - name: REDIS_HOST
-      value: litellm-dragonfly.ai.svc.cluster.local
-    - name: REDIS_PORT
-      value: "6379"
     - name: LITELLM_MASTER_KEY
       valueFrom:
         secretKeyRef:
           name: litellm
           key: LITELLM_MASTER_KEY
+    - name: LITELLM_MODE
+      value: PRODUCTION
+    - name: PROXY_BASE_URL
+      value: https://litellm.bjw-s.dev
+    - name: REDIS_HOST
+      value: litellm-dragonfly.ai.svc.cluster.local
+    - name: REDIS_PORT
+      value: "6379"
+  generalSettings:
+    health_check_endpoint: /v1/health
+    store_model_in_db: false
+  litellmSettings:
+    cache: true
+    cache_params:
+      type: redis
+      host: os.environ/REDIS_HOST
+      port: os.environ/REDIS_PORT
+      ttl: 300
+      supported_call_types:
+        - embedding
+        - aembedding
+    drop_params: true
+    failure_callback:
+      - prometheus
+    merge_reasoning_content_in_choices: true
+    num_retries: 2
+    prometheus_adapter: true
+    request_timeout: 900
+    retry_after: 5
+    set_verbose: false
+    success_callback:
+      - prometheus
   resources:
     requests:
       cpu: 100m
       memory: 256Mi
     limits:
       memory: 2Gi
+  routerSettings:
+    cooldown_time: 30
+    enable_pre_call_checks: true
+    redis_host: os.environ/REDIS_HOST
+    redis_port: os.environ/REDIS_PORT
+    routing_strategy: simple-shuffle
   service:
     type: ClusterIP
     port: 4000
-  route:
-    hostnames:
-      - litellm.bjw-s.dev
-    parentRefs:
-      - name: envoy-external
-        namespace: network
+  volumeMounts:
+    - name: cache
+      mountPath: /app/cache
+    - name: litellm
+      mountPath: /app/chatgpt_tokens
+      subPath: chatgpt_tokens
+  volumes:
+    - name: cache
+      emptyDir: {}
+    - name: litellm
+      persistentVolumeClaim:
+        claimName: litellm
