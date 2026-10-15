@@ -42,7 +42,7 @@ jobs:
           # Renovate classification from the API (used for manual re-reviews).
           # pull_request runs read these from the event context instead.
           fjo api "repos/${FORGEJO_REPOSITORY}/pulls/${PR_NUMBER}" \
-            --jq '"head_sha=\(.head.sha)\nis_renovate=\(.head.ref | startswith("renovate/"))"' \
+            --jq '"head_sha=\(.head.sha)\nbase_sha=\(.base.sha)\nis_renovate=\(.head.ref | startswith("renovate/"))"' \
             >> "$GITHUB_OUTPUT"
 
       - name: Checkout PR
@@ -50,6 +50,22 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ forgejo.event.pull_request.head.sha || steps.prctx.outputs.head_sha }}
+
+      - name: Assemble repository review guidance
+        id: guidance
+        env:
+          BASE_SHA: ${{ forgejo.event.pull_request.base.sha || steps.prctx.outputs.base_sha }}
+          IS_RENOVATE: ${{ ((forgejo.event_name == 'pull_request' && startsWith(forgejo.head_ref, 'renovate/')) || steps.prctx.outputs.is_renovate == 'true') && 'true' || 'false' }}
+        run: |
+          # Preserve the action's trusted-base policy: never load rules from PR head.
+          : "${BASE_SHA:?Missing trusted PR base SHA}"
+          prompt="${RUNNER_TEMP}/home-ops-review.md"
+          git show "${BASE_SHA}:.agents/instructions/pr-review.instructions.md" > "$prompt"
+          if [[ "$IS_RENOVATE" == "true" ]]; then
+            printf '\n\n---\n\n' >> "$prompt"
+            git show "${BASE_SHA}:.agents/skills/renovate-review/SKILL.md" >> "$prompt"
+          fi
+          printf 'path=%s\n' "$prompt" >> "$GITHUB_OUTPUT"
 
       - name: AI PR Review
         id: ai_review
@@ -86,7 +102,7 @@ jobs:
           review-routing-mode: auto
           standards-file-candidates: AGENTS.md
           search-url: https://search.bjw-s.dev/search
-          system-prompt-file: ${{ ((forgejo.event_name == 'pull_request' && startsWith(forgejo.head_ref, 'renovate/')) || steps.prctx.outputs.is_renovate == 'true') && '.agents/skills/renovate-review/SKILL.md' || '.agents/instructions/pr-review.instructions.md' }}
+          system-prompt-file: ${{ steps.guidance.outputs.path }}
           system-prompt-mode: append
           tool-allowed-gh-api-repos: "*"
           tool-mcp-servers: "konflate=http://konflate.flux-system.svc.cluster.local:8080/mcp"

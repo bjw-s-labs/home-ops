@@ -5,11 +5,11 @@ description: Review Renovate dependency updates in this Flux/GitOps home-ops rep
 
 # Review a Renovate PR in home-ops
 
-Determine **what changes on deployment and whether this repository relies on the old behavior**. Flux can reconcile `kubernetes/` changes soon after merge. This skill is loaded by the AI PR Review workflow for `renovate/*` branches; it adds repository-specific investigation steps to the bundled reviewer. The repository's **trusted `AGENTS.md` standards remain authoritative**.
+Determine **what changes on deployment and whether this repository relies on the old behavior**. Flux can reconcile `kubernetes/` changes soon after merge. This skill is loaded by the AI PR Review workflow for `renovate/*` branches alongside `.agents/instructions/pr-review.instructions.md`; it supplements the general review procedure and bundled reviewer. The repository's **trusted `AGENTS.md` standards remain authoritative**.
 
 ## 1. Establish the update and deployment footprint
 
-- Identify every dependency and old/new version, digest or chart tag. Renovate groups may contain several independent upgrades. A shared base under `kubernetes/apps/base/<namespace>/<app>/` can deploy to **main, utility and/or test** via overlays in `kubernetes/apps/<cluster>/`; look for every consuming overlay before judging impact.
+- Identify every dependency and old/new version, digest or chart tag. Renovate groups may contain several independent upgrades. Applications live under `kubernetes/apps/<namespace>/<app>/`; shared components live under `kubernetes/components/`. Trace all consumers of a changed component before judging impact.
 - Distinguish **OCIRepository chart tag** updates, **container image/digest** updates, **HelmRelease values** changes, **Talos/Kubernetes** upgrades, **GitHub Actions**, **OpenTofu providers/modules**, **Docker Compose** and Renovate configuration. An OCI chart is pinned by `ref.tag` rather than a container-style `@sha256:` digest. Do not flag that as missing image pinning.
 - The actual rendered resources, not the one-line git diff, determine most Helm/Flux compatibility risks.
 
@@ -20,7 +20,7 @@ The reviewer is configured with the **Konflate evidence provider and read-only M
 - `mcp__konflate__get_pr_summary` with this PR number: affected resources and clusters, additions/removals, image changes, data-loss, immutable field, RBAC, `suspend`/`prune`, and render errors.
 - `mcp__konflate__get_pr_diff` with this PR number when chart defaults, templates, selectors or Helm values could change rendered manifests while the git diff looks trivial.
 - `mcp__konflate__list_pull_requests` only if necessary to establish whether this PR has render evidence. If Konflate did not render it, say **unverified**, never "unchanged" or "safe".
-- For a local manual investigation the repository documents `flate diff all --path ./kubernetes/clusters/<cluster> --base origin/main`; do **not** claim to have run this command unless an independently allowed tool actually did. A SKILL.md does **not** grant shell or Kubernetes execution rights.
+- For a local manual investigation use `flate diff all --path ./kubernetes/flux/cluster --base origin/main`; do **not** claim to have run this command unless an independently allowed tool actually did. A SKILL.md does **not** grant shell or Kubernetes execution rights.
 
 Pay special attention to changes in resource names, label **values** as well as keys, selectors, ports, services, RBAC, storage classes, CRDs, probes, immutable fields and persistent-volume behavior. Konflate may omit CRDs/Secret data; their absence from a render is not evidence of no change. One unrelated rendering failure is not proof that the upgraded chart fails.
 
@@ -32,8 +32,8 @@ Begin with the PR's Release Notes, but inspect upstream when absent, truncated, 
 
 - **OCI chart:** Find its source in the app's `ocirepository.yaml`, follow the publisher's chart releases/templates and compare versions. For mirrored `ghcr.io/home-operations/charts-mirror/<chart>`, use `home-operations/charts-mirror` metadata to locate the real chart source. When the chart's `appVersion` changes, inspect the underlying application's release notes too.
 - **Container image:** Resolve upstream from the image owner or `org.opencontainers.image.source` metadata. For `ghcr.io/home-operations/*`, also inspect `home-operations/containers` build definitions/history for digest-only changes. Check image revision/source/created metadata when available.
-- **Talos / Kubernetes:** Check each affected cluster's `talos/<cluster>/machineconfig.yaml.j2` installer image and the `TalosUpgrade`/`KubernetesUpgrade` resources managed by tuppr. Verify the **specific Talos release supports the target Kubernetes version** against the published Sidero/Talos compatibility matrix before concluding compatibility. A patch bump alone is not proof.
-- **GitHub Action / Renovate preset / OpenTofu:** Read the upstream release/compare, then verify this repository's `.github/workflows/` inputs/outputs, `.renovate/` rules, `terraform/` constraints/state/migrations, or `docker/` runtime configuration as applicable.
+- **Talos / Kubernetes:** Check `kubernetes/talos/version.yaml`, the installer template in `kubernetes/talos/cluster.yaml.j2`, node overrides under `kubernetes/talos/nodes/`, and the upgrade recipes in `kubernetes/talos/mod.just`. Verify the **specific Talos release supports the target Kubernetes version** against the published Sidero/Talos compatibility matrix before concluding compatibility. Cite the matrix; a patch bump alone is not proof.
+- **CI action / Renovate preset / IaC:** Read the upstream release/compare, then verify this repository's `.forgejo/workflows/` inputs/outputs, `.renovate/` rules, `ansible/` automation, or `docker/` runtime configuration as applicable. Do not assume a dependency's generic deployment layout exists here.
 - Follow referenced upstream issues/PRs when a changelog only says "See #123". Don't infer changed defaults or a migration solely from a release-note headline.
 
 Check raised minimum versions, removed APIs or fields, changed auth/storage/network defaults, one-way migrations, and security advisories relevant to the deployed configuration. If an upstream source cannot be verified, label the evidence gap honestly.
@@ -43,11 +43,11 @@ Check raised minimum versions, removed APIs or fields, changed auth/storage/netw
 Search the **actual consumers** of anything removed or renamed, not just whether the new value is explicitly set:
 
 - Under `kubernetes/`, inspect selectors and labels in Prometheus/ServiceMonitors, alerts and dashboards, NetworkPolicies, HTTPRoutes/Gateway policies, PDBs, Flux `dependsOn`/`healthChecks`, `values`/`valuesFrom`/`postRenderers`, service DNS and CRD instances.
-- Trace base-to-overlay usage across **main / utility / test**. Cilium, Envoy Gateway, external-secrets, Rook/Ceph, PostgreSQL and storage-provider updates merit close inspection for compatibility and data safety where affected.
+- Trace application Kustomizations and shared-component usage from `kubernetes/flux/cluster/`. Cilium, Envoy Gateway, external-secrets, Rook/Ceph, PostgreSQL and storage-provider updates merit close inspection for compatibility and data safety where affected.
 - For `app-template` or shared chart changes, look for multiple affected HelmReleases. Chart defaults can change even when values in this repo do not.
-- In `terraform/`, `ansible/`, `docker/`, `.github/` and `.renovate/`, search the corresponding consumers rather than assuming everything is a Kubernetes release.
+- In `ansible/`, `docker/`, `.forgejo/` and `.renovate/`, search the corresponding consumers rather than assuming everything is a Kubernetes release.
 
-A documented home-ops convention is **not** a finding. In particular, `metadata.namespace` intentionally comes from namespace overlays/replacements, not inline on HelmReleases or Flux Kustomizations, and OCI chart tags are not container image digests. Existing exceptions in `AGENTS.md` remain valid.
+A documented home-ops convention is **not** a finding. Apply the namespace and image-pinning policies in `AGENTS.md`; do not substitute generic linting heuristics for this repository's deployment conventions.
 
 ## 5. Verdict and evidence
 

@@ -1,23 +1,17 @@
 # Home-ops PR review conventions
 
-This file is the `system_prompt_file` for the AI PR Review workflow
-(`.forgejo/workflows/pr-reviewer.yaml`), used with `system_prompt_mode: append`:
-the action keeps its (conditionally-assembled) bundled default system prompt and
-appends this file as a repo-specific addendum. Only home-ops conventions live
-here — the base review instructions, output schema, and host-platform / digest
-guidance come from the action and no longer need to be copied or kept in sync.
+This file contains the general home-ops review procedure. The AI PR Review
+workflow (`.forgejo/workflows/pr-reviewer.yaml`) always includes it in the
+assembled `system_prompt_file`, and adds the Renovate skill for Renovate PRs.
+With `system_prompt_mode: append`, the action retains its bundled review
+instructions and output schema. Do not duplicate those instructions here.
 
-## Home-ops conventions
+## Repository policy
 
-The conventions in the repository's `AGENTS.md` are authoritative for this project. Repository-specific conventions documented there override generic Kubernetes, Helm, Flux, or GitOps linting heuristics.
-
-If a pattern is explicitly documented as intentional in `AGENTS.md` (or in the conventions listed below), do not surface it as a concern, warning, or "for awareness" note in the review.
-
-### Documented conventions to honour without flagging
-
-- **`metadata.namespace` is intentionally absent on `HelmRelease` and `Kustomization` resources.** Each namespace overlay `kubernetes/apps/<cluster>/<namespace>/kustomization.yaml` sets kustomize's `namespace:` (e.g., `namespace: ai`) for the Flux `Kustomization`s it lists, and the replacement component at `kubernetes/components/replacements/ks.yaml` copies it into each one's `spec.targetNamespace`, which places the app's `HelmRelease` and other resources in that namespace. Do not flag the absence of `metadata.namespace` on these resources as an issue.
-
-- **OCI artifacts are pinned by tag/version, not by SHA digest.** The "Prefer `@sha256:` digests" policy in `AGENTS.md` applies to container images only. OCI artifacts pulled via `OCIRepository` (Helm charts in OCI registries) are pinned by tag or version, since OCI artifacts do not support SHA-tag references the same way container images do. Do not flag the absence of `@sha256:` on OCI artifact references.
+The repository's trusted `AGENTS.md` is the authoritative source of project
+conventions and is loaded separately by CI as the standards file. Follow its
+namespace, image-pinning, upstream-evidence, and task-guidance rules. Do not flag
+explicitly intentional patterns as concerns or "for awareness" notes.
 
 ### Compact Renovate digest-only reviews
 
@@ -51,4 +45,4 @@ A Konflate MCP server is configured. Konflate renders Helm charts and Kustomizat
 
 Konflate signals in the review: surface cautions as caveats or blockers by severity; treat render failures as blockers (the manifests may not apply cleanly). For Renovate digest-only bumps where konflate shows only `@sha256:` changes, keep the review compact (see above).
 
-Check upstream for breaking changes. As the PR-Reviewer that's part of your job.
+Check upstream for breaking changes and search this repository for affected consumers. Apply the evidence requirements in `AGENTS.md`; distinguish verified impact from unavailable evidence.
