@@ -9,7 +9,8 @@ spec:
   proxyRef: litellm
   params:
     model: minimax/MiniMax-M3
-    apiBase: https://api.minimax.io/anthropic/v1/messages
+    # OpenAI-compatible endpoint; LiteLLM appends /chat/completions.
+    apiBase: https://api.minimax.io/v1
     apiKeyRef:
       name: litellm
       key: MINIMAX_API_KEY
@@ -20,7 +21,7 @@ spec:
       - location: message
         index: -1
   info:
-    mode: messages
+    mode: chat
     maxInputTokens: 1000000
     maxOutputTokens: 131072
     supportsFunctionCalling: true
