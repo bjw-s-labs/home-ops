@@ -1,0 +1,68 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmcpserver_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMMCPServer
+metadata:
+  name: home-assistant-mcp
+spec:
+  # Clients reach it through LiteLLM at /mcp/home_assistant; access is granted per LiteLLM team.
+  alias: home_assistant
+  proxyNamespace: ai
+  proxyRef: litellm
+  transport: http
+  workload:
+    image: ghcr.io/homeassistant-ai/ha-mcp:8.7.0@sha256:600677bbd7574dfb59682e40d6945f73fcc8852d3684b3671506602473942448
+    args:
+      - ha-mcp-web
+    automountServiceAccountToken: false
+    env:
+      - name: HA_MCP_DISABLE_SETTINGS_UI
+        value: "true"
+      - name: HOMEASSISTANT_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: home-assistant-mcp-secret
+            key: HOMEASSISTANT_TOKEN
+      - name: HOMEASSISTANT_URL
+        value: https://hass.bjw-s.dev
+      - name: MCP_PORT
+        value: "8086"
+      - name: MCP_SECRET_PATH
+        value: /mcp
+      - name: READ_ONLY_MODE
+        value: "false"
+    path: /mcp
+    podLabels:
+      app.kubernetes.io/name: home-assistant-mcp
+      egress.policy.home.arpa/block-all: "true"
+    podSecurityContext:
+      fsGroup: 999
+      fsGroupChangePolicy: OnRootMismatch
+      runAsGroup: 999
+      runAsNonRoot: true
+      runAsUser: 999
+      seccompProfile:
+        type: RuntimeDefault
+    port: 8086
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        memory: 512Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+          - ALL
+    volumeMounts:
+      - name: state
+        mountPath: /home/mcpuser/.ha-mcp
+      - name: tmp
+        mountPath: /tmp
+    volumes:
+      - name: state
+        emptyDir: {}
+      - name: tmp
+        emptyDir: {}
