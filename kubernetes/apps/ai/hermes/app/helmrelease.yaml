@@ -23,9 +23,9 @@ spec:
               - ports:
                   - port: "4000"
                     protocol: TCP
-          - # Kanidm OIDC discovery, token and JWKS (idm.bjw-s.dev hairpins to envoy-external).
-            # serverNames limits this to TLS with SNI idm.bjw-s.dev, so other external routes
-            # (e.g. git.bjw-s.dev) are not reachable through the same gateway.
+          - # Kanidm OIDC (idm.bjw-s.dev) and Forgejo over HTTPS (git.bjw-s.dev); both hairpin to
+            # envoy-external. serverNames limits this to TLS with these SNIs, so other external
+            # routes are not reachable through the same gateway.
             toEndpoints:
               - matchLabels:
                   k8s:io.kubernetes.pod.namespace: network
@@ -35,7 +35,19 @@ spec:
                   - port: "10443"
                     protocol: TCP
                 serverNames:
+                  - git.bjw-s.dev
                   - idm.bjw-s.dev
+          - # GitHub over HTTPS: web/git (github.com), API and tarballs (*.github.com), raw files
+            # and release assets (*.githubusercontent.com). Relies on the DNS proxy enabled by the
+            # cluster-wide allow-dns-egress policy.
+            toFQDNs:
+              - matchName: github.com
+              - matchPattern: "*.github.com"
+              - matchPattern: "*.githubusercontent.com"
+            toPorts:
+              - ports:
+                  - port: "443"
+                    protocol: TCP
         ingress:
           - fromEndpoints:
               - matchLabels:

@@ -45,3 +45,67 @@ dashboard:
   # Only envoy-internal can reach port 9119 (CiliumNetworkPolicy in helmrelease.yaml).
   trusted_proxies:
     - 10.244.0.0/16
+
+security:
+  redact_secrets: true
+
+stt:
+  enabled: false
+wake_word:
+  enabled: false
+
+terminal:
+  backend: local
+  cwd: /opt/data/workspace
+  timeout: 180
+  persistent_shell: true
+
+timezone: Europe/Amsterdam
+
+privacy:
+  redact_pii: true
+
+approvals:
+  mode: smart
+
+toolsets:
+  - hermes-cli
+
+agent:
+  max_turns: 60
+  gateway_timeout: 1800
+  restart_drain_timeout: 60
+  api_max_retries: 2
+  reasoning_effort: medium
+  disabled_toolsets:
+    - a2a
+    - browser
+    - computer_use
+    - desktop_ui
+    - feishu_doc
+    - feishu_drive
+    - homeassistant
+    - image_gen
+    - spotify
+    - video
+    - video_gen
+    - x_search
+    - yuanbao
+
+platform_toolsets:
+  cli:
+    - clarify
+    - code_execution
+    - connections
+    - context_engine
+    - cronjob
+    - delegation
+    - file
+    - kanban
+    - memory
+    - session_search
+    - skills
+    - terminal
+    - todo
+    - vision
+    - web
