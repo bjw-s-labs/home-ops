@@ -1,11 +1,11 @@
 ---
-# Hermes managed scope (/etc/hermes/config.yaml). Leaf-level overlay on top of the mutable
-# /opt/data/config.yaml: keys pinned here cannot be changed from the dashboard or the CLI.
-# Everything not pinned (sessions, memory, skills, UI preferences) stays runtime state on the PVC.
-# Several values below equal Hermes' defaults; they are pinned to keep the behaviour explicit.
+# Hermes managed scope (/etc/hermes/config.yaml): only the settings every profile must share.
+# Leaf-level overlay on top of each profile's mutable config.yaml; the keys below cannot be changed
+# from the dashboard. Everything else (profiles, models, SOUL.md, skills, MCP servers, toolsets,
+# approvals) is managed in the dashboard and lives on the PVC.
 
 model:
-  # model.default is not pinned: each profile sets its own in its Git-managed config.yaml.
+  # model.default is not pinned: choose it per profile in the dashboard.
   provider: custom:litellm
   base_url: http://litellm.ai.svc.cluster.local:4000/v1
 
@@ -32,59 +32,8 @@ providers:
       minimax/m3.1-flash-preview:
         context_length: 1000000
 
-agent:
-  # Integrations, network-reaching and media tools are out of scope for this deployment;
-  # pod egress is limited to LiteLLM and Kanidm anyway.
-  disabled_toolsets:
-    - browser
-    - computer_use
-    - connections
-    - discord
-    - discord_admin
-    - feishu_doc
-    - feishu_drive
-    - homeassistant
-    - image_gen
-    - kanban
-    - search
-    - spotify
-    - tts
-    - video
-    - video_gen
-    - web
-    - x_search
-    - yuanbao
-  gateway_timeout: 1800
-  # Caps runaway tool loops per turn (default: unlimited); a cost guard for the unbudgeted key.
-  max_turns: 60
-  # Lets in-flight turns finish on restart, within the pod's 60s termination grace period.
-  restart_drain_timeout: 60
-
-approvals:
-  mode: manual
-
-auxiliary:
-  # High-volume background tasks on the cheap model; everything else inherits the main model.
-  compression:
-    provider: main
-    model: minimax/m3.1-flash-preview
-  title_generation:
-    provider: main
-    model: minimax/m3.1-flash-preview
-
-compression:
-  enabled: true
-  protect_last_n: 20
-  target_ratio: 0.20
-  threshold: 0.50
-
-cron:
-  # Cron-spawned agents may not create or edit jobs (no unattended scheduling loops).
-  allow_agent_scheduling: false
-  # Built-in in-process 60s ticker; its heartbeat backs the container's liveness probe.
-  provider: ""
-
 dashboard:
+  # Kanidm OIDC (managed .env) is the only login: no password or Nous Portal provider.
   basic_auth:
     password: ""
     password_hash: ""
@@ -96,28 +45,3 @@ dashboard:
   # Only envoy-internal can reach port 9119 (CiliumNetworkPolicy in helmrelease.yaml).
   trusted_proxies:
     - 10.244.0.0/16
-
-delegation:
-  # Subagent iteration cap (default: 250).
-  max_iterations: 100
-
-privacy:
-  # Mask personal data before it is sent to the model provider (default: off).
-  redact_pii: true
-
-security:
-  allow_private_urls: false
-  redact_secrets: true
-
-telemetry:
-  shared_metrics:
-    enabled: false
-
-terminal:
-  backend: local
-  cwd: /opt/data/workspace
-  env_passthrough: []
-  persistent_shell: true
-  timeout: 180
-
-timezone: Europe/Amsterdam

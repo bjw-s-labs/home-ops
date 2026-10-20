@@ -14,14 +14,6 @@ configMapGenerator:
     files:
       - ./resources/managed/.env
       - ./resources/managed/config.yaml
-  # Copied over /opt/data by the init container on every start. Keys cannot contain "/", so nested
-  # files use "." and the `seed` volume in helmrelease.yaml maps them back to their paths.
-  - name: hermes-data
-    files:
-      - ./resources/data/SOUL.md
-      - ./resources/data/config.yaml
-      - profiles.home-assistant.SOUL.md=./resources/data/profiles/home-assistant/SOUL.md
-      - profiles.home-assistant.config.yaml=./resources/data/profiles/home-assistant/config.yaml
 generatorOptions:
   disableNameSuffixHash: true
   annotations:

@@ -63,12 +63,10 @@ spec:
           terminationGracePeriodSeconds: 60
         strategy: Recreate
         initContainers:
-          # 1. Copy resources/data/ (the `seed` volume) over /opt/data: the files Hermes reads directly
-          #    rather than through the managed scope (config.yaml, SOUL.md and the profiles).
-          #    --remove-destination replaces files regardless of their current owner.
-          # 2. Run the image's config migration. Its own boot hook calls it through
-          #    `s6-setuidgid hermes`, which needs CAP_SETGID and fails as non-root.
-          config:
+          # Run the image's config migration before s6 starts. Its own boot hook calls it through
+          # `s6-setuidgid hermes`, which needs CAP_SETGID and fails as non-root. Skipped on first
+          # boot so the image still creates config.yaml.
+          config-migrate:
             image: &image
               repository: docker.io/nousresearch/hermes-agent
               tag: v2026.9.24@sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7
@@ -76,8 +74,7 @@ spec:
               - /bin/sh
               - -c
               - >-
-                cd /seed &&
-                cp -rL --remove-destination SOUL.md config.yaml profiles /opt/data/ &&
+                [ ! -f /opt/data/config.yaml ] ||
                 exec /opt/hermes/.venv/bin/python /opt/hermes/scripts/docker_config_migrate.py
             env:
               HOME: /opt/data
@@ -193,26 +190,8 @@ spec:
         advancedMounts:
           hermes:
             app:
-              # Read by secrets.command in resources/data/; tmpfs, never on the PVC.
+              # For profiles' `secrets.command` (the gateway never falls back to the pod env); tmpfs.
               - path: /mnt/secrets/litellm
-                readOnly: true
-      # resources/data/, laid out as it lands in /opt/data; copied there by the init container.
-      seed:
-        type: configMap
-        name: hermes-data
-        items:
-          - key: SOUL.md
-            path: SOUL.md
-          - key: config.yaml
-            path: config.yaml
-          - key: profiles.home-assistant.SOUL.md
-            path: profiles/home-assistant/SOUL.md
-          - key: profiles.home-assistant.config.yaml
-            path: profiles/home-assistant/config.yaml
-        advancedMounts:
-          hermes:
-            config:
-              - path: /seed
                 readOnly: true
       run:
         type: emptyDir

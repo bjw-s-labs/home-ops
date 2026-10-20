@@ -15,23 +15,29 @@ Single-replica [Hermes Agent](https://github.com/NousResearch/hermes-agent) with
 - The container runs as UID/GID `10000`, the image's `hermes` user. The image refuses any other non-root UID.
 - `/opt/data` (`HERMES_HOME`) is the kopiur-backed PVC that holds sessions, memories, skills, `workspace/`, logs, and the
   mutable `config.yaml`/`.env`. `/run` and `/tmp` are emptyDirs; the root filesystem is read-only.
-- Configuration lives in Git; state lives on the PVC. `app/resources/` mirrors where files end up:
-  - `managed/` (ConfigMap `hermes-managed`) is Hermes' managed scope, mounted read-only at `/etc/hermes/config.yaml` and
-    `/etc/hermes/.env`. Its keys (provider, disabled toolsets, approvals, terminal, cron scheduler, dashboard auth) override
-    every profile and cannot be changed from the dashboard. Cron-spawned agents cannot schedule further jobs.
-  - `data/` (ConfigMap `hermes-data`) is copied over `/opt/data` by the `config` init container on every start, which then
-    runs the image's config migration. It holds what Hermes reads straight from its home rather than through the managed
-    scope: each profile's `config.yaml` (model, `mcp_servers`, `secrets`, `skills.disabled`) and `SOUL.md`. A new profile
-    needs its files under `data/profiles/<name>/` plus matching keys in the generator and the `seed` volume's `items`.
-  - Dashboard edits to configuration are refused (managed keys) or reset on restart. Chats, memory, cron jobs and your own
-    skills are state and persist.
-- The gateway (cron jobs) resolves credentials per profile and does not fall back to the pod environment, so each
-  profile's `secrets.command` reads `OPENAI_API_KEY` from the `hermes-litellm` Secret mounted at `/mnt/secrets/litellm`
-  (tmpfs, not on the PVC).
-- Profiles: `default` (the base home) and `home-assistant`, both on `chatgpt/gpt-6-luna`. Only `home-assistant` has an MCP
-  server: `ha`, which is LiteLLM's `home_assistant` server. That server runs as
-  `kubernetes/apps/home-automation/home-assistant/mcp` (ha-mcp) and holds the Home Assistant token; Hermes only uses its
-  virtual key, which reaches the server through the `hermes` LiteLLM team.
+- Git only sets what every profile must share, through Hermes' managed scope: `app/resources/managed/` (ConfigMap
+  `hermes-managed`) is mounted read-only at `/etc/hermes/config.yaml` and `/etc/hermes/.env`. It pins the LiteLLM
+  provider and model catalog and the dashboard login (Kanidm OIDC only). Pinned keys cannot be changed from the dashboard.
+- Everything else is managed in the dashboard and lives on the PVC: profiles and their models, `SOUL.md`, skills, MCP
+  servers, toolsets, approvals and auxiliary models. Nothing in Git overwrites it.
+- The `config-migrate` init container runs the image's config migration on every start (the image's own attempt fails
+  as non-root).
+- The gateway (cron jobs) resolves credentials per profile and never falls back to the pod environment. A profile that
+  runs cron jobs or uses `${OPENAI_API_KEY}` (e.g. in MCP headers) needs this in its `config.yaml`; the `hermes-litellm`
+  Secret is mounted at `/mnt/secrets/litellm` for it (tmpfs, not on the PVC):
+
+  ```yaml
+  secrets:
+    command:
+      enabled: true
+      command: printf 'OPENAI_API_KEY=%s\n' "$(cat /mnt/secrets/litellm/key)"
+  ```
+
+- Home Assistant is reachable as LiteLLM's `home_assistant` MCP server
+  (`http://litellm.ai.svc.cluster.local:4000/mcp/home_assistant`, header `Authorization: Bearer ${OPENAI_API_KEY}`). It
+  runs as `kubernetes/apps/home-automation/home-assistant/mcp` (ha-mcp) and holds the Home Assistant token; Hermes'
+  virtual key reaches it through the `hermes` LiteLLM team. Use a short server name in Hermes (e.g. `ha`): tool names
+  are prefixed with it and capped at 64 characters.
 - The model provider is the in-cluster LiteLLM proxy. The `LiteLLMVirtualKey` mints a model-scoped key into the
   `hermes-litellm` Secret, exposed as `OPENAI_API_KEY`. That name is on Hermes' subprocess credential scrub list, so
   terminal and `execute_code` children don't inherit it.
