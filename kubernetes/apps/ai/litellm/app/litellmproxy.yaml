@@ -7,9 +7,38 @@ metadata:
 spec:
   image: ghcr.io/berriai/litellm:v1.106.0@sha256:2e4c0371f3a8c28e4da131d77abaa8341cd3b0c2fcc4d34d7c5900431af7b9d0
   replicas: 1
+  # Admin API access for DB-backed resources (LiteLLMVirtualKey). Models stay
+  # file-backed because applyMode is left at its default.
+  apiAccess:
+    masterKeyRef:
+      name: litellm
+      key: LITELLM_MASTER_KEY
   env:
     - name: CHATGPT_TOKEN_DIR
       value: /app/chatgpt_tokens
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: litellm-postgres-app
+          key: uri
+    - name: GENERIC_AUTHORIZATION_ENDPOINT
+      value: https://idm.bjw-s.dev/ui/oauth2
+    - name: GENERIC_CLIENT_USE_PKCE
+      value: "true"
+    - name: GENERIC_SCOPE
+      value: openid profile email
+    - name: GENERIC_TOKEN_ENDPOINT
+      value: https://idm.bjw-s.dev/oauth2/token
+    - name: GENERIC_USER_DISPLAY_NAME_ATTRIBUTE
+      value: name
+    - name: GENERIC_USER_EMAIL_ATTRIBUTE
+      value: email
+    - name: GENERIC_USER_ID_ATTRIBUTE
+      value: sub
+    - name: GENERIC_USER_ROLE_ATTRIBUTE
+      value: litellm_role
+    - name: GENERIC_USERINFO_ENDPOINT
+      value: https://idm.bjw-s.dev/oauth2/openid/litellm/userinfo
     - name: LITELLM_LOG
       value: INFO
     - name: LITELLM_MASTER_KEY
@@ -19,15 +48,32 @@ spec:
           key: LITELLM_MASTER_KEY
     - name: LITELLM_MODE
       value: PRODUCTION
+    # Encrypts provider credentials stored in the database. Must never change
+    # once the database holds data.
+    - name: LITELLM_SALT_KEY
+      valueFrom:
+        secretKeyRef:
+          name: litellm
+          key: LITELLM_SALT_KEY
     - name: PROXY_BASE_URL
       value: https://litellm.bjw-s.dev
     - name: REDIS_HOST
       value: litellm-dragonfly.ai.svc.cluster.local
     - name: REDIS_PORT
       value: "6379"
+  envFrom:
+    - secretRef:
+        name: litellm-kanidm-oauth2-credentials
   generalSettings:
+    # SSO (Kanidm) is the only Admin UI login; the master key no longer works
+    # as the UI password but still authenticates API calls.
+    disable_env_credential_login: true
     health_check_endpoint: /v1/health
     store_model_in_db: false
+    # Envoy gateway pods sit in the pod CIDR; trusting them lets the Admin UI
+    # login throttle key on the real client address from X-Forwarded-For.
+    trusted_proxy_ranges:
+      - 10.244.0.0/16
   litellmSettings:
     cache: true
     cache_params:

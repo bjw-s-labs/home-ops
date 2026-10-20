@@ -6,11 +6,18 @@ metadata:
   name: litellm
 spec:
   components:
+    - ../../../../components/cnpg/pg18
     - ../../../../components/dragonfly
     - ../../../../components/kopiur/backup
   dependsOn:
+    - name: cloudnative-pg-barman-plugin
+      namespace: database
     - name: dragonfly-operator
       namespace: database
+    - name: kanidm-instance
+      namespace: security
+    - name: kanidm-provision
+      namespace: security
     - name: litellm-operator
       namespace: ai
   healthCheckExprs:
@@ -18,11 +25,16 @@ spec:
       kind: Dragonfly
       failed: status.phase != 'ready'
       current: status.phase == 'ready'
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')
+      current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
   interval: 1h
   path: "./kubernetes/apps/ai/litellm/app"
   postBuild:
     substitute:
       APP: litellm
+      CNPG_CAPACITY: 8Gi
   prune: true
   sourceRef:
     kind: GitRepository

@@ -1,0 +1,40 @@
+---
+apiVersion: kaniop.rs/v1beta1
+kind: KanidmOAuth2Client
+metadata:
+  name: litellm
+spec:
+  kanidmRef:
+    name: sso
+    namespace: security
+  displayname: LiteLLM
+  origin: https://litellm.bjw-s.dev/
+  redirectUrl:
+    - https://litellm.bjw-s.dev/sso/callback
+  scopeMap:
+    - group: litellm_admins@idm.bjw-s.dev
+      scopes:
+        - openid
+        - profile
+        - email
+  # LiteLLM reads its UI role from this claim (GENERIC_USER_ROLE_ATTRIBUTE).
+  # csv keeps the single value a plain string, which is what LiteLLM expects.
+  claimMap:
+    - name: litellm_role
+      valuesMap:
+        - group: litellm_admins@idm.bjw-s.dev
+          values:
+            - proxy_admin
+      joinStrategy: csv
+  # NOTE: PKCE stays enforced; LiteLLM sends an S256 challenge when
+  # GENERIC_CLIENT_USE_PKCE=true.
+  preferShortUsername: true
+  strictRedirectUrl: true
+  disableConsentPrompt: true
+  # Exposes the credentials under LiteLLM's generic SSO env names, so the
+  # generated secret can be consumed with a plain envFrom.
+  secretKeyAliases:
+    clientId:
+      - GENERIC_CLIENT_ID
+    clientSecret:
+      - GENERIC_CLIENT_SECRET
