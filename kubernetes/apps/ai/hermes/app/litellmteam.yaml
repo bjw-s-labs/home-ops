@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmteam_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMTeam
+metadata:
+  name: hermes
+spec:
+  alias: hermes
+  # LiteLLM gives virtual keys no MCP servers unless granted; models stay limited per key.
+  mcpServers:
+    - home_assistant
+  # Must be set: litellm-operator 0.0.25 sends an unset list as `null`, which LiteLLM rejects (422).
+  # The virtual key still limits Hermes to its own model list.
+  models:
+    - all-proxy-models
+  proxyRef: litellm

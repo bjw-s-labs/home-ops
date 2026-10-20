@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./kanidmoauth2client.yaml
+  - ./litellmteam.yaml
+  - ./litellmvirtualkey.yaml
+  - ./ocirepository.yaml
+  - ./helmrelease.yaml
+configMapGenerator:
+  # Managed scope, mounted read-only into /etc/hermes.
+  - name: hermes-managed
+    files:
+      - ./resources/managed/.env
+      - ./resources/managed/config.yaml
+  # Copied over /opt/data by the init container on every start. Keys cannot contain "/", so nested
+  # files use "." and the `seed` volume in helmrelease.yaml maps them back to their paths.
+  - name: hermes-data
+    files:
+      - ./resources/data/SOUL.md
+      - ./resources/data/config.yaml
+      - profiles.home-assistant.SOUL.md=./resources/data/profiles/home-assistant/SOUL.md
+      - profiles.home-assistant.config.yaml=./resources/data/profiles/home-assistant/config.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled

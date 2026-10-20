@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmvirtualkey_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMVirtualKey
+metadata:
+  name: hermes
+spec:
+  keyAlias: hermes
+  # Keep in sync with providers.litellm.models in resources/managed/config.yaml.
+  models:
+    - chatgpt/gpt-6-luna
+    - chatgpt/gpt-6.1-sol
+    - minimax/m3
+    - minimax/m3.1-flash-preview
+  proxyRef: litellm
+  secretName: hermes-litellm
+  teamID: hermes

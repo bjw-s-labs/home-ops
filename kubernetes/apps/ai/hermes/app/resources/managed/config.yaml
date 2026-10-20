@@ -1,0 +1,123 @@
+---
+# Hermes managed scope (/etc/hermes/config.yaml). Leaf-level overlay on top of the mutable
+# /opt/data/config.yaml: keys pinned here cannot be changed from the dashboard or the CLI.
+# Everything not pinned (sessions, memory, skills, UI preferences) stays runtime state on the PVC.
+# Several values below equal Hermes' defaults; they are pinned to keep the behaviour explicit.
+
+model:
+  # model.default is not pinned: each profile sets its own in its Git-managed config.yaml.
+  provider: custom:litellm
+  base_url: http://litellm.ai.svc.cluster.local:4000/v1
+
+providers:
+  litellm:
+    name: LiteLLM
+    api: http://litellm.ai.svc.cluster.local:4000/v1
+    # OPENAI_API_KEY is on Hermes' subprocess credential scrub list, so the key is not passed to
+    # terminal / execute_code children. The value is the virtual key from the hermes-litellm Secret.
+    key_env: OPENAI_API_KEY
+    transport: chat_completions
+    default_model: chatgpt/gpt-6-luna
+    discover_models: false
+    session_affinity_header: x-litellm-session-id
+    # Keep in sync with spec.models in litellmvirtualkey.yaml; context lengths mirror the
+    # LiteLLMModel definitions in kubernetes/apps/ai/litellm/app/models/.
+    models:
+      chatgpt/gpt-6-luna:
+        context_length: 272000
+      chatgpt/gpt-6.1-sol:
+        context_length: 272000
+      minimax/m3:
+        context_length: 1000000
+      minimax/m3.1-flash-preview:
+        context_length: 1000000
+
+agent:
+  # Integrations, network-reaching and media tools are out of scope for this deployment;
+  # pod egress is limited to LiteLLM and Kanidm anyway.
+  disabled_toolsets:
+    - browser
+    - computer_use
+    - connections
+    - discord
+    - discord_admin
+    - feishu_doc
+    - feishu_drive
+    - homeassistant
+    - image_gen
+    - kanban
+    - search
+    - spotify
+    - tts
+    - video
+    - video_gen
+    - web
+    - x_search
+    - yuanbao
+  gateway_timeout: 1800
+  # Caps runaway tool loops per turn (default: unlimited); a cost guard for the unbudgeted key.
+  max_turns: 60
+  # Lets in-flight turns finish on restart, within the pod's 60s termination grace period.
+  restart_drain_timeout: 60
+
+approvals:
+  mode: manual
+
+auxiliary:
+  # High-volume background tasks on the cheap model; everything else inherits the main model.
+  compression:
+    provider: main
+    model: minimax/m3.1-flash-preview
+  title_generation:
+    provider: main
+    model: minimax/m3.1-flash-preview
+
+compression:
+  enabled: true
+  protect_last_n: 20
+  target_ratio: 0.20
+  threshold: 0.50
+
+cron:
+  # Cron-spawned agents may not create or edit jobs (no unattended scheduling loops).
+  allow_agent_scheduling: false
+  # Built-in in-process 60s ticker; its heartbeat backs the container's liveness probe.
+  provider: ""
+
+dashboard:
+  basic_auth:
+    password: ""
+    password_hash: ""
+    username: ""
+  oauth:
+    client_id: ""
+    provider: self-hosted
+  # Pod CIDR, so X-Forwarded-Proto from envoy-internal is honoured (Secure session cookies).
+  # Only envoy-internal can reach port 9119 (CiliumNetworkPolicy in helmrelease.yaml).
+  trusted_proxies:
+    - 10.244.0.0/16
+
+delegation:
+  # Subagent iteration cap (default: 250).
+  max_iterations: 100
+
+privacy:
+  # Mask personal data before it is sent to the model provider (default: off).
+  redact_pii: true
+
+security:
+  allow_private_urls: false
+  redact_secrets: true
+
+telemetry:
+  shared_metrics:
+    enabled: false
+
+terminal:
+  backend: local
+  cwd: /opt/data/workspace
+  env_passthrough: []
+  persistent_shell: true
+  timeout: 180
+
+timezone: Europe/Amsterdam

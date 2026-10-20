@@ -1,0 +1,86 @@
+---
+# Home Assistant profile (/opt/data/profiles/home-assistant), copied into place by the init
+# container on every start. A profile is its own Hermes home: it does not inherit the base
+# resources/data/config.yaml, but the managed scope (resources/managed/config.yaml) applies to it.
+_config_version: 46
+
+model:
+  # Model for this profile; must be one of providers.litellm.models in resources/managed/config.yaml.
+  default: chatgpt/gpt-6-luna
+
+mcp_servers:
+  # Through LiteLLM's MCP gateway (kubernetes/apps/home-automation/home-assistant/mcp); read-only
+  # unless READ_ONLY_MODE is turned off there. Access comes from the hermes LiteLLM team.
+  # Short server name: Hermes prefixes tools with mcp__<name>__ on top of LiteLLM's home_assistant_
+  # prefix, and provider tool names are capped at 64 characters.
+  ha:
+    url: http://litellm.ai.svc.cluster.local:4000/mcp/home_assistant
+    headers:
+      Authorization: "Bearer ${OPENAI_API_KEY}"
+
+secrets:
+  # Profile-scoped credentials never fall back to the pod env; read the key from the Secret file.
+  command:
+    enabled: true
+    command: printf 'OPENAI_API_KEY=%s\n' "$(cat /mnt/secrets/litellm/key)"
+
+skills:
+  # No bundled skills: ha-mcp provides its own guide (ha_get_skill_guide). hermes-agent is always on.
+  disabled:
+    - airtable
+    - apple-notes
+    - apple-reminders
+    - architecture-diagram
+    - arxiv
+    - ascii-video
+    - baoyu-infographic
+    - blocked-page-recovery
+    - box
+    - claude-code
+    - claude-design
+    - codebase-inspection
+    - codex
+    - competitor-news-monitor
+    - computer-use
+    - design-md
+    - document-to-action-items
+    - docx
+    - dogfood
+    - email-inbox-triage
+    - findmy
+    - gif-search
+    - github
+    - google-workspace
+    - grounded-citations
+    - hermes-agent-skill-authoring
+    - himalaya
+    - humanizer
+    - imessage
+    - inspecting-hermes-desktop-dom
+    - llm-wiki
+    - manim-video
+    - maps
+    - meeting-action-items
+    - node-inspect-debugger
+    - notion
+    - obsidian
+    - opencode
+    - p5js
+    - pdf
+    - popular-web-designs
+    - powerpoint
+    - product-price-monitor
+    - python-debugpy
+    - requesting-code-review
+    - sdlc-review
+    - simplify-code
+    - songsee
+    - songwriting-and-ai-music
+    - spike
+    - systematic-debugging
+    - teams-meeting-pipeline
+    - test-driven-development
+    - weekly-review-planning
+    - xlsx
+    - xurl
+    - youtube-content

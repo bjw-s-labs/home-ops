@@ -1,0 +1,236 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: hermes
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: hermes
+  interval: 30m
+  values:
+    networkpolicies:
+      hermes:
+        type: cilium
+        egress:
+          - # LiteLLM proxy (model provider)
+            toEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: ai
+                  app.kubernetes.io/name: litellm
+            toPorts:
+              - ports:
+                  - port: "4000"
+                    protocol: TCP
+          - # Kanidm OIDC discovery, token and JWKS (idm.bjw-s.dev hairpins to envoy-external).
+            # serverNames limits this to TLS with SNI idm.bjw-s.dev, so other external routes
+            # (e.g. git.bjw-s.dev) are not reachable through the same gateway.
+            toEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-external
+            toPorts:
+              - ports:
+                  - port: "10443"
+                    protocol: TCP
+                serverNames:
+                  - idm.bjw-s.dev
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+            toPorts:
+              - ports:
+                  - port: "9119"
+                    protocol: TCP
+    controllers:
+      hermes:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          labels:
+            egress.policy.home.arpa/block-all: "true"
+          securityContext:
+            fsGroup: 10000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 10000
+            runAsNonRoot: true
+            runAsUser: 10000
+            seccompProfile:
+              type: RuntimeDefault
+          terminationGracePeriodSeconds: 60
+        strategy: Recreate
+        initContainers:
+          # 1. Copy resources/data/ (the `seed` volume) over /opt/data: the files Hermes reads directly
+          #    rather than through the managed scope (config.yaml, SOUL.md and the profiles).
+          #    --remove-destination replaces files regardless of their current owner.
+          # 2. Run the image's config migration. Its own boot hook calls it through
+          #    `s6-setuidgid hermes`, which needs CAP_SETGID and fails as non-root.
+          config:
+            image: &image
+              repository: docker.io/nousresearch/hermes-agent
+              tag: v2026.9.24@sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7
+            command:
+              - /bin/sh
+              - -c
+              - >-
+                cd /seed &&
+                cp -rL --remove-destination SOUL.md config.yaml profiles /opt/data/ &&
+                exec /opt/hermes/.venv/bin/python /opt/hermes/scripts/docker_config_migrate.py
+            env:
+              HOME: /opt/data
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+        containers:
+          app:
+            image: *image
+            # s6-overlay /init stays PID 1. `gateway run` registers the gateway (cron scheduler) as an
+            # s6 service next to the dashboard (HERMES_DASHBOARD=1), then execs `sleep infinity` as the
+            # main-program heartbeat. No messaging platforms are configured.
+            args:
+              - gateway
+              - run
+            env:
+              HERMES_DASHBOARD: "1"
+              HERMES_DASHBOARD_HOST: 0.0.0.0
+              # Not on Hermes' subprocess scrub list, but redact_secrets masks it in terminal output
+              # and in anything sent to the model.
+              HERMES_DASHBOARD_OIDC_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: hermes-kanidm-oauth2-credentials
+                    key: CLIENT_SECRET
+              HERMES_DASHBOARD_PORT: &port 9119
+              # Model-scoped virtual key minted by the LiteLLMVirtualKey in litellmvirtualkey.yaml.
+              OPENAI_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: hermes-litellm
+                    key: key
+              # /run is an emptyDir, which s6-overlay rejects as world-writable unless acknowledged.
+              S6_YES_I_WANT_A_WORLD_WRITABLE_RUN_BECAUSE_KUBERNETES: "1"
+            probes:
+              # /api/health is unauthenticated by design; the dashboard refuses to bind without a
+              # registered auth provider, so a broken auth config fails these probes.
+              # Startup and liveness also require a fresh cron ticker heartbeat (written every 60s by
+              # the gateway), so a dead gateway or a hung scheduler restarts the container.
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: &healthcheck
+                      - /bin/sh
+                      - -c
+                      - >-
+                        curl -fsS -o /dev/null --max-time 4 http://127.0.0.1:9119/api/health &&
+                        hb=$(cut -d. -f1 /opt/data/cron/ticker_heartbeat) &&
+                        [ $(( $(date +%s) - hb )) -lt 300 ]
+                  failureThreshold: 3
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  failureThreshold: 3
+                  httpGet:
+                    path: /api/health
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: *healthcheck
+                  failureThreshold: 30
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                memory: 4Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      data:
+        existingClaim: hermes
+        globalMounts:
+          - path: /opt/data
+      # resources/managed/: Hermes' managed scope. Mounted per file so the image's own
+      # /etc/hermes/image-provenance.json stays visible.
+      managed:
+        type: configMap
+        name: hermes-managed
+        globalMounts:
+          - path: /etc/hermes/.env
+            subPath: .env
+            readOnly: true
+          - path: /etc/hermes/config.yaml
+            subPath: config.yaml
+            readOnly: true
+      litellm-key:
+        type: secret
+        name: hermes-litellm
+        advancedMounts:
+          hermes:
+            app:
+              # Read by secrets.command in resources/data/; tmpfs, never on the PVC.
+              - path: /mnt/secrets/litellm
+                readOnly: true
+      # resources/data/, laid out as it lands in /opt/data; copied there by the init container.
+      seed:
+        type: configMap
+        name: hermes-data
+        items:
+          - key: SOUL.md
+            path: SOUL.md
+          - key: config.yaml
+            path: config.yaml
+          - key: profiles.home-assistant.SOUL.md
+            path: profiles/home-assistant/SOUL.md
+          - key: profiles.home-assistant.config.yaml
+            path: profiles/home-assistant/config.yaml
+        advancedMounts:
+          hermes:
+            config:
+              - path: /seed
+                readOnly: true
+      run:
+        type: emptyDir
+        globalMounts:
+          - path: /run
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+    route:
+      app:
+        hostnames:
+          - hermes.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *port
