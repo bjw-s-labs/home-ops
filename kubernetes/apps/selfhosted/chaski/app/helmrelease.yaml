@@ -1,0 +1,65 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: chaski
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: chaski
+  interval: 30m
+  values:
+    config:
+      routes:
+        radarr-pushover:
+          target: radarr-pushover
+          whenExpr: payload.eventType == "Download" || payload.eventType == "ManualInteractionRequired" || payload.eventType == "Test"
+          title: >-
+            {{ if eq .payload.eventType "Download" }}Movie {{ if .payload.isUpgrade }}Upgraded{{ else }}Added{{ end }}{{ else if eq .payload.eventType "ManualInteractionRequired" }}Movie Requires Manual Interaction{{ else }}Test Notification{{ end }}
+          message: >-
+            {{ if eq .payload.eventType "Download" }}{{ printf "<b>%s (%v)</b><small>\n\n<b>Release:</b> %s\n<b>Client:</b> %s</small><small>\n\n%s</small>" .payload.movie.title .payload.movie.year .payload.movieFile.sceneName .payload.downloadClient .payload.movie.overview }}{{ else if eq .payload.eventType "ManualInteractionRequired" }}{{ printf "<b>%s (%v)</b><small>\n<b>Client:</b> %s</small>" .payload.movie.title .payload.movie.year .payload.downloadClient }}{{ else }}Howdy this is a test notification{{ end }}
+          params:
+            format: html
+            priority: >-
+              {{ if eq .payload.eventType "ManualInteractionRequired" }}high{{ else }}moderate{{ end }}
+            url: >-
+              {{ if eq .payload.eventType "Download" }}{{ printf "%s/movie/%v" .payload.applicationUrl .payload.movie.tmdbId }}{{ else if eq .payload.eventType "ManualInteractionRequired" }}{{ printf "%s/activity/queue" .payload.applicationUrl }}{{ else }}{{ .payload.applicationUrl }}{{ end }}
+            url_title: >-
+              {{ if eq .payload.eventType "Download" }}View Movie{{ else if eq .payload.eventType "ManualInteractionRequired" }}View Queue{{ else }}View Movies{{ end }}
+        sonarr-pushover:
+          target: sonarr-pushover
+          whenExpr: payload.eventType == "Download" || payload.eventType == "ManualInteractionRequired" || payload.eventType == "Test"
+          title: >-
+            {{ if eq .payload.eventType "Download" }}Episode {{ if .payload.isUpgrade }}Upgraded{{ else }}Added{{ end }}{{ else if eq .payload.eventType "ManualInteractionRequired" }}Episode Requires Manual Interaction{{ else }}Test Notification{{ end }}
+          message: >-
+            {{ if eq .payload.eventType "Download" }}{{ printf "<b>%s (S%02.0fE%02.0f)</b><small>\n%s</small><small>\n\n<b>Client:</b> %s</small>" .payload.series.title (index (index .payload.episodes 0) "seasonNumber") (index (index .payload.episodes 0) "episodeNumber") (index (index .payload.episodes 0) "title") .payload.downloadClient }}{{ else if eq .payload.eventType "ManualInteractionRequired" }}{{ printf "<b>%s</b><small>\n<b>Client:</b> %s</small>" .payload.series.title .payload.downloadClient }}{{ else }}Howdy this is a test notification{{ end }}
+          params:
+            format: html
+            priority: >-
+              {{ if eq .payload.eventType "ManualInteractionRequired" }}high{{ else }}moderate{{ end }}
+            url: >-
+              {{ if eq .payload.eventType "Download" }}{{ printf "%s/series/%s" .payload.applicationUrl .payload.series.titleSlug }}{{ else if eq .payload.eventType "ManualInteractionRequired" }}{{ printf "%s/activity/queue" .payload.applicationUrl }}{{ else }}{{ .payload.applicationUrl }}{{ end }}
+            url_title: >-
+              {{ if eq .payload.eventType "Download" }}View Series{{ else if eq .payload.eventType "ManualInteractionRequired" }}View Queue{{ else }}View Series{{ end }}
+      targets:
+        radarr-pushover:
+          apprise:
+            url: >-
+              {{ env "APPRISE_RADARR_PUSHOVER_URL" }}
+        sonarr-pushover:
+          apprise:
+            url: >-
+              {{ env "APPRISE_SONARR_PUSHOVER_URL" }}
+    envFrom:
+      - secretRef:
+          name: chaski-secret
+    podLabels:
+      egress.policy.home.arpa/internet: "true"
+    resources:
+      limits:
+        memory: 256Mi
+      requests:
+        cpu: 10m
+    service:
+      port: 8080
