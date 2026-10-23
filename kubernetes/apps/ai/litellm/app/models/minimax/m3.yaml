@@ -3,13 +3,14 @@
 apiVersion: litellm.home-operations.com/v1alpha1
 kind: LiteLLMModel
 metadata:
-  name: minimax-m3-anthropic
+  name: minimax-m3
 spec:
-  modelName: minimax/m3-anthropic
+  modelName: minimax/m3
   proxyRef: litellm
   params:
     model: minimax/MiniMax-M3
-    apiBase: https://api.minimax.io/anthropic/v1/messages
+    # OpenAI-compatible endpoint; LiteLLM appends /chat/completions.
+    apiBase: https://api.minimax.io/v1
     apiKeyRef:
       name: litellm
       key: MINIMAX_API_KEY
@@ -20,14 +21,9 @@ spec:
       - location: message
         index: -1
   info:
-    mode: anthropic_messages
+    mode: chat
     maxInputTokens: 1000000
     maxOutputTokens: 131072
     supportsFunctionCalling: true
     supportsPromptCaching: true
     supportsVision: true
-    extra:
-      input_cost_per_token: 3.0e-07
-      cache_creation_input_token_cost: 3.0e-07
-      cache_read_input_token_cost: 6.0e-08
-      output_cost_per_token: 1.2e-06

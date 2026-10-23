@@ -101,6 +101,14 @@ spec:
       memory: 256Mi
     limits:
       memory: 2Gi
+  route:
+    hostnames:
+      - litellm.bjw-s.dev
+    parentRefs:
+      - group: gateway.networking.k8s.io
+        kind: Gateway
+        name: envoy-internal
+        namespace: network
   routerSettings:
     cooldown_time: 30
     enable_pre_call_checks: true

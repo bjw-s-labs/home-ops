@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: neuralwatt-dsv4.1f
+spec:
+  modelName: neuralwatt/dsv4.1f
+  proxyRef: litellm
+  params:
+    model: openai/deepseek-v4.1-flash
+    apiBase: https://api.neuralwatt.com/v1
+    apiKeyRef:
+      name: litellm
+      key: NEURALWATT_API_KEY
+    additional:
+      order: 2
+      allowed_openai_params:
+      - reasoning_effort
+  info:
+    mode: chat
+    maxInputTokens: 1000000
+    maxOutputTokens: 393216
+    supportsFunctionCalling: true
+    supportsPromptCaching: true
+    supportsVision: true
