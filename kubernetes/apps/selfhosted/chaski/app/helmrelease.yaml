@@ -10,38 +10,69 @@ spec:
     name: chaski
   interval: 30m
   values:
+    deploymentAnnotations:
+      reloader.stakater.com/auto: "true"
+    env:
+      TZ: Europe/Amsterdam
     config:
       routes:
-        radarr-pushover:
+        radarr-download:
           target: radarr-pushover
-          whenExpr: payload.eventType == "Download" || payload.eventType == "ManualInteractionRequired" || payload.eventType == "Test"
           title: >-
-            {{ if eq .payload.eventType "Download" }}Movie {{ if .payload.isUpgrade }}Upgraded{{ else }}Added{{ end }}{{ else if eq .payload.eventType "ManualInteractionRequired" }}Movie Requires Manual Interaction{{ else }}Test Notification{{ end }}
-          message: >-
-            {{ if eq .payload.eventType "Download" }}{{ printf "<b>%s (%v)</b><small>\n\n<b>Release:</b> %s\n<b>Client:</b> %s</small><small>\n\n%s</small>" .payload.movie.title .payload.movie.year .payload.movieFile.sceneName .payload.downloadClient .payload.movie.overview }}{{ else if eq .payload.eventType "ManualInteractionRequired" }}{{ printf "<b>%s (%v)</b><small>\n<b>Client:</b> %s</small>" .payload.movie.title .payload.movie.year .payload.downloadClient }}{{ else }}Howdy this is a test notification{{ end }}
+            Movie {{ if .payload.isUpgrade }}Upgraded{{ else }}Added{{ end }}
+          message: |-
+            <b>{{ .payload.movie.title }} ({{ .payload.movie.year }})</b>
+            <small>{{ .payload.movie.overview | ellipsis 300 }}</small>
+            <small><b>Release:</b> {{ .payload.movieFile.sceneName }}
+            <b>Client:</b> {{ .payload.downloadClient | default "unknown" }}</small>
           params:
             format: html
-            priority: >-
-              {{ if eq .payload.eventType "ManualInteractionRequired" }}high{{ else }}moderate{{ end }}
+            priority: moderate
             url: >-
-              {{ if eq .payload.eventType "Download" }}{{ printf "%s/movie/%v" .payload.applicationUrl .payload.movie.tmdbId }}{{ else if eq .payload.eventType "ManualInteractionRequired" }}{{ printf "%s/activity/queue" .payload.applicationUrl }}{{ else }}{{ .payload.applicationUrl }}{{ end }}
-            url_title: >-
-              {{ if eq .payload.eventType "Download" }}View Movie{{ else if eq .payload.eventType "ManualInteractionRequired" }}View Queue{{ else }}View Movies{{ end }}
-        sonarr-pushover:
+              {{ printf "%s/movie/%v" .payload.applicationUrl .payload.movie.tmdbId }}
+            url_title: View Movie
+          whenExpr: payload.eventType == "Download"
+        radarr-manual:
+          target: radarr-pushover
+          title: Movie Requires Manual Interaction
+          message: |-
+            <b>{{ .payload.movie.title }} ({{ .payload.movie.year }})</b>
+            <small><b>Client:</b> {{ .payload.downloadClient | default "unknown" }}</small>
+          params:
+            format: html
+            priority: high
+            url: >-
+              {{ printf "%s/activity/queue" .payload.applicationUrl }}
+            url_title: View Queue
+          whenExpr: payload.eventType == "ManualInteractionRequired"
+        sonarr-download:
           target: sonarr-pushover
-          whenExpr: payload.eventType == "Download" || payload.eventType == "ManualInteractionRequired" || payload.eventType == "Test"
           title: >-
-            {{ if eq .payload.eventType "Download" }}Episode {{ if .payload.isUpgrade }}Upgraded{{ else }}Added{{ end }}{{ else if eq .payload.eventType "ManualInteractionRequired" }}Episode Requires Manual Interaction{{ else }}Test Notification{{ end }}
-          message: >-
-            {{ if eq .payload.eventType "Download" }}{{ printf "<b>%s (S%02.0fE%02.0f)</b><small>\n%s</small><small>\n\n<b>Client:</b> %s</small>" .payload.series.title (index (index .payload.episodes 0) "seasonNumber") (index (index .payload.episodes 0) "episodeNumber") (index (index .payload.episodes 0) "title") .payload.downloadClient }}{{ else if eq .payload.eventType "ManualInteractionRequired" }}{{ printf "<b>%s</b><small>\n<b>Client:</b> %s</small>" .payload.series.title .payload.downloadClient }}{{ else }}Howdy this is a test notification{{ end }}
+            Episode {{ if .payload.isUpgrade }}Upgraded{{ else }}Added{{ end }}
+          message: |-
+            <b>{{ .payload.series.title }} ({{ printf "S%02.0fE%02.0f" (index (index .payload.episodes 0) "seasonNumber") (index (index .payload.episodes 0) "episodeNumber") }})</b>
+            <small>{{ (index (index .payload.episodes 0) "title") | ellipsis 300 }}</small>
+            <small><b>Client:</b> {{ .payload.downloadClient | default "unknown" }}</small>
           params:
             format: html
-            priority: >-
-              {{ if eq .payload.eventType "ManualInteractionRequired" }}high{{ else }}moderate{{ end }}
+            priority: moderate
             url: >-
-              {{ if eq .payload.eventType "Download" }}{{ printf "%s/series/%s" .payload.applicationUrl .payload.series.titleSlug }}{{ else if eq .payload.eventType "ManualInteractionRequired" }}{{ printf "%s/activity/queue" .payload.applicationUrl }}{{ else }}{{ .payload.applicationUrl }}{{ end }}
-            url_title: >-
-              {{ if eq .payload.eventType "Download" }}View Series{{ else if eq .payload.eventType "ManualInteractionRequired" }}View Queue{{ else }}View Series{{ end }}
+              {{ printf "%s/series/%s" .payload.applicationUrl .payload.series.titleSlug }}
+            url_title: View Series
+          whenExpr: payload.eventType == "Download"
+        sonarr-manual:
+          target: sonarr-pushover
+          title: Episode Requires Manual Interaction
+          message: |-
+            <b>{{ .payload.series.title }}</b>
+            <small><b>Client:</b> {{ .payload.downloadClient | default "unknown" }}</small>
+          params:
+            format: html
+            priority: high
+            url: >-
+              {{ printf "%s/activity/queue" .payload.applicationUrl }}
+            url_title: View Queue
+          whenExpr: payload.eventType == "ManualInteractionRequired"
       targets:
         radarr-pushover:
           apprise:
