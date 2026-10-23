@@ -9,8 +9,7 @@ spec:
   # LiteLLM gives virtual keys no MCP servers unless granted; models stay limited per key.
   mcpServers:
     - home_assistant
-  # Must be set: litellm-operator 0.0.25 sends an unset list as `null`, which LiteLLM rejects (422).
-  # The virtual key still limits Hermes to its own model list.
+    - unifi_network
   models:
     - all-proxy-models
   proxyRef: litellm

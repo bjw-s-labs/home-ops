@@ -1,0 +1,56 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmcpserver_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMMCPServer
+metadata:
+  name: unifi-network-mcp
+spec:
+  alias: unifi_network
+  proxyRef: litellm
+  transport: http
+  workload:
+    image: ghcr.io/sirkirby/unifi-network-mcp:0.38.3@sha256:f872b0e26ceb40d144d857854a92d37d7a4f71f567f9a757a450d20301062855
+    automountServiceAccountToken: false
+    env:
+      - name: UNIFI_MCP_ALLOWED_HOSTS
+        value: unifi-network-mcp.ai.svc.cluster.local,unifi-network-mcp,localhost,127.0.0.1
+      - name: UNIFI_MCP_HOST
+        value: 0.0.0.0
+      - name: UNIFI_MCP_HTTP_ENABLED
+        value: "true"
+      - name: UNIFI_MCP_PORT
+        value: "3000"
+      - name: UNIFI_NETWORK_HOST
+        value: 10.1.1.1
+    envFrom:
+      - secretRef:
+          name: unifi-network-mcp
+    path: /mcp
+    podLabels:
+      app.kubernetes.io/name: unifi-network-mcp
+      egress.policy.home.arpa/block-all: "true"
+    podSecurityContext:
+      fsGroup: 65532
+      runAsNonRoot: true
+      runAsUser: 65532
+      seccompProfile:
+        type: RuntimeDefault
+    port: 3000
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        memory: 512Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      readOnlyRootFilesystem: true
+    volumeMounts:
+      - name: tmp
+        mountPath: /tmp
+    volumes:
+      - name: tmp
+        emptyDir: {}
