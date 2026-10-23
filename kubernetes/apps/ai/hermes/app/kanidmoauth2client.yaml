@@ -1,6 +1,6 @@
 ---
-# Confidential client for the dashboard's native self-hosted OIDC provider. kaniop writes the
-# credentials to hermes-kanidm-oauth2-credentials; Hermes sends the secret on top of PKCE.
+# Confidential client for Hermes WebUI's native OIDC provider. kaniop writes the
+# credentials to hermes-kanidm-oauth2-credentials; WebUI sends the secret with PKCE.
 # Issuer: https://idm.bjw-s.dev/oauth2/openid/hermes
 apiVersion: kaniop.rs/v1beta1
 kind: KanidmOAuth2Client
@@ -13,15 +13,22 @@ spec:
   displayname: Hermes
   origin: https://hermes.bjw-s.dev/
   redirectUrl:
-    - https://hermes.bjw-s.dev/auth/callback
-  # Hermes has no roles: every signed-in user gets full dashboard and agent (shell) access,
-  # so this group is the only authorization gate. Managed in the kanidm-provision repository.
+    - https://hermes.bjw-s.dev/api/auth/oidc/callback
+  # Every signed-in user gets full agent (shell) access. The group is managed in
+  # kanidm-provision and is checked both by Kanidm and by WebUI's allowlist.
   scopeMap:
     - group: hermes_admins@idm.bjw-s.dev
       scopes:
         - openid
         - profile
         - email
+  claimMap:
+    - name: hermes_access
+      valuesMap:
+        - group: hermes_admins@idm.bjw-s.dev
+          values:
+            - admin
+      joinStrategy: csv
   preferShortUsername: true
   strictRedirectUrl: true
   disableConsentPrompt: true

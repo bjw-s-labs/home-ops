@@ -23,9 +23,8 @@ spec:
               - ports:
                   - port: "4000"
                     protocol: TCP
-          - # Kanidm OIDC (idm.bjw-s.dev) and Forgejo over HTTPS (git.bjw-s.dev); both hairpin to
-            # envoy-external. serverNames limits this to TLS with these SNIs, so other external
-            # routes are not reachable through the same gateway.
+          - # Forgejo over HTTPS hairpins to envoy-external. WebUI's OIDC validator
+            # requires Kanidm to resolve to a public address (see the VPS rule below).
             toEndpoints:
               - matchLabels:
                   k8s:io.kubernetes.pod.namespace: network
@@ -36,6 +35,15 @@ spec:
                     protocol: TCP
                 serverNames:
                   - git.bjw-s.dev
+          - # Kanidm's public ingress address. Keep in sync with public-edge-dnsendpoint.yaml.
+            # Restrict TLS SNI to the issuer hostname.
+            toCIDR:
+              - 135.125.53.129/32
+            toPorts:
+              - ports:
+                  - port: "443"
+                    protocol: TCP
+                serverNames:
                   - idm.bjw-s.dev
           - # GitHub over HTTPS: web/git (github.com), API and tarballs (*.github.com), raw files
             # and release assets (*.githubusercontent.com). Relies on the DNS proxy enabled by the
@@ -48,6 +56,14 @@ spec:
               - ports:
                   - port: "443"
                     protocol: TCP
+          - # WebUI installs its Python dependencies on first start.
+            toFQDNs:
+              - matchName: pypi.org
+              - matchName: files.pythonhosted.org
+            toPorts:
+              - ports:
+                  - port: "443"
+                    protocol: TCP
         ingress:
           - fromEndpoints:
               - matchLabels:
@@ -55,7 +71,7 @@ spec:
                   gateway.networking.k8s.io/gateway-name: envoy-internal
             toPorts:
               - ports:
-                  - port: "9119"
+                  - port: "8787"
                     protocol: TCP
     controllers:
       hermes:
@@ -64,6 +80,12 @@ spec:
         pod:
           labels:
             egress.policy.home.arpa/block-all: "true"
+          # WebUI rejects OIDC endpoints that resolve to private IPs. Use the public
+          # ingress address for Kanidm while preserving its issuer hostname and TLS.
+          hostAliases:
+            - ip: 135.125.53.129
+              hostnames:
+                - idm.bjw-s.dev
           securityContext:
             fsGroup: 10000
             fsGroupChangePolicy: OnRootMismatch
@@ -104,36 +126,29 @@ spec:
         containers:
           app:
             image: *image
-            # s6-overlay /init stays PID 1. `gateway run` registers the gateway (cron scheduler) as an
-            # s6 service next to the dashboard (HERMES_DASHBOARD=1), then execs `sleep infinity` as the
-            # main-program heartbeat. No messaging platforms are configured.
+            # Run the host gateway from the root profile. Without -p default, the CLI
+            # follows the PVC's sticky active_profile and refuses a named profile.
+            command:
+              - hermes
             args:
+              - -p
+              - default
               - gateway
               - run
+              - --no-supervise
             env:
-              HERMES_DASHBOARD: "1"
-              HERMES_DASHBOARD_HOST: 0.0.0.0
-              # Not on Hermes' subprocess scrub list, but redact_secrets masks it in terminal output
-              # and in anything sent to the model.
-              HERMES_DASHBOARD_OIDC_CLIENT_SECRET:
-                valueFrom:
-                  secretKeyRef:
-                    name: hermes-kanidm-oauth2-credentials
-                    key: CLIENT_SECRET
-              HERMES_DASHBOARD_PORT: &port 9119
+              HERMES_DISABLE_LAZY_INSTALLS: "true"
+              HERMES_HOME: /opt/data
+              HERMES_WRITE_SAFE_ROOT: /opt/data
+              HOME: /opt/data
               # Model-scoped virtual key minted by the LiteLLMVirtualKey in litellmvirtualkey.yaml.
               OPENAI_API_KEY:
                 valueFrom:
                   secretKeyRef:
                     name: hermes-litellm
                     key: key
-              # /run is an emptyDir, which s6-overlay rejects as world-writable unless acknowledged.
-              S6_YES_I_WANT_A_WORLD_WRITABLE_RUN_BECAUSE_KUBERNETES: "1"
             probes:
-              # /api/health is unauthenticated by design; the dashboard refuses to bind without a
-              # registered auth provider, so a broken auth config fails these probes.
-              # Startup and liveness also require a fresh cron ticker heartbeat (written every 60s by
-              # the gateway), so a dead gateway or a hung scheduler restarts the container.
+              # A fresh cron ticker heartbeat (written every 60s by the gateway) is required.
               liveness:
                 enabled: true
                 custom: true
@@ -143,7 +158,6 @@ spec:
                       - /bin/sh
                       - -c
                       - >-
-                        curl -fsS -o /dev/null --max-time 4 http://127.0.0.1:9119/api/health &&
                         hb=$(cut -d. -f1 /opt/data/cron/ticker_heartbeat) &&
                         [ $(( $(date +%s) - hb )) -lt 300 ]
                   failureThreshold: 3
@@ -154,9 +168,8 @@ spec:
                 custom: true
                 spec:
                   failureThreshold: 3
-                  httpGet:
-                    path: /api/health
-                    port: *port
+                  exec:
+                    command: *healthcheck
                   periodSeconds: 10
                   timeoutSeconds: 5
               startup:
@@ -168,6 +181,87 @@ spec:
                   failureThreshold: 30
                   periodSeconds: 10
                   timeoutSeconds: 5
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 1Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+          webui:
+            image:
+              repository: ghcr.io/nesquena/hermes-webui
+              tag: 0.52.492@sha256:e507cafa7b112de9abd58348423ded28a8182539e6ebb5f95be603f20aff52e6
+            command:
+              - /bin/bash
+              - -c
+              - |
+                # The gateway generates API_SERVER_KEY in the shared Hermes home.
+                # Read only that value and pass it to the upstream WebUI entrypoint.
+                if [ -r "$HERMES_HOME/.env" ]; then
+                  key=$(sed -n 's/^API_SERVER_KEY=//p' "$HERMES_HOME/.env" | tail -n 1 | tr -d '"\r')
+                  if [ -n "$key" ]; then
+                    export HERMES_WEBUI_GATEWAY_API_KEY="$key"
+                  fi
+                fi
+                exec /hermeswebui_init.bash
+            env:
+              HERMES_API_URL: http://127.0.0.1:8642
+              HERMES_HOME: /home/hermeswebui/.hermes
+              HERMES_WEBUI_CHAT_BACKEND: gateway
+              HERMES_WEBUI_DEFAULT_WORKSPACE: /home/hermeswebui/.hermes/workspace
+              HERMES_WEBUI_GATEWAY_BASE_URL: http://127.0.0.1:8642
+              HERMES_WEBUI_GATEWAY_USE_RUNS_API: "true"
+              HERMES_WEBUI_HOST: 0.0.0.0
+              HERMES_WEBUI_OIDC_ALLOW_CLAIM: hermes_access
+              HERMES_WEBUI_OIDC_ALLOW_VALUES: admin
+              HERMES_WEBUI_OIDC_CLIENT_ID: hermes
+              HERMES_WEBUI_OIDC_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: hermes-kanidm-oauth2-credentials
+                    key: CLIENT_SECRET
+              HERMES_WEBUI_OIDC_ISSUER: https://idm.bjw-s.dev/oauth2/openid/hermes
+              HERMES_WEBUI_OIDC_REDIRECT_URI: https://hermes.bjw-s.dev/api/auth/oidc/callback
+              HERMES_WEBUI_PORT: &port 8787
+              HERMES_WEBUI_STATE_DIR: /home/hermeswebui/.hermes/webui
+              HOME: /home/hermeswebui
+              OPENAI_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: hermes-litellm
+                    key: key
+              UV_CACHE_DIR: /uv_cache
+              WANTED_GID: "10000"
+              WANTED_UID: "10000"
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  failureThreshold: 90
+                  httpGet:
+                    path: /health
+                    port: *port
+                  periodSeconds: 10
             resources:
               requests:
                 cpu: 100m
@@ -182,20 +276,45 @@ spec:
     persistence:
       data:
         existingClaim: hermes
-        globalMounts:
-          - path: /opt/data
+        advancedMounts:
+          hermes:
+            app:
+              - path: /opt/data
+            config-migrate:
+              - path: /opt/data
+            webui:
+              - path: /home/hermeswebui/.hermes
+      agent-source:
+        type: image
+        image: *image
+        advancedMounts:
+          hermes:
+            webui:
+              - path: /home/hermeswebui/.hermes/hermes-agent
+                subPath: opt/hermes
+                readOnly: true
+      app:
+        type: emptyDir
+        advancedMounts:
+          hermes:
+            webui:
+              - path: /app
       # resources/managed/: Hermes' managed scope. Mounted per file so the image's own
       # /etc/hermes/image-provenance.json stays visible.
       managed:
         type: configMap
         name: hermes-managed
-        globalMounts:
-          - path: /etc/hermes/.env
-            subPath: .env
-            readOnly: true
-          - path: /etc/hermes/config.yaml
-            subPath: config.yaml
-            readOnly: true
+        advancedMounts:
+          hermes:
+            app: &managed-mounts
+              - path: /etc/hermes/.env
+                subPath: .env
+                readOnly: true
+              - path: /etc/hermes/config.yaml
+                subPath: config.yaml
+                readOnly: true
+            config-migrate: *managed-mounts
+            webui: *managed-mounts
       litellm-key:
         type: secret
         name: hermes-litellm
@@ -203,6 +322,9 @@ spec:
           hermes:
             app:
               # For profiles' `secrets.command` (the gateway never falls back to the pod env); tmpfs.
+              - path: /mnt/secrets/litellm
+                readOnly: true
+            webui:
               - path: /mnt/secrets/litellm
                 readOnly: true
       run:
@@ -213,6 +335,12 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /tmp
+      uv-cache:
+        type: emptyDir
+        advancedMounts:
+          hermes:
+            webui:
+              - path: /uv_cache
     route:
       app:
         hostnames:

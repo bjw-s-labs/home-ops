@@ -1,11 +1,11 @@
 ---
 # Hermes managed scope (/etc/hermes/config.yaml): only the settings every profile must share.
 # Leaf-level overlay on top of each profile's mutable config.yaml; the keys below cannot be changed
-# from the dashboard. Everything else (profiles, models, SOUL.md, skills, MCP servers, toolsets,
-# approvals) is managed in the dashboard and lives on the PVC.
+# from the WebUI. Everything else (profiles, models, SOUL.md, skills, MCP servers, toolsets,
+# approvals) is managed in WebUI and lives on the PVC.
 
 model:
-  # model.default is not pinned: choose it per profile in the dashboard.
+  # model.default is not pinned: choose it per profile in the WebUI.
   provider: custom:litellm
   base_url: http://litellm.ai.svc.cluster.local:4000/v1
 
@@ -33,20 +33,6 @@ providers:
         context_length: 1000000
       neuralwatt/dsv4.1f:
         context_length: 1000000
-
-dashboard:
-  # Kanidm OIDC (managed .env) is the only login: no password or Nous Portal provider.
-  basic_auth:
-    password: ""
-    password_hash: ""
-    username: ""
-  oauth:
-    client_id: ""
-    provider: self-hosted
-  # Pod CIDR, so X-Forwarded-Proto from envoy-internal is honoured (Secure session cookies).
-  # Only envoy-internal can reach port 9119 (CiliumNetworkPolicy in helmrelease.yaml).
-  trusted_proxies:
-    - 10.244.0.0/16
 
 security:
   redact_secrets: true
