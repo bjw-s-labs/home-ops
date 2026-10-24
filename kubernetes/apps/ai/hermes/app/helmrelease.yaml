@@ -56,6 +56,16 @@ spec:
               - ports:
                   - port: "443"
                     protocol: TCP
+          - # Mise tools
+            toFQDNs:
+              - matchName: mise.jdx.dev
+              - matchName: mise-versions.jdx.dev
+              - matchName: search.parallel.ai
+              - matchName: hermes-agent.nousresearch.com
+            toPorts:
+              - ports:
+                  - port: "443"
+                    protocol: TCP
           - # WebUI installs its Python dependencies on first start.
             toFQDNs:
               - matchName: pypi.org
@@ -97,13 +107,35 @@ spec:
           terminationGracePeriodSeconds: 60
         strategy: Recreate
         initContainers:
-          # Run the image's config migration before s6 starts. Its own boot hook calls it through
-          # `s6-setuidgid hermes`, which needs CAP_SETGID and fails as non-root. Skipped on first
-          # boot so the image still creates config.yaml.
-          config-migrate:
+          profile-seed:
             image: &image
               repository: docker.io/nousresearch/hermes-agent
               tag: v2026.9.24@sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7
+            command:
+              - /opt/hermes/.venv/bin/python
+              - /seed/seed.py
+            env:
+              LITELLM_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: hermes-litellm
+                    key: key
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+          # Run the image's config migration before s6 starts. Its own boot hook calls it through
+          # `s6-setuidgid hermes`, which needs CAP_SETGID and fails as non-root. Skipped on first
+          # boot only when no profile config was seeded.
+          config-migrate:
+            image: *image
             command:
               - /bin/sh
               - -c
@@ -126,27 +158,25 @@ spec:
         containers:
           app:
             image: *image
-            # Run the host gateway from the root profile. Without -p default, the CLI
-            # follows the PVC's sticky active_profile and refuses a named profile.
-            command:
-              - hermes
-            args:
-              - -p
-              - default
-              - gateway
-              - run
-              - --no-supervise
+            args: ["sleep", "infinity"]
             env:
+              S6_YES_I_WANT_A_WORLD_WRITABLE_RUN_BECAUSE_KUBERNETES: "1"
+              # Hermes settings
               HERMES_DISABLE_LAZY_INSTALLS: "true"
               HERMES_HOME: /opt/data
               HERMES_WRITE_SAFE_ROOT: /opt/data
               HOME: /opt/data
-              # Model-scoped virtual key minted by the LiteLLMVirtualKey in litellmvirtualkey.yaml.
-              OPENAI_API_KEY:
+              LITELLM_BASE_URL: "http://litellm.ai.svc.cluster.local:4000/v1"
+              LITELLM_API_KEY:
                 valueFrom:
                   secretKeyRef:
                     name: hermes-litellm
                     key: key
+              # Terminal HOME moves into each named profile; mise stays on the shared PVC.
+              MISE_CACHE_DIR: /opt/data/.cache/mise
+              MISE_CONFIG_DIR: /opt/data/.config/mise
+              MISE_DATA_DIR: /opt/data/.local/share/mise
+              MISE_STATE_DIR: /opt/data/.local/state/mise
             probes:
               # A fresh cron ticker heartbeat (written every 60s by the gateway) is required.
               liveness:
@@ -196,19 +226,6 @@ spec:
             image:
               repository: ghcr.io/nesquena/hermes-webui
               tag: 0.52.555@sha256:d0bbb1c5371b1f4b0a28e4cffa5f403780eb81601b66a6d6843f6fc338f08523
-            command:
-              - /bin/bash
-              - -c
-              - |
-                # The gateway generates API_SERVER_KEY in the shared Hermes home.
-                # Read only that value and pass it to the upstream WebUI entrypoint.
-                if [ -r "$HERMES_HOME/.env" ]; then
-                  key=$(sed -n 's/^API_SERVER_KEY=//p' "$HERMES_HOME/.env" | tail -n 1 | tr -d '"\r')
-                  if [ -n "$key" ]; then
-                    export HERMES_WEBUI_GATEWAY_API_KEY="$key"
-                  fi
-                fi
-                exec /hermeswebui_init.bash
             env:
               HERMES_API_URL: http://127.0.0.1:8642
               HERMES_HOME: /home/hermeswebui/.hermes
@@ -282,6 +299,8 @@ spec:
               - path: /opt/data
             config-migrate:
               - path: /opt/data
+            profile-seed:
+              - path: /opt/data
             webui:
               - path: /home/hermeswebui/.hermes
       agent-source:
@@ -299,33 +318,34 @@ spec:
           hermes:
             webui:
               - path: /app
-      # resources/managed/: Hermes' managed scope. Mounted per file so the image's own
-      # /etc/hermes/image-provenance.json stays visible.
-      managed:
+      profile-seed:
         type: configMap
-        name: hermes-managed
+        name: hermes-profile-seed
         advancedMounts:
           hermes:
-            app: &managed-mounts
-              - path: /etc/hermes/.env
-                subPath: .env
+            profile-seed:
+              - path: /seed
                 readOnly: true
-              - path: /etc/hermes/config.yaml
-                subPath: config.yaml
-                readOnly: true
-            config-migrate: *managed-mounts
-            webui: *managed-mounts
-      litellm-key:
+      forgejo-token:
         type: secret
-        name: hermes-litellm
+        name: hermes-forgejo
         advancedMounts:
           hermes:
             app:
-              # For profiles' `secrets.command` (the gateway never falls back to the pod env); tmpfs.
-              - path: /mnt/secrets/litellm
+              - path: /mnt/secrets/forgejo
                 readOnly: true
-            webui:
-              - path: /mnt/secrets/litellm
+      mise:
+        type: image
+        image: ghcr.io/jdx/mise:2026.10.18
+        advancedMounts:
+          hermes:
+            app:
+              - path: /opt/mise
+                subPath: usr/local/bin
+                readOnly: true
+            profile-seed:
+              - path: /opt/mise
+                subPath: usr/local/bin
                 readOnly: true
       run:
         type: emptyDir

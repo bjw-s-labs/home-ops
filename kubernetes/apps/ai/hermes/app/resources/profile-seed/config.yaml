@@ -1,0 +1,97 @@
+---
+_config_version: 46
+
+providers:
+  litellm:
+    name: LiteLLM
+    api: http://litellm.ai.svc.cluster.local:4000/v1
+    key_env: LITELLM_API_KEY
+    transport: chat_completions
+    discover_models: true
+
+model:
+  default: chatgpt/gpt-6-luna
+  provider: litellm
+
+secrets:
+  command:
+    enabled: true
+    command: |
+      printf 'LITELLM_API_KEY=%s\n' "$LITELLM_API_KEY"
+    helper_timeout_seconds: 3
+    override_existing: true
+
+security:
+  redact_secrets: true
+
+terminal:
+  backend: local
+  cwd: /opt/data/workspace
+  persistent_shell: true
+  # Hermes takes a login-shell snapshot for terminal commands; restore the image's
+  # tool paths after the shell's /etc/profile replaces PATH. The seed script adds
+  # this setting to named profiles, which do not inherit this config file.
+  shell_init_files:
+    - /opt/data/.hermes-terminal-env.sh
+  timeout: 180
+
+timezone: Europe/Amsterdam
+
+privacy:
+  redact_pii: true
+
+approvals:
+  mode: smart
+
+toolsets:
+  - hermes-cli
+  - kanban
+
+agent:
+  max_turns: 60
+  gateway_timeout: 1800
+  restart_drain_timeout: 60
+  api_max_retries: 2
+  reasoning_effort: medium
+  disabled_toolsets:
+    - a2a
+    - browser
+    - computer_use
+    - desktop_ui
+    - feishu_doc
+    - feishu_drive
+    - homeassistant
+    - image_gen
+    - spotify
+    - video
+    - video_gen
+    - x_search
+    - yuanbao
+
+platform_toolsets:
+  cli:
+    - clarify
+    - code_execution
+    - connections
+    - context_engine
+    - cronjob
+    - delegation
+    - file
+    - kanban
+    - memory
+    - session_search
+    - skills
+    - terminal
+    - todo
+    - vision
+    - web
+
+telemetry:
+  shared_metrics:
+    enabled: false
+
+gateway:
+  multiplex_profiles: true
+
+streaming:
+  enabled: true

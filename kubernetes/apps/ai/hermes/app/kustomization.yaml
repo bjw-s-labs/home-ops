@@ -4,16 +4,17 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ./kanidmoauth2client.yaml
+  - ./externalsecret.yaml
   - ./litellmteam.yaml
   - ./litellmvirtualkey.yaml
   - ./ocirepository.yaml
   - ./helmrelease.yaml
 configMapGenerator:
-  # Managed scope, mounted read-only into /etc/hermes.
-  - name: hermes-managed
+  - name: hermes-profile-seed
     files:
-      - ./resources/managed/.env
-      - ./resources/managed/config.yaml
+      - ./resources/profile-seed/config.yaml
+      - ./resources/profile-seed/SOUL.md
+      - ./resources/profile-seed/seed.py
 generatorOptions:
   disableNameSuffixHash: true
   annotations:
