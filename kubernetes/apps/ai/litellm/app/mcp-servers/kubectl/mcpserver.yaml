@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmcpserver_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMMCPServer
+metadata:
+  name: kubectl-mcp
+spec:
+  alias: kubectl
+  proxyRef: litellm
+  transport: http
+  workload:
+    image: docker.io/rohitghumare64/kubectl-mcp-server:2.0.0@sha256:f1f57aa5d4952f3c49e4d9bb8071a143d0812bdc8253922d51eeca8a2615ea29
+    args:
+      - --transport
+      - streamable-http
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --read-only
+    automountServiceAccountToken: true
+    env:
+      - name: MCP_ALLOWED_HOSTS
+        value: kubectl-mcp.ai.svc.cluster.local
+      - name: MCP_ALLOW_UNAUTHENTICATED
+        value: "true"
+      - name: MCP_K8S_PROVIDER
+        value: in-cluster
+      - name: PYTHONUNBUFFERED
+        value: "1"
+    path: /mcp
+    podLabels:
+      app.kubernetes.io/name: kubectl-mcp
+      egress.policy.home.arpa/block-all: "true"
+      egress.policy.home.arpa/kube-api: "true"
+    port: 8000
+    replicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    serviceAccountName: kubectl-mcp-readonly

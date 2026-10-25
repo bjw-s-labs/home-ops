@@ -1,0 +1,37 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmcpserver_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMMCPServer
+metadata:
+  name: flux-mcp
+spec:
+  alias: flux
+  proxyRef: litellm
+  transport: http
+  workload:
+    image: ghcr.io/controlplaneio-fluxcd/flux-operator-mcp:v0.61.0@sha256:b253ef07502413bcad89d8fb8f9c01d3cfa070331698323fbd8fe0ae9cfa1cb4
+    args:
+      - serve
+      - --transport=http
+      - --port=8000
+    automountServiceAccountToken: true
+    env:
+      - name: RUNTIME_NAMESPACE
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.namespace
+    path: /mcp
+    podLabels:
+      app.kubernetes.io/name: flux-mcp
+      egress.policy.home.arpa/block-all: "true"
+      egress.policy.home.arpa/kube-api: "true"
+    port: 8000
+    replicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    serviceAccountName: flux-mcp
