@@ -23,6 +23,15 @@ spec:
               - ports:
                   - port: "4000"
                     protocol: TCP
+          - # In-cluster web search
+            toEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: selfhosted
+                  app.kubernetes.io/name: searxng
+            toPorts:
+              - ports:
+                  - port: "8080"
+                    protocol: TCP
           - # Forgejo over HTTPS hairpins to envoy-external. WebUI's OIDC validator
             # requires Kanidm to resolve to a public address (see the VPS rule below).
             toEndpoints:
@@ -48,6 +57,7 @@ spec:
           - # Allowlisted URLs
             toFQDNs:
               - matchPattern: "*.github.com"
+              - matchPattern: "*.github.io"
               - matchPattern: "*.githubusercontent.com"
               - matchPattern: "*.home-operations.com"
               - matchName: files.pythonhosted.org
@@ -56,7 +66,7 @@ spec:
               - matchName: mise.jdx.dev
               - matchName: mise-versions.jdx.dev
               - matchName: pypi.org
-              - matchName: search.parallel.ai
+              - matchName: api.firecrawl.dev
             toPorts:
               - ports:
                   - port: "443"
@@ -107,6 +117,7 @@ spec:
                   secretKeyRef:
                     name: hermes-litellm
                     key: key
+              SEARXNG_URL: http://searxng.selfhosted.svc.cluster.local:8080
             envFrom:
               - secretRef:
                   name: hermes
@@ -148,7 +159,9 @@ spec:
         containers:
           app:
             image: *image
-            args: ["sleep", "infinity"]
+            args:
+              - "sleep"
+              - "infinity"
             env:
               BASH_ENV: /opt/data/.hermes-terminal-env.sh
               S6_YES_I_WANT_A_WORLD_WRITABLE_RUN_BECAUSE_KUBERNETES: "1"
@@ -168,6 +181,7 @@ spec:
               MISE_CONFIG_DIR: /opt/data/.config/mise
               MISE_DATA_DIR: /opt/data/.local/share/mise
               MISE_STATE_DIR: /opt/data/.local/state/mise
+              SEARXNG_URL: http://searxng.selfhosted.svc.cluster.local:8080
             envFrom:
               - secretRef:
                   name: hermes

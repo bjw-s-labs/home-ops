@@ -19,6 +19,7 @@ update_env() (
 )
 
 : "${LITELLM_API_KEY:?LITELLM_API_KEY is required}"
+: "${SEARXNG_URL:?SEARXNG_URL is required}"
 : "${API_SERVER_KEY:?API_SERVER_KEY is required}"
 
 cp /seed/config.yaml "$data/config.yaml"
@@ -42,6 +43,7 @@ chmod 644 "$data/.hermes-terminal-env.sh"
 
 update_env "$data/.env" '/^LITELLM_/d' <<EOF
 LITELLM_API_KEY=$LITELLM_API_KEY
+SEARXNG_URL=$SEARXNG_URL
 EOF
 
 for profile in "$data"/profiles/*; do
@@ -49,6 +51,7 @@ for profile in "$data"/profiles/*; do
   update_env "$profile/.env" '/^LITELLM_API_KEY=/d; /^API_SERVER_KEY=/d; /^HERMES_WEBUI_GATEWAY_BASE_URL=/d' <<EOF
 LITELLM_API_KEY=$LITELLM_API_KEY
 API_SERVER_KEY=$API_SERVER_KEY
+SEARXNG_URL=$SEARXNG_URL
 HERMES_WEBUI_GATEWAY_BASE_URL=http://127.0.0.1:8642/p/${profile##*/}
 EOF
 done
