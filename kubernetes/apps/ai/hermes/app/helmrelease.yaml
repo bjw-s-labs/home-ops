@@ -45,31 +45,18 @@ spec:
                     protocol: TCP
                 serverNames:
                   - idm.bjw-s.dev
-          - # GitHub over HTTPS: web/git (github.com), API and tarballs (*.github.com), raw files
-            # and release assets (*.githubusercontent.com). Relies on the DNS proxy enabled by the
-            # cluster-wide allow-dns-egress policy.
+          - # Allowlisted URLs
             toFQDNs:
-              - matchName: github.com
               - matchPattern: "*.github.com"
               - matchPattern: "*.githubusercontent.com"
-            toPorts:
-              - ports:
-                  - port: "443"
-                    protocol: TCP
-          - # Mise tools
-            toFQDNs:
+              - matchPattern: "*.home-operations.com"
+              - matchName: files.pythonhosted.org
+              - matchName: github.com
+              - matchName: hermes-agent.nousresearch.com
               - matchName: mise.jdx.dev
               - matchName: mise-versions.jdx.dev
-              - matchName: search.parallel.ai
-              - matchName: hermes-agent.nousresearch.com
-            toPorts:
-              - ports:
-                  - port: "443"
-                    protocol: TCP
-          - # WebUI installs its Python dependencies on first start.
-            toFQDNs:
               - matchName: pypi.org
-              - matchName: files.pythonhosted.org
+              - matchName: search.parallel.ai
             toPorts:
               - ports:
                   - port: "443"
@@ -112,14 +99,17 @@ spec:
               repository: docker.io/nousresearch/hermes-agent
               tag: v2026.9.24@sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7
             command:
-              - /opt/hermes/.venv/bin/python
-              - /seed/seed.py
+              - /bin/bash
+              - /seed/seed.sh
             env:
               LITELLM_API_KEY:
                 valueFrom:
                   secretKeyRef:
                     name: hermes-litellm
                     key: key
+            envFrom:
+              - secretRef:
+                  name: hermes
             resources:
               requests:
                 cpu: 10m
@@ -160,6 +150,7 @@ spec:
             image: *image
             args: ["sleep", "infinity"]
             env:
+              BASH_ENV: /opt/data/.hermes-terminal-env.sh
               S6_YES_I_WANT_A_WORLD_WRITABLE_RUN_BECAUSE_KUBERNETES: "1"
               # Hermes settings
               HERMES_DISABLE_LAZY_INSTALLS: "true"
@@ -177,6 +168,9 @@ spec:
               MISE_CONFIG_DIR: /opt/data/.config/mise
               MISE_DATA_DIR: /opt/data/.local/share/mise
               MISE_STATE_DIR: /opt/data/.local/state/mise
+            envFrom:
+              - secretRef:
+                  name: hermes
             probes:
               # A fresh cron ticker heartbeat (written every 60s by the gateway) is required.
               liveness:
@@ -231,6 +225,11 @@ spec:
               HERMES_HOME: /home/hermeswebui/.hermes
               HERMES_WEBUI_CHAT_BACKEND: gateway
               HERMES_WEBUI_DEFAULT_WORKSPACE: /home/hermeswebui/.hermes/workspace
+              HERMES_WEBUI_GATEWAY_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: hermes
+                    key: API_SERVER_KEY
               HERMES_WEBUI_GATEWAY_BASE_URL: http://127.0.0.1:8642
               HERMES_WEBUI_GATEWAY_USE_RUNS_API: "true"
               HERMES_WEBUI_HOST: 0.0.0.0
@@ -336,7 +335,7 @@ spec:
                 readOnly: true
       mise:
         type: image
-        image: ghcr.io/jdx/mise:2026.10.18
+        image: ghcr.io/jdx/mise:2026.10.19
         advancedMounts:
           hermes:
             app:
