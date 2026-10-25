@@ -29,7 +29,7 @@ jobs:
     name: AI PR Review
     if: ${{ (forgejo.event_name == 'pull_request' && forgejo.event.pull_request.head.repo.full_name == forgejo.repository && !forgejo.event.pull_request.draft) || forgejo.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 35
     steps:
       - name: Resolve PR head for re-review
         id: prctx
