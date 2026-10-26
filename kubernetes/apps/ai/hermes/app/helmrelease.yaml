@@ -33,7 +33,7 @@ spec:
                   - port: "8080"
                     protocol: TCP
           - # Forgejo over HTTPS hairpins to envoy-external. WebUI's OIDC validator
-            # requires Kanidm to resolve to a public address (see the VPS rule below).
+            # requires Kanidm to resolve to a public address
             toEndpoints:
               - matchLabels:
                   k8s:io.kubernetes.pod.namespace: network
@@ -54,29 +54,29 @@ spec:
                     protocol: TCP
                 serverNames:
                   - idm.bjw-s.dev
-          - # Allowlisted URLs
-            toFQDNs:
-              - matchPattern: "*.github.com"
-              - matchPattern: "*.github.io"
-              - matchPattern: "*.githubusercontent.com"
-              - matchPattern: "*.home-operations.com"
-              - matchName: codeberg.org
-              - matchName: code.forgejo.org
-              - matchName: files.pythonhosted.org
-              - matchName: ghcr.io
-              - matchName: github.com
-              - matchName: gsoci.azurecr.io
-              - matchName: hermes-agent.nousresearch.com
-              - matchName: mise.jdx.dev
-              - matchName: mise-versions.jdx.dev
-              - matchName: mirror.gcr.io
-              - matchName: pypi.org
-              - matchName: quay.io
-              - matchName: api.firecrawl.dev
-            toPorts:
-              - ports:
-                  - port: "443"
-                    protocol: TCP
+          # - # Allowlisted URLs
+          #   toFQDNs:
+          #     - matchPattern: "*.github.com"
+          #     - matchPattern: "*.github.io"
+          #     - matchPattern: "*.githubusercontent.com"
+          #     - matchPattern: "*.home-operations.com"
+          #     - matchName: codeberg.org
+          #     - matchName: code.forgejo.org
+          #     - matchName: files.pythonhosted.org
+          #     - matchName: ghcr.io
+          #     - matchName: github.com
+          #     - matchName: gsoci.azurecr.io
+          #     - matchName: hermes-agent.nousresearch.com
+          #     - matchName: mise.jdx.dev
+          #     - matchName: mise-versions.jdx.dev
+          #     - matchName: mirror.gcr.io
+          #     - matchName: pypi.org
+          #     - matchName: quay.io
+          #     - matchName: api.firecrawl.dev
+          #   toPorts:
+          #     - ports:
+          #         - port: "443"
+          #           protocol: TCP
         ingress:
           - fromEndpoints:
               - matchLabels:
@@ -92,7 +92,7 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           labels:
-            egress.policy.home.arpa/block-all: "true"
+            egress.policy.home.arpa/internet: "true"
           # WebUI rejects OIDC endpoints that resolve to private IPs. Use the public
           # ingress address for Kanidm while preserving its issuer hostname and TLS.
           hostAliases:
