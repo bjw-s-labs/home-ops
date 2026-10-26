@@ -54,29 +54,29 @@ spec:
                     protocol: TCP
                 serverNames:
                   - idm.bjw-s.dev
-          # - # Allowlisted URLs
-          #   toFQDNs:
-          #     - matchPattern: "*.github.com"
-          #     - matchPattern: "*.github.io"
-          #     - matchPattern: "*.githubusercontent.com"
-          #     - matchPattern: "*.home-operations.com"
-          #     - matchName: codeberg.org
-          #     - matchName: code.forgejo.org
-          #     - matchName: files.pythonhosted.org
-          #     - matchName: ghcr.io
-          #     - matchName: github.com
-          #     - matchName: gsoci.azurecr.io
-          #     - matchName: hermes-agent.nousresearch.com
-          #     - matchName: mise.jdx.dev
-          #     - matchName: mise-versions.jdx.dev
-          #     - matchName: mirror.gcr.io
-          #     - matchName: pypi.org
-          #     - matchName: quay.io
-          #     - matchName: api.firecrawl.dev
-          #   toPorts:
-          #     - ports:
-          #         - port: "443"
-          #           protocol: TCP
+                  # - # Allowlisted URLs
+                  #   toFQDNs:
+                  #     - matchPattern: "*.github.com"
+                  #     - matchPattern: "*.github.io"
+                  #     - matchPattern: "*.githubusercontent.com"
+                  #     - matchPattern: "*.home-operations.com"
+                  #     - matchName: codeberg.org
+                  #     - matchName: code.forgejo.org
+                  #     - matchName: files.pythonhosted.org
+                  #     - matchName: ghcr.io
+                  #     - matchName: github.com
+                  #     - matchName: gsoci.azurecr.io
+                  #     - matchName: hermes-agent.nousresearch.com
+                  #     - matchName: mise.jdx.dev
+                  #     - matchName: mise-versions.jdx.dev
+                  #     - matchName: mirror.gcr.io
+                  #     - matchName: pypi.org
+                  #     - matchName: quay.io
+                  #     - matchName: api.firecrawl.dev
+                  #   toPorts:
+                  #     - ports:
+                  #         - port: "443"
+                  #           protocol: TCP
         ingress:
           - fromEndpoints:
               - matchLabels:
@@ -263,6 +263,11 @@ spec:
                     key: CLIENT_SECRET
               HERMES_WEBUI_OIDC_ISSUER: https://idm.bjw-s.dev/oauth2/openid/hermes
               HERMES_WEBUI_OIDC_REDIRECT_URI: https://hermes.bjw-s.dev/api/auth/oidc/callback
+              HERMES_WEBUI_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: hermes-webui
+                    key: PASSWORD
               HERMES_WEBUI_PORT: &port 8787
               HERMES_WEBUI_STATE_DIR: /home/hermeswebui/.hermes/webui
               HOME: /home/hermeswebui
