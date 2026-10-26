@@ -266,7 +266,7 @@ spec:
               HERMES_WEBUI_PORT: &port 8787
               HERMES_WEBUI_STATE_DIR: /home/hermeswebui/.hermes/webui
               HOME: /home/hermeswebui
-              OPENAI_API_KEY:
+              LITELLM_API_KEY:
                 valueFrom:
                   secretKeyRef:
                     name: hermes-litellm
@@ -274,6 +274,14 @@ spec:
               UV_CACHE_DIR: /uv_cache
               WANTED_GID: "10000"
               WANTED_UID: "10000"
+            # The init script runs as PID 1 without forwarding SIGTERM; signal server.py directly.
+            lifecycle:
+              preStop:
+                exec:
+                  command:
+                    - /bin/sh
+                    - -c
+                    - kill -TERM $(cat /proc/1/task/1/children)
             probes:
               liveness:
                 enabled: true

@@ -41,14 +41,14 @@ fi
 EOF
 chmod 644 "$data/.hermes-terminal-env.sh"
 
-update_env "$data/.env" '/^LITELLM_/d' <<EOF
+update_env "$data/.env" '/^LITELLM_/d; /^SEARXNG_URL=/d' <<EOF
 LITELLM_API_KEY=$LITELLM_API_KEY
 SEARXNG_URL=$SEARXNG_URL
 EOF
 
 for profile in "$data"/profiles/*; do
   [[ -d $profile ]] || continue
-  update_env "$profile/.env" '/^LITELLM_API_KEY=/d; /^API_SERVER_KEY=/d; /^HERMES_WEBUI_GATEWAY_BASE_URL=/d' <<EOF
+  update_env "$profile/.env" '/^LITELLM_API_KEY=/d; /^API_SERVER_KEY=/d; /^SEARXNG_URL=/d; /^HERMES_WEBUI_GATEWAY_BASE_URL=/d' <<EOF
 LITELLM_API_KEY=$LITELLM_API_KEY
 API_SERVER_KEY=$API_SERVER_KEY
 SEARXNG_URL=$SEARXNG_URL
