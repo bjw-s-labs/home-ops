@@ -1,0 +1,42 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmcpserver_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMMCPServer
+metadata:
+  name: kubesearch-mcp
+spec:
+  alias: kubesearch
+  proxyRef: litellm
+  proxyNamespace: ai
+  transport: http
+  workload:
+    image: ghcr.io/perfectra1n/kubesearch-mcp:1.3.0
+    port: 3000
+    path: /mcp
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        memory: 1Gi
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+          - ALL
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+      fsGroupChangePolicy: OnRootMismatch
+      seccompProfile:
+        type: RuntimeDefault
+    volumes:
+      - name: data
+        emptyDir:
+          sizeLimit: 2Gi
+    volumeMounts:
+      - name: data
+        mountPath: /data
