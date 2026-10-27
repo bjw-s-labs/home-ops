@@ -1,0 +1,18 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmvirtualkey_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMVirtualKey
+metadata:
+  name: kritika
+spec:
+  keyAlias: kritika
+  # Empty would permit every model on the proxy.
+  models:
+    - minimax/m3
+    - minimax/m3.1-flash-preview
+  proxyRef: litellm
+  # The proxy lives in `ai` while this key and its Secret stay in `dev`, so
+  # kritika reads the key from its own namespace and the operator reaches the
+  # proxy across the boundary.
+  proxyNamespace: ai
+  secretName: kritika-litellm

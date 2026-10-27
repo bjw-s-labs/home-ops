@@ -1,0 +1,149 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kritika
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: kritika
+  interval: 1h
+  values:
+    deploymentAnnotations:
+      secret.reloader.stakater.com/auto: "true"
+    config:
+      webUrl: https://kritika.bjw-s.dev
+      auth:
+        admin:
+          password:
+            env: KRITIKA_AUTH_ADMIN_PASSWORD
+      forgejo:
+        home:
+          host: git.bjw-s.dev
+          # The accounts this connection serves, not the bot that owns the
+          # integration: kritika lists and polls repositories per account.
+          accounts:
+            - bjw-s
+          audience: u:4:a8c9a2ec-7746-4386-b922-6aa1a6cf221b
+          privateKey:
+            env: KRITIKA_FORGEJO_PRIVATE_KEY
+          # A second integration scoped to read:repository alone, so runner
+          # pods never hold a writable token.
+          runnerAudience: u:4:d39f5412-b1c5-45f0-898f-3d589238be39
+          webhookSecret:
+            env: KRITIKA_FORGEJO_WEBHOOK_SECRET
+      embedding:
+        model: openrouter/voyageai/voyage-code-4
+        dims: 1024
+      providers:
+        chatgpt:
+          type: chatgpt
+        openrouter:
+          type: openrouter
+          apiKey:
+            env: KRITIKA_OPENROUTER_API_KEY
+        litellm:
+          type: openai
+          baseUrl: http://litellm.ai.svc.cluster.local:4000/v1
+          apiKey:
+            env: KRITIKA_LITELLM_API_KEY
+          pricing:
+            minimax/m3.1-flash-preview:
+              input: 0.3
+              output: 1.2
+            minimax/m3:
+              input: 0.3
+              output: 1.2
+      review:
+        model: chatgpt/~luna-latest
+        fallback: litellm/neuralwatt/dsv4.1f
+      trigger:
+        exclude:
+          - name: forks
+            expr: pr.fork
+      egress:
+        allow:
+          - "*"
+          # git.bjw-s.dev resolves to the internal Envoy address here.
+          - 10.1.6.41
+        deny:
+          - 10.244.0.0/16
+    env:
+      # Generated into this namespace by the LiteLLMVirtualKey, so spend is
+      # attributed per app rather than using the proxy's master key.
+      KRITIKA_LITELLM_API_KEY:
+        valueFrom:
+          secretKeyRef:
+            name: kritika-litellm
+            key: key
+    envFrom:
+      - secretRef:
+          name: kritika-secret
+    database:
+      # CNPG generates a secret for the database owner only, so the app and
+      # runner roles get theirs from ExternalSecrets.
+      app:
+        existingSecret: kritika-postgres-approle
+      owner:
+        existingSecret: kritika-postgres-app
+      runner:
+        existingSecret: kritika-postgres-runner
+    runner:
+      podTemplate:
+        spec:
+          # No gVisor or Kata RuntimeClass is installed here, so this is the
+          # isolation the runners get.
+          hostUsers: false
+          resources:
+            requests:
+              cpu: 10m
+              memory: 128Mi
+            limits:
+              memory: 1Gi
+    httpRoute:
+      enabled: true
+      annotations:
+        gatus.home-operations.com/endpoint: |-
+          conditions: ["[STATUS] == 200"]
+          path: /api/v1/meta
+      hostnames:
+        - kritika.bjw-s.dev
+      parentRefs:
+        - name: envoy-internal
+          namespace: network
+    monitoring:
+      serviceMonitor:
+        enabled: true
+      prometheusRule:
+        enabled: true
+      dashboards:
+        enabled: true
+        grafanaOperator:
+          enabled: true
+          matchLabels:
+            dashboards: grafana
+    networkPolicy:
+      type: cilium
+      postgres:
+        namespace: dev
+        podSelector:
+          cnpg.io/cluster: kritika-postgres
+      extraEgress:
+        # A NetworkPolicy matches pods and their own ports, not a Service's.
+        - to:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: ai
+              podSelector:
+                matchLabels:
+                  app.kubernetes.io/name: litellm
+          ports:
+            - port: 4000
+              protocol: TCP
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        memory: 512Mi

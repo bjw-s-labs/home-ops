@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: kritika-postgres
+spec:
+  # Single node, so no standby to replicate to; enablePDB stays false.
+  instances: 1
+  # "standard" carries pgvector, which vchord needs; "minimal" does not.
+  # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6-standard-bookworm
+  enablePDB: false
+  enableSuperuserAccess: false
+  bootstrap:
+    initdb:
+      database: kritika
+      owner: kritika
+      # CNPG creates the named owner as unprivileged when no initdb secret is
+      # set, and generates <cluster>-app for it. The app role's Secret uses a
+      # different name because CNPG reserves that one.
+  postgresql:
+    extensions:
+      - name: vchord
+        image:
+          # renovate: datasource=docker depName=ghcr.io/tensorchord/vchord-scratch
+          reference: ghcr.io/tensorchord/vchord-scratch:pg18-v1.1.1
+        # This image keeps Debian's paths, not CNPG's /extensions defaults.
+        dynamic_library_path:
+          - /usr/lib/postgresql/18/lib/
+        extension_control_path:
+          - /usr/share/postgresql/18/
+    shared_preload_libraries:
+      - vchord
+  primaryUpdateMethod: switchover
+  primaryUpdateStrategy: unsupervised
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 2Gi
+  storage:
+    size: 10Gi
+    storageClass: miroir-local

@@ -14,6 +14,11 @@ spec:
       admin:
         username: ""
       config:
+        # JWT integrations fetch keys from an issuer that resolves to the
+        # internal Envoy (10.1.6.42). ALLOWED_DOMAINS is exclusive once set and
+        # would deny the CI review action's issuer, so allow local networks.
+        authorized_integration:
+          ALLOW_LOCALNETWORKS: true
         cache:
           ENABLED: true
           ADAPTER: redis
