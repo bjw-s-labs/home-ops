@@ -92,9 +92,7 @@ spec:
     runner:
       podTemplate:
         spec:
-          # No gVisor or Kata RuntimeClass is installed here, so this is the
-          # isolation the runners get.
-          hostUsers: false
+          runtimeClassName: gvisor
           resources:
             requests:
               cpu: 10m
