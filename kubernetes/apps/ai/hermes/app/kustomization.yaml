@@ -10,11 +10,12 @@ resources:
   - ./ocirepository.yaml
   - ./helmrelease.yaml
 configMapGenerator:
+  - name: hermes-config
+    files:
+      - ./resources/config.yaml
   - name: hermes-profile-seed
     files:
-      - ./resources/profile-seed/config.yaml
-      - ./resources/profile-seed/SOUL.md
-      - ./resources/profile-seed/seed.sh
+      - ./resources/seed.sh
 generatorOptions:
   disableNameSuffixHash: true
   annotations:

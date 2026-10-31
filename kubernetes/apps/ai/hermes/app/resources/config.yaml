@@ -1,0 +1,41 @@
+---
+# Managed infrastructure overlay; profile preferences remain on the PVC.
+dashboard:
+  oauth:
+    provider: self-hosted
+    self_hosted:
+      client_id: hermes
+      issuer: https://idm.bjw-s.dev/oauth2/openid/hermes
+      scopes: openid profile email
+  public_url: https://hermes-dash.bjw-s.dev
+
+gateway:
+  multiplex_profiles: true
+
+providers:
+  litellm:
+    api: http://litellm.ai.svc.cluster.local:4000/v1
+    discover_models: true
+    key_env: LITELLM_API_KEY
+    name: LiteLLM
+    transport: chat_completions
+
+secrets:
+  command:
+    enabled: true
+    command: |
+      printf 'LITELLM_API_KEY=%s\n' "$LITELLM_API_KEY"
+    helper_timeout_seconds: 3
+    override_existing: true
+
+security:
+  redact_secrets: true
+
+terminal:
+  backend: local
+
+webapp:
+  enabled: true
+  host: 0.0.0.0
+  port: 9120
+  public_url: https://hermes.bjw-s.dev

@@ -1,6 +1,6 @@
 ---
-# Confidential client for Hermes WebUI's native OIDC provider. kaniop writes the
-# credentials to hermes-kanidm-oauth2-credentials; WebUI sends the secret with PKCE.
+# Confidential client shared by the Hermes Dashboard and native Webapp.
+# kaniop writes credentials to hermes-kanidm-oauth2-credentials; both use PKCE.
 # Issuer: https://idm.bjw-s.dev/oauth2/openid/hermes
 apiVersion: kaniop.rs/v1beta1
 kind: KanidmOAuth2Client
@@ -14,8 +14,10 @@ spec:
   origin: https://hermes.bjw-s.dev/
   redirectUrl:
     - https://hermes.bjw-s.dev/api/auth/oidc/callback
+    - https://hermes.bjw-s.dev/auth/callback
+    - https://hermes-dash.bjw-s.dev/auth/callback
   # Every signed-in user gets full agent (shell) access. The group is managed in
-  # kanidm-provision and is checked both by Kanidm and by WebUI's allowlist.
+  # kanidm-provision; Kanidm restricts both interfaces.
   scopeMap:
     - group: hermes_admins@idm.bjw-s.dev
       scopes:

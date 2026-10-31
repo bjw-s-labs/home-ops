@@ -32,8 +32,7 @@ spec:
               - ports:
                   - port: "8080"
                     protocol: TCP
-          - # Forgejo over HTTPS hairpins to envoy-external. WebUI's OIDC validator
-            # requires Kanidm to resolve to a public address
+          - # Forgejo over HTTPS hairpins to envoy-external
             toEndpoints:
               - matchLabels:
                   k8s:io.kubernetes.pod.namespace: network
@@ -84,7 +83,9 @@ spec:
                   gateway.networking.k8s.io/gateway-name: envoy-internal
             toPorts:
               - ports:
-                  - port: "8787"
+                  - port: "9120"
+                    protocol: TCP
+                  - port: "9119"
                     protocol: TCP
     controllers:
       hermes:
@@ -93,8 +94,6 @@ spec:
         pod:
           labels:
             egress.policy.home.arpa/internet: "true"
-          # WebUI rejects OIDC endpoints that resolve to private IPs. Use the public
-          # ingress address for Kanidm while preserving its issuer hostname and TLS.
           hostAliases:
             - ip: 135.125.53.129
               hostnames:
@@ -113,7 +112,8 @@ spec:
           profile-seed:
             image: &image
               repository: docker.io/nousresearch/hermes-agent
-              tag: v2026.9.24@sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7
+              # Development revision 7020ea3e96c3fdbc768c5296493e186df46f075b includes the Webapp.
+              tag: main@sha256:51f6541963c6f561119401ba39ff2bca7e5a1ec4d5f0e584564f7590af55930c
             command:
               - /bin/bash
               - /seed/seed.sh
@@ -140,7 +140,7 @@ spec:
                   - ALL
           # Run the image's config migration before s6 starts. Its own boot hook calls it through
           # `s6-setuidgid hermes`, which needs CAP_SETGID and fails as non-root. Skipped on first
-          # boot only when no profile config was seeded.
+          # boot only when no profile config exists yet.
           config-migrate:
             image: *image
             command:
@@ -165,13 +165,22 @@ spec:
         containers:
           app:
             image: *image
+            # Explicitly start the gateway under s6; sleep alone only restores saved run intent.
             args:
-              - "sleep"
-              - "infinity"
+              - gateway
+              - run
             env:
               BASH_ENV: /opt/data/.hermes-terminal-env.sh
               S6_YES_I_WANT_A_WORLD_WRITABLE_RUN_BECAUSE_KUBERNETES: "1"
               # Hermes settings
+              HERMES_DASHBOARD: "true"
+              HERMES_DASHBOARD_HOST: 0.0.0.0
+              HERMES_DASHBOARD_OIDC_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: hermes-kanidm-oauth2-credentials
+                    key: CLIENT_SECRET
+              HERMES_DASHBOARD_PORT: "9119"
               HERMES_DISABLE_LAZY_INSTALLS: "true"
               HERMES_HOME: /opt/data
               HERMES_WRITE_SAFE_ROOT: /opt/data
@@ -227,97 +236,10 @@ spec:
                   timeoutSeconds: 5
             resources:
               requests:
-                memory: 1Gi
-                cpu: 10m
+                memory: 1536Mi
+                cpu: 110m
               limits:
-                memory: 4Gi
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
-          webui:
-            image:
-              repository: ghcr.io/nesquena/hermes-webui
-              tag: 0.52.588@sha256:8f7fb44c7daa7faba950156125675846c434a34edc4ef4c79a7d6354ebe06321
-            env:
-              HERMES_API_URL: http://127.0.0.1:8642
-              HERMES_HOME: /home/hermeswebui/.hermes
-              HERMES_WEBUI_CHAT_BACKEND: gateway
-              HERMES_WEBUI_DEFAULT_WORKSPACE: /home/hermeswebui/.hermes/workspace
-              HERMES_WEBUI_GATEWAY_API_KEY:
-                valueFrom:
-                  secretKeyRef:
-                    name: hermes
-                    key: API_SERVER_KEY
-              HERMES_WEBUI_GATEWAY_BASE_URL: http://127.0.0.1:8642
-              HERMES_WEBUI_GATEWAY_USE_RUNS_API: "true"
-              HERMES_WEBUI_HOST: 0.0.0.0
-              HERMES_WEBUI_OIDC_ALLOW_CLAIM: hermes_access
-              HERMES_WEBUI_OIDC_ALLOW_VALUES: admin
-              HERMES_WEBUI_OIDC_CLIENT_ID: hermes
-              HERMES_WEBUI_OIDC_CLIENT_SECRET:
-                valueFrom:
-                  secretKeyRef:
-                    name: hermes-kanidm-oauth2-credentials
-                    key: CLIENT_SECRET
-              HERMES_WEBUI_OIDC_ISSUER: https://idm.bjw-s.dev/oauth2/openid/hermes
-              HERMES_WEBUI_OIDC_REDIRECT_URI: https://hermes.bjw-s.dev/api/auth/oidc/callback
-              HERMES_WEBUI_PASSWORD:
-                valueFrom:
-                  secretKeyRef:
-                    name: hermes-webui
-                    key: PASSWORD
-              HERMES_WEBUI_PORT: &port 8787
-              HERMES_WEBUI_STATE_DIR: /home/hermeswebui/.hermes/webui
-              HOME: /home/hermeswebui
-              LITELLM_API_KEY:
-                valueFrom:
-                  secretKeyRef:
-                    name: hermes-litellm
-                    key: key
-              UV_CACHE_DIR: /uv_cache
-              WANTED_GID: "10000"
-              WANTED_UID: "10000"
-            # The init script runs as PID 1 without forwarding SIGTERM; signal server.py directly.
-            lifecycle:
-              preStop:
-                exec:
-                  command:
-                    - /bin/sh
-                    - -c
-                    - kill -TERM $(cat /proc/1/task/1/children)
-            probes:
-              liveness:
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /health
-                    port: *port
-              readiness:
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /health
-                    port: *port
-              startup:
-                enabled: true
-                custom: true
-                spec:
-                  failureThreshold: 90
-                  httpGet:
-                    path: /health
-                    port: *port
-                  periodSeconds: 10
-            resources:
-              requests:
-                cpu: 100m
-                memory: 1Gi
-              limits:
-                memory: 4Gi
+                memory: 6Gi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -335,23 +257,14 @@ spec:
               - path: /opt/data
             profile-seed:
               - path: /opt/data
-            webui:
-              - path: /home/hermeswebui/.hermes
-      agent-source:
-        type: image
-        image: *image
+      config:
+        type: configMap
+        name: hermes-config
         advancedMounts:
           hermes:
-            webui:
-              - path: /home/hermeswebui/.hermes/hermes-agent
-                subPath: opt/hermes
+            app:
+              - path: /etc/hermes
                 readOnly: true
-      app:
-        type: emptyDir
-        advancedMounts:
-          hermes:
-            webui:
-              - path: /app
       profile-seed:
         type: configMap
         name: hermes-profile-seed
@@ -389,21 +302,35 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /tmp
-      uv-cache:
-        type: emptyDir
-        advancedMounts:
-          hermes:
-            webui:
-              - path: /uv_cache
     route:
-      app:
+      webapp:
         hostnames:
           - hermes.bjw-s.dev
         parentRefs:
           - name: envoy-internal
             namespace: network
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: webapp
+            timeouts:
+              request: 0s
+      dashboard:
+        hostnames:
+          - hermes-dash.bjw-s.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: dashboard
     service:
       app:
         ports:
-          http:
-            port: *port
+          webapp:
+            appProtocol: kubernetes.io/wss
+            port: 9120
+          dashboard:
+            appProtocol: kubernetes.io/wss
+            port: 9119
