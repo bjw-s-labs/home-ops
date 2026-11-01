@@ -24,15 +24,30 @@ secrets:
   command:
     enabled: true
     command: |
-      printf 'LITELLM_API_KEY=%s\n' "$LITELLM_API_KEY"
+      set -eu
+      printf 'LITELLM_API_KEY='
+      /bin/cat /mnt/secrets/litellm/key
+      printf '\nSEARXNG_URL=http://searxng.selfhosted.svc.cluster.local:8080\n'
     helper_timeout_seconds: 3
     override_existing: true
 
 security:
   redact_secrets: true
 
+skills:
+  external_dirs:
+    - /opt/data/shared/skills
+
 terminal:
   backend: local
+  cwd: /opt/data/workspace
+  env_passthrough:
+    - SEARXNG_URL
+
+telemetry:
+  shared_metrics:
+    enabled: false
+    send: false
 
 webapp:
   enabled: true

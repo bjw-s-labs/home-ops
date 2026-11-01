@@ -53,29 +53,6 @@ spec:
                     protocol: TCP
                 serverNames:
                   - idm.bjw-s.dev
-                  # - # Allowlisted URLs
-                  #   toFQDNs:
-                  #     - matchPattern: "*.github.com"
-                  #     - matchPattern: "*.github.io"
-                  #     - matchPattern: "*.githubusercontent.com"
-                  #     - matchPattern: "*.home-operations.com"
-                  #     - matchName: codeberg.org
-                  #     - matchName: code.forgejo.org
-                  #     - matchName: files.pythonhosted.org
-                  #     - matchName: ghcr.io
-                  #     - matchName: github.com
-                  #     - matchName: gsoci.azurecr.io
-                  #     - matchName: hermes-agent.nousresearch.com
-                  #     - matchName: mise.jdx.dev
-                  #     - matchName: mise-versions.jdx.dev
-                  #     - matchName: mirror.gcr.io
-                  #     - matchName: pypi.org
-                  #     - matchName: quay.io
-                  #     - matchName: api.firecrawl.dev
-                  #   toPorts:
-                  #     - ports:
-                  #         - port: "443"
-                  #           protocol: TCP
         ingress:
           - fromEndpoints:
               - matchLabels:
@@ -109,40 +86,14 @@ spec:
           terminationGracePeriodSeconds: 60
         strategy: Recreate
         initContainers:
-          profile-seed:
-            image: &image
-              repository: docker.io/nousresearch/hermes-agent
-              # Development revision 7020ea3e96c3fdbc768c5296493e186df46f075b includes the Webapp.
-              tag: main@sha256:cb3ca7fbf680c786b1169a5bbd3b3057623609e1fed2bacbf7f968a10bd8fe26
-            command:
-              - /bin/bash
-              - /seed/seed.sh
-            env:
-              LITELLM_API_KEY:
-                valueFrom:
-                  secretKeyRef:
-                    name: hermes-litellm
-                    key: key
-              SEARXNG_URL: http://searxng.selfhosted.svc.cluster.local:8080
-            envFrom:
-              - secretRef:
-                  name: hermes
-            resources:
-              requests:
-                cpu: 10m
-              limits:
-                memory: 512Mi
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
           # Run the image's config migration before s6 starts. Its own boot hook calls it through
           # `s6-setuidgid hermes`, which needs CAP_SETGID and fails as non-root. Skipped on first
           # boot only when no profile config exists yet.
           config-migrate:
-            image: *image
+            image: &image
+              repository: docker.io/nousresearch/hermes-agent
+              # Development revision 7020ea3e96c3fdbc768c5296493e186df46f075b includes the Webapp.
+              tag: main@sha256:cb3ca7fbf680c786b1169a5bbd3b3057623609e1fed2bacbf7f968a10bd8fe26
             command:
               - /bin/sh
               - -c
@@ -170,7 +121,6 @@ spec:
               - gateway
               - run
             env:
-              BASH_ENV: /opt/data/.hermes-terminal-env.sh
               S6_YES_I_WANT_A_WORLD_WRITABLE_RUN_BECAUSE_KUBERNETES: "1"
               # Hermes settings
               HERMES_DASHBOARD: "true"
@@ -185,17 +135,21 @@ spec:
               HERMES_HOME: /opt/data
               HERMES_WRITE_SAFE_ROOT: /opt/data
               HOME: /opt/data
+              GIT_CONFIG_GLOBAL: /opt/data/shared/gitconfig
+              PATH: /opt/data/shared/bin:/opt/data/.local/bin:/opt/data/.local/share/mise/shims:/opt/mise:/opt/hermes/.venv/bin:/opt/hermes/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
               LITELLM_BASE_URL: "http://litellm.ai.svc.cluster.local:4000/v1"
-              LITELLM_API_KEY:
-                valueFrom:
-                  secretKeyRef:
-                    name: hermes-litellm
-                    key: key
               # Terminal HOME moves into each named profile; mise stays on the shared PVC.
               MISE_CACHE_DIR: /opt/data/.cache/mise
               MISE_CONFIG_DIR: /opt/data/.config/mise
               MISE_DATA_DIR: /opt/data/.local/share/mise
               MISE_STATE_DIR: /opt/data/.local/state/mise
+              # The profile HOME changes in terminal sessions; use one shared
+              # mise config and tool installation for every profile.
+              MISE_CONFIG_FILE: /opt/data/shared/mise.toml
+              FORGE_CREDENTIALS_DIR: /mnt/secrets/forges
+              FORGE_HOSTS_FILE: /opt/data/shared/forge-hosts.json
+              FORGE_IDENTITIES_FILE: /opt/data/shared/forge-identities.json
+              FORGE_REPOS_ROOT: /opt/data/workspace/repos
               SEARXNG_URL: http://searxng.selfhosted.svc.cluster.local:8080
             envFrom:
               - secretRef:
@@ -255,8 +209,6 @@ spec:
               - path: /opt/data
             config-migrate:
               - path: /opt/data
-            profile-seed:
-              - path: /opt/data
       config:
         type: configMap
         name: hermes-config
@@ -265,21 +217,21 @@ spec:
             app:
               - path: /etc/hermes
                 readOnly: true
-      profile-seed:
-        type: configMap
-        name: hermes-profile-seed
-        advancedMounts:
-          hermes:
-            profile-seed:
-              - path: /seed
-                readOnly: true
       forgejo-token:
         type: secret
         name: hermes-forgejo
         advancedMounts:
           hermes:
             app:
-              - path: /mnt/secrets/forgejo
+              - path: /mnt/secrets/forges/forgejo
+                readOnly: true
+      litellm-token:
+        type: secret
+        name: hermes-litellm
+        advancedMounts:
+          hermes:
+            app:
+              - path: /mnt/secrets/litellm
                 readOnly: true
       mise:
         type: image
@@ -287,10 +239,6 @@ spec:
         advancedMounts:
           hermes:
             app:
-              - path: /opt/mise
-                subPath: usr/local/bin
-                readOnly: true
-            profile-seed:
               - path: /opt/mise
                 subPath: usr/local/bin
                 readOnly: true

@@ -32,10 +32,49 @@ addresses, Kanidm OIDC, the LiteLLM provider and credential helper, the gateway
 topology, secret redaction, and the local terminal backend. Managed values take
 precedence over each profile's settings.
 
-Profile configuration and `SOUL.md` live on the PVC and are managed in the app.
-The init script provisions shared credentials and terminal tooling, but never
-copies either file. Existing profile settings and SOUL files remain in place;
-remove any old text claiming they are overwritten at startup through the app.
+Profile configuration, `.env`, and `SOUL.md` live on the PVC. The deployment
+does not seed or rewrite profile files at startup. Hermes' per-profile command
+secret source reads the LiteLLM key from a read-only Kubernetes Secret mount and
+supplies the SearXNG URL. The pod exposes the existing shared mise install and
+shims through `PATH` and reuses the existing workspace on the PVC.
+
+Hermes resolves secret sources from each profile's own `config.yaml`; the
+machine-level `/etc/hermes/config.yaml` source does not populate routed profile
+scopes. The `homelab-operator` PVC profile config therefore carries its own
+`secrets.command` declaration. Add the same declaration to a new profile's
+config when that profile needs the LiteLLM credential.
+
+## Shared forge toolkit and workspace
+
+The Forge Toolkit is already installed on the persistent PVC under
+`/opt/data/shared/`. Pod restarts reuse the existing files; Hermes loads
+`/opt/data/shared/skills` for every profile through the managed
+`skills.external_dirs` setting in `/etc/hermes/config.yaml`.
+
+Repository identifiers always use `HOST/OWNER/REPO`. The `forge-repos` skill
+guides discovery; `forge-git repo path` resolves the canonical path and
+`forge-git repo ensure` reuses a matching checkout or clones a missing one under
+`/opt/data/workspace/repos/<host>/<owner>/<repo>`. Existing remotes are checked;
+the helper does not reset or update an existing checkout.
+
+`hermes-forgejo` remains the source of the read-only
+`/mnt/secrets/forges/forgejo/git.bjw-s.dev` credential. `forge-auth` selects a
+CLI by both provider and hostname, while Git's shared global config uses
+`git-credential-forge` and disables synthesized identities. `forge-git` resolves
+commit identity from the authenticated account API or an operator-supplied
+`/opt/data/shared/forge-identities.json`. That optional file is deliberately
+not created or populated by GitOps. Never put credentials in it or in GitOps.
+
+To add another forge, create an ExternalSecret only after its credential exists,
+mount the Secret read-only at
+`/mnt/secrets/forges/<provider>` with its key named for the forge hostname, and
+add the hostname/provider pair to the persistent host mapping. Add only the
+required egress for that forge, preserving the existing Forgejo route. Review
+the provider's documented CLI and API endpoints before enabling it. Do not put
+tokens in the host mapping or CLI configuration. The existing mise tools and
+Forge Toolkit files are operator-maintained on the PVC and are not refreshed by
+pod startup. Git and Python remain available from the Hermes image and mise
+shims on `PATH`.
 
 ## Deployment checks
 
@@ -59,7 +98,7 @@ After Flux deploys the PR, check:
 ## Rollback
 
 Revert this PR through Git and let Flux deploy the previous manifests. This
-removes the preview and restores the pinned backend image and seed config.
+removes the preview and restores the pinned backend image and managed config.
 It does not undo persistent database migrations. If the old backend cannot read
 migrated state, restore the verified pre-upgrade PVC backup with an explicitly
 approved recovery procedure; do not delete or overwrite the PVC as a routine
