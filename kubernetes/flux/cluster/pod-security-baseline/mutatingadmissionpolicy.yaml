@@ -1,0 +1,37 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingAdmissionPolicy
+metadata:
+  name: default-pod-security-baseline
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["namespaces"]
+  matchConditions:
+    - name: not-excluded-system-namespace
+      expression: >-
+        !["kube-system", "kube-public", "kube-node-lease"].exists(name,
+        name == object.metadata.name)
+  mutations:
+    - patchType: ApplyConfiguration
+      applyConfiguration:
+        expression: >-
+          Object{metadata: Object.metadata{labels: has(object.metadata.labels) &&
+          "pss.policy.bjw-s.dev/baseline" in object.metadata.labels &&
+          object.metadata.labels["pss.policy.bjw-s.dev/baseline"] == "audit" ?
+          ("pod-security.kubernetes.io/audit" in object.metadata.labels ? {} :
+          {"pod-security.kubernetes.io/audit": "baseline"}) :
+          ("pod-security.kubernetes.io/enforce" in object.metadata.labels ? {} :
+          {"pod-security.kubernetes.io/enforce": "baseline"})}}}
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: >-
+          has(object.metadata.labels) && "pss.policy.bjw-s.dev/baseline" in object.metadata.labels &&
+          object.metadata.labels["pss.policy.bjw-s.dev/baseline"] == "audit" &&
+          "pod-security.kubernetes.io/enforce" in object.metadata.labels &&
+          object.metadata.labels["pod-security.kubernetes.io/enforce"] == "baseline" ?
+          [JSONPatch{op: "remove", path: "/metadata/labels/pod-security.kubernetes.io~1enforce"}] : []

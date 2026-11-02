@@ -6,6 +6,14 @@ namespace: observability
 components:
   - ../../components/flux-alerts
   - ../../components/namespace
+patches:
+  - target:
+      kind: Namespace
+    patch: |
+      - op: add
+        path: /metadata/labels
+        value:
+          pss.policy.bjw-s.dev/baseline: audit
 resources:
   - ./blackbox-exporter/ks.yaml
   - ./gatus/ks.yaml

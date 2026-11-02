@@ -6,6 +6,14 @@ namespace: network
 components:
   - ../../components/flux-alerts
   - ../../components/namespace
+patches:
+  - target:
+      kind: Namespace
+    patch: |
+      - op: add
+        path: /metadata/labels
+        value:
+          pss.policy.bjw-s.dev/baseline: audit
 resources:
   - ./echo-server/ks.yaml
   - ./external-dns/ks.yaml
