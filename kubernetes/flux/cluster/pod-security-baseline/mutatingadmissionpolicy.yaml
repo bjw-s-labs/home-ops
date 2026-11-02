@@ -27,11 +27,3 @@ spec:
           {"pod-security.kubernetes.io/audit": "baseline"}) :
           ("pod-security.kubernetes.io/enforce" in object.metadata.labels ? {} :
           {"pod-security.kubernetes.io/enforce": "baseline"})}}}
-    - patchType: JSONPatch
-      jsonPatch:
-        expression: >-
-          has(object.metadata.labels) && "pss.policy.bjw-s.dev/baseline" in object.metadata.labels &&
-          object.metadata.labels["pss.policy.bjw-s.dev/baseline"] == "audit" &&
-          "pod-security.kubernetes.io/enforce" in object.metadata.labels &&
-          object.metadata.labels["pod-security.kubernetes.io/enforce"] == "baseline" ?
-          [JSONPatch{op: "remove", path: "/metadata/labels/pod-security.kubernetes.io~1enforce"}] : []
