@@ -25,6 +25,34 @@ spec:
           "pss.policy.bjw-s.dev/baseline" in object.metadata.labels &&
           object.metadata.labels["pss.policy.bjw-s.dev/baseline"] == "audit" ?
           ("pod-security.kubernetes.io/audit" in object.metadata.labels ? {} :
-          {"pod-security.kubernetes.io/audit": "baseline"}) :
+          {"pod-security.kubernetes.io/audit": "baseline",
+          "pss.policy.bjw-s.dev/audit-injected": "true"}) :
           ("pod-security.kubernetes.io/enforce" in object.metadata.labels ? {} :
-          {"pod-security.kubernetes.io/enforce": "baseline"})}}
+          {"pod-security.kubernetes.io/enforce": "baseline",
+          "pss.policy.bjw-s.dev/enforce-injected": "true"})}}
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: >-
+          has(object.metadata.labels) &&
+          "pss.policy.bjw-s.dev/baseline" in object.metadata.labels &&
+          object.metadata.labels["pss.policy.bjw-s.dev/baseline"] == "audit" &&
+          "pss.policy.bjw-s.dev/enforce-injected" in object.metadata.labels &&
+          object.metadata.labels["pss.policy.bjw-s.dev/enforce-injected"] == "true" &&
+          "pod-security.kubernetes.io/enforce" in object.metadata.labels &&
+          object.metadata.labels["pod-security.kubernetes.io/enforce"] == "baseline" ? [
+            JSONPatch{op: "remove", path: "/metadata/labels/pod-security.kubernetes.io~1enforce"},
+            JSONPatch{op: "remove", path: "/metadata/labels/pss.policy.bjw-s.dev~1enforce-injected"}
+          ] : []
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: >-
+          has(object.metadata.labels) &&
+          (! ("pss.policy.bjw-s.dev/baseline" in object.metadata.labels) ||
+          object.metadata.labels["pss.policy.bjw-s.dev/baseline"] != "audit") &&
+          "pss.policy.bjw-s.dev/audit-injected" in object.metadata.labels &&
+          object.metadata.labels["pss.policy.bjw-s.dev/audit-injected"] == "true" &&
+          "pod-security.kubernetes.io/audit" in object.metadata.labels &&
+          object.metadata.labels["pod-security.kubernetes.io/audit"] == "baseline" ? [
+            JSONPatch{op: "remove", path: "/metadata/labels/pod-security.kubernetes.io~1audit"},
+            JSONPatch{op: "remove", path: "/metadata/labels/pss.policy.bjw-s.dev~1audit-injected"}
+          ] : []
