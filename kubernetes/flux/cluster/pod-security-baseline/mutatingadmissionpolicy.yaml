@@ -5,6 +5,7 @@ metadata:
   name: default-pod-security-baseline
 spec:
   failurePolicy: Fail
+  reinvocationPolicy: IfNeeded
   matchConstraints:
     resourceRules:
       - apiGroups: [""]
@@ -26,4 +27,4 @@ spec:
           ("pod-security.kubernetes.io/audit" in object.metadata.labels ? {} :
           {"pod-security.kubernetes.io/audit": "baseline"}) :
           ("pod-security.kubernetes.io/enforce" in object.metadata.labels ? {} :
-          {"pod-security.kubernetes.io/enforce": "baseline"})}}}
+          {"pod-security.kubernetes.io/enforce": "baseline"})}}
