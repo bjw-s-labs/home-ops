@@ -25,16 +25,13 @@ spec:
               workdir_parent: shared/workdir
             host:
               workdir_parent: /data/act
-            kubernetes:
-              namespace: forgejo
-              poll_timeout: 10m
             log:
               level: info
             plugins:
               k8s:
                 address: unix:///plugin/forgejo-runner-k8s.sock
                 options:
-                  namespace: dev
+                  namespace: forgejo-runner
                   poll_timeout: 10m
                   labels: "app.kubernetes.io/name=forgejo-runner-instance,app.kubernetes.io/instance=env-${ENV_ID},egress.policy.home.arpa/block-all=true"
                   resources: |
@@ -53,6 +50,7 @@ spec:
               timeout: 3h
               shutdown_timeout: 3m
           podspec-default.yaml: |-
+            automountServiceAccountToken: false
             containers:
               - env:
                   - name: DEBIAN_FRONTEND
@@ -68,6 +66,7 @@ spec:
                     memory: 256Mi
             restartPolicy: Never
           podspec-dind.yaml: |-
+            automountServiceAccountToken: false
             initContainers:
               - name: dind
                 image: docker:29-dind
