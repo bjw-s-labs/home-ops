@@ -38,18 +38,59 @@ secret source reads the LiteLLM key from a read-only Kubernetes Secret mount and
 supplies the SearXNG URL. The pod exposes the existing shared mise install and
 shims through `PATH` and reuses the existing workspace on the PVC.
 
-Hermes resolves secret sources from each profile's own `config.yaml`; the
-machine-level `/etc/hermes/config.yaml` source does not populate routed profile
-scopes. The `homelab-operator` PVC profile config therefore carries its own
-`secrets.command` declaration. Add the same declaration to a new profile's
-config when that profile needs the LiteLLM credential.
+Hermes resolves secret sources and external skill directories from each profile's
+raw `config.yaml`, bypassing the machine-level overlay. These settings must be
+owned exclusively by the profile: declaring them in `/etc/hermes/config.yaml`
+causes every Dashboard config save to strip them from the profile, even though
+their runtime readers cannot inherit the managed values.
+
+For each profile that needs LiteLLM credentials and the shared toolkit, merge the
+following into `/opt/data/profiles/<name>/config.yaml` (or `/opt/data/config.yaml`
+for the default profile). Preserve sibling settings such as `skills.disabled`,
+other secret sources, and all unrelated preferences. This contains only a helper
+declaration, never the resolved credential:
+
+```yaml
+secrets:
+  command:
+    enabled: true
+    command: |
+      set -eu
+      printf 'LITELLM_API_KEY='
+      /bin/cat /mnt/secrets/litellm/key
+      printf '\nSEARXNG_URL=http://searxng.selfhosted.svc.cluster.local:8080\n'
+    helper_timeout_seconds: 3
+    override_existing: true
+
+skills:
+  external_dirs:
+    - /opt/data/shared/skills
+```
+
+### Recovery from stripped profile settings
+
+Deploy the overlay change removing `secrets.command` and `skills.external_dirs`
+before restoring either profile. Verify those sections are absent from the live
+`/etc/hermes/config.yaml`; otherwise the next Dashboard save will strip them again.
+
+With an explicitly authorized live repair, back up the current profile files,
+then merge only the settings above into `homelab-operator` and
+`home-assistant-helper`. Do not restore whole historical configs: that would undo
+recent Dashboard edits. Restart the gateway after restoration so it rebuilds
+profile credential scopes and MCP connections.
+
+Validate both profiles by saving an unrelated preference in the Dashboard and
+confirming these settings remain in their files. After a gateway restart, verify
+shared skills appear (subject to each profile's disabled list), LiteLLM requests
+succeed, and MCP connections no longer report a missing `LITELLM_API_KEY`. Never
+print the helper output when checking credential availability.
 
 ## Shared forge toolkit and workspace
 
 The Forge Toolkit is already installed on the persistent PVC under
-`/opt/data/shared/`. Pod restarts reuse the existing files; Hermes loads
-`/opt/data/shared/skills` for every profile through the managed
-`skills.external_dirs` setting in `/etc/hermes/config.yaml`.
+`/opt/data/shared/`. Pod restarts reuse the existing files; profiles load
+`/opt/data/shared/skills` through their own `skills.external_dirs` setting as
+described above. Configure this explicitly for each new profile that needs it.
 
 Repository identifiers always use `HOST/OWNER/REPO`. The `forge-repos` skill
 guides discovery; `forge-git repo path` resolves the canonical path and
