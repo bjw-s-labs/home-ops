@@ -73,13 +73,21 @@ sandbox for hostile code or a move to dedicated compute.
   ClusterSecretStore has no namespace condition blocking this destination.
   No secret value is copied through Git, rotated, or re-registered. Do not run
   old and new controllers concurrently with the same registration identity.
-- **Storage, capacity, and scheduling:** all runner data/cache and DinD storage
-  are `emptyDir`, so replacement loses only ephemeral state/cache. There is no
-  PVC, backup, database, or Forgejo data migration. Capacity remains four jobs;
-  requests/limits, images, labels, scheduling, native-sidecar ordering, and
-  shutdown settings are unchanged. There was no applicable ResourceQuota or
-  LimitRange in `dev`; none is silently introduced here. Namespace separation
-  does not isolate CPU, memory, disk, or kernel contention on the shared node.
+- **Storage, capacity, and scheduling:** the runner's `/data` (including its
+  cache) uses a 50Gi PVC on the Samsung-backed `miroir-local-slow` class and
+  persists across runner pod replacements; `/tmp` remains `emptyDir`. Each
+  DinD job gets a separate 25Gi generic ephemeral PVC for `/var/lib/docker`,
+  which Kubernetes removes with the job pod. Renovate uses a 10Gi claim on the
+  same class for each per-run scratch volume. These volumes are node-local and
+  unreplicated; their contents are disposable. Capacity remains four CI jobs,
+  plus Renovate's configured parallelism of five, so simultaneous jobs can
+  request up to 200Gi on the Samsung including the runner cache claim. Miroir
+  uses an LVM thin pool, so monitor physical pool and metadata usage as well as
+  PVC requests. Requests/limits, images, labels, scheduling, native-sidecar
+  ordering, and shutdown settings are otherwise unchanged. There was no
+  applicable ResourceQuota or LimitRange in `dev`; none is silently introduced
+  here. Namespace separation does not isolate CPU, memory, disk, or kernel
+  contention on the shared node.
 - **Other controllers:** Flux, External Secrets, reloader, log collection, and
   cluster monitoring are cluster-scoped in the reviewed setup. Flux error
   alerts are included in the new namespace. There is no runner PodMonitor or

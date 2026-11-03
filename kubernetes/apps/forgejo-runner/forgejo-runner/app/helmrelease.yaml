@@ -121,7 +121,15 @@ spec:
                     readOnly: true
             volumes:
               - name: docker-storage
-                emptyDir: {}
+                ephemeral:
+                  volumeClaimTemplate:
+                    spec:
+                      accessModes:
+                        - ReadWriteOnce
+                      resources:
+                        requests:
+                          storage: 25Gi
+                      storageClassName: miroir-local-slow
               - name: docker-certs
                 emptyDir: {}
             restartPolicy: Never
@@ -197,6 +205,12 @@ spec:
         identifier: config
         globalMounts:
           - path: /config
+      data:
+        accessMode: ReadWriteOnce
+        size: 50Gi
+        storageClass: miroir-local-slow
+        globalMounts:
+          - path: /data
       plugin:
         type: emptyDir
         globalMounts:
@@ -204,8 +218,6 @@ spec:
       tmpfs:
         type: emptyDir
         globalMounts:
-          - path: /data
-            subPath: data
           - path: /tmp
             subPath: tmp
       runner-secret:

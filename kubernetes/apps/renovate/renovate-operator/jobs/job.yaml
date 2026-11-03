@@ -31,6 +31,17 @@ spec:
     requests:
       cpu: 100m
       memory: 128Mi
+  scratchVolume:
+    enabled: true
+    ephemeral:
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
+          storageClassName: miroir-local-slow
   schedule: 0 * * * *
   secretRef: renovate-secret
   webhook:
