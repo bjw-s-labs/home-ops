@@ -1,0 +1,34 @@
+context: |
+  Read AGENTS.md and applicable task guidance before planning changes.
+  Repository policy remains canonical there; do not duplicate it in specs.
+  These artifacts describe infrastructure contracts, not a manifest inventory.
+  Separate repository evidence, intended behavior, assumptions, and live verification.
+  Planning and repository edits do not authorize deployment or other live operations.
+  Forgejo is authoritative; GitHub mirrors it and supplies manifests to Flux.
+  This external source avoids depending on in-cluster Forgejo during bootstrap
+  or recovery. Preserve this boundary and verify mirror delivery before rollout.
+operations:
+  apply:
+    guidance:
+      - Report local validation separately from deployment and runtime verification.
+      - Leave unapproved operational steps pending; do not mark them completed.
+  archive:
+    guidance:
+      - Report unresolved validation gaps and deployment status explicitly.
+rules:
+  design:
+    - Trace resource ownership and reconciliation paths before choosing an approach.
+    - Cover deployment impact, validation, and recovery for disruptive changes.
+    - Identify secret references and consumers without including secret values.
+  proposal:
+    - State the outcome, affected capabilities, and explicit non-goals.
+    - Identify availability, data-loss, or access-control risks when applicable.
+  specs:
+    - Specify observable behavior with testable scenarios, not copies of YAML.
+    - Do not turn accidental implementation details into requirements.
+    - Preserve capability paths and distinguish baseline behavior from new requirements.
+  tasks:
+    - Use concrete repository paths and executable validation commands where known.
+    - Separate local implementation from operational steps needing explicit approval.
+    - Include recovery checks for storage, namespace, bootstrap, or ownership changes.
+schema: spec-driven
