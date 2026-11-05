@@ -4,6 +4,7 @@ kind: Kanidm
 metadata:
   name: sso
 spec:
+  disableUpgradeChecks: true
   domain: idm.bjw-s.dev
   origin: https://idm.bjw-s.dev
   replicaGroups:
@@ -15,7 +16,7 @@ spec:
           cpu: 10m
         limits:
           memory: 512Mi
-  image: kanidm/server:1.11.2
+  image: kanidm/server:1.12.0
   logLevel: info
   groupNamespaceSelector: {}
   oauth2ClientNamespaceSelector: {}
