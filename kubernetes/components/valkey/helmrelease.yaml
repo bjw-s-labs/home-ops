@@ -1,0 +1,164 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ${APP}-valkey
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: ${APP}-valkey
+  interval: 30m
+  values:
+    controllers:
+      valkey:
+        type: deployment
+        pod:
+          automountServiceAccountToken: false
+          securityContext:
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+        replicas: 1
+        strategy: Recreate
+        containers:
+          server:
+            image:
+              repository: docker.io/valkey/valkey
+              tag: 9.1.3-alpine@sha256:bf09d58e96d6b4524a15396b65b242bbe18beebbcc15a04d8ee75ddac62fae0b
+            args:
+              - --bind
+              - 0.0.0.0
+              - --protected-mode
+              - "no"
+              - --dir
+              - /data
+              - --dbfilename
+              - dump.rdb
+              - --save
+              - "300 1"
+              - --appendonly
+              - "no"
+              - --maxmemory
+              - 512mb
+              - --maxmemory-policy
+              - noeviction
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  exec: &ping
+                    command:
+                      - /bin/sh
+                      - -ec
+                      - "test \"$(valkey-cli -h 127.0.0.1 ping)\" = PONG"
+                  failureThreshold: 60
+                  periodSeconds: 5
+                  timeoutSeconds: 2
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec: *ping
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  exec: *ping
+                  periodSeconds: 5
+                  timeoutSeconds: 2
+            resources:
+              requests:
+                cpu: 25m
+                memory: 256Mi
+              limits:
+                memory: 768Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+              readOnlyRootFilesystem: true
+              runAsGroup: 1000
+              runAsUser: 999
+          exporter:
+            image:
+              repository: docker.io/oliver006/redis_exporter
+              tag: v1.97.0@sha256:f5f903fbe77571d455ede0453b084d6840bc62fc105efac001034421cab83b99
+            env:
+              REDIS_ADDR: redis://127.0.0.1:6379
+            resources:
+              requests:
+                cpu: 5m
+                memory: 16Mi
+              limits:
+                memory: 64Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+              readOnlyRootFilesystem: true
+              runAsGroup: 59000
+              runAsUser: 59000
+    networkpolicies:
+      # Preserve the effective client access scope of the existing operator policy.
+      valkey:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/controller: valkey
+            app.kubernetes.io/instance: ${APP}-valkey
+            app.kubernetes.io/name: ${APP}-valkey
+        ingress:
+          - fromEndpoints:
+              - {}
+            toPorts:
+              - ports:
+                  - port: "6379"
+                    protocol: TCP
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: observability
+                  app.kubernetes.io/name: prometheus
+            toPorts:
+              - ports:
+                  - port: "9121"
+                    protocol: TCP
+    persistence:
+      data:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        forceRename: ${APP}-valkey
+        size: 512Mi
+        storageClass: miroir-local
+        advancedMounts:
+          valkey:
+            server:
+              - path: /data
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+    service:
+      valkey:
+        type: ClusterIP
+        controller: valkey
+        forceRename: ${APP}-valkey
+        ports:
+          redis:
+            port: 6379
+          metrics:
+            port: 9121
+    serviceMonitor:
+      valkey:
+        service:
+          identifier: valkey
+        endpoints:
+          - port: metrics
+            interval: 30s

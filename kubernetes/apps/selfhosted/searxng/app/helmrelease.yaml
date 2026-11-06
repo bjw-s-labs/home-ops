@@ -33,7 +33,7 @@ spec:
         egress:
           - toEndpoints:
               - matchLabels:
-                  k8s:app: searxng-dragonfly
+                  app.kubernetes.io/name: searxng-valkey
             toPorts:
               - ports:
                   - port: "6379"
@@ -73,7 +73,7 @@ spec:
             env:
               SEARXNG_BASE_URL: https://search.bjw-s.dev
               SEARXNG_PORT: &httpPort 8080
-              SEARXNG_VALKEY_URL: "redis://searxng-dragonfly:6379"
+              SEARXNG_VALKEY_URL: "redis://searxng-valkey:6379"
             envFrom:
               - externalSecretRef:
                   identifier: searxng

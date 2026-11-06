@@ -1,7 +1,7 @@
 # Forgejo runner isolation and namespace cutover
 
 The runner controller, Kubernetes plugin, and transient workflow Jobs live in
-`forgejo-runner`. Forgejo, its Dragonfly instance, signing/OAuth credentials, and
+`forgejo-runner`. Forgejo, its Valkey instance, signing/OAuth credentials, and
 persistent data remain in `dev`. This is a namespace/RBAC separation, not a
 sandbox for hostile code or a move to dedicated compute.
 

@@ -7,10 +7,7 @@ metadata:
 spec:
   components:
     - ../../../../components/kopiur/backup
-    - ../../../../components/dragonfly
-  dependsOn:
-    - name: dragonfly-operator
-      namespace: database
+    - ../../../../components/valkey
   interval: 1h
   path: "./kubernetes/apps/selfhosted/nextcloud/app"
   postBuild:
@@ -19,7 +16,6 @@ spec:
       KOPIUR_CAPACITY: 15Gi
       KOPIUR_MOVER_UID: "0"
       KOPIUR_MOVER_GID: "82"
-      DRAGONFLY_REPLICAS: "1"
   prune: true
   sourceRef:
     kind: GitRepository

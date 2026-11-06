@@ -33,7 +33,7 @@ spec:
         egress:
           - toEndpoints:
               - matchLabels:
-                  k8s:app: manyfold-dragonfly
+                  app.kubernetes.io/name: manyfold-valkey
             toPorts:
               - ports:
                   - port: "6379"
@@ -82,7 +82,7 @@ spec:
               DATABASE_URL: sqlite3:/data/database/manyfold.sqlite3
               MULTIUSER: false
               PORT: &httpPort 3214
-              REDIS_URL: redis://manyfold-dragonfly:6379
+              REDIS_URL: redis://manyfold-valkey:6379
               REGISTRATION: false
               SECRET_KEY_BASE:
                 valueFrom:

@@ -7,8 +7,8 @@ metadata:
 spec:
   components:
     - ../../../../components/kopiur/backup
+    - ../../../../components/valkey
     - ../../../../components/zeroscaler
-    - ../../../../components/dragonfly
   interval: 1h
   path: "./kubernetes/apps/selfhosted/paperless/app"
   postBuild:
@@ -18,7 +18,6 @@ spec:
       KOPIUR_CAPACITY: 15Gi
       KOPIUR_MOVER_UID: "1000"
       KOPIUR_MOVER_GID: "65542"
-      DRAGONFLY_REPLICAS: "1"
   prune: true
   sourceRef:
     kind: GitRepository

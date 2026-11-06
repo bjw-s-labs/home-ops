@@ -7,10 +7,7 @@ metadata:
 spec:
   components:
     - ../../../../components/kopiur/backup
-    - ../../../../components/dragonfly
-  dependsOn:
-    - name: dragonfly-operator
-      namespace: database
+    - ../../../../components/valkey
   interval: 1h
   path: "./kubernetes/apps/selfhosted/manyfold/app"
   postBuild:
@@ -18,7 +15,6 @@ spec:
       APP: manyfold
       KOPIUR_CLAIM: manyfold-data
       KOPIUR_CAPACITY: 5Gi
-      DRAGONFLY_REPLICAS: "1"
   prune: true
   sourceRef:
     kind: GitRepository

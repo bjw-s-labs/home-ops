@@ -7,12 +7,10 @@ metadata:
 spec:
   components:
     - ../../../../components/cnpg/pg18
-    - ../../../../components/dragonfly
     - ../../../../components/kopiur/backup
+    - ../../../../components/valkey
   dependsOn:
     - name: cloudnative-pg-barman-plugin
-      namespace: database
-    - name: dragonfly-operator
       namespace: database
     - name: kanidm-instance
       namespace: security
@@ -21,10 +19,6 @@ spec:
     - name: litellm-operator
       namespace: ai
   healthCheckExprs:
-    - apiVersion: dragonflydb.io/v1alpha1
-      kind: Dragonfly
-      failed: status.phase != 'ready'
-      current: status.phase == 'ready'
     - apiVersion: postgresql.cnpg.io/v1
       kind: Cluster
       failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')

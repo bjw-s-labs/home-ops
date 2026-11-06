@@ -22,7 +22,7 @@ spec:
         cache:
           ENABLED: true
           ADAPTER: redis
-          HOST: redis://forgejo-dragonfly:6379?pool_size=100&idle_timeout=180s
+          HOST: redis://forgejo-valkey:6379?pool_size=100&idle_timeout=180s
         cron.archive_cleanup:
           ENABLED: true
           RUN_AT_START: true
@@ -40,7 +40,7 @@ spec:
           ENABLE_OPENID_SIGNUP: false
         queue:
           TYPE: redis
-          CONN_STR: redis://forgejo-dragonfly:6379?pool_size=100&idle_timeout=180s
+          CONN_STR: redis://forgejo-valkey:6379?pool_size=100&idle_timeout=180s
         repository:
           DEFAULT_REPO_UNITS: repo.code,repo.releases,repo.issues,repo.pulls,repo.actions
           DISABLED_REPO_UNITS: repo.ext_wiki,repo.ext_issues
@@ -79,7 +79,7 @@ spec:
           REQUIRE_SIGNIN_VIEW: false
         session:
           PROVIDER: redis
-          PROVIDER_CONFIG: redis://forgejo-dragonfly:6379?pool_size=100&idle_timeout=180s
+          PROVIDER_CONFIG: redis://forgejo-valkey:6379?pool_size=100&idle_timeout=180s
           SESSION_LIFE_TIME: "1209600"
         ui:
           DEFAULT_THEME: melosso

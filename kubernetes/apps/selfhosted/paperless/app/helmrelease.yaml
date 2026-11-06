@@ -35,7 +35,7 @@ spec:
         egress:
           - toEndpoints:
               - matchLabels:
-                  k8s:app: paperless-dragonfly
+                  app.kubernetes.io/name: paperless-valkey
             toPorts:
               - ports:
                   - port: "6379"
@@ -87,7 +87,7 @@ spec:
               PAPERLESS_OCR_LANGUAGES: nld
               PAPERLESS_OCR_LANGUAGE: nld
               # Configure redis integration
-              PAPERLESS_REDIS: redis://paperless-dragonfly:6379
+              PAPERLESS_REDIS: redis://paperless-valkey:6379
               # Configure user permissions
               # Only affects local storage; NFS access is mapall'd to k8s_user:truenas_user (3002:4000) on gladius
               USERMAP_GID: "100"
