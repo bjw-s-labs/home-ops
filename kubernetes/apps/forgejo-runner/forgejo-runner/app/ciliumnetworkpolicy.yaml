@@ -30,15 +30,16 @@ spec:
               protocol: TCP
             - port: "8089"
               protocol: TCP
-    - # LiteLLM
+    - # Agent Gateway
       toEndpoints:
         - matchLabels:
-            app.kubernetes.io/name: litellm
+            app.kubernetes.io/name: agentgateway
+            app.kubernetes.io/instance: agentgateway
             k8s:io.kubernetes.pod.namespace: ai
       toPorts:
         - ports:
             - protocol: TCP
-              port: "4000"
+              port: "8080"
     - # Konflate
       toEndpoints:
         - matchLabels:

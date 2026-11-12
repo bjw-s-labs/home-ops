@@ -14,14 +14,17 @@ spec:
       hermes:
         type: cilium
         egress:
-          - # LiteLLM proxy (model provider)
+          - # Agent Gateway (model provider)
             toEndpoints:
               - matchLabels:
                   k8s:io.kubernetes.pod.namespace: ai
-                  app.kubernetes.io/name: litellm
+                  app.kubernetes.io/name: agentgateway
+                  app.kubernetes.io/instance: agentgateway
             toPorts:
               - ports:
-                  - port: "4000"
+                  - port: "8080"
+                    protocol: TCP
+                  - port: "8081"
                     protocol: TCP
           - # In-cluster web search
             toEndpoints:
@@ -136,7 +139,6 @@ spec:
               HOME: /opt/data
               GIT_CONFIG_GLOBAL: /opt/data/shared/gitconfig
               PATH: /opt/data/shared/bin:/opt/data/.local/bin:/opt/data/.local/share/mise/shims:/opt/mise:/opt/hermes/.venv/bin:/opt/hermes/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-              LITELLM_BASE_URL: "http://litellm.ai.svc.cluster.local:4000/v1"
               # Terminal HOME moves into each named profile; mise stays on the shared PVC.
               MISE_CACHE_DIR: /opt/data/.cache/mise
               MISE_CONFIG_DIR: /opt/data/.config/mise
@@ -224,13 +226,13 @@ spec:
             app:
               - path: /mnt/secrets/forges/forgejo
                 readOnly: true
-      litellm-token:
+      agentgateway-token:
         type: secret
-        name: hermes-litellm
+        name: agentgateway-hermes
         advancedMounts:
           hermes:
             app:
-              - path: /mnt/secrets/litellm
+              - path: /mnt/secrets/agentgateway
                 readOnly: true
       mise:
         type: image

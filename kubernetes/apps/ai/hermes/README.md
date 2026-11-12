@@ -28,36 +28,48 @@ agent access.
 
 `app/resources/config.yaml` is a read-only managed overlay mounted at
 `/etc/hermes/config.yaml` (Hermes' supported path). It pins Webapp and Dashboard
-addresses, Kanidm OIDC, the LiteLLM provider and credential helper, the gateway
-topology, secret redaction, and the local terminal backend. Managed values take
+addresses, Kanidm OIDC, the gateway topology, secret redaction, and the local
+terminal backend. Managed values take
 precedence over each profile's settings.
 
 Profile configuration, `.env`, and `SOUL.md` live on the PVC. The deployment
 does not seed or rewrite profile files at startup. Hermes' per-profile command
-secret source reads the LiteLLM key from a read-only Kubernetes Secret mount and
+secret source reads the Agent Gateway key from a read-only Kubernetes Secret mount and
 supplies the SearXNG URL. The pod exposes the existing shared mise install and
 shims through `PATH` and reuses the existing workspace on the PVC.
 
 Hermes resolves secret sources and external skill directories from each profile's
-raw `config.yaml`, bypassing the machine-level overlay. These settings must be
+raw `config.yaml`, bypassing the machine-level overlay. `hermes doctor` likewise
+validates `model.provider` against the profile's raw `providers` section only. These settings must be
 owned exclusively by the profile: declaring them in `/etc/hermes/config.yaml`
 causes every Dashboard config save to strip them from the profile, even though
 their runtime readers cannot inherit the managed values.
 
-For each profile that needs LiteLLM credentials and the shared toolkit, merge the
+For each profile that needs Agent Gateway credentials and the shared toolkit, merge the
 following into `/opt/data/profiles/<name>/config.yaml` (or `/opt/data/config.yaml`
 for the default profile). Preserve sibling settings such as `skills.disabled`,
 other secret sources, and all unrelated preferences. This contains only a helper
 declaration, never the resolved credential:
 
 ```yaml
+model:
+  base_url: http://agentgateway.ai.svc.cluster.local:8080/v1
+  provider: agentgateway
+
+providers:
+  agentgateway:
+    api: http://agentgateway.ai.svc.cluster.local:8080/v1
+    discover_models: true
+    key_env: AGENTGATEWAY_API_KEY
+    name: Agent Gateway
+
 secrets:
   command:
     enabled: true
     command: |
       set -eu
-      printf 'LITELLM_API_KEY='
-      /bin/cat /mnt/secrets/litellm/key
+      printf 'AGENTGATEWAY_API_KEY='
+      /bin/cat /mnt/secrets/agentgateway/key
       printf '\nSEARXNG_URL=http://searxng.selfhosted.svc.cluster.local:8080\n'
     helper_timeout_seconds: 3
     override_existing: true
@@ -81,8 +93,8 @@ profile credential scopes and MCP connections.
 
 Validate both profiles by saving an unrelated preference in the Dashboard and
 confirming these settings remain in their files. After a gateway restart, verify
-shared skills appear (subject to each profile's disabled list), LiteLLM requests
-succeed, and MCP connections no longer report a missing `LITELLM_API_KEY`. Never
+shared skills appear (subject to each profile's disabled list), Agent Gateway requests
+succeed, and MCP connections no longer report a missing `AGENTGATEWAY_API_KEY`. Never
 print the helper output when checking credential availability.
 
 ## Shared forge toolkit and workspace

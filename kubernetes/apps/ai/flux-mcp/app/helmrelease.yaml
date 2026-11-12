@@ -1,0 +1,54 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: flux-mcp
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: flux-mcp
+  interval: 30m
+  values:
+    controllers:
+      flux-mcp:
+        annotations:
+          reloader.stakater.com/auto: 'true'
+        pod:
+          labels:
+            egress.policy.home.arpa/block-all: 'true'
+            egress.policy.home.arpa/kube-api: 'true'
+            app.kubernetes.io/name: flux-mcp
+            app.kubernetes.io/instance: flux-mcp
+          automountServiceAccountToken: true
+        replicas: 1
+        serviceAccount:
+          name: flux-mcp
+        containers:
+          mcp:
+            image:
+              repository: ghcr.io/controlplaneio-fluxcd/flux-operator-mcp
+              tag: v0.62.1@sha256:0b4181bc9ada80eedf3e9df3355153abc9c3e6d8b913bddebe0b12908309bff6
+            args:
+            - serve
+            - --transport=http
+            - --port=8000
+            env:
+              RUNTIME_NAMESPACE:
+                valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.namespace
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+    service:
+      app:
+        controller: flux-mcp
+        ports:
+          http:
+            port: 8000
+            targetPort: 8000
+            protocol: TCP

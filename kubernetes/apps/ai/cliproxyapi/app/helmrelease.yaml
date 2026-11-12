@@ -1,0 +1,93 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cliproxyapi
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: cliproxyapi
+  interval: 30m
+  values:
+    controllers:
+      cliproxyapi:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          labels:
+            egress.policy.home.arpa/internet: "true"
+          securityContext:
+            fsGroup: 10000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 10000
+            runAsNonRoot: true
+            runAsUser: 10000
+            seccompProfile:
+              type: RuntimeDefault
+        containers:
+          app:
+            image:
+              repository: docker.io/eceasy/cli-proxy-api
+              tag: v8.0.64@sha256:362e7ac699a0f2608d7c55f8f8cb764e5afbfe4ed22aadc26fcb147eecbf2a03
+            command:
+              - /CLIProxyAPI/CLIProxyAPI
+            args:
+              - --config
+              - /etc/cliproxyapi/config.yaml
+              - --local-model
+            env:
+              HOME: /data
+            ports:
+              - name: http
+                containerPort: 8317
+                protocol: TCP
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: http
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: http
+                  periodSeconds: 10
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 1Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      auth:
+        existingClaim: cliproxyapi
+        globalMounts:
+          - path: /data/.cli-proxy-api
+      config:
+        type: secret
+        name: cliproxyapi-config
+        globalMounts:
+          - path: /etc/cliproxyapi
+            readOnly: true
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+    service:
+      app:
+        controller: cliproxyapi
+        ports:
+          http:
+            port: 8317
+            targetPort: http

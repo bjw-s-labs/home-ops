@@ -8,9 +8,7 @@ spec:
   dependsOn:
     - name: cloudnative-pg
       namespace: database
-    # The virtual key is created through the proxy's admin API, so the proxy
-    # must exist first.
-    - name: litellm
+    - name: agentgateway
       namespace: ai
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2

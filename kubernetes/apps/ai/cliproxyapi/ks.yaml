@@ -1,0 +1,22 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cliproxyapi
+spec:
+  components:
+    - ../../../../components/kopiur/backup
+  interval: 1h
+  path: ./kubernetes/apps/ai/cliproxyapi/app
+  postBuild:
+    substitute:
+      APP: cliproxyapi
+      KOPIUR_CAPACITY: 5Gi
+      KOPIUR_MOVER_GID: "10000"
+      KOPIUR_MOVER_UID: "10000"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: ai

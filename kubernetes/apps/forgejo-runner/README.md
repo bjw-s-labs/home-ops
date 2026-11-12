@@ -41,9 +41,9 @@ sandbox for hostile code or a move to dedicated compute.
   Existing jobs ran in `dev`, not the obsolete block's `forgejo` value.
 - **Job egress:** the moved policy explicitly selects Forgejo in `dev` on TCP
   3000. Controller/cache endpoint selectors remain namespace-local because both
-  sides move together. Existing allows for LiteLLM (`ai`, TCP 4000), Konflate
+  sides move together. Model egress targets Agent Gateway (`ai`, TCP 8080); Konflate
   (`flux-system`, TCP 8080), external Envoy (`network`), and Internet HTTP/HTTPS
-  are preserved. Clusterwide DNS egress still applies. The job's `block-all`
+  remain allowed. Clusterwide DNS egress still applies. The job's `block-all`
   label excludes the broad default-egress policy; Cilium's clusterwide policy
   repository implements policies additively, so the empty egress rule contributes
   no allow and the endpoint remains default-denied except for matching allow

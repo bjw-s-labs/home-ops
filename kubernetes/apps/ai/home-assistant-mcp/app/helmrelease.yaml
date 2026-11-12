@@ -1,0 +1,82 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: home-assistant-mcp
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: home-assistant-mcp
+  interval: 30m
+  values:
+    controllers:
+      home-assistant-mcp:
+        annotations:
+          reloader.stakater.com/auto: 'true'
+        pod:
+          labels:
+            egress.policy.home.arpa/block-all: 'true'
+            app.kubernetes.io/name: home-assistant-mcp
+            app.kubernetes.io/instance: home-assistant-mcp
+          automountServiceAccountToken: false
+          securityContext:
+            fsGroup: 999
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 999
+            runAsNonRoot: true
+            runAsUser: 999
+            seccompProfile:
+              type: RuntimeDefault
+        replicas: 1
+        containers:
+          mcp:
+            image:
+              repository: ghcr.io/homeassistant-ai/ha-mcp
+              tag: 9.1.2@sha256:381b1e01635d3c51f35a01882863610bc0b76a22bae93835a6a5a5c926d9ecb4
+            args:
+            - ha-mcp-web
+            env:
+              HA_MCP_DISABLE_SETTINGS_UI:
+                value: 'true'
+              HOMEASSISTANT_TOKEN:
+                valueFrom:
+                  secretKeyRef:
+                    name: home-assistant-mcp-secret
+                    key: HOMEASSISTANT_TOKEN
+              HOMEASSISTANT_URL:
+                value: https://hass.bjw-s.dev
+              MCP_PORT:
+                value: '8086'
+              MCP_SECRET_PATH:
+                value: /mcp
+              READ_ONLY_MODE:
+                value: 'false'
+            resources:
+              requests:
+                cpu: 50m
+                memory: 100Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                - ALL
+    persistence:
+      state:
+        type: emptyDir
+        globalMounts:
+        - path: /home/mcpuser/.ha-mcp
+      tmp:
+        type: emptyDir
+        globalMounts:
+        - path: /tmp
+    service:
+      app:
+        controller: home-assistant-mcp
+        ports:
+          http:
+            port: 8086
+            targetPort: 8086
+            protocol: TCP

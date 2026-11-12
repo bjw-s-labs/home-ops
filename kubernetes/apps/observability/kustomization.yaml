@@ -1,28 +1,25 @@
 ---
-# yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: observability
 components:
-  - ../../components/flux-alerts
-  - ../../components/namespace
+- ../../components/flux-alerts
+- ../../components/namespace
 patches:
-  - target:
-      kind: Namespace
-    patch: |
-      - op: add
-        path: /metadata/labels
-        value:
-          pss.policy.bjw-s.dev/baseline: audit
+- target:
+    kind: Namespace
+  patch: "- op: add\n  path: /metadata/labels\n  value:\n    pss.policy.bjw-s.dev/baseline:\
+    \ audit\n"
 resources:
-  - ./blackbox-exporter/ks.yaml
-  - ./gatus/ks.yaml
-  - ./grafana-operator/ks.yaml
-  - ./kromgo/ks.yaml
-  - ./kube-state-metrics/ks.yaml
-  - ./kube-prometheus-stack/ks.yaml
-  - ./node-exporter/ks.yaml
-  - ./prometheus-adapter/ks.yaml
-  - ./silence-operator/ks.yaml
-  - ./smartctl-exporter/ks.yaml
-  - ./victoria-logs/ks.yaml
+- ./blackbox-exporter/ks.yaml
+- ./gatus/ks.yaml
+- ./grafana-mcp/ks.yaml
+- ./grafana-operator/ks.yaml
+- ./kromgo/ks.yaml
+- ./kube-prometheus-stack/ks.yaml
+- ./kube-state-metrics/ks.yaml
+- ./node-exporter/ks.yaml
+- ./prometheus-adapter/ks.yaml
+- ./silence-operator/ks.yaml
+- ./smartctl-exporter/ks.yaml
+- ./victoria-logs/ks.yaml

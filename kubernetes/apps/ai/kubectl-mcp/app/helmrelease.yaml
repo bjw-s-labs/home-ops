@@ -1,0 +1,62 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kubectl-mcp
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: kubectl-mcp
+  interval: 30m
+  values:
+    controllers:
+      kubectl-mcp:
+        annotations:
+          reloader.stakater.com/auto: 'true'
+        pod:
+          labels:
+            egress.policy.home.arpa/block-all: 'true'
+            egress.policy.home.arpa/kube-api: 'true'
+            app.kubernetes.io/name: kubectl-mcp
+            app.kubernetes.io/instance: kubectl-mcp
+          automountServiceAccountToken: true
+        replicas: 1
+        serviceAccount:
+          name: kubectl-mcp-readonly
+        containers:
+          mcp:
+            image:
+              repository: docker.io/rohitghumare64/kubectl-mcp-server
+              tag: 2.0.0@sha256:f1f57aa5d4952f3c49e4d9bb8071a143d0812bdc8253922d51eeca8a2615ea29
+            args:
+            - --transport
+            - streamable-http
+            - --host
+            - 0.0.0.0
+            - --port
+            - '8000'
+            - --read-only
+            env:
+              MCP_ALLOWED_HOSTS:
+                value: kubectl-mcp.ai.svc.cluster.local
+              MCP_ALLOW_UNAUTHENTICATED:
+                value: 'true'
+              MCP_K8S_PROVIDER:
+                value: in-cluster
+              PYTHONUNBUFFERED:
+                value: '1'
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+    service:
+      app:
+        controller: kubectl-mcp
+        ports:
+          http:
+            port: 8000
+            targetPort: 8000
+            protocol: TCP

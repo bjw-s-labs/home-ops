@@ -45,16 +45,9 @@ spec:
             env: KRITIKA_OPENROUTER_API_KEY
         litellm:
           type: openai
-          baseUrl: http://litellm.ai.svc.cluster.local:4000/v1
+          baseUrl: http://agentgateway.ai.svc.cluster.local:8080/v1
           apiKey:
             env: KRITIKA_LITELLM_API_KEY
-          pricing:
-            minimax/m3.1-flash-preview:
-              input: 0.3
-              output: 1.2
-            minimax/m3:
-              input: 0.3
-              output: 1.2
       review:
         model: chatgpt/~luna-latest
         fallback: litellm/neuralwatt/dsv4.1f
@@ -70,12 +63,11 @@ spec:
         deny:
           - 10.244.0.0/16
     env:
-      # Generated into this namespace by the LiteLLMVirtualKey, so spend is
-      # attributed per app rather than using the proxy's master key.
+      # A namespace-local scoped Agent Gateway key.
       KRITIKA_LITELLM_API_KEY:
         valueFrom:
           secretKeyRef:
-            name: kritika-litellm
+            name: agentgateway-kritika
             key: key
     envFrom:
       - secretRef:
@@ -135,9 +127,10 @@ spec:
                   kubernetes.io/metadata.name: ai
               podSelector:
                 matchLabels:
-                  app.kubernetes.io/name: litellm
+                  app.kubernetes.io/name: agentgateway
+                  app.kubernetes.io/instance: agentgateway
           ports:
-            - port: 4000
+            - port: 8080
               protocol: TCP
     resources:
       requests:
