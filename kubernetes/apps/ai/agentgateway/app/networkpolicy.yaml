@@ -13,6 +13,13 @@ spec:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: ai
             app.kubernetes.io/name: hermes
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+            - port: "8081"
+              protocol: TCP
+    - fromEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: dev
             app.kubernetes.io/name: kritika
@@ -22,8 +29,6 @@ spec:
       toPorts:
         - ports:
             - port: "8080"
-              protocol: TCP
-            - port: "8081"
               protocol: TCP
   egress:
     - toEntities:
