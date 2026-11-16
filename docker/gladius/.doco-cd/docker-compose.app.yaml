@@ -4,15 +4,15 @@
 secrets:
   1pw_token:
     file: /home/truenas_admin/.config/doco-cd/1pw_token
-  api_secret:
-    file: /home/truenas_admin/.config/doco-cd/api_secret
+  api_keys:
+    file: /home/truenas_admin/.config/doco-cd/api_keys
   webhook_secret:
     file: /home/truenas_admin/.config/doco-cd/webhook_secret
 services:
   app:
     container_name: doco-cd
     environment:
-      API_SECRET_FILE: /run/secrets/api_secret
+      API_KEYS_FILE: /run/secrets/api_keys
       DEPLOY_CONFIG_BASE_DIR: ./docker/gladius/
       HTTP_PORT: 8880
       LOG_LEVEL: info
@@ -33,13 +33,13 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-    image: ghcr.io/kimdre/doco-cd:0.133.2@sha256:8ca3cf6701f70ac3af4c5d726e542fe3a854a038149375f87222ec2719b3c975
+    image: ghcr.io/kimdre/doco-cd:0.134.0@sha256:1d40f570403689c762c63009ade3d5d0dc24595bf40f9629a8ab3865e4ddb768
     ports:
       - 8880:8880
     restart: unless-stopped
     secrets:
       - 1pw_token
-      - api_secret
+      - api_keys
       - webhook_secret
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

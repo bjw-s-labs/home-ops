@@ -19,7 +19,7 @@
         - key: Infrastructure/1Password - Doco-CD/password
           var: doco_1pw_sa_token
         - key: Infrastructure/Doco-CD/api_secret
-          var: doco_api_secret
+          var: doco_api_key
         - key: Infrastructure/Doco-CD/webhook_secret
           var: doco_webhook_secret
       check_mode: false
@@ -30,7 +30,7 @@
     - name: Set secret facts
       ansible.builtin.set_fact:
         doco_1pw_sa_token: "{{ secrets_raw.results[0].stdout }}"
-        doco_api_secret: "{{ secrets_raw.results[1].stdout }}"
+        doco_api_key: "{{ secrets_raw.results[1].stdout }}"
         doco_webhook_secret: "{{ secrets_raw.results[2].stdout }}"
       no_log: true
 
@@ -67,8 +67,10 @@
           loop:
             - name: 1pw_token
               content: "{{ doco_1pw_sa_token }}"
-            - name: api_secret
-              content: "{{ doco_api_secret }}"
+            - name: api_keys
+              content: |
+                - key: {{ doco_api_key }}
+                  role: full
             - name: webhook_secret
               content: "{{ doco_webhook_secret }}"
 

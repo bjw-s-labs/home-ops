@@ -4,15 +4,15 @@
 secrets:
   1pw_token:
     file: /opt/doco-cd/1pw_token
-  api_secret:
-    file: /opt/doco-cd/api_secret
+  api_keys:
+    file: /opt/doco-cd/api_keys
   webhook_secret:
     file: /opt/doco-cd/webhook_secret
 services:
   app:
     container_name: doco-cd
     environment:
-      API_SECRET_FILE: /run/secrets/api_secret
+      API_KEYS_FILE: /run/secrets/api_keys
       DEPLOY_CONFIG_BASE_DIR: ./docker/icarus/
       HTTP_PORT: 8880
       LOG_LEVEL: info
@@ -33,11 +33,11 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-    image: ghcr.io/kimdre/doco-cd:0.133.2@sha256:8ca3cf6701f70ac3af4c5d726e542fe3a854a038149375f87222ec2719b3c975
+    image: ghcr.io/kimdre/doco-cd:0.134.0@sha256:1d40f570403689c762c63009ade3d5d0dc24595bf40f9629a8ab3865e4ddb768
     restart: unless-stopped
     secrets:
       - 1pw_token
-      - api_secret
+      - api_keys
       - webhook_secret
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
