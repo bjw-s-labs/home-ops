@@ -1,4 +1,13 @@
 ---
+configs:
+  truenas-s3:
+    content: |
+      http:
+        services:
+          truenas-s3:
+            loadBalancer:
+              servers:
+                - url: http://10.1.1.12:9000
 networks:
   apps:
     name: apps
@@ -18,6 +27,10 @@ services:
       - --entrypoints.websecure.http.tls.domains[0].main=*.bjw-s.dev
       - --providers.docker=true
       - --providers.docker.exposedByDefault=false
+      - --providers.file.directory=/etc/traefik/dynamic
+    configs:
+      - source: truenas-s3
+        target: /etc/traefik/dynamic/truenas-s3.yaml
     container_name: traefik
     environment:
       - OVH_ENDPOINT=ovh-eu
@@ -25,6 +38,12 @@ services:
       - OVH_APPLICATION_SECRET=${OVH_APPLICATION_SECRET}
       - OVH_CONSUMER_KEY=${OVH_CONSUMER_KEY}
     image: ghcr.io/traefik/traefik:v3.7.19@sha256:aa942a00bce033c909bf1f7e861d93761be4b31a035f10d2410d33e38a8f41cf
+    labels:
+      dexd.enabled: 'true'
+      traefik.enable: 'true'
+      traefik.http.routers.truenas-s3.priority: '1000'
+      traefik.http.routers.truenas-s3.rule: Host(`s3.bjw-s.dev`)
+      traefik.http.routers.truenas-s3.service: truenas-s3@file
     networks:
       - apps
     ports:
