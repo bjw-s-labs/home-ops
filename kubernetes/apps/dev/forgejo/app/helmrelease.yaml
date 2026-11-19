@@ -28,6 +28,12 @@ spec:
           RUN_AT_START: true
           SCHEDULE: "@every 1h"
           OLDER_THAN: 2h
+        database:
+          DB_TYPE: postgres
+          HOST: forgejo-postgres-rw.dev.svc.cluster.local:5432
+          NAME: forgejo
+          SSL_MODE: require
+          USER: forgejo
         indexer:
           ISSUE_INDEXER_TYPE: bleve
           REPO_INDEXER_ENABLED: true
@@ -86,6 +92,15 @@ spec:
           THEMES: forgejo-auto,forgejo-light,forgejo-dark,melosso,melosso-dark,melosso-light
         webhook:
           ALLOWED_HOST_LIST: "*"
+      additionalConfigFromEnvs:
+        # The chart renders gitea.config.database verbatim into app.ini, so the
+        # password is injected from the CNPG app secret as an env var and mapped
+        # into [database] PASSWD by environment-to-ini (FORGEJO__DATABASE__PASSWD).
+        - name: FORGEJO__DATABASE__PASSWD
+          valueFrom:
+            secretKeyRef:
+              name: forgejo-postgres-app
+              key: password
       oauth:
         - name: kanidm
           adminGroup: forgejo_admins@idm.bjw-s.dev

@@ -7,16 +7,25 @@ metadata:
 spec:
   components:
     - ../../../../components/anubis
+    - ../../../../components/cnpg/pg18
     - ../../../../components/kopiur/backup
     - ../../../../components/valkey
   dependsOn:
+    - name: cloudnative-pg-barman-plugin
+      namespace: database
     - name: kanidm-instance
       namespace: security
+  healthCheckExprs:
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')
+      current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
   interval: 1h
   path: "./kubernetes/apps/dev/forgejo/app"
   postBuild:
     substitute:
       APP: forgejo
+      CNPG_CAPACITY: 8Gi
       KOPIUR_MOVER_UID: "1000"
       KOPIUR_MOVER_GID: "1000"
       KOPIUR_CAPACITY: 10Gi

@@ -1,0 +1,39 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: forgejo-egress
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: forgejo
+      app.kubernetes.io/instance: forgejo
+  egress:
+    # PostgreSQL for the app database (CNPG cluster forgejo-postgres).
+    - toEndpoints:
+        - matchLabels:
+            k8s:cnpg.io/cluster: forgejo-postgres
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # Valkey/Dragonfly for cache, queue and sessions.
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: forgejo-valkey
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+    # Kanidm for the OIDC login flow.
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-external
+      toPorts:
+        - ports:
+            - port: "10443"
+              protocol: TCP
+          serverNames:
+            - idm.bjw-s.dev
