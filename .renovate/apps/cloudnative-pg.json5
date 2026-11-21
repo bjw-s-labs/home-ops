@@ -1,5 +1,20 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  // CNPG uses imageName rather than image, so the Kubernetes manager misses it.
+  // Capture only the tag: the generic annotation manager would capture the entire
+  // registry/name:tag reference as currentValue, which is not a Docker version.
+  customManagers: [
+    {
+      customType: "regex",
+      description: "Track CloudNativePG PostgreSQL image tags and optional digests",
+      managerFilePatterns: ["/^kubernetes/.+\\.ya?ml$/"],
+      matchStrings: [
+        "imageName:[ \\t]*[\"']?(?<depName>ghcr\\.io/cloudnative-pg/postgresql):(?<currentValue>[^\\s\"'@]+)(?:@(?<currentDigest>sha256:[a-f0-9]{64}))?",
+      ],
+      datasourceTemplate: "docker",
+      versioningTemplate: "docker",
+    },
+  ],
   packageRules: [
     {
       // The PostgreSQL major is encoded in the components/cnpg/pgNN directory and is
