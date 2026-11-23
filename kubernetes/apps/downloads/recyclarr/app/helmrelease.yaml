@@ -35,6 +35,8 @@ spec:
           failedJobsHistory: 1
           successfulJobsHistory: 0
         pod:
+          labels:
+            egress.policy.home.arpa/internet: "true"
           securityContext:
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
@@ -65,6 +67,34 @@ spec:
               capabilities:
                 drop:
                   - ALL
+    networkpolicies:
+      recyclarr:
+        type: cilium
+        egress:
+          - toEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: downloads
+                  app.kubernetes.io/name: radarr
+            toPorts:
+              - ports:
+                  - port: "7878"
+                    protocol: TCP
+          - toEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: downloads
+                  app.kubernetes.io/name: sonarr
+            toPorts:
+              - ports:
+                  - port: "8989"
+                    protocol: TCP
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/controller: recyclarr
+            app.kubernetes.io/instance: recyclarr
+            app.kubernetes.io/name: recyclarr
+        enableDefaultDeny:
+          ingress: true
+        ingress: []
     persistence:
       config:
         existingClaim: recyclarr-config

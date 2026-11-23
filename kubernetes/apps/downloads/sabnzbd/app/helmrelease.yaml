@@ -40,6 +40,8 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
+          labels:
+            egress.policy.home.arpa/internet: "true"
           securityContext:
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
@@ -97,6 +99,43 @@ spec:
               capabilities:
                 drop:
                   - ALL
+    networkpolicies:
+      sabnzbd:
+        type: cilium
+        # Preserve the configured completion hook if cross-seed is restored.
+        egress:
+          - toEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: downloads
+                  app.kubernetes.io/name: cross-seed
+            toPorts:
+              - ports:
+                  - port: "2468"
+                    protocol: TCP
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/controller: sabnzbd
+            app.kubernetes.io/instance: sabnzbd
+            app.kubernetes.io/name: sabnzbd
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: downloads
+                  k8s:app.kubernetes.io/controller: radarr
+                  k8s:app.kubernetes.io/instance: radarr
+                  k8s:app.kubernetes.io/name: radarr
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: downloads
+                  k8s:app.kubernetes.io/controller: sonarr
+                  k8s:app.kubernetes.io/instance: sonarr
+                  k8s:app.kubernetes.io/name: sonarr
+            toPorts:
+              - ports:
+                  - port: "8080"
+                    protocol: TCP
     persistence:
       config:
         existingClaim: sabnzbd-config

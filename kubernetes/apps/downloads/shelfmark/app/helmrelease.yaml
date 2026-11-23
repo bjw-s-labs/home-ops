@@ -13,6 +13,8 @@ spec:
     controllers:
       shelfmark:
         pod:
+          labels:
+            egress.policy.home.arpa/internet: "true"
           securityContext:
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
@@ -71,6 +73,23 @@ spec:
               capabilities:
                 drop:
                   - ALL
+    networkpolicies:
+      shelfmark:
+        type: cilium
+        endpointSelector:
+          matchLabels:
+            app.kubernetes.io/controller: shelfmark
+            app.kubernetes.io/instance: shelfmark
+            app.kubernetes.io/name: shelfmark
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  k8s:io.kubernetes.pod.namespace: network
+                  gateway.networking.k8s.io/gateway-name: envoy-internal
+            toPorts:
+              - ports:
+                  - port: "8084"
+                    protocol: TCP
     persistence:
       config:
         existingClaim: shelfmark
