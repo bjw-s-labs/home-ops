@@ -77,7 +77,41 @@ secrets:
 skills:
   external_dirs:
     - /opt/data/shared/skills
+  index_desc_limit: 1024
 ```
+
+`skills.index_desc_limit` sets how many characters of each skill description
+Hermes shows the model in the skill index. The default is 60, which cuts off most
+descriptions of the shared skills. Hermes reads the value from the active profile.
+
+### Simple English output style
+
+The `simple-english` skill from
+[AminBlg/SimpleEnglish](https://github.com/AminBlg/SimpleEnglish) is installed on
+the PVC at `/opt/data/shared/skills/simple-english`, pinned to tag `v2.1.2`. A
+skill loads only on demand, so the always-on style is a Hermes personality (a named
+prompt overlay). The `homelab-operator` and `workshop` profiles define it in their
+own `config.yaml`:
+
+```yaml
+agent:
+  personalities:
+    simple-english:
+      description: Plain English in the spirit of ASD-STE100
+      system_prompt: |
+        <body of output-styles/simple-english.md from the pinned tag>
+
+display:
+  personality: simple-english
+```
+
+`display.personality` is the default personality of the profile. `/personality none`
+turns the style off and `/personality simple-english` turns it on again. Hermes
+saves that choice to `display.personality`, so it also applies to later sessions.
+
+To update, copy `skills/simple-english/` from the new upstream tag to the shared
+skills folder. Then replace the `system_prompt` text in each profile with the new
+body of `output-styles/simple-english.md`. Keep both on the same tag.
 
 ### Recovery from stripped profile settings
 
